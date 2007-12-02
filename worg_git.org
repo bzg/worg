@@ -8,21 +8,118 @@
 #+PRIORITIES: A C B
 #+CATEGORY:   worg
 
+* What is git?  
 
-* Install git
-* Clone Worg 
-* Edit Worg
+[[http://git.or.cz][git]] is a fast version control system that let you collaborate on a
+project.  For details on how using git, go and read the [[http://www.kernel.org/pub/software/scm/git/docs/tutorial.html][git tutorial]].
+For details on the public git repository, go and read the [[http://repo.or.cz/about.html][about page]] of
+http://repo.or.cz/.
 
-* Merge your changes
-  
-Push your files:
+* The first time you contribute to Worg
 
-http://repo.or.cz/w/Worg.git
+1. Register a new account on the git public repository (where worg
+   lives): http://repo.or.cz/m/reguser.cgi
 
-#FIXME check
+2. Install git on your system.
 
-git push git+ssh://git.repo.cz/Worg.git/ 
+3. Clone the project somewhere in a working directory:
 
-* Can I undo my changes?
-* What if two people edit Worg at the same time?
-* Can I have private sections in Worg?
+   :~$ git clone git+ssh://repo.or.cz/srv/git/Worg.git
+
+4. Go to the newly created =Worg/= directory and edit the files
+
+5. Add new files to the index: 
+
+   :~$ git add *.org
+
+6. Get a diff a the change you've just made:
+
+   :~$ git diff --cached
+
+7. Commit changes with the appropriate ChangeLog:
+
+  :~$ git commit -a -m "My changelog"
+
+8. Push your change to Worg:
+
+  :~$ git push
+
+* Editing Worg from an existing working directory
+
+1. Update your Worg directory:
+
+   :~$ git pull
+
+   Note: this is the equivalent of =cvs update= and will complain if
+   there are conflicts between your working directory and the remote
+   Worg directory.
+
+2. Edit the files
+
+3. Add new files (=git-add=) and commit your changes (=git-commit=)
+
+4. Push your Worg directory
+
+   :~$ git push
+
+You're done!
+
+* Anonymous editing through the "mob" user/branch
+
+If you don't want to register a new account on =repo.or.gz= but still
+want to suggest modifications on Worg, you can do this by editing the
+"mob" branch of Worg.  For details about the =mob= user, check [[http://repo.or.cz/mob.html][this
+webpage]] on repo.or.cz
+
+This branch is usually empty, since interesting changes are quickly
+merged into the master branch.  But it is important to make sure that
+you pull all changes in any existing =mob= branch before trying to push
+yours. 
+
+1. Clone the Worg project as the =mob= user:
+
+   :~$ git clone git+ssh://mob@repo.or.cz/srv/git/Worg.git
+
+2. Check out the "mob" branch to avoid conflicts between the =mob=
+   branch that you will soon create and any existing =mob= branch:
+
+   :~$ git checkout origin/mob
+
+   You should get this warning:
+
+   : Note: moving to "origin/mob" which isn't a local branch
+   : If you want to create a new branch from this checkout, you may do so
+   : now or later) by using -b with the checkout command again. Example:
+   : git checkout -b <new_branch_name>
+
+   Don't worry.
+
+3. Create a new branch named =mob= from this checkout:
+
+   :~$ git checkout -b mob
+
+4. Edit the files, add new files (=git-add=) and commit (=git-commit=)
+   them as usual.
+
+5. Push the =mob= branch into the Worg remote directory:
+
+   :~$ git push origin mob
+
+You're done!
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+# FIXME:
+# What if two people edit Worg at the same time?
+# Can I have private sections in Worg?
