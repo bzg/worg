@@ -1,0 +1,51 @@
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TITLE: Creating a SSH-key in repo.or.cz
+#+AUTHOR: Worg people
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+EMAIL:      bzg AT altern DOT org
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+#+OPTIONS:   H:3 num:nil toc:t \n:nil @:t ::t |:t ^:nil -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+
+
+To [[http://repo.or.cz/m/reguser.cgi][register]] in http://repo.or.cz/ you need to have a SSH key. What's that and how can you create one?
+
+A /public key/ is like a door lock, and a /private key/ is like the key. =Repo.or.cz= is asking you for the /public key/, that means, they ask you to provide a lock, and they will install your lock in their server. Then, with your /private key/ you will be able to open a connection to the server.
+
+Your /private key/ may be easy to use: just /have it/, and you can use it to open the lock.
+But suppose you lose it; then it's not secure anymore; any person which has the key (which is a file) can connect to the server supplanting your identity.
+Therefore, at the computer we do that the /private key/ has a /password/ (also called „passphrase“). Then, you do not only need to possess the key to open the lock; you also need to know how to use it (that means, you must have the /public key/ *and* know the password).
+So: *use a passphrase* for more security.
+
+*** Steps to create your private and public keys for repo.or.cz
+
+1. Run =ssh-keygen= with no parameters. If you want to change the encryption algorithm used, see [[*RSA or DSA][the section below]].
+2. /Location of the key/: just press enter
+3. /Passphrase of the key/: enter your new password; the one you will type each time to be able to connect. You can have no password at all, but it's not recommended; read the description at the introduction to know why.
+4. Now you have 2 new files:
+ - =id_rsa=: that's your new private key. Don't share it!
+ - =id_rsa.pub=: that's your new /public key/. You can distribute it.
+ - You will also see a /fingerprint/ (like =31:c0:5a:92:70:5e:91=... etc).
+5. Look at the public key. If you don't like the user name which appears at the end, re-run =ssh-keygen -C "comment that you want"=
+6. Copy and paste the /public/ key (the contents of =id_rsa.pub=) in the text box in http://repo.or.cz/m/reguser.cgi
+7. In „/login/“, write the user name you want to have in this server
+8. Write also your e-mail
+9. Click the button „/Register/“
+10. Now you must ask the administrator to give you „push“-access: to allow you to upload contents to the project.
+
+
+*** RSA or DSA?
+
+You can decide if at the key creation you want to use the algorithm RSA or the algorithm DSA.
+If you know which one you like, you're lucky; use it!
+If not, decide one; both will work.
+By default, =ssh-keygen= uses RSA,
+but you can use =ssh-keygen -t dsa= to use DSA.
+
+
+# ----------------------------
+#
+# Started at 11.12.2007 by Daniel Clemente. This text is in the public domain.
+
