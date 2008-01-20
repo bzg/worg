@@ -4,7 +4,7 @@
 ;;
 ;; Emacs Lisp Archive Entry
 ;; Filename: org-export-latex.el
-;; Version: 5.19
+;; Version: 5.19a
 ;; Author: Bastien Guerry <bzg AT altern DOT org>
 ;; Maintainer: Bastien Guerry <bzg AT altern DOT org>
 ;; Keywords: org, wp, tex
@@ -626,9 +626,9 @@ OPT-PLIST is the options plist for current buffer."
      (when org-export-latex-packages-alist
        (mapconcat (lambda(p)
 		    (if (equal "" (car p))
-			(format "\\usepackage{%s}" (cadr p))
-		      (format "\\usepackage[%s]{%s}"
-			      (car p) (cadr p))))
+			(format "\\usepackage{%s}" (cdr p))
+		      (format "\\usepackage[%s]{%s}\n"
+			      (car p) (cdr p))))
 		  org-export-latex-packages-alist "\n"))
      ;; insert additional commands in the header
      org-export-latex-append-header
