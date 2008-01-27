@@ -328,7 +328,7 @@ in a window.  A non-interactive call will only retunr the buffer."
       rtn)))
 
 ;;;###autoload
-(defun org-export-as-latex (arg &optional hidden ext-plist
+(defun org-export-as-latex (&optional arg hidden ext-plist
 				to-buffer body-only)
   "Export current buffer to a LaTeX file.
 If there is an active region, export only the region.  The prefix
