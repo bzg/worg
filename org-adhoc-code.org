@@ -1,0 +1,78 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE:      [No title for now, please update]
+#+AUTHOR:     Worg people
+#+EMAIL:      bzg AT altern DOT org
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+# This file is the default header for new Org files in Worg.  Feel free
+# to tailor it to your needs.
+
+[[file:index.org][{Back to Worg's index}]]
+
+This page is for ad hoc bits of code.
+
+* Automatically add an appointment when clocking in a task
+
+:;; Make sure you have a sensible value for `appt-message-warning-time'
+:(defvar bzg-org-clock-in-appt-delay 100
+:  "Number of minutes for setting an appointment by clocking-in")
+
+This function let's you add an appointment for the current entry.  
+This can be useful when you need a reminder.
+
+:(defun bzg-org-clock-in-add-appt (&optional n)
+:  "Add an appointment for the Org entry at point in N minutes."
+:  (interactive)
+:  (save-excursion
+:    (org-back-to-heading t)
+:    (looking-at org-complex-heading-regexp)
+:    (let* ((msg (match-string-no-properties 4))
+:	   (ct-time (decode-time))
+:	   (appt-min (+ (cadr ct-time) 
+:			(or n bzg-org-clock-in-appt-delay)))
+:	   (appt-time ; define the time for the appointment
+:	    (progn (setf (cadr ct-time) appt-min) ct-time)))
+:      (appt-add (format-time-string  
+:		 "%H:%M" (apply 'encode-time appt-time)) msg)
+:      (if (interactive-p) (message "New appointment for %s" msg)))))
+
+You can advise =org-clock-in= so that =C-c C-x C-i= will automatically
+add an appointment:
+
+:(defadvice org-clock-in (after org-clock-in-add-appt activate)
+:  "Add an appointment when clocking a task in."
+:  (bzg-org-clock-in-add-appt))
+
+You may also want to delete the associated appointment when clocking
+out.  This function does this:
+
+:(defun bzg-org-clock-out-delete-appt nil
+:  "When clocking out, delete any associated appointment."
+:  (interactive)
+:  (save-excursion
+:    (org-back-to-heading t)
+:    (looking-at org-complex-heading-regexp)
+:    (let* ((msg (match-string-no-properties 4)))
+:      (setq appt-time-msg-list
+:	    (delete nil 
+:		    (mapcar 
+:		     (lambda (appt)
+:		       (if (not (string-match (regexp-quote msg) 
+:					      (cadr appt))) appt))
+:		     appt-time-msg-list)))
+:      (appt-check))))
+
+And here is the advice for =org-clock-out= (=C-c C-x C-o=)
+
+:(defadvice org-clock-out (before org-clock-out-delete-appt activate)
+:  "Delete an appointment when clocking a task out."
+:  (bzg-org-clock-out-delete-appt))
+
+*IMPORTANT*: You can add appointment by clocking in in both an
+=org-mode= and an =org-agenda-mode= buffer.  But clocking out from
+agenda buffer with the advice above will bring an error.  
