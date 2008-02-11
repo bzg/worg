@@ -15,7 +15,7 @@ is a set of Org files collectively edited by people who like Org-mode and
 want to share tutorials, ideas, code snippets, etc.
 
 #+BEGIN: timestamp :string "Last update: " :format "%Y-%m-%d @ %H:%M"
-Last update: 2008-02-11 @ 01:15
+Last update: 2008-02-11 @ 01:55
 #+END:
 
 # For this dynamic block to work, you need to add elisp/worg.el in your
@@ -66,6 +66,36 @@ The Org mailing list is very active.
 <input type="submit" value="Search gmane.emacs.orgmode">
 </form>
 #+END_HTML
+
+Last messages from the mailing list:
+
+#+BEGIN_HTML
+<?php
+
+define('MAGPIE_DIR', '../../wikiprof.net/magpie/');
+require_once(MAGPIE_DIR.'rss_fetch.inc');
+$url1 = "http://www.wikiprof.net/carnet/rss.xml";
+
+if ( $url1 ) {
+	$rss1 = fetch_rss( $url1 );
+	echo
+	"<div
+	class=\"node\"><h3
+	class=\"nodeTitle\"><a
+	href=\"http://www.wikiprof.net/carnet/\">Le carnet : les derniers billets du blog</a><a class=\"inscription\" title=\"C'est libre et gratuit !\" href=\"http://www.wikiprof.net/carnet/user/register\"><img src=\"/images/site/inscription.png\"></a></h3>\n\n";
+        echo "<div class=\"content\">";
+	echo "<ul>\n";
+	foreach ($rss1->items as $item) {
+		$href1 = $item['link'];
+		$title1 = $item['title'];	
+		echo "<li><a class=\"feed\" href=\"$href1\">$title1</a></li>\n";
+	}
+	echo "</ul>\n</div>\n</div>\n";}
+?>
+#+END_HTML
+	  
+</body>
+</html>
 
 
 
