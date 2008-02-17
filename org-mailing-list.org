@@ -1,0 +1,54 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE:      Org mailing list
+#+AUTHOR:     Worg people
+#+EMAIL:      bzg AT altern DOT org
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+# This file is the default header for new Org files in Worg.  Feel free
+# to tailor it to your needs.
+
+[[file:index.org][{Back to Worg's index}]]
+
+* Search in Org mailing list
+
+The [[file:org-mailing-list.org][Org mailing list]] is very active.  
+
+#+BEGIN_HTML
+<form method="get" action="http://search.gmane.org/">
+<input type="text" name="query">
+<input type="hidden" name="group" value="gmane.emacs.orgmode">
+<input type="submit" value="Search gmane.emacs.orgmode">
+</form>
+#+END_HTML
+
+* Last messages from the mailing list
+
+#+BEGIN_HTML
+<?php
+ 
+define('MAGPIE_DIR', '/home/guerry/wikiprof.net/magpie/');
+require_once(MAGPIE_DIR.'rss_fetch.inc');
+$url1 = "http://rss.gmane.org/topics/excerpts/gmane.emacs.orgmode";
+
+if ( $url1 ) 
+   {
+   $rss1 = fetch_rss( $url1 );
+   echo "<div><h3><a href=\"http://rss.gmane.org/topics/excerpts/gmane.emacs.orgmode\">";
+   echo "Org-mode mailing list</a></h3>\n\n";
+   echo "<div class=\"content\">";
+   echo "<ul>\n";
+
+   foreach ($rss1->items as $item) {
+            $href1 = $item['link'];
+	    $title1 = htmlentities($item['title']);	
+	    echo "<li><a class=\"feed\" href=\"$href1\">$title1</a></li>\n";
+	    }
+	    echo "</ul>\n</div>\n</div>\n";}
+?>
+#+END_HTML
+
