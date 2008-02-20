@@ -89,6 +89,17 @@ session containing your work!"
 
 http://article.gmane.org/gmane.emacs.orgmode/5276
 
+:(require 'term)
+:
+:(defun ash-org-goto-screen (name)                                              
+:  "Open the screen with the specified name in the window"                      
+:  (interactive "MScreen name: ")                                              
+:  (let ((screen-buffer-name (ash-org-screen-buffer-name name)))                
+:    (if (member screen-buffer-name                                            
+:                (mapcar 'buffer-name (buffer-list)))                          
+:        (switch-to-buffer screen-buffer-name)                                  
+:      (switch-to-buffer (ash-org-screen-helper name "-dr")))))  
+:
 :(defun ash-org-screen-buffer-name (name)
 :  "Returns the buffer name corresponding to the screen name given."
 :  (concat "*screen " name "*"))
