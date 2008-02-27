@@ -2,7 +2,7 @@
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
-#+TITLE:      Org as a spreadsheet system: introduction
+#+TITLE:      Org as a spreadsheet system: a short introduction
 #+AUTHOR:     Worg people
 #+EMAIL:      bzg AT altern DOT org
 #+LANGUAGE:   en
@@ -124,6 +124,18 @@ So now we have this table
 As our single formula in =#+TBLFM= now applies to the entire column,
 there is no reference to any row.  The formula was applied for the
 =@2$4= field, and is now applied for the =$4= column.
+
+Finally, we can add the field formulas to get the means in each
+discipline:
+
+:| Student  | Maths | Physics | Mean |
+:|----------+-------+---------+------|
+:| Bertrand |    13 |      09 |   11 |
+:| Henri    |    15 |      14 | 14.5 |
+:| Arnold   |    17 |      13 |   15 |
+:|----------+-------+---------+------|
+:| Means    |    15 |      12 |      |
+:#+TBLFM: $4=vmean($2..$3)::@5$2=vmean(@2$2..@4$2)::@5$3=vmean(@2$3..@4$3)
 
 * Interactively edit formulas
 
