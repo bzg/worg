@@ -66,24 +66,24 @@ you: =line @2, col $4, ref @2$4 or D2=, meaning that you are on the
 second row (or line) of the fourth column, and the reference for this
 field is either =@2$4= or =D2=.
 
-At any moment, if your lost in rows and columns, you can always turn
-on the reference visualization grid with =C-c }=:
+At any moment, if you are lost in rows and columns, you can always
+turn on the reference visualization grid with =C-c }=:
 
 [[file:/git/Worg/images/bzg/reference_visualization.jpg]]
 
 * Your first formula
 
-Put the cursor in the (empty) =[Formula]= field.  Now start type
+Put the cursor in the (empty) =[Formula]= field.  Now type
 ~=vmean($2..$3)~ in this field.  This formula means: calculate the
 /mean/ for fields from the second (=$2=) to the third (=$3=) field /in
 this row/.  If you prefer to use the other notation, type
-~=vmean(B&..C&)~ -- where the =&= character stands for /in this row/,
+~=vmean(B&..C&)~ -- where the =&= character stands for "in this row",
 (which is implicit in the previous notation.)
 
-While still in the row, hit =C-c C-c=: you should observe two things:
-the formula has been replaced by the result of the calculation and a
-new line starting with =#+TBLFM= has been inserted at the bottom of
-the table.
+While still in the row, hit =C-c C-c= -- you should observe two
+things: 1) the formula has been replaced by the result of the
+calculation and 2) a new line starting with =#+TBLFM= has been
+inserted at the bottom of the table.
 
 The =#+TBLFM= line contains all the formulas for the table above, and
 you should be careful while editing it manually.
@@ -99,23 +99,24 @@ Ok, so now we have this table:
 :| Arnold   |    17 |      13 |      |
 :#+TBLFM: @2$4=vmean($2..$3)
 
-But what we really want is to compute the formulas for /all fields/ in
-the column named "Mean" -- in other words, we really want a =column
-formula= not a =field formula=.
+But what we really want is to compute the formulas for /all fields in
+the column/ named "Mean".  In other words, we really want a =column
+formula=, not a =field formula=.
 
 To replace the formula with a column formula, go back to the field
 where it has been defined and type ~=vmean($2..$3)~.  Note that the
 only difference with what you've inserted previously is that the
 formula is prefixed by ~=~ instead of ~:=~.  When you're done, do a
 =C-c C-c= in the field: you should be prompted whether you want to
-replace the formula with a column formula.  
+replace the formula with a column formula, which is precisely what we
+want.
 
 Once you agree with this, the value in the field should be the same
 than before (namely =11=) and you can now update all the fields in
 this column by reapplying all formulas with =C-u C-c *= (or =C-c
 C-c= if you're on the =#+TBLFM= line.)
 
-So now we have this table
+So now we have this table:
 
 :| Student  | Maths | Physics | Mean |
 :|----------+-------+---------+------|
@@ -125,11 +126,13 @@ So now we have this table
 :#+TBLFM: $4=vmean($2..$3)
 
 As our single formula in =#+TBLFM= now applies to the entire column,
-there is no reference to any row.  The formula was applied for the
-=@2$4= field, and is now applied for the =$4= column.
+it doesn't contain any reference to a row.  The formula was previously
+applied for the =@2$4= field, and it is now applied for the =$4=
+column.
 
-Finally, we can add the field formulas to get the means in each
-discipline:
+Finally, we can add the row for the means per discipline.  This row
+contains two /field formulas/, each one calculating the mean for the
+fields above in the same column:
 
 :| Student  | Maths | Physics | Mean |
 :|----------+-------+---------+------|
