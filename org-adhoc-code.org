@@ -1,4 +1,4 @@
-#+OPTIONS:    H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c)
@@ -129,3 +129,40 @@ http://article.gmane.org/gmane.emacs.orgmode/5276
 :;; \"%s\")") to org-link-abbrev-alist.
 
 
+
+* Org Agenda + Appt + Zenity
+
+Russell Adams posted this setup [[http://article.gmane.org/gmane.emacs.orgmode/5806][on the list]].  It make sure your agenda
+appointments are known by Emacs, and it displays warnings in a [[http://live.gnome.org/Zenity][zenity]]
+popup window.
+
+:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+:; For org appointment reminders
+:
+:;; Get appointments for today
+:(defun my-org-agenda-to-appt ()
+:  (interactive)
+:  (setq appt-time-msg-list nil)
+:  (let ((org-deadline-warning-days 0))    ;; will be automatic in org 5.23
+:        (org-agenda-to-appt)))
+:
+:;; Run once, activate and schedule refresh
+:(my-org-agenda-to-appt)
+:(appt-activate t)
+:(run-at-time "24:01" nil 'my-org-agenda-to-appt)
+:
+:; 5 minute warnings
+:(setq appt-message-warning-time 15)
+:(setq appt-display-interval 5)
+:
+:; Update appt each time agenda opened.
+:(add-hook 'org-finalize-agenda-hook 'my-org-agenda-to-appt)
+:
+:; Setup zenify, we tell appt to use window, and replace default function
+:(setq appt-display-format 'window)
+:(setq appt-disp-window-function (function my-appt-disp-window))
+:
+:(defun my-appt-disp-window (min-to-app new-time msg)                      
+:  (save-window-excursion (shell-command (concat 
+:    "/usr/bin/zenity --info --title='Appointment' --text='" 
+:    msg "' &") nil nil)))
