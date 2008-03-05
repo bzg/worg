@@ -1,0 +1,40 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TITLE:      List of org-mode hooks - examples of use
+#+AUTHOR:     Worg people
+#+EMAIL:      bzg AT altern DOT org
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+# This file is the default header for new Org files in Worg.  Feel free
+# to tailor it to your needs.
+
+[[file:index.org][{Back to Worg's index}]]
+
+This is the list of Org-mode hooks with their default values:
+
+| Hook                             | Default value                       |
+|----------------------------------+-------------------------------------|
+| org-load-hook                    | nil                                 |
+| org-cycle-hook                   | '(org-cycle-hide-archived-subtrees) |
+| org-insert-heading-hook          | nil                                 |
+| org-occur-hook                   | '(org-first-headline-recenter)      |
+| org-follow-link-hook             | nil                                 |
+| org-after-todo-state-change-hook | nil                                 |
+| org-finalize-agenda-hook         | nil                                 |
+
+Feel free to give example of how do you use these hooks.  Ideas for
+other hooks are also welcome.
+
+* org-follow-link-hook						 :bzg:
+
+If  you want to display dormant article when following Gnus articles:
+
+:(add-hook 'org-follow-link-hook 
+:	  (lambda () (if (eq major-mode gnus-summary-mode) 
+:			 (gnus-summary-insert-dormant-articles))))
+
+
+# org-add-hook?
