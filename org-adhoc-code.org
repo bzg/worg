@@ -182,3 +182,23 @@ http://article.gmane.org/gmane.emacs.orgmode/5073
 :agenda views.  The default of using 13 months look ahead is easily
 :changed. It just happens I sometimes like to look a year into the
 :future. :-)
+
+* org-remember-anything
+
+[[http://www.emacswiki.org/cgi-bin/wiki/Anything][Anything]] users may find the snippet below interesting: 
+
+:(defvar org-remember-anything
+:  '((name . "Org Remember")
+:    (candidates . (lambda () (mapcar 'car org-remember-templates)))
+:    (action . (lambda (name)
+:                (let* ((orig-template org-remember-templates)
+:                       (org-remember-templates
+:                        (list (assoc name orig-template))))
+:                  (call-interactively 'org-remember))))))
+
+You can add it to your 'anything-sources' variable and open remember directly
+from anything. I imagine this would be more interesting for people with many
+remember templatesm, so that you are out of keys to assign those to. You should
+get something like this:
+
+[[file:images/thumbs/org-remember-anything.png]]
