@@ -129,7 +129,6 @@ http://article.gmane.org/gmane.emacs.orgmode/5276
 :;; \"%s\")") to org-link-abbrev-alist.
 
 
-
 * Org Agenda + Appt + Zenity
 
 Russell Adams posted this setup [[http://article.gmane.org/gmane.emacs.orgmode/5806][on the list]].  It make sure your agenda
@@ -202,3 +201,18 @@ remember templatesm, so that you are out of keys to assign those to. You should
 get something like this:
 
 [[file:images/thumbs/org-remember-anything.png]]
+
+* Reload Org
+
+This function by Bernt Hansen reloads Org's compiled files.  This is
+useful when you update and compile Org often.
+
+:;; Your org-mode directory
+:(setq my-org-mode-git-directory "~/git/org-mode")
+:
+:(defun org-reload-org nil
+:  "Reload Org lisp files."
+:  (interactive)
+:  (mapc (lambda(f) (load (car f)))
+:	(directory-files-and-attributes 
+:	  (concat my-org-mode-git-directory "/lisp") t "\\.elc\\'")))
