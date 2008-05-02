@@ -207,12 +207,38 @@ get something like this:
 This function by Bernt Hansen reloads Org's compiled files.  This is
 useful when you update and compile Org often.
 
+By default it reloads compiled org files.  If you call it with a prefix
+argument it reloads source files.
+
 :;; Your org-mode directory
+
 :(setq my-org-mode-git-directory "~/git/org-mode")
 :
+:(defun org-reload-org (&optional source)
+:  "Reload Compiled Org lisp files."
+:  (interactive "p")
+:  (message "source is %s" source)
+:  (if (equal source 4)
+:      (setq my-org-files "\\.el\\'")
+:    (setq my-org-files "\\.elc\\'"))
+:  (mapc (lambda(f) (load (car f)))
+:	(directory-files-and-attributes (concat my-org-mode-git-directory "/lisp") t my-org-files)))
+
 :(defun org-reload-org nil
 :  "Reload Org lisp files."
 :  (interactive)
 :  (mapc (lambda(f) (load (car f)))
 :	(directory-files-and-attributes 
 :	  (concat my-org-mode-git-directory "/lisp") t "\\.elc\\'")))
+
+Normally you want to use the compiled files since they are faster. If
+you run into a bug and want to generate a useful backtrace for the maintainer
+you can reload the source files and enter debugger on error with
+
+:C-u M-x org-reload-org
+
+and turn on the "Enter Debugger On Error" option.  Redo the action
+that generates the error and cut and paste the resulting backtrace
+into an email.  To switch back to the compiled version just reload again with
+
+:M-x org-reload-org
