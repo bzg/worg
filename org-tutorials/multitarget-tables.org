@@ -1,0 +1,169 @@
+#+TITLE: Using Org-Mode Table Formatting Functions
+#+AUTHOR: Jason Riedy
+#+EMAIL: jason@acm.org
+#+LANGUAGE: en
+#+TEXT: *Abstract:* Org-mode's ability to slice one table into many
+#+TEXT: separately formatted destinations helps keep documentation
+#+TEXT: and data in sync.  We provide an example using both the
+#+TEXT: multiple-target facilities and formatting with functions.
+#+TEXT: Side-effects in the functions gather header data necessary
+#+TEXT: for generating flexible SQL insertion statements.
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+PRIORITIES: A C B
+#+CATEGORY:   worg-tutorial
+
+[[file:../index.org][{Back to Worg's index}]]
+
+* Introduction
+
+In large-scale data analysis, one often associates integers with
+parameter name rather than strings.  The performance and storage
+difference is significant for multi-gigabyte data sets.  But
+integers are not at all convenient or descriptive.
+Systems like [[http://www.r-project.org][R]] provide a =factor= data type that translates the
+stored integers into user-level strings.
+Emulating that construct in SQL is handy for data transfer with [[http://www.sqlite.org][SQLite]]
+or out-of-core analysis in R using a [[http://cran.r-project.org/web/packages/SQLiteDF/index.html][SQL back-end]].
+That leaves the problem of maintaining a registry of integer level
+codes, string names, and documentation.
+
+[[http://orgmode.org][Org-mode]] provide a fast, light-weight table mechanism that can be sent
+in email, bundled with code, or embedded in documentation.  The tables
+can be transformed and placed elsewhere.  It sounds like a perfect
+registry, generating documentation and code from one data table.
+Similar techniques could be used in a multi-lingual document to store
+many translations in one table and send them to sections in specific
+languages.
+
+We start with a simple table:
+#+ORGTBL: SEND exdoc orgtbl-to-orgtbl :skipcols (2) :fmt (1 "=%s=") :hfmt (1 "%s")
+#+ORGTBL: SEND exsql orgtbl-to-sqlinsert :sqlname "extbl" :fmt (2 "%s") :tstart "#+BEGIN_EXAMPLE\nBEGIN TRANSACTION;" :tend "COMMIT;\n#+END_EXAMPLE"
+| Name  | Level | Description     |
+|-------+-------+-----------------|
+| normx |     1 | norm(x, \infty) |
+| normb |     2 | norm(b, \infty) |
+| normA |     3 | norm(A, \infty) |
+
+That one source table contains the documentation in the first and
+third column:
+#+BEGIN RECEIVE ORGTBL exdoc
+| Name | Description |
+|---
+| =normx= | norm(x, \infty) |
+| =normb= | norm(b, \infty) |
+| =normA= | norm(A, \infty) |
+#+END RECEIVE ORGTBL exdoc
+
+The first two columns of the source table provide the data we must
+transfer the SQL.  The third column can be used to embed some
+documentation into the table itself after the string is sanitized for
+SQL.  The remaining necessary information, the SQL destination table
+name, can be provided as a parameter to =#+ORGTBL: SEND=, producing
+the following code chunk:
+#+BEGIN RECEIVE ORGTBL exsql
+#+BEGIN_EXAMPLE
+BEGIN TRANSACTION;
+INSERT INTO extbl( Name, Level, Description ) VALUES ( 'normx' , 1 , 'norm(x, infty)' );
+INSERT INTO extbl( Name, Level, Description ) VALUES ( 'normb' , 2 , 'norm(b, infty)' );
+INSERT INTO extbl( Name, Level, Description ) VALUES ( 'normA' , 3 , 'norm(A, infty)' );
+COMMIT;
+#+END_EXAMPLE
+#+END RECEIVE ORGTBL exsql
+
+We will explain the parameters used to produce both outputs.  The SQL
+insertion statements use functions as formatting parameters, some of
+which are called purely for the side-effect of gathering the header
+fields.  The SQL-generating code is distributed with org-mode in
+=contrib/lisp/orgtbl-sqlinsert.el=.
+
+* Specifying multiple destinations for a single table
+
+Sending one table to multiple destinations is straight-forward.  Add
+one =SEND= directive for each destination.  For example, the first
+table has the following two directives prepended, with parameters
+described later:
+: #+ORGTBL: SEND exdoc orgtbl-to-orgtbl ...
+: #+ORGTBL: SEND exsql orgtbl-to-sqlinsert ...
+
+The documentation removes the second column and adds fiddly formatting
+parameters with
+: :skipcols (2) :fmt (1 "=%s=") :hfmt (1 "%s")
+
+The SQL-generating line gathers the destination table name and passes
+integers through unchanged with the parameters
+: :sqlname "extbl" :fmt (2 "%s")
+The SQL table name defaults to the name of the target, =exsql= in this
+case.  And the default formatting used for
+other columns is =orgtbl-sql-strip-and-quote=.  That routine only
+removes potentially non-portable constructs; it is not designed to
+prevent insertion attacks.
+We could apply =orgtbl-sql-strip-and-quote= to the first column of the
+documentation table to ensure the strings match exactly, but it
+easier to use simple, non-mangled strings as names.
+
+By default, a block of insertions is wrapped in =BEGIN TRANSACTION=
+and =COMMIT= statements.  These can be supressed by setting =:tstart=
+and =:tend= to =nil=.  The example used in this document uses a
+"double-embedding" trick to wrap the statement in an org-mode code block:
+: :tstart "#+BEGIN_EXAMPLE\nBEGIN TRANSACTION;"
+: :tend "COMMIT;\n#+END_EXAMPLE"
+Similar wrapping can embed the SQL statements into literate programs.
+There is built-in support for [[http://www.eecs.harvard.edu/nr/noweb/][Noweb]] with the =:nowebname= parameter.
+Setting =:nowebname= to a string wraps the insertions in a Noweb code
+chunk named with the string.
+
+* Formatting with functions for side effects and display
+
+The =orgtbl-to-sqlinsert= routine calls =orgtbl-to-generic= for all
+the generic table parsing.  The parameters provide an example of using
+functions for gathering data as well as formatting.  Emacs Lisp's
+dynamic binding allows manipulating any symbols in the current
+environment, so the formatting functions do not need to pass
+parameters through the outer functions.
+
+The default =:tstart= parameter is one example used strictly for
+formatting.  After the =:nowebname= parameter is decoded and bound to
+=nowebname=, it can be checked within a thunk to produce the starting
+string:
+: :tstart (lambda () (concat (if nowebname
+:                                (format "<<%s>>= \n" nowebname)
+:                              "")
+:                            "BEGIN TRANSACTION;"))
+
+The functions need not be pure.  The header formatting gathers the
+first header line into the variable =hdrlist= with
+: :hfmt (lambda (f) (progn (if firstheader (push f hdrlist)) ""))
+Then each line is preceded with a function that uses =hdrlist= to
+ensure data values are associated with named columns rather than just
+positions.
+: :lstart (lambda () (concat "INSERT INTO "
+:                            sqlname "( "
+:                            (mapconcat 'identity (reverse hdrlist)
+:                                       ", ")
+:                            " )" (if breakvals "\n" " ")
+:                                     "VALUES ( "))
+
+Note that =orgtbl-to-sqlinsert= takes advantage of org-mode's applying
+the formatting to each cell /before/ checking for a line-formatting
+function.  The header line itself and sectioning line are suppressed
+with the settings
+: :hlfmt (lambda (lst) (setq firstheader nil))
+: :hline nil
+: :remove-nil-lines t
+
+Similar techniques could be used to generate a table's SQL definition
+from the second header line.
+
+* Current limitations
+
+One current limitation is that all the tables are in the same Emacs
+buffer and hence the same text file.  A literate programming mechanism
+like [[http://www.eecs.harvard.edu/nr/noweb/][Noweb]] can separate the chunks.
+
+Also, the tables must be sent manually.  Writing a function that scans
+an entire buffer for all =SEND= and =RECEIVE= pairs is feasible, as is
+using [[http://www.gnu.org/software/emacs/elisp/html_node/Overlays.html][overlays]] to manage automatic updates.
+
