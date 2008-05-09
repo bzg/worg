@@ -18,7 +18,8 @@
  * <script type="text/javascript" language="JavaScript" src="org-info.js"></script>
  * <script type="text/javascript" language="JavaScript">
  *  <![CDATA[ // comment around this one
- *  org_html_manager.set("LOCAL_TOC", 1);
+ *  org_html_manager.set("LOCAL_TOC", "1");
+ *  org_html_manager.set("VIEW", "info");
  *  org_html_manager.set("VIEW_BUTTONS", "true");
  *  org_html_manager.set("LINK_UP", "http://full/path/to/index/of/this/directory.html");
  *  org_html_manager.set("LINK_HOME", "http://full/path/to/homepage.html");
@@ -28,25 +29,14 @@
  * </script>
  *
  * @todo
- * You may use the new export options template line #+INFOJS ...
+ * You may use the new export options template line #+INFOJS_OPT: view:info ...
  */
-
-var org_html_manager = new OrgHtmlManager();
-
-/**
- * Wait for document.body to be loaded and call org_html_manager.init().
- * In Opera document.body is true, even if not loaded (try with big big
- * file). This case is handled by the OrgHtmlManager class itself.
- */
-function OrgHtmlManagerLoadCheck()
-{
-  org_html_manager.init();
-}
 
 
 /**
  * Creates a new OrgNode.
- * An OrgOutline stores some refs to its assoziated node in the document tree.
+ * An OrgOutline stores some refs to its assoziated node in the document tree
+ * along with some additional properties.
  */
 function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
 {
@@ -232,611 +222,974 @@ OrgNode.prototype.setState = function (state)
   this.state = state;
 };
 
+
+
 /**
  * OrgManager manages OrgNodes.
  * We don't create anything in the constructor, since the document is not loaded
  * yet.
  */
-function OrgHtmlManager ()
-{
+var org_html_manager = {
   // Option
-  this.MOUSE_HINT;                     // Highlight heading under mouse?
-  this.PLAIN_VIEW = 0;                 // We're in plain view mode. On startup == overview
-  this.CONTENT_VIEW = 1;               // plain view show structure
-  this.ALL_VIEW = 2;                   // plain view show all
-  this.INFO_VIEW  = 3;                 // We're in info view mode
-  this.VIEW = this.OVER_VIEW;          // Default view mode (s. setup())
-  this.LOCAL_TOC = false;              // Create sub indexes (s. setup())
-  this.LINK_HOME;                      // Link to this.LINK_HOME?
-  this.LINK_UP;                        // Link to this.LINK_UP?
-  this.LINKS = "";                     // Prepare the links for later use (see setup);
-  this.RUN_MAX = 1200;                 // Max attempts to scan (results in ~2 minutes)
-  this.RUN_INTERVAL = 100;             // Interval of scans in milliseconds.
-  this.DEBUG = 0;                      // Gather and show debugging info?
-  this.WINDOW_BORDER = false;          // Draw a border aroung info window
-  this.HIDE_TOC = false;               // Hide the table of contents.
-  this.TOC_DEPTH = 0;                  // Level to cut the table of contents. No
-                                       // cutting if 0.
+  MOUSE_HINT: 0,               // Highlight heading under mouse?
+  PLAIN_VIEW: 0,               // We're in plain view mode. On startup:= overview
+  CONTENT_VIEW: 1,             // plain view show structure
+  ALL_VIEW: 2,                 // plain view show all
+  INFO_VIEW : 3,               // We're in info view mode
+  VIEW: this.OVER_VIEW,        // Default view mode (s. setup())
+  LOCAL_TOC: false,            // Create sub indexes (s. setup())
+  LINK_HOME: 0,                // Link to this.LINK_HOME?
+  LINK_UP: 0,                  // Link to this.LINK_UP?
+  LINKS: "",                   // Prepare the links for later use (see setup),
+  RUN_MAX: 1200,               // Max attempts to scan (results in ~2 minutes)
+  RUN_INTERVAL: 100,           // Interval of scans in milliseconds.
+  DEBUG: 0,                    // Gather and show debugging info?
+  WINDOW_BORDER: false,        // Draw a border aroung info window
+  HIDE_TOC: false,             // Hide the table of contents.
+  TOC_DEPTH: 0,                // Level to cut the table of contents. No cutting if 0.
 
   // Private
-  this.BASE_URL = document.URL;        // URL without '#sec-x.y.z'
-  this.START_SECTION = 0;              // Will be evtl. recomputed from '#sec-x.y.z'
-  this.ROOT;                           // Root element or our OrgNode tree
-  this.NODE;                           // The current node
-  this.TITLE;                          // Save the title for hide/show
-  this.LOAD_CHECK = null;              // Saves the setTimeout()'s value
-  this.WINDOW;                         // A div to display info view mode
-  this.SECS = new Array();             // The OrgNode tree
-  this.REGEX = /(#sec\-)([\d\.]*)$/;   // identify a section link in toc
-  this.EXCHANGE = /(sec-[\d\.]*)$/;    // extract the section number
-  this.UNTAG_REGEX = /<[^>]+>/i;       // Remove HTML tags
-  this.EMPTY_START = /^(\s*)(.*)/;     // Trim (s. getKey())
-  this.EMPTY_END = /\s$/;              // Trim (s. getKey())
-  this.SECEX = /([\d\.]*)/;            // Section number (command 's')
-  this.TOC = null;                     // toc.
-  this.runs = 0;                       // Count the scan runs.
-  this.HISTORY = new Array(50);        // Save navigation history.
-  this.HIST_INDEX = 0;
-  this.SKIP_HISTORY = false;           // popHistory() set's this to true.
-  this.FIXED_TOC = false;              // Leave toc alone if position=[fixed|absolute]?
+  BASE_URL: document.URL,      // URL without '#sec-x.y.z'
+  START_SECTION: 0,            // Will be evtl. recomputed from '#sec-x.y.z'
+  ROOT: null,                  // Root element or our OrgNode tree
+  NODE: null,                  // The current node
+  TITLE: null,                 // Save the title for hide/show
+  LOAD_CHECK: null,            // Saves the setTimeout()'s value
+  WINDOW: null,                // A div to display info view mode
+  SECS: new Array(),           // The OrgNode tree
+  REGEX: /(#sec\-)([\d\.]*)$/, // identify a section link in toc
+  EXCHANGE: /(sec-[\d\.]*)$/,  // extract the section number
+  UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
+  EMPTY_START: /^(\s*)(.*)/,   // Trim (s. getKey())
+  EMPTY_END: /\s$/,            // Trim (s. getKey())
+  SECEX: /([\d\.]*)/,          // Section number (command 's')
+  TOC: null,                   // toc.
+  runs: 0,                     // Count the scan runs.
+  HISTORY: new Array(50),      // Save navigation history.
+  HIST_INDEX: 0,
+  SKIP_HISTORY: false,         // popHistory() set's this to true.
+  FIXED_TOC: false,            // Leave toc alone if position=[fixed|absolute]?
   // Debugging:
-  this.debug = "";                     // Will be shown after every scan, if not empty
-  // Debugging levels:
-  this.DEBUG_FATAL = 1;                // Fatale Fehler anzeigen.
-  this.DEBUG_BUILD = 1 << 5;
-  this.DEBUG_TREE = 1 << 10;
-  this.WINDOW_BORDER = false;          // Draw a border aroung info window
+  debug: "",                   // Will be shown after every scan, if not empty
+  DEBUG_FATAL: 1,              // Fatale Fehler anzeigen.
+  DEBUG_BUILD: 1 << 5,
+  DEBUG_TREE: 1 << 10,
+  WINDOW_BORDER: false,        // Draw a border aroung info window
   // Commands:
-  this.CONSOLE;                        // The div containing the minibuffer.
-  this.CONSOLE_INPUT = null;
-  this.command_str = "";
-  this.console_first_time = true;      // Cookie would be cool maybe.
-  this.MESSAGING;                      // Is there a message in the console?
-  this.MESSAGING_INPLACE = 1;
-  this.MESSAGING_TOP = 2;
-}
+  CONSOLE: null,               // The div containing the minibuffer.
+  CONSOLE_INPUT: null,
+  command_str: "",
+  console_first_time: true,    // Cookie would be cool maybe.
+  MESSAGING:0,                 // Is there a message in the console?
+  MESSAGING_INPLACE: 1,
+  MESSAGING_TOP: 2,
+  // show help:
+  helping:false,
+  last_view_mode:0,
 
 
-/**
- * Setup the OrgHtmlManager for scanning.
- * Here the timeout function gets set, that tells the wakes up org_html_mager
- * for the next attempt to scan the document.
- * All user setable config vars (the documented ones) are checked and adjusted
- * to a legal value.
- */
-OrgHtmlManager.prototype.setup = function ()
-{
-  this.VIEW  = this.VIEW ? this.VIEW : this.PLAIN_VIEW;
-  this.VIEW_BUTTONS = (this.VIEW_BUTTONS && this.VIEW_BUTTONS != "0") ? true : false;
-  this.LOCAL_TOC = (this.LOCAL_TOC && this.LOCAL_TOC != "0") ? true : false;
-  this.HIDE_TOC = (this.TOC && this.TOC != "0") ? false : true;
-  // this.BASE_URL = document.URL;
-  // make HIDE_TOC the min. index in this.SECS:
+  /**
+   * Setup the OrgHtmlManager for scanning.
+   * Here the timeout function gets set, that tells the wakes up org_html_mager
+   * for the next attempt to scan the document.
+   * All user setable config vars (the documented ones) are checked and adjusted
+   * to a legal value.
+   */
+  setup: function ()
+  {
+    this.VIEW  = this.VIEW ? this.VIEW : this.PLAIN_VIEW;
+    this.VIEW_BUTTONS = (this.VIEW_BUTTONS && this.VIEW_BUTTONS != "0") ? true : false;
+    this.LOCAL_TOC = (this.LOCAL_TOC && this.LOCAL_TOC != "0") ? true : false;
+    this.HIDE_TOC = (this.TOC && this.TOC != "0") ? false : true;
 
-  this.LINKS +=
+    this.LINKS +=
     ((this.LINK_UP && this.LINK_UP != document.URL) ? '<a href="'+this.LINK_UP+'">Up</a> / ' : "")
-  + ((this.LINK_HOME && this.LINK_HOME != document.URL) ? '<a href="'+this.LINK_HOME+'">HOME</a> / ' : "");
+      + ((this.LINK_HOME && this.LINK_HOME != document.URL) ? '<a href="'+this.LINK_HOME+'">HOME</a> / ' : "");
 
-  this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", 50);
-};
+    this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", 50);
+  },
 
 
-OrgHtmlManager.prototype.removeTags = function (str)
-{
-  while(str.match(this.UNTAG_REGEX)) {
+  removeTags: function (str)
+  {
+    while(str.match(this.UNTAG_REGEX)) {
       str = str.substr(0, str.indexOf('<')) + str.substr(str.indexOf('>') + 1);
       if(this.DEBUG > 5) this.debug += str + "\n";
-  }
-  return str;
-};
-
-
-OrgHtmlManager.prototype.init = function ()
-{
-  this.runs++;
-  if(1 ==  this.runs) {
-    this.WINDOW = document.createElement("div");
-    if(this.WINDOW_BORDER) this.WINDOW.style.border="1px dashed black";
-  }
-  var theIndex = document.getElementById('table-of-contents');
-  var scanned_all = false;
-  if(null != theIndex) {
-    if(this.initFromTOC()) {
-      scanned_all = true;
     }
-  }
+    return str;
+  },
 
 
-  if(this.BASE_URL.match(this.REGEX)) {
-    // cut the '#sec-x.y.z' from base url.
-    var matches = this.EXCHANGE.exec(this.BASE_URL);
-    var id = matches[1].substr(4);
-    for(var i=0;i<this.SECS.length;++i) {
-      if(this.SECS[i].base_id == id) {
-        this.START_SECTION = i;
-        break;
+  init: function ()
+  {
+    this.runs++;
+    if(1 ==  this.runs) {
+      this.WINDOW = document.createElement("div");
+      if(this.WINDOW_BORDER) this.WINDOW.style.border="1px dashed black";
+    }
+    var theIndex = document.getElementById('table-of-contents');
+    var scanned_all = false;
+    if(null != theIndex) {
+      if(this.initFromTOC()) {
+        scanned_all = true;
       }
     }
-    this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('#'));
-  }
 
-  this.convertLinks(); // adjust internal links. BASE_URL has to be stripped.
-
-  if(scanned_all) {
-    var v = this.VIEW; // will be changed in this.plainView()!
-    this.plainView(this.START_SECTION);
-    this.ROOT.dirty = true;
-    this.ROOT_STATE = OrgNode.STATE_UNFOLDED;
-    this.toggleGlobaly();
-    if(v > this.PLAIN_VIEW) {
-      this.toggleGlobaly();
+    if(this.BASE_URL.match(this.REGEX)) {
+      // cut the '#sec-x.y.z' from base url.
+      var matches = this.EXCHANGE.exec(this.BASE_URL);
+      var id = matches[1].substr(4);
+      for(var i=0;i<this.SECS.length;++i) {
+        if(this.SECS[i].base_id == id) {
+          this.START_SECTION = i;
+          break;
+        }
+      }
+      this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('#'));
     }
-    if (v == this.ALL_VIEW) {
-      this.toggleGlobaly();
+
+    this.convertLinks(); // adjust internal links. BASE_URL has to be stripped.
+
+    if(scanned_all) {
+      if(this.VIEW == this.INFO_VIEW) {
+        this.infoView(this.START_SECTION);
+      }
+      else {
+        var v = this.VIEW; // will be changed in this.plainView()!
+        this.plainView(this.START_SECTION);
+        this.ROOT.dirty = true;
+        this.ROOT_STATE = OrgNode.STATE_UNFOLDED;
+        this.toggleGlobaly();
+        if(v > this.PLAIN_VIEW) {
+          this.toggleGlobaly();
+        }
+        if (v == this.ALL_VIEW) {
+          this.toggleGlobaly();
+        }
+      }
+      window.scrollTo(0, 0);
     }
-    window.scrollTo(0, 0);
-  }
-  else {
-    if( this.runs < this.RUN_MAX ) {
-      this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", this.RUN_INTERVAL);
-      return;
+    else {
+      if( this.runs < this.RUN_MAX ) {
+        this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", this.RUN_INTERVAL);
+        return;
+      }
+      // TODO: warn if not scanned_all
     }
-    // TODO: warn if not scanned_all
-  }
 
-  this.CONSOLE = document.createElement("div");
-  this.CONSOLE.innerHTML = '<form action="" onsubmit="return false;">'
-  +'<input type="text" id="org-console-input" onkeydown="org_html_manager.getKey(this);" maxlength="150" style="width:100%;border:1px inset #dddddd;"'
-  +' value=""/>'
-  +'</form>';
-  this.CONSOLE.style.position = 'fixed';
-  this.CONSOLE.style.marginTop = '-40px';
-  this.CONSOLE.style.top = '0px';
-  this.CONSOLE.style.left = '0px';
-  this.CONSOLE.style.width = '100%';
-  this.CONSOLE.style.height = '40px';
+    this.CONSOLE = document.createElement("div");
+    this.CONSOLE.innerHTML = '<form action="" onsubmit="return false;">'
+      +'<input type="text" id="org-console-input" onkeydown="org_html_manager.getKey(this);" maxlength="150" style="width:100%;border:1px inset #dddddd;"'
+      +' value=""/>'
+      +'</form>';
+    this.CONSOLE.style.position = 'fixed';
+    this.CONSOLE.style.marginTop = '-40px';
+    this.CONSOLE.style.top = '-40px';
+    this.CONSOLE.style.left = '0px';
+    this.CONSOLE.style.width = '100%';
+    this.CONSOLE.style.height = '30px';
 
-  document.body.insertBefore(this.CONSOLE, document.body.firstChild);
-  this.MESSAGING = false;
-  this.CONSOLE_INPUT = document.getElementById("org-console-input");
-  document.onkeypress=OrgHtmlManagerKeyEvent;
+    document.body.insertBefore(this.CONSOLE, document.body.firstChild);
+    this.MESSAGING = false;
+    this.CONSOLE_INPUT = document.getElementById("org-console-input");
+    this.CONSOLE_INPUT.style.marginTop = '-40px';
+    document.onkeypress=OrgHtmlManagerKeyEvent;
 
-  if(0 != this.DEBUG && this.debug.length) alert(this.debug);
-};
+    if(0 != this.DEBUG && this.debug.length) alert(this.debug);
+  },
 
 
-OrgHtmlManager.prototype.initFromTOC = function ()
-{
-  // scan the document for sections. We do it by scanning the toc,
-  // so we do what is customized for orgmode (depth of sections in toc).
-  if(this.runs == 1 || ! this.ROOT) {
-    var toc = document.getElementById("table-of-contents");
-    if(null != toc) {
-      var heading = null;
-      var i = 0;
-      for(i;heading == null && i < 7;++i) // TODO: What is this?
-        heading = toc.getElementsByTagName("h"+i)[0];
-      heading.setAttribute('onclick', 'org_html_manager.fold(0);');
+  initFromTOC: function ()
+  {
+    // scan the document for sections. We do it by scanning the toc,
+    // so we do what is customized for orgmode (depth of sections in toc).
+    if(this.runs == 1 || ! this.ROOT) {
+      var toc = document.getElementById("table-of-contents");
+      if(null != toc) {
+        var heading = null;
+        var i = 0;
+        for(i;heading == null && i < 7;++i) // TODO: What is this?
+          heading = toc.getElementsByTagName("h"+i)[0];
+        heading.setAttribute('onclick', 'org_html_manager.fold(0);');
+        heading.style.cursor = "pointer";
+        if(this.MOUSE_HINT) {
+          heading.setAttribute('onmouseover', 'org_html_manager.highlight_headline(this);');
+          heading.setAttribute('onmouseout', 'org_html_manager.unhighlight_headline(this);');
+        }
+
+        if(this.FIXED_TOC) {
+          heading.setAttribute('onclick', 'org_html_manager.toggleGlobaly();');
+          this.ROOT = new OrgNode( null,
+                                   document.body.getElementsByTagName("h1")[0],
+                                   'javascript:org_html_manager.navigateTo(0);',
+                                   0,
+                                   null ); // the root node
+          this.TOC = new OrgNode( toc,
+                                  heading,
+                                  'javascript:org_html_manager.navigateTo(0);',
+                                  i,
+                                  null ); // the root node
+          this.NODE = this.ROOT;
+        }
+        else {
+          this.ROOT = new OrgNode( null,
+                                   document.body.getElementsByTagName("h1")[0],
+                                   'javascript:org_html_manager.navigateTo(0);',
+                                   0,
+                                   null ); // the root node
+          if(this.HIDE_TOC) {
+            this.TOC = new OrgNode( toc,
+                                    "",
+                                    'javascript:org_html_manager.navigateTo(0);',
+                                    i,
+                                    null );
+            this.NODE = this.ROOT;
+            OrgNode.hideElement(toc);
+          }
+          else {
+            this.TOC = new OrgNode( toc,
+                                    heading,
+                                    'javascript:org_html_manager.navigateTo(0);',
+                                    i,
+                                    this.ROOT ); // the root node
+            this.TOC.folder = document.getElementById("text-table-of-contents");
+            this.TOC.idx = 0;
+            this.NODE = this.TOC;
+            this.SECS.push(this.TOC);
+          }
+        }
+      }
+      else
+        return false;
+    }
+
+    var theIndex = document.getElementsByTagName("ul")[0]; // toc
+
+    // Could we scan the document all the way down?
+    // Return false if not.
+    if(! this.ulToOutlines(theIndex))
+      return false;
+
+    if(this.TOC_DEPTH) {
+      this.cutToc(theIndex, 1);
+    }
+
+    // Move the title into the first visible section.
+    // TODO: show title above everything if FIXED_TOC !!!
+    this.TITLE = document.getElementsByTagName("h1")[0];
+    if(!this.FIXED_TOC) {
+      var title = this.TITLE.cloneNode(true);
+      this.SECS[0].div.insertBefore(title, this.SECS[0].div.firstChild);
+      OrgNode.hideElement(this.TITLE);
+    }
+
+    // Create all the navigation links:
+    this.build();
+    this.NODE = this.SECS[0];
+
+    document.body.insertBefore(this.WINDOW, this.NODE.div);
+
+    return true;
+  },
+
+  /**
+   * Used by OrgHtmlManager::initFromToc
+   */
+  ulToOutlines: function (ul)
+  {
+    if(ul.hasChildNodes() && ! ul.scanned_for_org) {
+      for(var i=0; i<ul.childNodes.length; ++i) {
+        if(false == this.liToOutlines(ul.childNodes[i])) {
+          //this.debug += "ulToOutlines: stopped. "+this.SECS.length + " Childnodes scanned.";
+          return false;
+        }
+      }
+      ul.scanned_for_org = 1;
+    }
+    return true;
+  },
+
+  /**
+   * Used by OrgHtmlManager::initFromToc
+   */
+  liToOutlines: function (li)
+  {
+    if(! li.scanned_for_org) {
+      for(var i=0; i<li.childNodes.length; ++i) {
+        var c = li.childNodes[i];
+        switch (c.nodeName) {
+        case "A":
+          //this.debug += c.href + "\n";
+          var newHref = this.mkNodeFromHref(c.href);
+          if(false == newHref) {
+            this.debug += "liToOutlines: stopped\n";
+            return false;
+          }
+          else
+            c.href = newHref;
+          break;
+        case "UL":
+          return this.ulToOutlines(c);
+          break;
+        }
+      }
+      li.scanned_for_org = 1;
+    }
+  },
+
+  /**
+   * Used by OrgHtmlManager::initFromToc
+   */
+  cutToc: function (ul, cur_depth)
+  {
+    cur_depth++;
+    if(ul.hasChildNodes()) {
+      for(var i=0; i < ul.childNodes.length; ++i) {
+        var li = ul.childNodes[i];
+        for(var j=0; j < li.childNodes.length; ++j) {
+          var c = li.childNodes[j];
+          if(c.nodeName == "UL") {
+            if(cur_depth > this.TOC_DEPTH)
+              li.removeChild(c);
+            else
+              this.cutToc(c, cur_depth); }}}}
+  },
+
+  /**
+   * Used by OrgHtmlManager::liToOutlines
+   */
+  mkNodeFromHref: function (s)
+  {
+    if(s.match(this.REGEX)) {
+      var matches = this.EXCHANGE.exec(s);
+      var ret = 'javascript:org_html_manager.navigateTo("'+matches[1]+'");';
+      this.debug += matches[0]+"\n";
+      this.debug += " -> linked section: " + matches[1].substr(4) + "\n";
+      var heading = document.getElementById(matches[1]);
+      // This heading could be null, if the document is not yet entirely loaded.
+      // So we stop scanning and set the timeout function in caller.
+      // We could even count the <ul> and <li> elements above to speed up the next
+      // scan.
+      if(null == heading) {
+        this.debug += ("heading is null. Scanning stopped.\n");
+        return(false);
+      }
+      var div = heading.parentNode; // seems to work great in browsers
+      var sec = this.SECS.length;
+      var depth = div.className.substr(8);
+      var id = matches[1].substr(4);
+      heading.setAttribute('onclick', 'org_html_manager.fold(' + sec + ');');
       heading.style.cursor = "pointer";
       if(this.MOUSE_HINT) {
         heading.setAttribute('onmouseover', 'org_html_manager.highlight_headline(this);');
         heading.setAttribute('onmouseout', 'org_html_manager.unhighlight_headline(this);');
       }
-
-      if(this.FIXED_TOC) {
-        heading.setAttribute('onclick', 'org_html_manager.toggleGlobaly();');
-        this.ROOT = new OrgNode( null,
-                                 document.body.getElementsByTagName("h1")[0],
-                                 'javascript:org_html_manager.navigateTo(0);',
-                                 0,
-                                 null ); // the root node
-        this.TOC = new OrgNode( toc,
-                                heading,
-                                'javascript:org_html_manager.navigateTo(0);',
-                                i,
-                                null ); // the root node
-        this.NODE = this.ROOT;
+      var link = 'javascript:org_html_manager.navigateTo(' + sec + ')';
+      // Is this wrong (??):
+      if(depth > this.NODE.depth) {
+        this.NODE = new OrgNode ( div, heading, link, depth, this.NODE, id);
+      }
+      else if (depth == 2) {
+        this.NODE = new OrgNode ( div, heading, link, depth, this.ROOT, id);
       }
       else {
-        this.ROOT = new OrgNode( null,
-                                 document.body.getElementsByTagName("h1")[0],
-                                 'javascript:org_html_manager.navigateTo(0);',
-                                 0,
-                                 null ); // the root node
-        if(this.HIDE_TOC) {
-          this.TOC = new OrgNode( toc,
-                                  "",
-                                  'javascript:org_html_manager.navigateTo(0);',
-                                  i,
-                                  null );
-          this.NODE = this.ROOT;
-          OrgNode.hideElement(toc);
-        }
-        else {
-          this.TOC = new OrgNode( toc,
-                                  heading,
-                                  'javascript:org_html_manager.navigateTo(0);',
-                                  i,
-                                  this.ROOT ); // the root node
-          this.TOC.folder = document.getElementById("text-table-of-contents");
-          this.TOC.idx = 0;
-          this.NODE = this.TOC;
-          this.SECS.push(this.TOC);
-        }
+        var p = this.NODE;
+        while(p.depth > depth) p = p.parent;
+        this.NODE = new OrgNode ( div, heading, link, depth, p.parent, id);
       }
+      this.SECS.push(this.NODE);
+      this.NODE.hide();
+      return (link);
     }
-    else
-      return false;
-  }
+    // return the link as it was, if no section link:
+    return (s);
+  },
 
-  var theIndex = document.getElementsByTagName("ul")[0]; // toc
-
-  // Could we scan the document all the way down?
-  // Return false if not.
-  if(! this.ulToOutlines(theIndex))
-    return false;
-
-  if(this.TOC_DEPTH) {
-    this.cutToc(theIndex, 1);
-  }
-
-  // Move the title into the first visible section.
-  // TODO: show title above everything if FIXED_TOC !!!
-  this.TITLE = document.getElementsByTagName("h1")[0];
-  if(!this.FIXED_TOC) {
-    var title = this.TITLE.cloneNode(true);
-    this.SECS[0].div.insertBefore(title, this.SECS[0].div.firstChild);
-    OrgNode.hideElement(this.TITLE);
-  }
-
-  // Create all the navigation links:
-  this.build();
-  this.NODE = this.SECS[0];
-
-  // Showing the window is TOC-dependend. So we do it here:
-  document.body.insertBefore(this.WINDOW, this.NODE.div); //document.getElementById("table-of-contents"));
-
-  return true;
-};
-
-/**
- * Used by OrgHtmlManager::initFromToc
- */
-OrgHtmlManager.prototype.ulToOutlines = function (ul)
-{
-  if(ul.hasChildNodes() && ! ul.scanned_for_org) {
-    for(var i=0; i<ul.childNodes.length; ++i) {
-      if(false == this.liToOutlines(ul.childNodes[i])) {
-        //this.debug += "ulToOutlines: stopped. "+this.SECS.length + " Childnodes scanned.";
-        return false;
-      }
-    }
-    ul.scanned_for_org = 1;
-  }
-  return true;
-};
-
-/**
- * Used by OrgHtmlManager::initFromToc
- */
-OrgHtmlManager.prototype.liToOutlines = function (li)
-{
-  if(! li.scanned_for_org) {
-    for(var i=0; i<li.childNodes.length; ++i) {
-      var c = li.childNodes[i];
-      switch (c.nodeName) {
-      case "A":
-        //this.debug += c.href + "\n";
-        var newHref = this.mkNodeFromHref(c.href);
-        if(false == newHref) {
-          this.debug += "liToOutlines: stopped\n";
-          return false;
-        }
-        else
-          c.href = newHref;
-        break;
-      case "UL":
-        return this.ulToOutlines(c);
-        break;
-      }
-    }
-    li.scanned_for_org = 1;
-  }
-};
-
-/**
- * Used by OrgHtmlManager::initFromToc
- */
-OrgHtmlManager.prototype.cutToc = function (ul, cur_depth)
-{
-  cur_depth++;
-  if(ul.hasChildNodes()) {
-    for(var i=0; i < ul.childNodes.length; ++i) {
-      var li = ul.childNodes[i];
-      for(var j=0; j < li.childNodes.length; ++j) {
-        var c = li.childNodes[j];
-        if(c.nodeName == "UL") {
-          if(cur_depth > this.TOC_DEPTH)
-            li.removeChild(c);
-          else
-            this.cutToc(c, cur_depth); }}}}};
-
-/**
- * Used by OrgHtmlManager::liToOutlines
- */
-OrgHtmlManager.prototype.mkNodeFromHref = function (s)
-{
-  if(s.match(this.REGEX)) {
-    var matches = this.EXCHANGE.exec(s);
-    var ret = 'javascript:org_html_manager.navigateTo("'+matches[1]+'");';
-    this.debug += matches[0]+"\n";
-    this.debug += " -> linked section: " + matches[1].substr(4) + "\n";
-    var heading = document.getElementById(matches[1]);
-    // This heading could be null, if the document is not yet entirely loaded.
-    // So we stop scanning and set the timeout function in caller.
-    // We could even count the <ul> and <li> elements above to speed up the next
-    // scan.
-    if(null == heading) {
-      this.debug += ("heading is null. Scanning stopped.\n");
-      return(false);
-    }
-    var div = heading.parentNode; // seems to work great in browsers
-    var sec = this.SECS.length;
-    var depth = div.className.substr(8);
-    var id = matches[1].substr(4);
-    heading.setAttribute('onclick', 'org_html_manager.fold(' + sec + ');');
-    heading.style.cursor = "pointer";
-    if(this.MOUSE_HINT) {
-      heading.setAttribute('onmouseover', 'org_html_manager.highlight_headline(this);');
-      heading.setAttribute('onmouseout', 'org_html_manager.unhighlight_headline(this);');
-    }
-    var link = 'javascript:org_html_manager.navigateTo(' + sec + ')';
-    //this is wrong (??):
-    if(depth > this.NODE.depth) {
-      this.NODE = new OrgNode ( div, heading, link, depth, this.NODE, id);
-    }
-    else if (depth == 2) {
-      this.NODE = new OrgNode ( div, heading, link, depth, this.ROOT, id);
-    }
-    else {
-      var p = this.NODE;
-      while(p.depth > depth) p = p.parent;
-      this.NODE = new OrgNode ( div, heading, link, depth, p.parent, id);
-    }
-    this.SECS.push(this.NODE);
-    this.NODE.hide();
-    return (link);
-  }
-  // return the link as it was, if no section link:
-  return (s);
-};
-
-/**
- * Creates all the navigation links for this.SECS.
- * This is called from initFromStructure() and initFromToc() as well.
- *
- * @todo Apply style classes to the generated links.
- */
-OrgHtmlManager.prototype.build = function ()
-{
-  var index_name =  this.TITLE.innerHTML;
-  var min_subindex_sec = 0;
-
-  for(var i = 0; i < this.SECS.length; ++i)
+  /**
+   * Creates all the navigation links for this.SECS.
+   * This is called from initFromStructure() and initFromToc() as well.
+   *
+   * @todo Apply style classes to the generated links.
+   */
+  build: function ()
   {
-    this.SECS[i].idx = i;
-    var html = '<table width="100%" border="0" style="border-bottom:1px solid black;">'
-      +'<tr><td colspan="3" style="text-align:left;border-style:none;vertical-align:bottom;">'
-      +'<span style="float:left;display:inline;text-align:left;">'
-      +'Top: <a accesskey="i" href="javascript:org_html_manager.navigateTo(0);">'+index_name+'</a></span>'
-      +'<span style="float:right;display:inline;text-align:right;font-size:70%;">'
-      + this.LINKS
-      +'<a accesskey="t" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></span>'
-      +'</td></tr><tr><td style="text-align:left;border-style:none;vertical-align:bottom;width:22%">';
+    var index_name =  this.TITLE.innerHTML;
+    var min_subindex_sec = 0;
 
-    if(i>1) // was > 0
-      html += '<a accesskey="p" href="'+this.SECS[i-1].link
+    for(var i = 0; i < this.SECS.length; ++i)
+    {
+      this.SECS[i].idx = i;
+      var html = '<table width="100%" border="0" style="border-bottom:1px solid black;">'
+        +'<tr><td colspan="3" style="text-align:left;border-style:none;vertical-align:bottom;">'
+        +'<span style="float:left;display:inline;text-align:left;">'
+        +'Top: <a accesskey="i" href="javascript:org_html_manager.navigateTo(0);">'+index_name+'</a></span>'
+        +'<span style="float:right;display:inline;text-align:right;font-size:70%;">'
+        + this.LINKS
+        +'<a accesskey="t" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></span>'
+        +'</td></tr><tr><td style="text-align:left;border-style:none;vertical-align:bottom;width:22%">';
+
+      if(i>1) // was > 0
+        html += '<a accesskey="p" href="'+this.SECS[i-1].link
         +'" title="Go to: '+this.removeTags(this.SECS[i-1].heading.innerHTML)+'">Previous</a> | ';
-    else
-      html += 'Previous | ';
+      else
+        html += 'Previous | ';
 
-    if(i < this.SECS.length - 1)
-      html += '<a accesskey="n" href="'+this.SECS[i+1].link
+      if(i < this.SECS.length - 1)
+        html += '<a accesskey="n" href="'+this.SECS[i+1].link
         +'" title="Go to: '+this.removeTags(this.SECS[i+1].heading.innerHTML)+'">Next</a>';
-    else
-      html += 'Next';
+      else
+        html += 'Next';
 
-    html += '</td><td style="text-align:center;vertical-align:bottom;border-style:none;width:56%;">';
+      html += '</td><td style="text-align:center;vertical-align:bottom;border-style:none;width:56%;">';
 
-    if(i>0 && this.SECS[i].parent.parent) // != this.ROOT)
-      html += '<a href="'+this.SECS[i].parent.link
+      if(i>0 && this.SECS[i].parent.parent) // != this.ROOT)
+        html += '<a href="'+this.SECS[i].parent.link
         +'" title="Go to: '+this.removeTags(this.SECS[i].parent.heading.innerHTML)+'">'
         +'<span style="font-variant:small-caps;font-style:italic;">'
         +this.SECS[i].parent.heading.innerHTML+'</span></a>';
-    else
-      html += '<span style="font-variant:small-caps;font-style:italic;">'+this.SECS[i].heading.innerHTML+'</span>';
-
-    // Right:
-    html += '</td><td style="text-align:right;vertical-align:bottom;border-style:none;width:22%">';
-    html += (i + 1) +'</td></tr></table>';
-
-    // buttons:
-    this.SECS[i].buttons = document.createElement("div");
-    this.SECS[i].buttons.innerHTML = '<div style="display:inline;float:right;text-align:right;font-size:70%;font-weight:normal;">'
-      + this.LINKS
-      + '<a accesskey="t" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></div>';
-    if(this.SECS[i].folder)
-      // this.SECS[i].heading.appendChild(this.SECS[i].buttons);
-      this.SECS[i].div.insertBefore(this.SECS[i].buttons, this.SECS[i].heading); //div.firstChild.nextSibling);
-    else if(this.SECS[i].div.hasChildNodes()) {
-      alert("HIER");
-      this.SECS[i].div.insertBefore(this.SECS[i].buttons, this.SECS[i].div.firstChild);
-    }
-    if(!this.VIEW_BUTTONS) OrgNode.hideElement(this.SECS[i].buttons);
-    this.SECS[i].navigation = html;
-
-    // subindex for sections containing subsections:
-    if(0 < this.SECS[i].children.length && this.LOCAL_TOC)
-    {
-      var navi2 = document.createElement("div");
-      html = 'Contents:<br /><ul>'; // <li>'+this.SECS[i].heading.innerHTML+'<ul>';
-      for(var k=0; k < this.SECS[i].children.length; ++k) {
-        html += '<li><a href="'
-          +this.SECS[i].children[k].link+'">'
-          +this.SECS[i].children[k].heading.innerHTML+'</a></li>';
-      }
-      html += '</ul>'; // </li></ul>';
-      navi2.innerHTML = html;
-      if(this.SECS[i].folder)
-        this.SECS[i].folder.insertBefore(navi2, this.SECS[i].folder.firstChild);
       else
-        this.SECS[i].div.insertBefore
-          (navi2, this.SECS[i].div.getElementsByTagName("h"+this.SECS[i].depth)[0].nextSibling);
-    }
-  }
-};
+        html += '<span style="font-variant:small-caps;font-style:italic;">'+this.SECS[i].heading.innerHTML+'</span>';
 
-OrgHtmlManager.prototype.showSection = function (sec)
-{
-  var section = parseInt(sec);
-  var last_node = this.NODE;
-  if(this.HIDE_TOC && this.NODE == this.TOC && !this.FIXED_TOC) {
-    OrgNode.hideElement(this.TOC.div);
-    if(this.PLAIN_VIEW == this.VIEW) {
-      this.ROOT.showAllChildren();
-      for(var i=0;i<this.ROOT.children.length;++i) {
-        this.ROOT.children[i].state = OrgNode.STATE_UNFOLDED;
-        this.ROOT.children[i].fold();
+      // Right:
+      html += '</td><td style="text-align:right;vertical-align:bottom;border-style:none;width:22%">';
+      html += (i + 1) +'</td></tr></table>';
+
+      // buttons:
+      this.SECS[i].buttons = document.createElement("div");
+      this.SECS[i].buttons.innerHTML = '<div style="display:inline;float:right;text-align:right;font-size:70%;font-weight:normal;">'
+        + this.LINKS
+        + '<a accesskey="t" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></div>';
+      if(this.SECS[i].folder)
+        // this.SECS[i].heading.appendChild(this.SECS[i].buttons);
+        this.SECS[i].div.insertBefore(this.SECS[i].buttons, this.SECS[i].heading); //div.firstChild.nextSibling);
+      else if(this.SECS[i].div.hasChildNodes()) {
+        this.SECS[i].div.insertBefore(this.SECS[i].buttons, this.SECS[i].div.firstChild);
+      }
+      if(!this.VIEW_BUTTONS) OrgNode.hideElement(this.SECS[i].buttons);
+      this.SECS[i].navigation = html;
+
+      // subindex for sections containing subsections:
+      if(0 < this.SECS[i].children.length && this.LOCAL_TOC)
+      {
+        var navi2 = document.createElement("div");
+        html = 'Contents:<br /><ul>'; // <li>'+this.SECS[i].heading.innerHTML+'<ul>';
+        for(var k=0; k < this.SECS[i].children.length; ++k) {
+          html += '<li><a href="'
+            +this.SECS[i].children[k].link+'">'
+            +this.SECS[i].children[k].heading.innerHTML+'</a></li>';
+        }
+        html += '</ul>'; // </li></ul>';
+        navi2.innerHTML = html;
+        if(this.SECS[i].folder)
+          this.SECS[i].folder.insertBefore(navi2, this.SECS[i].folder.firstChild);
+        else
+          this.SECS[i].div.insertBefore
+        (navi2, this.SECS[i].div.getElementsByTagName("h"+this.SECS[i].depth)[0].nextSibling);
       }
     }
-  }
-  if('toc' == sec || (!isNaN(section) && this.SECS[section])) {
-    if('toc' == sec && this.HIDE_TOC)
-      {
-        this.NODE = this.TOC;
-        this.ROOT.hideAllChildren();
-        if(this.INFO_VIEW == this.VIEW)
-          this.WINDOW.innerHTML =  this.NODE.div.innerHTML;
-        else
-          this.NODE.setState(OrgNode.STATE_UNFOLDED);
-        window.scrollTo(0, 0);
+  },
+
+  showSection: function (sec)
+  {
+    var section = parseInt(sec);
+    var last_node = this.NODE;
+    if(this.HIDE_TOC && this.NODE == this.TOC && !this.FIXED_TOC) {
+      OrgNode.hideElement(this.TOC.div);
+      if(this.PLAIN_VIEW == this.VIEW) {
+        this.ROOT.showAllChildren();
+        for(var i=0;i<this.ROOT.children.length;++i) {
+          this.ROOT.children[i].state = OrgNode.STATE_UNFOLDED;
+          this.ROOT.children[i].fold();
+        }
       }
-    else
-      {
-        this.NODE = this.SECS[section];
-        if(this.INFO_VIEW == this.VIEW) {
-          if(this.VIEW_BUTTONS) OrgNode.showElement(last_node.buttons);
-          OrgNode.hideElement(this.NODE.buttons);
-          this.NODE.setState(OrgNode.STATE_UNFOLDED);
-          for(var i=0;i<this.NODE.children.length; ++i)
-            this.NODE.children[i].hide();
-          this.WINDOW.innerHTML =  this.NODE.navigation + this.NODE.div.innerHTML;
-          this.NODE.hide();
+    }
+    if('toc' == sec || (!isNaN(section) && this.SECS[section])) {
+      if('toc' == sec && this.HIDE_TOC)
+        {
+          this.NODE = this.TOC;
+          this.ROOT.hideAllChildren();
+          if(this.INFO_VIEW == this.VIEW)
+            this.WINDOW.innerHTML =  this.NODE.div.innerHTML;
+          else
+            this.NODE.setState(OrgNode.STATE_UNFOLDED);
           window.scrollTo(0, 0);
         }
-        else {
-          if(! this.VIEW_BUTTONS) OrgNode.hideElement(last_node.buttons);
-          OrgNode.showElement(this.NODE.buttons);
-          this.NODE.setState(OrgNode.UNFOLDED);
-          this.NODE.show();
-          if(0 < this.NODE.idx)
-            this.NODE.div.scrollIntoView(true);
-          else
+      else
+        {
+          this.NODE = this.SECS[section];
+          if(this.INFO_VIEW == this.VIEW) {
+            if(this.VIEW_BUTTONS) OrgNode.showElement(last_node.buttons);
+            OrgNode.hideElement(this.NODE.buttons);
+            this.NODE.setState(OrgNode.STATE_UNFOLDED);
+            for(var i=0;i<this.NODE.children.length; ++i)
+              this.NODE.children[i].hide();
+            this.WINDOW.innerHTML =  this.NODE.navigation + this.NODE.div.innerHTML;
+            this.NODE.hide();
             window.scrollTo(0, 0);
+          }
+          else {
+            if(! this.VIEW_BUTTONS) OrgNode.hideElement(last_node.buttons);
+            OrgNode.showElement(this.NODE.buttons);
+            this.NODE.setState(OrgNode.UNFOLDED);
+            this.NODE.show();
+            if(0 < this.NODE.idx)
+              this.NODE.div.scrollIntoView(true);
+            else
+              window.scrollTo(0, 0);
+          }
+        }
+    }
+  },
+
+
+  plainView: function (sec)
+  {
+    this.VIEW = this.PLAIN_VIEW;
+    OrgNode.hideElement(this.WINDOW);
+    // OrgNode.showElement(this.TITLE);
+    // For Opera and accesskeys we have to remove the navigation here to get it
+    // working when toggeling back to info view again:
+    if(this.WINDOW.firstChild) // might not be set after init
+      this.WINDOW.removeChild(this.WINDOW.firstChild);
+    this.ROOT.showAllChildren();
+    for(var i=0;i<this.ROOT.children.length;++i) {
+      this.ROOT.children[i].state = OrgNode.STATE_UNFOLDED;
+      this.ROOT.children[i].fold();
+    }
+    this.showSection(sec);
+    this.NODE.div.scrollIntoView(true);
+  },
+
+  infoView: function (sec, skip_show_section)
+  {
+    this.VIEW = this.INFO_VIEW;
+    this.unhighlight_headline(this.NODE.heading);
+    if(!this.FIXED_TOC)
+      OrgNode.hideElement(this.TITLE);
+    OrgNode.showElement(this.WINDOW);
+    this.ROOT.hideAllChildren();
+    if(this.TOC && !this.FIXED_TOC) OrgNode.hideElement(this.TOC.div);
+    if(!skip_show_section)
+      this.showSection(sec);
+  },
+
+  toggleView: function (sec)
+  {
+    if(this.VIEW == this.INFO_VIEW)
+      this.plainView(sec);
+    else
+      this.infoView(sec);
+  },
+
+  fold: function (sec)
+  {
+    var section = parseInt(sec);
+    this.SECS[section].fold();
+    if(! this.VIEW_BUTTONS) OrgNode.hideElement(this.NODE.buttons);
+    this.NODE = this.SECS[section];
+    OrgNode.showElement(this.NODE.buttons);
+    if(this.INPUT_FIELD) this.INPUT_FIELD.focus();
+  },
+
+  highlight_headline: function(h)
+  {
+    if(this.PLAIN_VIEW == this.VIEW && this.MOUSE_HINT) {
+      if('underline' == this.MOUSE_HINT)
+        h.style.borderBottom = "1px dashed #666666";
+      else
+        h.style.backgroundColor = this.MOUSE_HINT;
+    }
+  },
+
+
+  unhighlight_headline: function(h)
+  {
+    if('underline' == this.MOUSE_HINT) {
+      h.style.borderBottom = "";
+    }
+    else
+      h.style.backgroundColor = "";
+  },
+
+  /**
+   * Execute arbitrary JavaScript code. This one is used for configuration.
+   */
+  set: function (eval_key, eval_val)
+  {
+    if("VIEW" == eval_key) {
+      var overview = this.PLAIN_VIEW;
+      var content = this.CONTENT_VIEW;
+      var showall = this.ALL_VIEW;
+      var info = this.INFO_VIEW;
+      eval("this."+eval_key+"="+eval_val+";");
+      return;
+    }
+
+    if(eval_val)
+      eval("this."+eval_key+"='"+eval_val+"';");
+    else
+      eval("this."+eval_key+"=0;");
+  },
+
+
+  /**
+   * All commands that add something to the history should return.
+   */
+  getKey: function ()
+  {
+    var s = this.CONSOLE_INPUT.value;
+    var clean_up = false;
+    var copy = false;
+
+    // the easiest is to just drop everything and clean the console.
+    // User has to retype again.
+    if(this.MESSAGING) {
+      this.CONSOLE_INPUT.value = "";
+      this.CONSOLE_INPUT.style.color = "#666666";
+      this.CONSOLE.style.marginTop = '-40px';
+      this.CONSOLE_INPUT.style.marginTop = '-40px';
+      this.CONSOLE.style.top = '-40px';
+      this.command_str = "";
+      this.CONSOLE_INPUT.value = "";
+      if(this.MESSAGING_INPLACE == this.MESSAGING) {
+        this.NODE.div.removeChild(this.NODE.div.firstChild);
+      }
+      this.MESSAGING = false;
+      return;
+    }
+    else if(this.helping) {
+      this.showHelp();
+      this.command_str = "";
+      this.CONSOLE_INPUT.value = "";
+      return;
+    }
+
+    // return, if s is empty:
+    if(0 == s.length) return;
+
+    // Always remove TOC from history, if HIDE_TOC
+    if(this.HIDE_TOC && this.TOC == this.NODE && "v" != s && "V" != s) {
+      s = "b";
+    }
+    else {
+      if(s.match(this.EMPTY_START))
+        s = s.match(this.EMPTY_START)[2];
+      if(s.length && s.match(this.EMPTY_END))
+        s = s.substr(0, s.length - 1);
+    }
+
+    if (s.length && s.length == this.command_str.length) {
+      if ('help' == s) {
+        this.showHelp();
+        clean_up = true;
+      }
+      else { // unknown command
+        this.warn( s + ": command not found.");
+        return;                          // rely on what happends if messaging
+      }
+    }
+
+    else if (1 == s.length)    // one char wide commands
+      {
+        if ('n' == s) {
+          if(this.NODE.state == OrgNode.STATE_FOLDED && this.VIEW == this.PLAIN_VIEW) {
+            this.showSection(this.NODE.idx);
+          }
+          else if(this.NODE.idx < this.SECS.length - 1) {
+            this.navigateTo(this.NODE.idx + 1);
+            return;
+          } else {
+            this.warn("Already last section.");
+            return;                          // rely on what happends if messaging
+          }
+        }
+        else if ('p' == s) {
+          if(this.NODE.idx > 0) {
+            this.navigateTo(this.NODE.idx - 1);
+            return;
+          } else {
+            this.warn("Already first section.");
+            return;                          // rely on what happends if messaging
+          }
+        }
+        else if ('b' == s) {
+          this.popHistory();
+          return;
+        }
+        else if ('B' == s) {
+          this.popHistory(true);
+          return;
+        }
+        else if ('q' == s) {
+          if(window.confirm("Really close this file?")) {
+            window.close();
+          }
+          clean_up = true;
+        }
+        else if ('i' == s) {
+          if(this.FIXED_TOC) this.TOC.focus;
+          else if (this.HIDE_TOC) this.navigateTo('toc');
+          else if(0 != this.NODE.idx) this.navigateTo(0);
+          clean_up = true;
+        }
+        else if ('t' == s) {
+          this.toggleView(this.NODE.idx);
+          clean_up = true;
+        }
+        else if ('v' == s) {
+          if(window.innerHeight)
+            window.scrollBy(0, window.innerHeight - 30);
+          else if(document.documentElement.clientHeight)
+            window.scrollBy(0, document.documentElement.clientHeight - 30);
+          else
+            window.scrollBy(0, document.body.cleintHeight - 30);
+          clean_up = true;
+        }
+        else if ('V' == s) {
+          if(window.innerHeight)
+            window.scrollBy(0, -(window.innerHeight - 30));
+          else if(document.documentElement.clientHeight)
+            window.scrollBy(0, -(document.documentElement.clientHeight - 30));
+          else
+            window.scrollBy(0, -(document.body.cleintHeight - 30));
+          clean_up = true;
+        }
+        else if ('u' == s) {
+          if(this.NODE.parent) {
+            this.NODE = this.NODE.parent;
+            this.showSection(this.NODE.idx);
+          }
+          clean_up = true;
+        }
+        else if ('f' == s) {
+          if(this.VIEW != this.INFO_VIEW) {
+            this.NODE.fold();
+            this.NODE.div.scrollIntoView(true);
+          }
+          clean_up = true;
+        }
+        else if ('g' == s) {
+          if(this.VIEW != this.INFO_VIEW) {
+            this.toggleGlobaly();
+            this.NODE.div.scrollIntoView(true);
+          }
+          clean_up = true;
+        }
+        else if ('?' == s || 'l' == s || '¿' == s) {
+          this.showHelp();
+          clean_up = true;
+        }
+        else if ('H' == s && this.LINK_HOME) {
+          window.document.location.href = this.LINK_HOME;
+          clean_up = true;
+        }
+        else if ('h' == s && this.LINK_UP) {
+          window.document.location.href = this.LINK_UP;
+          clean_up = true;
+        }
+        else if ('s' == s) {
+          var matches = this.SECEX.exec(window.prompt("Enter Section:"));
+          var sec = matches[1];
+          var sec_found = false;
+          for(var i = 0; i < this.SECS.length; ++i) {
+            if(this.SECS[i].base_id == sec) {
+              this.pushHistory(this.SECS[i].idx, this.NODE.idx);
+              this.showSection(this.SECS[i].idx);
+              return;
+            }
+          }
+          if(! sec_found) {
+            this.warn("" + sec +": no such section.");
+            return;
+          }
+        }
+        else {
+          copy = true;
         }
       }
-  }
-  /* if(this.INPUT_FIELD) this.INPUT_FIELD.focus(); */
-};
-
-
-OrgHtmlManager.prototype.plainView = function (sec)
-{
-  this.VIEW = this.PLAIN_VIEW;
-  OrgNode.hideElement(this.WINDOW);
-  // OrgNode.showElement(this.TITLE);
-  // For Opera and accesskeys we have to remove the navigation here to get it
-  // working when toggeling back to info view again:
-  if(this.WINDOW.firstChild) // might not be set after init
-    this.WINDOW.removeChild(this.WINDOW.firstChild);
-  this.ROOT.showAllChildren();
-  for(var i=0;i<this.ROOT.children.length;++i) {
-    this.ROOT.children[i].state = OrgNode.STATE_UNFOLDED;
-    this.ROOT.children[i].fold();
-  }
-  this.showSection(sec);
-  this.NODE.div.scrollIntoView(true);
-};
-
-OrgHtmlManager.prototype.infoView = function (sec, skip_show_section)
-{
-  this.VIEW = this.INFO_VIEW;
-  this.unhighlight_headline(this.NODE.heading);
-  if(!this.FIXED_TOC)
-    OrgNode.hideElement(this.TITLE);
-  OrgNode.showElement(this.WINDOW);
-  this.ROOT.hideAllChildren();
-  if(this.TOC && !this.FIXED_TOC) OrgNode.hideElement(this.TOC.div);
-  if(!skip_show_section)
-    this.showSection(sec);
-};
-
-OrgHtmlManager.prototype.toggleView = function (sec)
-{
-  if(this.VIEW == this.INFO_VIEW)
-    this.plainView(sec);
-  else
-    this.infoView(sec);
-};
-
-OrgHtmlManager.prototype.fold = function (sec)
-{
-  var section = parseInt(sec);
-  this.SECS[section].fold();
-  if(! this.VIEW_BUTTONS) OrgNode.hideElement(this.NODE.buttons);
-  this.NODE = this.SECS[section];
-  OrgNode.showElement(this.NODE.buttons);
-  if(this.INPUT_FIELD) this.INPUT_FIELD.focus();
-};
-
-OrgHtmlManager.prototype.highlight_headline = function(h)
-{
-  if(this.PLAIN_VIEW == this.VIEW && this.MOUSE_HINT) {
-    if('underline' == this.MOUSE_HINT)
-      h.style.borderBottom = "1px dashed #666666";
     else
-      h.style.backgroundColor = this.MOUSE_HINT;
-  }
-};
+      copy = true;
 
 
-OrgHtmlManager.prototype.unhighlight_headline = function(h)
-{
-  if('underline' == this.MOUSE_HINT) {
-    h.style.borderBottom = "";
-  }
-  else
-    h.style.backgroundColor = "";
-};
-
-/**
- * Execute arbitrary JavaScript code. This one is used for configuration.
- */
-OrgHtmlManager.prototype.set = function (eval_key, eval_val)
-{
-  if("VIEW" == eval_key) {
-    var overview = this.PLAIN_VIEW;
-    var content = this.CONTENT_VIEW;
-    var showall = this.ALL_VIEW;
-    var info = this.INFO_VIEW;
-    eval("this."+eval_key+"="+eval_val+";");
+    this.command_str = "";
+    this.CONSOLE_INPUT.value = "";
     return;
+  },
+
+
+  warn: function (what)
+  {
+    this.CONSOLE_INPUT.style.color="red";
+    this.CONSOLE_INPUT.value= what + " Press any key to proceed.";
+    if(this.VIEW != this.INFO_VIEW) {
+      var v = this.CONSOLE_INPUT.cloneNode(true);
+      v.style.marginTop = '0px';
+      v.style.top = '0px';
+      this.NODE.div.insertBefore(v, this.NODE.div.firstChild);
+      v.scrollIntoView(true);
+      this.MESSAGING = this.MESSAGING_INPLACE;
+    } else {
+      this.CONSOLE.style.marginTop = '0px';
+      this.CONSOLE_INPUT.style.marginTop = '0px';
+      this.CONSOLE.style.top = '0px';
+      this.MESSAGING = this.MESSAGING_TOP;
+    }
+  },
+
+
+  toggleGlobaly: function ()
+  {
+    if(this.ROOT.durty) {
+      this.ROOT.state = OrgNode.STATE_UNFOLDED;
+    }
+
+    if(OrgNode.STATE_UNFOLDED == this.ROOT.state) {
+      for(var i=0;i<this.ROOT.children.length;++i) {
+        // Pretend they are unfolded. They will toggle to FOLDED then:
+        this.ROOT.children[i].state = OrgNode.STATE_UNFOLDED;
+        this.ROOT.children[i].fold(true);
+      }
+      this.ROOT.state = OrgNode.STATE_UNFOLDED;
+      this.ROOT.state = OrgNode.STATE_FOLDED;
+    }
+    else if(OrgNode.STATE_FOLDED == this.ROOT.state) {
+      for(var i=0;i<this.ROOT.children.length;++i)
+        this.ROOT.children[i].fold(true);
+      this.ROOT.state = OrgNode.STATE_HEADLINES;
+    }
+    else {
+      for(var i=0;i<this.ROOT.children.length;++i)
+        this.ROOT.children[i].fold();
+      this.ROOT.state = OrgNode.STATE_UNFOLDED;
+    }
+
+    // All this sets ROOT durty again. So clean it:
+    this.ROOT.durty = false;
+  },
+
+
+  showHelp: function ()
+  {
+    this.helping = this.helping ? 0 : 1;
+    if (this.helping) {
+      this.last_view_mode = this.VIEW;
+      this.infoView(true);
+      this.WINDOW.innerHTML = '<h2>Keyboard Shortcuts</h2>'
+        +'<table cellpadding="3" style="margin:20px;border-style:none;" border="0">'
+        +'<tr><td> <code><b>?/¿/l</b></code> </td><td> show this help screen</td></tr>'
+        +'<tr><td> <code><b>n</b></code> </td><td> goto the next section</td></tr>'
+        +'<tr><td> <code><b>p</b></code> </td><td> goto the previous section</td></tr>'
+        +'<tr><td> <code><b>i</b></code> </td><td> show table of contents</td></tr>'
+        +'<tr><td> <code><b>s</b></code> </td><td> goto section</td></tr>'
+        +'<tr><td> <code><b>b</b></code> </td><td> go back to last visited section. Only when following internal links.</td></tr>'
+        +'<tr><td> <code><b>t</b></code> </td><td> toggle the view mode</td></tr>'
+        +'<tr><td> <code><b>f</b></code> </td><td> fold current section (plain view)</td></tr>'
+        +'<tr><td> <code><b>g</b></code> </td><td> fold globaly (plain view)</td></tr>'
+        +'<tr><td> <code><b>v</b></code> </td><td> scroll down</td></tr>'
+        +'<tr><td> <code><b>V</b></code> </td><td> scroll back up</td></tr>'
+        +'<tr><td> <code><b>u</b></code> </td><td> one level up (parent section)</td></tr>'
+        +'<tr><td> <code><b>h</b></code> </td><td> if supplied, go to the main index in this directory (home)</td></tr>'
+        +'<tr><td> <code><b>H</b></code> </td><td> if supplied, go to link homepage (HOME)</td></tr>'
+        +'</table><br />Press any key to proceed.';
+    }
+    else {
+      if(this.PLAIN_VIEW == this.last_view_mode) {
+        this.plainView();
+      }
+      this.showSection(this.NODE.idx);
+    }
+  },
+
+
+ convertLinks: function ()
+  {
+    var i = (this.HIDE_TOC ? 0 : 1);
+    for(i; i < this.SECS.length; ++i)
+      {
+        if(this.SECS[i].folder)
+          {
+            var links = this.SECS[i].folder.getElementsByTagName("a");
+
+            for(var j=0; j<links.length; ++j) {
+              var href = links[j].href.replace(this.BASE_URL, '');
+              if(0 == href.indexOf('#') && links[j].href.match(this.REGEX)) {
+                var matches = this.EXCHANGE.exec(href);
+                if(matches) {
+                  var id = matches[1].substr(4);
+                  // could use quicksort like search here:
+                  for(var k = 0; k < this.SECS.length; ++k) {
+                    if(this.SECS[k].base_id == id) {
+                      links[j].href="javascript:org_html_manager.navigateTo("+k+")";
+                      break;
+                    }}}}}}}
+  },
+
+
+  /**
+   * This one is just here, because we might want to push different than
+   * navigational commands on the history in the future. Is this true?
+   */
+  navigateTo: function (sec)
+  {
+    this.pushHistory(sec, this.NODE.idx);
+    this.showSection(sec);
+  },
+
+
+  /**
+   *  All undoable navigation commands should push the oposit here
+   */
+  pushHistory: function (command, undo)
+  {
+    if(! this.SKIP_HISTORY) {
+      this.HISTORY[this.HIST_INDEX] = new Array(command, undo);
+      this.HIST_INDEX = (this.HIST_INDEX + 1) % 50;
+    }
+    this.SKIP_HISTORY = false;
+    this.CONSOLE_INPUT.value = "";
+  },
+
+
+ /**
+  * only 'b' and 'B' trigger this one
+  */
+  popHistory: function (foreward)
+  {
+    if(foreward) {
+      if(this.HISTORY[this.HIST_INDEX]) {
+        var s = parseInt(this.HISTORY[this.HIST_INDEX][0]);
+        if(! isNaN(s) || 'toc' == this.HISTORY[this.HIST_INDEX][0]) {
+          this.showSection(this.HISTORY[this.HIST_INDEX][0]);
+          this.CONSOLE_INPUT.value = "";
+        }
+        else {
+          this.SKIP_HISTORY = true;
+          this.CONSOLE_INPUT.value = this.HISTORY[this.HIST_INDEX][0];
+          this.getKey();
+        }
+        this.HIST_INDEX = (this.HIST_INDEX + 1) % 50;
+      }
+      else
+        this.warn("History: No where to foreward go from here.");
+    } else {
+      if(this.HISTORY[this.HIST_INDEX - 1]) {
+        this.HIST_INDEX = this.HIST_INDEX == 0 ? 49 : this.HIST_INDEX - 1;
+        var s = parseInt(this.HISTORY[this.HIST_INDEX][1]);
+        if(! isNaN(s) || 'toc' == this.HISTORY[this.HIST_INDEX][1]) {
+          this.showSection(this.HISTORY[this.HIST_INDEX][1]);
+          this.CONSOLE_INPUT.value = "";
+        }
+        else {
+          this.SKIP_HISTORY = true;
+          this.CONSOLE_INPUT.value = this.HISTORY[this.HIST_INDEX][1];
+          this.getKey();
+        }
+      }
+      else
+        this.warn("History: No where to back go from here.");
+    }
   }
 
-  if(eval_val)
-    eval("this."+eval_key+"='"+eval_val+"';");
-  else
-    eval("this."+eval_key+"=0;");
 };
 
 
@@ -858,339 +1211,11 @@ function OrgHtmlManagerKeyEvent (e)
 
 
 /**
- * All commands that add something to the history should return.
+ * Wait for document.body to be loaded and call org_html_manager.init().
+ * In Opera document.body is true, even if not loaded (try with big big
+ * file). This case is handled by the OrgHtmlManager class itself.
  */
-OrgHtmlManager.prototype.getKey = function ()
+function OrgHtmlManagerLoadCheck()
 {
-  var s = this.CONSOLE_INPUT.value;
-  var clean_up = false;
-  var copy = false;
-
-  // the easiest is to just drop everything and clean the console.
-  // User has to retype again.
-  if(this.MESSAGING) {
-    this.CONSOLE_INPUT.value = "";
-    this.CONSOLE_INPUT.style.color = "#666666";
-    // this.CONSOLE_INPUT.style.marginTop = "-40px";
-    // this.CONSOLE.style.top = '-40px';
-    this.CONSOLE.style.marginTop = '-40px';
-    this.command_str = "";
-    this.CONSOLE_INPUT.value = "";
-    if(this.MESSAGING_INPLACE == this.MESSAGING) {
-      this.NODE.div.removeChild(this.NODE.div.firstChild);
-    }
-    this.MESSAGING = false;
-    return;
-  }
-
-  // return, if s is empty:
-  if(0 == s.length) return;
-
-  // Always remove TOC from history, if HIDE_TOC
-  if(this.HIDE_TOC && this.TOC == this.NODE && "v" != s && "V" != s) {
-    s = "b";
-  }
-  else {
-    if(s.match(this.EMPTY_START))
-      s = s.match(this.EMPTY_START)[2];
-    if(s.length && s.match(this.EMPTY_END))
-      s = s.substr(0, s.length - 1);
-  }
-
-  if (s.length && s.length == this.command_str.length)
-    {
-      if ('help' == s)
-        {
-          this.showHelp();
-          clean_up = true;
-        }
-
-      else // unknown command
-        {
-          this.warn( s + ": command not found.");
-          return;                          // rely on what happends if messaging
-        }
-    }
-
-  else if (1 == s.length)    // one char wide commands
-    {
-      if ('n' == s) {
-        if(this.NODE.idx < this.SECS.length - 1) {
-          this.navigateTo(this.NODE.idx + 1);
-          return;
-        } else {
-          this.warn("Already last section.");
-          return;                          // rely on what happends if messaging
-        }
-      }
-      else if ('p' == s) {
-        if(this.NODE.idx > 0) {
-          this.navigateTo(this.NODE.idx - 1);
-          return;
-        } else {
-          this.warn("Already first section.");
-          return;                          // rely on what happends if messaging
-        }
-      }
-      else if ('b' == s) {
-        this.popHistory();
-        return;
-      }
-      else if ('B' == s) {
-        this.popHistory(true);
-        return;
-      }
-      else if ('q' == s) {
-        if(window.confirm("Really close this file?")) {
-          window.close();
-        }
-        clean_up = true;
-      }
-      else if ('i' == s) {
-        if(this.FIXED_TOC) this.TOC.focus;
-        else if (this.HIDE_TOC) this.navigateTo('toc');
-        else if(0 != this.NODE.idx) this.navigateTo(0);
-        clean_up = true;
-      }
-      else if ('t' == s) {
-        this.toggleView(this.NODE.idx);
-        clean_up = true;
-      }
-      else if ('v' == s) {
-        if(window.innerHeight)
-          window.scrollBy(0, window.innerHeight - 30);
-        else if(document.body.clientHeight)
-          window.scrollBy(0, document.body.cleintHeight - 30);
-        clean_up = true;
-      }
-      else if ('V' == s) {
-        if(window.innerHeight)
-          window.scrollBy(0, -(window.innerHeight - 30));
-        else if(document.body.clientHeight)
-          window.scrollBy(0, -(document.body.cleintHeight - 30));
-        clean_up = true;
-      }
-      else if ('u' == s) {
-        if(this.NODE.parent) {
-          this.NODE = this.NODE.parent;
-          this.showSection(this.NODE.idx);
-        }
-        clean_up = true;
-      }
-      else if ('f' == s) {
-        if(this.VIEW != this.INFO_VIEW) {
-          this.NODE.fold();
-          this.NODE.div.scrollIntoView(true);
-        }
-        clean_up = true;
-      }
-      else if ('g' == s) {
-        if(this.VIEW != this.INFO_VIEW) {
-          this.toggleGlobaly();
-          this.NODE.div.scrollIntoView(true);
-        }
-        clean_up = true;
-      }
-      else if ('?' == s || '¿' == s) {
-        this.showHelp();
-        clean_up = true;
-      }
-      else if ('H' == s && this.LINK_HOME) {
-        window.document.location.href = this.LINK_HOME;
-        clean_up = true;
-      }
-      else if ('h' == s && this.LINK_UP) {
-        window.document.location.href = this.LINK_UP;
-        clean_up = true;
-      }
-      else if ('s' == s) {
-        var matches = this.SECEX.exec(window.prompt("Enter Section:"));
-        var sec = matches[1];
-        var sec_found = false;
-        for(var i = 0; i < this.SECS.length; ++i) {
-          if(this.SECS[i].base_id == sec) {
-            this.pushHistory(this.SECS[i].idx, this.NODE.idx);
-            this.showSection(this.SECS[i].idx);
-            return;
-          }
-        }
-        if(! sec_found) {
-          this.warn("" + sec +": no such section.");
-          return;
-        }
-      }
-      else {
-        copy = true;
-      }
-    }
-  else
-    copy = true;
-
-
-  this.command_str = "";
-  this.CONSOLE_INPUT.value = "";
-  return;
-};
-
-
-OrgHtmlManager.prototype.warn = function (what)
-{
-  this.CONSOLE_INPUT.style.color="red";
-  this.CONSOLE_INPUT.value= what + " Press any key to proceed.";
-  if(this.VIEW != this.INFO_VIEW) {
-    var v = this.CONSOLE_INPUT.cloneNode(true);
-    v.style.marginTop = '0px';
-    v.style.top = '0px';
-    this.NODE.div.insertBefore(v, this.NODE.div.firstChild);
-    v.scrollIntoView(true);
-    this.MESSAGING = this.MESSAGING_INPLACE;
-  } else {
-    this.CONSOLE.style.marginTop = '0px';
-    this.CONSOLE.style.top = '0px';
-    this.MESSAGING = this.MESSAGING_TOP;
-  }
-};
-
-
-OrgHtmlManager.prototype.toggleGlobaly = function ()
-{
-  if(this.ROOT.durty) {
-    this.ROOT.state = OrgNode.STATE_UNFOLDED;
-  }
-
-  if(OrgNode.STATE_UNFOLDED == this.ROOT.state) {
-    for(var i=0;i<this.ROOT.children.length;++i) {
-      // Pretend they are unfolded. They will toggle to FOLDED then:
-      this.ROOT.children[i].state = OrgNode.STATE_UNFOLDED;
-      this.ROOT.children[i].fold(true);
-     }
-    this.ROOT.state = OrgNode.STATE_UNFOLDED;
-    this.ROOT.state = OrgNode.STATE_FOLDED;
-  }
-  else if(OrgNode.STATE_FOLDED == this.ROOT.state) {
-    for(var i=0;i<this.ROOT.children.length;++i)
-      this.ROOT.children[i].fold(true);
-    this.ROOT.state = OrgNode.STATE_HEADLINES;
-  }
-  else {
-    for(var i=0;i<this.ROOT.children.length;++i)
-      this.ROOT.children[i].fold();
-    this.ROOT.state = OrgNode.STATE_UNFOLDED;
-  }
-
-  // All this sets ROOT durty again. So clean it:
-  this.ROOT.durty = false;
-};
-
-
-OrgHtmlManager.prototype.showHelp = function ()
-{
-  this.infoView(true);
-  this.WINDOW.innerHTML = '<h2>Keyboard Shortcuts</h2>'
-  +'<table cellpadding="3" style="margin:20px;border-style:none;" border="0">'
-  +'<tr><td> <code><b>?</b></code> </td><td> show this help screen (not in FF)</td></tr>'
-  +'<tr><td> <code><b>n</b></code> </td><td> goto the next section</td></tr>'
-  +'<tr><td> <code><b>p</b></code> </td><td> goto the previous section</td></tr>'
-  +'<tr><td> <code><b>i</b></code> </td><td> goto the first section (maybe the T.O.C.)</td></tr>'
-  +'<tr><td> <code><b>s</b></code> </td><td> goto section</td></tr>'
-  +'<tr><td> <code><b>b</b></code> </td><td> go back to last visited section. Only when following internal links.</td></tr>'
-  +'<tr><td> <code><b>t</b></code> </td><td> toggle the view mode</td></tr>'
-  +'<tr><td> <code><b>f</b></code> </td><td> fold current section (plain view)</td></tr>'
-  +'<tr><td> <code><b>g</b></code> </td><td> fold globaly (plain view)</td></tr>'
-  +'<tr><td> <code><b>v</b></code> </td><td> scroll down</td></tr>'
-  +'<tr><td> <code><b>V</b></code> </td><td> scroll back up</td></tr>'
-  +'<tr><td> <code><b>u</b></code> </td><td> one level up (parent section)</td></tr>'
-  +'<tr><td> <code><b>h</b></code> </td><td> if supplied, go to the main index in this directory (home)</td></tr>'
-  +'<tr><td> <code><b>H</b></code> </td><td> if supplied, go to link homepage (HOME)</td></tr>'
-  +'</table>';
-};
-
-
-OrgHtmlManager.prototype.convertLinks = function ()
-{
-  var i = (this.HIDE_TOC ? 0 : 1);
-  for(i; i < this.SECS.length; ++i)
-  {
-    if(this.SECS[i].folder)
-    {
-      var links = this.SECS[i].folder.getElementsByTagName("a");
-
-      for(var j=0; j<links.length; ++j) {
-        if(links[j].href.match(this.REGEX)) {
-          var href = links[j].href.replace(this.BASE_URL, '');
-          var matches = this.EXCHANGE.exec(href);
-          if(matches) {
-            var id = matches[1].substr(4);
-            // could use quicksort like search here:
-            for(var k = 0; k < this.SECS.length; ++k) {
-              if(this.SECS[k].base_id == id) {
-                links[j].href="javascript:org_html_manager.navigateTo("+k+")";
-                break;
-              }}}}}}}
-};
-
-
-/**
- * This one is just here, because we might want to push different than
- * navigational commands on the history in the future. Is this true?
- */
-OrgHtmlManager.prototype.navigateTo = function (sec)
-{
-  this.pushHistory(sec, this.NODE.idx);
-  this.showSection(sec);
-};
-
-
-/**
- *  All undoable navigation commands should push the oposit here
- */
-OrgHtmlManager.prototype.pushHistory = function (command, undo)
-{
-  if(! this.SKIP_HISTORY) {
-    this.HISTORY[this.HIST_INDEX] = new Array(command, undo);
-    this.HIST_INDEX = (this.HIST_INDEX + 1) % 50;
-  }
-  this.SKIP_HISTORY = false;
-  this.CONSOLE_INPUT.value = "";
-};
-
-
-/**
- * only 'b' and 'B' trigger this one
- */
-OrgHtmlManager.prototype.popHistory = function (foreward)
-{
-  if(foreward) {
-    if(this.HISTORY[this.HIST_INDEX]) {
-      var s = parseInt(this.HISTORY[this.HIST_INDEX][0]);
-      if(! isNaN(s) || 'toc' == this.HISTORY[this.HIST_INDEX][0]) {
-        this.showSection(this.HISTORY[this.HIST_INDEX][0]);
-        this.CONSOLE_INPUT.value = "";
-      }
-      else {
-        this.SKIP_HISTORY = true;
-        this.CONSOLE_INPUT.value = this.HISTORY[this.HIST_INDEX][0];
-        this.getKey();
-      }
-      this.HIST_INDEX = (this.HIST_INDEX + 1) % 50;
-    }
-    else
-      this.warn("History: No where to foreward go from here.");
-  } else {
-    if(this.HISTORY[this.HIST_INDEX - 1]) {
-      this.HIST_INDEX = this.HIST_INDEX == 0 ? 49 : this.HIST_INDEX - 1;
-      var s = parseInt(this.HISTORY[this.HIST_INDEX][1]);
-      if(! isNaN(s) || 'toc' == this.HISTORY[this.HIST_INDEX][1]) {
-        this.showSection(this.HISTORY[this.HIST_INDEX][1]);
-        this.CONSOLE_INPUT.value = "";
-      }
-      else {
-        this.SKIP_HISTORY = true;
-        this.CONSOLE_INPUT.value = this.HISTORY[this.HIST_INDEX][1];
-        this.getKey();
-      }
-    }
-    else
-      this.warn("History: No where to back go from here.");
-  }
-};
+  org_html_manager.init();
+}
