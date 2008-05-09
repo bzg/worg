@@ -250,11 +250,13 @@ function OrgHtmlManager ()
   this.LINK_HOME;                      // Link to this.LINK_HOME?
   this.LINK_UP;                        // Link to this.LINK_UP?
   this.LINKS = "";                     // Prepare the links for later use (see setup);
-  this.RUN_MAX = 900;                 // Max attempts to scan (results in ~2 minutes)
+  this.RUN_MAX = 1200;                 // Max attempts to scan (results in ~2 minutes)
+  this.RUN_INTERVAL = 100;             // Interval of scans in milliseconds.
   this.DEBUG = 0;                      // Gather and show debugging info?
   this.WINDOW_BORDER = false;          // Draw a border aroung info window
   this.HIDE_TOC = false;               // Hide the table of contents.
-  this.TOC_DEPTH = 0;                  // Hide the table of contents.
+  this.TOC_DEPTH = 0;                  // Level to cut the table of contents. No
+                                       // cutting if 0.
 
   // Private
   this.BASE_URL = document.URL;        // URL without '#sec-x.y.z'
@@ -276,6 +278,7 @@ function OrgHtmlManager ()
   this.HISTORY = new Array(50);        // Save navigation history.
   this.HIST_INDEX = 0;
   this.SKIP_HISTORY = false;           // popHistory() set's this to true.
+  this.FIXED_TOC = false;              // Leave toc alone if position=[fixed|absolute]?
   // Debugging:
   this.debug = "";                     // Will be shown after every scan, if not empty
   // Debugging levels:
@@ -289,6 +292,8 @@ function OrgHtmlManager ()
   this.command_str = "";
   this.console_first_time = true;      // Cookie would be cool maybe.
   this.MESSAGING;                      // Is there a message in the console?
+  this.MESSAGING_INPLACE = 1;
+  this.MESSAGING_TOP = 2;
 }
 
 
@@ -358,26 +363,22 @@ OrgHtmlManager.prototype.init = function ()
   this.convertLinks(); // adjust internal links. BASE_URL has to be stripped.
 
   if(scanned_all) {
-    if(this.VIEW == this.INFO_VIEW) {
-      this.infoView(this.START_SECTION);
-    }
-    else {
-      var v = this.VIEW; // will be changed in this.plainView()!
-      this.plainView(this.START_SECTION);
-      this.ROOT.dirty = true;
-      this.ROOT_STATE = OrgNode.STATE_UNFOLDED;
+    var v = this.VIEW; // will be changed in this.plainView()!
+    this.plainView(this.START_SECTION);
+    this.ROOT.dirty = true;
+    this.ROOT_STATE = OrgNode.STATE_UNFOLDED;
+    this.toggleGlobaly();
+    if(v > this.PLAIN_VIEW) {
       this.toggleGlobaly();
-      if(v > this.PLAIN_VIEW) {
-        this.toggleGlobaly();
-      }
-      if (v == this.ALL_VIEW) {
-        this.toggleGlobaly();
-      }
     }
+    if (v == this.ALL_VIEW) {
+      this.toggleGlobaly();
+    }
+    window.scrollTo(0, 0);
   }
   else {
     if( this.runs < this.RUN_MAX ) {
-      this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", 100);
+      this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", this.RUN_INTERVAL);
       return;
     }
     // TODO: warn if not scanned_all
@@ -385,18 +386,20 @@ OrgHtmlManager.prototype.init = function ()
 
   this.CONSOLE = document.createElement("div");
   this.CONSOLE.innerHTML = '<form action="" onsubmit="return false;">'
-  +'<input type="text" id="org-console-input" onkeydown="org_html_manager.getKey(this);" maxlength="150" style="width:100%;border:1px inset #dddddd;margin-top:-200px;"'
+  +'<input type="text" id="org-console-input" onkeydown="org_html_manager.getKey(this);" maxlength="150" style="width:100%;border:1px inset #dddddd;"'
   +' value=""/>'
   +'</form>';
   this.CONSOLE.style.position = 'fixed';
-  this.CONSOLE.style.top = '-200px';
-  this.CONSOLE.style.marginTop = '-200px';
+  this.CONSOLE.style.marginTop = '-40px';
+  this.CONSOLE.style.top = '0px';
   this.CONSOLE.style.left = '0px';
   this.CONSOLE.style.width = '100%';
+  this.CONSOLE.style.height = '40px';
+
   document.body.insertBefore(this.CONSOLE, document.body.firstChild);
   this.MESSAGING = false;
   this.CONSOLE_INPUT = document.getElementById("org-console-input");
-  document.onkeydown=OrgHtmlManagerKeyEvent;
+  document.onkeypress=OrgHtmlManagerKeyEvent;
 
   if(0 != this.DEBUG && this.debug.length) alert(this.debug);
 };
@@ -411,7 +414,7 @@ OrgHtmlManager.prototype.initFromTOC = function ()
     if(null != toc) {
       var heading = null;
       var i = 0;
-      for(i;heading == null && i < 7;++i)
+      for(i;heading == null && i < 7;++i) // TODO: What is this?
         heading = toc.getElementsByTagName("h"+i)[0];
       heading.setAttribute('onclick', 'org_html_manager.fold(0);');
       heading.style.cursor = "pointer";
@@ -419,30 +422,47 @@ OrgHtmlManager.prototype.initFromTOC = function ()
         heading.setAttribute('onmouseover', 'org_html_manager.highlight_headline(this);');
         heading.setAttribute('onmouseout', 'org_html_manager.unhighlight_headline(this);');
       }
-      // _div, _heading, _link, _depth, _parent, _base_id, _usefolding
-      this.ROOT = new OrgNode( null,
-                               document.body.getElementsByTagName("h1")[0],
-                               'javascript:org_html_manager.navigateTo(0);',
-                               0,
-                               null ); // the root node
-      if(1 != this.HIDE_TOC) {
+
+      if(this.FIXED_TOC) {
+        heading.setAttribute('onclick', 'org_html_manager.toggleGlobaly();');
+        this.ROOT = new OrgNode( null,
+                                 document.body.getElementsByTagName("h1")[0],
+                                 'javascript:org_html_manager.navigateTo(0);',
+                                 0,
+                                 null ); // the root node
         this.TOC = new OrgNode( toc,
                                 heading,
                                 'javascript:org_html_manager.navigateTo(0);',
                                 i,
-                                this.ROOT ); // the root node
-        this.TOC.folder = document.getElementById("text-table-of-contents");
-        this.TOC.idx = 0;
-        this.NODE = this.TOC;
-        this.SECS.push(this.TOC);
-      } else {
-        this.TOC = new OrgNode( toc,
-                                "",
-                                'javascript:org_html_manager.navigateTo(0);',
-                                i,
-                                null );
+                                null ); // the root node
         this.NODE = this.ROOT;
-        OrgNode.hideElement(toc);
+      }
+      else {
+        this.ROOT = new OrgNode( null,
+                                 document.body.getElementsByTagName("h1")[0],
+                                 'javascript:org_html_manager.navigateTo(0);',
+                                 0,
+                                 null ); // the root node
+        if(this.HIDE_TOC) {
+          this.TOC = new OrgNode( toc,
+                                  "",
+                                  'javascript:org_html_manager.navigateTo(0);',
+                                  i,
+                                  null );
+          this.NODE = this.ROOT;
+          OrgNode.hideElement(toc);
+        }
+        else {
+          this.TOC = new OrgNode( toc,
+                                  heading,
+                                  'javascript:org_html_manager.navigateTo(0);',
+                                  i,
+                                  this.ROOT ); // the root node
+          this.TOC.folder = document.getElementById("text-table-of-contents");
+          this.TOC.idx = 0;
+          this.NODE = this.TOC;
+          this.SECS.push(this.TOC);
+        }
       }
     }
     else
@@ -460,18 +480,21 @@ OrgHtmlManager.prototype.initFromTOC = function ()
     this.cutToc(theIndex, 1);
   }
 
-  // Move the title into the first visible section:
+  // Move the title into the first visible section.
+  // TODO: show title above everything if FIXED_TOC !!!
   this.TITLE = document.getElementsByTagName("h1")[0];
-  var title = this.TITLE.cloneNode(true);
-  this.SECS[0].div.insertBefore(title, this.SECS[0].div.firstChild);
-  OrgNode.hideElement(this.TITLE);
+  if(!this.FIXED_TOC) {
+    var title = this.TITLE.cloneNode(true);
+    this.SECS[0].div.insertBefore(title, this.SECS[0].div.firstChild);
+    OrgNode.hideElement(this.TITLE);
+  }
 
   // Create all the navigation links:
   this.build();
   this.NODE = this.SECS[0];
 
   // Showing the window is TOC-dependend. So we do it here:
-  document.body.insertBefore(this.WINDOW, document.getElementById("table-of-contents"));
+  document.body.insertBefore(this.WINDOW, this.NODE.div); //document.getElementById("table-of-contents"));
 
   return true;
 };
@@ -536,12 +559,7 @@ OrgHtmlManager.prototype.cutToc = function (ul, cur_depth)
           if(cur_depth > this.TOC_DEPTH)
             li.removeChild(c);
           else
-            this.cutToc(c, cur_depth);
-        }
-      }
-    }
-  }
-};
+            this.cutToc(c, cur_depth); }}}}};
 
 /**
  * Used by OrgHtmlManager::liToOutlines
@@ -609,11 +627,11 @@ OrgHtmlManager.prototype.build = function ()
     this.SECS[i].idx = i;
     var html = '<table width="100%" border="0" style="border-bottom:1px solid black;">'
       +'<tr><td colspan="3" style="text-align:left;border-style:none;vertical-align:bottom;">'
-      +'<div style="float:left;display:inline;text-align:left;">'
-      +'Top: <a accesskey="i" href="javascript:org_html_manager.navigateTo(0);">'+index_name+'</a></div>'
-      +'<div style="float:right;display:inline;text-align:right;font-size:70%;">'
+      +'<span style="float:left;display:inline;text-align:left;">'
+      +'Top: <a accesskey="i" href="javascript:org_html_manager.navigateTo(0);">'+index_name+'</a></span>'
+      +'<span style="float:right;display:inline;text-align:right;font-size:70%;">'
       + this.LINKS
-      +'<a accesskey="t" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></div>'
+      +'<a accesskey="t" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></span>'
       +'</td></tr><tr><td style="text-align:left;border-style:none;vertical-align:bottom;width:22%">';
 
     if(i>1) // was > 0
@@ -682,7 +700,7 @@ OrgHtmlManager.prototype.showSection = function (sec)
 {
   var section = parseInt(sec);
   var last_node = this.NODE;
-  if(this.HIDE_TOC && this.NODE == this.TOC) {
+  if(this.HIDE_TOC && this.NODE == this.TOC && !this.FIXED_TOC) {
     OrgNode.hideElement(this.TOC.div);
     if(this.PLAIN_VIEW == this.VIEW) {
       this.ROOT.showAllChildren();
@@ -750,15 +768,17 @@ OrgHtmlManager.prototype.plainView = function (sec)
   this.NODE.div.scrollIntoView(true);
 };
 
-OrgHtmlManager.prototype.infoView = function (sec)
+OrgHtmlManager.prototype.infoView = function (sec, skip_show_section)
 {
   this.VIEW = this.INFO_VIEW;
   this.unhighlight_headline(this.NODE.heading);
-  OrgNode.hideElement(this.TITLE);
+  if(!this.FIXED_TOC)
+    OrgNode.hideElement(this.TITLE);
   OrgNode.showElement(this.WINDOW);
   this.ROOT.hideAllChildren();
-  if(this.TOC) OrgNode.hideElement(this.TOC.div);
-  this.showSection(sec);
+  if(this.TOC && !this.FIXED_TOC) OrgNode.hideElement(this.TOC.div);
+  if(!skip_show_section)
+    this.showSection(sec);
 };
 
 OrgHtmlManager.prototype.toggleView = function (sec)
@@ -851,12 +871,15 @@ OrgHtmlManager.prototype.getKey = function ()
   if(this.MESSAGING) {
     this.CONSOLE_INPUT.value = "";
     this.CONSOLE_INPUT.style.color = "#666666";
-    this.CONSOLE_INPUT.style.marginTop = "-200px";
-    this.CONSOLE.style.top = '-200px';
-    this.CONSOLE.style.marginTop = '-200px'; // IE
-    this.MESSAGING = false;
+    // this.CONSOLE_INPUT.style.marginTop = "-40px";
+    // this.CONSOLE.style.top = '-40px';
+    this.CONSOLE.style.marginTop = '-40px';
     this.command_str = "";
     this.CONSOLE_INPUT.value = "";
+    if(this.MESSAGING_INPLACE == this.MESSAGING) {
+      this.NODE.div.removeChild(this.NODE.div.firstChild);
+    }
+    this.MESSAGING = false;
     return;
   }
 
@@ -897,7 +920,6 @@ OrgHtmlManager.prototype.getKey = function ()
           return;
         } else {
           this.warn("Already last section.");
-          this.MESSAGING = true;
           return;                          // rely on what happends if messaging
         }
       }
@@ -925,7 +947,8 @@ OrgHtmlManager.prototype.getKey = function ()
         clean_up = true;
       }
       else if ('i' == s) {
-        if (this.HIDE_TOC) this.navigateTo('toc');
+        if(this.FIXED_TOC) this.TOC.focus;
+        else if (this.HIDE_TOC) this.navigateTo('toc');
         else if(0 != this.NODE.idx) this.navigateTo(0);
         clean_up = true;
       }
@@ -1013,11 +1036,19 @@ OrgHtmlManager.prototype.getKey = function ()
 OrgHtmlManager.prototype.warn = function (what)
 {
   this.CONSOLE_INPUT.style.color="red";
-  this.CONSOLE_INPUT.style.marginTop="0px";
-  this.CONSOLE.style.top = '0px';
-  this.CONSOLE.style.marginTop = '0px';
   this.CONSOLE_INPUT.value= what + " Press any key to proceed.";
-  this.MESSAGING = true;
+  if(this.VIEW != this.INFO_VIEW) {
+    var v = this.CONSOLE_INPUT.cloneNode(true);
+    v.style.marginTop = '0px';
+    v.style.top = '0px';
+    this.NODE.div.insertBefore(v, this.NODE.div.firstChild);
+    v.scrollIntoView(true);
+    this.MESSAGING = this.MESSAGING_INPLACE;
+  } else {
+    this.CONSOLE.style.marginTop = '0px';
+    this.CONSOLE.style.top = '0px';
+    this.MESSAGING = this.MESSAGING_TOP;
+  }
 };
 
 
@@ -1054,21 +1085,24 @@ OrgHtmlManager.prototype.toggleGlobaly = function ()
 
 OrgHtmlManager.prototype.showHelp = function ()
 {
-  alert ("Valid Input\n\n"
-         +"?  -  show this help screen (not in FF)\n"
-         +"n  -  goto the next section\n"
-         +"p  -  goto the previous section\n"
-         +"i  -  goto the first section (maybe the T.O.C.)\n"
-         +"s  -  goto section\n"
-         +"b  -  go back to last visited section. Only when following internal links.\n"
-         +"t  -  toggle the view mode\n"
-         +"f  -  fold current section (plain view)\n"
-         +"g  -  fold globaly (plain view)\n"
-         +"v  -  scroll down\n"
-         +"V  -  scroll back up\n"
-         +"u  -  one level up (parent section)\n"
-         +"h  -  if supplied, go to the main index in this directory (home)\n"
-         +"H  -  if supplied, go to link homepage (HOME)\n");
+  this.infoView(true);
+  this.WINDOW.innerHTML = '<h2>Keyboard Shortcuts</h2>'
+  +'<table cellpadding="3" style="margin:20px;border-style:none;" border="0">'
+  +'<tr><td> <code><b>?</b></code> </td><td> show this help screen (not in FF)</td></tr>'
+  +'<tr><td> <code><b>n</b></code> </td><td> goto the next section</td></tr>'
+  +'<tr><td> <code><b>p</b></code> </td><td> goto the previous section</td></tr>'
+  +'<tr><td> <code><b>i</b></code> </td><td> goto the first section (maybe the T.O.C.)</td></tr>'
+  +'<tr><td> <code><b>s</b></code> </td><td> goto section</td></tr>'
+  +'<tr><td> <code><b>b</b></code> </td><td> go back to last visited section. Only when following internal links.</td></tr>'
+  +'<tr><td> <code><b>t</b></code> </td><td> toggle the view mode</td></tr>'
+  +'<tr><td> <code><b>f</b></code> </td><td> fold current section (plain view)</td></tr>'
+  +'<tr><td> <code><b>g</b></code> </td><td> fold globaly (plain view)</td></tr>'
+  +'<tr><td> <code><b>v</b></code> </td><td> scroll down</td></tr>'
+  +'<tr><td> <code><b>V</b></code> </td><td> scroll back up</td></tr>'
+  +'<tr><td> <code><b>u</b></code> </td><td> one level up (parent section)</td></tr>'
+  +'<tr><td> <code><b>h</b></code> </td><td> if supplied, go to the main index in this directory (home)</td></tr>'
+  +'<tr><td> <code><b>H</b></code> </td><td> if supplied, go to link homepage (HOME)</td></tr>'
+  +'</table>';
 };
 
 
