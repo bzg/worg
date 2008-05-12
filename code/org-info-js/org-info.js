@@ -913,9 +913,12 @@ var org_html_manager = {
           else if(0 != this.NODE.idx) this.navigateTo(0);
           clean_up = true;
         }
-        else if ('t' == s) {
+        else if ('m' == s) {
           this.toggleView(this.NODE.idx);
           clean_up = true;
+        }
+        else if ('t' == s) {
+          this.navigateTo(0);
         }
         else if ('v' == s) {
           if(window.innerHeight)
@@ -1077,10 +1080,11 @@ var org_html_manager = {
         +'<tr><td> <code><b>?/¿/l</b></code> </td><td> show this help screen</td></tr>'
         +'<tr><td> <code><b>n</b></code> </td><td> goto the next section</td></tr>'
         +'<tr><td> <code><b>p</b></code> </td><td> goto the previous section</td></tr>'
+        +'<tr><td> <code><b>t</b></code> </td><td> goto the first section</td></tr>'
         +'<tr><td> <code><b>i</b></code> </td><td> show table of contents</td></tr>'
         +'<tr><td> <code><b>s</b></code> </td><td> goto section</td></tr>'
         +'<tr><td> <code><b>b</b></code> </td><td> go back to last visited section. Only when following internal links.</td></tr>'
-        +'<tr><td> <code><b>t</b></code> </td><td> toggle the view mode</td></tr>'
+        +'<tr><td> <code><b>m</b></code> </td><td> toggle the view mode</td></tr>'
         +'<tr><td> <code><b>f</b></code> </td><td> fold current section (plain view)</td></tr>'
         +'<tr><td> <code><b>g</b></code> </td><td> fold globaly (plain view)</td></tr>'
         +'<tr><td> <code><b>v</b></code> </td><td> scroll down</td></tr>'
