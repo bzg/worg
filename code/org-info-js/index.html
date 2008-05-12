@@ -6,8 +6,8 @@ lang="en" xml:lang="en">
 <title>EMACS ORG-INFO.JS</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2008/05/12 17:04:32"/>
-<meta name="author" content="sebastian_rose@gmx.de"/>
+<meta name="generated" content="2008/05/12 19:55:12"/>
+<meta name="author" content="Sebastian Rose"/>
 <link rel="stylesheet" type="text/css" href="stylesheet.css" />
 <script type="text/javascript" language="JavaScript" src="org-info.js"></script>
 <script type="text/javascript" language="JavaScript">
@@ -32,35 +32,35 @@ org_html_manager.setup();  // activate after the parameterd are set
 <ul>
 <li><a href="#sec-1">1 The Name of the Game</a>
 <ul>
-<li><a href="#sec-1.1">1.1 View Modes</a></li>
+<li><a href="#sec-1.1">1.1 Terms used throughout this Document</a></li>
+<li><a href="#sec-1.2">1.2 Navigation</a></li>
 </ul>
 </li>
 <li><a href="#sec-2">2 Features</a></li>
 <li><a href="#sec-3">3 Usage</a>
 <ul>
-<li><a href="#sec-3.1">3.1 Prerequisites</a></li>
-<li><a href="#sec-3.2">3.2 Export-Setup - the new Way</a>
+<li><a href="#sec-3.1">3.1 Export-Setup - the new Way</a>
 <ul>
-<li><a href="#sec-3.2.1">3.2.1 Using customize</a></li>
-<li><a href="#sec-3.2.2">3.2.2 Per File Basis: #+INFOJS_OPT</a></li>
+<li><a href="#sec-3.1.1">3.1.1 Using customize</a></li>
+<li><a href="#sec-3.1.2">3.1.2 Per File Basis: #+INFOJS_OPT</a></li>
 </ul>
 </li>
-<li><a href="#sec-3.3">3.3 Export-Setup - the old Way</a>
+<li><a href="#sec-3.2">3.2 Export-Setup - the old Way</a>
 <ul>
-<li><a href="#sec-3.3.1">3.3.1 Using a special * COMMENT Section</a></li>
-<li><a href="#sec-3.3.2">3.3.2 Using customize</a></li>
-<li><a href="#sec-3.3.3">3.3.3 Export-Setup per Project</a></li>
+<li><a href="#sec-3.2.1">3.2.1 Using a special * COMMENT Section</a></li>
+<li><a href="#sec-3.2.2">3.2.2 Using customize</a></li>
+<li><a href="#sec-3.2.3">3.2.3 Export-Setup per Project</a></li>
 </ul></li>
 </ul>
 </li>
-<li><a href="#sec-4">4 Navigation</a></li>
+<li><a href="#sec-4">4 CSS</a></li>
 <li><a href="#sec-5">5 Supported Browsers</a>
 <ul>
 <li><a href="#sec-5.1">5.1 People reported it works in</a></li>
 </ul>
 </li>
 <li><a href="#sec-6">6 Why Do I Need a T.O.C?</a></li>
-<li><a href="#sec-7">7 The HTML</a>
+<li><a href="#sec-7">7 The XHTML</a>
 <ul>
 <li><a href="#sec-7.1">7.1 Using Set()</a></li>
 </ul>
@@ -102,33 +102,31 @@ org_html_manager.setup();  // activate after the parameterd are set
 
 
 <p>
-The script and it's setup are still under development and might change
-frequently. This documentation might as well be outdated by the time you read
-this. If you don't mind using it anyway and adjust your org export options at
-times we wish you good luck and hope the fun will outweigh your effort.
+The org-info.js JavaScript (subsequently called <i>the script</i>) and its setup
+are still under development and might change frequently. This documentation
+might as well be outdated by the time you read this. If you don't mind using
+it anyway and adjust your org export options at times we wish you good luck
+and hope the fun will outweigh your effort.
 </p>
 <p>
-The aim of this little script is to implement a part of emacs org-mode
-facilities of folding in the HTML-exported files and to display them in a
-linuxdoc like way. This documentation is one XHTML file, exported from one
-*.org file using a single keyboard shortcut. No additional postprocessing was
-done.
+The aim of this little script is to implement a part of emacs Org-mode
+facilities (folding in the first place) in the XHTML-exported files and to
+display them in a linuxdoc like way. This documentation is one XHTML file,
+exported from one *.org file using a single keyboard shortcut. No additional
+postprocessing was done.
 </p>
 <p>
 There are no external dependencies. The script is quite small and fast enough
 for larger files too. I tested it with the file <code>ORGWEBPAGE/Changes.org</code> in
-the <code>org-mode</code> package which gave me 225 pages to handle and on my old
+the <code>Org-mode</code> package which gave me 225 pages to handle and on my old
 omnibook it still worked nicely. The current version tries to do so over the
 net too (see <a href="http://orgmode.org/Changes.html">http://orgmode.org/Changes.html</a>).
 </p>
 <p>
-Try it. Click on the small '<i>toggle view</i>' link on the right above the
-headline. Still seeing this section after clicking the link? Click the same
-link againg please. Still here and navigation bar back again?
-</p>
-<p>
-Find out about shortcuts in section <a href="#sec-4">Navigation</a> (and come back here
-pressing '<code>b</code>').
+There are some drawbacks though. It is currently not possible to open internal
+links in another tab (e.g. using middle click in Firefox) due my poor
+JavaScript knowledge. This is not very high on my TODO list since the history
+mechanism of the script is a good alternative to tab usage.
 </p>
 <p>
 The ChangeLog can be found <a href="#sec-9">here</a> (come back here here by pressing '<code>b</code>' there).
@@ -136,19 +134,17 @@ The ChangeLog can be found <a href="#sec-9">here</a> (come back here here by pre
 <p>
 Go to the next section by pressing '<code>n</code>'.
 </p>
-<p>
-'<code>?</code>', '<code>¿</code>' or '<code>l</code>' will show all shortcuts available.
-</p>
 
 </div>
 
 <div id="outline-container-1.1" class="outline-3">
-<h3 id="sec-1.1">1.1 <span class="target">View Modes</span> </h3>
+<h3 id="sec-1.1">1.1 <span class="target">Terms used throughout this Document</span> </h3>
 <div id="text-1.1">
 
 
 <p>
-I tend to talk about view modes. Currently two view modes exist.
+I tend to talk about view modes. One may toggle the view mode by pressing
+'<code>m</code>' or click the <i>toggle view</i> link. Currently two view modes exist.
 </p>
 <dl>
 <dt><b>info view mode</b></dt><dd>
@@ -173,7 +169,71 @@ of the document my be (un-)folded using '<code>g</code>'.
 
 
 <p>
-One may toggle the view mode by pressing '<code>t</code>' or click the <i>toggle view</i> link.
+<b>T.O.C.</b> is used for the table of contents. The table of contents may be
+visited using '<code>i</code>' (index) regardless of its visibility.
+</p>
+<p>
+A <b>section</b> is everything with a headline.
+</p>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.2" class="outline-3">
+<h3 id="sec-1.2">1.2 <span class="target">Navigation</span> </h3>
+<div id="text-1.2">
+
+
+<p>
+The visitor of this file (and every XHTML-exported org file that includes
+the script) may use the mouse or the following keys to navigate the page:
+</p>
+<table border="0" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<col align="left"></col><col align="left"></col><col align="left"></col><col align="left"></col>
+<thead>
+<tr><th>Key</th><th>Action</th><th>Info</th><th>Plain</th></tr>
+</thead>
+<tbody>
+<tr><td>n</td><td>next section</td><td>y</td><td>y</td></tr>
+<tr><td>p</td><td>previous section</td><td>y</td><td>y</td></tr>
+<tr><td>t</td><td>top. First section/T.O.C.</td><td>y</td><td>y</td></tr>
+<tr><td>i</td><td>show T.O.C.</td><td>y</td><td>y</td></tr>
+<tr><td>u</td><td>one level up (parent section)</td><td>y</td><td>y</td></tr>
+<tr><td>s</td><td>prompt for section number</td><td>y</td><td>y</td></tr>
+<tr><td>m</td><td>toggle view mode</td><td>y</td><td>y</td></tr>
+<tr><td>v</td><td>scroll by 200 px</td><td>y</td><td>y</td></tr>
+<tr><td>V</td><td>scroll back 200 px</td><td>y</td><td>y</td></tr>
+<tr><td>?</td><td>show shortcuts</td><td>y</td><td>y</td></tr>
+<tr><td>h</td><td>follow the link '<i>UP</i>'</td><td>y</td><td>y</td></tr>
+<tr><td>H</td><td>follow the link '<i>HOME</i>'</td><td>y</td><td>y</td></tr>
+<tr><td>f</td><td>fold current section</td><td></td><td>y</td></tr>
+<tr><td>g</td><td>fold globaly</td><td></td><td>y</td></tr>
+</tbody>
+</table>
+
+
+<p>
+The script always tries to keep the last selected section visible. This is
+somewhat strange when scrolling, but really helpfull for keyboard navigation.
+</p>
+<p>
+If the keyboard shortcuts work for you, drop me a mail and tell me your
+browser and its version so we can put it on list of <a href="#sec-5">supported browsers</a>.
+</p>
+<p>
+The TOC is handled specially, when hidden. If you press '<code>i</code>', the TOC is
+displayed. Any subsequent key press goes back to where you've been before. The
+TOC does not show up the history. Same applies to the keyboard help.
+</p>
+
+
+<p>
+Find out about shortcuts in section <a href="#sec-1.2">Navigation</a> (and come back here
+pressing '<code>b</code>').
+</p>
+<p>
+'<code>?</code>', '<code>¿</code>' or '<code>l</code>' will show all shortcuts available.
 </p>
 
 </div>
@@ -204,7 +264,7 @@ before.
 <dt><b>Easy keyboard navigation</b></dt><dd>
 
 <p>
-See Section <a href="#sec-4">Navigation</a> for a list of shortcuts.
+See Section <a href="#sec-1.2">Navigation</a> for a list of shortcuts.
 </p></dd>
 <dt><b>Structure is taken from export preferences</b></dt><dd>
 
@@ -212,6 +272,13 @@ See Section <a href="#sec-4">Navigation</a> for a list of shortcuts.
 The paging is done according to your setting of
 <code>org-export-headline-levels</code>. Scanning the T.O.C. is a good way to get
 around browser detection. An option to hide the T.O.C. exists.
+</p></dd>
+<dt><b>Cut the TOC</b></dt><dd>
+
+<p>
+You may cut the table of contents to a certain depth. The splitting of the
+document is not affected by this option. Hence you might set the level of
+headlines to 4, but cut the TOC to show only the first two levels.
 </p></dd>
 <dt><b>Optional subindexes</b></dt><dd>
 
@@ -261,7 +328,7 @@ next/previous section.
 <dt><b>Folding</b></dt><dd>
 
 <p>
-Emulates the way of folding in emacs org-mode.
+Emulates the way of folding in emacs Org-mode.
 </p></dd>
 <dt><b>Inter-linking</b></dt><dd>
 
@@ -290,13 +357,6 @@ using '<code>b</code>'.
 If the URL is suffixed by '<code>#sec-x.y.z</code>' that section will be displayed
 after startup.
 </p></dd>
-<dt><b>Cut the TOC</b></dt><dd>
-
-<p>
-You may cut the table of contents to a certain depth. The splitting of the
-document is not affected by this option. Hence you might set the level of
-headlines to 4, but cut the TOC to show only the first two levels.
-</p></dd>
 </dl>
 
 
@@ -310,21 +370,13 @@ headlines to 4, but cut the TOC to show only the first two levels.
 <div id="text-3">
 
 
-
-</div>
-
-<div id="outline-container-3.1" class="outline-3">
-<h3 id="sec-3.1">3.1 Prerequisites</h3>
-<div id="text-3.1">
-
-
 <p>
-To produce this HTML file I used the current version of org-mode and it's
-HTML export. The structure of the exported XHTML has changed a bit in
-beginning of March 2008 to support scripting an other tools that work on
-<code>XML</code>. Thanks to Carsten Dominik who found the time to modify the current
-export modul to produce the draft version of the next generation XHTML.  The
-new structure won't break any of your stylesheets though.
+This section describes the setup of your org files for the utilisation of the
+scipt. <a href="#sec-3.1">Export-Setup - the new Way</a> will guide you to setup your org XHTML
+export. That section refers to an Org-mode version &gt;= 6.02. For those using an
+Org-mode version &lt; 6.02 the next section (<a href="#sec-3.2">Export-Setup - the old Way</a>)
+remains. <a href="#sec-7.1">Using Set()</a> contains a list of all supported options for adjusting
+the <code>org_html_manager</code> to suit your needs.
 </p>
 <p>
 A sufficient up to date version is available for download on <a href="http://orgmode.org/#sec-3">orgmode.org</a> or
@@ -336,40 +388,59 @@ git-clone git://repo.or.cz/org-mode.git
 </pre>
 </p>
 <p>
-The current version of this script will not work with the HTML export as
-distributed with the current org-mode package (and hence emacs 22.x)
-anymore. But I'm afraid there are good chances the new exporter is in emacs
-before this thing here enters a usefull state :-)
+This script will not work with the XHTML export as distributed with the
+current Org-mode package (and hence emacs 22.x) anymore (??). But I'm afraid
+there are good chances the new exporter is in emacs before this thing here
+enters a somewhat stable state :-)
 </p>
 <p>
-The new export made it into git somewhere around version 5.23a+.
+To produce this XHTML file I used the current version of Org-mode and it's
+XHTML export. The structure of the exported XHTML has changed a bit in
+beginning of March 2008 to support scripting an other tools that work on
+<code>XML</code>. Thanks to Carsten Dominik who found the time to modify the current
+export modul to produce the draft version of the next generation XHTML.  The
+new structure won't break any of your stylesheets though.
 </p>
-</div>
+<p>
+The new export made it into git somewhere around version 5.23a+. Try <code>M-x   org-version</code> to find about your Org-mode version.
+</p>
 
 </div>
 
-<div id="outline-container-3.2" class="outline-3">
-<h3 id="sec-3.2">3.2 Export-Setup - the new Way</h3>
-<div id="text-3.2">
+<div id="outline-container-3.1" class="outline-3">
+<h3 id="sec-3.1">3.1 <span class="target">Export-Setup - the new Way</span> </h3>
+<div id="text-3.1">
 
 
 <p>
-There is no need to do something you don't do occasionally in org-mode when
-it comes to HTML export. Just use one of the four ordinary ways to include
+There is no need to do something you don't do occasionally in Org-mode when
+it comes to XHTML export. Just use one of the four ordinary ways to include
 something into the head of the resulting html file.
 </p>
 <p>
 The modern way of org export setup provides extra options to include and
 configure the script, as well as a emacs customize interface for this same
 purpose. Options set in customize may be overwritten on a per-file basis
-using some special <code>#+</code> lines in the head of your org file.
+using one or more special <code>#+INFOJS_OPT:</code> lines in the head of your org
+file.
+</p>
+<p>
+As an example, the head of this org file looks like this:
+</p>
+<p>
+<pre>
+#+INFOJS_OPT: path:org-info.js
+#+INFOJS_OPT: toc:nil localtoc:t view:info mouse:underline
+#+INFOJS_OPT: up:http://www.legito.net/
+#+INFOJS_OPT: home:http://orgmode.org buttons:nil
+</pre>
 </p>
 
 </div>
 
-<div id="outline-container-3.2.1" class="outline-4">
-<h4 id="sec-3.2.1">3.2.1 Using customize</h4>
-<div id="text-3.2.1">
+<div id="outline-container-3.1.1" class="outline-4">
+<h4 id="sec-3.1.1">3.1.1 Using customize</h4>
+<div id="text-3.1.1">
 
 
 <p>
@@ -387,7 +458,7 @@ perfect by default. So I'll concentrate on <i>Org Infojs Options</i> here.
 <dt><code>path</code></dt><dd>
 
 <p>
-Absolute or relative URL to the script as used in in HTML
+Absolute or relative URL to the script as used in in XHTML
 links. '<code>org-info.js</code>' will find the file in the current
 directory. Keep in mind that this will be the directory of the
 exported file, eventually a directory on a server.
@@ -471,7 +542,7 @@ Highlight the headline under the mouse in plain view mode?
 <code>underline</code> &mdash; underline the headline under mouse,
 </li>
 <li>
-<code>#dddddd</code> &mdash; or any valid HTML/CSS color value like <code>red</code> to draw a
+<code>#dddddd</code> &mdash; or any valid XHTML/CSS color value like <code>red</code> to draw a
 colored background for the headline under the mouse.
 </li>
 </ul>
@@ -504,9 +575,9 @@ Affects plain view mode only.
 
 </div>
 
-<div id="outline-container-3.2.2" class="outline-4">
-<h4 id="sec-3.2.2">3.2.2 Per File Basis: #+INFOJS_OPT</h4>
-<div id="text-3.2.2">
+<div id="outline-container-3.1.2" class="outline-4">
+<h4 id="sec-3.1.2">3.1.2 Per File Basis: #+INFOJS_OPT</h4>
+<div id="text-3.1.2">
 
 
 <p>
@@ -533,29 +604,30 @@ An URL pointing to some main page. The text displayed is <code>Up</code>.
 </dl>
 
 
-
 </div>
 </div>
 
 </div>
 
-<div id="outline-container-3.3" class="outline-3">
-<h3 id="sec-3.3">3.3 Export-Setup - the old Way</h3>
-<div id="text-3.3">
+<div id="outline-container-3.2" class="outline-3">
+<h3 id="sec-3.2">3.2 <span class="target">Export-Setup - the old Way</span> </h3>
+<div id="text-3.2">
 
 
 <p>
 This section describes the old way to setup the script using the
-<code>org-export-html-style</code> configuration. If you own a current version
-(6.00 ++) of org-mode you should better use <a href="#sec-3.2">Export-Setup - the new Way</a> of setting up the
-export for script usage.
+<code>org-export-html-style</code> configuration. If you own a current version (6.00
+++) of Org-mode you should better use <a href="#sec-3.1">Export-Setup - the new Way</a> of setting
+up the export for script usage. You might want to read the sections <a href="#sec-7">The XHTML</a>
+for more information. <a href="#sec-7.1">Using Set()</a> contains a list of all supported options
+recognised by the script.
 </p>
 
 </div>
 
-<div id="outline-container-3.3.1" class="outline-4">
-<h4 id="sec-3.3.1">3.3.1 Using a special * COMMENT Section</h4>
-<div id="text-3.3.1">
+<div id="outline-container-3.2.1" class="outline-4">
+<h4 id="sec-3.2.1">3.2.1 Using a special * COMMENT Section</h4>
+<div id="text-3.2.1">
 
 
 <p>
@@ -590,9 +662,9 @@ itself.
 
 </div>
 
-<div id="outline-container-3.3.2" class="outline-4">
-<h4 id="sec-3.3.2">3.3.2 Using customize</h4>
-<div id="text-3.3.2">
+<div id="outline-container-3.2.2" class="outline-4">
+<h4 id="sec-3.2.2">3.2.2 Using customize</h4>
+<div id="text-3.2.2">
 
 
 <p>
@@ -622,9 +694,9 @@ This way all your files will be exported using the script in the future.
 
 </div>
 
-<div id="outline-container-3.3.3" class="outline-4">
-<h4 id="sec-3.3.3">3.3.3 Export-Setup per Project</h4>
-<div id="text-3.3.3">
+<div id="outline-container-3.2.3" class="outline-4">
+<h4 id="sec-3.2.3">3.2.3 Export-Setup per Project</h4>
+<div id="text-3.2.3">
 
 
 <p>
@@ -660,51 +732,34 @@ Don't forget to add an export target for the script itself ;-)
 </div>
 
 <div id="outline-container-4" class="outline-2">
-<h2 id="sec-4">4 <span class="target">Navigation</span> </h2>
+<h2 id="sec-4">4 CSS</h2>
 <div id="text-4">
 
 
 <p>
-Once the script is included, the visitor of the resulting HTML file may use
-the mouse or the following keys to navigate the page:
+There is currently only one CSS class used in the script. More style classes
+will follow in the future.
 </p>
-<table border="0" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-<col align="left"></col><col align="left"></col><col align="left"></col><col align="left"></col>
-<thead>
-<tr><th>Key</th><th>Action</th><th>Info</th><th>Plain</th></tr>
-</thead>
-<tbody>
-<tr><td>n</td><td>next section</td><td>y</td><td>y</td></tr>
-<tr><td>p</td><td>previous section</td><td>y</td><td>y</td></tr>
-<tr><td>t</td><td>top. First section/T.O.C.</td><td>y</td><td>y</td></tr>
-<tr><td>i</td><td>show T.O.C.</td><td>y</td><td>y</td></tr>
-<tr><td>u</td><td>one level up (parent section)</td><td>y</td><td>y</td></tr>
-<tr><td>s</td><td>prompt for section number</td><td>y</td><td>y</td></tr>
-<tr><td>t</td><td>toggle view mode</td><td>y</td><td>y</td></tr>
-<tr><td>v</td><td>scroll by 200 px</td><td>y</td><td>y</td></tr>
-<tr><td>V</td><td>scroll back 200 px</td><td>y</td><td>y</td></tr>
-<tr><td>?</td><td>show shortcuts</td><td>y</td><td>y</td></tr>
-<tr><td>h</td><td>follow the link '<i>UP</i>'</td><td>y</td><td>y</td></tr>
-<tr><td>H</td><td>follow the link '<i>HOME</i>'</td><td>y</td><td>y</td></tr>
-<tr><td>f</td><td>fold current section</td><td></td><td>y</td></tr>
-<tr><td>g</td><td>fold globaly</td><td></td><td>y</td></tr>
-</tbody>
-</table>
-
+<dl>
+<dt><code>org-info-info-navigation</code></dt><dd>
 
 <p>
-The script always tries to keep the last selected section visible. This is
-somewhat strange when scrolling, but really helpfull for keyboard navigation.
-</p>
-<p>
-If the keyboard shortcuts work for you, drop me a mail and tell me your
-browser and its version so we can put it on list of <a href="#sec-5">supported browsers</a>.
-</p>
-<p>
-The TOC is handled specially, when hidden. If you press '<code>i</code>', the TOC is
-displayed. Any subsequent key press goes back to where you've been before. The
-TOC does not show up the history. Same applies to the keyboard help.
-</p>
+Style for the navigation table in info view mode. I needed this one to avoid
+border around that table. You may add lines like these to your stylesheet:
+<pre>
+/* Style for org-info.js */
+
+.org-info-info-navigation
+{
+  border-style:none;
+}
+</pre>
+</p></dd>
+</dl>
+
+
+
+
 </div>
 
 </div>
@@ -786,7 +841,7 @@ we can update the above table.
 
 <p>
 Currently the script depends on the table of contents in the resulting
-HTML. The T.O.C. can be hidden though.
+XHTML. The T.O.C. can be hidden though.
 </p>
 <p>
 The main reason is the behaviour of browsers. There is no safe way to detect
@@ -801,21 +856,21 @@ connections too. There should be tons of other bugs though :)
 </div>
 
 <div id="outline-container-7" class="outline-2">
-<h2 id="sec-7">7 The HTML</h2>
+<h2 id="sec-7">7 <span class="target">The XHTML</span> </h2>
 <div id="text-7">
 
 
 <p>
-This section is obsolete as of org version 6.00-pre-3, since there is also a
-new configuration interface in org now to setup the script without dealing
-with JavaScript. It is still here to show how the desired look of the head
-section of the HTML. Also someone might be interested to use the script for
-XHTML files not exported from org.
+End users may consider this section obsolete as of org version 6.00-pre-3,
+since there is a new configuration interface in org now to setup the script
+without dealing with JavaScript. It is still here to show how the desired look
+of the head section of the XHTML. Also someone might be interested to use the
+script for XHTML files not exported from org.
 </p>
 <p>
-The script has to be included in the header of the resulting HTML files. The
-document structure has to be exactly the one produced by the current HTML
-export of emacs org-mode.
+The script has to be included in the header of the resulting XHTML files. The
+document structure has to be exactly the one produced by the current XHTML
+export of emacs Org-mode.
 You may pass options to the <code>org_html_manager</code> by utilising it's <code>set()</code>
 method. For a list of options see section <a href="#sec-7.1">Using Set()</a>. This is what the
 head section should look like:
@@ -901,7 +956,7 @@ for sections containing subsections. See sections 1 2, or 3.1 of this
 document. The index below the headline (under 'Contents:') is generated
 by the script. This one is off by default.
 </p></dd>
-<dt><code>INFO_SWITCH_ALWAYS</code></dt><dd>
+<dt><code>VIEW_BUTTONS</code></dt><dd>
 
 <p>
 If <code>true</code>, include the small '<i>toggle view</i>' link above every headline in
@@ -929,13 +984,13 @@ This way we can link files into a tree, if all subdirectories in the
 project follow the same conventions. Like containing some
 <code>subdir/index.org</code> and a homepage somwhere else.
 </p></dd>
-<dt><code>LINK_TO_MAIN</code></dt><dd>
+<dt><code>LINK_HOME</code></dt><dd>
 
 <p>
 May be set, to link to an other file, preferably the main home page. You
 must use an absolute URL here. This link will be displayed as
 <pre>
-&lt;a href="LINK_TO_MAIN"&gt;Up&lt;/a&gt;
+&lt;a href="LINK_HOME"&gt;Up&lt;/a&gt;
 </pre>
 Command: '<code>H</code>' - HOME::
 This way we can link files into a tree, if all subdirectories in the
@@ -970,10 +1025,7 @@ document has  to be exported with T.O.C.  since the script depends  on it (See
 </p>
 <p>
 When   included,   it   creates    a   global   JavaScript™   variable   named
-<code>org_html_manager</code>, which is an  instance of the class <code>OrgHtmlManager</code>. The
-class is  meant as a singleton but  there are no precautions  for avoiding the
-creation of  an other  instance. No one  would need  to create a  new instance
-anyway.
+<code>org_html_manager</code>.
 </p>
 <p>
 The  <code>org_html_manager::setup()</code>  function,  that  you  will  have  to  call
@@ -1032,16 +1084,22 @@ Since '<code>i</code>' now shows the T.O.C. there was a shortcut missing to go t
 first section (which might as well be the T.O.C. if <code>#+INFOJS_OPT:       toc:t</code>). This key is now '<code>t</code>'. For toggling the view mode, '<code>m</code>' is used
 from now on.
 </p></dd>
-</dl>
-
-
-<dl>
-<dt><b>&amp;iquset;</b></dt><dd>
+<dt><b>&amp;iquest;</b></dt><dd>
 
 <p>
 To show the help screen one may use the '<code>¿</code>' key. The help-screen got
 upated using '<code>&amp;iquest;</code>' now to avoid distorted displaying of this
 character.
+</p></dd>
+<dt><b>org-info-info-navigation</b></dt><dd>
+
+<p>
+Style class for the navigation bar in info view mode.
+</p></dd>
+<dt><b>Documentation</b></dt><dd>
+
+<p>
+Documentation reworked. Should be fairly uptodate now.
 </p></dd>
 </dl>
 
@@ -1648,7 +1706,7 @@ working in both modes very easy, but currently also only in info view
 mode implemented.
 </li>
 <li>
-<b>Code relies now on next generation HTML-Export format.</b>
+<b>Code relies now on next generation XHTML-Export format.</b>
 </li>
 </ul>
 </dd>
@@ -1732,7 +1790,7 @@ Set the initial view mode. Set to <code>org_html_manager.PLAIN_VIEW</code> or
 
 
 <p>
-The aim of this little script is to implement a part of emacs org-mode
+The aim of this little script is to implement a part of emacs Org-mode
 facilities of folding. Oh, no - not originaly.
 </p>
 <p>
@@ -1742,7 +1800,7 @@ wanted to have them paged just like texinfo or linuxdoc files. In February
 <a href="http://orgmode.org/todo.html">http://orgmode.org/todo.html</a>. And I could not resist to write him some of my
 thoughts about this great emacs mode including some little ideas and
 drawbacks. I don't know how, but it somehow these guys made me, lazy bone that
-I am, write this little script as an apetizer of <i>web 3.0 in org-mode</i> (Phil
+I am, write this little script as an apetizer of <i>web 3.0 in Org-mode</i> (Phil
 Jackson).
 </p>
 <p>
@@ -1751,7 +1809,7 @@ features. Bastien Guerry was so kind to publish it on
 <a href="http://www.legito.net/org-info-js/">http://www.legito.net/org-info-js/</a> the first months. Thanks Bastien.
 </p>
 <p>
-In the first days of April Carsten Dominik added code to org-mode to support
+In the first days of April Carsten Dominik added code to Org-mode to support
 the usage of this script. Hence the script may now be configured in a similar way
 to the other export options. Since then it is even possible to configure this
 script through customize.
@@ -1769,11 +1827,11 @@ script through customize.
 Very special thanks to Carsten Dominik, Bastien Guerry and Phil Jackson who
 have encouraged me to write and publish this little piece of (unfinished) work
 and all the hundrets of hours they spent on this fantastic emacs mode called
-org-mode and the export modules.
+Org-mode and the export modules.
 </p>
 <p>
 Org is a new working experience for me and there is nothing comparable to
-working with emacs AND org-mode.
+working with emacs AND Org-mode.
 </p>
 <p>
 An other big kiss to Gabi (<a href="http://www.emma-stil.de">www.emma-stil.de</a>) for being so patient while I was
@@ -1820,7 +1878,7 @@ subject to <a href="http://www.fsf.org/licensing/licenses/fdl.txt">GFDL</a>.
 
 
 <p>
-This document in emacs23 with org-mode v. 5.22a+. The visibilty of the
+This document in emacs23 with Org-mode v. 5.22a+. The visibilty of the
 contents of a individual section or subsection can be toggled by clicking the
 stars in front of the headlines or moving there and hitting <code>TAB</code>. The
 visibility of the entire document structure can be changed by pressing
@@ -1834,9 +1892,9 @@ indentation. <code>ALT+LEFT/RIGHT</code> promotes and demotes the subtree.
 
 </div>
 </div>
-<div id="postamble"><p class="author"> Author: sebastian_rose@gmx.de
+<div id="postamble"><p class="author"> Author: Sebastian Rose
 <a href="mailto:sebastian_rose@gmx.de">&lt;sebastian_rose@gmx.de&gt;</a>
 </p>
-<p class="date"> Date: 2008/05/12 17:04:32</p>
+<p class="date"> Date: 2008/05/12 19:55:12</p>
 </div></body>
 </html>

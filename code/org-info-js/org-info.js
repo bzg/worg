@@ -619,7 +619,7 @@ var org_html_manager = {
     for(var i = 0; i < this.SECS.length; ++i)
     {
       this.SECS[i].idx = i;
-      var html = '<table width="100%" border="0" style="border-bottom:1px solid black;">'
+      var html = '<table class="org-info-info-navigation" width="100%" border="0" style="border-bottom:1px solid black;">'
         +'<tr><td colspan="3" style="text-align:left;border-style:none;vertical-align:bottom;">'
         +'<span style="float:left;display:inline;text-align:left;">'
         +'Top: <a accesskey="i" href="javascript:org_html_manager.navigateTo(0);">'+index_name+'</a></span>'
@@ -843,7 +843,6 @@ var org_html_manager = {
     // return, if s is empty:
     if(0 == s.length) return;
 
-    var clean_up = false;
     var copy = false;
 
     // the easiest is to just drop everything and clean the console.
@@ -905,20 +904,17 @@ var org_html_manager = {
           if(window.confirm("Really close this file?")) {
             window.close();
           }
-          clean_up = true;
         }
         else if ('i' == s) {
           if(this.FIXED_TOC) this.TOC.focus;
           else if (this.HIDE_TOC) this.navigateTo('toc');
           else if(0 != this.NODE.idx) this.navigateTo(0);
-          clean_up = true;
         }
         else if ('m' == s) {
           this.toggleView(this.NODE.idx);
-          clean_up = true;
         }
         else if ('t' == s) {
-          this.navigateTo(0);
+          if(0 != this.NODE.idx) this.navigateTo(0);
         }
         else if ('v' == s) {
           if(window.innerHeight)
@@ -927,7 +923,6 @@ var org_html_manager = {
             window.scrollBy(0, document.documentElement.clientHeight - 30);
           else
             window.scrollBy(0, document.body.cleintHeight - 30);
-          clean_up = true;
         }
         else if ('V' == s) {
           if(window.innerHeight)
@@ -936,40 +931,33 @@ var org_html_manager = {
             window.scrollBy(0, -(document.documentElement.clientHeight - 30));
           else
             window.scrollBy(0, -(document.body.cleintHeight - 30));
-          clean_up = true;
         }
         else if ('u' == s) {
           if(this.NODE.parent) {
             this.NODE = this.NODE.parent;
             this.showSection(this.NODE.idx);
           }
-          clean_up = true;
         }
         else if ('f' == s) {
           if(this.VIEW != this.INFO_VIEW) {
             this.NODE.fold();
             this.NODE.div.scrollIntoView(true);
           }
-          clean_up = true;
         }
         else if ('g' == s) {
           if(this.VIEW != this.INFO_VIEW) {
             this.toggleGlobaly();
             this.NODE.div.scrollIntoView(true);
           }
-          clean_up = true;
         }
         else if ('?' == s || 'l' == s || '¿' == s) {
           this.showHelp();
-          clean_up = true;
         }
         else if ('H' == s && this.LINK_HOME) {
           window.document.location.href = this.LINK_HOME;
-          clean_up = true;
         }
         else if ('h' == s && this.LINK_UP) {
           window.document.location.href = this.LINK_UP;
-          clean_up = true;
         }
         else if ('s' == s) {
           var matches = this.SECEX.exec(window.prompt("Enter Section:"));
