@@ -1,0 +1,1900 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+lang="en" xml:lang="en">
+<head>
+<title>EMACS ORG-INFO.JS</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2008/05/12 20:18:10"/>
+<meta name="author" content="Sebastian Rose"/>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" />
+<script type="text/javascript" language="JavaScript" src="org-info.js"></script>
+<script type="text/javascript" language="JavaScript">
+/* <![CDATA[ */
+org_html_manager.set("TOC_DEPTH", "3");
+org_html_manager.set("LINK_HOME", "http://orgmode.org");
+org_html_manager.set("LINK_UP", "http://www.legito.net/");
+org_html_manager.set("LOCAL_TOC", "1");
+org_html_manager.set("VIEW_BUTTONS", "0");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.set("TOC", "0");
+org_html_manager.set("VIEW", "info");
+org_html_manager.setup();  // activate after the parameterd are set
+/* ]]> */
+</script>
+</head><body>
+<h1 id="title">EMACS ORG-INFO.JS</h1>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 The Name of the Game</a>
+<ul>
+<li><a href="#sec-1.1">1.1 Terms used throughout this Document</a></li>
+<li><a href="#sec-1.2">1.2 Navigation</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2 Features</a></li>
+<li><a href="#sec-3">3 Usage</a>
+<ul>
+<li><a href="#sec-3.1">3.1 Export-Setup - the new Way</a>
+<ul>
+<li><a href="#sec-3.1.1">3.1.1 Using customize</a></li>
+<li><a href="#sec-3.1.2">3.1.2 Per File Basis: #+INFOJS_OPT</a></li>
+</ul>
+</li>
+<li><a href="#sec-3.2">3.2 Export-Setup - the old Way</a>
+<ul>
+<li><a href="#sec-3.2.1">3.2.1 Using a special * COMMENT Section</a></li>
+<li><a href="#sec-3.2.2">3.2.2 Using customize</a></li>
+<li><a href="#sec-3.2.3">3.2.3 Export-Setup per Project</a></li>
+</ul></li>
+</ul>
+</li>
+<li><a href="#sec-4">4 CSS</a></li>
+<li><a href="#sec-5">5 Supported Browsers</a>
+<ul>
+<li><a href="#sec-5.1">5.1 People reported it works in</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6 Why Do I Need a T.O.C?</a></li>
+<li><a href="#sec-7">7 The XHTML</a>
+<ul>
+<li><a href="#sec-7.1">7.1 Using Set()</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8 How it works</a></li>
+<li><a href="#sec-9">9 ChangeLog</a>
+<ul>
+<li><a href="#sec-9.1">9.1  2008-05-12 Mo </a></li>
+<li><a href="#sec-9.2">9.2  2008-05-12 Mo </a></li>
+<li><a href="#sec-9.3">9.3  2008-05-09 Fr </a></li>
+<li><a href="#sec-9.4">9.4  2008-05-04 So </a></li>
+<li><a href="#sec-9.5">9.5  2008-05-02 Fr </a></li>
+<li><a href="#sec-9.6">9.6  2008-04-17 Do </a></li>
+<li><a href="#sec-9.7">9.7  2008-04-15 Di </a></li>
+<li><a href="#sec-9.8">9.8  2008-04-13 So </a></li>
+<li><a href="#sec-9.9">9.9 2008-04-09 Mi</a></li>
+<li><a href="#sec-9.10">9.10 2008-04-06 So</a></li>
+<li><a href="#sec-9.11">9.11 2008-03-31 Mo</a></li>
+<li><a href="#sec-9.12">9.12  2008-03-30 So </a></li>
+<li><a href="#sec-9.13">9.13  2008-03-23 So</a></li>
+<li><a href="#sec-9.14">9.14  2008-03-22 Sa </a></li>
+<li><a href="#sec-9.15">9.15  2008-03-21 Fr </a></li>
+<li><a href="#sec-9.16">9.16  2008-03-13 Do </a></li>
+<li><a href="#sec-9.17">9.17  2008-03-12 Mi </a></li>
+<li><a href="#sec-9.18">9.18  2008-03-11 Di </a></li>
+</ul>
+</li>
+<li><a href="#sec-10">10 History</a></li>
+<li><a href="#sec-11">11 Thanks</a></li>
+<li><a href="#sec-12">12 License</a></li>
+<li><a href="#sec-13">13 THE END</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1">1 The Name of the Game</h2>
+<div id="text-1">
+
+
+<p>
+The org-info.js JavaScript (subsequently called <i>the script</i>) and its setup
+are still under development and might change frequently. This documentation
+might as well be outdated by the time you read this. If you don't mind using
+it anyway and adjust your org export options at times we wish you good luck
+and hope the fun will outweigh your effort.
+</p>
+<p>
+The aim of this little script is to implement a part of emacs Org-mode
+facilities (folding in the first place) in the XHTML-exported files and to
+display them in a linuxdoc like way. This documentation is one XHTML file,
+exported from one *.org file using a single keyboard shortcut. No additional
+postprocessing was done.
+</p>
+<p>
+There are no external dependencies. The script is quite small and fast enough
+for larger files too. I tested it with the file <code>ORGWEBPAGE/Changes.org</code> in
+the <code>Org-mode</code> package which gave me 225 pages to handle and on my old
+omnibook it still worked nicely. The current version tries to do so over the
+net too (see <a href="http://orgmode.org/Changes.html">http://orgmode.org/Changes.html</a>).
+</p>
+<p>
+There are some drawbacks though. It is currently not possible to open internal
+links in another tab (e.g. using middle click in Firefox) due my poor
+JavaScript knowledge. This is not very high on my TODO list since the history
+mechanism of the script is a good alternative to tab usage.
+</p>
+<p>
+The ChangeLog can be found <a href="#sec-9">here</a> (come back here here by pressing '<code>b</code>' there).
+</p>
+<p>
+Go to the next section by pressing '<code>n</code>'.
+</p>
+
+</div>
+
+<div id="outline-container-1.1" class="outline-3">
+<h3 id="sec-1.1">1.1 <span class="target">Terms used throughout this Document</span> </h3>
+<div id="text-1.1">
+
+
+<p>
+I tend to talk about view modes. One may toggle the view mode by pressing
+'<code>m</code>' or click the <i>toggle view</i> link. Currently two view modes exist.
+</p>
+<dl>
+<dt><b>info view mode</b></dt><dd>
+
+<p>
+This mode displays the sections one by one, paged like the typical
+linuxdoc or texinfo files. This is the view mode you should face when
+first visiting this documentation.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>plain view mode</b></dt><dd>
+
+<p>
+This mode displays the entire file. In this mode the sections are foldable
+by clicking the headlines or pressing '<code>f</code>' (fold). The entire structure
+of the document my be (un-)folded using '<code>g</code>'.
+</p></dd>
+</dl>
+
+
+<p>
+<b>T.O.C.</b> is used for the table of contents. The table of contents may be
+visited using '<code>i</code>' (index) regardless of its visibility.
+</p>
+<p>
+A <b>section</b> is everything with a headline.
+</p>
+
+</div>
+
+</div>
+
+<div id="outline-container-1.2" class="outline-3">
+<h3 id="sec-1.2">1.2 <span class="target">Navigation</span> </h3>
+<div id="text-1.2">
+
+
+<p>
+The visitor of this file (and every XHTML-exported org file that includes
+the script) may use the mouse or the following keys to navigate the page:
+</p>
+<table border="0" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<col align="left"></col><col align="left"></col><col align="left"></col><col align="left"></col>
+<thead>
+<tr><th>Key</th><th>Action</th><th>Info</th><th>Plain</th></tr>
+</thead>
+<tbody>
+<tr><td>n</td><td>next section</td><td>y</td><td>y</td></tr>
+<tr><td>p</td><td>previous section</td><td>y</td><td>y</td></tr>
+<tr><td>t</td><td>top. First section/T.O.C.</td><td>y</td><td>y</td></tr>
+<tr><td>i</td><td>show T.O.C.</td><td>y</td><td>y</td></tr>
+<tr><td>u</td><td>one level up (parent section)</td><td>y</td><td>y</td></tr>
+<tr><td>s</td><td>prompt for section number</td><td>y</td><td>y</td></tr>
+<tr><td>m</td><td>toggle view mode</td><td>y</td><td>y</td></tr>
+<tr><td>v</td><td>scroll by 200 px</td><td>y</td><td>y</td></tr>
+<tr><td>V</td><td>scroll back 200 px</td><td>y</td><td>y</td></tr>
+<tr><td>?</td><td>show shortcuts</td><td>y</td><td>y</td></tr>
+<tr><td>h</td><td>follow the link '<i>UP</i>'</td><td>y</td><td>y</td></tr>
+<tr><td>H</td><td>follow the link '<i>HOME</i>'</td><td>y</td><td>y</td></tr>
+<tr><td>f</td><td>fold current section</td><td></td><td>y</td></tr>
+<tr><td>g</td><td>fold globaly</td><td></td><td>y</td></tr>
+</tbody>
+</table>
+
+
+<p>
+The script always tries to keep the last selected section visible. This is
+somewhat strange when scrolling, but really helpfull for keyboard navigation.
+</p>
+<p>
+If the keyboard shortcuts work for you, drop me a mail and tell me your
+browser and its version so we can put it on list of <a href="#sec-5">supported browsers</a>.
+</p>
+<p>
+The TOC is handled specially, when hidden. If you press '<code>i</code>', the TOC is
+displayed. Any subsequent key press goes back to where you've been before. The
+TOC does not show up the history. Same applies to the keyboard help.
+</p>
+
+
+<p>
+Find out about shortcuts in section <a href="#sec-1.2">Navigation</a> (and come back here
+pressing '<code>b</code>').
+</p>
+<p>
+'<code>?</code>', '<code>¿</code>' or '<code>l</code>' will show all shortcuts available.
+</p>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2">2 <span class="target">Features</span> </h2>
+<div id="text-2">
+
+
+<dl>
+<dt><b>Toggle plain and info view</b></dt><dd>
+
+<p>
+One can click the script-generated links in info view mode to read through
+the whole file page by page. By clicking on '<i>toggle view</i>' (or pressing
+`t´) you can switch between info and plain view mode.
+</p></dd>
+<dt><b>Keep place in file when toggling</b></dt><dd>
+
+<p>
+When changing the view mode via the '<i>toggle view</i>' links, the reader gets
+the same part of the document presented after the view change as he saw
+before.
+</p></dd>
+<dt><b>Easy keyboard navigation</b></dt><dd>
+
+<p>
+See Section <a href="#sec-1.2">Navigation</a> for a list of shortcuts.
+</p></dd>
+<dt><b>Structure is taken from export preferences</b></dt><dd>
+
+<p>
+The paging is done according to your setting of
+<code>org-export-headline-levels</code>. Scanning the T.O.C. is a good way to get
+around browser detection. An option to hide the T.O.C. exists.
+</p></dd>
+<dt><b>Cut the TOC</b></dt><dd>
+
+<p>
+You may cut the table of contents to a certain depth. The splitting of the
+document is not affected by this option. Hence you might set the level of
+headlines to 4, but cut the TOC to show only the first two levels.
+</p></dd>
+<dt><b>Optional subindexes</b></dt><dd>
+
+<p>
+The script optionally creates subindexes under the headline of a section
+containing subsections not exceeding <code>org-export-headline-levels</code>. This
+was done to get a more texinfo/linuxdoc kind of feel and a better
+orientaton.
+</p></dd>
+<dt><b>Startupview customizable</b></dt><dd>
+
+<p>
+Choose how to display the document on load. Info-like or plain.
+</p></dd>
+<dt><b>Toggle links everywhere / only on top</b></dt><dd>
+
+<p>
+You may choose to display the '<i>toggle view</i>' links above every headline
+or just next the current sections headline.
+</p></dd>
+<dt><b>Numbered pages</b></dt><dd>
+
+<p>
+In info view mode every page gets a page number starting from one.
+</p></dd>
+<dt><b>Markright alike headings</b></dt><dd>
+
+<p>
+Info view mode only. Similar to the <code>\markright</code> command in LaTeX
+the Title of the current sections parent appears on top of each page. In
+subsections this heading can be use as link up to start of the parent
+section (see top of this page when you're in info view mode). You can move
+to the parent section by pressing `u´ (up).
+</p></dd>
+<dt><b>Customizable features</b></dt><dd>
+
+<p>
+All features are customizable simply by setting up your export options
+template (see <a href="#sec-3">Usage</a>).
+</p></dd>
+<dt><b>Tooltips</b></dt><dd>
+
+<p>
+Moving the mouse on the navigation links shows a tooltip with name of
+next/previous section.
+</p></dd>
+<dt><b>Folding</b></dt><dd>
+
+<p>
+Emulates the way of folding in emacs Org-mode.
+</p></dd>
+<dt><b>Inter-linking</b></dt><dd>
+
+<p>
+The exported pages can be linked to the homepage and an directory index or
+some other sort of parent file.
+</p></dd>
+<dt><b>Hide T.O.C.</b></dt><dd>
+
+<p>
+The T.O.C. can be hidden completly. Hittin '<code>i</code>' still will show it. When
+showing the T.O.C. hitting '<code>i</code>' any navigation command ('<code>n</code>', '<code>p</code>',
+'<code>s</code>'&hellip;) will trigger an history-back. Thus the T.O.C. will not get in your
+way when navigating the history later on.
+</p></dd>
+<dt><b>Adjusted internal links</b></dt><dd>
+
+<p>
+Internal links to section headings are automatically adjusted to work with
+this script. When following such internal links, one may go back again
+using '<code>b</code>'.
+</p></dd>
+<dt><b>Detect the target in the URL</b></dt><dd>
+
+<p>
+If the URL is suffixed by '<code>#sec-x.y.z</code>' that section will be displayed
+after startup.
+</p></dd>
+</dl>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3">3 <span class="target">Usage</span> </h2>
+<div id="text-3">
+
+
+<p>
+This section describes the setup of your org files for the utilisation of the
+script. <a href="#sec-3.1">Export-Setup - the new Way</a> will guide you to setup your org XHTML
+export. That section refers to an Org-mode version &gt;= 6.02. For those using an
+Org-mode version &lt; 6.02 the next section (<a href="#sec-3.2">Export-Setup - the old Way</a>)
+remains. <a href="#sec-7.1">Using Set()</a> contains a list of all supported options for adjusting
+the <code>org_html_manager</code> to suit your needs.
+</p>
+<p>
+A sufficient up to date version is available for download on <a href="http://orgmode.org/#sec-3">orgmode.org</a> or
+in the git repo:
+</p>
+<p>
+<pre>
+git-clone git://repo.or.cz/org-mode.git
+</pre>
+</p>
+<p>
+This script will not work with the XHTML export as distributed with the
+current Org-mode package (and hence emacs 22.x) anymore (??). But I'm afraid
+there are good chances the new exporter is in emacs before this thing here
+enters a somewhat stable state :-)
+</p>
+<p>
+To produce this XHTML file I used the current version of Org-mode and it's
+XHTML export. The structure of the exported XHTML has changed a bit in
+beginning of March 2008 to support scripting an other tools that work on
+<code>XML</code>. Thanks to Carsten Dominik who found the time to modify the current
+export modul to produce the draft version of the next generation XHTML.  The
+new structure won't break any of your stylesheets though.
+</p>
+<p>
+The new export made it into git somewhere around version 5.23a+. Try <code>M-x   org-version</code> to find out about your Org-mode version.
+</p>
+
+</div>
+
+<div id="outline-container-3.1" class="outline-3">
+<h3 id="sec-3.1">3.1 <span class="target">Export-Setup - the new Way</span> </h3>
+<div id="text-3.1">
+
+
+<p>
+There is no need to do something you don't do occasionally in Org-mode when
+it comes to XHTML export. Just use one of the ordinary ways to include
+something into the head of the resulting html file.
+</p>
+<p>
+The modern way of org export setup provides extra options to include and
+configure the script, as well as a emacs customize interface for this same
+purpose. Options set in customize may be overwritten on a per-file basis
+using one or more special <code>#+INFOJS_OPT:</code> lines in the head of your org
+file.
+</p>
+<p>
+As an example, the head of this org file looks like:
+</p>
+<p>
+<pre>
+#+INFOJS_OPT: path:org-info.js
+#+INFOJS_OPT: toc:nil localtoc:t view:info mouse:underline
+#+INFOJS_OPT: up:http://www.legito.net/
+#+INFOJS_OPT: home:http://orgmode.org buttons:nil
+</pre>
+</p>
+
+</div>
+
+<div id="outline-container-3.1.1" class="outline-4">
+<h4 id="sec-3.1.1">3.1.1 Using customize</h4>
+<div id="text-3.1.1">
+
+
+<p>
+To use customize type
+<pre>
+M-x customize-group RET org-export-html RET
+</pre>
+scroll to the bottom and click <code>Org Export HTML INFOJS</code>.
+</p>
+<p>
+On this page three main options may be configured. <i>Org Export Html Use       Infojs</i> is very good documented and <i>Org Infojs Template</i> should be
+perfect by default. So I'll concentrate on <i>Org Infojs Options</i> here.
+</p>
+<dl>
+<dt><code>path</code></dt><dd>
+
+<p>
+Absolute or relative URL to the script as used in in XHTML
+links. '<code>org-info.js</code>' will find the file in the current
+directory. Keep in mind that this will be the directory of the
+exported file, eventually a directory on a server.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><code>view</code></dt><dd>
+
+<p>
+What kind of view mode should the script enter on startup? Possible
+values are
+</p><ul>
+<li>
+<code>info</code> &mdash; info view mode,
+</li>
+<li>
+<code>overview</code> &mdash; plain view mode, only first level headlines visible,
+</li>
+<li>
+<code>content</code> &mdash; plain view mode, all headlines visible,
+</li>
+<li>
+<code>showall</code> &mdash; plain view mode showing the entire document.
+</li>
+</ul>
+</dd>
+</dl>
+
+
+<dl>
+<dt><code>toc</code></dt><dd>
+
+<p>
+Show the table of contents? <br/>
+Possible values:
+</p><ul>
+<li>
+<code>t</code> &mdash; show the toc,
+</li>
+<li>
+<code>nil</code> &mdash; hide the toc (only show when '<code>i</code>' is pressed),
+</li>
+<li>
+<code>Publishing/Export property</code> &mdash; derivate this setting from another
+property like <code>org-export-with-toc</code>.
+</li>
+</ul>
+</dd>
+</dl>
+
+
+<dl>
+<dt><code>localtoc</code></dt><dd>
+
+<p>
+Should the script insert a local table of contents below the headings
+of sections containing subsections? <br/>
+Possible values:
+</p><ul>
+<li>
+<code>t</code> &mdash; show the local toc,
+</li>
+<li>
+<code>nil</code> &mdash; hide the toc (only show when '<code>i</code>' is pressed). This is
+the default, if this option is omitted.
+</li>
+</ul>
+</dd>
+</dl>
+
+
+<dl>
+<dt><code>mouse</code></dt><dd>
+
+<p>
+Highlight the headline under the mouse in plain view mode?
+</p><ul>
+<li>
+<code>underline</code> &mdash; underline the headline under mouse,
+</li>
+<li>
+<code>#dddddd</code> &mdash; or any valid XHTML/CSS color value like <code>red</code> to draw a
+colored background for the headline under the mouse.
+</li>
+</ul>
+</dd>
+</dl>
+
+
+<dl>
+<dt><code>runs</code></dt><dd>
+
+<p>
+<b>Obsolete</b>. See <a href="#sec-9.6">ChangeLog</a>.
+Number of attempts to scan the document. It's no risk to set this to a
+higher value than the default. The <code>org_html_manager</code> will stop as
+soon as the entire document is scanned.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><code>buttons</code></dt><dd>
+
+<p>
+Affects plain view mode only.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-3.1.2" class="outline-4">
+<h4 id="sec-3.1.2">3.1.2 Per File Basis: #+INFOJS_OPT</h4>
+<div id="text-3.1.2">
+
+
+<p>
+A single file may overwrite the global options using a line like this:
+<pre>
+#+INFOJS_OPT: view:info mouse:underline up:index.html home:http://www.mydomain.tpl toc:t
+</pre>
+</p>
+<p>
+Possible options are the same as in the previous section. Additional (?)
+options include:
+</p>
+<dl>
+<dt><code>home</code></dt><dd>
+
+<p>
+An URL to link to the homepage. The text displayed is <code>HOME</code>.
+</p></dd>
+<dt><code>up</code></dt><dd>
+
+<p>
+An URL pointing to some main page. The text displayed is <code>Up</code>.
+</p></dd>
+</dl>
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-3.2" class="outline-3">
+<h3 id="sec-3.2">3.2 <span class="target">Export-Setup - the old Way</span> </h3>
+<div id="text-3.2">
+
+
+<p>
+This section describes the old way to setup the script using the
+<code>org-export-html-style</code> configuration. If you own a current version (6.00
+++) of Org-mode you should better use <a href="#sec-3.1">Export-Setup - the new Way</a> of setting
+up the export for script usage. You might want to read the sections <a href="#sec-7">The XHTML</a>
+for more information. <a href="#sec-7.1">Using Set()</a> contains a list of all supported options
+recognised by the script.
+</p>
+
+</div>
+
+<div id="outline-container-3.2.1" class="outline-4">
+<h4 id="sec-3.2.1">3.2.1 Using a special * COMMENT Section</h4>
+<div id="text-3.2.1">
+
+
+<p>
+The second possibility to include the script is to add a special section
+to the end of your org file (multiple lines possible):
+</p>
+<p>
+<pre>
+* COMMENT html style specifications
+# Local Variables:
+# org-export-html-style: "&lt;link rel=\"stylesheet\"
+# type=\"text/css\" href=\"styles.css\" /&gt;
+# &lt;script type=\"text/javascript\" language=\"JavaScript\" src=\"org-info.js\"&gt;
+# &lt;/script&gt;
+# &lt;script type=\"text/javascript\" language=\"JavaScript\"&gt;
+#  /* &lt;![CDATA[ */
+#    org_html_manager.set(\"LOCAL_TOC\", 1);
+#    org_html_manager.set(\"VIEW_BUTTONS\", \"true\");
+#    org_html_manager.set(\"MOUSE_HINT\", \"underline\");
+#    org_html_manager.setup ();
+#  /* ]]&gt; */
+# &lt;/script&gt;"
+# End:
+</pre>
+</p>
+<p>
+Ensure to precede all the verbatim double quotes with a backslash and
+include the whole value of <code>org-export-html-style</code> into double quotes
+itself.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-3.2.2" class="outline-4">
+<h4 id="sec-3.2.2">3.2.2 Using customize</h4>
+<div id="text-3.2.2">
+
+
+<p>
+One could customize the option '<code>org-export-html-style</code>' globaly by
+<pre>
+M-x cuomize-variable RET org-export-html-style RET
+</pre>
+and set it there.
+</p>
+<p>
+<pre>
+&lt;script type="text/javascript" language="JavaScript" src="org-info.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" language="JavaScript"&gt;
+/* &lt;![CDATA[ */
+org_html_manager.set("LOCAL_TOC", 1);
+org_html_manager.set("VIEW_BUTTONS", "true");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.setup ();
+/* ]]&gt; */
+&lt;/script&gt;
+</pre>
+</p>
+<p>
+This way all your files will be exported using the script in the future.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-3.2.3" class="outline-4">
+<h4 id="sec-3.2.3">3.2.3 Export-Setup per Project</h4>
+<div id="text-3.2.3">
+
+
+<p>
+Last but not least and very handy is the possibility to setup the usage of
+the script per project. This is a taylor made passage of the org manual:
+</p>
+<p>
+<pre>
+(setq org-publish-project-alist
+      ’(("org"
+         :base-directory "~/org/"
+         :publishing-directory "~/public_html"
+         :section-numbers nil
+         :table-of-contents nil
+         :style "&lt;link rel=stylesheet href=\"../other/mystyle.css\"
+                type=\"text/css\"&gt;
+                &lt;script type=\"text/javascript\" language=\"JavaScript\"
+                        src=\"org-info.js\"&gt;&lt;/script&gt;
+                &lt;script type=\"text/javascript\" language=\"JavaScript\"&gt;
+                 /* &lt;![CDATA[ */
+                    org_html_manager.setup ();
+                 /* ]]&gt; */
+                &lt;/script&gt;")))
+</pre>
+</p>
+<p>
+Don't forget to add an export target for the script itself ;-)
+</p>
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-4" class="outline-2">
+<h2 id="sec-4">4 CSS</h2>
+<div id="text-4">
+
+
+<p>
+There is currently only one CSS class used in the script. More style classes
+will follow in the future.
+</p>
+<dl>
+<dt><code>org-info-info-navigation</code></dt><dd>
+
+<p>
+Style for the navigation table in info view mode. I needed this one to avoid
+border around that table. You may add lines like these to your stylesheet:
+<pre>
+/* Style for org-info.js */
+
+.org-info-info-navigation
+{
+  border-style:none;
+}
+</pre>
+</p></dd>
+</dl>
+
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-5" class="outline-2">
+<h2 id="sec-5">5 <span class="target">Supported Browsers</span> </h2>
+<div id="text-5">
+
+
+<p>
+The functionality of the script is based on <code>DOM</code>. This leads to some
+incompatibility with legacy browsers. But hey, it's 2008, isn't it?
+</p>
+<p>
+So what browsers are supported then? Well - I do not know for
+shure. JavaScript™ 1.4 plus <code>DOM</code> should make
+</p><ul>
+<li>
+Netscape 6.0 and higher
+</li>
+<li>
+Internet Explorer 5.0 and up
+</li>
+<li>
+Firefox 1.0 ++  - 2.0.0.12 tested
+</li>
+<li>
+Opera   7.0 and higher - v.9.26 tested.
+</li>
+<li>
+Safari 1.0
+</li>
+</ul>
+
+
+<p>
+I have written and tested the script only in current Firefox and Opera so
+far (lack of spare time, operation systems on my laptop, and installed
+browsers). The test results will go in the next section.
+</p>
+
+</div>
+
+<div id="outline-container-5.1" class="outline-3">
+<h3 id="sec-5.1">5.1 <span class="target">People reported it works in</span> </h3>
+<div id="text-5.1">
+
+
+<p>
+So let's gather the tested Browsers here. Problems are only listed, if they
+are Browser specific. Let me say it again: we don't wont to support legacy
+browsers, do we?
+</p>
+<table border="0" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<col align="left"></col><col align="right"></col><col align="left"></col><col align="left"></col>
+<thead>
+<tr><th>Browser</th><th>Version</th><th>✔</th><th>Problems</th></tr>
+</thead>
+<tbody>
+<tr><td>Opera</td><td>9.26</td><td>✔</td><td>-</td></tr>
+<tr><td>Iceweasel</td><td>2.0.0.12</td><td>✔</td><td>-</td></tr>
+</tbody>
+</table>
+
+
+<p>
+If you manage to get this thingy working in any browser please let us know, so
+we can update the above table.
+</p>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-6" class="outline-2">
+<h2 id="sec-6">6 <span class="target">Why Do I Need a T.O.C?</span> </h2>
+<div id="text-6">
+
+
+<p>
+Currently the script depends on the table of contents in the resulting
+XHTML. The T.O.C. can be hidden though.
+</p>
+<p>
+The main reason is the behaviour of browsers. There is no safe way to detect
+if the entire document is loaded at a certain point in time. Opera for example
+returns <code>true</code> if we ask it <code>if(document.body)</code>. The <code>init()</code> function of the
+<code>OrgHtmlManager</code> is aware of the possibility, that not even the T.O.C. might
+be loaded when this function is called. Hence it should work for slow
+connections too. There should be tons of other bugs though :)
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-7" class="outline-2">
+<h2 id="sec-7">7 <span class="target">The XHTML</span> </h2>
+<div id="text-7">
+
+
+<p>
+End users may consider this section obsolete as of org version 6.00-pre-3,
+since there is a new configuration interface in org now to setup the script
+without dealing with JavaScript. It is still here to show the desired look
+of the head section of the XHTML. Also someone might be interested to use the
+script for XHTML files not exported from org.
+</p>
+<p>
+The script has to be included in the header of the resulting XHTML files. The
+document structure has to be exactly the one produced by the current XHTML
+export of emacs Org-mode.
+You may pass options to the <code>org_html_manager</code> by utilising its <code>set()</code>
+method. For a list of options see section <a href="#sec-7.1">Using Set()</a>. This is what the
+head section should look like:
+</p>
+<p>
+<pre>
+&lt;script type="text/javascript" language="JavaScript" src="org-info.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" language="JavaScript"&gt;
+/* &lt;![CDATA[ */
+org_html_manager.set("SUB_INDEXES", 1);
+org_html_manager.set("TOC", 1);
+org_html_manager.set("VIEW_BUTTONS", "1");
+org_html_manager.set("MOUSE_HINT", "underline"); // or background-color like '#eeeeee'
+org_html_manager.setup ();
+/* ]]&gt; */
+&lt;/script&gt;
+</pre>
+</p>
+<p>
+To just use the script with the defaults put this into the head section of the
+XHTML files:
+</p>
+<p>
+<pre>
+&lt;script type="text/javascript" language="JavaScript" src="org-info.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" language="JavaScript"&gt;
+/* &lt;![CDATA[ */
+org_html_manager.setup ();
+/* ]]&gt; */
+&lt;/script&gt;
+</pre>
+</p>
+<p>
+I recommend the use of
+<pre>
+&lt;script type="text/javascript" language="JavaScript" src="org-info.js"&gt;&lt;/script&gt;
+</pre>
+instead of
+<pre>
+&lt;script type="text/javascript" language="JavaScript" src="org-info.js" /&gt;
+</pre>
+which is valid XHTML but not understood by all browsers. I'll use the first
+version throughout this document where ever the space allows to do so.
+</p>
+
+</div>
+
+<div id="outline-container-7.1" class="outline-3">
+<h3 id="sec-7.1">7.1 <span class="target">Using Set()</span> </h3>
+<div id="text-7.1">
+
+
+<p>
+Before calling
+<pre>
+org_html_manager.setup ();
+</pre>
+one may configure the script by using the <code>org_html_manager</code>'s function
+<code>set(key, val)</code>. There is one important rule for all of these options. If
+you set a string value containing single quotes, do it this way:
+<pre>
+org_html_manager.set("key", "value with \\'single quotes\\'");
+</pre>
+</p>
+<dl>
+<dt><code>VIEW</code></dt><dd>
+
+<p>
+Set to a true value to start in textinfo kind of view. Note: you
+could also use <code>org_html_manager.INFO_VIEW</code> or
+<code>org_html_manager.PLAIN_VIEW</code>. Defaults to plain view mode.
+</p></dd>
+<dt><code>HIDE_TOC</code></dt><dd>
+
+<p>
+If <code>1</code>, hide the table of contents.
+</p></dd>
+<dt><code>SUB_INDEXES</code></dt><dd>
+
+<p>
+If set to a <code>true</code> (<code>1</code> or not empty string) value, create subindexes
+for sections containing subsections. See sections 1 2, or 3.1 of this
+document. The index below the headline (under 'Contents:') is generated
+by the script. This one is off by default.
+</p></dd>
+<dt><code>VIEW_BUTTONS</code></dt><dd>
+
+<p>
+If <code>true</code>, include the small '<i>toggle view</i>' link above every headline in
+plain view too. The visitor can toggle the view every where in the file
+then. If <code>false</code>, only at the top of the file such a link is displayed
+when in plain view. Default is <code>false</code>.
+</p></dd>
+<dt><code>MOUSE_HINT</code></dt><dd>
+
+<p>
+Highlight the heading under the mouse. This can be a background color
+(like '<code>#ff0000</code>' or '<code>red</code>') or the keyword '<code>underline</code>'.
+</p></dd>
+<dt><code>LINK_UP</code></dt><dd>
+
+<p>
+May be set, to link to an other file, preferably the main index page of a
+subdirectory. You might consider using an absolute URL here. This link will be
+displayed as
+<pre>
+&lt;a href="LINK_UP"&gt;Up&lt;/a&gt;
+</pre>
+Command: '<code>h</code>' - home::
+This way we can link files into a tree, if all subdirectories in the
+project follow the same conventions. Like containing some
+<code>subdir/index.org</code> and a homepage somwhere else.
+</p></dd>
+<dt><code>LINK_HOME</code></dt><dd>
+
+<p>
+May be set, to link to an other file, preferably the main home page. You
+must use an absolute URL here. This link will be displayed as
+<pre>
+&lt;a href="LINK_HOME"&gt;Up&lt;/a&gt;
+</pre>
+Command: '<code>H</code>' - HOME::
+This way we can link files into a tree, if all subdirectories in the
+project follow the same conventions. Like containing some
+<code>subdir/index.org</code> and a homepage somwhere else.
+</p></dd>
+<dt><code>TOC_DEPTH</code></dt><dd>
+
+<p>
+Cut the T.O.C. at a certain level. This was done to support big big
+files and was requested by Carsten Dominik. If '<code>0</code>' or not provided at
+all the T.O.C. will not be cut. If set to a number greater than '<code>0</code>',
+the T.O.C. will cut to only show headlines down to that very level.
+</p></dd>
+</dl>
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-8" class="outline-2">
+<h2 id="sec-8">8 How it works</h2>
+<div id="text-8">
+
+
+<p>
+First of all the script is included  in the header as described in <a href="#sec-3">Usage</a>.  The
+document has  to be exported with T.O.C.  since the script depends  on it (See
+<a href="#sec-6">Why Do I Need a T.O.C?</a>).
+</p>
+<p>
+When   included,   it   creates    a   global   JavaScript™   variable   named
+<code>org_html_manager</code>.
+</p>
+<p>
+The  <code>org_html_manager::setup()</code>  function,  that  you  will  have  to  call
+yourself  (see examples in  <a href="#sec-3">Usage</a>), sets  up a  timeout function  calling it's
+<code>init()</code> function after  50ms. After those 50 ms  The <code>init()</code> function starts
+it's first attempt  to scan the document, using the T.O.C.  as a guide. During
+this scan the  <code>org_html_manager</code> builds a tree of  nodes, each caching some
+data for later use. Once an element of the document is scanned it is marked by
+setting a property <code>scanned_for_org</code> to <code>1</code>. This way it will not be scanned
+a second time in  subsquent runs (it will be checked though,  but no work will
+be done for it).
+</p>
+<p>
+If the document  (or the T.O.C.) is not  entirely loaded, <code>org_html_manager</code>
+stops  scanning,  sets  the  timeout  again  to start  an  other  scan  50  ms
+later. Once the  entire document is loaded and scanned no  new timeout will be
+set, and the document is displayed in the desired way (hopefully).
+</p>
+<p>
+Once the number of attempts to scan the  the document was configurable. This
+was dropped, since we can not know in advance how fast the document will be
+loaded on the client side.
+</p>
+<p>
+The <code>org_html_manager</code> also  changes the document a bit to  make it react on
+certain input  events and follow your  wishes. The old  '<i>event handling</i>' was
+entirely based on the normal link functions using so called <code>accesskeys</code>. This
+has changed a little, but is  still only in experimental state. The accesskeys
+will stay cause there is no reason to remove them.
+</p>
+<p>
+There is still  the idea of a new <i>emacs like</i>  keyboard handling to implement
+complex commands (which is still in the far future).
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-9" class="outline-2">
+<h2 id="sec-9">9 <span class="target">ChangeLog</span> </h2>
+<div id="text-9">
+
+
+</div>
+
+<div id="outline-container-9.1" class="outline-3">
+<h3 id="sec-9.1">9.1 <span class="target"> 2008-05-12 Mo </span> </h3>
+<div id="text-9.1">
+
+
+<dl>
+<dt><b>New key to go to the first section</b></dt><dd>
+
+<p>
+Since '<code>i</code>' now shows the T.O.C. there was a shortcut missing to go to the
+first section (which might as well be the T.O.C. if <code>#+INFOJS_OPT:       toc:t</code>). This key is now '<code>t</code>'. For toggling the view mode, '<code>m</code>' is used
+from now on.
+</p></dd>
+<dt><b>&amp;iquest;</b></dt><dd>
+
+<p>
+To show the help screen one may use the '<code>¿</code>' key. The help-screen got
+upated using '<code>&amp;iquest;</code>' now to avoid distorted displaying of this
+character.
+</p></dd>
+<dt><b>org-info-info-navigation</b></dt><dd>
+
+<p>
+Style class for the navigation bar in info view mode.
+</p></dd>
+<dt><b>Documentation</b></dt><dd>
+
+<p>
+Documentation reworked. Should be fairly uptodate now.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.2" class="outline-3">
+<h3 id="sec-9.2">9.2 <span class="target"> 2008-05-12 Mo </span> </h3>
+<div id="text-9.2">
+
+
+<dl>
+<dt><b>Removal of Minibuffer</b></dt><dd>
+
+<p>
+The minibuffer was not removed when unsing the mouse to navigate. Fixed.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.3" class="outline-3">
+<h3 id="sec-9.3">9.3 <span class="target"> 2008-05-09 Fr </span> </h3>
+<div id="text-9.3">
+
+
+<dl>
+<dt><b>First Section</b></dt><dd>
+
+<p>
+'<code>n</code>' now unfolds the current section if folded when in plain view
+mode. Thus the first section will be shown after startup in folded view.
+</p></dd>
+<dt><b>Startup in info view mode</b></dt><dd>
+
+<p>
+This one was broken. Fixed.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.4" class="outline-3">
+<h3 id="sec-9.4">9.4 <span class="target"> 2008-05-04 So </span> </h3>
+<div id="text-9.4">
+
+
+<dl>
+<dt><b>OrgHtmlManager class</b></dt><dd>
+
+<p>
+No more OrgHtmlManager class anymore. Script uses the
+<pre>
+var org_html_manager = { property: value, /* ... */ };
+</pre>
+syntax now. This was done to avoid inheritance and instantiation of more
+than one OrgHtmlManager.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>Help display</b></dt><dd>
+
+<p>
+The displaying of Keyboard shortcuts now behaves like the (hidden)
+TOC. I.e. keyboard shortcuts are displayed when pressing '<code>?</code>' and any
+hidden again when pressing any key. The old view mode is restored when
+hiding the help display.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>Fixed: external links</b></dt><dd>
+
+<p>
+External links now work again.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.5" class="outline-3">
+<h3 id="sec-9.5">9.5 <span class="target"> 2008-05-02 Fr </span> </h3>
+<div id="text-9.5">
+
+
+<dl>
+<dt><b>Minibuffer Handling</b></dt><dd>
+
+<p>
+If the document is neither in info view mode nor displayed with a fixed
+TOC, the minibuffer will be shown right above the current headline. This
+is not the final fix for this, but a work around for the wrong IE
+behaviout concerning <i>position:fixed</i>.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>Keyboard Input on keypress</b></dt><dd>
+
+<p>
+The script now takes the <code>onkeypress</code> function to read user input. This is
+more compatible then <code>onkeydown</code> or <code>onkeyup</code>. Thus the keys work now in
+IE too (and the '?' key in Firefox). Holding the '<code>n</code>' key down for a
+while can be used for fast searching.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>Scrolling in IE</b></dt><dd>
+
+<p>
+&hellip;is fixed. But it is not possible to scroll in IE if <code>FIXED_TOC</code> is on.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.6" class="outline-3">
+<h3 id="sec-9.6">9.6 <span class="target"> 2008-04-17 Do </span> </h3>
+<div id="text-9.6">
+
+
+<dl>
+<dt><b>RUNS DROPPED</b></dt><dd>
+
+<p>
+The option '<code>RUNS</code>' is dropped now. The <code>org_html_manager</code> now tries to
+scan the document until it's entirely loaded. There is an internal limit
+now set to some hundred runs which will makes a max. ~2 minute scan
+phase.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.7" class="outline-3">
+<h3 id="sec-9.7">9.7 <span class="target"> 2008-04-15 Di </span> </h3>
+<div id="text-9.7">
+
+
+<p>
+These two changes where ideas of Carsten Dominik.
+</p>
+<dl>
+<dt><b>Local TOC</b></dt><dd>
+
+<p>
+&hellip;shows now subsections only.
+</p></dd>
+<dt><b>Cut the TOC</b></dt><dd>
+
+<p>
+Now the table of contents may be cutted to a certain depth. Navigation is
+not affected. The name of the new <code>set()</code> option is '<code>TOC_DEPTH</code>'.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.8" class="outline-3">
+<h3 id="sec-9.8">9.8 <span class="target"> 2008-04-13 So </span> </h3>
+<div id="text-9.8">
+
+
+<dl>
+<dt><b>Overall history</b></dt><dd>
+
+<p>
+History now records all commands that change the current section.
+</p></dd>
+<dt><b>Hide TOC but show when 'i' is pressed</b></dt><dd>
+
+<p>
+The TOC is now always shown, when '<code>i</code>' is pressed, even if hidden from
+the document. The fun is, that each following navigation command triggers
+a history-back event. This way the hidden TOC does not show up when moving
+in the history thereafter. Hence now it's possible to read section 5.1,
+take a short look in the TOC and the next '<code>n</code>', '<code>p</code>' or '<code>b</code>' command
+takes you back to the section last visited (5.1 in this case).
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.9" class="outline-3">
+<h3 id="sec-9.9">9.9 2008-04-09 Mi</h3>
+<div id="text-9.9">
+
+
+<dl>
+<dt><b>Minibuffer fixed for IE</b></dt><dd>
+
+<p>
+It now appears and hides again. Thanks to Tobias Prinz for the trick with
+negative margins.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.10" class="outline-3">
+<h3 id="sec-9.10">9.10 2008-04-06 So</h3>
+<div id="text-9.10">
+
+
+<ul>
+<li>
+<b>Adjusted to new Setup</b>
+Carsten Dominik added the new possibility to configure the script using
+typical org syntax. Users may even use customize to set up the script
+now. Names of options passed to the <code>set()</code> functions are now adjusted to
+the ones we discussed. Internal variable names where changed to reflect
+this change.
+</li>
+<li>
+TODO search my mails to figure out the correct date!!!
+</li>
+</ul>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.11" class="outline-3">
+<h3 id="sec-9.11">9.11 2008-03-31 Mo</h3>
+<div id="text-9.11">
+
+
+<dl>
+<dt><b>Fixed subindexes</b></dt><dd>
+
+<p>
+&hellip;when using <code>HIDE_TOC</code>. First section had no subindex in this case.
+</p></dd>
+<dt><b>Added key q</b></dt><dd>
+
+<p>
+&hellip;to close the window.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.12" class="outline-3">
+<h3 id="sec-9.12">9.12 <span class="target"> 2008-03-30 So </span> </h3>
+<div id="text-9.12">
+
+
+<dl>
+<dt><b>Internal links working</b></dt><dd>
+
+<p>
+Internal links are now converted to work with this script. The user has
+to go back using the `=s=' key since the history is not
+updated. Could Browsers understand this? Or is there a possibility to
+catch the `/back/' button event?
+</p></dd>
+<dt><b>org-file.html#sec-x.y.z</b></dt><dd>
+
+<p>
+is now working too. That is, <a href="http://path/to/org-file.html#sec-x.y.z">http://path/to/org-file.html#sec-x.y.z</a> makes
+the script displaying that section in the configured view mode.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>Folding now on by default.</b></dt><dd>
+
+</dd>
+</dl>
+
+
+<dl>
+<dt><b>Scrolling</b></dt><dd>
+
+<p>
+'<code>v</code>' and '<code>V</code>' now scroll the window by the visible height of the
+document window. A little bit less though for better orientation.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>Deleted setup section using export options template</b></dt><dd>
+
+<p>
+This one was not working. I'm not shure it ever was&hellip; but I think so. I
+should look up this one in the documentation again.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>Plain view mode is default</b></dt><dd>
+
+</dd>
+</dl>
+
+
+<dl>
+<dt><b>FIXED Bugs</b></dt><dd>
+
+<ul>
+<li>
+The view mode was dependend on the folding feature.
+</li>
+<li>
+When folding was of an error was shown when trying to fold.
+</li>
+</ul>
+</dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.13" class="outline-3">
+<h3 id="sec-9.13">9.13 <span class="target"> 2008-03-23 So</span> </h3>
+<div id="text-9.13">
+
+
+<dl>
+<dt><b>Clicking a headline makes it the current section</b></dt><dd>
+
+<p>
+and thus the candidate for displaying in next info view and the point
+from where 'next' and 'previous' work.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.14" class="outline-3">
+<h3 id="sec-9.14">9.14 <span class="target"> 2008-03-22 Sa </span> </h3>
+<div id="text-9.14">
+
+
+<dl>
+<dt><b>TOC, title and global folding</b></dt><dd>
+
+<p>
+The title was doubled in some cases. This should be fixed now. The TOC
+is now a node as all the other sections to.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>Keyboard</b></dt><dd>
+
+<p>
+Some more work on this. There seems to be some locale related problem
+concerning the keyboard input of a `?´ (help) in Firefox. Added a
+workaround for this one, but probably only working here.
+</p></dd>
+</dl>
+
+
+<ul>
+<li>
+<b>Documentation updated.</b>
+</li>
+</ul>
+
+
+<dl>
+<dt><b>Stylesheet</b></dt><dd>
+
+<p>
+now with indentation. This demonstrates the folding somewhat better.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>Hide T.O.C.</b></dt><dd>
+
+<p>
+The table of contents can now be hidden completely due to the new option
+<code>HIDE_TOC</code>. Hence the documents have to be exported with T.O.C., but may
+be displayed without it.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.15" class="outline-3">
+<h3 id="sec-9.15">9.15 <span class="target"> 2008-03-21 Fr </span> </h3>
+<div id="text-9.15">
+
+
+<dl>
+<dt><b>Commands reworked</b></dt><dd>
+
+<p>
+The '<i>minibuffer</i>' is now invisible by default. Commands can be entered
+into the <code>document</code> itself. Still, the chars entered are appended to the
+minibuffers contents, to keep the possibility to enter more complex
+commands in the future. The minibuffer is still needed for commands to
+work in firefox.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>Section numbers are now read through</b> <code>window.prompt()</code></dt><dd>
+
+<p>
+This was done to simplify the command interface code. Now the commands
+entered are just one char in length.
+</p></dd>
+</dl>
+
+
+<dl>
+<dt><b>Global folding now working</b></dt><dd>
+
+<p>
+There was not much to do left for this one to do.
+</p></dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.16" class="outline-3">
+<h3 id="sec-9.16">9.16 <span class="target"> 2008-03-13 Do </span> </h3>
+<div id="text-9.16">
+
+
+
+
+<dl>
+<dt><b>LINK_UP</b></dt><dd>
+
+<p>
+May be set, to link to an other file, preferably the main index page. This
+link will be displayed as
+<pre>
+&lt;a href="LINK_UP"&gt;HOME&lt;/a&gt;
+</pre>
+Command: '<code>h</code>' - home
+</p></dd>
+<dt><b>LINK_TO_MAIN</b></dt><dd>
+
+<p>
+May be set, to link to an other file, preferably the main index page. This
+link will be displayed as
+<pre>
+&lt;a href="LINK_TO_MAIN"&gt;Up&lt;/a&gt;
+</pre>
+Command: '<code>H</code>' - HOME
+</p></dd>
+</dl>
+
+
+<p>
+This way we can link files into a tree, if all subdirectories in the
+project follow the same conventions. Like containing some
+<code>subdir/index.org</code> and a homepage somwhere else.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-9.17" class="outline-3">
+<h3 id="sec-9.17">9.17 <span class="target"> 2008-03-12 Mi </span> </h3>
+<div id="text-9.17">
+
+
+<dl>
+<dt><b>Folding.</b></dt><dd>
+
+<p>
+First attempt to get the global folding working. Hmm.
+</p></dd>
+<dt><b>New Commands</b></dt><dd>
+
+<ul>
+<li>
+'<code>?</code>' - show the little help screen.
+</li>
+<li>
+'<code>n</code>' - go to next section.
+</li>
+<li>
+'<code>p</code>' - go to previous section.
+</li>
+<li>
+'<code>i</code>' - go to Index.
+</li>
+<li>
+'<code>f</code>' - fold current section when in plain view mode.
+</li>
+<li>
+'<code>g</code>' - fold globally when in plain view mode.
+</li>
+<li>
+'<code>u</code>' - up to parent section.
+</li>
+<li>
+'<code>t</code>' - toggle view mode.
+</li>
+<li>
+'<code>v</code>' - scroll down.
+</li>
+<li>
+'<code>V</code>' - scroll up.
+</li>
+</ul>
+</dd>
+</dl>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9.18" class="outline-3">
+<h3 id="sec-9.18">9.18 <span class="target"> 2008-03-11 Di </span> </h3>
+<div id="text-9.18">
+
+
+<dl>
+<dt><b>Radical code cleanup.</b></dt><dd>
+
+<p>
+Removed unused variables and functions. More secure, less
+errorprone. This cood be even better.
+</p><ul>
+<li>
+<b>Org mode like toggling of headlines now basically works.</b>
+</li>
+</ul>
+</dd>
+<dt><b>Commands can be input through a little 'minibuffer' on top of the screen.</b></dt><dd>
+
+<p>
+This needs some special style settings for IE (position fixed). I will
+append a minimal stylesheet for this purpos the next days in this
+documentation for copy and paste.
+This is partially working. Implemented Commands are:
+</p><ul>
+<li>
+'<code>help</code>' - show a little help screen. This done with <code>alert()</code> and
+thus a TODO.
+</li>
+<li>
+'<code>t</code>' - toggle view mode.
+</li>
+<li>
+'<code>k</code>' - kill the <i>minibuffer</i>.
+</li>
+<li>
+'<code>N</code>' - where <code>N</code> is a section number: goto section <code>N</code>. This could be
+working in both modes very easy, but currently also only in info view
+mode implemented.
+</li>
+<li>
+<b>Code relies now on next generation XHTML-Export format.</b>
+</li>
+</ul>
+</dd>
+<dt><b>Some kind of rudimentary debugging system.</b></dt><dd>
+
+<p>
+May be turned on bei seting config options:
+<pre>
+org_html_manager.set("WINDOW_BORDER", "true");
+org_html_manager.set("DEBUG", org_html_manager.DEBUG_FATAL);
+</pre>
+</p></dd>
+<dt><b>Better way of configuration for the enduser. Fault tolerant. No undefined</b></dt><dd>
+
+<p>
+variables when scanning starts. The users my use the <code>set(key, value)</code>
+function of the <code>OrgHtmlManger</code> class like this:
+<pre>
+org_html_manager.set ( "SUB_INDEXES",        0);
+org_html_manager.set ( "INFO_SWITCH_ALWAYS", "true");
+org_html_manager.set ( "FOLDING",            "true");
+org_html_manager.set ( "MOUSE_HINT",         "underline");
+org_html_manager.set ( "CONSOLE",            "true");
+org_html_manager.setup ();
+</pre>
+</p></dd>
+<dt><b>New configuration accepts these options</b></dt><dd>
+
+</dd>
+<dt><code>SUB_INDEXES</code></dt><dd>
+
+<p>
+Create subindexes for sections containing sections.
+</p></dd>
+<dt><code>INFO_SWITCH_ALWAYS</code></dt><dd>
+
+<p>
+Show the small '<i>toggle view</i>' link next to every Headline to toggle
+the view easily without scrolling back to top of the page in plain
+view mode.
+</p></dd>
+<dt><code>FOLDING</code></dt><dd>
+
+<p>
+This is for the new folding. Turn it on. This will be the default when
+the moving and toggling has an acceptable form.
+</p></dd>
+<dt><code>MOUSE_HINT</code></dt><dd>
+
+<p>
+I love this one. Accepts the keyword '<code>underline</code>' or any other
+value. But if not '<code>underline</code>', it should be a valid value to set the
+<code>background-color</code> in CSS. So preferebly something like
+'<code>#eeeeee</code>'. In plain view mode with toggle feature turned on the
+headline with mouse in it will be either hightlighted, if you pass a
+color, or underlined.
+</p></dd>
+<dt><code>CONSOLE</code></dt><dd>
+
+<p>
+Display the <i>minibuffer</i> on top of the screen. Turn this one on. It's
+fun and you can kill it simply by pressing '<code>k</code>'.
+</p></dd>
+<dt><code>VIEW</code></dt><dd>
+
+<p>
+Set the initial view mode. Set to <code>org_html_manager.PLAIN_VIEW</code> or
+<code>org_html_manager.INFO_VIEW</code>.
+</p></dd>
+</dl>
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-10" class="outline-2">
+<h2 id="sec-10">10 History</h2>
+<div id="text-10">
+
+
+<p>
+The aim of this little script is to implement a part of emacs Org-mode
+facilities of folding. Oh, no - not originaly.
+</p>
+<p>
+My first idea was to view some of my larger org files without scrolling. I
+wanted to have them paged just like texinfo or linuxdoc files. In February
+2008 I came across Carsten Dominiks <i>ideas</i> page
+<a href="http://orgmode.org/todo.html">http://orgmode.org/todo.html</a>. And I could not resist to write him some of my
+thoughts about this great emacs mode including some little ideas and
+drawbacks. I don't know how, but it somehow these guys made me, lazy bone that
+I am, write this little script as an apetizer of <i>web 3.0 in Org-mode</i> (Phil
+Jackson).
+</p>
+<p>
+I did and since some people really liked it, worked a bit more on it and added
+features. Bastien Guerry was so kind to publish it on
+<a href="http://www.legito.net/org-info-js/">http://www.legito.net/org-info-js/</a> the first months. Thanks Bastien.
+</p>
+<p>
+In the first days of April Carsten Dominik added code to Org-mode to support
+the usage of this script. Hence the script may now be configured in a similar way
+to the other export options. Since then it is even possible to configure this
+script through customize.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-11" class="outline-2">
+<h2 id="sec-11">11 Thanks</h2>
+<div id="text-11">
+
+
+<p>
+Very special thanks to Carsten Dominik, Bastien Guerry and Phil Jackson who
+have encouraged me to write and publish this little piece of (unfinished) work
+and all the hundrets of hours they spent on this fantastic emacs mode called
+Org-mode and the export modules.
+</p>
+<p>
+Org is a new working experience for me and there is nothing comparable to
+working with emacs AND Org-mode.
+</p>
+<p>
+An other big kiss to Gabi (<a href="http://www.emma-stil.de">www.emma-stil.de</a>) for being so patient while I was
+not working on our projects but playing with emacs.
+</p>
+<p>
+Thanks to Tobias Prinz for listening to my stupid JavaScript questions and all
+the usefull tips. Espacially the negative margin trick and key input.
+</p>
+<p>
+And again big thanks to Carsten Dominik for making the inclusion and
+configuration of the script so easy for the users, and all the inspired
+ideas. A lot of the power of the final make up is your merit! We all love to
+read the best of all mailing lists because of the kind and relaxed tone that
+is yours.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-12" class="outline-2">
+<h2 id="sec-12">12 License</h2>
+<div id="text-12">
+
+
+<p>
+What I think about licenses? Well - I think licences and patents are not far
+from each other. Poor people (and poor countries!!!) stay poor because of both
+of them. But since I know where I live, in a world made of licenses and
+patents, I have to apply some license to my work to protect it and stay
+unprotected.
+</p>
+<p>
+Hence the script itself is provided under the <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">GPL version 2</a>. This document is
+subject to <a href="http://www.fsf.org/licensing/licenses/fdl.txt">GFDL</a>.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-13" class="outline-2">
+<h2 id="sec-13">13 THE END</h2>
+<div id="text-13">
+
+
+<p>
+This document in emacs23 with Org-mode v. 5.22a+. The visibilty of the
+contents of a individual section or subsection can be toggled by clicking the
+stars in front of the headlines or moving there and hitting <code>TAB</code>. The
+visibility of the entire document structure can be changed by pressing
+<code>SHIFT+TAB</code> anywhere. When on a headline, pressing <code>ALT+UP/DOWN</code> moves the
+entire subtree to different location in the tree, keeping it's level of
+indentation. <code>ALT+LEFT/RIGHT</code> promotes and demotes the subtree.
+</p>
+<p>
+<img src="img/emacs23-org.js.org.png"/>
+</p>
+
+</div>
+</div>
+<div id="postamble"><p class="author"> Author: Sebastian Rose
+<a href="mailto:sebastian_rose@gmx.de">&lt;sebastian_rose@gmx.de&gt;</a>
+</p>
+<p class="date"> Date: 2008/05/12 20:18:10</p>
+</div></body>
+</html>
