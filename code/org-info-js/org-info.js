@@ -913,8 +913,13 @@ var org_html_manager = {
         else if ('m' == s) {
           this.toggleView(this.NODE.idx);
         }
-        else if ('t' == s) {
+        else if ('<' == s || 't' == s) {
           if(0 != this.NODE.idx) this.navigateTo(0);
+          else window.scrollTo(0,0);
+        }
+        else if ('>' == s || 'E' == s) { // 'e' scrolls down in opera :-/
+          if((this.SECS.length - 1) != this.NODE.idx) this.navigateTo(this.SECS.length - 1);
+          else this.SECS[this.SECS.length - 1].div.scrollIntoView(true);
         }
         else if ('v' == s) {
           if(window.innerHeight)
@@ -985,7 +990,7 @@ var org_html_manager = {
 
     this.command_str = "";
     this.CONSOLE_INPUT.value = "";
-    return;
+    return true;
   },
 
 
@@ -1068,7 +1073,8 @@ var org_html_manager = {
         +'<tr><td> <code><b>?/&iquest;/l</b></code> </td><td> show this help screen</td></tr>'
         +'<tr><td> <code><b>n</b></code> </td><td> goto the next section</td></tr>'
         +'<tr><td> <code><b>p</b></code> </td><td> goto the previous section</td></tr>'
-        +'<tr><td> <code><b>t</b></code> </td><td> goto the first section</td></tr>'
+        +'<tr><td> <code><b>t/&lt;</b></code> </td><td> goto the first section</td></tr>'
+        +'<tr><td> <code><b>E/&gt;</b></code> </td><td> goto the last section</td></tr>'
         +'<tr><td> <code><b>i</b></code> </td><td> show table of contents</td></tr>'
         +'<tr><td> <code><b>s</b></code> </td><td> goto section</td></tr>'
         +'<tr><td> <code><b>b</b></code> </td><td> go back to last visited section. Only when following internal links.</td></tr>'
