@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.3
+ *       org-info.js, v.0.0.5
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -775,6 +775,7 @@ var org_html_manager = {
 
   toggleView: function (sec)
   {
+    this.removeWarning();
     if(this.VIEW == this.INFO_VIEW)
       this.plainView(sec);
     else
@@ -783,6 +784,7 @@ var org_html_manager = {
 
   fold: function (sec)
   {
+    this.removeWarning();
     var section = parseInt(sec);
     this.SECS[section].fold();
     if(! this.VIEW_BUTTONS) OrgNode.hideElement(this.NODE.buttons);
@@ -838,24 +840,16 @@ var org_html_manager = {
   getKey: function ()
   {
     var s = this.CONSOLE_INPUT.value;
+    // return, if s is empty:
+    if(0 == s.length) return;
+
     var clean_up = false;
     var copy = false;
 
     // the easiest is to just drop everything and clean the console.
     // User has to retype again.
     if(this.MESSAGING) {
-      this.CONSOLE_INPUT.value = "";
-      this.CONSOLE_INPUT.style.color = "#666666";
-      this.CONSOLE.style.marginTop = '-40px';
-      this.CONSOLE_INPUT.style.marginTop = '-40px';
-      this.CONSOLE.style.top = '-40px';
-      this.command_str = "";
-      this.CONSOLE_INPUT.value = "";
-      if(this.MESSAGING_INPLACE == this.MESSAGING) {
-        this.NODE.div.removeChild(this.NODE.div.firstChild);
-      }
-      this.MESSAGING = false;
-      return;
+      this.removeWarning();
     }
     else if(this.helping) {
       this.showHelp();
@@ -864,8 +858,6 @@ var org_html_manager = {
       return;
     }
 
-    // return, if s is empty:
-    if(0 == s.length) return;
 
     // Always remove TOC from history, if HIDE_TOC
     if(this.HIDE_TOC && this.TOC == this.NODE && "v" != s && "V" != s) {
@@ -878,18 +870,7 @@ var org_html_manager = {
         s = s.substr(0, s.length - 1);
     }
 
-    if (s.length && s.length == this.command_str.length) {
-      if ('help' == s) {
-        this.showHelp();
-        clean_up = true;
-      }
-      else { // unknown command
-        this.warn( s + ": command not found.");
-        return;                          // rely on what happends if messaging
-      }
-    }
-
-    else if (1 == s.length)    // one char wide commands
+    if (1 == s.length)    // one char wide commands
       {
         if ('n' == s) {
           if(this.NODE.state == OrgNode.STATE_FOLDED && this.VIEW == this.PLAIN_VIEW) {
@@ -1036,6 +1017,23 @@ var org_html_manager = {
     }
   },
 
+  removeWarning: function()
+  {
+    if(this.MESSAGING) {
+      this.CONSOLE_INPUT.value = "";
+      this.CONSOLE_INPUT.style.color = "#666666";
+      this.CONSOLE.style.marginTop = '-40px';
+      this.CONSOLE_INPUT.style.marginTop = '-40px';
+      this.CONSOLE.style.top = '-40px';
+      this.command_str = "";
+      this.CONSOLE_INPUT.value = "";
+      if(this.MESSAGING_INPLACE == this.MESSAGING) {
+        this.NODE.div.removeChild(this.NODE.div.firstChild);
+      }
+      this.MESSAGING = false;
+      return;
+    }
+  },
 
   toggleGlobaly: function ()
   {
