@@ -1077,7 +1077,7 @@ var org_html_manager = {
       this.infoView(true);
       this.WINDOW.innerHTML = '<h2>Keyboard Shortcuts</h2>'
         +'<table cellpadding="3" style="margin:20px;border-style:none;" border="0">'
-        +'<tr><td> <code><b>?/¿/l</b></code> </td><td> show this help screen</td></tr>'
+        +'<tr><td> <code><b>?/&iquest;/l</b></code> </td><td> show this help screen</td></tr>'
         +'<tr><td> <code><b>n</b></code> </td><td> goto the next section</td></tr>'
         +'<tr><td> <code><b>p</b></code> </td><td> goto the previous section</td></tr>'
         +'<tr><td> <code><b>t</b></code> </td><td> goto the first section</td></tr>'
