@@ -242,3 +242,15 @@ that generates the error and cut and paste the resulting backtrace
 into an email.  To switch back to the compiled version just reload again with
 
 :M-x org-reload-org
+* Split horizontally for agenda
+If you would like to split the frame into two side-by-side windows
+when displaying the agenda, try this hack from Jan Rehders, which
+uses the `toggle-window-split' from
+http://www.emacswiki.org/cgi-bin/wiki/ToggleWindowSplit
+
+#+begin_src emacs-lisp
+;; patch org mode to use vertical splitting
+(defadvice org-prepare-agenda (after org-fix-split)
+ (toggle-window-split))
+(ad-activate 'org-prepare-agenda)
+#+end_src
