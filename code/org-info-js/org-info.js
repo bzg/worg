@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.5
+ *       org-info.js, v.0.0.5.1
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -257,7 +257,7 @@ var org_html_manager = {
   LOAD_CHECK: null,            // Saves the setTimeout()'s value
   WINDOW: null,                // A div to display info view mode
   SECS: new Array(),           // The OrgNode tree
-  REGEX: /(#sec\-)([\d\.]*)$/, // identify a section link in toc
+  REGEX: /(#sec\-)([\d\.]*$)/, // identify a section link in toc
   EXCHANGE: /(sec-[\d\.]*)$/,  // extract the section number
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
   EMPTY_START: /^(\s*)(.*)/,   // Trim (s. getKey())
@@ -286,6 +286,7 @@ var org_html_manager = {
   // show help:
   helping:false,
   last_view_mode:0,
+  TAB_INDEX: 1000,             // Users could have defined tabindexes!
 
 
   /**
@@ -297,6 +298,21 @@ var org_html_manager = {
    */
   setup: function ()
   {
+    if(location.search) { // enable overwriting of settings
+      var sets = location.search.substring(1).split('&');
+      for(var i = 0; i < sets.length; ++i) {
+        var pos = sets[i].indexOf('=');
+        if(-1 != pos) {
+          try {
+            var k = sets[i].substring(0, pos);
+            if("LiNK_HOME" != k && "LINK_UP" != k) {
+              var v = sets[i].substring(pos+1);
+              this.set(k, decodeURIComponent(v));
+            }
+          } catch(e) {}
+        }
+      }
+    }
     this.VIEW  = this.VIEW ? this.VIEW : this.PLAIN_VIEW;
     this.VIEW_BUTTONS = (this.VIEW_BUTTONS && this.VIEW_BUTTONS != "0") ? true : false;
     this.LOCAL_TOC = (this.LOCAL_TOC && this.LOCAL_TOC != "0") ? true : false;
@@ -345,7 +361,10 @@ var org_html_manager = {
           break;
         }
       }
-      this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('#'));
+      if(location.search)
+        this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('?'));
+      else
+        this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('#'));
     }
 
     this.convertLinks(); // adjust internal links. BASE_URL has to be stripped.
@@ -367,7 +386,8 @@ var org_html_manager = {
           this.toggleGlobaly();
         }
       }
-      window.scrollTo(0, 0);
+      if(this.START_SECTION) this.showSection(this.START_SECTION);
+      else window.scrollTo(0, 0);
     }
     else {
       if( this.runs < this.RUN_MAX ) {
@@ -379,7 +399,8 @@ var org_html_manager = {
 
     this.CONSOLE = document.createElement("div");
     this.CONSOLE.innerHTML = '<form action="" onsubmit="return false;">'
-      +'<input type="text" id="org-console-input" onkeydown="org_html_manager.getKey(this);" maxlength="150" style="width:100%;border:1px inset #dddddd;"'
+      +'<input type="text" id="org-console-input" onkeydown="org_html_manager.getKey();this.blur();"'
+      +' onclick="this.select();" maxlength="150" style="width:100%;border:1px inset #dddddd;"'
       +' value=""/>'
       +'</form>';
     this.CONSOLE.style.position = 'fixed';
@@ -410,11 +431,14 @@ var org_html_manager = {
         var i = 0;
         for(i;heading == null && i < 7;++i) // TODO: What is this?
           heading = toc.getElementsByTagName("h"+i)[0];
-        heading.setAttribute('onclick', 'org_html_manager.fold(0);');
+        heading.onclick = function() {org_html_manager.fold(0);};
+        //heading.setAttribute('onclick', 'org_html_manager.fold(0);');
         heading.style.cursor = "pointer";
         if(this.MOUSE_HINT) {
-          heading.setAttribute('onmouseover', 'org_html_manager.highlight_headline(this);');
-          heading.setAttribute('onmouseout', 'org_html_manager.unhighlight_headline(this);');
+          heading.onmouseover = function(){org_html_manager.highlight_headline(0);};
+          heading.onmouseout = function(){org_html_manager.unhighlight_headline(0);};
+          // heading.setAttribute('onmouseover', 'org_html_manager.highlight_headline(this);');
+          // heading.setAttribute('onmouseout', 'org_html_manager.unhighlight_headline(this);');
         }
 
         if(this.FIXED_TOC) {
@@ -452,12 +476,12 @@ var org_html_manager = {
                                     'javascript:org_html_manager.navigateTo(0);',
                                     i,
                                     this.ROOT ); // the root node
-            this.TOC.folder = document.getElementById("text-table-of-contents");
             this.TOC.idx = 0;
             this.NODE = this.TOC;
             this.SECS.push(this.TOC);
           }
         }
+        if(this.TOC) this.TOC.folder = document.getElementById("text-table-of-contents");
       }
       else
         return false;
@@ -525,8 +549,11 @@ var org_html_manager = {
             this.debug += "liToOutlines: stopped\n";
             return false;
           }
-          else
+          else {
             c.href = newHref;
+            c.tabIndex = this.TAB_INDEX;
+            this.TAB_INDEX++;
+          }
           break;
         case "UL":
           return this.ulToOutlines(c);
@@ -578,11 +605,14 @@ var org_html_manager = {
       var sec = this.SECS.length;
       var depth = div.className.substr(8);
       var id = matches[1].substr(4);
-      heading.setAttribute('onclick', 'org_html_manager.fold(' + sec + ');');
+      heading.onclick = function() {org_html_manager.fold("" + sec);};
+      // heading.setAttribute('onclick', 'org_html_manager.fold(' + sec + ');');
       heading.style.cursor = "pointer";
       if(this.MOUSE_HINT) {
-        heading.setAttribute('onmouseover', 'org_html_manager.highlight_headline(this);');
-        heading.setAttribute('onmouseout', 'org_html_manager.unhighlight_headline(this);');
+        heading.onmouseover = function() {org_html_manager.highlight_headline("" + sec);};
+        heading.onmouseout = function() {org_html_manager.unhighlight_headline("" + sec);};
+        // heading.setAttribute('onmouseover', 'org_html_manager.highlight_headline(this);');
+        // heading.setAttribute('onmouseout', 'org_html_manager.unhighlight_headline(this);');
       }
       var link = 'javascript:org_html_manager.navigateTo(' + sec + ')';
       // Is this wrong (??):
@@ -763,7 +793,7 @@ var org_html_manager = {
   infoView: function (sec, skip_show_section)
   {
     this.VIEW = this.INFO_VIEW;
-    this.unhighlight_headline(this.NODE.heading);
+    this.unhighlight_headline(this.NODE.idx);//heading);
     if(!this.FIXED_TOC)
       OrgNode.hideElement(this.TITLE);
     OrgNode.showElement(this.WINDOW);
@@ -795,22 +825,26 @@ var org_html_manager = {
 
   highlight_headline: function(h)
   {
+    var i = parseInt(h);
     if(this.PLAIN_VIEW == this.VIEW && this.MOUSE_HINT) {
       if('underline' == this.MOUSE_HINT)
-        h.style.borderBottom = "1px dashed #666666";
+        this.SECS[i].heading.style.borderBottom = "1px dashed #666666";
+      // h.style.borderBottom = "1px dashed #666666";
       else
-        h.style.backgroundColor = this.MOUSE_HINT;
+        this.SECS[i].heading.style.backgroundColor = this.MOUSE_HINT;
+      //h.style.backgroundColor = this.MOUSE_HINT;
     }
   },
 
 
   unhighlight_headline: function(h)
   {
+    var i = parseInt(h);
     if('underline' == this.MOUSE_HINT) {
-      h.style.borderBottom = "";
+      this.SECS[i].heading.style.borderBottom = "";
     }
     else
-      h.style.backgroundColor = "";
+      this.SECS[i].heading.style.backgroundColor = "";
   },
 
   /**
@@ -856,7 +890,6 @@ var org_html_manager = {
       this.CONSOLE_INPUT.value = "";
       return;
     }
-
 
     // Always remove TOC from history, if HIDE_TOC
     if(this.HIDE_TOC && this.TOC == this.NODE && "v" != s && "V" != s) {
@@ -906,7 +939,9 @@ var org_html_manager = {
           }
         }
         else if ('i' == s) {
-          if(this.FIXED_TOC) this.TOC.focus;
+          if(this.FIXED_TOC) {
+            this.TOC.folder.getElementsByTagName("A")[0].focus();
+          }
           else if (this.HIDE_TOC) this.navigateTo('toc');
           else if(0 != this.NODE.idx) this.navigateTo(0);
         }
@@ -937,8 +972,15 @@ var org_html_manager = {
           else
             window.scrollBy(0, -(document.body.cleintHeight - 30));
         }
+        else if ('l' == s) {
+          this.warn('[[' + this.BASE_URL + '#' + this.NODE.base_id + ']['
+                    + document.title + ', Sec. ' + this.removeTags(this.NODE.heading.innerHTML) + ']]',
+                    true);
+          this.CONSOLE_INPUT.select();
+          return;
+        }
         else if ('u' == s) {
-          if(this.NODE.parent) {
+          if(this.NODE.parent != this.ROOT) {
             this.NODE = this.NODE.parent;
             this.showSection(this.NODE.idx);
           }
@@ -980,13 +1022,7 @@ var org_html_manager = {
             return;
           }
         }
-        else {
-          copy = true;
-        }
       }
-    else
-      copy = true;
-
 
     this.command_str = "";
     this.CONSOLE_INPUT.value = "";
@@ -994,10 +1030,13 @@ var org_html_manager = {
   },
 
 
-  warn: function (what)
+  warn: function (what, pure)
   {
-    this.CONSOLE_INPUT.style.color="red";
-    this.CONSOLE_INPUT.value= what + " Press any key to proceed.";
+    if(! pure) {
+      this.CONSOLE_INPUT.style.color="red";
+      this.CONSOLE_INPUT.value= what + " Press any key to proceed.";
+    }
+    else { this.CONSOLE_INPUT.value= what; }
     if(this.VIEW != this.INFO_VIEW) {
       var v = this.CONSOLE_INPUT.cloneNode(true);
       v.style.marginTop = '0px';
@@ -1081,6 +1120,7 @@ var org_html_manager = {
         +'<tr><td> <code><b>m</b></code> </td><td> toggle the view mode</td></tr>'
         +'<tr><td> <code><b>f</b></code> </td><td> fold current section (plain view)</td></tr>'
         +'<tr><td> <code><b>g</b></code> </td><td> fold globaly (plain view)</td></tr>'
+        +'<tr><td> <code><b>l</b></code> </td><td> display org link</td></tr>'
         +'<tr><td> <code><b>v</b></code> </td><td> scroll down</td></tr>'
         +'<tr><td> <code><b>V</b></code> </td><td> scroll back up</td></tr>'
         +'<tr><td> <code><b>u</b></code> </td><td> one level up (parent section)</td></tr>'
@@ -1195,6 +1235,9 @@ function OrgHtmlManagerKeyEvent (e)
   if (!e) e = window.event;
   if (e.which) c = e.which;
   else if (e.keyCode) c = e.keyCode;
+
+  if(e.ctrlKey || e.modifiers & Event.CONTROL_MASK)
+    return;
 
   var s = String.fromCharCode(c);
   if(e.shiftKey) // || e.modifiers & Event.SHIFT_MASK)
