@@ -303,13 +303,22 @@ var org_html_manager = {
       for(var i = 0; i < sets.length; ++i) {
         var pos = sets[i].indexOf('=');
         if(-1 != pos) {
-          try {
-            var k = sets[i].substring(0, pos);
-            if("LiNK_HOME" != k && "LINK_UP" != k) {
-              var v = sets[i].substring(pos+1);
-              this.set(k, decodeURIComponent(v));
-            }
-          } catch(e) {}
+          var v = sets[i].substring(pos+1);
+          var k = sets[i].substring(0, pos);
+          switch(k) {
+            // Explicitely allow overwrites.
+            // Fall through:
+          case 'TOC':
+          case 'TOC_DEPTH':
+          case 'MOUSE_HINT':
+          case 'VIEW':
+          case 'HIDE_TOC':
+          case 'LOCAL_TOC':
+          case 'VIEW':
+            this.set(k, decodeURIComponent(v));
+            break;
+          default: break;
+          }
         }
       }
     }

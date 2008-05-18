@@ -60,63 +60,63 @@
 
 * <<Features>>
 
-  + *Toggle plain and info view* ::
+  + Toggle plain and info view ::
     One can click the script-generated links in info view mode to read through
     the whole file page by page. By clicking on '/toggle view/' (or pressing
     `t´) you can switch between info and plain view mode.
-  + *Keep place in file when toggling* ::
+  + Keep place in file when toggling ::
     When changing the view mode via the '/toggle view/' links, the reader gets
     the same part of the document presented after the view change as he saw
     before.
-  + *Easy keyboard navigation* ::
+  + Easy keyboard navigation ::
     See Section [[Navigation]] for a list of shortcuts.
-  + *Structure is taken from export preferences* ::
+  + Structure is taken from export preferences ::
     The paging is done according to your setting of
     =org-export-headline-levels=. Scanning the T.O.C. is a good way to get
     around browser detection. An option to hide the T.O.C. exists.
-  + *Cut the TOC* ::
+  + Cut the TOC ::
     You may cut the table of contents to a certain depth. The splitting of the
     document is not affected by this option. Hence you might set the level of
     headlines to 4, but cut the TOC to show only the first two levels.
-  + *Optional subindexes* ::
+  + Optional subindexes ::
     The script optionally creates subindexes under the headline of a section
     containing subsections not exceeding =org-export-headline-levels=. This
     was done to get a more texinfo/linuxdoc kind of feel and a better
     orientaton.
-  + *Startupview customizable* ::
+  + Startupview customizable ::
     Choose how to display the document on load. Info-like or plain.
-  + *Toggle links everywhere / only on top* ::
+  + Toggle links everywhere / only on top ::
     You may choose to display the '/toggle view/' links above every headline
     or just next the current sections headline.
-  + *Numbered pages* ::
+  + Numbered pages ::
     In info view mode every page gets a page number starting from one.
-  + *Markright alike headings* ::
+  + Markright alike headings ::
     Info view mode only. Similar to the =\markright= command in LaTeX
     the Title of the current sections parent appears on top of each page. In
     subsections this heading can be use as link up to start of the parent
     section (see top of this page when you're in info view mode). You can move
     to the parent section by pressing `u´ (up).
-  + *Customizable features* ::
+  + Customizable features ::
     All features are customizable simply by setting up your export options
     template (see [[Usage]]).
-  + *Tooltips* ::
+  + Tooltips ::
     Moving the mouse on the navigation links shows a tooltip with name of
     next/previous section.
-  + *Folding* ::
+  + Folding ::
     Emulates the way of folding in emacs Org-mode.
-  + *Inter-linking* ::
+  + Inter-linking ::
     The exported pages can be linked to the homepage and an directory index or
     some other sort of parent file.
-  + *Hide T.O.C.* ::
+  + Hide T.O.C. ::
     The T.O.C. can be hidden completly. Hittin '=i=' still will show it. When
     showing the T.O.C. hitting '=i=' any navigation command ('=n=', '=p=',
     '=s='...) will trigger an history-back. Thus the T.O.C. will not get in your
     way when navigating the history later on.
-  + *Adjusted internal links* ::
+  + Adjusted internal links ::
     Internal links to section headings are automatically adjusted to work with
     this script. When following such internal links, one may go back again
     using '=b='.
-  + *Detect the target in the URL* ::
+  + Detect the target in the URL ::
     If the URL is suffixed by '=#sec-x.y.z=' that section will be displayed
     after startup.
 
@@ -362,26 +362,29 @@
   One may overwrite the author's settings using special suffixes appended to the
   URL of the script. Here are some examples linking to this section and changing
   the intial view mode. Currently only the '/internal/' options are used (see
-  [Using set()] for a list).
+  [[Using set()]] for a list).
 
 #+BEGIN_HTML
     <ul>
     <li>
-    <a href="index.html?TOC=0&VIEW=info&MOUSE_HINT=underline#sec-4">TOC=0&VIEW=info&MOUSE_HINT=underline#sec-2.1</a>
+    <a href="index.html?TOC=1&VIEW=info#sec-4"><code>index.html?TOC=1&VIEW=info#sec-2.1</code></a>
     </li>
     <li>
-    <a href="index.html?TOC=0&VIEW=overview&MOUSE_HINT=rgb(133,133,255)#sec-4">TOC=1&VIEW=overview&MOUSE_HINT=rgb(133,133,255)#sec-2.1</a>
+    <a href="index.html?TOC=0&VIEW=overview#sec-4"><code>index.html?TOC=0&VIEW=overview#sec-2.1</code></a>
     </li>
     <li>
-    <a href="index.html?TOC=0&VIEW=content&MOUSE_HINT=rgb(255,133,0)#sec-4">TOC=0&VIEW=content&MOUSE_HINT=rgb(255,133,0)#sec-2.1</a>
+    <a href="index.html?VIEW=content&TOC_DEPTH=1#sec-4"><code>index.html?VIEW=content&TOC_DEPTH=1#sec-2.1</code></a>
     </li>
     <li>
-    <a href="index.html?TOC=0&VIEW=showall&MOUSE_HINT=rgb(0,255,0)#sec-4">TOC=0&VIEW=showall&MOUSE_HINT=rgb(0,255,0)#sec-2.1</a>
+    <a href="index.html?VIEW=showall&MOUSE_HINT=rgb(255,133,0)#sec-4"><code>index.html?VIEW=showall&MOUSE_HINT=rgb(255,133,0)#sec-2.1</code></a>
     </li>
     </ul>
 #+END_HTML
 
   *Note that it is not possible to change the* '/HOME/' *and* '/Up/' *links*.
+
+  *Note* also that everything but =[0-9a-zA-Z\.-_]= should be URL encoded if used
+  as an options value.
 
 * CSS
 
@@ -409,13 +412,16 @@
   shure. JavaScript™ 1.4 plus =DOM= should make
     + Netscape 6.0 and higher
     + Internet Explorer 5.0 and up
-    + Firefox 1.0 ++  - 2.0.0.12 tested
-    + Opera   7.0 and higher - v.9.26 tested.
+    + Firefox 1.0 ++  - 2.0.0.12 and 3.0 Beta tested
+    + Opera 7.0 and higher - v.9.26 tested.
     + Safari 1.0
 
-  I have written and tested the script only in current Firefox and Opera so
-  far (lack of spare time, operation systems on my laptop, and installed
-  browsers). The test results will go in the next section.
+  I have written and tested the script only in current Firefox, Opera and IE 6
+  so far for a lack of spare time, operation systems on my laptop, and installed
+  browsers. IE is not fully supported (onclick, position fixed...) but fairly
+  working. Firefox 2 is anyoing slow as with all web pages heavily utilising
+  JavaScript. I recently installed Firefox 3.0 Beta which works much better. For
+  once in my life I have to admit that Opera is the best here.
 
 *** <<People reported it works in>>
 
@@ -461,7 +467,7 @@
   :<script type="text/javascript" language="JavaScript" src="org-info.js"></script>
   :<script type="text/javascript" language="JavaScript">
   :/* <![CDATA[ */
-  :org_html_manager.set("SUB_INDEXES", 1);
+  :org_html_manager.set("LOCAL_TOC", 1);
   :org_html_manager.set("TOC", 1);
   :org_html_manager.set("VIEW_BUTTONS", "1");
   :org_html_manager.set("MOUSE_HINT", "underline"); // or background-color like '#eeeeee'
@@ -513,7 +519,8 @@
       when in plain view. Default is =false=.
     + =MOUSE\_HINT= ::
       Highlight the heading under the mouse. This can be a background color
-      (like '=#ff0000=' or '=red=') or the keyword '=underline='.
+      (like '=#ff0000=', '=red=' or '=rgb(230,230,230)=') or the keyword
+      #'=underline='.
     + =LINK\_UP= ::
       May be set, to link to an other file, preferably the main index page of a
       subdirectory. You might consider using an absolute URL here. This link will be
@@ -575,13 +582,23 @@
   complex commands (which is still in the far future).
 
 * <<ChangeLog>>
+
+*** 2008-05-18 So
+
+    + Docs where wrong ::
+      Still some outdated stuff here.
+    + Allow overwrites ::
+      Changed the code to explicitly allow a certain URL overwrite. Otherwise
+      visitors could overwrite any variable internally used by the
+      =org_html_manger=.
+
 *** << 2008-05-18 So >>
 
     + URL Parsing ::
       Now the user may call the script and pass options to overwrite the authors
       settings using this syntax:
       : http://localhost/index.html?TOC=0&VIEW=showall&MOUSE_HINT=rgb(255,133,0)
-      Some links for testing are provided in section [[Overwriting the Author's settings]]
+      Some links for testing are provided in section [[Linking to Files using the Script]]
 
     + Focus the T.O.C. ::
       '=i=' tries to focus the T.O.C. if =FIXED_TOC= is ="1"=. This is still
@@ -731,84 +748,84 @@
 
 *** << 2008-03-30 So >>
 
-    + *Internal links working* ::
+    + Internal links working ::
       Internal links are now converted to work with this script. The user has
       to go back using the `=s=' key since the history is not
       updated. Could Browsers understand this? Or is there a possibility to
       catch the `/back/' button event?
-    + *org-file.html#sec-x.y.z* ::
+    + org-file.html#sec-x.y.z ::
       is now working too. That is, http://path/to/org-file.html#sec-x.y.z makes
       the script displaying that section in the configured view mode.
 
-    + *Folding now on by default.* ::
+    + Folding now on by default. ::
 
-    + *Scrolling* ::
+    + Scrolling ::
       '=v=' and '=V=' now scroll the window by the visible height of the
       document window. A little bit less though for better orientation.
 
-    + *Deleted setup section using export options template* ::
+    + Deleted setup section using export options template ::
       This one was not working. I'm not shure it ever was... but I think so. I
       should look up this one in the documentation again.
 
-    + *Plain view mode is default* ::
+    + Plain view mode is default ::
 
-    + *FIXED Bugs* ::
+    + FIXED Bugs ::
       - The view mode was dependend on the folding feature.
       - When folding was of an error was shown when trying to fold.
 
 *** << 2008-03-23 So>>
 
-    + *Clicking a headline makes it the current section* ::
+    + Clicking a headline makes it the current section ::
       and thus the candidate for displaying in next info view and the point
       from where 'next' and 'previous' work.
 
 *** << 2008-03-22 Sa >>
 
-    + *TOC, title and global folding* ::
+    + TOC, title and global folding ::
       The title was doubled in some cases. This should be fixed now. The TOC
       is now a node as all the other sections to.
 
-    + *Keyboard* ::
+    + Keyboard ::
       Some more work on this. There seems to be some locale related problem
       concerning the keyboard input of a `?´ (help) in Firefox. Added a
       workaround for this one, but probably only working here.
 
     + *Documentation updated.*
 
-    + *Stylesheet* ::
+    + Stylesheet ::
       now with indentation. This demonstrates the folding somewhat better.
 
-    + *Hide T.O.C.* ::
+    + Hide T.O.C. ::
       The table of contents can now be hidden completely due to the new option
       =HIDE_TOC=. Hence the documents have to be exported with T.O.C., but may
       be displayed without it.
 
 *** << 2008-03-21 Fr >>
 
-    + *Commands reworked* ::
+    + Commands reworked ::
       The '/minibuffer/' is now invisible by default. Commands can be entered
       into the =document= itself. Still, the chars entered are appended to the
       minibuffers contents, to keep the possibility to enter more complex
       commands in the future. The minibuffer is still needed for commands to
       work in firefox.
 
-    + *Section numbers are now read through* =window.prompt()= ::
+    + Section numbers are now read through =window.prompt()= ::
       This was done to simplify the command interface code. Now the commands
       entered are just one char in length.
 
-    + *Global folding now working* ::
+    + Global folding now working ::
       There was not much to do left for this one to do.
 
 *** << 2008-03-13 Do >>
 
     *Added new config options:* ::
 
-    + *LINK\_UP* ::
+    + LINK\_UP ::
       May be set, to link to an other file, preferably the main index page. This
       link will be displayed as
       :<a href="LINK_UP">HOME</a>
       Command: '=h=' - home
-    + *LINK\_TO\_MAIN* ::
+    + LINK\_TO\_MAIN ::
       May be set, to link to an other file, preferably the main index page. This
       link will be displayed as
       :<a href="LINK_TO_MAIN">Up</a>
@@ -820,9 +837,9 @@
 
 *** << 2008-03-12 Mi >>
 
-    + *Folding.* ::
+    + Folding. ::
       First attempt to get the global folding working. Hmm.
-    + *New Commands* ::
+    + New Commands ::
       - '=?=' - show the little help screen.
       - '=n=' - go to next section.
       - '=p=' - go to previous section.
@@ -836,11 +853,11 @@
 
 *** << 2008-03-11 Di >>
 
-    + *Radical code cleanup.* ::
+    + Radical code cleanup. ::
       Removed unused variables and functions. More secure, less
       errorprone. This cood be even better.
     + *Org mode like toggling of headlines now basically works.*
-    + *Commands can be input through a little 'minibuffer' on top of the screen.* ::
+    + Commands can be input through a little 'minibuffer' on top of the screen. ::
       This needs some special style settings for IE (position fixed). I will
       append a minimal stylesheet for this purpos the next days in this
       documentation for copy and paste.
@@ -853,20 +870,20 @@
         working in both modes very easy, but currently also only in info view
         mode implemented.
     + *Code relies now on next generation XHTML-Export format.*
-    + *Some kind of rudimentary debugging system.* ::
+    + Some kind of rudimentary debugging system. ::
       May be turned on bei seting config options:
       :org_html_manager.set("WINDOW_BORDER", "true");
       :org_html_manager.set("DEBUG", org_html_manager.DEBUG_FATAL);
-    + *Better way of configuration for the enduser. Fault tolerant. No undefined* ::
+    + Better way of configuration for the enduser. Fault tolerant. No undefined ::
       variables when scanning starts. The users my use the =set(key, value)=
       function of the =OrgHtmlManger= class like this:
-      :org_html_manager.set ( "SUB_INDEXES",        0);
-      :org_html_manager.set ( "INFO_SWITCH_ALWAYS", "true");
+      :org_html_manager.set ( "LOCAL_TOC",        0);
+      :org_html_manager.set ( "VIEW_BUTTONS", "true");
       :org_html_manager.set ( "FOLDING",            "true");
       :org_html_manager.set ( "MOUSE_HINT",         "underline");
       :org_html_manager.set ( "CONSOLE",            "true");
       :org_html_manager.setup ();
-    + *New configuration accepts these options* ::
+    + New configuration accepts these options ::
       - =SUB\_INDEXES= ::
         Create subindexes for sections containing sections.
       - =INFO\_SWITCH\_ALWAYS= ::
