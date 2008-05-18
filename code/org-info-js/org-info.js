@@ -1245,7 +1245,7 @@ function OrgHtmlManagerKeyEvent (e)
   if (e.which) c = e.which;
   else if (e.keyCode) c = e.keyCode;
 
-  if(e.ctrlKey || e.modifiers & Event.CONTROL_MASK)
+  if(e.ctrlKey) // || e.modifiers & Event.CONTROL_MASK)
     return;
 
   var s = String.fromCharCode(c);
