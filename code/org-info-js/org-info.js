@@ -327,9 +327,10 @@ var org_html_manager = {
     this.LOCAL_TOC = (this.LOCAL_TOC && this.LOCAL_TOC != "0") ? true : false;
     this.HIDE_TOC = (this.TOC && this.TOC != "0") ? false : true;
     if(this.FIXED_TOC && this.FIXED_TOC != "0") {
-      this.FIXED_TOC = 1;
+      this.FIXED_TOC = true;
       this.HIDE_TOC = false;
     }
+    else this.FIXED_TOC = false;
 
     this.LINKS +=
     ((this.LINK_UP && this.LINK_UP != document.URL) ? '<a href="'+this.LINK_UP+'">Up</a> / ' : "")
