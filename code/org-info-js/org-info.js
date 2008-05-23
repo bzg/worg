@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.5.1
+ *       org-info.js, v.0.0.6.0
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -326,6 +326,10 @@ var org_html_manager = {
     this.VIEW_BUTTONS = (this.VIEW_BUTTONS && this.VIEW_BUTTONS != "0") ? true : false;
     this.LOCAL_TOC = (this.LOCAL_TOC && this.LOCAL_TOC != "0") ? true : false;
     this.HIDE_TOC = (this.TOC && this.TOC != "0") ? false : true;
+    if(this.FIXED_TOC && this.FIXED_TOC != "0") {
+      this.FIXED_TOC = 1;
+      this.HIDE_TOC = false;
+    }
 
     this.LINKS +=
     ((this.LINK_UP && this.LINK_UP != document.URL) ? '<a href="'+this.LINK_UP+'">Up</a> / ' : "")
