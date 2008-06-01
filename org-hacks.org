@@ -19,60 +19,70 @@ workaround.  Go crazy.
 
 * Automatically add an appointment when clocking in a task
 
-:;; Make sure you have a sensible value for `appt-message-warning-time'
-:(defvar bzg-org-clock-in-appt-delay 100
-:  "Number of minutes for setting an appointment by clocking-in")
+#+BEGIN_SRC emacs-lisp
+;; Make sure you have a sensible value for `appt-message-warning-time'
+(defvar bzg-org-clock-in-appt-delay 100
+  "Number of minutes for setting an appointment by clocking-in")
+#+END_SRC
 
 This function let's you add an appointment for the current entry.
 This can be useful when you need a reminder.
 
-:(defun bzg-org-clock-in-add-appt (&optional n)
-:  "Add an appointment for the Org entry at point in N minutes."
-:  (interactive)
-:  (save-excursion
-:    (org-back-to-heading t)
-:    (looking-at org-complex-heading-regexp)
-:    (let* ((msg (match-string-no-properties 4))
-:	   (ct-time (decode-time))
-:	   (appt-min (+ (cadr ct-time)
-:			(or n bzg-org-clock-in-appt-delay)))
-:	   (appt-time ; define the time for the appointment
-:	    (progn (setf (cadr ct-time) appt-min) ct-time)))
-:      (appt-add (format-time-string
-:		 "%H:%M" (apply 'encode-time appt-time)) msg)
-:      (if (interactive-p) (message "New appointment for %s" msg)))))
+#+BEGIN_SRC emacs-lisp
+(defun bzg-org-clock-in-add-appt (&optional n)
+  "Add an appointment for the Org entry at point in N minutes."
+  (interactive)
+  (save-excursion
+    (org-back-to-heading t)
+    (looking-at org-complex-heading-regexp)
+    (let* ((msg (match-string-no-properties 4))
+	   (ct-time (decode-time))
+	   (appt-min (+ (cadr ct-time)
+			(or n bzg-org-clock-in-appt-delay)))
+	   (appt-time ; define the time for the appointment
+	    (progn (setf (cadr ct-time) appt-min) ct-time)))
+      (appt-add (format-time-string
+		 "%H:%M" (apply 'encode-time appt-time)) msg)
+      (if (interactive-p) (message "New appointment for %s" msg)))))
+#+END_SRC
 
 You can advise =org-clock-in= so that =C-c C-x C-i= will automatically
 add an appointment:
 
-:(defadvice org-clock-in (after org-clock-in-add-appt activate)
-:  "Add an appointment when clocking a task in."
-:  (bzg-org-clock-in-add-appt))
+#+BEGIN_SRC emacs-lisp
+(defadvice org-clock-in (after org-clock-in-add-appt activate)
+  "Add an appointment when clocking a task in."
+  (bzg-org-clock-in-add-appt))
+#+END_SRC
 
 You may also want to delete the associated appointment when clocking
 out.  This function does this:
 
-:(defun bzg-org-clock-out-delete-appt nil
-:  "When clocking out, delete any associated appointment."
-:  (interactive)
-:  (save-excursion
-:    (org-back-to-heading t)
-:    (looking-at org-complex-heading-regexp)
-:    (let* ((msg (match-string-no-properties 4)))
-:      (setq appt-time-msg-list
-:	    (delete nil
-:		    (mapcar
-:		     (lambda (appt)
-:		       (if (not (string-match (regexp-quote msg)
-:					      (cadr appt))) appt))
-:		     appt-time-msg-list)))
-:      (appt-check))))
+#+BEGIN_SRC emacs-lisp
+(defun bzg-org-clock-out-delete-appt nil
+  "When clocking out, delete any associated appointment."
+  (interactive)
+  (save-excursion
+    (org-back-to-heading t)
+    (looking-at org-complex-heading-regexp)
+    (let* ((msg (match-string-no-properties 4)))
+      (setq appt-time-msg-list
+	    (delete nil
+		    (mapcar
+		     (lambda (appt)
+		       (if (not (string-match (regexp-quote msg)
+					      (cadr appt))) appt))
+		     appt-time-msg-list)))
+      (appt-check))))
+#+END_SRC
 
 And here is the advice for =org-clock-out= (=C-c C-x C-o=)
 
-:(defadvice org-clock-out (before org-clock-out-delete-appt activate)
-:  "Delete an appointment when clocking a task out."
-:  (bzg-org-clock-out-delete-appt))
+#+BEGIN_SRC emacs-lisp
+(defadvice org-clock-out (before org-clock-out-delete-appt activate)
+  "Delete an appointment when clocking a task out."
+  (bzg-org-clock-out-delete-appt))
+#+END_SRC
 
 *IMPORTANT*: You can add appointment by clocking in in both an
 =org-mode= and an =org-agenda-mode= buffer.  But clocking out from
@@ -89,45 +99,46 @@ session containing your work!"
 
 http://article.gmane.org/gmane.emacs.orgmode/5276
 
-:(require 'term)
-:
-:(defun ash-org-goto-screen (name)                                              
-:  "Open the screen with the specified name in the window"                      
-:  (interactive "MScreen name: ")                                              
-:  (let ((screen-buffer-name (ash-org-screen-buffer-name name)))                
-:    (if (member screen-buffer-name                                            
-:                (mapcar 'buffer-name (buffer-list)))                          
-:        (switch-to-buffer screen-buffer-name)                                  
-:      (switch-to-buffer (ash-org-screen-helper name "-dr")))))  
-:
-:(defun ash-org-screen-buffer-name (name)
-:  "Returns the buffer name corresponding to the screen name given."
-:  (concat "*screen " name "*"))
-:
-:(defun ash-org-screen-helper (name arg)
-:  ;; Pick the name of the new buffer.
-:  (let ((term-ansi-buffer-name
-:	 (generate-new-buffer-name 
-:	  (ash-org-screen-buffer-name name))))
-:    (setq term-ansi-buffer-name
-:          (term-ansi-make-term 
-:	   term-ansi-buffer-name "/usr/bin/screen" nil arg name))
-:    (set-buffer term-ansi-buffer-name)
-:    (term-mode)
-:    (term-char-mode)
-:    (term-set-escape-char ?\C-x)
-:    term-ansi-buffer-name))
-:
-:(defun ash-org-screen (name)
-:  "Start a screen session with name"
-:  (interactive "MScreen name: ")
-:  (save-excursion
-:    (ash-org-screen-helper name "-S"))
-:  (insert-string (concat "[[screen:" name "]]")))
-:
-:;; And don't forget to add ("screen" . "elisp:(ash-org-goto-screen
-:;; \"%s\")") to org-link-abbrev-alist.
+#+BEGIN_SRC emacs-lisp
+(require 'term)
 
+(defun ash-org-goto-screen (name)                                              
+  "Open the screen with the specified name in the window"                      
+  (interactive "MScreen name: ")                                              
+  (let ((screen-buffer-name (ash-org-screen-buffer-name name)))                
+    (if (member screen-buffer-name                                            
+                (mapcar 'buffer-name (buffer-list)))                          
+        (switch-to-buffer screen-buffer-name)                                  
+      (switch-to-buffer (ash-org-screen-helper name "-dr")))))  
+
+(defun ash-org-screen-buffer-name (name)
+  "Returns the buffer name corresponding to the screen name given."
+  (concat "*screen " name "*"))
+
+(defun ash-org-screen-helper (name arg)
+  ;; Pick the name of the new buffer.
+  (let ((term-ansi-buffer-name
+	 (generate-new-buffer-name 
+	  (ash-org-screen-buffer-name name))))
+    (setq term-ansi-buffer-name
+          (term-ansi-make-term 
+	   term-ansi-buffer-name "/usr/bin/screen" nil arg name))
+    (set-buffer term-ansi-buffer-name)
+    (term-mode)
+    (term-char-mode)
+    (term-set-escape-char ?\C-x)
+    term-ansi-buffer-name))
+
+(defun ash-org-screen (name)
+  "Start a screen session with name"
+  (interactive "MScreen name: ")
+  (save-excursion
+    (ash-org-screen-helper name "-S"))
+  (insert-string (concat "[[screen:" name "]]")))
+
+;; And don't forget to add ("screen" . "elisp:(ash-org-goto-screen
+;; \"%s\")") to org-link-abbrev-alist.
+#+END_SRC
 
 * Org Agenda + Appt + Zenity
 
@@ -135,36 +146,38 @@ Russell Adams posted this setup [[http://article.gmane.org/gmane.emacs.orgmode/5
 appointments are known by Emacs, and it displays warnings in a [[http://live.gnome.org/Zenity][zenity]]
 popup window.
 
-:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-:; For org appointment reminders
-:
-:;; Get appointments for today
-:(defun my-org-agenda-to-appt ()
-:  (interactive)
-:  (setq appt-time-msg-list nil)
-:  (let ((org-deadline-warning-days 0))    ;; will be automatic in org 5.23
-:        (org-agenda-to-appt)))
-:
-:;; Run once, activate and schedule refresh
-:(my-org-agenda-to-appt)
-:(appt-activate t)
-:(run-at-time "24:01" nil 'my-org-agenda-to-appt)
-:
-:; 5 minute warnings
-:(setq appt-message-warning-time 15)
-:(setq appt-display-interval 5)
-:
-:; Update appt each time agenda opened.
-:(add-hook 'org-finalize-agenda-hook 'my-org-agenda-to-appt)
-:
-:; Setup zenify, we tell appt to use window, and replace default function
-:(setq appt-display-format 'window)
-:(setq appt-disp-window-function (function my-appt-disp-window))
-:
-:(defun my-appt-disp-window (min-to-app new-time msg)                      
-:  (save-window-excursion (shell-command (concat 
-:    "/usr/bin/zenity --info --title='Appointment' --text='" 
-:    msg "' &") nil nil)))
+#+BEGIN_SRC emacs-lisp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; For org appointment reminders
+
+;; Get appointments for today
+(defun my-org-agenda-to-appt ()
+  (interactive)
+  (setq appt-time-msg-list nil)
+  (let ((org-deadline-warning-days 0))    ;; will be automatic in org 5.23
+        (org-agenda-to-appt)))
+
+;; Run once, activate and schedule refresh
+(my-org-agenda-to-appt)
+(appt-activate t)
+(run-at-time "24:01" nil 'my-org-agenda-to-appt)
+
+; 5 minute warnings
+(setq appt-message-warning-time 15)
+(setq appt-display-interval 5)
+
+; Update appt each time agenda opened.
+(add-hook 'org-finalize-agenda-hook 'my-org-agenda-to-appt)
+
+; Setup zenify, we tell appt to use window, and replace default function
+(setq appt-display-format 'window)
+(setq appt-disp-window-function (function my-appt-disp-window))
+
+(defun my-appt-disp-window (min-to-app new-time msg)                      
+  (save-window-excursion (shell-command (concat 
+    "/usr/bin/zenity --info --title='Appointment' --text='" 
+    msg "' &") nil nil)))
+#+END_SRC
 
 * remind2org 
 
@@ -186,14 +199,16 @@ http://article.gmane.org/gmane.emacs.orgmode/5073
 
 [[http://www.emacswiki.org/cgi-bin/wiki/Anything][Anything]] users may find the snippet below interesting: 
 
-:(defvar org-remember-anything
-:  '((name . "Org Remember")
-:    (candidates . (lambda () (mapcar 'car org-remember-templates)))
-:    (action . (lambda (name)
-:                (let* ((orig-template org-remember-templates)
-:                       (org-remember-templates
-:                        (list (assoc name orig-template))))
-:                  (call-interactively 'org-remember))))))
+#+BEGIN_SRC emacs-lisp
+(defvar org-remember-anything
+  '((name . "Org Remember")
+    (candidates . (lambda () (mapcar 'car org-remember-templates)))
+    (action . (lambda (name)
+                (let* ((orig-template org-remember-templates)
+                       (org-remember-templates
+                        (list (assoc name orig-template))))
+                  (call-interactively 'org-remember))))))
+#+END_SRC
 
 You can add it to your 'anything-sources' variable and open remember directly
 from anything. I imagine this would be more interesting for people with many
@@ -210,26 +225,28 @@ useful when you update and compile Org often.
 By default it reloads compiled org files.  If you call it with a prefix
 argument it reloads source files.
 
-:;; Your org-mode directory
+#+BEGIN_SRC emacs-lisp
+;; Your org-mode directory
 
-:(setq my-org-mode-git-directory "~/git/org-mode")
-:
-:(defun org-reload-org (&optional source)
-:  "Reload Compiled Org lisp files."
-:  (interactive "p")
-:  (message "source is %s" source)
-:  (if (equal source 4)
-:      (setq my-org-files "\\.el\\'")
-:    (setq my-org-files "\\.elc\\'"))
-:  (mapc (lambda(f) (load (car f)))
-:	(directory-files-and-attributes (concat my-org-mode-git-directory "/lisp") t my-org-files)))
+(setq my-org-mode-git-directory "~/git/org-mode")
 
-:(defun org-reload-org nil
-:  "Reload Org lisp files."
-:  (interactive)
-:  (mapc (lambda(f) (load (car f)))
-:	(directory-files-and-attributes 
-:	  (concat my-org-mode-git-directory "/lisp") t "\\.elc\\'")))
+(defun org-reload-org (&optional source)
+  "Reload Compiled Org lisp files."
+  (interactive "p")
+  (message "source is %s" source)
+  (if (equal source 4)
+      (setq my-org-files "\\.el\\'")
+    (setq my-org-files "\\.elc\\'"))
+  (mapc (lambda(f) (load (car f)))
+	(directory-files-and-attributes (concat my-org-mode-git-directory "/lisp") t my-org-files)))
+
+(defun org-reload-org nil
+  "Reload Org lisp files."
+  (interactive)
+  (mapc (lambda(f) (load (car f)))
+	(directory-files-and-attributes 
+	  (concat my-org-mode-git-directory "/lisp") t "\\.elc\\'")))
+#+END_SRC
 
 Normally you want to use the compiled files since they are faster. If
 you run into a bug and want to generate a useful backtrace for the maintainer
@@ -242,15 +259,18 @@ that generates the error and cut and paste the resulting backtrace
 into an email.  To switch back to the compiled version just reload again with
 
 :M-x org-reload-org
+
 * Split horizontally for agenda
-If you would like to split the frame into two side-by-side windows
-when displaying the agenda, try this hack from Jan Rehders, which
-uses the `toggle-window-split' from
+
+If you would like to split the frame into two side-by-side windows when
+displaying the agenda, try this hack from Jan Rehders, which uses the
+`toggle-window-split' from
+
 http://www.emacswiki.org/cgi-bin/wiki/ToggleWindowSplit
 
-#+begin_src emacs-lisp
-;; patch org mode to use vertical splitting
+#+BEGIN_SRC emacs-lisp
+;; Patch org-mode to use vertical splitting
 (defadvice org-prepare-agenda (after org-fix-split)
- (toggle-window-split))
+  (toggle-window-split))
 (ad-activate 'org-prepare-agenda)
-#+end_src
+#+END_SRC
