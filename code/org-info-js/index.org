@@ -37,6 +37,8 @@
 
   Go to the next section by pressing '=n='.
 
+
+
 *** <<Terms used throughout this Document>>
 
     I tend to talk about view modes. One may toggle the view mode by pressing
@@ -126,23 +128,25 @@
     The visitor of this file (and every XHTML-exported org file that includes
     the script) may use the mouse or the following keys to navigate the page:
 
-    | Key    | Action                        | Info | Plain |
-    |--------+-------------------------------+------+-------|
-    | n      | next section                  | y    | y     |
-    | p      | previous section              | y    | y     |
-    | t or < | top. First section/T.O.C.     | y    | y     |
-    | E or > | End. Last section             | y    | y     |
-    | i      | show T.O.C.                   | y    | y     |
-    | u      | one level up (parent section) | y    | y     |
-    | s      | prompt for section number     | y    | y     |
-    | m      | toggle view mode              | y    | y     |
-    | v      | scroll by 200 px              | y    | y     |
-    | V      | scroll back 200 px            | y    | y     |
-    | ?      | show shortcuts                | y    | y     |
-    | h      | follow the link '/UP/'        | y    | y     |
-    | H      | follow the link '/HOME/'      | y    | y     |
-    | f      | fold current section          |      | y     |
-    | g      | fold globaly                  |      | y     |
+    | Key    | Action                            | Info | Plain |
+    |--------+-----------------------------------+------+-------|
+    | ?      | show shortcuts                    | y    | y     |
+    | E or > | End. Last section                 | y    | y     |
+    | f      | fold current section              |      | y     |
+    | g      | fold globaly                      |      | y     |
+    | H      | follow the link '/HOME/'          | y    | y     |
+    | h      | follow the link '/UP/'            | y    | y     |
+    | i      | show T.O.C.                       | y    | y     |
+    | l      | show HTML link to current section | y    | y     |
+    | L      | show OrgMode link to this section | y    | y     |
+    | m      | toggle view mode                  | y    | y     |
+    | n      | next section                      | y    | y     |
+    | p      | previous section                  | y    | y     |
+    | s      | prompt for section number         | y    | y     |
+    | t or < | top. First section/T.O.C.         | y    | y     |
+    | u      | one level up (parent section)     | y    | y     |
+    | V      | scroll back 200 px                | y    | y     |
+    | v      | scroll by 200 px                  | y    | y     |
 
     The script always tries to keep the last selected section visible. This is
     somewhat strange when scrolling, but really helpfull for keyboard navigation.
@@ -203,11 +207,12 @@
     file.
 
     As an example, the head of this org file looks like:
-
-    :#+INFOJS_OPT: path:org-info.js
-    :#+INFOJS_OPT: toc:nil localtoc:t view:info mouse:underline
-    :#+INFOJS_OPT: up:http://www.legito.net/
-    :#+INFOJS_OPT: home:http://orgmode.org buttons:nil
+#+BEGIN_SRC org
+#+INFOJS_OPT: path:org-info.js
+#+INFOJS_OPT: toc:nil localtoc:t view:info mouse:underline
+#+INFOJS_OPT: up:http://www.legito.net/
+#+INFOJS_OPT: home:http://orgmode.org buttons:nil
+#+END_SRC
 
 ***** Using customize
 
@@ -267,7 +272,9 @@
 ***** Per File Basis: #+INFOJS\_OPT
 
       A single file may overwrite the global options using a line like this:
-      :#+INFOJS_OPT: view:info mouse:underline up:index.html home:http://www.mydomain.tpl toc:t
+#+BEGIN_SRC org
+#+INFOJS_OPT: view:info mouse:underline up:index.html home:http://www.mydomain.tpl toc:t
+#+END_SRC
 
       Possible options are the same as in the previous section. Additional (?)
       options include:
@@ -291,21 +298,23 @@
       The second possibility to include the script is to add a special section
       to the end of your org file (multiple lines possible):
 
-      :* COMMENT html style specifications
-      :# Local Variables:
-      :# org-export-html-style: "<link rel=\"stylesheet\"
-      :# type=\"text/css\" href=\"styles.css\" />
-      :# <script type=\"text/javascript\" language=\"JavaScript\" src=\"org-info.js\">
-      :# </script>
-      :# <script type=\"text/javascript\" language=\"JavaScript\">
-      :#  /* <![CDATA[ */
-      :#    org_html_manager.set(\"LOCAL_TOC\", 1);
-      :#    org_html_manager.set(\"VIEW_BUTTONS\", \"true\");
-      :#    org_html_manager.set(\"MOUSE_HINT\", \"underline\");
-      :#    org_html_manager.setup ();
-      :#  /* ]]> */
-      :# </script>"
-      :# End:
+#+BEGIN_SRC org
+* COMMENT html style specifications
+# Local Variables:
+# org-export-html-style: "<link rel=\"stylesheet\"
+# type=\"text/css\" href=\"styles.css\" />
+# <script type=\"text/javascript\" language=\"JavaScript\" src=\"org-info.js\">
+# </script>
+# <script type=\"text/javascript\" language=\"JavaScript\">
+#  /* <![CDATA[ */
+#    org_html_manager.set(\"LOCAL_TOC\", 1);
+#    org_html_manager.set(\"VIEW_BUTTONS\", \"true\");
+#    org_html_manager.set(\"MOUSE_HINT\", \"underline\");
+#    org_html_manager.setup ();
+#  /* ]]> */
+# </script>"
+# End:
+#+END_SRC
 
       Ensure to precede all the verbatim double quotes with a backslash and
       include the whole value of =org-export-html-style= into double quotes
@@ -317,15 +326,17 @@
       :M-x cuomize-variable RET org-export-html-style RET
       and set it there.
 
-      :<script type="text/javascript" language="JavaScript" src="org-info.js"></script>
-      :<script type="text/javascript" language="JavaScript">
-      :/* <![CDATA[ */
-      :org_html_manager.set("LOCAL_TOC", 1);
-      :org_html_manager.set("VIEW_BUTTONS", "true");
-      :org_html_manager.set("MOUSE_HINT", "underline");
-      :org_html_manager.setup ();
-      :/* ]]> */
-      :</script>
+#+BEGIN_SRC sgml
+<script type="text/javascript" language="JavaScript" src="org-info.js"></script>
+<script type="text/javascript" language="JavaScript">
+/* <![CDATA[ */
+org_html_manager.set("LOCAL_TOC", 1);
+org_html_manager.set("VIEW_BUTTONS", "true");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.setup ();
+/* ]]> */
+</script>
+#+END_SRC
 
       This way all your files will be exported using the script in the future.
 
@@ -334,21 +345,23 @@
       Last but not least and very handy is the possibility to setup the usage of
       the script per project. This is a taylor made passage of the org manual:
 
-      :(setq org-publish-project-alist
-      :      ’(("org"
-      :         :base-directory "~/org/"
-      :         :publishing-directory "~/public_html"
-      :         :section-numbers nil
-      :         :table-of-contents nil
-      :         :style "<link rel=stylesheet href=\"../other/mystyle.css\"
-      :                type=\"text/css\">
-      :                <script type=\"text/javascript\" language=\"JavaScript\"
-      :                        src=\"org-info.js\"></script>
-      :                <script type=\"text/javascript\" language=\"JavaScript\">
-      :                 /* <![CDATA[ */
-      :                    org_html_manager.setup ();
-      :                 /* ]]> */
-      :                </script>")))
+#+BEGIN_SRC lisp
+(setq org-publish-project-alist
+      ’(("org"
+         :base-directory "~/org/"
+         :publishing-directory "~/public_html"
+         :section-numbers nil
+         :table-of-contents nil
+         :style "<link rel=stylesheet href=\"../other/mystyle.css\"
+                type=\"text/css\">
+                <script type=\"text/javascript\" language=\"JavaScript\"
+                        src=\"org-info.js\"></script>
+                <script type=\"text/javascript\" language=\"JavaScript\">
+                 /* <![CDATA[ */
+                    org_html_manager.setup ();
+                 /* ]]> */
+                </script>")))
+#+END_SRC
 
       Don't forget to add an export target for the script itself ;-)
 
@@ -394,12 +407,14 @@
   + =org-info-info-navigation= ::
     Style for the navigation table in info view mode. I needed this one to avoid
     border around that table. You may add lines like these to your stylesheet:
-    :/* Style for org-info.js */
-    :
-    :.org-info-info-navigation
-    :{
-    :  border-style:none;
-    :}
+#+BEGIN_SRC css
+/* Style for org-info.js */
+
+.org-info-info-navigation
+{
+  border-style:none;
+}
+#+END_SRC
 
 
 
@@ -429,10 +444,13 @@
     are Browser specific. Let me say it again: we don't wont to support legacy
     browsers, do we?
 
-    | Browser   |  Version | ✔ | Problems |
-    |-----------+----------+---+----------|
-    | Opera     |     9.26 | ✔ | -        |
-    | Iceweasel | 2.0.0.12 | ✔ | -        |
+    | Browser           |    Version | ✔ | Problems |
+    |-------------------+------------+---+----------|
+    | Opera             |       9.26 | ✔ | -        |
+    | Firefox/Iceweasel |   2.0.0.12 | ✔ | -        |
+    | Firefox/Iceweasel | 3.0.2 Beta | ✔ | -        |
+    | IE                |        5.5 | ✔ | -        |
+    | IE                |          6 | ✔ | -        |
 
     If you manage to get this thingy working in any browser please let us know, so
     we can update the above table.
@@ -464,31 +482,39 @@
   method. For a list of options see section [[Using Set()]]. This is what the
   head section should look like:
 
-  :<script type="text/javascript" language="JavaScript" src="org-info.js"></script>
-  :<script type="text/javascript" language="JavaScript">
-  :/* <![CDATA[ */
-  :org_html_manager.set("LOCAL_TOC", 1);
-  :org_html_manager.set("TOC", 1);
-  :org_html_manager.set("VIEW_BUTTONS", "1");
-  :org_html_manager.set("MOUSE_HINT", "underline"); // or background-color like '#eeeeee'
-  :org_html_manager.setup ();
-  :/* ]]> */
-  :</script>
+#+BEGIN_SRC sgml
+<script type="text/javascript" language="JavaScript" src="org-info.js"></script>
+<script type="text/javascript" language="JavaScript">
+/* <![CDATA[ */
+org_html_manager.set("LOCAL_TOC", 1);
+org_html_manager.set("TOC", 1);
+org_html_manager.set("VIEW_BUTTONS", "1");
+org_html_manager.set("MOUSE_HINT", "underline"); // or background-color like '#eeeeee'
+org_html_manager.setup ();
+/* ]]> */
+</script>
+#+END_SRC
 
   To just use the script with the defaults put this into the head section of the
   XHTML files:
 
-  :<script type="text/javascript" language="JavaScript" src="org-info.js"></script>
-  :<script type="text/javascript" language="JavaScript">
-  :/* <![CDATA[ */
-  :org_html_manager.setup ();
-  :/* ]]> */
-  :</script>
+#+BEGIN_SRC sgml
+<script type="text/javascript" language="JavaScript" src="org-info.js"></script>
+<script type="text/javascript" language="JavaScript">
+/* <![CDATA[ */
+org_html_manager.setup ();
+/* ]]> */
+</script>
+#+END_SRC
 
   I recommend the use of
-  :<script type="text/javascript" language="JavaScript" src="org-info.js"></script>
+#+BEGIN_SRC sgml
+<script type="text/javascript" language="JavaScript" src="org-info.js"></script>
+#+END_SRC
   instead of
-  :<script type="text/javascript" language="JavaScript" src="org-info.js" />
+#+BEGIN_SRC sgml
+<script type="text/javascript" language="JavaScript" src="org-info.js" />
+#+END_SRC
   which is valid XHTML but not understood by all browsers. I'll use the first
   version throughout this document where ever the space allows to do so.
 
@@ -582,6 +608,22 @@
   complex commands (which is still in the far future).
 
 * <<ChangeLog>>
+
+*** <2008-06-17 Di>
+
+    + New Variable org-export-section-number-format ::
+      Adjusted the script to detect the IDs correctly for use with the new
+      OrgMode version 6.05 (the section number format can now be adjusted in
+      OrgMode via =org-export-section-number-format=). This Change is backward
+      compatible.
+    + Display HTML links ::
+      '=l=' now displays a HTML link to the current section whereas '=L=' now
+      shows the OrgMode link. Thanks to Carsten for this idea.
+
+
+*** << 2008-05-23 Fr >>
+
+    + *T.O.C. fixed accidentally*
 
 *** 2008-05-18 So
 
@@ -951,6 +993,8 @@
   ideas. A lot of the power of the final make up is your merit! We all love to
   read the best of all mailing lists because of the kind and relaxed tone that
   is yours.
+
+  Thanks a lot for OrgMode!
 
 * License
 
