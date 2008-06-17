@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.6.0
+ *       org-info.js, v.0.0.6.1
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -257,8 +257,8 @@ var org_html_manager = {
   LOAD_CHECK: null,            // Saves the setTimeout()'s value
   WINDOW: null,                // A div to display info view mode
   SECS: new Array(),           // The OrgNode tree
-  REGEX: /(#sec\-)([\d\.]*$)/, // identify a section link in toc
-  EXCHANGE: /(sec-[\d\.]*)$/,  // extract the section number
+  REGEX: /(#sec\-)(.*$)/, // identify a section link in toc
+  EXCHANGE: /(sec-.*)$/,  // extract the section number
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
   EMPTY_START: /^(\s*)(.*)/,   // Trim (s. getKey())
   EMPTY_END: /\s$/,            // Trim (s. getKey())
@@ -987,6 +987,13 @@ var org_html_manager = {
             window.scrollBy(0, -(document.body.cleintHeight - 30));
         }
         else if ('l' == s) {
+          this.warn('<a href="' + this.BASE_URL + '#' + this.NODE.base_id + '">'
+                    + document.title + ', Sec. ' + this.removeTags(this.NODE.heading.innerHTML) + '</a>',
+                    true);
+          this.CONSOLE_INPUT.select();
+          return;
+        }
+        else if ('L' == s) {
           this.warn('[[' + this.BASE_URL + '#' + this.NODE.base_id + ']['
                     + document.title + ', Sec. ' + this.removeTags(this.NODE.heading.innerHTML) + ']]',
                     true);
@@ -1134,7 +1141,8 @@ var org_html_manager = {
         +'<tr><td> <code><b>m</b></code> </td><td> toggle the view mode</td></tr>'
         +'<tr><td> <code><b>f</b></code> </td><td> fold current section (plain view)</td></tr>'
         +'<tr><td> <code><b>g</b></code> </td><td> fold globaly (plain view)</td></tr>'
-        +'<tr><td> <code><b>l</b></code> </td><td> display org link</td></tr>'
+        +'<tr><td> <code><b>l</b></code> </td><td> display HTML link</td></tr>'
+        +'<tr><td> <code><b>L</b></code> </td><td> display Org link</td></tr>'
         +'<tr><td> <code><b>v</b></code> </td><td> scroll down</td></tr>'
         +'<tr><td> <code><b>V</b></code> </td><td> scroll back up</td></tr>'
         +'<tr><td> <code><b>u</b></code> </td><td> one level up (parent section)</td></tr>'
