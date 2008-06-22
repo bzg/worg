@@ -45,6 +45,7 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
   this.idx = -1;                          // The index in OrgHtmlManager::SECS[]
   this.heading = _heading;
   this.link = _link;
+  this.hasHighlight = false;
   this.parent = _parent;
   this.durty = false;                     // Node is durty, when children get
                                           // folded seperatly.
@@ -65,6 +66,7 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
 
   var folder = document.getElementById("text-"+this.base_id);
   if(null != folder) {
+    folder.isOrgNodeFolder = true;
     this.folder = folder;
   }
 
@@ -93,6 +95,36 @@ OrgNode.showElement = function (e)
     e.style.display = 'block';
     e.style.visibility = 'visible';
   }
+};
+
+/**
+ * Find the OrgNode containing a DOM-text-node.
+ * @param dom The text node.
+ * @param org The OrgNode containing the OrgNode in question.
+ */
+OrgNode.textNodeToIdx = function (dom, org)
+{
+  while(dom.nodeType !=  1 /* IE has no Node.ELEMENT_NODE... */
+        || -1 == dom.attributes["id"].value.indexOf("outline-container-")) {
+    dom = dom.parentNode;
+  }
+  var base_id = dom.attributes["id"].value.substr(18);
+  return OrgNode.idxForBaseId(base_id, org);
+};
+
+/**
+ * Find an OrgNode with base_id inside an OrgNode and return it's idx.
+ * @param base The base_id.
+ * @param org The OrgNode.
+ */
+OrgNode.idxForBaseId = function(base, org)
+{
+  if(org.base_id == base) return org;
+  for(var i = 0; i < org.children.length; ++i) {
+    var o = OrgNode.idxForBaseId(idx, org.children[i]);
+    if(null != o) return o;
+  }
+  return null;
 };
 
 //
@@ -190,8 +222,8 @@ OrgNode.prototype.fold = function (hide_folder)
       for(var i=0;i<this.children.length;++i) { this.children[i].setState(OrgNode.STATE_FOLDED); }
     }
   }
-  else
-    alert("folder == null\nCheck your org export version.");
+  // else
+  //   alert("folder == null\nCheck your org export version.");
 };
 
 /**
@@ -278,20 +310,29 @@ var org_html_manager = {
   // Commands:
   CONSOLE: null,               // The div containing the minibuffer.
   CONSOLE_INPUT: null,
-  command_str: "",
+  CONSOLE_LABEL: null,
+  CONSOLE_ACTIONS: null,
+  COMMAND_STR: "",
+  SEARCH_STR: "",
+  SEARCH_REGEX: "",
+  SEARCH_HL_REG: new RegExp('>([^<]*)?(<span [^>]*?"org-info-search-highlight"[^>]*?>)(.*?)(<\/span>)([^>]*)?<', "ig"),
   console_first_time: true,    // Cookie would be cool maybe.
-  MESSAGING:0,                 // Is there a message in the console?
+  MESSAGING: 0,                // Is there a message in the console?
   MESSAGING_INPLACE: 1,
   MESSAGING_TOP: 2,
   // show help:
-  helping:false,
+  HELPING: false,
+  // console in read mode?
+  READING: false,
+  // if yes, which command caused the readmode?
+  READ_COMMAND: "",
   last_view_mode:0,
   TAB_INDEX: 1000,             // Users could have defined tabindexes!
 
 
   /**
    * Setup the OrgHtmlManager for scanning.
-   * Here the timeout function gets set, that tells the wakes up org_html_mager
+   * Here the timeout func gets set, that tells the wakes up org_html_mager
    * for the next attempt to scan the document.
    * All user setable config vars (the documented ones) are checked and adjusted
    * to a legal value.
@@ -412,24 +453,28 @@ var org_html_manager = {
     }
 
     this.CONSOLE = document.createElement("div");
-    this.CONSOLE.innerHTML = '<form action="" onsubmit="return false;">'
-      +'<input type="text" id="org-console-input" onkeydown="org_html_manager.getKey();this.blur();"'
+    this.CONSOLE.innerHTML = '<form action="" onsubmit="org_html_manager.evalReadCommand(); return false;">'
+      +'<table style="width:100%;margin:0px 0px 0px 0px;border-style:none;" cellpadding="0" cellspacing="2" summary="minibuffer">'
+      +'<tbody><tr><td id="org-console-label" style="white-space:nowrap;"></td><td style="width:100%;">'
+      +'<input type="text" id="org-console-input" onkeydown="org_html_manager.getKey();"'
       +' onclick="this.select();" maxlength="150" style="width:100%;border:1px inset #dddddd;"'
-      +' value=""/>'
+      +' value=""/></td><td id="org-console-actions"></td></tr></tbody></table>'
       +'</form>';
-    this.CONSOLE.style.position = 'fixed';
-    this.CONSOLE.style.marginTop = '-40px';
-    this.CONSOLE.style.top = '-40px';
+    this.CONSOLE.style.position = 'realtive';
+    this.CONSOLE.style.marginTop = '-45px';
+    this.CONSOLE.style.top = '-45px';
     this.CONSOLE.style.left = '0px';
     this.CONSOLE.style.width = '100%';
     this.CONSOLE.style.height = '30px';
 
     document.body.insertBefore(this.CONSOLE, document.body.firstChild);
     this.MESSAGING = false;
+    this.CONSOLE_LABEL = document.getElementById("org-console-label");
     this.CONSOLE_INPUT = document.getElementById("org-console-input");
-    this.CONSOLE_INPUT.style.marginTop = '-40px';
+    this.CONSOLE_ACTIONS = document.getElementById("org-console-actions");
+    this.CONSOLE_INPUT.style.marginTop = '-45px';
     document.onkeypress=OrgHtmlManagerKeyEvent;
-
+    //this.CONSOLE.firstChild.onsubmit = function(){org_html_manager.evalReadCommand();return false};
     if(0 != this.DEBUG && this.debug.length) alert(this.debug);
   },
 
@@ -446,13 +491,10 @@ var org_html_manager = {
         for(i;heading == null && i < 7;++i) // TODO: What is this?
           heading = toc.getElementsByTagName("h"+i)[0];
         heading.onclick = function() {org_html_manager.fold(0);};
-        //heading.setAttribute('onclick', 'org_html_manager.fold(0);');
         heading.style.cursor = "pointer";
         if(this.MOUSE_HINT) {
           heading.onmouseover = function(){org_html_manager.highlight_headline(0);};
           heading.onmouseout = function(){org_html_manager.unhighlight_headline(0);};
-          // heading.setAttribute('onmouseover', 'org_html_manager.highlight_headline(this);');
-          // heading.setAttribute('onmouseout', 'org_html_manager.unhighlight_headline(this);');
         }
 
         if(this.FIXED_TOC) {
@@ -608,25 +650,22 @@ var org_html_manager = {
       this.debug += " -> linked section: " + matches[1].substr(4) + "\n";
       var heading = document.getElementById(matches[1]);
       // This heading could be null, if the document is not yet entirely loaded.
-      // So we stop scanning and set the timeout function in caller.
+      // So we stop scanning and set the timeout func in caller.
       // We could even count the <ul> and <li> elements above to speed up the next
       // scan.
       if(null == heading) {
         this.debug += ("heading is null. Scanning stopped.\n");
         return(false);
       }
-      var div = heading.parentNode; // seems to work great in browsers
+      var div = heading.parentNode;
       var sec = this.SECS.length;
       var depth = div.className.substr(8);
       var id = matches[1].substr(4);
       heading.onclick = function() {org_html_manager.fold("" + sec);};
-      // heading.setAttribute('onclick', 'org_html_manager.fold(' + sec + ');');
       heading.style.cursor = "pointer";
       if(this.MOUSE_HINT) {
         heading.onmouseover = function() {org_html_manager.highlight_headline("" + sec);};
         heading.onmouseout = function() {org_html_manager.unhighlight_headline("" + sec);};
-        // heading.setAttribute('onmouseover', 'org_html_manager.highlight_headline(this);');
-        // heading.setAttribute('onmouseout', 'org_html_manager.unhighlight_headline(this);');
       }
       var link = 'javascript:org_html_manager.navigateTo(' + sec + ')';
       // Is this wrong (??):
@@ -891,19 +930,22 @@ var org_html_manager = {
     // return, if s is empty:
     if(0 == s.length) return;
 
-    var copy = false;
-
     // the easiest is to just drop everything and clean the console.
     // User has to retype again.
-    if(this.MESSAGING) {
+    if(this.MESSAGING && !this.READING) {
       this.removeWarning();
     }
-    else if(this.helping) {
+    else if(this.HELPING) {
       this.showHelp();
-      this.command_str = "";
       this.CONSOLE_INPUT.value = "";
       return;
     }
+    else if(this.READING) {
+      this.COMMAND_STR = s;
+      return;
+    }
+
+    this.CONSOLE_INPUT.blur();
 
     // Always remove TOC from history, if HIDE_TOC
     if(this.HIDE_TOC && this.TOC == this.NODE && "v" != s && "V" != s) {
@@ -918,7 +960,30 @@ var org_html_manager = {
 
     if (1 == s.length)    // one char wide commands
       {
-        if ('n' == s) {
+        if ('b' == s) {
+          this.popHistory();
+        }
+        else if ('B' == s) {
+          this.popHistory(true);
+        }
+        else if ('c' == s) {
+          this.removeSearchHiglight();
+          if(this.VIEW == this.INFO_VIEW) {
+            // redisplay in info view mode:
+            this.showSection(this.NODE.idx);
+          }
+        }
+        else if ('i' == s) {
+          if(this.FIXED_TOC) {
+            this.TOC.folder.getElementsByTagName("A")[0].focus();
+          }
+          else if (this.HIDE_TOC) this.navigateTo('toc');
+          else if(0 != this.NODE.idx) this.navigateTo(0);
+        }
+        else if ('m' == s) {
+          this.toggleView(this.NODE.idx);
+        }
+        else if ('n' == s) {
           if(this.NODE.state == OrgNode.STATE_FOLDED && this.VIEW == this.PLAIN_VIEW) {
             this.showSection(this.NODE.idx);
           }
@@ -939,28 +1004,10 @@ var org_html_manager = {
             return;                          // rely on what happends if messaging
           }
         }
-        else if ('b' == s) {
-          this.popHistory();
-          return;
-        }
-        else if ('B' == s) {
-          this.popHistory(true);
-          return;
-        }
         else if ('q' == s) {
           if(window.confirm("Really close this file?")) {
             window.close();
           }
-        }
-        else if ('i' == s) {
-          if(this.FIXED_TOC) {
-            this.TOC.folder.getElementsByTagName("A")[0].focus();
-          }
-          else if (this.HIDE_TOC) this.navigateTo('toc');
-          else if(0 != this.NODE.idx) this.navigateTo(0);
-        }
-        else if ('m' == s) {
-          this.toggleView(this.NODE.idx);
         }
         else if ('<' == s || 't' == s) {
           if(0 != this.NODE.idx) this.navigateTo(0);
@@ -1012,7 +1059,7 @@ var org_html_manager = {
             this.NODE.div.scrollIntoView(true);
           }
         }
-        else if ('g' == s) {
+        else if ('F' == s) {
           if(this.VIEW != this.INFO_VIEW) {
             this.toggleGlobaly();
             this.NODE.div.scrollIntoView(true);
@@ -1027,25 +1074,45 @@ var org_html_manager = {
         else if ('h' == s && this.LINK_UP) {
           window.document.location.href = this.LINK_UP;
         }
+        else if ('g' == s) {
+          this.startRead(s, "Enter section number:");
+          return;
+        }
         else if ('s' == s) {
-          var matches = this.SECEX.exec(window.prompt("Enter Section:"));
-          var sec = matches[1];
-          var sec_found = false;
-          for(var i = 0; i < this.SECS.length; ++i) {
-            if(this.SECS[i].base_id == sec) {
-              this.pushHistory(this.SECS[i].idx, this.NODE.idx);
-              this.showSection(this.SECS[i].idx);
-              return;
-            }
+          this.SEARCH_STR = "";
+          this.startRead(s, "Search forward:");
+          return;
+        }
+        else if ('S' == s) {
+          if("" == this.SEARCH_STR) {
+            s = "s";
+            this.startRead(s, "Search forward:");
           }
-          if(! sec_found) {
-            this.warn("" + sec +": no such section.");
-            return;
+          else {
+            this.READ_COMMAND = s;
+            this.evalReadCommand();
           }
+          return;
+        }
+        else if ('r' == s) {
+          this.SEARCH_STR = "";
+          this.startRead(s, "Search backwards:");
+          return;
+        }
+        else if ('R' == s) {
+          if("" == this.SEARCH_STR) {
+            s = "r";
+            this.startRead(s, "Search backwards:");
+          }
+          else {
+            this.READ_COMMAND = s;
+            this.evalReadCommand();
+          }
+          return;
         }
       }
 
-    this.command_str = "";
+    this.COMMAND_STR = "";
     this.CONSOLE_INPUT.value = "";
     return true;
   },
@@ -1057,38 +1124,73 @@ var org_html_manager = {
       this.CONSOLE_INPUT.style.color="red";
       this.CONSOLE_INPUT.value= what + " Press any key to proceed.";
     }
-    else { this.CONSOLE_INPUT.value= what; }
-    if(this.VIEW != this.INFO_VIEW) {
-      var v = this.CONSOLE_INPUT.cloneNode(true);
-      v.style.marginTop = '0px';
-      v.style.top = '0px';
-      this.NODE.div.insertBefore(v, this.NODE.div.firstChild);
-      v.scrollIntoView(true);
-      this.MESSAGING = this.MESSAGING_INPLACE;
-    } else {
-      this.CONSOLE.style.marginTop = '0px';
-      this.CONSOLE_INPUT.style.marginTop = '0px';
-      this.CONSOLE.style.top = '0px';
-      this.MESSAGING = this.MESSAGING_TOP;
-    }
+    else { this.CONSOLE_INPUT.value = what; }
+    this.showConsole();
+  },
+
+  startRead: function (command, label)
+  {
+    this.READ_COMMAND = command;
+    this.READING = true;
+    this.CONSOLE_INPUT.style.color = "blue";
+    this.CONSOLE_LABEL.innerHTML = label;
+    this.showConsole();
+    document.onkeypress=null;
+    this.CONSOLE_INPUT.focus();
+    this.CONSOLE_INPUT.onblur = function() {org_html_manager.CONSOLE_INPUT.focus();};
+    // wait until keyup was processed:
+    window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value="";}, 50);
+  },
+
+  endRead: function (command, label)
+  {
+    this.READING = false;
+    this.CONSOLE_INPUT.onblur = null;
+    this.READ_COMMAND = "";
+    document.onkeypress=OrgHtmlManagerKeyEvent;
+    this.CONSOLE_INPUT.onblur = null;
   },
 
   removeWarning: function()
   {
-    if(this.MESSAGING) {
-      this.CONSOLE_INPUT.value = "";
-      this.CONSOLE_INPUT.style.color = "#666666";
-      this.CONSOLE.style.marginTop = '-40px';
-      this.CONSOLE_INPUT.style.marginTop = '-40px';
-      this.CONSOLE.style.top = '-40px';
-      this.command_str = "";
-      this.CONSOLE_INPUT.value = "";
-      if(this.MESSAGING_INPLACE == this.MESSAGING) {
-        this.NODE.div.removeChild(this.NODE.div.firstChild);
-      }
-      this.MESSAGING = false;
-      return;
+    this.CONSOLE_INPUT.value = "";
+    this.CONSOLE_INPUT.style.color = "#666666";
+    this.hideConsole();
+    return;
+  },
+
+  showConsole: function()
+  {
+    if(this.VIEW != this.INFO_VIEW) {
+      // Maybe clone the CONSOLE?
+      document.body.removeChild(document.body.firstChild);
+      this.NODE.div.insertBefore(this.CONSOLE, this.NODE.div.firstChild);
+      this.NODE.div.scrollIntoView(true);
+      this.MESSAGING = this.MESSAGING_INPLACE;
+    } else {
+      this.MESSAGING = this.MESSAGING_TOP;
+      window.scrollTo(0, 0);
     }
+    this.CONSOLE.style.marginTop = '0px';
+    this.CONSOLE.style.top = '0px';
+    this.CONSOLE_INPUT.style.marginTop = '0px';
+  },
+
+  hideConsole: function()
+  {
+    this.CONSOLE.style.marginTop = '-45px';
+    this.CONSOLE_INPUT.style.marginTop = '-45px';
+    this.CONSOLE.style.top = '-45px';
+    this.COMMAND_STR = "";
+    this.CONSOLE_LABEL.innerHTML = "";
+    this.CONSOLE_INPUT.value = "";
+    this.CONSOLE_ACTIONS.innerHTML = "";
+    if(this.MESSAGING_INPLACE == this.MESSAGING) {
+      this.NODE.div.removeChild(this.NODE.div.firstChild);
+      document.body.insertBefore(this.CONSOLE, document.body.firstChild);
+    }
+    this.MESSAGING = false;
+    this.READING = false;
   },
 
   toggleGlobaly: function ()
@@ -1124,8 +1226,8 @@ var org_html_manager = {
 
   showHelp: function ()
   {
-    this.helping = this.helping ? 0 : 1;
-    if (this.helping) {
+    this.HELPING = this.HELPING ? 0 : 1;
+    if (this.HELPING) {
       this.last_view_mode = this.VIEW;
       this.infoView(true);
       this.WINDOW.innerHTML = '<h2>Keyboard Shortcuts</h2>'
@@ -1136,11 +1238,15 @@ var org_html_manager = {
         +'<tr><td> <code><b>t/&lt;</b></code> </td><td> goto the first section</td></tr>'
         +'<tr><td> <code><b>E/&gt;</b></code> </td><td> goto the last section</td></tr>'
         +'<tr><td> <code><b>i</b></code> </td><td> show table of contents</td></tr>'
-        +'<tr><td> <code><b>s</b></code> </td><td> goto section</td></tr>'
+        +'<tr><td> <code><b>g</b></code> </td><td> goto section</td></tr>'
         +'<tr><td> <code><b>b</b></code> </td><td> go back to last visited section. Only when following internal links.</td></tr>'
         +'<tr><td> <code><b>m</b></code> </td><td> toggle the view mode</td></tr>'
         +'<tr><td> <code><b>f</b></code> </td><td> fold current section (plain view)</td></tr>'
-        +'<tr><td> <code><b>g</b></code> </td><td> fold globaly (plain view)</td></tr>'
+        +'<tr><td> <code><b>F</b></code> </td><td> fold globaly (plain view)</td></tr>'
+        +'<tr><td> <code><b>s</b></code> </td><td> search forward (prompt)</td></tr>'
+        +'<tr><td> <code><b>S</b></code> </td><td> search again forward</td></tr>'
+        +'<tr><td> <code><b>r</b></code> </td><td> search backwards (prompt)</td></tr>'
+        +'<tr><td> <code><b>R</b></code> </td><td> search again backwards</td></tr>'
         +'<tr><td> <code><b>l</b></code> </td><td> display HTML link</td></tr>'
         +'<tr><td> <code><b>L</b></code> </td><td> display Org link</td></tr>'
         +'<tr><td> <code><b>v</b></code> </td><td> scroll down</td></tr>'
@@ -1159,7 +1265,7 @@ var org_html_manager = {
   },
 
 
- convertLinks: function ()
+  convertLinks: function ()
   {
     var i = (this.HIDE_TOC ? 0 : 1);
     for(i; i < this.SECS.length; ++i)
@@ -1245,6 +1351,132 @@ var org_html_manager = {
       }
       else
         this.warn("History: No where to back go from here.");
+    }
+  },
+
+  evalReadCommand: function()
+  {
+    if("" == this.READ_COMMAND) return false;
+
+    if(this.READ_COMMAND == 'g') { // goto section
+      var matches = this.SECEX.exec(this.CONSOLE_INPUT.value);
+      var sec = matches[1];
+      var sec_found = false;
+      for(var i = 0; i < this.SECS.length; ++i) {
+        if(this.SECS[i].base_id == sec) {
+          this.endRead();
+          this.removeWarning();
+          this.navigateTo(this.SECS[i].idx);
+          return;
+        }
+      }
+      if(! sec_found) {
+        this.endRead();
+        this.warn("" + sec +": no such section.");
+        return;
+      }
+    }
+
+    else if(this.READ_COMMAND == 's') { // text search
+      this.SEARCH_STR = this.CONSOLE_INPUT.value;
+      this.SEARCH_REGEX = new RegExp(">([^<]*)?("+this.SEARCH_STR+")([^>]*)?<","ig");
+      this.CONSOLE_LABEL.innerHTML = "Search forwards for &quot;<i>" + this.SEARCH_STR +"</i>&quot;";
+      for(var i = this.NODE.idx; i < this.SECS.length; ++i) {
+        if(this.searchTextInOrgNode(i)) {
+          this.SECS[i].hasHighlight = true;
+          this.endRead();
+          this.removeWarning();
+          this.navigateTo(this.SECS[i].idx);
+          return;
+        }
+      }
+      this.endRead();
+      this.warn(this.SEARCH_STR +": text not found.");
+      return;
+    }
+
+    else if(this.READ_COMMAND == 'S') { // repeat text search
+      for(var i = this.NODE.idx + 1; i < this.SECS.length; ++i) {
+        if(this.searchTextInOrgNode(i)) {
+          this.SECS[i].hasHighlight = true;
+          this.endRead();
+          this.removeWarning();
+          this.navigateTo(this.SECS[i].idx);
+          return;
+        }
+      }
+      this.warn(this.SEARCH_STR +": text not found.");
+      return;
+    }
+
+    else if(this.READ_COMMAND == 'r') { // text search backwards
+      this.SEARCH_STR = this.CONSOLE_INPUT.value;
+      this.SEARCH_REGEX = new RegExp(">([^<]*)?("+this.SEARCH_STR+")([^>]*)?<","ig");
+      this.CONSOLE_LABEL.innerHTML = "Searching backwards for &quot;<i>" + this.SEARCH_STR +"</i>&quot;";
+      for(var i = this.NODE.idx; i > -1; --i) {
+        if(this.searchTextInOrgNode(i)) {
+          this.SECS[i].hasHighlight = true;
+          this.endRead();
+          this.removeWarning();
+          this.navigateTo(this.SECS[i].idx);
+          return;
+        }
+      }
+      this.endRead();
+      this.warn(this.SEARCH_STR +": text not found.");
+      return;
+    }
+
+    else if(this.READ_COMMAND == 'R') { // repeat text search backwards
+      for(var i = this.NODE.idx - 1; i > -1; --i) {
+        this.CONSOLE_INPUT.value = this.removeTags(this.SECS[i].heading.innerHTML);
+        if(this.searchTextInOrgNode(i)) {
+          this.SECS[i].hasHighlight = true;
+          this.endRead();
+          this.removeWarning();
+          this.navigateTo(this.SECS[i].idx);
+          return;
+        }
+      }
+      this.warn(this.SEARCH_STR +": text not found.");
+      return;
+    }
+  },
+
+  searchTextInOrgNode: function(i)
+  {
+    var ret = false;
+    if(null != this.SECS[i]) {
+      if(this.SEARCH_REGEX.test(this.SECS[i].heading.innerHTML)) {
+        ret = true;
+        this.setSearchHighlight(this.SECS[i].heading);
+      }
+      if(this.SEARCH_REGEX.test(this.SECS[i].folder.innerHTML)) {
+        ret = true;
+        this.setSearchHighlight(this.SECS[i].folder);
+      }
+      return ret;
+    }
+    return false;
+  },
+
+  setSearchHighlight: function(dom)
+  {
+    var tmp = dom.innerHTML;
+    dom.innerHTML = tmp.replace(this.SEARCH_REGEX,
+      '>$1<span name="org-info-search-highlight" class="org-info-search-highlight">$2</span>$3<');
+  },
+
+  removeSearchHiglight: function()
+  {
+    for(var i = 0; i < this.SECS.length; ++i) {
+      if(this.SECS[i].hasHighlight) {
+        var tmp = this.SECS[i].heading.innerHTML;
+        this.SECS[i].heading.innerHTML = tmp.replace(this.SEARCH_HL_REG, '>$1$3$5<');
+        var tmp = this.SECS[i].folder.innerHTML;
+        this.SECS[i].folder.innerHTML = tmp.replace(this.SEARCH_HL_REG, '>$1$3$5<');
+        this.SECS[i].hasHighlight = false;
+      }
     }
   }
 

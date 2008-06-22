@@ -1,6 +1,6 @@
 #+TITLE: EMACS ORG-INFO.JS
 #+AUTHOR: Sebastian Rose
-#+EMAIL: sebastian_rose@gmx.de
+#+EMAIL:
 #+LANGUAGE: en
 #+INFOJS_OPT: path:org-info.js
 #+INFOJS_OPT: toc:nil localtoc:t view:info mouse:underline
@@ -62,6 +62,8 @@
 
 * <<Features>>
 
+  + Full text-search with highlighting ::
+    Search forward, backwards, repeated search... This is still experimental.
   + Toggle plain and info view ::
     One can click the script-generated links in info view mode to read through
     the whole file page by page. By clicking on '/toggle view/' (or pressing
@@ -122,7 +124,6 @@
     If the URL is suffixed by '=#sec-x.y.z=' that section will be displayed
     after startup.
 
-
 *** <<Navigation>>
 
     The visitor of this file (and every XHTML-exported org file that includes
@@ -133,7 +134,8 @@
     | ?      | show shortcuts                    | y    | y     |
     | E or > | End. Last section                 | y    | y     |
     | f      | fold current section              |      | y     |
-    | g      | fold globaly                      |      | y     |
+    | F      | fold globaly                      |      | y     |
+    | g      | prompt for section number (goto)  | y    | y     |
     | H      | follow the link '/HOME/'          | y    | y     |
     | h      | follow the link '/UP/'            | y    | y     |
     | i      | show T.O.C.                       | y    | y     |
@@ -142,7 +144,10 @@
     | m      | toggle view mode                  | y    | y     |
     | n      | next section                      | y    | y     |
     | p      | previous section                  | y    | y     |
-    | s      | prompt for section number         | y    | y     |
+    | r      | search backwards                  | y    | y     |
+    | R      | repeat last search backwards      | y    | y     |
+    | s      | search forward                    | y    | y     |
+    | S      | repeat last search backwards      | y    | y     |
     | t or < | top. First section/T.O.C.         | y    | y     |
     | u      | one level up (parent section)     | y    | y     |
     | V      | scroll back 200 px                | y    | y     |
@@ -380,16 +385,16 @@ org_html_manager.setup ();
 #+BEGIN_HTML
     <ul>
     <li>
-    <a href="index.html?TOC=1&VIEW=info#sec-4"><code>index.html?TOC=1&VIEW=info#sec-2.1</code></a>
+    <a href="index.html?TOC=1&VIEW=info#sec-4"><code>index.html?TOC=1&VIEW=info#sec-4</code></a>
     </li>
     <li>
-    <a href="index.html?TOC=0&VIEW=overview#sec-4"><code>index.html?TOC=0&VIEW=overview#sec-2.1</code></a>
+    <a href="index.html?TOC=0&VIEW=overview#sec-4"><code>index.html?TOC=0&VIEW=overview#sec-4</code></a>
     </li>
     <li>
-    <a href="index.html?VIEW=content&TOC_DEPTH=1#sec-4"><code>index.html?VIEW=content&TOC_DEPTH=1#sec-2.1</code></a>
+    <a href="index.html?VIEW=content&TOC_DEPTH=1#sec-4"><code>index.html?VIEW=content&TOC_DEPTH=1#sec-4</code></a>
     </li>
     <li>
-    <a href="index.html?VIEW=showall&MOUSE_HINT=rgb(255,133,0)#sec-4"><code>index.html?VIEW=showall&MOUSE_HINT=rgb(255,133,0)#sec-2.1</code></a>
+    <a href="index.html?VIEW=showall&MOUSE_HINT=rgb(255,133,0)#sec-4"><code>index.html?VIEW=showall&MOUSE_HINT=rgb(255,133,0)#sec-4</code></a>
     </li>
     </ul>
 #+END_HTML
@@ -413,6 +418,18 @@ org_html_manager.setup ();
 .org-info-info-navigation
 {
   border-style:none;
+}
+#org-console-label
+{
+  font-size:10px;
+  font-weight:bold;
+  white-space:nowrap;
+}
+.org-info-search-highlight
+{
+  background-color:#ffff00;
+  color:#000000;
+  font-weight:bold;
 }
 #+END_SRC
 
@@ -609,7 +626,28 @@ org_html_manager.setup ();
 
 * <<ChangeLog>>
 
-*** <2008-06-17 Di>
+*** << 2008-06-22 So >>
+
+    This update introduced some changes concerning keyboard shortcuts.
+
+    *This one is not tested in IE yet!*
+
+    + Search ::
+      You may use '=s=' to search forward and '=r=' to search
+      backwards. These two prompt for input. To repeat the last search, use
+      '=S=' and '=R=' to search forward and backwards respectively.
+      Use '=c=' to remove all the match highlights.
+
+      Absolutely Beta...
+
+    + goto-section ::
+      Since '=s=' was the candidate for searching, it could no longer be used
+      for the /goto section/ command. This is now remapped to '=g=' (goto).
+    + No more popups ::
+      The minibuffer can be switched to read mode. Thus it may be used to read
+      input. No need for popup windows (=window.prompt()=) anymore.
+
+*** << 2008-06-17 Di >>
 
     + New Variable org-export-section-number-format ::
       Adjusted the script to detect the IDs correctly for use with the new
@@ -620,10 +658,13 @@ org_html_manager.setup ();
       '=l=' now displays a HTML link to the current section whereas '=L=' now
       shows the OrgMode link. Thanks to Carsten for this idea.
 
-
 *** << 2008-05-23 Fr >>
 
     + *T.O.C. fixed accidentally*
+    + Jump to link in sidebar ::
+
+      If =FIXED\_TOC= is set, '=i=' focusses the first link in the T.O.C. =TAB=
+      may be used to traverse the links.
 
 *** 2008-05-18 So
 
@@ -860,7 +901,7 @@ org_html_manager.setup ();
 
 *** << 2008-03-13 Do >>
 
-    *Added new config options:* ::
+    *Added new config options:*
 
     + LINK\_UP ::
       May be set, to link to an other file, preferably the main index page. This
@@ -1022,5 +1063,5 @@ org_html_manager.setup ();
 * COMMENT html style specifications
 
 # Local Variables:
-# org-export-html-style: "<link rel=\"stylesheet\" type=\"text/css\" href=\"stylesheet.css\" />"
+# org-export-html-style: "<link rel=\"stylesheet\" type=\"text/css\" href=\"../../worg.css\" />"
 # End:
