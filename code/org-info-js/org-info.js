@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.6.1
+ *       org-info.js, v.0.0.6.3
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -28,8 +28,6 @@
  *  ]]> // comment around this one
  * </script>
  *
- * @todo
- * You may use the new export options template line #+INFOJS_OPT: view:info ...
  */
 
 
@@ -316,6 +314,7 @@ var org_html_manager = {
   SEARCH_STR: "",
   SEARCH_REGEX: "",
   SEARCH_HL_REG: new RegExp('>([^<]*)?(<span [^>]*?"org-info-search-highlight"[^>]*?>)(.*?)(<\/span>)([^>]*)?<', "ig"),
+  OCCUR: "",
   console_first_time: true,    // Cookie would be cool maybe.
   MESSAGING: 0,                // Is there a message in the console?
   MESSAGING_INPLACE: 1,
@@ -356,6 +355,7 @@ var org_html_manager = {
           case 'HIDE_TOC':
           case 'LOCAL_TOC':
           case 'VIEW':
+          case 'OCCUR':
             this.set(k, decodeURIComponent(v));
             break;
           default: break;
@@ -398,6 +398,7 @@ var org_html_manager = {
       this.WINDOW = document.createElement("div");
       if(this.WINDOW_BORDER) this.WINDOW.style.border="1px dashed black";
     }
+    this.WINDOW.style.marginBottom = "40px";
     var theIndex = document.getElementById('table-of-contents');
     var scanned_all = false;
     if(null != theIndex) {
@@ -449,7 +450,7 @@ var org_html_manager = {
         this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", this.RUN_INTERVAL);
         return;
       }
-      // TODO: warn if not scanned_all
+      // CANCELED: warn if not scanned_all
     }
 
     this.CONSOLE = document.createElement("div");
@@ -461,8 +462,8 @@ var org_html_manager = {
       +' value=""/></td><td id="org-console-actions"></td></tr></tbody></table>'
       +'</form>';
     this.CONSOLE.style.position = 'relative';
-    this.CONSOLE.style.marginTop = '-45px';
-    this.CONSOLE.style.top = '-45px';
+    this.CONSOLE.style.marginTop = '-40px';
+    this.CONSOLE.style.top = '-40px';
     this.CONSOLE.style.left = '0px';
     this.CONSOLE.style.width = '100%';
     this.CONSOLE.style.height = '30px';
@@ -472,9 +473,15 @@ var org_html_manager = {
     this.CONSOLE_LABEL = document.getElementById("org-console-label");
     this.CONSOLE_INPUT = document.getElementById("org-console-input");
     this.CONSOLE_ACTIONS = document.getElementById("org-console-actions");
-    this.CONSOLE_INPUT.style.marginTop = '-45px';
+    this.CONSOLE_INPUT.style.marginTop = '-40px';
     document.onkeypress=OrgHtmlManagerKeyEvent;
-    //this.CONSOLE.firstChild.onsubmit = function(){org_html_manager.evalReadCommand();return false};
+
+    if("" != this.OCCUR) {
+      this.CONSOLE_INPUT.value = this.OCCUR;
+      this.READ_COMMAND = 'o';
+      this.evalReadCommand();
+    }
+
     if(0 != this.DEBUG && this.debug.length) alert(this.debug);
   },
 
@@ -1078,6 +1085,11 @@ var org_html_manager = {
           this.startRead(s, "Enter section number:");
           return;
         }
+        else if ('o' == s) {
+          this.OCCUR = "";
+          this.startRead(s, "Occur:");
+          return;
+        }
         else if ('s' == s) {
           this.SEARCH_STR = "";
           this.startRead(s, "Search forward:");
@@ -1178,9 +1190,9 @@ var org_html_manager = {
 
   hideConsole: function()
   {
-    this.CONSOLE.style.marginTop = '-45px';
-    this.CONSOLE_INPUT.style.marginTop = '-45px';
-    this.CONSOLE.style.top = '-45px';
+    this.CONSOLE.style.marginTop = '-40px';
+    this.CONSOLE_INPUT.style.marginTop = '-40px';
+    this.CONSOLE.style.top = '-40px';
     this.COMMAND_STR = "";
     this.CONSOLE_LABEL.innerHTML = "";
     this.CONSOLE_INPUT.value = "";
@@ -1226,35 +1238,70 @@ var org_html_manager = {
 
   showHelp: function ()
   {
+      /* This is an OrgMode version of the table. Turn on orgtbl-mode in
+         this buffer, edit the table, then press C-c C-c with the cursor
+         in the table.  The table will then be translated an inserted below.
+#+ORGTBL: SEND Shortcuts orgtbl-to-generic :splice t :skip 2 :lstart "\t+'<tr>" :lend "</tr>'" :fmt (1 "<td><code><b>%s</b></code></td>" 2 "<td>%s</td>") :hline "\t+'</tbody><tbody>'"
+      | Key          | Function                                                             |
+      |--------------+----------------------------------------------------------------------|
+      | ? / &iquest; | show this help screen                                                |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>Moving around</b>                                                 |
+      | n / p        | goto the next / previous section                                     |
+      | t / E        | goto the first / last section                                        |
+      | g            | goto section...                                                      |
+      | u            | go one level up (parent section)                                     |
+      | i            | show table of contents                                               |
+      | b            | go back to last visited section. Only when following internal links. |
+      | h / H        | go to main index in this directory / link HOME page                  |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>View</b>                                                          |
+      | m            | toggle the view mode between info and plain                          |
+      | f            | fold current section / whole document (plain view only)              |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>Searching</b>                                                     |
+      | s / r        | search forward / backward....                                        |
+      | S / R        | search again forward / backward                                      |
+      | o            | occur-mode                                                           |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>Misc</b>                                                          |
+      | l / L        | display HTML link / Org link                                         |
+      | v / V        | scroll down / up                                                     |
+      */
     this.HELPING = this.HELPING ? 0 : 1;
     if (this.HELPING) {
       this.last_view_mode = this.VIEW;
       this.infoView(true);
       this.WINDOW.innerHTML = '<h2>Keyboard Shortcuts</h2>'
-        +'<table cellpadding="3" style="margin:20px;border-style:none;" border="0">'
-        +'<tr><td> <code><b>?/&iquest;/l</b></code> </td><td> show this help screen</td></tr>'
-        +'<tr><td> <code><b>n</b></code> </td><td> goto the next section</td></tr>'
-        +'<tr><td> <code><b>p</b></code> </td><td> goto the previous section</td></tr>'
-        +'<tr><td> <code><b>t/&lt;</b></code> </td><td> goto the first section</td></tr>'
-        +'<tr><td> <code><b>E/&gt;</b></code> </td><td> goto the last section</td></tr>'
-        +'<tr><td> <code><b>i</b></code> </td><td> show table of contents</td></tr>'
-        +'<tr><td> <code><b>g</b></code> </td><td> goto section</td></tr>'
-        +'<tr><td> <code><b>b</b></code> </td><td> go back to last visited section. Only when following internal links.</td></tr>'
-        +'<tr><td> <code><b>m</b></code> </td><td> toggle the view mode</td></tr>'
-        +'<tr><td> <code><b>f</b></code> </td><td> fold current section (plain view)</td></tr>'
-        +'<tr><td> <code><b>F</b></code> </td><td> fold globaly (plain view)</td></tr>'
-        +'<tr><td> <code><b>s</b></code> </td><td> search forward (prompt)</td></tr>'
-        +'<tr><td> <code><b>S</b></code> </td><td> search again forward</td></tr>'
-        +'<tr><td> <code><b>r</b></code> </td><td> search backwards (prompt)</td></tr>'
-        +'<tr><td> <code><b>R</b></code> </td><td> search again backwards</td></tr>'
-        +'<tr><td> <code><b>l</b></code> </td><td> display HTML link</td></tr>'
-        +'<tr><td> <code><b>L</b></code> </td><td> display Org link</td></tr>'
-        +'<tr><td> <code><b>v</b></code> </td><td> scroll down</td></tr>'
-        +'<tr><td> <code><b>V</b></code> </td><td> scroll back up</td></tr>'
-        +'<tr><td> <code><b>u</b></code> </td><td> one level up (parent section)</td></tr>'
-        +'<tr><td> <code><b>h</b></code> </td><td> if supplied, go to the main index in this directory (home)</td></tr>'
-        +'<tr><td> <code><b>H</b></code> </td><td> if supplied, go to link homepage (HOME)</td></tr>'
-        +'</table><br />Press any key to proceed.';
+        +'<table cellpadding="3" rules="groups" frame="hsides" style="margin:20px;border-style:none;" border="0";>'
+	+'<tbody>'
+      // BEGIN RECEIVE ORGTBL Shortcuts
+	+'<tr><td><code><b>? / &iquest;</b></code></td><td>show this help screen</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>Moving around</b></td></tr>'
+	+'<tr><td><code><b>n / p</b></code></td><td>goto the next / previous section</td></tr>'
+	+'<tr><td><code><b>t / E</b></code></td><td>goto the first / last section</td></tr>'
+	+'<tr><td><code><b>g</b></code></td><td>goto section...</td></tr>'
+	+'<tr><td><code><b>u</b></code></td><td>go one level up (parent section)</td></tr>'
+	+'<tr><td><code><b>i</b></code></td><td>show table of contents</td></tr>'
+	+'<tr><td><code><b>b</b></code></td><td>go back to last visited section. Only when following internal links.</td></tr>'
+	+'<tr><td><code><b>h / H</b></code></td><td>go to main index in this directory / link HOME page</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>View</b></td></tr>'
+	+'<tr><td><code><b>m</b></code></td><td>toggle the view mode between info and plain</td></tr>'
+	+'<tr><td><code><b>f</b></code></td><td>fold current section / whole document (plain view only)</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>Searching</b></td></tr>'
+	+'<tr><td><code><b>s / r</b></code></td><td>search forward / backward....</td></tr>'
+	+'<tr><td><code><b>S / R</b></code></td><td>search again forward / backward</td></tr>'
+	+'<tr><td><code><b>o</b></code></td><td>occur-mode</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>Misc</b></td></tr>'
+	+'<tr><td><code><b>l / L</b></code></td><td>display HTML link / Org link</td></tr>'
+	+'<tr><td><code><b>v / V</b></code></td><td>scroll down / up</td></tr>'
+      // END RECEIVE ORGTBL Shortcuts
+       +'</tbody>'
+       +'</table><br />Press any key to proceed.';
     }
     else {
       if(this.PLAIN_VIEW == this.last_view_mode) {
@@ -1379,11 +1426,10 @@ var org_html_manager = {
 
     else if(this.READ_COMMAND == 's') { // text search
       this.SEARCH_STR = this.CONSOLE_INPUT.value;
-      this.SEARCH_REGEX = new RegExp(">([^<]*)?("+this.SEARCH_STR+")([^>]*)?<","ig");
+      this.makeSearchRegexp();
       this.CONSOLE_LABEL.innerHTML = "Search forwards for &quot;<i>" + this.SEARCH_STR +"</i>&quot;";
       for(var i = this.NODE.idx; i < this.SECS.length; ++i) {
         if(this.searchTextInOrgNode(i)) {
-          this.SECS[i].hasHighlight = true;
           this.endRead();
           this.removeWarning();
           this.navigateTo(this.SECS[i].idx);
@@ -1398,7 +1444,6 @@ var org_html_manager = {
     else if(this.READ_COMMAND == 'S') { // repeat text search
       for(var i = this.NODE.idx + 1; i < this.SECS.length; ++i) {
         if(this.searchTextInOrgNode(i)) {
-          this.SECS[i].hasHighlight = true;
           this.endRead();
           this.removeWarning();
           this.navigateTo(this.SECS[i].idx);
@@ -1411,11 +1456,10 @@ var org_html_manager = {
 
     else if(this.READ_COMMAND == 'r') { // text search backwards
       this.SEARCH_STR = this.CONSOLE_INPUT.value;
-      this.SEARCH_REGEX = new RegExp(">([^<]*)?("+this.SEARCH_STR+")([^>]*)?<","ig");
+      this.makeSearchRegexp();
       this.CONSOLE_LABEL.innerHTML = "Searching backwards for &quot;<i>" + this.SEARCH_STR +"</i>&quot;";
       for(var i = this.NODE.idx; i > -1; --i) {
         if(this.searchTextInOrgNode(i)) {
-          this.SECS[i].hasHighlight = true;
           this.endRead();
           this.removeWarning();
           this.navigateTo(this.SECS[i].idx);
@@ -1431,7 +1475,6 @@ var org_html_manager = {
       for(var i = this.NODE.idx - 1; i > -1; --i) {
         this.CONSOLE_INPUT.value = this.removeTags(this.SECS[i].heading.innerHTML);
         if(this.searchTextInOrgNode(i)) {
-          this.SECS[i].hasHighlight = true;
           this.endRead();
           this.removeWarning();
           this.navigateTo(this.SECS[i].idx);
@@ -1441,6 +1484,44 @@ var org_html_manager = {
       this.warn(this.SEARCH_STR +": text not found.");
       return;
     }
+
+    else if(this.READ_COMMAND == 'o') { // occur
+      this.OCCUR = this.CONSOLE_INPUT.value;
+      this.SEARCH_STR = this.OCCUR;
+      this.endRead();
+      this.removeWarning();
+      this.makeSearchRegexp();
+      var occurs = new Array();
+      this.warn("Please wait while searching for '" + this.SEARCH_STR + "'", true);
+      for(var i = 0; i < this.SECS.length; ++i) {
+        if(this.searchTextInOrgNode(i)) {
+          occurs.push(i);
+        }
+      }
+      this.removeWarning();
+      if(0 == occurs.length) {
+        this.warn(this.SEARCH_STR +": text not found.");
+        return;
+      }
+
+      if(this.PLAIN_VIEW != this.VIEW) this.plainView();
+      this.ROOT.durty = true;
+      this.toggleGlobaly();
+      for(var i = 0; i < this.SECS.length; ++i) {
+        OrgNode.showElement(this.SECS[i].div);
+        OrgNode.hideElement(this.SECS[i].folder);
+      }
+      for(var i = (occurs.length - 1); i >= 1; --i) {
+        OrgNode.showElement(this.SECS[occurs[i]].folder);
+      }
+      this.showSection(occurs[0]);
+    }
+  },
+
+  makeSearchRegexp: function()
+  {
+    var tmp = this.SEARCH_STR.replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/=/g, "\\=").replace(/\\/g, "\\\\").replace(/\?/g, "\\?").replace(/\*/g, "\\*").replace(/\+/g, "\\+").replace(/\"/g, "&quot;");
+    this.SEARCH_REGEX =  new RegExp(">([^<]*)?("+tmp+")([^>]*)?<","ig");
   },
 
   searchTextInOrgNode: function(i)
@@ -1450,10 +1531,12 @@ var org_html_manager = {
       if(this.SEARCH_REGEX.test(this.SECS[i].heading.innerHTML)) {
         ret = true;
         this.setSearchHighlight(this.SECS[i].heading);
+        this.SECS[i].hasHighlight = true;
       }
       if(this.SEARCH_REGEX.test(this.SECS[i].folder.innerHTML)) {
         ret = true;
         this.setSearchHighlight(this.SECS[i].folder);
+        this.SECS[i].hasHighlight = true;
       }
       return ret;
     }
@@ -1464,17 +1547,21 @@ var org_html_manager = {
   {
     var tmp = dom.innerHTML;
     dom.innerHTML = tmp.replace(this.SEARCH_REGEX,
-      '>$1<span name="org-info-search-highlight" class="org-info-search-highlight">$2</span>$3<');
+      '>$1<span class="org-info-search-highlight">$2</span>$3<');
   },
 
   removeSearchHiglight: function()
   {
     for(var i = 0; i < this.SECS.length; ++i) {
       if(this.SECS[i].hasHighlight) {
-        var tmp = this.SECS[i].heading.innerHTML;
-        this.SECS[i].heading.innerHTML = tmp.replace(this.SEARCH_HL_REG, '>$1$3$5<');
-        var tmp = this.SECS[i].folder.innerHTML;
-        this.SECS[i].folder.innerHTML = tmp.replace(this.SEARCH_HL_REG, '>$1$3$5<');
+        while(this.SEARCH_HL_REG.test(this.SECS[i].heading.innerHTML)) {
+          var tmp = this.SECS[i].heading.innerHTML;
+          this.SECS[i].heading.innerHTML = tmp.replace(this.SEARCH_HL_REG, '>$1$3$5<');
+        }
+        while(this.SEARCH_HL_REG.test(this.SECS[i].folder.innerHTML)) {
+          var tmp = this.SECS[i].folder.innerHTML;
+          this.SECS[i].folder.innerHTML = tmp.replace(this.SEARCH_HL_REG, '>$1$3$5<');
+        }
         this.SECS[i].hasHighlight = false;
       }
     }
