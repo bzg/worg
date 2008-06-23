@@ -460,7 +460,7 @@ var org_html_manager = {
       +' onclick="this.select();" maxlength="150" style="width:100%;border:1px inset #dddddd;"'
       +' value=""/></td><td id="org-console-actions"></td></tr></tbody></table>'
       +'</form>';
-    this.CONSOLE.style.position = 'realtive';
+    this.CONSOLE.style.position = 'relative';
     this.CONSOLE.style.marginTop = '-45px';
     this.CONSOLE.style.top = '-45px';
     this.CONSOLE.style.left = '0px';
