@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.6.2
+ *       org-info.js, v.0.0.6.3
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -398,6 +398,7 @@ var org_html_manager = {
       this.WINDOW = document.createElement("div");
       if(this.WINDOW_BORDER) this.WINDOW.style.border="1px dashed black";
     }
+    this.WINDOW.style.marginBottom = "40px";
     var theIndex = document.getElementById('table-of-contents');
     var scanned_all = false;
     if(null != theIndex) {
@@ -1237,36 +1238,70 @@ var org_html_manager = {
 
   showHelp: function ()
   {
+      /* This is an OrgMode version of the table. Turn on orgtbl-mode in
+         this buffer, edit the table, then press C-c C-c with the cursor
+         in the table.  The table will then be translated an inserted below.
+#+ORGTBL: SEND Shortcuts orgtbl-to-generic :splice t :skip 2 :lstart "\t+'<tr>" :lend "</tr>'" :fmt (1 "<td><code><b>%s</b></code></td>" 2 "<td>%s</td>") :hline "\t+'</tbody><tbody>'"
+      | Key          | Function                                                             |
+      |--------------+----------------------------------------------------------------------|
+      | ? / &iquest; | show this help screen                                                |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>Moving around</b>                                                 |
+      | n / p        | goto the next / previous section                                     |
+      | t / E        | goto the first / last section                                        |
+      | g            | goto section...                                                      |
+      | u            | go one level up (parent section)                                     |
+      | i            | show table of contents                                               |
+      | b            | go back to last visited section. Only when following internal links. |
+      | h / H        | go to main index in this directory / link HOME page                  |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>View</b>                                                          |
+      | m            | toggle the view mode between info and plain                          |
+      | f            | fold current section / whole document (plain view only)              |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>Searching</b>                                                     |
+      | s / r        | search forward / backward....                                        |
+      | S / R        | search again forward / backward                                      |
+      | o            | occur-mode                                                           |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>Misc</b>                                                          |
+      | l / L        | display HTML link / Org link                                         |
+      | v / V        | scroll down / up                                                     |
+      */
     this.HELPING = this.HELPING ? 0 : 1;
     if (this.HELPING) {
       this.last_view_mode = this.VIEW;
       this.infoView(true);
       this.WINDOW.innerHTML = '<h2>Keyboard Shortcuts</h2>'
-        +'<table cellpadding="3" style="margin:20px;border-style:none;" border="0">'
-        +'<tr><td> <code><b>?/&iquest;/l</b></code> </td><td> show this help screen</td></tr>'
-        +'<tr><td> <code><b>n</b></code> </td><td> goto the next section</td></tr>'
-        +'<tr><td> <code><b>p</b></code> </td><td> goto the previous section</td></tr>'
-        +'<tr><td> <code><b>t/&lt;</b></code> </td><td> goto the first section</td></tr>'
-        +'<tr><td> <code><b>E/&gt;</b></code> </td><td> goto the last section</td></tr>'
-        +'<tr><td> <code><b>i</b></code> </td><td> show table of contents</td></tr>'
-        +'<tr><td> <code><b>g</b></code> </td><td> goto section</td></tr>'
-        +'<tr><td> <code><b>b</b></code> </td><td> go back to last visited section. Only when following internal links.</td></tr>'
-        +'<tr><td> <code><b>m</b></code> </td><td> toggle the view mode</td></tr>'
-        +'<tr><td> <code><b>f</b></code> </td><td> fold current section (plain view)</td></tr>'
-        +'<tr><td> <code><b>F</b></code> </td><td> fold globaly (plain view)</td></tr>'
-        +'<tr><td> <code><b>o</b></code> </td><td> occur (prompt)</td></tr>'
-        +'<tr><td> <code><b>s</b></code> </td><td> search forward (prompt)</td></tr>'
-        +'<tr><td> <code><b>S</b></code> </td><td> search again forward</td></tr>'
-        +'<tr><td> <code><b>r</b></code> </td><td> search backwards (prompt)</td></tr>'
-        +'<tr><td> <code><b>R</b></code> </td><td> search again backwards</td></tr>'
-        +'<tr><td> <code><b>l</b></code> </td><td> display HTML link</td></tr>'
-        +'<tr><td> <code><b>L</b></code> </td><td> display Org link</td></tr>'
-        +'<tr><td> <code><b>v</b></code> </td><td> scroll down</td></tr>'
-        +'<tr><td> <code><b>V</b></code> </td><td> scroll back up</td></tr>'
-        +'<tr><td> <code><b>u</b></code> </td><td> one level up (parent section)</td></tr>'
-        +'<tr><td> <code><b>h</b></code> </td><td> if supplied, go to the main index in this directory (home)</td></tr>'
-        +'<tr><td> <code><b>H</b></code> </td><td> if supplied, go to link homepage (HOME)</td></tr>'
-        +'</table><br />Press any key to proceed.';
+        +'<table cellpadding="3" rules="groups" frame="hsides" style="margin:20px;border-style:none;" border="0";>'
+	+'<tbody>'
+      // BEGIN RECEIVE ORGTBL Shortcuts
+	+'<tr><td><code><b>? / &iquest;</b></code></td><td>show this help screen</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>Moving around</b></td></tr>'
+	+'<tr><td><code><b>n / p</b></code></td><td>goto the next / previous section</td></tr>'
+	+'<tr><td><code><b>t / E</b></code></td><td>goto the first / last section</td></tr>'
+	+'<tr><td><code><b>g</b></code></td><td>goto section...</td></tr>'
+	+'<tr><td><code><b>u</b></code></td><td>go one level up (parent section)</td></tr>'
+	+'<tr><td><code><b>i</b></code></td><td>show table of contents</td></tr>'
+	+'<tr><td><code><b>b</b></code></td><td>go back to last visited section. Only when following internal links.</td></tr>'
+	+'<tr><td><code><b>h / H</b></code></td><td>go to main index in this directory / link HOME page</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>View</b></td></tr>'
+	+'<tr><td><code><b>m</b></code></td><td>toggle the view mode between info and plain</td></tr>'
+	+'<tr><td><code><b>f</b></code></td><td>fold current section / whole document (plain view only)</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>Searching</b></td></tr>'
+	+'<tr><td><code><b>s / r</b></code></td><td>search forward / backward....</td></tr>'
+	+'<tr><td><code><b>S / R</b></code></td><td>search again forward / backward</td></tr>'
+	+'<tr><td><code><b>o</b></code></td><td>occur-mode</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>Misc</b></td></tr>'
+	+'<tr><td><code><b>l / L</b></code></td><td>display HTML link / Org link</td></tr>'
+	+'<tr><td><code><b>v / V</b></code></td><td>scroll down / up</td></tr>'
+      // END RECEIVE ORGTBL Shortcuts
+       +'</tbody>'
+       +'</table><br />Press any key to proceed.';
     }
     else {
       if(this.PLAIN_VIEW == this.last_view_mode) {
