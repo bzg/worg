@@ -40,7 +40,7 @@
   Find out about shortcuts in section [[Shortcuts]] (and come back here
   pressing '=b=').
 
-  '=?=', '=¿=' or '=l=' will show all shortcuts available.
+  '=?=' or '=¿=' will show all shortcuts available.
 
 *** <<Terms used throughout this Document>>
 
@@ -157,33 +157,33 @@
   displayed. Any subsequent key press goes back to where you've been before. The
   TOC does not show up the history. Same applies to the keyboard help.
 
-    |--------+-----------------------------------+------+-------|
-    | Key    | Action                            | Info | Plain |
-    |--------+-----------------------------------+------+-------|
-    | ?      | show shortcuts                    | y    | y     |
-    | c      | remove search highlights          | y    | y     |
-    | E or > | End. Last section                 | y    | y     |
-    | f      | fold current section              |      | y     |
-    | F      | fold globaly                      |      | y     |
-    | g      | prompt for section number (goto)  | y    | y     |
-    | H      | follow the link '/HOME/'          | y    | y     |
-    | h      | follow the link '/UP/'            | y    | y     |
-    | i      | show T.O.C.                       | y    | y     |
-    | l      | show HTML link to current section | y    | y     |
-    | L      | show OrgMode link to this section | y    | y     |
-    | m      | toggle view mode                  | y    | y     |
-    | n      | next section                      | y    | y     |
-    | o      | occur                             | y    | y     |
-    | p      | previous section                  | y    | y     |
-    | r      | search backwards                  | y    | y     |
-    | R      | repeat last search backwards      | y    | y     |
-    | s      | search forward                    | y    | y     |
-    | S      | repeat last search backwards      | y    | y     |
-    | t or < | top. First section/T.O.C.         | y    | y     |
-    | u      | one level up (parent section)     | y    | y     |
-    | V      | scroll back 200 px                | y    | y     |
-    | v      | scroll by 200 px                  | y    | y     |
+  | Key   | Function                                                             |
+  |-------+----------------------------------------------------------------------|
+  | ? / ¿ | show this help screen                                                |
+  |-------+----------------------------------------------------------------------|
+  |       | <b>Moving around</b>                                                 |
+  | n / p | goto the next / previous section                                     |
+  | t / E | goto the first / last section                                        |
+  | g     | goto section...                                                      |
+  | u     | go one level up (parent section)                                     |
+  | i     | show table of contents                                               |
+  | b     | go back to last visited section. Only when following internal links. |
+  | h / H | go to main index in this directory / link HOME page                  |
+  |-------+----------------------------------------------------------------------|
+  |       | <b>View</b>                                                          |
+  | m     | toggle the view mode between info and plain                          |
+  | f     | fold current section / whole document (plain view only)              |
+  |-------+----------------------------------------------------------------------|
+  |       | <b>Searching</b>                                                     |
+  | s / r | search forward / backward....                                        |
+  | S / R | search again forward / backward                                      |
+  | o     | occur-mode                                                           |
+  |-------+----------------------------------------------------------------------|
+  |       | <b>Misc</b>                                                          |
+  | l / L | display HTML link / Org link                                         |
+  | v / V | scroll down / up                                                     |
 
+  Thanks Carsten, for this beautifull table!
 
 * <<Usage>>
 
@@ -422,7 +422,7 @@ org_html_manager.setup ();
   *Note* also that everything but =[0-9a-zA-Z\.-_]= should be URL encoded if used
   as an options value.
 
-* CSS
+* <<CSS>>
 
   There is currently only one CSS class used in the script. More style classes
   will follow in the future.
@@ -433,17 +433,17 @@ org_html_manager.setup ();
 #+BEGIN_SRC css
 /* Style for org-info.js */
 
-.org-info-info-navigation
+.org-info-js_info-navigation
 {
   border-style:none;
 }
-#org-console-label
+#org-info-js_console-label
 {
   font-size:10px;
   font-weight:bold;
   white-space:nowrap;
 }
-.org-info-search-highlight
+.org-info-js_search-highlight
 {
   background-color:#ffff00;
   color:#000000;
@@ -644,7 +644,40 @@ org_html_manager.setup ();
 
 * <<ChangeLog>>
 
-*** << 2008-06-23 Mo >>
+*** 2008-06-24 Di
+
+    + '=L=' and '=l=' use the new read mode ::
+      This means we may use =CTRL-c= to copy the link. Close the minibuffer
+      using =RET=.
+    + '=L=' and '=l=' choose link type ::
+      If the search string is not empty, the visitor is prompted to choose
+      between a link to the current section or an 'occur' link.
+    + Error in docs ::
+      :Carsten Dominik schrieb:
+      :> One more:
+      :>
+      :> index.html still says that "l" shows the list of shortcuts.  This is no
+      :> longer the case.
+      :>
+      :> - Carsten
+    + Absolute path to stylesheet ::
+      Avoid missing stylesheet. Now this file links to the absolute URL.
+    + RET hides minibuffer ::
+      ...in every case now.
+    + 's RET' does the same as 'S' ::
+      One of the many good ideas of Carsten. \\
+      Implementation: if the search string has not changed, '=s=' and '=r=' move on
+      to the next/previous section. Else the current section is searched first.
+    + Clear the search highlight ::
+      If a new search/occur is started, the search highlight is cleared. It may
+      still be cleared by pressing '=c=' (clear).
+    + CSS styles renamed ::
+      All the style classes and IDs in use are renamed, to avoid clashing with
+      styles in other packages in Worg.git/code/*. All the styles are now
+      prefixed by =org-info-js_= (see [[CSS]]).
+
+
+*** 2008-06-23 Mo
 
     + Position of minibuffer ::
       Typo. Fixed.
@@ -1108,5 +1141,5 @@ org_html_manager.setup ();
 * COMMENT html style specifications
 
 # Local Variables:
-# org-export-html-style: "<link rel=\"stylesheet\" type=\"text/css\" href=\"../../worg.css\" />"
+# org-export-html-style: "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://orgmode.org/worg/worg.css\" />"
 # End:

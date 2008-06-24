@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.6.3
+ *       org-info.js, v.0.0.6.4
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -43,7 +43,7 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
   this.idx = -1;                          // The index in OrgHtmlManager::SECS[]
   this.heading = _heading;
   this.link = _link;
-  this.hasHighlight = false;
+  this.hasHighlight = false;              // Node highlighted (search)
   this.parent = _parent;
   this.durty = false;                     // Node is durty, when children get
                                           // folded seperatly.
@@ -310,11 +310,9 @@ var org_html_manager = {
   CONSOLE_INPUT: null,
   CONSOLE_LABEL: null,
   CONSOLE_ACTIONS: null,
-  COMMAND_STR: "",
-  SEARCH_STR: "",
+  OCCUR: "",                   // The search string.
   SEARCH_REGEX: "",
-  SEARCH_HL_REG: new RegExp('>([^<]*)?(<span [^>]*?"org-info-search-highlight"[^>]*?>)(.*?)(<\/span>)([^>]*)?<', "ig"),
-  OCCUR: "",
+  SEARCH_HL_REG: new RegExp('>([^<]*)?(<span [^>]*?"org-info-js_search-highlight"[^>]*?>)(.*?)(<\/span>)([^>]*)?<', "ig"),
   console_first_time: true,    // Cookie would be cool maybe.
   MESSAGING: 0,                // Is there a message in the console?
   MESSAGING_INPLACE: 1,
@@ -325,9 +323,14 @@ var org_html_manager = {
   READING: false,
   // if yes, which command caused the readmode?
   READ_COMMAND: "",
+  // numerical commands are internal commands.
+  READ_COMMAND_NULL: "_0",
+  READ_COMMAND_HTML_LINK: "_1",
+  READ_COMMAND_ORG_LINK: "_2",
+  LAST_WAS_SEARCH: false,      // if this is true, and OCCUR unchanged, skip to next section if repeated search.
   last_view_mode:0,
   TAB_INDEX: 1000,             // Users could have defined tabindexes!
-
+  SEARCH_HIGHLIGHT_ON: false,
 
   /**
    * Setup the OrgHtmlManager for scanning.
@@ -456,10 +459,10 @@ var org_html_manager = {
     this.CONSOLE = document.createElement("div");
     this.CONSOLE.innerHTML = '<form action="" onsubmit="org_html_manager.evalReadCommand(); return false;">'
       +'<table style="width:100%;margin:0px 0px 0px 0px;border-style:none;" cellpadding="0" cellspacing="2" summary="minibuffer">'
-      +'<tbody><tr><td id="org-console-label" style="white-space:nowrap;"></td><td style="width:100%;">'
-      +'<input type="text" id="org-console-input" onkeydown="org_html_manager.getKey();"'
+      +'<tbody><tr><td id="org-info-js_console-label" style="white-space:nowrap;"></td><td style="width:100%;">'
+      +'<input type="text" id="org-info-js_console-input" onkeydown="org_html_manager.getKey();"'
       +' onclick="this.select();" maxlength="150" style="width:100%;border:1px inset #dddddd;"'
-      +' value=""/></td><td id="org-console-actions"></td></tr></tbody></table>'
+      +' value=""/></td><td id="org-info-js_console-actions"></td></tr></tbody></table>'
       +'</form>';
     this.CONSOLE.style.position = 'relative';
     this.CONSOLE.style.marginTop = '-40px';
@@ -470,9 +473,9 @@ var org_html_manager = {
 
     document.body.insertBefore(this.CONSOLE, document.body.firstChild);
     this.MESSAGING = false;
-    this.CONSOLE_LABEL = document.getElementById("org-console-label");
-    this.CONSOLE_INPUT = document.getElementById("org-console-input");
-    this.CONSOLE_ACTIONS = document.getElementById("org-console-actions");
+    this.CONSOLE_LABEL = document.getElementById("org-info-js_console-label");
+    this.CONSOLE_INPUT = document.getElementById("org-info-js_console-input");
+    this.CONSOLE_ACTIONS = document.getElementById("org-info-js_console-actions");
     this.CONSOLE_INPUT.style.marginTop = '-40px';
     document.onkeypress=OrgHtmlManagerKeyEvent;
 
@@ -709,7 +712,7 @@ var org_html_manager = {
     for(var i = 0; i < this.SECS.length; ++i)
     {
       this.SECS[i].idx = i;
-      var html = '<table class="org-info-info-navigation" width="100%" border="0" style="border-bottom:1px solid black;">'
+      var html = '<table class="org-info-js_info-navigation" width="100%" border="0" style="border-bottom:1px solid black;">'
         +'<tr><td colspan="3" style="text-align:left;border-style:none;vertical-align:bottom;">'
         +'<span style="float:left;display:inline;text-align:left;">'
         +'Top: <a accesskey="i" href="javascript:org_html_manager.navigateTo(0);">'+index_name+'</a></span>'
@@ -948,7 +951,6 @@ var org_html_manager = {
       return;
     }
     else if(this.READING) {
-      this.COMMAND_STR = s;
       return;
     }
 
@@ -974,7 +976,7 @@ var org_html_manager = {
           this.popHistory(true);
         }
         else if ('c' == s) {
-          this.removeSearchHiglight();
+          this.removeSearchHighlight();
           if(this.VIEW == this.INFO_VIEW) {
             // redisplay in info view mode:
             this.showSection(this.NODE.idx);
@@ -1020,7 +1022,7 @@ var org_html_manager = {
           if(0 != this.NODE.idx) this.navigateTo(0);
           else window.scrollTo(0,0);
         }
-        else if ('>' == s || 'E' == s) { // 'e' scrolls down in opera :-/
+        else if ('>' == s || 'E' == s || 'e' == s) {
           if((this.SECS.length - 1) != this.NODE.idx) this.navigateTo(this.SECS.length - 1);
           else this.SECS[this.SECS.length - 1].div.scrollIntoView(true);
         }
@@ -1040,20 +1042,6 @@ var org_html_manager = {
           else
             window.scrollBy(0, -(document.body.cleintHeight - 30));
         }
-        else if ('l' == s) {
-          this.warn('<a href="' + this.BASE_URL + '#' + this.NODE.base_id + '">'
-                    + document.title + ', Sec. ' + this.removeTags(this.NODE.heading.innerHTML) + '</a>',
-                    true);
-          this.CONSOLE_INPUT.select();
-          return;
-        }
-        else if ('L' == s) {
-          this.warn('[[' + this.BASE_URL + '#' + this.NODE.base_id + ']['
-                    + document.title + ', Sec. ' + this.removeTags(this.NODE.heading.innerHTML) + ']]',
-                    true);
-          this.CONSOLE_INPUT.select();
-          return;
-        }
         else if ('u' == s) {
           if(this.NODE.parent != this.ROOT) {
             this.NODE = this.NODE.parent;
@@ -1072,7 +1060,7 @@ var org_html_manager = {
             this.NODE.div.scrollIntoView(true);
           }
         }
-        else if ('?' == s || 'l' == s || '¿' == s) {
+        else if ('?' == s || '¿' == s) {
           this.showHelp();
         }
         else if ('H' == s && this.LINK_HOME) {
@@ -1081,22 +1069,47 @@ var org_html_manager = {
         else if ('h' == s && this.LINK_UP) {
           window.document.location.href = this.LINK_UP;
         }
+
+        /* === READ COMMANDS === */
+
+        else if ('l' == s) {
+          if("" != this.OCCUR) {
+            this.startRead(this.READ_COMMAND_HTML_LINK, "Choose HTML-link type: 's' = section, 'o' = occur");
+          } else {
+            this.startRead(s, "HTML-link:",
+                           '<a href="' + this.BASE_URL + "#" + this.NODE.base_id + '">' +
+                           document.title + ", Sec. '" + this.removeTags(this.NODE.heading.innerHTML) + "'</a>");
+            window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
+          }
+          return;
+        }
+        else if ('L' == s) {
+          if("" != this.OCCUR) {
+            this.startRead(this.READ_COMMAND_ORG_LINK, "Choose Org-link type: 's' = section, 'o' = occur");
+          } else {
+            this.startRead(s, "Org-link:",
+                           '[[' + this.BASE_URL + "#" + this.NODE.base_id + '][' +
+                           document.title + ", Sec. '" + this.removeTags(this.NODE.heading.innerHTML) + "']]");
+            window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
+          }
+          return;
+        }
         else if ('g' == s) {
           this.startRead(s, "Enter section number:");
           return;
         }
         else if ('o' == s) {
-          this.OCCUR = "";
           this.startRead(s, "Occur:");
+          window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=org_html_manager.OCCUR;org_html_manager.CONSOLE_INPUT.select();}, 100);
           return;
         }
         else if ('s' == s) {
-          this.SEARCH_STR = "";
           this.startRead(s, "Search forward:");
+          window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=org_html_manager.OCCUR;org_html_manager.CONSOLE_INPUT.select();}, 100);
           return;
         }
         else if ('S' == s) {
-          if("" == this.SEARCH_STR) {
+          if("" == this.OCCUR) {
             s = "s";
             this.startRead(s, "Search forward:");
           }
@@ -1107,12 +1120,12 @@ var org_html_manager = {
           return;
         }
         else if ('r' == s) {
-          this.SEARCH_STR = "";
           this.startRead(s, "Search backwards:");
+          window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=org_html_manager.OCCUR;org_html_manager.CONSOLE_INPUT.select();}, 100);
           return;
         }
         else if ('R' == s) {
-          if("" == this.SEARCH_STR) {
+          if("" == this.OCCUR) {
             s = "r";
             this.startRead(s, "Search backwards:");
           }
@@ -1124,7 +1137,6 @@ var org_html_manager = {
         }
       }
 
-    this.COMMAND_STR = "";
     this.CONSOLE_INPUT.value = "";
     return true;
   },
@@ -1140,8 +1152,9 @@ var org_html_manager = {
     this.showConsole();
   },
 
-  startRead: function (command, label)
+  startRead: function (command, label, value)
   {
+    if(null == value) value = "";
     this.READ_COMMAND = command;
     this.READING = true;
     this.CONSOLE_INPUT.style.color = "blue";
@@ -1151,16 +1164,17 @@ var org_html_manager = {
     this.CONSOLE_INPUT.focus();
     this.CONSOLE_INPUT.onblur = function() {org_html_manager.CONSOLE_INPUT.focus();};
     // wait until keyup was processed:
-    window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value="";}, 50);
+    window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=value;}, 50);
   },
 
   endRead: function (command, label)
   {
     this.READING = false;
-    this.CONSOLE_INPUT.onblur = null;
     this.READ_COMMAND = "";
-    document.onkeypress=OrgHtmlManagerKeyEvent;
+    this.CONSOLE_LABEL.value = "";
     this.CONSOLE_INPUT.onblur = null;
+    this.CONSOLE_INPUT.blur();
+    document.onkeypress=OrgHtmlManagerKeyEvent;
   },
 
   removeWarning: function()
@@ -1168,7 +1182,6 @@ var org_html_manager = {
     this.CONSOLE_INPUT.value = "";
     this.CONSOLE_INPUT.style.color = "#666666";
     this.hideConsole();
-    return;
   },
 
   showConsole: function()
@@ -1193,7 +1206,6 @@ var org_html_manager = {
     this.CONSOLE.style.marginTop = '-40px';
     this.CONSOLE_INPUT.style.marginTop = '-40px';
     this.CONSOLE.style.top = '-40px';
-    this.COMMAND_STR = "";
     this.CONSOLE_LABEL.innerHTML = "";
     this.CONSOLE_INPUT.value = "";
     this.CONSOLE_ACTIONS.innerHTML = "";
@@ -1401,106 +1413,115 @@ var org_html_manager = {
     }
   },
 
+  /**
+   * Please return, if you want the minibuffer to stay on screen.
+   * Remember to call this.endRead()!
+   */
   evalReadCommand: function()
   {
-    if("" == this.READ_COMMAND) return false;
+    var command = this.READ_COMMAND;
+    var result  = this.CONSOLE_INPUT.value;
 
-    if(this.READ_COMMAND == 'g') { // goto section
-      var matches = this.SECEX.exec(this.CONSOLE_INPUT.value);
+    this.endRead();
+    this.removeWarning();
+
+    if("" == command) return false;
+
+    if(command == 'g') { // goto section
+      var matches = this.SECEX.exec(result);
       var sec = matches[1];
       var sec_found = false;
       for(var i = 0; i < this.SECS.length; ++i) {
         if(this.SECS[i].base_id == sec) {
-          this.endRead();
-          this.removeWarning();
           this.navigateTo(this.SECS[i].idx);
           return;
         }
       }
       if(! sec_found) {
-        this.endRead();
         this.warn("" + sec +": no such section.");
         return;
       }
     }
 
-    else if(this.READ_COMMAND == 's') { // text search
-      this.SEARCH_STR = this.CONSOLE_INPUT.value;
+    else if(command == 's') { // search
+      if(this.SEARCH_HIGHLIGHT_ON) this.removeSearchHighlight();
+      var restore = this.OCCUR;
+      var plus = 0;
+      if(result == this.OCCUR) plus++;
+      this.OCCUR = result;
       this.makeSearchRegexp();
-      this.CONSOLE_LABEL.innerHTML = "Search forwards for &quot;<i>" + this.SEARCH_STR +"</i>&quot;";
-      for(var i = this.NODE.idx; i < this.SECS.length; ++i) {
+      for(var i = this.NODE.idx + plus; i < this.SECS.length; ++i) {
         if(this.searchTextInOrgNode(i)) {
-          this.endRead();
-          this.removeWarning();
+          this.OCCUR = result;
           this.navigateTo(this.SECS[i].idx);
           return;
         }
       }
-      this.endRead();
-      this.warn(this.SEARCH_STR +": text not found.");
+      this.CONSOLE_LABEL.innerHTML = "Search forwards for &quot;<i>" + this.OCCUR +"</i>&quot;: ";
+      this.warn("text not found.");
+      this.OCCUR = restore;
       return;
     }
 
-    else if(this.READ_COMMAND == 'S') { // repeat text search
+    else if(command == 'S') { // repeat search
       for(var i = this.NODE.idx + 1; i < this.SECS.length; ++i) {
         if(this.searchTextInOrgNode(i)) {
-          this.endRead();
-          this.removeWarning();
           this.navigateTo(this.SECS[i].idx);
           return;
         }
       }
-      this.warn(this.SEARCH_STR +": text not found.");
+      this.CONSOLE_LABEL.innerHTML = "Search forwards for &quot;<i>" + this.OCCUR +"</i>&quot;: ";
+      this.warn("text not found.");
       return;
     }
 
-    else if(this.READ_COMMAND == 'r') { // text search backwards
-      this.SEARCH_STR = this.CONSOLE_INPUT.value;
+    else if(command == 'r') { // search backwards
+      if(this.SEARCH_HIGHLIGHT_ON) this.removeSearchHighlight();
+      var restore = this.OCCUR;
+      this.OCCUR = result;
+      var plus = 0;
+      if(result == this.OCCUR) plus++;
       this.makeSearchRegexp();
-      this.CONSOLE_LABEL.innerHTML = "Searching backwards for &quot;<i>" + this.SEARCH_STR +"</i>&quot;";
-      for(var i = this.NODE.idx; i > -1; --i) {
+      for(var i = this.NODE.idx - plus; i > -1; --i) {
         if(this.searchTextInOrgNode(i)) {
-          this.endRead();
-          this.removeWarning();
           this.navigateTo(this.SECS[i].idx);
           return;
         }
       }
-      this.endRead();
-      this.warn(this.SEARCH_STR +": text not found.");
+      this.CONSOLE_LABEL.innerHTML = "Searching backwards for &quot;<i>" + this.OCCUR +"</i>&quot;: ";
+      this.warn("text not found.");
+      this.OCCUR = restore;
       return;
     }
 
-    else if(this.READ_COMMAND == 'R') { // repeat text search backwards
+    else if(command == 'R') { // repeat search backwards
       for(var i = this.NODE.idx - 1; i > -1; --i) {
-        this.CONSOLE_INPUT.value = this.removeTags(this.SECS[i].heading.innerHTML);
+        result = this.removeTags(this.SECS[i].heading.innerHTML);
         if(this.searchTextInOrgNode(i)) {
-          this.endRead();
-          this.removeWarning();
           this.navigateTo(this.SECS[i].idx);
           return;
         }
       }
-      this.warn(this.SEARCH_STR +": text not found.");
+      this.CONSOLE_LABEL.innerHTML = "Searching backwards for &quot;<i>" + this.OCCUR +"</i>&quot;: ";
+      this.warn("text not found.");
       return;
     }
 
-    else if(this.READ_COMMAND == 'o') { // occur
-      this.OCCUR = this.CONSOLE_INPUT.value;
-      this.SEARCH_STR = this.OCCUR;
-      this.endRead();
-      this.removeWarning();
+    else if(command == 'o') { // occur
+      if(this.SEARCH_HIGHLIGHT_ON) this.removeSearchHighlight();
+      var restore = this.OCCUR;
+      this.OCCUR = result;
       this.makeSearchRegexp();
       var occurs = new Array();
-      this.warn("Please wait while searching for '" + this.SEARCH_STR + "'", true);
       for(var i = 0; i < this.SECS.length; ++i) {
         if(this.searchTextInOrgNode(i)) {
           occurs.push(i);
         }
       }
-      this.removeWarning();
       if(0 == occurs.length) {
-        this.warn(this.SEARCH_STR +": text not found.");
+        this.CONSOLE_LABEL.innerHTML = "Searching occurences of &quot;<i>" + this.OCCUR +"</i>&quot;: ";
+        this.warn(this.OCCUR +": text not found.");
+        this.OCCUR = restore;
         return;
       }
 
@@ -1516,11 +1537,46 @@ var org_html_manager = {
       }
       this.showSection(occurs[0]);
     }
+
+    else if(command == this.READ_COMMAND_ORG_LINK) {
+      var c = result.charAt(0);
+      if('s' == c) {
+        this.startRead(this.READ_COMMAND_NULL, "Org-link:",
+                       '[[' + this.BASE_URL + "#" + this.NODE.base_id + '][' +
+                       document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "']]");
+        window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
+      } else if('o' == c) {
+        this.startRead(this.READ_COMMAND_NULL, "Org-link:",
+                       '[[' + this.BASE_URL + "?OCCUR=" + this.OCCUR + '][' +
+                       document.title + ", occurences of '" + this.OCCUR + "']]");
+        window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
+      } else {
+        this.warn(c + ": No such link type!");
+      }
+    }
+
+    else if(command == this.READ_COMMAND_HTML_LINK) {
+      var c = result.charAt(0);
+      if('s' == c) {
+        this.startRead(this.READ_COMMAND_NULL, "HTML-link:",
+                       '<a href="' + this.BASE_URL + "#" + this.NODE.base_id + '">' +
+                       document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "'</a>");
+        window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
+      } else if('o' == c) {
+        this.startRead(this.READ_COMMAND_NULL, "HTML-link:",
+                       '<a href="' + this.BASE_URL + "?OCCUR=" + this.OCCUR + '">' +
+                       document.title + ", occurences of '" + this.OCCUR + "'</a>");
+        window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
+      } else {
+        this.warn(c + ": No such link type!");
+      }
+    }
+
   },
 
   makeSearchRegexp: function()
   {
-    var tmp = this.SEARCH_STR.replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/=/g, "\\=").replace(/\\/g, "\\\\").replace(/\?/g, "\\?").replace(/\*/g, "\\*").replace(/\+/g, "\\+").replace(/\"/g, "&quot;");
+    var tmp = this.OCCUR.replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/=/g, "\\=").replace(/\\/g, "\\\\").replace(/\?/g, "\\?").replace(/\*/g, "\\*").replace(/\+/g, "\\+").replace(/\"/g, "&quot;");
     this.SEARCH_REGEX =  new RegExp(">([^<]*)?("+tmp+")([^>]*)?<","ig");
   },
 
@@ -1532,11 +1588,13 @@ var org_html_manager = {
         ret = true;
         this.setSearchHighlight(this.SECS[i].heading);
         this.SECS[i].hasHighlight = true;
+        this.SEARCH_HIGHLIGHT_ON = true;
       }
       if(this.SEARCH_REGEX.test(this.SECS[i].folder.innerHTML)) {
         ret = true;
         this.setSearchHighlight(this.SECS[i].folder);
         this.SECS[i].hasHighlight = true;
+        this.SEARCH_HIGHLIGHT_ON = true;
       }
       return ret;
     }
@@ -1547,10 +1605,10 @@ var org_html_manager = {
   {
     var tmp = dom.innerHTML;
     dom.innerHTML = tmp.replace(this.SEARCH_REGEX,
-      '>$1<span class="org-info-search-highlight">$2</span>$3<');
+      '>$1<span class="org-info-js_search-highlight">$2</span>$3<');
   },
 
-  removeSearchHiglight: function()
+  removeSearchHighlight: function()
   {
     for(var i = 0; i < this.SECS.length; ++i) {
       if(this.SECS[i].hasHighlight) {
@@ -1565,6 +1623,7 @@ var org_html_manager = {
         this.SECS[i].hasHighlight = false;
       }
     }
+    this.SEARCH_HIGHLIGHT_ON = false;
   }
 
 };
