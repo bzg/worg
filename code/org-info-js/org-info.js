@@ -277,6 +277,7 @@ var org_html_manager = {
   WINDOW_BORDER: false,        // Draw a border aroung info window
   HIDE_TOC: false,             // Hide the table of contents.
   TOC_DEPTH: 0,                // Level to cut the table of contents. No cutting if 0.
+  STARTUP_MESSAGE: true,       // Show info at startup?
 
   // Private
   BASE_URL: document.URL,      // URL without '#sec-x.y.z'
@@ -368,6 +369,7 @@ var org_html_manager = {
     }
     this.VIEW  = this.VIEW ? this.VIEW : this.PLAIN_VIEW;
     this.VIEW_BUTTONS = (this.VIEW_BUTTONS && this.VIEW_BUTTONS != "0") ? true : false;
+    this.STARTUP_MESSAGE = (this.STARTUP_MESSAGE && this.STARTUP_MESSAGE != "0") ? true : false;
     this.LOCAL_TOC = (this.LOCAL_TOC && this.LOCAL_TOC != "0") ? true : false;
     this.HIDE_TOC = (this.TOC && this.TOC != "0") ? false : true;
     if(this.FIXED_TOC && this.FIXED_TOC != "0") {
@@ -458,11 +460,11 @@ var org_html_manager = {
 
     this.CONSOLE = document.createElement("div");
     this.CONSOLE.innerHTML = '<form action="" onsubmit="org_html_manager.evalReadCommand(); return false;">'
-      +'<table style="width:100%;margin:0px 0px 0px 0px;border-style:none;" cellpadding="0" cellspacing="2" summary="minibuffer">'
-      +'<tbody><tr><td id="org-info-js_console-label" style="white-space:nowrap;"></td><td style="width:100%;">'
+      +'<table id="org-info-js_minibuffer" style="width:100%;margin:0px 0px 0px 0px;border-style:none;" cellpadding="0" cellspacing="2" summary="minibuffer">'
+      +'<tbody><tr><td id="org-info-js_console-label" style="white-space:nowrap;border-style:none;"></td><td style="width:100%;border-style:none;">'
       +'<input type="text" id="org-info-js_console-input" onkeydown="org_html_manager.getKey();"'
       +' onclick="this.select();" maxlength="150" style="width:100%;border:1px inset #dddddd;"'
-      +' value=""/></td><td id="org-info-js_console-actions"></td></tr></tbody></table>'
+      +' value=""/></td><td id="org-info-js_console-actions" style="border-style:none;"></td></tr></tbody></table>'
       +'</form>';
     this.CONSOLE.style.position = 'relative';
     this.CONSOLE.style.marginTop = '-40px';
@@ -486,6 +488,9 @@ var org_html_manager = {
     }
 
     if(0 != this.DEBUG && this.debug.length) alert(this.debug);
+    if(this.STARTUP_MESSAGE) {
+      this.warn("This page uses org-info.js. Press '?' for more information.", true);
+    }
   },
 
 
@@ -721,7 +726,7 @@ var org_html_manager = {
         +'<a accesskey="t" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></span>'
         +'</td></tr><tr><td style="text-align:left;border-style:none;vertical-align:bottom;width:22%">';
 
-      if(i>1) // was > 0
+      if(i>0)
         html += '<a accesskey="p" href="'+this.SECS[i-1].link
         +'" title="Go to: '+this.removeTags(this.SECS[i-1].heading.innerHTML)+'">Previous</a> | ';
       else
@@ -1180,6 +1185,7 @@ var org_html_manager = {
   removeWarning: function()
   {
     this.CONSOLE_INPUT.value = "";
+    this.CONSOLE_LABEL.innerHTML = "";
     this.CONSOLE_INPUT.style.color = "#666666";
     this.hideConsole();
   },
@@ -1426,6 +1432,7 @@ var org_html_manager = {
     this.removeWarning();
 
     if("" == command) return false;
+    if("" == result) return false;
 
     if(command == 'g') { // goto section
       var matches = this.SECEX.exec(result);
@@ -1444,6 +1451,7 @@ var org_html_manager = {
     }
 
     else if(command == 's') { // search
+      if("" == result) return false;
       if(this.SEARCH_HIGHLIGHT_ON) this.removeSearchHighlight();
       var restore = this.OCCUR;
       var plus = 0;
@@ -1476,6 +1484,7 @@ var org_html_manager = {
     }
 
     else if(command == 'r') { // search backwards
+      if("" == result) return false;
       if(this.SEARCH_HIGHLIGHT_ON) this.removeSearchHighlight();
       var restore = this.OCCUR;
       this.OCCUR = result;
@@ -1508,6 +1517,7 @@ var org_html_manager = {
     }
 
     else if(command == 'o') { // occur
+      if("" == result) return false;
       if(this.SEARCH_HIGHLIGHT_ON) this.removeSearchHighlight();
       var restore = this.OCCUR;
       this.OCCUR = result;
