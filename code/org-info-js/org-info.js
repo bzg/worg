@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.6.4
+ *       org-info.js, v.0.0.6.5
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -460,11 +460,11 @@ var org_html_manager = {
 
     this.CONSOLE = document.createElement("div");
     this.CONSOLE.innerHTML = '<form action="" onsubmit="org_html_manager.evalReadCommand(); return false;">'
-      +'<table id="org-info-js_minibuffer" style="width:100%;margin:0px 0px 0px 0px;border-style:none;" cellpadding="0" cellspacing="2" summary="minibuffer">'
-      +'<tbody><tr><td id="org-info-js_console-label" style="white-space:nowrap;border-style:none;"></td><td style="width:100%;border-style:none;">'
+      +'<table id="org-info-js_console" style="width:100%;margin:0px 0px 0px 0px;" cellpadding="0" cellspacing="2" summary="minibuffer">'
+      +'<tbody><tr><td id="org-info-js_console-label" style="white-space:nowrap;"></td><td style="width:100%;">'
       +'<input type="text" id="org-info-js_console-input" onkeydown="org_html_manager.getKey();"'
-      +' onclick="this.select();" maxlength="150" style="width:100%;border:1px inset #dddddd;"'
-      +' value=""/></td><td id="org-info-js_console-actions" style="border-style:none;"></td></tr></tbody></table>'
+      +' onclick="this.select();" maxlength="150" style="width:100%;"'
+      +' value=""/></td><td id="org-info-js_console-actions"></td></tr></tbody></table>'
       +'</form>';
     this.CONSOLE.style.position = 'relative';
     this.CONSOLE.style.marginTop = '-40px';
