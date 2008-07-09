@@ -143,8 +143,8 @@
 * <<<Shortcuts>>>
 
   The visitor of this file (and every XHTML-exported org file that includes the
-  script) may use the mouse or the following keys to navigate. '=?=' or '=H='
-  should give you a list of shortcuts too.
+  script) may use the mouse or the following keys to navigate. '=?=' should give
+  you a list of shortcuts too.
 
   The script always tries to keep the last selected section visible. This is
   somewhat strange when scrolling, but really helpfull for keyboard navigation.
@@ -156,31 +156,31 @@
   displayed. Any subsequent key press goes back to where you've been before. The
   TOC does not show up the history. Same applies to the keyboard help.
 
-  | Key   | Function                                                             |
-  |-------+----------------------------------------------------------------------|
-  | ? / ¿ | show this help screen                                                |
-  |-------+----------------------------------------------------------------------|
-  |       | *Moving around*                                                      |
-  | n / p | goto the next / previous section                                     |
-  | t / E | goto the first / last section                                        |
-  | g     | goto section...                                                      |
-  | u     | go one level up (parent section)                                     |
-  | i     | show table of contents                                               |
-  | b     | go back to last visited section. Only when following internal links. |
-  | h / H | go to main index in this directory / link HOME page                  |
-  |-------+----------------------------------------------------------------------|
-  |       | *View*                                                               |
-  | m     | toggle the view mode between info and plain                          |
-  | f     | fold current section / whole document (plain view only)              |
-  |-------+----------------------------------------------------------------------|
-  |       | *Searching*                                                          |
-  | s / r | search forward / backward....                                        |
-  | S / R | search again forward / backward                                      |
-  | o     | occur-mode                                                           |
-  |-------+----------------------------------------------------------------------|
-  |       | *Misc*                                                               |
-  | l / L | display HTML link / Org link                                         |
-  | v / V | scroll down / up                                                     |
+  | Key   | Function                                                |
+  |-------+---------------------------------------------------------|
+  | ? / ¿ | show this help screen                                   |
+  |-------+---------------------------------------------------------|
+  |       | *Moving around*                                         |
+  | n / p | goto the next / previous section                        |
+  | t / E | goto the first / last section                           |
+  | g     | goto section...                                         |
+  | u     | go one level up (parent section)                        |
+  | i     | show table of contents                                  |
+  | b / B | go back to last / forward to next visited section.      |
+  | h / H | go to main index in this directory / link HOME page     |
+  |-------+---------------------------------------------------------|
+  |       | *View*                                                  |
+  | m     | toggle the view mode between info and plain             |
+  | f /F  | fold current section / whole document (plain view only) |
+  |-------+---------------------------------------------------------|
+  |       | *Searching*                                             |
+  | s / r | search forward / backward....                           |
+  | S / R | search again forward / backward                         |
+  | o     | occur-mode                                              |
+  |-------+---------------------------------------------------------|
+  |       | *Misc*                                                  |
+  | l / L | display HTML link / Org link                            |
+  | v / V | scroll down / up                                        |
 
   Thanks Carsten, for this beautifull table!
 
@@ -643,12 +643,31 @@ org_html_manager.setup ();
 
 * <<ChangeLog>>
 
+*** 2008-07-09 Mi
+
+    + Missing shortcuts in help ::
+      '=F=' and '=B='.
+    + Use two lines to be more verbose ::
+      Since the new read-mode, there are many occasions when you have to press RET
+      to close the minibuffer. Thus we should always have a parenthesis saying
+      '/press X to close/'.
+    + Implement the 'standard minibuffer' ::
+      A little bit more visible, two lines, a narrow gray border.
+    + Scroll to the very top for sec. 0 in plain view mode ::
+      Scrolling the NODE.div into view seemed unnatural.
+    + Standard height for minibuffer ::
+      This was done to hide and show the minibuffer quite correct.
+    + Reduce flicker after reading ::
+      =hideConsole()= is only called, if the result of the last read command does
+      not lead to an error. =showConsole()= looks, wether the the minibuffer is
+      hidden.
+
 *** 2008-06-26 Do
 
     + Stop searching empty strings.
     + Use the local stylesheet again.
     + Show a startup message ::
-      This one is cutomizable. Use
+      One out of many ideas from Carsten. This one is cutomizable. Use
       =org_html_manager.set("STARTUP_MESSAGE", "0");= to inhibit.
 
 *** 2008-06-24 Di

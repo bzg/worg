@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.6.5
+ *       org-info.js, v.0.0.6.7
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -310,7 +310,7 @@ var org_html_manager = {
   CONSOLE: null,               // The div containing the minibuffer.
   CONSOLE_INPUT: null,
   CONSOLE_LABEL: null,
-  CONSOLE_ACTIONS: null,
+  CONSOLE_OFFSET: "50px",
   OCCUR: "",                   // The search string.
   SEARCH_REGEX: "",
   SEARCH_HL_REG: new RegExp('>([^<]*)?(<span [^>]*?"org-info-js_search-highlight"[^>]*?>)(.*?)(<\/span>)([^>]*)?<', "ig"),
@@ -422,11 +422,11 @@ var org_html_manager = {
           break;
         }
       }
-      if(location.search)
-        this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('?'));
-      else
-        this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('#'));
     }
+    if(-1 != this.BASE_URL.indexOf('?'))
+      this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('?'));
+    if(-1 != this.BASE_URL.indexOf('#'))
+      this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('#'));
 
     this.convertLinks(); // adjust internal links. BASE_URL has to be stripped.
 
@@ -459,26 +459,32 @@ var org_html_manager = {
     }
 
     this.CONSOLE = document.createElement("div");
-    this.CONSOLE.innerHTML = '<form action="" onsubmit="org_html_manager.evalReadCommand(); return false;">'
+    this.CONSOLE.innerHTML = '<form action="" style="margin:0px;padding:0px;" onsubmit="org_html_manager.evalReadCommand(); return false;">'
       +'<table id="org-info-js_console" style="width:100%;margin:0px 0px 0px 0px;" cellpadding="0" cellspacing="2" summary="minibuffer">'
-      +'<tbody><tr><td id="org-info-js_console-label" style="white-space:nowrap;"></td><td style="width:100%;">'
+      +'<tbody><tr><td id="org-info-js_console-icon">&#160;</td><td style="width:100%;vertical-align:middle;">'
+      +'<table style="width:100%;margin:0px 0px 0px 0px;" cellpadding="0" cellspacing="2">'
+      +'<tbody><tr><td id="org-info-js_console-label" style="white-space:nowrap;"></td></tr>'
+      +'<tr><td style="width:100%;vertical-align:middle;">'
       +'<input type="text" id="org-info-js_console-input" onkeydown="org_html_manager.getKey();"'
       +' onclick="this.select();" maxlength="150" style="width:100%;"'
-      +' value=""/></td><td id="org-info-js_console-actions"></td></tr></tbody></table>'
+      +' value=""/></td></tr></tbody></table></td><td>&#160;</td></tr></tbody></table>'
       +'</form>';
     this.CONSOLE.style.position = 'relative';
-    this.CONSOLE.style.marginTop = '-40px';
-    this.CONSOLE.style.top = '-40px';
+    this.CONSOLE.style.marginTop =  "-" + this.CONSOLE_OFFSET;
+    this.CONSOLE.style.top = "-" + this.CONSOLE_OFFSET;
     this.CONSOLE.style.left = '0px';
     this.CONSOLE.style.width = '100%';
-    this.CONSOLE.style.height = '30px';
+    this.CONSOLE.style.height = '40px';
+    this.CONSOLE.style.overflow = 'hidden';
+    this.CONSOLE.style.verticalAlign = 'middle';
+    this.CONSOLE.style.zIndex = '9';
+    this.CONSOLE.style.border = "1px solid #cccccc";
+    this.CONSOLE.id = 'org-info-js_console-container';
 
     document.body.insertBefore(this.CONSOLE, document.body.firstChild);
     this.MESSAGING = false;
     this.CONSOLE_LABEL = document.getElementById("org-info-js_console-label");
     this.CONSOLE_INPUT = document.getElementById("org-info-js_console-input");
-    this.CONSOLE_ACTIONS = document.getElementById("org-info-js_console-actions");
-    this.CONSOLE_INPUT.style.marginTop = '-40px';
     document.onkeypress=OrgHtmlManagerKeyEvent;
 
     if("" != this.OCCUR) {
@@ -855,7 +861,8 @@ var org_html_manager = {
       this.ROOT.children[i].fold();
     }
     this.showSection(sec);
-    this.NODE.div.scrollIntoView(true);
+    if(this.NODE.idx == 0) window.scrollTo(0, 0);
+    else this.NODE.div.scrollIntoView(true);
   },
 
   infoView: function (sec, skip_show_section)
@@ -897,10 +904,8 @@ var org_html_manager = {
     if(this.PLAIN_VIEW == this.VIEW && this.MOUSE_HINT) {
       if('underline' == this.MOUSE_HINT)
         this.SECS[i].heading.style.borderBottom = "1px dashed #666666";
-      // h.style.borderBottom = "1px dashed #666666";
       else
         this.SECS[i].heading.style.backgroundColor = this.MOUSE_HINT;
-      //h.style.backgroundColor = this.MOUSE_HINT;
     }
   },
 
@@ -949,6 +954,7 @@ var org_html_manager = {
     // User has to retype again.
     if(this.MESSAGING && !this.READING) {
       this.removeWarning();
+      return;
     }
     else if(this.HELPING) {
       this.showHelp();
@@ -1083,7 +1089,8 @@ var org_html_manager = {
           } else {
             this.startRead(s, "HTML-link:",
                            '<a href="' + this.BASE_URL + "#" + this.NODE.base_id + '">' +
-                           document.title + ", Sec. '" + this.removeTags(this.NODE.heading.innerHTML) + "'</a>");
+                           document.title + ", Sec. '" + this.removeTags(this.NODE.heading.innerHTML) + "'</a>",
+                           "C-c to copy, ");
             window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
           }
           return;
@@ -1094,7 +1101,8 @@ var org_html_manager = {
           } else {
             this.startRead(s, "Org-link:",
                            '[[' + this.BASE_URL + "#" + this.NODE.base_id + '][' +
-                           document.title + ", Sec. '" + this.removeTags(this.NODE.heading.innerHTML) + "']]");
+                           document.title + ", Sec. '" + this.removeTags(this.NODE.heading.innerHTML) + "']]",
+                           "C-c to copy, ");
             window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
           }
           return;
@@ -1104,12 +1112,14 @@ var org_html_manager = {
           return;
         }
         else if ('o' == s) {
-          this.startRead(s, "Occur:");
+          if("" != this.OCCUR) this.startRead(s, "Occur:", this.OCCUR, "RET to use previous, DEL ");
+          else this.startRead(s, "Occur:", this.OCCUR);
           window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=org_html_manager.OCCUR;org_html_manager.CONSOLE_INPUT.select();}, 100);
           return;
         }
         else if ('s' == s) {
-          this.startRead(s, "Search forward:");
+          if("" != this.OCCUR) this.startRead(s, "Search forward:", this.OCCUR, "RET to use previous, DEL ");
+          else this.startRead(s, "Search forward:", this.OCCUR);
           window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=org_html_manager.OCCUR;org_html_manager.CONSOLE_INPUT.select();}, 100);
           return;
         }
@@ -1125,7 +1135,8 @@ var org_html_manager = {
           return;
         }
         else if ('r' == s) {
-          this.startRead(s, "Search backwards:");
+          if("" != this.OCCUR) this.startRead(s, "Search backwards:", this.OCCUR, "RET to use previous, DEL ");
+          else this.startRead(s, "Search backwards:", this.OCCUR);
           window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=org_html_manager.OCCUR;org_html_manager.CONSOLE_INPUT.select();}, 100);
           return;
         }
@@ -1146,24 +1157,26 @@ var org_html_manager = {
     return true;
   },
 
-
-  warn: function (what, pure)
-  {
-    if(! pure) {
-      this.CONSOLE_INPUT.style.color="red";
-      this.CONSOLE_INPUT.value= what + " Press any key to proceed.";
-    }
-    else { this.CONSOLE_INPUT.value = what; }
-    this.showConsole();
-  },
-
-  startRead: function (command, label, value)
+  warn: function (what, harmless, value)
   {
     if(null == value) value = "";
+    this.CONSOLE_INPUT.value = value;
+    if(! harmless) this.CONSOLE_LABEL.style.color = "red";
+    this.CONSOLE_LABEL.innerHTML = "<span style='float:left;'>"+what +"</span>"+
+    "<span style='float:right;color:#aaaaaa;font-weight:normal;'>(press any key to proceed)</span>";
+    this.showConsole();
+    // wait until keyup was processed:
+    window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=value;}, 50);
+  },
+
+  startRead: function (command, label, value, shortcuts)
+  {
+    if(null == value) value = "";
+    if(null == shortcuts) shortcuts = "";
     this.READ_COMMAND = command;
     this.READING = true;
-    this.CONSOLE_INPUT.style.color = "blue";
-    this.CONSOLE_LABEL.innerHTML = label;
+    this.CONSOLE_LABEL.innerHTML = "<span style='float:left;'>"+label+"</span>"+
+    "<span style='float:right;color:#aaaaaa;font-weight:normal;'>("+shortcuts+"RET to close)</span>";
     this.showConsole();
     document.onkeypress=null;
     this.CONSOLE_INPUT.focus();
@@ -1176,51 +1189,50 @@ var org_html_manager = {
   {
     this.READING = false;
     this.READ_COMMAND = "";
-    this.CONSOLE_LABEL.value = "";
     this.CONSOLE_INPUT.onblur = null;
     this.CONSOLE_INPUT.blur();
     document.onkeypress=OrgHtmlManagerKeyEvent;
+    // this.hideConsole();
   },
 
   removeWarning: function()
   {
-    this.CONSOLE_INPUT.value = "";
-    this.CONSOLE_LABEL.innerHTML = "";
-    this.CONSOLE_INPUT.style.color = "#666666";
+    this.CONSOLE_LABEL.style.color = "#333333";
     this.hideConsole();
   },
 
   showConsole: function()
   {
-    if(this.VIEW != this.INFO_VIEW) {
-      // Maybe clone the CONSOLE?
-      document.body.removeChild(document.body.firstChild);
-      this.NODE.div.insertBefore(this.CONSOLE, this.NODE.div.firstChild);
-      this.NODE.div.scrollIntoView(true);
-      this.MESSAGING = this.MESSAGING_INPLACE;
-    } else {
-      this.MESSAGING = this.MESSAGING_TOP;
-      window.scrollTo(0, 0);
+    if(!this.MESSAGING) {
+      if(this.VIEW != this.INFO_VIEW) {
+        // Maybe clone the CONSOLE?
+        document.body.removeChild(document.body.firstChild);
+        this.NODE.div.insertBefore(this.CONSOLE, this.NODE.div.firstChild);
+        this.NODE.div.scrollIntoView(true);
+        this.MESSAGING = this.MESSAGING_INPLACE;
+      } else {
+        this.MESSAGING = this.MESSAGING_TOP;
+        window.scrollTo(0, 0);
+      }
+      this.CONSOLE.style.marginTop = '0px';
+      this.CONSOLE.style.top = '0px';
     }
-    this.CONSOLE.style.marginTop = '0px';
-    this.CONSOLE.style.top = '0px';
-    this.CONSOLE_INPUT.style.marginTop = '0px';
   },
 
   hideConsole: function()
   {
-    this.CONSOLE.style.marginTop = '-40px';
-    this.CONSOLE_INPUT.style.marginTop = '-40px';
-    this.CONSOLE.style.top = '-40px';
-    this.CONSOLE_LABEL.innerHTML = "";
-    this.CONSOLE_INPUT.value = "";
-    this.CONSOLE_ACTIONS.innerHTML = "";
-    if(this.MESSAGING_INPLACE == this.MESSAGING) {
-      this.NODE.div.removeChild(this.NODE.div.firstChild);
-      document.body.insertBefore(this.CONSOLE, document.body.firstChild);
+    if(this.MESSAGING) {
+      this.CONSOLE.style.marginTop = "-" + this.CONSOLE_OFFSET;
+      this.CONSOLE.style.top = "-" + this.CONSOLE_OFFSET;
+      this.CONSOLE_LABEL.innerHTML = "";
+      this.CONSOLE_INPUT.value = "";
+      if(this.MESSAGING_INPLACE == this.MESSAGING) {
+        this.NODE.div.removeChild(this.NODE.div.firstChild);
+        document.body.insertBefore(this.CONSOLE, document.body.firstChild);
+        if(this.NODE.idx != 0) this.NODE.div.scrollIntoView();
+      }
+      this.MESSAGING = false;
     }
-    this.MESSAGING = false;
-    this.READING = false;
   },
 
   toggleGlobaly: function ()
@@ -1270,12 +1282,12 @@ var org_html_manager = {
       | g            | goto section...                                                      |
       | u            | go one level up (parent section)                                     |
       | i            | show table of contents                                               |
-      | b            | go back to last visited section. Only when following internal links. |
+      | b / B        | go back to last / forward to next visited section.                   |
       | h / H        | go to main index in this directory / link HOME page                  |
       |--------------+----------------------------------------------------------------------|
       |              | <b>View</b>                                                          |
       | m            | toggle the view mode between info and plain                          |
-      | f            | fold current section / whole document (plain view only)              |
+      | f / F        | fold current section / whole document (plain view only)              |
       |--------------+----------------------------------------------------------------------|
       |              | <b>Searching</b>                                                     |
       | s / r        | search forward / backward....                                        |
@@ -1290,7 +1302,7 @@ var org_html_manager = {
     if (this.HELPING) {
       this.last_view_mode = this.VIEW;
       this.infoView(true);
-      this.WINDOW.innerHTML = '<h2>Keyboard Shortcuts</h2>'
+      this.WINDOW.innerHTML = 'Press any key to proceed.<h2>Keyboard Shortcuts</h2>'
         +'<table cellpadding="3" rules="groups" frame="hsides" style="margin:20px;border-style:none;" border="0";>'
 	+'<tbody>'
       // BEGIN RECEIVE ORGTBL Shortcuts
@@ -1302,12 +1314,12 @@ var org_html_manager = {
 	+'<tr><td><code><b>g</b></code></td><td>goto section...</td></tr>'
 	+'<tr><td><code><b>u</b></code></td><td>go one level up (parent section)</td></tr>'
 	+'<tr><td><code><b>i</b></code></td><td>show table of contents</td></tr>'
-	+'<tr><td><code><b>b</b></code></td><td>go back to last visited section. Only when following internal links.</td></tr>'
+	+'<tr><td><code><b>b / B</b></code></td><td>go back to last / forward to next visited section.</td></tr>'
 	+'<tr><td><code><b>h / H</b></code></td><td>go to main index in this directory / link HOME page</td></tr>'
 	+'</tbody><tbody>'
 	+'<tr><td><code><b></b></code></td><td><b>View</b></td></tr>'
 	+'<tr><td><code><b>m</b></code></td><td>toggle the view mode between info and plain</td></tr>'
-	+'<tr><td><code><b>f</b></code></td><td>fold current section / whole document (plain view only)</td></tr>'
+	+'<tr><td><code><b>f / F</b></code></td><td>fold current section / whole document (plain view only)</td></tr>'
 	+'</tbody><tbody>'
 	+'<tr><td><code><b></b></code></td><td><b>Searching</b></td></tr>'
 	+'<tr><td><code><b>s / r</b></code></td><td>search forward / backward....</td></tr>'
@@ -1320,6 +1332,7 @@ var org_html_manager = {
       // END RECEIVE ORGTBL Shortcuts
        +'</tbody>'
        +'</table><br />Press any key to proceed.';
+      window.scrollTo(0, 0);
     }
     else {
       if(this.PLAIN_VIEW == this.last_view_mode) {
@@ -1360,6 +1373,8 @@ var org_html_manager = {
    */
   navigateTo: function (sec)
   {
+    if     (this.READING)   { this.endRead(); }
+    else if(this.MESSAGING) { this.removeWarning(); }
     this.pushHistory(sec, this.NODE.idx);
     this.showSection(sec);
   },
@@ -1429,10 +1444,11 @@ var org_html_manager = {
     var result  = this.CONSOLE_INPUT.value;
 
     this.endRead();
-    this.removeWarning();
 
-    if("" == command) return false;
-    if("" == result) return false;
+    if("" == command || "" == result) {
+      this.hideConsole();
+      return false;
+    }
 
     if(command == 'g') { // goto section
       var matches = this.SECEX.exec(result);
@@ -1440,12 +1456,13 @@ var org_html_manager = {
       var sec_found = false;
       for(var i = 0; i < this.SECS.length; ++i) {
         if(this.SECS[i].base_id == sec) {
+          this.hideConsole();
           this.navigateTo(this.SECS[i].idx);
           return;
         }
       }
       if(! sec_found) {
-        this.warn("" + sec +": no such section.");
+        this.warn("Goto section: no such section.", false, sec);
         return;
       }
     }
@@ -1461,12 +1478,12 @@ var org_html_manager = {
       for(var i = this.NODE.idx + plus; i < this.SECS.length; ++i) {
         if(this.searchTextInOrgNode(i)) {
           this.OCCUR = result;
+          this.hideConsole();
           this.navigateTo(this.SECS[i].idx);
           return;
         }
       }
-      this.CONSOLE_LABEL.innerHTML = "Search forwards for &quot;<i>" + this.OCCUR +"</i>&quot;: ";
-      this.warn("text not found.");
+      this.warn("Search forwards: text not found.", false, this.OCCUR);
       this.OCCUR = restore;
       return;
     }
@@ -1474,12 +1491,12 @@ var org_html_manager = {
     else if(command == 'S') { // repeat search
       for(var i = this.NODE.idx + 1; i < this.SECS.length; ++i) {
         if(this.searchTextInOrgNode(i)) {
+          this.hideConsole();
           this.navigateTo(this.SECS[i].idx);
           return;
         }
       }
-      this.CONSOLE_LABEL.innerHTML = "Search forwards for &quot;<i>" + this.OCCUR +"</i>&quot;: ";
-      this.warn("text not found.");
+      this.warn("Search forwards: text not found.", false, this.OCCUR);
       return;
     }
 
@@ -1493,12 +1510,12 @@ var org_html_manager = {
       this.makeSearchRegexp();
       for(var i = this.NODE.idx - plus; i > -1; --i) {
         if(this.searchTextInOrgNode(i)) {
+          this.hideConsole();
           this.navigateTo(this.SECS[i].idx);
           return;
         }
       }
-      this.CONSOLE_LABEL.innerHTML = "Searching backwards for &quot;<i>" + this.OCCUR +"</i>&quot;: ";
-      this.warn("text not found.");
+      this.warn("Search backwards: text not found.", false, this.OCCUR);
       this.OCCUR = restore;
       return;
     }
@@ -1507,12 +1524,12 @@ var org_html_manager = {
       for(var i = this.NODE.idx - 1; i > -1; --i) {
         result = this.removeTags(this.SECS[i].heading.innerHTML);
         if(this.searchTextInOrgNode(i)) {
+          this.hideConsole();
           this.navigateTo(this.SECS[i].idx);
           return;
         }
       }
-      this.CONSOLE_LABEL.innerHTML = "Searching backwards for &quot;<i>" + this.OCCUR +"</i>&quot;: ";
-      this.warn("text not found.");
+      this.warn("Search backwards: text not found.", false, this.OCCUR);
       return;
     }
 
@@ -1529,12 +1546,12 @@ var org_html_manager = {
         }
       }
       if(0 == occurs.length) {
-        this.CONSOLE_LABEL.innerHTML = "Searching occurences of &quot;<i>" + this.OCCUR +"</i>&quot;: ";
-        this.warn(this.OCCUR +": text not found.");
+        this.warn("Occur: text not found.", false, this.OCCUR);
         this.OCCUR = restore;
         return;
       }
 
+      this.hideConsole();
       if(this.PLAIN_VIEW != this.VIEW) this.plainView();
       this.ROOT.durty = true;
       this.toggleGlobaly();
@@ -1551,14 +1568,16 @@ var org_html_manager = {
     else if(command == this.READ_COMMAND_ORG_LINK) {
       var c = result.charAt(0);
       if('s' == c) {
-        this.startRead(this.READ_COMMAND_NULL, "Org-link:",
+        this.startRead(this.READ_COMMAND_NULL, "Org-link to this section:",
                        '[[' + this.BASE_URL + "#" + this.NODE.base_id + '][' +
-                       document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "']]");
+                       document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "']]",
+                       "C-c to copy, ");
         window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
       } else if('o' == c) {
-        this.startRead(this.READ_COMMAND_NULL, "Org-link:",
+        this.startRead(this.READ_COMMAND_NULL, "Org-link, occurences of <i>&quot;"+this.OCCUR+"&quot;</i>:",
                        '[[' + this.BASE_URL + "?OCCUR=" + this.OCCUR + '][' +
-                       document.title + ", occurences of '" + this.OCCUR + "']]");
+                       document.title + ", occurences of '" + this.OCCUR + "']]",
+                       "C-c to copy, ");
         window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
       } else {
         this.warn(c + ": No such link type!");
@@ -1568,14 +1587,16 @@ var org_html_manager = {
     else if(command == this.READ_COMMAND_HTML_LINK) {
       var c = result.charAt(0);
       if('s' == c) {
-        this.startRead(this.READ_COMMAND_NULL, "HTML-link:",
+        this.startRead(this.READ_COMMAND_NULL, "HTML-link to this section:",
                        '<a href="' + this.BASE_URL + "#" + this.NODE.base_id + '">' +
-                       document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "'</a>");
+                       document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "'</a>",
+                       "C-c to copy, ");
         window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
       } else if('o' == c) {
-        this.startRead(this.READ_COMMAND_NULL, "HTML-link:",
+        this.startRead(this.READ_COMMAND_NULL, "HTML-link, occurences of <i>&quot;"+this.OCCUR+"&quot;</i>:",
                        '<a href="' + this.BASE_URL + "?OCCUR=" + this.OCCUR + '">' +
-                       document.title + ", occurences of '" + this.OCCUR + "'</a>");
+                       document.title + ", occurences of '" + this.OCCUR + "'</a>",
+                       "C-c to copy, ");
         window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
       } else {
         this.warn(c + ": No such link type!");
