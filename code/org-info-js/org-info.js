@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.6.7
+ *       org-info.js, v.0.0.6.8
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -460,14 +460,14 @@ var org_html_manager = {
 
     this.CONSOLE = document.createElement("div");
     this.CONSOLE.innerHTML = '<form action="" style="margin:0px;padding:0px;" onsubmit="org_html_manager.evalReadCommand(); return false;">'
-      +'<table id="org-info-js_console" style="width:100%;margin:0px 0px 0px 0px;" cellpadding="0" cellspacing="2" summary="minibuffer">'
-      +'<tbody><tr><td id="org-info-js_console-icon">&#160;</td><td style="width:100%;vertical-align:middle;">'
+      +'<table id="org-info-js_console" style="width:100%;margin:0px 0px 0px 0px;" cellpadding="0" cellspacing="0" summary="minibuffer">'
+      +'<tbody><tr><td id="org-info-js_console-icon" style="padding:0px 0px 0px 0px;">&#160;</td><td style="width:100%;vertical-align:middle;padding:0px 0px 0px 0px;">'
       +'<table style="width:100%;margin:0px 0px 0px 0px;" cellpadding="0" cellspacing="2">'
-      +'<tbody><tr><td id="org-info-js_console-label" style="white-space:nowrap;"></td></tr>'
-      +'<tr><td style="width:100%;vertical-align:middle;">'
+      +'<tbody><tr><td id="org-info-js_console-label" style="white-space:nowrap;padding:0px 0px 0px 0px;"></td></tr>'
+      +'<tr><td style="width:100%;vertical-align:middle;padding:0px 0px 0px 0px;">'
       +'<input type="text" id="org-info-js_console-input" onkeydown="org_html_manager.getKey();"'
-      +' onclick="this.select();" maxlength="150" style="width:100%;"'
-      +' value=""/></td></tr></tbody></table></td><td>&#160;</td></tr></tbody></table>'
+      +' onclick="this.select();" maxlength="150" style="width:100%;padding:0px;margin:0px 0px 0px 0px;border-style:none;"'
+      +' value=""/></td></tr></tbody></table></td><td style="padding:0px 0px 0px 0px;">&#160;</td></tr></tbody></table>'
       +'</form>';
     this.CONSOLE.style.position = 'relative';
     this.CONSOLE.style.marginTop =  "-" + this.CONSOLE_OFFSET;
