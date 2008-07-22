@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.6.8
+ *       org-info.js, v.0.0.6.9
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -28,7 +28,26 @@
  *  ]]> // comment around this one
  * </script>
  *
+ *
+ * The script is now roughly devided in sections by form-feeds. Editors can
+ * move section wise using the common emacs commands for this purpos ('M-x ]'
+ * and  'M-x ]').
+ *
+ * The sections are:
+ *    1. This comment block.
+ *    2. Everything around =OrgNodes=.
+ *    3. =org_html_manager= constructor and setup.
+ *    4. =org_html_manager= folding and view related stuff.
+ *    5. =org_html_manager= history related methods.
+ *    6. =org_html_manager= minibuffer handling.
+ *    7. =org_html_manager= user input.
+ *    8. =org_html_manager= search functonality.
+ *    9. =org_html_manager= misc.
+ *    10. Global functions.
  */
+
+
+
 
 
 /**
@@ -252,6 +271,8 @@ OrgNode.prototype.setState = function (state)
   this.state = state;
 };
 
+
+
 
 
 /**
@@ -793,6 +814,53 @@ var org_html_manager = {
     }
   },
 
+  /**
+   * Execute arbitrary JavaScript code. Used for configuration.
+   */
+  set: function (eval_key, eval_val)
+  {
+    if("VIEW" == eval_key) {
+      var overview = this.PLAIN_VIEW;
+      var content = this.CONTENT_VIEW;
+      var showall = this.ALL_VIEW;
+      var info = this.INFO_VIEW;
+      eval("this."+eval_key+"="+eval_val+";");
+      return;
+    }
+
+    if(eval_val)
+      eval("this."+eval_key+"='"+eval_val+"';");
+    else
+      eval("this."+eval_key+"=0;");
+  },
+
+  convertLinks: function ()
+  {
+    var i = (this.HIDE_TOC ? 0 : 1);
+    for(i; i < this.SECS.length; ++i)
+      {
+        if(this.SECS[i].folder)
+          {
+            var links = this.SECS[i].folder.getElementsByTagName("a");
+
+            for(var j=0; j<links.length; ++j) {
+              var href = links[j].href.replace(this.BASE_URL, '');
+              if(0 == href.indexOf('#') && links[j].href.match(this.REGEX)) {
+                var matches = this.EXCHANGE.exec(href);
+                if(matches) {
+                  var id = matches[1].substr(4);
+                  // could use quicksort like search here:
+                  for(var k = 0; k < this.SECS.length; ++k) {
+                    if(this.SECS[k].base_id == id) {
+                      links[j].href="javascript:org_html_manager.navigateTo("+k+")";
+                      break;
+                    }}}}}}}
+  },
+
+
+
+
+
   showSection: function (sec)
   {
     var section = parseInt(sec);
@@ -844,7 +912,6 @@ var org_html_manager = {
         }
     }
   },
-
 
   plainView: function (sec)
   {
@@ -898,47 +965,189 @@ var org_html_manager = {
     if(this.INPUT_FIELD) this.INPUT_FIELD.focus();
   },
 
-  highlight_headline: function(h)
+  toggleGlobaly: function ()
   {
-    var i = parseInt(h);
-    if(this.PLAIN_VIEW == this.VIEW && this.MOUSE_HINT) {
-      if('underline' == this.MOUSE_HINT)
-        this.SECS[i].heading.style.borderBottom = "1px dashed #666666";
-      else
-        this.SECS[i].heading.style.backgroundColor = this.MOUSE_HINT;
+    if(this.ROOT.durty) {
+      this.ROOT.state = OrgNode.STATE_UNFOLDED;
     }
+
+    if(OrgNode.STATE_UNFOLDED == this.ROOT.state) {
+      for(var i=0;i<this.ROOT.children.length;++i) {
+        // Pretend they are unfolded. They will toggle to FOLDED then:
+        this.ROOT.children[i].state = OrgNode.STATE_UNFOLDED;
+        this.ROOT.children[i].fold(true);
+      }
+      this.ROOT.state = OrgNode.STATE_UNFOLDED;
+      this.ROOT.state = OrgNode.STATE_FOLDED;
+    }
+    else if(OrgNode.STATE_FOLDED == this.ROOT.state) {
+      for(var i=0;i<this.ROOT.children.length;++i)
+        this.ROOT.children[i].fold(true);
+      this.ROOT.state = OrgNode.STATE_HEADLINES;
+    }
+    else {
+      for(var i=0;i<this.ROOT.children.length;++i)
+        this.ROOT.children[i].fold();
+      this.ROOT.state = OrgNode.STATE_UNFOLDED;
+    }
+
+    // All this sets ROOT durty again. So clean it:
+    this.ROOT.durty = false;
   },
 
 
-  unhighlight_headline: function(h)
+
+
+
+  /**
+   * This one is just here, because we might want to push different than
+   * navigational commands on the history in the future. Is this true?
+   */
+  navigateTo: function (sec)
   {
-    var i = parseInt(h);
-    if('underline' == this.MOUSE_HINT) {
-      this.SECS[i].heading.style.borderBottom = "";
-    }
-    else
-      this.SECS[i].heading.style.backgroundColor = "";
+    if     (this.READING)   { this.endRead(); }
+    else if(this.MESSAGING) { this.removeWarning(); }
+    this.pushHistory(sec, this.NODE.idx);
+    this.showSection(sec);
   },
 
   /**
-   * Execute arbitrary JavaScript code. This one is used for configuration.
+   *  All undoable navigation commands should push the oposit here
    */
-  set: function (eval_key, eval_val)
+  pushHistory: function (command, undo)
   {
-    if("VIEW" == eval_key) {
-      var overview = this.PLAIN_VIEW;
-      var content = this.CONTENT_VIEW;
-      var showall = this.ALL_VIEW;
-      var info = this.INFO_VIEW;
-      eval("this."+eval_key+"="+eval_val+";");
-      return;
+    if(! this.SKIP_HISTORY) {
+      this.HISTORY[this.HIST_INDEX] = new Array(command, undo);
+      this.HIST_INDEX = (this.HIST_INDEX + 1) % 50;
     }
-
-    if(eval_val)
-      eval("this."+eval_key+"='"+eval_val+"';");
-    else
-      eval("this."+eval_key+"=0;");
+    this.SKIP_HISTORY = false;
+    this.CONSOLE_INPUT.value = "";
   },
+
+ /**
+  * only 'b' and 'B' trigger this one
+  */
+  popHistory: function (foreward)
+  {
+    if(foreward) {
+      if(this.HISTORY[this.HIST_INDEX]) {
+        var s = parseInt(this.HISTORY[this.HIST_INDEX][0]);
+        if(! isNaN(s) || 'toc' == this.HISTORY[this.HIST_INDEX][0]) {
+          this.showSection(this.HISTORY[this.HIST_INDEX][0]);
+          this.CONSOLE_INPUT.value = "";
+        }
+        else {
+          this.SKIP_HISTORY = true;
+          this.CONSOLE_INPUT.value = this.HISTORY[this.HIST_INDEX][0];
+          this.getKey();
+        }
+        this.HIST_INDEX = (this.HIST_INDEX + 1) % 50;
+      }
+      else
+        this.warn("History: No where to foreward go from here.");
+    } else {
+      if(this.HISTORY[this.HIST_INDEX - 1]) {
+        this.HIST_INDEX = this.HIST_INDEX == 0 ? 49 : this.HIST_INDEX - 1;
+        var s = parseInt(this.HISTORY[this.HIST_INDEX][1]);
+        if(! isNaN(s) || 'toc' == this.HISTORY[this.HIST_INDEX][1]) {
+          this.showSection(this.HISTORY[this.HIST_INDEX][1]);
+          this.CONSOLE_INPUT.value = "";
+        }
+        else {
+          this.SKIP_HISTORY = true;
+          this.CONSOLE_INPUT.value = this.HISTORY[this.HIST_INDEX][1];
+          this.getKey();
+        }
+      }
+      else
+        this.warn("History: No where to back go from here.");
+    }
+  },
+
+
+
+
+
+  warn: function (what, harmless, value)
+  {
+    if(null == value) value = "";
+    this.CONSOLE_INPUT.value = value;
+    if(! harmless) this.CONSOLE_LABEL.style.color = "red";
+    this.CONSOLE_LABEL.innerHTML = "<span style='float:left;'>"+what +"</span>"+
+    "<span style='float:right;color:#aaaaaa;font-weight:normal;'>(press any key to proceed)</span>";
+    this.showConsole();
+    // wait until keyup was processed:
+    window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=value;}, 50);
+  },
+
+  startRead: function (command, label, value, shortcuts)
+  {
+    if(null == value) value = "";
+    if(null == shortcuts) shortcuts = "";
+    this.READ_COMMAND = command;
+    this.READING = true;
+    this.CONSOLE_LABEL.innerHTML = "<span style='float:left;'>"+label+"</span>"+
+    "<span style='float:right;color:#aaaaaa;font-weight:normal;'>("+shortcuts+"RET to close)</span>";
+    this.showConsole();
+    document.onkeypress=null;
+    this.CONSOLE_INPUT.focus();
+    this.CONSOLE_INPUT.onblur = function() {org_html_manager.CONSOLE_INPUT.focus();};
+    // wait until keyup was processed:
+    window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=value;}, 50);
+  },
+
+  endRead: function (command, label)
+  {
+    this.READING = false;
+    this.READ_COMMAND = "";
+    this.CONSOLE_INPUT.onblur = null;
+    this.CONSOLE_INPUT.blur();
+    document.onkeypress=OrgHtmlManagerKeyEvent;
+    // this.hideConsole();
+  },
+
+  removeWarning: function()
+  {
+    this.CONSOLE_LABEL.style.color = "#333333";
+    this.hideConsole();
+  },
+
+  showConsole: function()
+  {
+    if(!this.MESSAGING) {
+      if(this.VIEW != this.INFO_VIEW) {
+        // Maybe clone the CONSOLE?
+        document.body.removeChild(document.body.firstChild);
+        this.NODE.div.insertBefore(this.CONSOLE, this.NODE.div.firstChild);
+        this.NODE.div.scrollIntoView(true);
+        this.MESSAGING = this.MESSAGING_INPLACE;
+      } else {
+        this.MESSAGING = this.MESSAGING_TOP;
+        window.scrollTo(0, 0);
+      }
+      this.CONSOLE.style.marginTop = '0px';
+      this.CONSOLE.style.top = '0px';
+    }
+  },
+
+  hideConsole: function()
+  {
+    if(this.MESSAGING) {
+      this.CONSOLE.style.marginTop = "-" + this.CONSOLE_OFFSET;
+      this.CONSOLE.style.top = "-" + this.CONSOLE_OFFSET;
+      this.CONSOLE_LABEL.innerHTML = "";
+      this.CONSOLE_INPUT.value = "";
+      if(this.MESSAGING_INPLACE == this.MESSAGING) {
+        this.NODE.div.removeChild(this.NODE.div.firstChild);
+        document.body.insertBefore(this.CONSOLE, document.body.firstChild);
+        if(this.NODE.idx != 0) this.NODE.div.scrollIntoView();
+      }
+      this.MESSAGING = false;
+    }
+  },
+
+
+
 
 
   /**
@@ -948,7 +1157,10 @@ var org_html_manager = {
   {
     var s = this.CONSOLE_INPUT.value;
     // return, if s is empty:
-    if(0 == s.length) return;
+    if(0 == s.length) {
+      if(this.MESSAGING && !this.READING) this.removeWarning();
+        return;
+    }
 
     // the easiest is to just drop everything and clean the console.
     // User has to retype again.
@@ -1157,283 +1369,6 @@ var org_html_manager = {
     return true;
   },
 
-  warn: function (what, harmless, value)
-  {
-    if(null == value) value = "";
-    this.CONSOLE_INPUT.value = value;
-    if(! harmless) this.CONSOLE_LABEL.style.color = "red";
-    this.CONSOLE_LABEL.innerHTML = "<span style='float:left;'>"+what +"</span>"+
-    "<span style='float:right;color:#aaaaaa;font-weight:normal;'>(press any key to proceed)</span>";
-    this.showConsole();
-    // wait until keyup was processed:
-    window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=value;}, 50);
-  },
-
-  startRead: function (command, label, value, shortcuts)
-  {
-    if(null == value) value = "";
-    if(null == shortcuts) shortcuts = "";
-    this.READ_COMMAND = command;
-    this.READING = true;
-    this.CONSOLE_LABEL.innerHTML = "<span style='float:left;'>"+label+"</span>"+
-    "<span style='float:right;color:#aaaaaa;font-weight:normal;'>("+shortcuts+"RET to close)</span>";
-    this.showConsole();
-    document.onkeypress=null;
-    this.CONSOLE_INPUT.focus();
-    this.CONSOLE_INPUT.onblur = function() {org_html_manager.CONSOLE_INPUT.focus();};
-    // wait until keyup was processed:
-    window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.value=value;}, 50);
-  },
-
-  endRead: function (command, label)
-  {
-    this.READING = false;
-    this.READ_COMMAND = "";
-    this.CONSOLE_INPUT.onblur = null;
-    this.CONSOLE_INPUT.blur();
-    document.onkeypress=OrgHtmlManagerKeyEvent;
-    // this.hideConsole();
-  },
-
-  removeWarning: function()
-  {
-    this.CONSOLE_LABEL.style.color = "#333333";
-    this.hideConsole();
-  },
-
-  showConsole: function()
-  {
-    if(!this.MESSAGING) {
-      if(this.VIEW != this.INFO_VIEW) {
-        // Maybe clone the CONSOLE?
-        document.body.removeChild(document.body.firstChild);
-        this.NODE.div.insertBefore(this.CONSOLE, this.NODE.div.firstChild);
-        this.NODE.div.scrollIntoView(true);
-        this.MESSAGING = this.MESSAGING_INPLACE;
-      } else {
-        this.MESSAGING = this.MESSAGING_TOP;
-        window.scrollTo(0, 0);
-      }
-      this.CONSOLE.style.marginTop = '0px';
-      this.CONSOLE.style.top = '0px';
-    }
-  },
-
-  hideConsole: function()
-  {
-    if(this.MESSAGING) {
-      this.CONSOLE.style.marginTop = "-" + this.CONSOLE_OFFSET;
-      this.CONSOLE.style.top = "-" + this.CONSOLE_OFFSET;
-      this.CONSOLE_LABEL.innerHTML = "";
-      this.CONSOLE_INPUT.value = "";
-      if(this.MESSAGING_INPLACE == this.MESSAGING) {
-        this.NODE.div.removeChild(this.NODE.div.firstChild);
-        document.body.insertBefore(this.CONSOLE, document.body.firstChild);
-        if(this.NODE.idx != 0) this.NODE.div.scrollIntoView();
-      }
-      this.MESSAGING = false;
-    }
-  },
-
-  toggleGlobaly: function ()
-  {
-    if(this.ROOT.durty) {
-      this.ROOT.state = OrgNode.STATE_UNFOLDED;
-    }
-
-    if(OrgNode.STATE_UNFOLDED == this.ROOT.state) {
-      for(var i=0;i<this.ROOT.children.length;++i) {
-        // Pretend they are unfolded. They will toggle to FOLDED then:
-        this.ROOT.children[i].state = OrgNode.STATE_UNFOLDED;
-        this.ROOT.children[i].fold(true);
-      }
-      this.ROOT.state = OrgNode.STATE_UNFOLDED;
-      this.ROOT.state = OrgNode.STATE_FOLDED;
-    }
-    else if(OrgNode.STATE_FOLDED == this.ROOT.state) {
-      for(var i=0;i<this.ROOT.children.length;++i)
-        this.ROOT.children[i].fold(true);
-      this.ROOT.state = OrgNode.STATE_HEADLINES;
-    }
-    else {
-      for(var i=0;i<this.ROOT.children.length;++i)
-        this.ROOT.children[i].fold();
-      this.ROOT.state = OrgNode.STATE_UNFOLDED;
-    }
-
-    // All this sets ROOT durty again. So clean it:
-    this.ROOT.durty = false;
-  },
-
-
-  showHelp: function ()
-  {
-      /* This is an OrgMode version of the table. Turn on orgtbl-mode in
-         this buffer, edit the table, then press C-c C-c with the cursor
-         in the table.  The table will then be translated an inserted below.
-#+ORGTBL: SEND Shortcuts orgtbl-to-generic :splice t :skip 2 :lstart "\t+'<tr>" :lend "</tr>'" :fmt (1 "<td><code><b>%s</b></code></td>" 2 "<td>%s</td>") :hline "\t+'</tbody><tbody>'"
-      | Key          | Function                                                             |
-      |--------------+----------------------------------------------------------------------|
-      | ? / &iquest; | show this help screen                                                |
-      |--------------+----------------------------------------------------------------------|
-      |              | <b>Moving around</b>                                                 |
-      | n / p        | goto the next / previous section                                     |
-      | t / E        | goto the first / last section                                        |
-      | g            | goto section...                                                      |
-      | u            | go one level up (parent section)                                     |
-      | i            | show table of contents                                               |
-      | b / B        | go back to last / forward to next visited section.                   |
-      | h / H        | go to main index in this directory / link HOME page                  |
-      |--------------+----------------------------------------------------------------------|
-      |              | <b>View</b>                                                          |
-      | m            | toggle the view mode between info and plain                          |
-      | f / F        | fold current section / whole document (plain view only)              |
-      |--------------+----------------------------------------------------------------------|
-      |              | <b>Searching</b>                                                     |
-      | s / r        | search forward / backward....                                        |
-      | S / R        | search again forward / backward                                      |
-      | o            | occur-mode                                                           |
-      |--------------+----------------------------------------------------------------------|
-      |              | <b>Misc</b>                                                          |
-      | l / L        | display HTML link / Org link                                         |
-      | v / V        | scroll down / up                                                     |
-      */
-    this.HELPING = this.HELPING ? 0 : 1;
-    if (this.HELPING) {
-      this.last_view_mode = this.VIEW;
-      this.infoView(true);
-      this.WINDOW.innerHTML = 'Press any key to proceed.<h2>Keyboard Shortcuts</h2>'
-        +'<table cellpadding="3" rules="groups" frame="hsides" style="margin:20px;border-style:none;" border="0";>'
-	+'<tbody>'
-      // BEGIN RECEIVE ORGTBL Shortcuts
-	+'<tr><td><code><b>? / &iquest;</b></code></td><td>show this help screen</td></tr>'
-	+'</tbody><tbody>'
-	+'<tr><td><code><b></b></code></td><td><b>Moving around</b></td></tr>'
-	+'<tr><td><code><b>n / p</b></code></td><td>goto the next / previous section</td></tr>'
-	+'<tr><td><code><b>t / E</b></code></td><td>goto the first / last section</td></tr>'
-	+'<tr><td><code><b>g</b></code></td><td>goto section...</td></tr>'
-	+'<tr><td><code><b>u</b></code></td><td>go one level up (parent section)</td></tr>'
-	+'<tr><td><code><b>i</b></code></td><td>show table of contents</td></tr>'
-	+'<tr><td><code><b>b / B</b></code></td><td>go back to last / forward to next visited section.</td></tr>'
-	+'<tr><td><code><b>h / H</b></code></td><td>go to main index in this directory / link HOME page</td></tr>'
-	+'</tbody><tbody>'
-	+'<tr><td><code><b></b></code></td><td><b>View</b></td></tr>'
-	+'<tr><td><code><b>m</b></code></td><td>toggle the view mode between info and plain</td></tr>'
-	+'<tr><td><code><b>f / F</b></code></td><td>fold current section / whole document (plain view only)</td></tr>'
-	+'</tbody><tbody>'
-	+'<tr><td><code><b></b></code></td><td><b>Searching</b></td></tr>'
-	+'<tr><td><code><b>s / r</b></code></td><td>search forward / backward....</td></tr>'
-	+'<tr><td><code><b>S / R</b></code></td><td>search again forward / backward</td></tr>'
-	+'<tr><td><code><b>o</b></code></td><td>occur-mode</td></tr>'
-	+'</tbody><tbody>'
-	+'<tr><td><code><b></b></code></td><td><b>Misc</b></td></tr>'
-	+'<tr><td><code><b>l / L</b></code></td><td>display HTML link / Org link</td></tr>'
-	+'<tr><td><code><b>v / V</b></code></td><td>scroll down / up</td></tr>'
-      // END RECEIVE ORGTBL Shortcuts
-       +'</tbody>'
-       +'</table><br />Press any key to proceed.';
-      window.scrollTo(0, 0);
-    }
-    else {
-      if(this.PLAIN_VIEW == this.last_view_mode) {
-        this.plainView();
-      }
-      this.showSection(this.NODE.idx);
-    }
-  },
-
-
-  convertLinks: function ()
-  {
-    var i = (this.HIDE_TOC ? 0 : 1);
-    for(i; i < this.SECS.length; ++i)
-      {
-        if(this.SECS[i].folder)
-          {
-            var links = this.SECS[i].folder.getElementsByTagName("a");
-
-            for(var j=0; j<links.length; ++j) {
-              var href = links[j].href.replace(this.BASE_URL, '');
-              if(0 == href.indexOf('#') && links[j].href.match(this.REGEX)) {
-                var matches = this.EXCHANGE.exec(href);
-                if(matches) {
-                  var id = matches[1].substr(4);
-                  // could use quicksort like search here:
-                  for(var k = 0; k < this.SECS.length; ++k) {
-                    if(this.SECS[k].base_id == id) {
-                      links[j].href="javascript:org_html_manager.navigateTo("+k+")";
-                      break;
-                    }}}}}}}
-  },
-
-
-  /**
-   * This one is just here, because we might want to push different than
-   * navigational commands on the history in the future. Is this true?
-   */
-  navigateTo: function (sec)
-  {
-    if     (this.READING)   { this.endRead(); }
-    else if(this.MESSAGING) { this.removeWarning(); }
-    this.pushHistory(sec, this.NODE.idx);
-    this.showSection(sec);
-  },
-
-
-  /**
-   *  All undoable navigation commands should push the oposit here
-   */
-  pushHistory: function (command, undo)
-  {
-    if(! this.SKIP_HISTORY) {
-      this.HISTORY[this.HIST_INDEX] = new Array(command, undo);
-      this.HIST_INDEX = (this.HIST_INDEX + 1) % 50;
-    }
-    this.SKIP_HISTORY = false;
-    this.CONSOLE_INPUT.value = "";
-  },
-
-
- /**
-  * only 'b' and 'B' trigger this one
-  */
-  popHistory: function (foreward)
-  {
-    if(foreward) {
-      if(this.HISTORY[this.HIST_INDEX]) {
-        var s = parseInt(this.HISTORY[this.HIST_INDEX][0]);
-        if(! isNaN(s) || 'toc' == this.HISTORY[this.HIST_INDEX][0]) {
-          this.showSection(this.HISTORY[this.HIST_INDEX][0]);
-          this.CONSOLE_INPUT.value = "";
-        }
-        else {
-          this.SKIP_HISTORY = true;
-          this.CONSOLE_INPUT.value = this.HISTORY[this.HIST_INDEX][0];
-          this.getKey();
-        }
-        this.HIST_INDEX = (this.HIST_INDEX + 1) % 50;
-      }
-      else
-        this.warn("History: No where to foreward go from here.");
-    } else {
-      if(this.HISTORY[this.HIST_INDEX - 1]) {
-        this.HIST_INDEX = this.HIST_INDEX == 0 ? 49 : this.HIST_INDEX - 1;
-        var s = parseInt(this.HISTORY[this.HIST_INDEX][1]);
-        if(! isNaN(s) || 'toc' == this.HISTORY[this.HIST_INDEX][1]) {
-          this.showSection(this.HISTORY[this.HIST_INDEX][1]);
-          this.CONSOLE_INPUT.value = "";
-        }
-        else {
-          this.SKIP_HISTORY = true;
-          this.CONSOLE_INPUT.value = this.HISTORY[this.HIST_INDEX][1];
-          this.getKey();
-        }
-      }
-      else
-        this.warn("History: No where to back go from here.");
-    }
-  },
-
   /**
    * Please return, if you want the minibuffer to stay on screen.
    * Remember to call this.endRead()!
@@ -1605,6 +1540,10 @@ var org_html_manager = {
 
   },
 
+
+
+
+
   makeSearchRegexp: function()
   {
     var tmp = this.OCCUR.replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/=/g, "\\=").replace(/\\/g, "\\\\").replace(/\?/g, "\\?").replace(/\*/g, "\\*").replace(/\+/g, "\\+").replace(/\"/g, "&quot;");
@@ -1655,9 +1594,113 @@ var org_html_manager = {
       }
     }
     this.SEARCH_HIGHLIGHT_ON = false;
+  },
+
+
+
+
+
+  highlight_headline: function(h)
+  {
+    var i = parseInt(h);
+    if(this.PLAIN_VIEW == this.VIEW && this.MOUSE_HINT) {
+      if('underline' == this.MOUSE_HINT)
+        this.SECS[i].heading.style.borderBottom = "1px dashed #666666";
+      else
+        this.SECS[i].heading.style.backgroundColor = this.MOUSE_HINT;
+    }
+  },
+
+  unhighlight_headline: function(h)
+  {
+    var i = parseInt(h);
+    if('underline' == this.MOUSE_HINT) {
+      this.SECS[i].heading.style.borderBottom = "";
+    }
+    else
+      this.SECS[i].heading.style.backgroundColor = "";
+  },
+
+  showHelp: function ()
+  {
+      /* This is an OrgMode version of the table. Turn on orgtbl-mode in
+         this buffer, edit the table, then press C-c C-c with the cursor
+         in the table.  The table will then be translated an inserted below.
+#+ORGTBL: SEND Shortcuts orgtbl-to-generic :splice t :skip 2 :lstart "\t+'<tr>" :lend "</tr>'" :fmt (1 "<td><code><b>%s</b></code></td>" 2 "<td>%s</td>") :hline "\t+'</tbody><tbody>'"
+      | Key          | Function                                                             |
+      |--------------+----------------------------------------------------------------------|
+      | ? / &iquest; | show this help screen                                                |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>Moving around</b>                                                 |
+      | n / p        | goto the next / previous section                                     |
+      | t / E        | goto the first / last section                                        |
+      | g            | goto section...                                                      |
+      | u            | go one level up (parent section)                                     |
+      | i            | show table of contents                                               |
+      | b / B        | go back to last / forward to next visited section.                   |
+      | h / H        | go to main index in this directory / link HOME page                  |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>View</b>                                                          |
+      | m            | toggle the view mode between info and plain                          |
+      | f / F        | fold current section / whole document (plain view only)              |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>Searching</b>                                                     |
+      | s / r        | search forward / backward....                                        |
+      | S / R        | search again forward / backward                                      |
+      | o            | occur-mode                                                           |
+      |--------------+----------------------------------------------------------------------|
+      |              | <b>Misc</b>                                                          |
+      | l / L        | display HTML link / Org link                                         |
+      | v / V        | scroll down / up                                                     |
+      */
+    this.HELPING = this.HELPING ? 0 : 1;
+    if (this.HELPING) {
+      this.last_view_mode = this.VIEW;
+      this.infoView(true);
+      this.WINDOW.innerHTML = 'Press any key to proceed.<h2>Keyboard Shortcuts</h2>'
+        +'<table cellpadding="3" rules="groups" frame="hsides" style="margin:20px;border-style:none;" border="0";>'
+	+'<tbody>'
+      // BEGIN RECEIVE ORGTBL Shortcuts
+	+'<tr><td><code><b>? / &iquest;</b></code></td><td>show this help screen</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>Moving around</b></td></tr>'
+	+'<tr><td><code><b>n / p</b></code></td><td>goto the next / previous section</td></tr>'
+	+'<tr><td><code><b>t / E</b></code></td><td>goto the first / last section</td></tr>'
+	+'<tr><td><code><b>g</b></code></td><td>goto section...</td></tr>'
+	+'<tr><td><code><b>u</b></code></td><td>go one level up (parent section)</td></tr>'
+	+'<tr><td><code><b>i</b></code></td><td>show table of contents</td></tr>'
+	+'<tr><td><code><b>b / B</b></code></td><td>go back to last / forward to next visited section.</td></tr>'
+	+'<tr><td><code><b>h / H</b></code></td><td>go to main index in this directory / link HOME page</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>View</b></td></tr>'
+	+'<tr><td><code><b>m</b></code></td><td>toggle the view mode between info and plain</td></tr>'
+	+'<tr><td><code><b>f / F</b></code></td><td>fold current section / whole document (plain view only)</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>Searching</b></td></tr>'
+	+'<tr><td><code><b>s / r</b></code></td><td>search forward / backward....</td></tr>'
+	+'<tr><td><code><b>S / R</b></code></td><td>search again forward / backward</td></tr>'
+	+'<tr><td><code><b>o</b></code></td><td>occur-mode</td></tr>'
+	+'</tbody><tbody>'
+	+'<tr><td><code><b></b></code></td><td><b>Misc</b></td></tr>'
+	+'<tr><td><code><b>l / L</b></code></td><td>display HTML link / Org link</td></tr>'
+	+'<tr><td><code><b>v / V</b></code></td><td>scroll down / up</td></tr>'
+      // END RECEIVE ORGTBL Shortcuts
+       +'</tbody>'
+       +'</table><br />Press any key to proceed.';
+      window.scrollTo(0, 0);
+    }
+    else {
+      if(this.PLAIN_VIEW == this.last_view_mode) {
+        this.plainView();
+      }
+      this.showSection(this.NODE.idx);
+    }
   }
 
 };
+
+
+
 
 
 function OrgHtmlManagerKeyEvent (e)
