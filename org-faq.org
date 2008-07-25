@@ -1,4 +1,4 @@
-o#+STARTUP:   overview
+#+STARTUP:   overview
 #+OPTIONS:   H:2 num:t toc:t \n:nil @:t ::t |:t ^:t *:t TeX:t
 #+EMAIL:     carsten.dominik@gmail.com
 #+AUTHOR:    Worg people
@@ -8,6 +8,57 @@ o#+STARTUP:   overview
 #+OPTIONS:   H:3 num:nil toc:t \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
 
 * General
+
+** How do I keep current with Org mode development?
+
+   Org mode is developed in [[http://en.wikipedia.org/wiki/Git_(software)][Git]].  You can keep up-to-date with Org
+   mode developement by cloning Org mode repository and refreshing
+   your copy with latest changes whenever you wish.  You only need to
+   use two Git commands (clone and pull.)  Here are the steps in
+   brief (please customize locations to suit your setup):
+
+   1. Select a location to house the Org mode repository (approx. 115
+      MB; includes documentation, compiled elisp files and history
+      going all the way back to v4.12a)
+
+      =$ mkdir $HOME/elisp && cd $HOME/elisp=
+
+   2. Clone the Org mode Git repository.
+
+      Recommended approach:
+
+      =$ git clone git://repo.or.cz/org-mode.git org-mode.git=
+
+      Alternate approach if you are behind a firewall that allows only
+      HTTP (can be quite slow):
+
+      =$ git clone http://repo.or.cz/r/org-mode.git org-mode.git=
+
+   3. Compile and install Org mode and build documentation.
+
+      =$ cd org-mode.git && make && make doc && make install=
+
+      Please note that you can choose to /not/ compile at all and run
+      using source =.el= files only.  Compiled files speed things up.
+
+   4. This is where you configure Org mode with Emacs.  Please refer
+      to [[./org-tutorials/index.org][Org tutorials]].
+
+   5. Keeping up-to-date.
+
+      Cloning the repository is a one time activity.  From this point
+      onwards you only need to /pull/ the latest changes.
+
+      =$ cd $HOME/elisp/org-mode.git=
+
+      and then
+
+      =$ git pull && make clean && make && make doc && make install=
+
+   6. You should restart org mode to have the changes take effect (if
+      you are not rebooting Emacs.)  Also since the intention is to
+      "keep up" with Org mode, you should visit ChangeLog and updated
+      sections of documentation for latest updates (use =git log=.)
 
 ** What is the difference between Org and TaskPaper?
 
@@ -165,55 +216,6 @@ mode using
    further calls to =org-occur= to keep the current visibility and
    highlighting in addition to the new ones.
 
-** How do I keep current with Org mode development?
-
-   Org mode is developed in [[http://en.wikipedia.org/wiki/Git_(software)][Git]].  You can keep up-to-date with Org
-   mode developement by cloning Org mode repository and refreshing
-   your copy with latest changes whenever you wish.  You only need to
-   use two Git commands (clone and pull.)  Here are the steps in
-   brief (please customize locations to suit your setup):
-
-   1. Select a location to house the Org mode repository (approx. 115
-      MB; includes documentation, compiled elisp files and history
-      going all the way back to v4.12a)
-
-      =$ mkdir $HOME/elisp && cd $HOME/elisp=
-
-   2. Clone the Org mode Git repository.
-
-      Recommended approach:
-
-      =$ git clone git://repo.or.cz/org-mode.git org-mode.git=
-
-      Alternate approach if you are behind a firewall that allows only
-      HTTP (can be quite slow):
-
-      =$ git clone http://repo.or.cz/r/org-mode.git org-mode.git=
-
-   3. Compile and install Org mode and build documentation.
-
-      =$ cd org-mode.git && make && make doc && make install=
-
-      Please note that you can choose to /not/ compile at all and run
-      using source =.el= files only.  Compiled files speed things up.
-
-   4. This is where you configure Org mode with Emacs.  Please refer
-      to [[http://orgmode.org/worg/org-tutorials/index.php][Org tutorials]].
-
-   5. Keeping up-to-date.
-
-      Cloning the repository is a one time activity.  From this point
-      onwards you only need to /pull/ the latest changes.
-
-      =$ cd $HOME/elisp/org-mode.git=
-
-      then
-
-      =$ git pull && make clean && make && make doc && make install=
-
-   6. You may need to restart org mode to have the changes take effect
-      (if you are not rebooting Emacs.)
-      
 * Hyperlinks
 
 ** Why do I have to confirm the execution of each shell/elisp link?
