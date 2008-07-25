@@ -298,7 +298,7 @@ var org_html_manager = {
   WINDOW_BORDER: false,        // Draw a border aroung info window
   HIDE_TOC: false,             // Hide the table of contents.
   TOC_DEPTH: 0,                // Level to cut the table of contents. No cutting if 0.
-  STARTUP_MESSAGE: true,       // Show info at startup?
+  STARTUP_MESSAGE: 0,          // Show info at startup?
 
   // Private
   BASE_URL: document.URL,      // URL without '#sec-x.y.z'
@@ -376,6 +376,7 @@ var org_html_manager = {
           case 'TOC':
           case 'TOC_DEPTH':
           case 'MOUSE_HINT':
+          case 'HELP':
           case 'VIEW':
           case 'HIDE_TOC':
           case 'LOCAL_TOC':
@@ -828,6 +829,8 @@ var org_html_manager = {
       eval("this."+eval_key+"="+eval_val+";");
       return;
     }
+    else if("HELP" == eval_key)
+      eval("this.STARTUP_MESSAGE="+eval_val+";");
 
     if(eval_val)
       eval("this."+eval_key+"='"+eval_val+"';");
