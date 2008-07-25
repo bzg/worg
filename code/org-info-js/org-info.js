@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.6.9
+ *       org-info.js, v.0.0.7.0
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
