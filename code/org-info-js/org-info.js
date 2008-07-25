@@ -298,7 +298,7 @@ var org_html_manager = {
   WINDOW_BORDER: false,        // Draw a border aroung info window
   HIDE_TOC: false,             // Hide the table of contents.
   TOC_DEPTH: 0,                // Level to cut the table of contents. No cutting if 0.
-  STARTUP_MESSAGE: true,       // Show info at startup?
+  STARTUP_MESSAGE: 0,          // Show info at startup?
 
   // Private
   BASE_URL: document.URL,      // URL without '#sec-x.y.z'
@@ -376,6 +376,7 @@ var org_html_manager = {
           case 'TOC':
           case 'TOC_DEPTH':
           case 'MOUSE_HINT':
+          case 'HELP':
           case 'VIEW':
           case 'HIDE_TOC':
           case 'LOCAL_TOC':
@@ -400,8 +401,9 @@ var org_html_manager = {
     else this.FIXED_TOC = false;
 
     this.LINKS +=
-    ((this.LINK_UP && this.LINK_UP != document.URL) ? '<a href="'+this.LINK_UP+'">Up</a> / ' : "")
-      + ((this.LINK_HOME && this.LINK_HOME != document.URL) ? '<a href="'+this.LINK_HOME+'">HOME</a> / ' : "");
+    ((this.LINK_UP && this.LINK_UP != document.URL) ? '<a href="'+this.LINK_UP+'">Up</a> / ' : "") +
+    ((this.LINK_HOME && this.LINK_HOME != document.URL) ? '<a href="'+this.LINK_HOME+'">HOME</a> / ' : "") +
+    '<a onclick="org_html_manager.showHelp();">HELP</a> / ';
 
     this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", 50);
   },
@@ -827,6 +829,8 @@ var org_html_manager = {
       eval("this."+eval_key+"="+eval_val+";");
       return;
     }
+    else if("HELP" == eval_key)
+      eval("this.STARTUP_MESSAGE="+eval_val+";");
 
     if(eval_val)
       eval("this."+eval_key+"='"+eval_val+"';");
@@ -1300,7 +1304,7 @@ var org_html_manager = {
             this.startRead(this.READ_COMMAND_HTML_LINK, "Choose HTML-link type: 's' = section, 'o' = occur");
           } else {
             this.startRead(s, "HTML-link:",
-                           '<a href="' + this.BASE_URL + "#" + this.NODE.base_id + '">' +
+                           '<a href="' + this.BASE_URL + "#sec-" + this.NODE.base_id + '">' +
                            document.title + ", Sec. '" + this.removeTags(this.NODE.heading.innerHTML) + "'</a>",
                            "C-c to copy, ");
             window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
@@ -1312,7 +1316,7 @@ var org_html_manager = {
             this.startRead(this.READ_COMMAND_ORG_LINK, "Choose Org-link type: 's' = section, 'o' = occur");
           } else {
             this.startRead(s, "Org-link:",
-                           '[[' + this.BASE_URL + "#" + this.NODE.base_id + '][' +
+                           '[[' + this.BASE_URL + "#sec-" + this.NODE.base_id + '][' +
                            document.title + ", Sec. '" + this.removeTags(this.NODE.heading.innerHTML) + "']]",
                            "C-c to copy, ");
             window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
@@ -1366,7 +1370,7 @@ var org_html_manager = {
       }
 
     this.CONSOLE_INPUT.value = "";
-    return true;
+    return;
   },
 
   /**
@@ -1382,7 +1386,7 @@ var org_html_manager = {
 
     if("" == command || "" == result) {
       this.hideConsole();
-      return false;
+      return;
     }
 
     if(command == 'g') { // goto section
@@ -1504,7 +1508,7 @@ var org_html_manager = {
       var c = result.charAt(0);
       if('s' == c) {
         this.startRead(this.READ_COMMAND_NULL, "Org-link to this section:",
-                       '[[' + this.BASE_URL + "#" + this.NODE.base_id + '][' +
+                       '[[' + this.BASE_URL + "#sec-" + this.NODE.base_id + '][' +
                        document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "']]",
                        "C-c to copy, ");
         window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
@@ -1523,7 +1527,7 @@ var org_html_manager = {
       var c = result.charAt(0);
       if('s' == c) {
         this.startRead(this.READ_COMMAND_NULL, "HTML-link to this section:",
-                       '<a href="' + this.BASE_URL + "#" + this.NODE.base_id + '">' +
+                       '<a href="' + this.BASE_URL + "#sec-" + this.NODE.base_id + '">' +
                        document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "'</a>",
                        "C-c to copy, ");
         window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
@@ -1623,9 +1627,11 @@ var org_html_manager = {
 
   showHelp: function ()
   {
-      /* This is an OrgMode version of the table. Turn on orgtbl-mode in
-         this buffer, edit the table, then press C-c C-c with the cursor
-         in the table.  The table will then be translated an inserted below.
+    if     (this.READING)   { this.endRead(); }
+    else if(this.MESSAGING) { this.removeWarning(); }
+    /* This is an OrgMode version of the table. Turn on orgtbl-mode in
+       this buffer, edit the table, then press C-c C-c with the cursor
+       in the table.  The table will then be translated an inserted below.
 #+ORGTBL: SEND Shortcuts orgtbl-to-generic :splice t :skip 2 :lstart "\t+'<tr>" :lend "</tr>'" :fmt (1 "<td><code><b>%s</b></code></td>" 2 "<td>%s</td>") :hline "\t+'</tbody><tbody>'"
       | Key          | Function                                                             |
       |--------------+----------------------------------------------------------------------|
@@ -1657,7 +1663,8 @@ var org_html_manager = {
     if (this.HELPING) {
       this.last_view_mode = this.VIEW;
       this.infoView(true);
-      this.WINDOW.innerHTML = 'Press any key to proceed.<h2>Keyboard Shortcuts</h2>'
+      this.WINDOW.innerHTML = 'Press any key or <a onclick="org_html_manager.showHelp();">click here</a> to proceed.'
+        +'<h2>Keyboard Shortcuts</h2>'
         +'<table cellpadding="3" rules="groups" frame="hsides" style="margin:20px;border-style:none;" border="0";>'
 	+'<tbody>'
       // BEGIN RECEIVE ORGTBL Shortcuts
@@ -1686,7 +1693,7 @@ var org_html_manager = {
 	+'<tr><td><code><b>v / V</b></code></td><td>scroll down / up</td></tr>'
       // END RECEIVE ORGTBL Shortcuts
        +'</tbody>'
-       +'</table><br />Press any key to proceed.';
+       +'</table><br />Press any key or <a onclick="org_html_manager.showHelp();">click here</a> to proceed.';
       window.scrollTo(0, 0);
     }
     else {
@@ -1710,11 +1717,10 @@ function OrgHtmlManagerKeyEvent (e)
   if (e.which) c = e.which;
   else if (e.keyCode) c = e.keyCode;
 
-  if(e.ctrlKey) // || e.modifiers & Event.CONTROL_MASK)
-    return;
+  if(e.ctrlKey) return;
 
   var s = String.fromCharCode(c);
-  if(e.shiftKey) // || e.modifiers & Event.SHIFT_MASK)
+  if(e.shiftKey)
     org_html_manager.CONSOLE_INPUT.value = org_html_manager.CONSOLE_INPUT.value + s;
   else
     org_html_manager.CONSOLE_INPUT.value = org_html_manager.CONSOLE_INPUT.value + s.toLowerCase();
