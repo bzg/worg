@@ -1504,7 +1504,7 @@ var org_html_manager = {
       var c = result.charAt(0);
       if('s' == c) {
         this.startRead(this.READ_COMMAND_NULL, "Org-link to this section:",
-                       '[[' + this.BASE_URL + "#" + this.NODE.base_id + '][' +
+                       '[[' + this.BASE_URL + "#sec-" + this.NODE.base_id + '][' +
                        document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "']]",
                        "C-c to copy, ");
         window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
@@ -1523,7 +1523,7 @@ var org_html_manager = {
       var c = result.charAt(0);
       if('s' == c) {
         this.startRead(this.READ_COMMAND_NULL, "HTML-link to this section:",
-                       '<a href="' + this.BASE_URL + "#" + this.NODE.base_id + '">' +
+                       '<a href="' + this.BASE_URL + "#sec-" + this.NODE.base_id + '">' +
                        document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "'</a>",
                        "C-c to copy, ");
         window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
