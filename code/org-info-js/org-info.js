@@ -483,14 +483,14 @@ var org_html_manager = {
 
     this.CONSOLE = document.createElement("div");
     this.CONSOLE.innerHTML = '<form action="" style="margin:0px;padding:0px;" onsubmit="org_html_manager.evalReadCommand(); return false;">'
-      +'<table id="org-info-js_console" style="width:100%;margin:0px 0px 0px 0px;" cellpadding="0" cellspacing="0" summary="minibuffer">'
-      +'<tbody><tr><td id="org-info-js_console-icon" style="padding:0px 0px 0px 0px;">&#160;</td><td style="width:100%;vertical-align:middle;padding:0px 0px 0px 0px;">'
-      +'<table style="width:100%;margin:0px 0px 0px 0px;" cellpadding="0" cellspacing="2">'
-      +'<tbody><tr><td id="org-info-js_console-label" style="white-space:nowrap;padding:0px 0px 0px 0px;"></td></tr>'
-      +'<tr><td style="width:100%;vertical-align:middle;padding:0px 0px 0px 0px;">'
+      +'<table id="org-info-js_console" style="width:100%;margin:0px 0px 0px 0px;border-style:none;" cellpadding="0" cellspacing="0" summary="minibuffer">'
+      +'<tbody><tr><td id="org-info-js_console-icon" style="padding:0px 0px 0px 0px;border-style:none;">&#160;</td><td style="width:100%;vertical-align:middle;padding:0px 0px 0px 0px;border-style:none;">'
+      +'<table style="width:100%;margin:0px 0px 0px 0px;border-style:none;" cellpadding="0" cellspacing="2">'
+      +'<tbody><tr><td id="org-info-js_console-label" style="white-space:nowrap;padding:0px 0px 0px 0px;border-style:none;"></td></tr>'
+      +'<tr><td style="width:100%;vertical-align:middle;padding:0px 0px 0px 0px;border-style:none;">'
       +'<input type="text" id="org-info-js_console-input" onkeydown="org_html_manager.getKey();"'
       +' onclick="this.select();" maxlength="150" style="width:100%;padding:0px;margin:0px 0px 0px 0px;border-style:none;"'
-      +' value=""/></td></tr></tbody></table></td><td style="padding:0px 0px 0px 0px;">&#160;</td></tr></tbody></table>'
+      +' value=""/></td></tr></tbody></table></td><td style="padding:0px 0px 0px 0px;border-style:none;">&#160;</td></tr></tbody></table>'
       +'</form>';
     this.CONSOLE.style.position = 'relative';
     this.CONSOLE.style.marginTop =  "-" + this.CONSOLE_OFFSET;
@@ -1009,7 +1009,7 @@ var org_html_manager = {
    */
   navigateTo: function (sec)
   {
-    if     (this.READING)   { this.endRead(); }
+    if     (this.READING)   { this.endRead(); this.hideConsole(); }
     else if(this.MESSAGING) { this.removeWarning(); }
     this.pushHistory(sec, this.NODE.idx);
     this.showSection(sec);
@@ -1162,6 +1162,7 @@ var org_html_manager = {
     var s = this.CONSOLE_INPUT.value;
     // return, if s is empty:
     if(0 == s.length) {
+      if(this.HELPING) { this.showHelp(); return; }
       if(this.MESSAGING && !this.READING) this.removeWarning();
         return;
     }
@@ -1231,6 +1232,20 @@ var org_html_manager = {
             return;                          // rely on what happends if messaging
           }
         }
+        else if ('N' == s) {
+          if(this.NODE.idx < this.SECS.length - 1) {
+            var d = this.NODE.depth;
+            var idx = this.NODE.idx + 1;
+            while(idx < this.SECS.length - 1 && this.SECS[idx].depth >= d) {
+              if(this.SECS[idx].depth == d) {
+                this.navigateTo(idx);
+                return;
+              }
+              ++idx;
+            }
+          }
+          this.warn("No next sibling.");
+        }
         else if ('p' == s) {
           if(this.NODE.idx > 0) {
             this.navigateTo(this.NODE.idx - 1);
@@ -1239,6 +1254,20 @@ var org_html_manager = {
             this.warn("Already first section.");
             return;                          // rely on what happends if messaging
           }
+        }
+        else if ('P' == s) {
+          if(this.NODE.idx > 0) {
+            var d = this.NODE.depth;
+            var idx = this.NODE.idx - 1;
+            while(idx > 0 && this.SECS[idx].depth >= d) {
+              if(this.SECS[idx].depth == d) {
+                this.navigateTo(idx);
+                return;
+              }
+              --idx;
+            }
+          }
+          this.warn("No previous sibling.");
         }
         else if ('q' == s) {
           if(window.confirm("Really close this file?")) {
@@ -1633,31 +1662,32 @@ var org_html_manager = {
        this buffer, edit the table, then press C-c C-c with the cursor
        in the table.  The table will then be translated an inserted below.
 #+ORGTBL: SEND Shortcuts orgtbl-to-generic :splice t :skip 2 :lstart "\t+'<tr>" :lend "</tr>'" :fmt (1 "<td><code><b>%s</b></code></td>" 2 "<td>%s</td>") :hline "\t+'</tbody><tbody>'"
-      | Key          | Function                                                             |
-      |--------------+----------------------------------------------------------------------|
-      | ? / &iquest; | show this help screen                                                |
-      |--------------+----------------------------------------------------------------------|
-      |              | <b>Moving around</b>                                                 |
-      | n / p        | goto the next / previous section                                     |
-      | t / E        | goto the first / last section                                        |
-      | g            | goto section...                                                      |
-      | u            | go one level up (parent section)                                     |
-      | i            | show table of contents                                               |
-      | b / B        | go back to last / forward to next visited section.                   |
-      | h / H        | go to main index in this directory / link HOME page                  |
-      |--------------+----------------------------------------------------------------------|
-      |              | <b>View</b>                                                          |
-      | m            | toggle the view mode between info and plain                          |
-      | f / F        | fold current section / whole document (plain view only)              |
-      |--------------+----------------------------------------------------------------------|
-      |              | <b>Searching</b>                                                     |
-      | s / r        | search forward / backward....                                        |
-      | S / R        | search again forward / backward                                      |
-      | o            | occur-mode                                                           |
-      |--------------+----------------------------------------------------------------------|
-      |              | <b>Misc</b>                                                          |
-      | l / L        | display HTML link / Org link                                         |
-      | v / V        | scroll down / up                                                     |
+      | Key          | Function                                                |
+      |--------------+---------------------------------------------------------|
+      | ? / &iquest; | show this help screen                                   |
+      |--------------+---------------------------------------------------------|
+      |              | <b>Moving around</b>                                    |
+      | n / p        | goto the next / previous section                        |
+      | N / P        | goto the next / previous sibling                        |
+      | t / E        | goto the first / last section                           |
+      | g            | goto section...                                         |
+      | u            | go one level up (parent section)                        |
+      | i            | show table of contents                                  |
+      | b / B        | go back to last / forward to next visited section.      |
+      | h / H        | go to main index in this directory / link HOME page     |
+      |--------------+---------------------------------------------------------|
+      |              | <b>View</b>                                             |
+      | m            | toggle the view mode between info and plain             |
+      | f / F        | fold current section / whole document (plain view only) |
+      |--------------+---------------------------------------------------------|
+      |              | <b>Searching</b>                                        |
+      | s / r        | search forward / backward....                           |
+      | S / R        | search again forward / backward                         |
+      | o            | occur-mode                                              |
+      |--------------+---------------------------------------------------------|
+      |              | <b>Misc</b>                                             |
+      | l / L        | display HTML link / Org link                            |
+      | v / V        | scroll down / up                                        |
       */
     this.HELPING = this.HELPING ? 0 : 1;
     if (this.HELPING) {
@@ -1672,6 +1702,7 @@ var org_html_manager = {
 	+'</tbody><tbody>'
 	+'<tr><td><code><b></b></code></td><td><b>Moving around</b></td></tr>'
 	+'<tr><td><code><b>n / p</b></code></td><td>goto the next / previous section</td></tr>'
+	+'<tr><td><code><b>N / P</b></code></td><td>goto the next / previous sibling</td></tr>'
 	+'<tr><td><code><b>t / E</b></code></td><td>goto the first / last section</td></tr>'
 	+'<tr><td><code><b>g</b></code></td><td>goto section...</td></tr>'
 	+'<tr><td><code><b>u</b></code></td><td>go one level up (parent section)</td></tr>'
