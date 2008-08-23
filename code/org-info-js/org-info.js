@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.7.3
+ *       org-info.js, v.0.0.7.3a
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -468,6 +468,19 @@ var org_html_manager = {
     this.convertLinks(); // adjust internal links. BASE_URL has to be stripped.
 
     if(scanned_all) {
+
+      // Temporary FIX for missing P element if skip:nil
+      var b = document.getElementsByTagName('body')[0];
+      var n = b.firstChild;
+      if(3 == n.nodeType) { // IE has no ....
+        var neu = n.cloneNode(true);
+        var p = document.createElement("p");
+        p.id = "text-before-first-headline";
+        p.appendChild(neu);
+        b.replaceChild(p, n);
+      }
+      // END OF temporary FIX.
+
       if(this.VIEW == this.INFO_VIEW) {
         this.infoView(this.START_SECTION);
       }
@@ -1352,7 +1365,8 @@ var org_html_manager = {
           this.showHelp();
         }
         else if ('C' == s) {
-          this.showTagsIndex();
+          if(this.SORTED_TAGS.length) this.showTagsIndex();
+          else this.warn("No Tags found.");
         }
         else if ('H' == s && this.LINK_HOME) {
           window.document.location.href = this.LINK_HOME;
