@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.7.0
+ *       org-info.js, v.0.0.7.3
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -111,6 +111,17 @@ OrgNode.showElement = function (e)
   if(e) {
     e.style.display = 'block';
     e.style.visibility = 'visible';
+  }
+};
+
+OrgNode.toggleElement = function (e)
+{
+  if(e.style.display == 'none') {
+    e.style.display = 'block';
+    e.style.visibility = 'visible';
+  } else {
+    e.style.display = 'none';
+    e.style.visibility = 'hidden';
   }
 };
 
@@ -353,6 +364,9 @@ var org_html_manager = {
   last_view_mode:0,
   TAB_INDEX: 1000,             // Users could have defined tabindexes!
   SEARCH_HIGHLIGHT_ON: false,
+  TAGS: {},                    // Tags: {tag:[index,index2...],tag2:[index1,index2...]}
+  SORTED_TAGS: new Array(),    // Sorted tags
+  TAGS_INDEX: null,            // Caches the tags-index screen
 
   /**
    * Setup the OrgHtmlManager for scanning.
@@ -403,7 +417,7 @@ var org_html_manager = {
     this.LINKS +=
     ((this.LINK_UP && this.LINK_UP != document.URL) ? '<a href="'+this.LINK_UP+'">Up</a> / ' : "") +
     ((this.LINK_HOME && this.LINK_HOME != document.URL) ? '<a href="'+this.LINK_HOME+'">HOME</a> / ' : "") +
-    '<a onclick="org_html_manager.showHelp();">HELP</a> / ';
+    '<a href="javascript:org_html_manager.showHelp();">HELP</a> / ';
 
     this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", 50);
   },
@@ -725,6 +739,22 @@ var org_html_manager = {
         this.NODE = new OrgNode ( div, heading, link, depth, p.parent, id);
       }
       this.SECS.push(this.NODE);
+      // Prepare the tags-index:
+      var spans = heading.getElementsByTagName("span");
+      if(spans) {
+        for(var i = 0; i < spans.length; ++i) {
+          if(spans[i].className == "tag") {
+            var tags = spans[i].innerHTML.split("&nbsp;");
+            for(var j = 0; j < tags.length; ++j) {
+              if(! this.TAGS[tags[j]]) {
+                this.TAGS[tags[j]] = new Array();
+                this.SORTED_TAGS.push(tags[j]);
+              }
+              this.TAGS[tags[j]].push(sec);
+            }
+          }
+        }
+      }
       this.NODE.hide();
       return (link);
     }
@@ -814,6 +844,8 @@ var org_html_manager = {
         (navi2, this.SECS[i].div.getElementsByTagName("h"+this.SECS[i].depth)[0].nextSibling);
       }
     }
+    // Setup the Tags for sorted output:
+    this.SORTED_TAGS.sort();
   },
 
   /**
@@ -1319,6 +1351,9 @@ var org_html_manager = {
         else if ('?' == s || '¿' == s) {
           this.showHelp();
         }
+        else if ('C' == s) {
+          this.showTagsIndex();
+        }
         else if ('H' == s && this.LINK_HOME) {
           window.document.location.href = this.LINK_HOME;
         }
@@ -1672,7 +1707,7 @@ var org_html_manager = {
       | t / E        | goto the first / last section                           |
       | g            | goto section...                                         |
       | u            | go one level up (parent section)                        |
-      | i            | show table of contents                                  |
+      | i / C        | show table of contents / tags index                     |
       | b / B        | go back to last / forward to next visited section.      |
       | h / H        | go to main index in this directory / link HOME page     |
       |--------------+---------------------------------------------------------|
@@ -1684,6 +1719,7 @@ var org_html_manager = {
       | s / r        | search forward / backward....                           |
       | S / R        | search again forward / backward                         |
       | o            | occur-mode                                              |
+      | c            | clear search-highlight                                  |
       |--------------+---------------------------------------------------------|
       |              | <b>Misc</b>                                             |
       | l / L        | display HTML link / Org link                            |
@@ -1693,38 +1729,80 @@ var org_html_manager = {
     if (this.HELPING) {
       this.last_view_mode = this.VIEW;
       this.infoView(true);
-      this.WINDOW.innerHTML = 'Press any key or <a onclick="org_html_manager.showHelp();">click here</a> to proceed.'
+      this.WINDOW.innerHTML = 'Press any key or <a href="javascript:org_html_manager.showHelp();">click here</a> to proceed.'
         +'<h2>Keyboard Shortcuts</h2>'
         +'<table cellpadding="3" rules="groups" frame="hsides" style="margin:20px;border-style:none;" border="0";>'
-	+'<tbody>'
+    +'<tbody>'
       // BEGIN RECEIVE ORGTBL Shortcuts
-	+'<tr><td><code><b>? / &iquest;</b></code></td><td>show this help screen</td></tr>'
-	+'</tbody><tbody>'
-	+'<tr><td><code><b></b></code></td><td><b>Moving around</b></td></tr>'
-	+'<tr><td><code><b>n / p</b></code></td><td>goto the next / previous section</td></tr>'
-	+'<tr><td><code><b>N / P</b></code></td><td>goto the next / previous sibling</td></tr>'
-	+'<tr><td><code><b>t / E</b></code></td><td>goto the first / last section</td></tr>'
-	+'<tr><td><code><b>g</b></code></td><td>goto section...</td></tr>'
-	+'<tr><td><code><b>u</b></code></td><td>go one level up (parent section)</td></tr>'
-	+'<tr><td><code><b>i</b></code></td><td>show table of contents</td></tr>'
-	+'<tr><td><code><b>b / B</b></code></td><td>go back to last / forward to next visited section.</td></tr>'
-	+'<tr><td><code><b>h / H</b></code></td><td>go to main index in this directory / link HOME page</td></tr>'
-	+'</tbody><tbody>'
-	+'<tr><td><code><b></b></code></td><td><b>View</b></td></tr>'
-	+'<tr><td><code><b>m</b></code></td><td>toggle the view mode between info and plain</td></tr>'
-	+'<tr><td><code><b>f / F</b></code></td><td>fold current section / whole document (plain view only)</td></tr>'
-	+'</tbody><tbody>'
-	+'<tr><td><code><b></b></code></td><td><b>Searching</b></td></tr>'
-	+'<tr><td><code><b>s / r</b></code></td><td>search forward / backward....</td></tr>'
-	+'<tr><td><code><b>S / R</b></code></td><td>search again forward / backward</td></tr>'
-	+'<tr><td><code><b>o</b></code></td><td>occur-mode</td></tr>'
-	+'</tbody><tbody>'
-	+'<tr><td><code><b></b></code></td><td><b>Misc</b></td></tr>'
-	+'<tr><td><code><b>l / L</b></code></td><td>display HTML link / Org link</td></tr>'
-	+'<tr><td><code><b>v / V</b></code></td><td>scroll down / up</td></tr>'
+    +'<tr><td><code><b>? / &iquest;</b></code></td><td>show this help screen</td></tr>'
+    +'</tbody><tbody>'
+    +'<tr><td><code><b></b></code></td><td><b>Moving around</b></td></tr>'
+    +'<tr><td><code><b>n / p</b></code></td><td>goto the next / previous section</td></tr>'
+    +'<tr><td><code><b>N / P</b></code></td><td>goto the next / previous sibling</td></tr>'
+    +'<tr><td><code><b>t / E</b></code></td><td>goto the first / last section</td></tr>'
+    +'<tr><td><code><b>g</b></code></td><td>goto section...</td></tr>'
+    +'<tr><td><code><b>u</b></code></td><td>go one level up (parent section)</td></tr>'
+    +'<tr><td><code><b>i / C</b></code></td><td>show table of contents / tags index</td></tr>'
+    +'<tr><td><code><b>b / B</b></code></td><td>go back to last / forward to next visited section.</td></tr>'
+    +'<tr><td><code><b>h / H</b></code></td><td>go to main index in this directory / link HOME page</td></tr>'
+    +'</tbody><tbody>'
+    +'<tr><td><code><b></b></code></td><td><b>View</b></td></tr>'
+    +'<tr><td><code><b>m</b></code></td><td>toggle the view mode between info and plain</td></tr>'
+    +'<tr><td><code><b>f / F</b></code></td><td>fold current section / whole document (plain view only)</td></tr>'
+    +'</tbody><tbody>'
+    +'<tr><td><code><b></b></code></td><td><b>Searching</b></td></tr>'
+    +'<tr><td><code><b>s / r</b></code></td><td>search forward / backward....</td></tr>'
+    +'<tr><td><code><b>S / R</b></code></td><td>search again forward / backward</td></tr>'
+    +'<tr><td><code><b>o</b></code></td><td>occur-mode</td></tr>'
+    +'<tr><td><code><b>c</b></code></td><td>clear search-highlight</td></tr>'
+    +'</tbody><tbody>'
+    +'<tr><td><code><b></b></code></td><td><b>Misc</b></td></tr>'
+    +'<tr><td><code><b>l / L</b></code></td><td>display HTML link / Org link</td></tr>'
+    +'<tr><td><code><b>v / V</b></code></td><td>scroll down / up</td></tr>'
       // END RECEIVE ORGTBL Shortcuts
        +'</tbody>'
-       +'</table><br />Press any key or <a onclick="org_html_manager.showHelp();">click here</a> to proceed.';
+       +'</table><br />Press any key or <a href="javascript:org_html_manager.showHelp();">click here</a> to proceed.';
+      window.scrollTo(0, 0);
+    }
+    else {
+      if(this.PLAIN_VIEW == this.last_view_mode) {
+        this.plainView();
+      }
+      this.showSection(this.NODE.idx);
+    }
+  },
+
+
+  showTagsIndex: function ()
+  {
+    if     (this.READING)   { this.endRead(); }
+    else if(this.MESSAGING) { this.removeWarning(); }
+    this.HELPING = this.HELPING ? 0 : 1;
+    if (this.HELPING) {
+      this.last_view_mode = this.VIEW;
+      this.infoView(true);
+      if(null == this.TAGS_INDEX) {
+        this.TAGS_INDEX = 'Press any key or <a href="javascript:org_html_manager.showTagsIndex();">click here</a> to proceed.'
+          +'<br /><br />Click the headlines to expand the contents.'
+          +'<h2>Index of Tags</h2>';
+        for(var i = 0; i < this.SORTED_TAGS.length; ++i) {
+          var tag = this.SORTED_TAGS[i];
+          var fid = 'org-html-manager-sorted-tags-' + tag;
+          this.TAGS_INDEX += '<a onclick="javascript:OrgNode.toggleElement(document.getElementById(\''
+            + fid + '\'));"><h3 onmouseover = function(){org_html_manager.highlight_headline(this);}>' + tag + '</h3></a>'
+            + '<div id="' + fid + '" style="visibility:hidden;display:none;"><ul>';
+          for(var j = 0; j < this.TAGS[tag].length; ++j) {
+            var idx = this.TAGS[tag][j];
+            this.TAGS_INDEX += '<li><a href="javascript:org_html_manager.showSection('
+              + idx + ');">'
+              + this.SECS[idx].heading.innerHTML +'</a></li>';
+          }
+          this.TAGS_INDEX += '</ul></div>';
+
+        }
+        this.TAGS_INDEX += '<br />Press any key or <a href="javascript:org_html_manager.showTagsIndex();">click here</a> to proceed.';
+      }
+      this.WINDOW.innerHTML = this.TAGS_INDEX;
       window.scrollTo(0, 0);
     }
     else {
@@ -1734,6 +1812,7 @@ var org_html_manager = {
       this.showSection(this.NODE.idx);
     }
   }
+
 
 };
 
