@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.7.3a
+ *       org-info.js, v.0.0.7.4a
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -322,6 +322,8 @@ var org_html_manager = {
   SECS: new Array(),           // The OrgNode tree
   REGEX: /(#sec\-)(.*$)/, // identify a section link in toc
   EXCHANGE: /(sec-.*)$/,  // extract the section number
+  FOOTNOTE_REGEX: /(#fn\.\d*$)/,       // identify a link to a footnote
+  FOOTNOTE_BACK_REGEX: /(#fnr\.\d*$)/, // identify a link to a footnote src
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
   EMPTY_START: /^(\s*)(.*)/,   // Trim (s. getKey())
   EMPTY_END: /\s$/,            // Trim (s. getKey())
@@ -886,6 +888,7 @@ var org_html_manager = {
   convertLinks: function ()
   {
     var i = (this.HIDE_TOC ? 0 : 1);
+    var last_section = this.SECS.length - 1;
     for(i; i < this.SECS.length; ++i)
       {
         if(this.SECS[i].folder)
@@ -894,16 +897,25 @@ var org_html_manager = {
 
             for(var j=0; j<links.length; ++j) {
               var href = links[j].href.replace(this.BASE_URL, '');
-              if(0 == href.indexOf('#') && links[j].href.match(this.REGEX)) {
-                var matches = this.EXCHANGE.exec(href);
-                if(matches) {
-                  var id = matches[1].substr(4);
-                  // could use quicksort like search here:
-                  for(var k = 0; k < this.SECS.length; ++k) {
-                    if(this.SECS[k].base_id == id) {
-                      links[j].href="javascript:org_html_manager.navigateTo("+k+")";
-                      break;
-                    }}}}}}}
+              if(0 == href.indexOf('#')) {
+                if(links[j].href.match(this.REGEX)) {
+                  var matches = this.EXCHANGE.exec(href);
+                  if(matches) {
+                    var id = matches[1].substr(4);
+                    // could use quicksort like search here:
+                    for(var k = 0; k < this.SECS.length; ++k) {
+                      if(this.SECS[k].base_id == id) {
+                        links[j].href="javascript:org_html_manager.navigateTo("+k+")";
+                        break;
+                      }}}}
+                else if (links[j].href.match(this.FOOTNOTE_REGEX)) {
+                  var matches = this.FOOTNOTE_REGEX.exec(href);
+                  if(matches) {
+                    var id = matches[1].substr(4);
+                    var fn_name = matches[1].substr(1);
+                    links[j].href="javascript:org_html_manager.navigateTo("+last_section+")";
+                    document.getElementsByName(fn_name)[0].href="javascript:org_html_manager.navigateTo("+i+")";
+                  }}}}}}
   },
 
 
@@ -1826,7 +1838,6 @@ var org_html_manager = {
       this.showSection(this.NODE.idx);
     }
   }
-
 
 };
 
