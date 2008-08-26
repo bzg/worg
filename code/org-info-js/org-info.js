@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.7.5a
+ *       org-info.js, v.0.0.7.6b
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -297,7 +297,8 @@ var org_html_manager = {
   PLAIN_VIEW: 0,               // We're in plain view mode. On startup:= overview
   CONTENT_VIEW: 1,             // plain view show structure
   ALL_VIEW: 2,                 // plain view show all
-  INFO_VIEW : 3,               // We're in info view mode
+  INFO_VIEW: 3,                // We're in info view mode
+  PRESENTATION_VIEW: 4,        // Presentationmode.
   VIEW: this.OVER_VIEW,        // Default view mode (s. setup())
   LOCAL_TOC: false,            // Create sub indexes (s. setup())
   LINK_HOME: 0,                // Link to this.LINK_HOME?
@@ -310,7 +311,7 @@ var org_html_manager = {
   HIDE_TOC: false,             // Hide the table of contents.
   TOC_DEPTH: 0,                // Level to cut the table of contents. No cutting if 0.
   STARTUP_MESSAGE: 0,          // Show info at startup?
-
+  POSTAMBLE: null,             // cache the 'postamble' element.
   // Private
   BASE_URL: document.URL,      // URL without '#sec-x.y.z'
   START_SECTION: 0,            // Will be evtl. recomputed from '#sec-x.y.z'
@@ -470,7 +471,8 @@ var org_html_manager = {
     this.convertLinks(); // adjust internal links. BASE_URL has to be stripped.
 
     if(scanned_all) {
-
+      var pa=document.getElementById('postamble');
+      if(pa) this.POSTAMBLE=pa;
       // Temporary FIX for missing P element if skip:nil
       var b = document.getElementsByTagName('body')[0];
       var n = b.firstChild;
@@ -485,6 +487,9 @@ var org_html_manager = {
 
       if(this.VIEW == this.INFO_VIEW) {
         this.infoView(this.START_SECTION);
+      }
+      else if(this.VIEW == this.PRESENTATION_VIEW) {
+        this.presentationView(this.START_SECTION);
       }
       else {
         var v = this.VIEW; // will be changed in this.plainView()!
@@ -873,6 +878,7 @@ var org_html_manager = {
       var content = this.CONTENT_VIEW;
       var showall = this.ALL_VIEW;
       var info = this.INFO_VIEW;
+      var presentation = this.PRESENTATION_VIEW;
       eval("this."+eval_key+"="+eval_val+";");
       return;
     }
@@ -950,13 +956,13 @@ var org_html_manager = {
       else
         {
           this.NODE = this.SECS[section];
-          if(this.INFO_VIEW == this.VIEW) {
-            if(this.VIEW_BUTTONS) OrgNode.showElement(last_node.buttons);
+          if(this.PRESENTATION_VIEW == this.VIEW || this.INFO_VIEW == this.VIEW) {
             OrgNode.hideElement(this.NODE.buttons);
             this.NODE.setState(OrgNode.STATE_UNFOLDED);
             for(var i=0;i<this.NODE.children.length; ++i)
               this.NODE.children[i].hide();
-            this.WINDOW.innerHTML =  this.NODE.navigation + this.NODE.div.innerHTML;
+            if(this.PRESENTATION_VIEW == this.VIEW) this.WINDOW.innerHTML = this.NODE.div.innerHTML;
+            else this.WINDOW.innerHTML = this.NODE.navigation + this.NODE.div.innerHTML;
             this.NODE.hide();
             window.scrollTo(0, 0);
           }
@@ -989,6 +995,7 @@ var org_html_manager = {
       this.ROOT.children[i].fold();
     }
     this.showSection(sec);
+    if(this.POSTAMBLE) OrgNode.showElement(this.POSTAMBLE);
     if(this.NODE.idx == 0) window.scrollTo(0, 0);
     else this.NODE.div.scrollIntoView(true);
   },
@@ -996,12 +1003,27 @@ var org_html_manager = {
   infoView: function (sec, skip_show_section)
   {
     this.VIEW = this.INFO_VIEW;
-    this.unhighlight_headline(this.NODE.idx);//heading);
+    this.unhighlight_headline(this.NODE.idx);
     if(!this.FIXED_TOC)
       OrgNode.hideElement(this.TITLE);
     OrgNode.showElement(this.WINDOW);
     this.ROOT.hideAllChildren();
     if(this.TOC && !this.FIXED_TOC) OrgNode.hideElement(this.TOC.div);
+    if(this.POSTAMBLE) OrgNode.showElement(this.POSTAMBLE);
+    if(!skip_show_section)
+      this.showSection(sec);
+  },
+
+  presentationView: function (sec, skip_show_section)
+  {
+    this.VIEW = this.PRESENTATION_VIEW;
+    this.unhighlight_headline(this.NODE.idx);
+    OrgNode.hideElement(this.TITLE);
+    if(this.TOC) OrgNode.hideElement(this.TOC.div);
+    OrgNode.showElement(this.WINDOW);
+    this.ROOT.hideAllChildren();
+    OrgNode.hideElement(this.TOC.div);
+    if(this.POSTAMBLE) OrgNode.hideElement(this.POSTAMBLE);
     if(!skip_show_section)
       this.showSection(sec);
   },
@@ -1164,7 +1186,6 @@ var org_html_manager = {
     this.CONSOLE_INPUT.onblur = null;
     this.CONSOLE_INPUT.blur();
     document.onkeypress=OrgHtmlManagerKeyEvent;
-    // this.hideConsole();
   },
 
   removeWarning: function()
@@ -1176,7 +1197,7 @@ var org_html_manager = {
   showConsole: function()
   {
     if(!this.MESSAGING) {
-      if(this.VIEW != this.INFO_VIEW) {
+      if(this.VIEW == this.PLAIN_VIEW) {
         // Maybe clone the CONSOLE?
         document.body.removeChild(document.body.firstChild);
         this.NODE.div.insertBefore(this.CONSOLE, this.NODE.div.firstChild);
@@ -1276,6 +1297,9 @@ var org_html_manager = {
         }
         else if ('m' == s) {
           this.toggleView(this.NODE.idx);
+        }
+        else if ('x' == s) {
+          this.presentationView(this.NODE.idx);
         }
         else if ('n' == s) {
           if(this.NODE.state == OrgNode.STATE_FOLDED && this.VIEW == this.PLAIN_VIEW) {
@@ -1723,38 +1747,38 @@ var org_html_manager = {
        this buffer, edit the table, then press C-c C-c with the cursor
        in the table.  The table will then be translated an inserted below.
 #+ORGTBL: SEND Shortcuts orgtbl-to-generic :splice t :skip 2 :lstart "\t+'<tr>" :lend "</tr>'" :fmt (1 "<td><code><b>%s</b></code></td>" 2 "<td>%s</td>") :hline "\t+'</tbody><tbody>'"
-      | Key          | Function                                                |
-      |--------------+---------------------------------------------------------|
-      | ? / &iquest; | show this help screen                                   |
-      |--------------+---------------------------------------------------------|
-      |              | <b>Moving around</b>                                    |
-      | n / p        | goto the next / previous section                        |
-      | N / P        | goto the next / previous sibling                        |
-      | t / E        | goto the first / last section                           |
-      | g            | goto section...                                         |
-      | u            | go one level up (parent section)                        |
-      | i / C        | show table of contents / tags index                     |
-      | b / B        | go back to last / forward to next visited section.      |
-      | h / H        | go to main index in this directory / link HOME page     |
-      |--------------+---------------------------------------------------------|
-      |              | <b>View</b>                                             |
-      | m            | toggle the view mode between info and plain             |
-      | f / F        | fold current section / whole document (plain view only) |
-      |--------------+---------------------------------------------------------|
-      |              | <b>Searching</b>                                        |
-      | s / r        | search forward / backward....                           |
-      | S / R        | search again forward / backward                         |
-      | o            | occur-mode                                              |
-      | c            | clear search-highlight                                  |
-      |--------------+---------------------------------------------------------|
-      |              | <b>Misc</b>                                             |
-      | l / L        | display HTML link / Org link                            |
-      | v / V        | scroll down / up                                        |
+      | Key          | Function                                                   |
+      |--------------+------------------------------------------------------------|
+      | ? / &iquest; | show this help screen                                      |
+      |--------------+------------------------------------------------------------|
+      |              | <b>Moving around</b>                                       |
+      | n / p        | goto the next / previous section                           |
+      | N / P        | goto the next / previous sibling                           |
+      | t / E        | goto the first / last section                              |
+      | g            | goto section...                                            |
+      | u            | go one level up (parent section)                           |
+      | i / C        | show table of contents / tags index                        |
+      | b / B        | go back to last / forward to next visited section.         |
+      | h / H        | go to main index in this directory / link HOME page        |
+      |--------------+------------------------------------------------------------|
+      |              | <b>View</b>                                                |
+      | m / x        | toggle the view mode between info and plain / presentation |
+      | f / F        | fold current section / whole document (plain view only)    |
+      |--------------+------------------------------------------------------------|
+      |              | <b>Searching</b>                                           |
+      | s / r        | search forward / backward....                              |
+      | S / R        | search again forward / backward                            |
+      | o            | occur-mode                                                 |
+      | c            | clear search-highlight                                     |
+      |--------------+------------------------------------------------------------|
+      |              | <b>Misc</b>                                                |
+      | l / L        | display HTML link / Org link                               |
+      | v / V        | scroll down / up                                           |
       */
     this.HELPING = this.HELPING ? 0 : 1;
     if (this.HELPING) {
       this.last_view_mode = this.VIEW;
-      this.infoView(true);
+      if(this.PLAIN_VIEW == this.VIEW) this.infoView(true);
       this.WINDOW.innerHTML = 'Press any key or <a href="javascript:org_html_manager.showHelp();">click here</a> to proceed.'
         +'<h2>Keyboard Shortcuts</h2>'
         +'<table cellpadding="3" rules="groups" frame="hsides" style="margin:20px;border-style:none;" border="0";>'
@@ -1773,7 +1797,7 @@ var org_html_manager = {
     +'<tr><td><code><b>h / H</b></code></td><td>go to main index in this directory / link HOME page</td></tr>'
     +'</tbody><tbody>'
     +'<tr><td><code><b></b></code></td><td><b>View</b></td></tr>'
-    +'<tr><td><code><b>m</b></code></td><td>toggle the view mode between info and plain</td></tr>'
+    +'<tr><td><code><b>m / x</b></code></td><td>toggle the view mode between info and plain / presentation</td></tr>'
     +'<tr><td><code><b>f / F</b></code></td><td>fold current section / whole document (plain view only)</td></tr>'
     +'</tbody><tbody>'
     +'<tr><td><code><b></b></code></td><td><b>Searching</b></td></tr>'
@@ -1794,6 +1818,9 @@ var org_html_manager = {
       if(this.PLAIN_VIEW == this.last_view_mode) {
         this.plainView();
       }
+      else if(this.PRESENTATION_VIEW == this.last_view_mode) {
+        this.presentationView();
+      }
       this.showSection(this.NODE.idx);
     }
   },
@@ -1806,7 +1833,7 @@ var org_html_manager = {
     this.HELPING = this.HELPING ? 0 : 1;
     if (this.HELPING) {
       this.last_view_mode = this.VIEW;
-      this.infoView(true);
+      if(this.PLAIN_VIEW == this.VIEW) this.infoView(true);
       if(null == this.TAGS_INDEX) {
         this.TAGS_INDEX = 'Press any key or <a href="javascript:org_html_manager.showTagsIndex();">click here</a> to proceed.'
           +'<br /><br />Click the headlines to expand the contents.'
@@ -1834,6 +1861,9 @@ var org_html_manager = {
     else {
       if(this.PLAIN_VIEW == this.last_view_mode) {
         this.plainView();
+      }
+      else if(this.PRESENTATION_VIEW == this.last_view_mode) {
+        this.presentationView();
       }
       this.showSection(this.NODE.idx);
     }
