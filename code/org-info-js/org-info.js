@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.7.4a
+ *       org-info.js, v.0.0.7.5a
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -1814,8 +1814,8 @@ var org_html_manager = {
         for(var i = 0; i < this.SORTED_TAGS.length; ++i) {
           var tag = this.SORTED_TAGS[i];
           var fid = 'org-html-manager-sorted-tags-' + tag;
-          this.TAGS_INDEX += '<a onclick="javascript:OrgNode.toggleElement(document.getElementById(\''
-            + fid + '\'));"><h3 onmouseover = function(){org_html_manager.highlight_headline(this);}>' + tag + '</h3></a>'
+          this.TAGS_INDEX += '<a href="javascript:OrgNode.toggleElement(document.getElementById(\''
+            + fid + '\'));"><h3>' + tag + '</h3></a>'
             + '<div id="' + fid + '" style="visibility:hidden;display:none;"><ul>';
           for(var j = 0; j < this.TAGS[tag].length; ++j) {
             var idx = this.TAGS[tag][j];
