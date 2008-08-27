@@ -298,7 +298,7 @@ var org_html_manager = {
   CONTENT_VIEW: 1,             // plain view show structure
   ALL_VIEW: 2,                 // plain view show all
   INFO_VIEW: 3,                // We're in info view mode
-  PRESENTATION_VIEW: 4,        // Presentationmode.
+  SLIDE_VIEW: 4,               // Slidemode.
   VIEW: this.OVER_VIEW,        // Default view mode (s. setup())
   LOCAL_TOC: false,            // Create sub indexes (s. setup())
   LINK_HOME: 0,                // Link to this.LINK_HOME?
@@ -370,6 +370,7 @@ var org_html_manager = {
   TAGS: {},                    // Tags: {tag:[index,index2...],tag2:[index1,index2...]}
   SORTED_TAGS: new Array(),    // Sorted tags
   TAGS_INDEX: null,            // Caches the tags-index screen
+  CLICK_TIMEOUT: null,         // Mousehandling
 
   /**
    * Setup the OrgHtmlManager for scanning.
@@ -444,6 +445,7 @@ var org_html_manager = {
       if(this.WINDOW_BORDER) this.WINDOW.style.border="1px dashed black";
     }
     this.WINDOW.style.marginBottom = "40px";
+    this.WINDOW.id = "org-info-js-window";
     var theIndex = document.getElementById('table-of-contents');
     var scanned_all = false;
     if(null != theIndex) {
@@ -488,8 +490,8 @@ var org_html_manager = {
       if(this.VIEW == this.INFO_VIEW) {
         this.infoView(this.START_SECTION);
       }
-      else if(this.VIEW == this.PRESENTATION_VIEW) {
-        this.presentationView(this.START_SECTION);
+      else if(this.VIEW == this.SLIDE_VIEW) {
+        this.slideView(this.START_SECTION);
       }
       else {
         var v = this.VIEW; // will be changed in this.plainView()!
@@ -635,7 +637,7 @@ var org_html_manager = {
     // Move the title into the first visible section.
     // TODO: show title above everything if FIXED_TOC !!!
     this.TITLE = document.getElementsByTagName("h1")[0];
-    if(!this.FIXED_TOC) {
+    if(!this.FIXED_TOC && !this.VIEW == this.SLIDE_VIEW) {
       var title = this.TITLE.cloneNode(true);
       this.SECS[0].div.insertBefore(title, this.SECS[0].div.firstChild);
       OrgNode.hideElement(this.TITLE);
@@ -878,7 +880,7 @@ var org_html_manager = {
       var content = this.CONTENT_VIEW;
       var showall = this.ALL_VIEW;
       var info = this.INFO_VIEW;
-      var presentation = this.PRESENTATION_VIEW;
+      var slide = this.SLIDE_VIEW;
       eval("this."+eval_key+"="+eval_val+";");
       return;
     }
@@ -956,12 +958,12 @@ var org_html_manager = {
       else
         {
           this.NODE = this.SECS[section];
-          if(this.PRESENTATION_VIEW == this.VIEW || this.INFO_VIEW == this.VIEW) {
+          if(this.SLIDE_VIEW == this.VIEW || this.INFO_VIEW == this.VIEW) {
             OrgNode.hideElement(this.NODE.buttons);
             this.NODE.setState(OrgNode.STATE_UNFOLDED);
             for(var i=0;i<this.NODE.children.length; ++i)
               this.NODE.children[i].hide();
-            if(this.PRESENTATION_VIEW == this.VIEW) this.WINDOW.innerHTML = this.NODE.div.innerHTML;
+            if(this.SLIDE_VIEW == this.VIEW) this.WINDOW.innerHTML = this.NODE.div.innerHTML;
             else this.WINDOW.innerHTML = this.NODE.navigation + this.NODE.div.innerHTML;
             this.NODE.hide();
             window.scrollTo(0, 0);
@@ -982,6 +984,8 @@ var org_html_manager = {
 
   plainView: function (sec)
   {
+    document.onclick = null;
+    document.ondblclick = null;
     this.VIEW = this.PLAIN_VIEW;
     OrgNode.hideElement(this.WINDOW);
     // OrgNode.showElement(this.TITLE);
@@ -1002,6 +1006,8 @@ var org_html_manager = {
 
   infoView: function (sec, skip_show_section)
   {
+    document.onclick = null;
+    document.ondblclick = null;
     this.VIEW = this.INFO_VIEW;
     this.unhighlight_headline(this.NODE.idx);
     if(!this.FIXED_TOC)
@@ -1014,18 +1020,57 @@ var org_html_manager = {
       this.showSection(sec);
   },
 
-  presentationView: function (sec, skip_show_section)
+  slideView: function (sec, skip_show_section)
   {
-    this.VIEW = this.PRESENTATION_VIEW;
+    this.VIEW = this.SLIDE_VIEW;
     this.unhighlight_headline(this.NODE.idx);
     OrgNode.hideElement(this.TITLE);
     if(this.TOC) OrgNode.hideElement(this.TOC.div);
+    OrgNode.showElement(this.TITLE);
     OrgNode.showElement(this.WINDOW);
     this.ROOT.hideAllChildren();
     OrgNode.hideElement(this.TOC.div);
     if(this.POSTAMBLE) OrgNode.hideElement(this.POSTAMBLE);
     if(!skip_show_section)
       this.showSection(sec);
+    document.onclick = function(){org_html_manager.scheduleClick("org_html_manager.nextSection()");};
+    document.ondblclick = function(){org_html_manager.scheduleClick("org_html_manager.previousSection()");};
+  },
+
+  executeClick: function(func)
+  {
+    eval(func);
+    if(null != this.CLICK_TIMEOUT) this.CLICK_TIMEOUT = null;
+  },
+
+  scheduleClick: function(func, when)
+  {
+    if(null == when) when = 250;
+    if(null == this.CLICK_TIMEOUT) {
+      this.CLICK_TIMEOUT = window.setTimeout("org_html_manager.executeClick(" + func + ")", when);
+    }
+    else {
+      window.clearTimeout(this.CLICK_TIMEOUT);
+      this.CLICK_TIMEOUT = null;
+    }
+  },
+
+  nextSection: function()
+  {
+    var i = this.NODE.idx + 1;
+    if(i<this.SECS.length)
+      this.navigateTo(i);
+    else if (this.VIEW == this.SLIDE_VIEW)
+      this.navigateTo(0);
+  },
+
+  previousSection: function()
+  {
+    var i = this.NODE.idx;
+    if(i>0)
+      this.navigateTo(i-1);
+    else if (this.VIEW == this.SLIDE_VIEW)
+      this.navigateTo(this.SECS.length - 1);
   },
 
   toggleView: function (sec)
@@ -1283,7 +1328,7 @@ var org_html_manager = {
         }
         else if ('c' == s) {
           this.removeSearchHighlight();
-          if(this.VIEW == this.INFO_VIEW) {
+          if(this.VIEW == this.INFO_VIEW || this.VIEW == this.SLIDE_VIEW) {
             // redisplay in info view mode:
             this.showSection(this.NODE.idx);
           }
@@ -1299,7 +1344,7 @@ var org_html_manager = {
           this.toggleView(this.NODE.idx);
         }
         else if ('x' == s) {
-          this.presentationView(this.NODE.idx);
+          this.slideView(this.NODE.idx);
         }
         else if ('n' == s) {
           if(this.NODE.state == OrgNode.STATE_FOLDED && this.VIEW == this.PLAIN_VIEW) {
@@ -1747,33 +1792,33 @@ var org_html_manager = {
        this buffer, edit the table, then press C-c C-c with the cursor
        in the table.  The table will then be translated an inserted below.
 #+ORGTBL: SEND Shortcuts orgtbl-to-generic :splice t :skip 2 :lstart "\t+'<tr>" :lend "</tr>'" :fmt (1 "<td><code><b>%s</b></code></td>" 2 "<td>%s</td>") :hline "\t+'</tbody><tbody>'"
-      | Key          | Function                                                   |
-      |--------------+------------------------------------------------------------|
-      | ? / &iquest; | show this help screen                                      |
-      |--------------+------------------------------------------------------------|
-      |              | <b>Moving around</b>                                       |
-      | n / p        | goto the next / previous section                           |
-      | N / P        | goto the next / previous sibling                           |
-      | t / E        | goto the first / last section                              |
-      | g            | goto section...                                            |
-      | u            | go one level up (parent section)                           |
-      | i / C        | show table of contents / tags index                        |
-      | b / B        | go back to last / forward to next visited section.         |
-      | h / H        | go to main index in this directory / link HOME page        |
-      |--------------+------------------------------------------------------------|
-      |              | <b>View</b>                                                |
-      | m / x        | toggle the view mode between info and plain / presentation |
-      | f / F        | fold current section / whole document (plain view only)    |
-      |--------------+------------------------------------------------------------|
-      |              | <b>Searching</b>                                           |
-      | s / r        | search forward / backward....                              |
-      | S / R        | search again forward / backward                            |
-      | o            | occur-mode                                                 |
-      | c            | clear search-highlight                                     |
-      |--------------+------------------------------------------------------------|
-      |              | <b>Misc</b>                                                |
-      | l / L        | display HTML link / Org link                               |
-      | v / V        | scroll down / up                                           |
+      | Key          | Function                                                |
+      |--------------+---------------------------------------------------------|
+      | ? / &iquest; | show this help screen                                   |
+      |--------------+---------------------------------------------------------|
+      |              | <b>Moving around</b>                                    |
+      | n / p        | goto the next / previous section                        |
+      | N / P        | goto the next / previous sibling                        |
+      | t / E        | goto the first / last section                           |
+      | g            | goto section...                                         |
+      | u            | go one level up (parent section)                        |
+      | i / C        | show table of contents / tags index                     |
+      | b / B        | go back to last / forward to next visited section.      |
+      | h / H        | go to main index in this directory / link HOME page     |
+      |--------------+---------------------------------------------------------|
+      |              | <b>View</b>                                             |
+      | m / x        | toggle the view mode between info and plain / slides    |
+      | f / F        | fold current section / whole document (plain view only) |
+      |--------------+---------------------------------------------------------|
+      |              | <b>Searching</b>                                        |
+      | s / r        | search forward / backward....                           |
+      | S / R        | search again forward / backward                         |
+      | o            | occur-mode                                              |
+      | c            | clear search-highlight                                  |
+      |--------------+---------------------------------------------------------|
+      |              | <b>Misc</b>                                             |
+      | l / L        | display HTML link / Org link                            |
+      | v / V        | scroll down / up                                        |
       */
     this.HELPING = this.HELPING ? 0 : 1;
     if (this.HELPING) {
@@ -1797,7 +1842,7 @@ var org_html_manager = {
     +'<tr><td><code><b>h / H</b></code></td><td>go to main index in this directory / link HOME page</td></tr>'
     +'</tbody><tbody>'
     +'<tr><td><code><b></b></code></td><td><b>View</b></td></tr>'
-    +'<tr><td><code><b>m / x</b></code></td><td>toggle the view mode between info and plain / presentation</td></tr>'
+    +'<tr><td><code><b>m / x</b></code></td><td>toggle the view mode between info and plain / slides</td></tr>'
     +'<tr><td><code><b>f / F</b></code></td><td>fold current section / whole document (plain view only)</td></tr>'
     +'</tbody><tbody>'
     +'<tr><td><code><b></b></code></td><td><b>Searching</b></td></tr>'
@@ -1818,8 +1863,8 @@ var org_html_manager = {
       if(this.PLAIN_VIEW == this.last_view_mode) {
         this.plainView();
       }
-      else if(this.PRESENTATION_VIEW == this.last_view_mode) {
-        this.presentationView();
+      else if(this.SLIDE_VIEW == this.last_view_mode) {
+        this.slideView();
       }
       this.showSection(this.NODE.idx);
     }
@@ -1862,8 +1907,8 @@ var org_html_manager = {
       if(this.PLAIN_VIEW == this.last_view_mode) {
         this.plainView();
       }
-      else if(this.PRESENTATION_VIEW == this.last_view_mode) {
-        this.presentationView();
+      else if(this.SLIDE_VIEW == this.last_view_mode) {
+        this.slideView();
       }
       this.showSection(this.NODE.idx);
     }
