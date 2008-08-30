@@ -1,0 +1,72 @@
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   SUGGESTION(s) TOIMPLEMENT(t) IMPLEMENTED(i)
+#+SEQ_TODO:   BUGREPORT(r) BUG(b) FIXED(f)
+#+TITLE:      org-info-js
+#+AUTHOR:     Worg people
+#+LANGUAGE:   en
+#+CATEGORY:   org-info-js
+#+OPTIONS:    H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+
+* org-info-js by Sebastian Rose
+
+org-info-js is a great javascript tool to navigate through a HTML page
+(as exported by Org) the way you navigate through an Org or an info
+manual, i.e. supporting folding, previous/next buttons, etc.
+
+** org-info-js as powerpoint
+
+It was [[http://www.mail-archive.com/emacs-orgmode@gnu.org/msg07820.html][noticed]] that files exported by org-info-js were similar to [[http://meyerweb.com/eric/tools/s5/][s5]]
+the simple standards-based Slide Show System.  After some hacking,
+Sebastian Rose added some features to allow org-mode and org-info-js
+to be used to create simple slide shows and presentations.
+
+An example org-info-js presentation can be found [[file:code/org-info-js/org-slides][here]]
+
+*** SUGGESTION #+TITLE's shouldn't display on every slide by default
+
+The title for each slide should (by default) be the slides heading.
+
+*** SUGGESTION Name for org-info-js slide show extension(s)
+
+Some suggested names for this functionality.
+
+- org-present
+- org-point
+- org-note (as in keynote)
+- present-org
+
+*** SUGGESTION Use properties to reveal bullet points
+
+To have bullet points reveal themselves one by one in org-info-js you
+need to replicate the slide many times, e.g.
+
+#+BEGIN_SRC org
+,* Overview
+
+,+ The first point
+
+,* Overview
+
+,+ The first point
+,+ The second point revealed
+
+,* Overview
+
+,+ The first point
+,+ The second point revealed
+,+ The third point (note the duplication of the slide)
+#+END_SRC
+
+Rather than this, we might (assuming properties can be exported) be
+able to support a syntax like the following:
+
+#+BEGIN_SRC org
+,* Overview
+, :PROPERTIES:
+, :reveal:   t
+, :END:
+
+, + Revealed properties
+, + Appear one after the other
+, + But this time only need to be stated once!
+#+END_SRC
