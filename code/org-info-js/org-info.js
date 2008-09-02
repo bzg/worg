@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.7.6b
+ *       org-info.js, v.0.0.7.6c
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -30,8 +30,8 @@
  *
  *
  * The script is now roughly devided in sections by form-feeds. Editors can
- * move section wise using the common emacs commands for this purpos ('M-x ]'
- * and  'M-x ]').
+ * move section wise using the common emacs commands for this purpos ('C-x ]'
+ * and  'C-x ]').
  *
  * The sections are:
  *    1. This comment block.
@@ -323,8 +323,8 @@ var org_html_manager = {
   SECS: new Array(),           // The OrgNode tree
   REGEX: /(#sec\-)(.*$)/, // identify a section link in toc
   EXCHANGE: /(sec-.*)$/,  // extract the section number
-  FOOTNOTE_REGEX: /(#fn\.\d*$)/,       // identify a link to a footnote
-  FOOTNOTE_BACK_REGEX: /(#fnr\.\d*$)/, // identify a link to a footnote src
+  FOOTNOTE_REGEX: /^(#fn\.\d*$)/,       // identify a link to a footnote
+  FOOTNOTE_BACK_REGEX: /^(#fnr\.\d*$)/, // identify a link to a footnote src
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
   EMPTY_START: /^(\s*)(.*)/,   // Trim (s. getKey())
   EMPTY_END: /\s$/,            // Trim (s. getKey())
