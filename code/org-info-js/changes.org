@@ -1,0 +1,539 @@
+#+STARTUP: align fold nodlcheck hidestars oddeven lognotestate
+#+TITLE: ORG-INFO.JS: Changes
+#+AUTHOR: Sebastian Rose
+#+EMAIL:
+#+LANGUAGE: en
+#+INFOJS_OPT: path:org-info.js
+#+INFOJS_OPT: toc:nil localtoc:t view:info mouse:underline
+#+INFOJS_OPT: up:http://orgmode.org/worg/
+#+INFOJS_OPT: home:http://orgmode.org buttons:nil
+
+* 2008-09-06 Sa
+
+  + *Toggle list items automatically* ::
+    No need to create several sections with redundant content. Now the script
+    handles exactly one plain list per section (the first one found)
+    specially. The list items are displayed one by one.
+  + *Documentation* ::
+    Fixed some errors there and added a seperate section for presentation.
+
+* 2008-08-27 Mi
+
+  + *Slides* ::
+    Move back and forth by double click and click.
+
+* 2008-08-25 Mo
+
+  + *Footnotes now working* ::
+    Now =convertLinks()= converts footnote links too.
+
+* 2008-08-24 So
+
+  + *Wrap text before first headline in <p>* ::
+    If you use org-info.js, the text before first headline is now wrapped into
+    a =p= element:
+    :<p id="text-before-first-headline"> text </p>
+  + *Tag index* ::
+    =C= now shows an index based on tags. This was an [[http://lists.gnu.org/archive/html/emacs-orgmode/2008-07/msg00434.html][idea of Rick Moynihan]].
+  + *Fixed appearance of 'HELP' link et al* ::
+    I.e. added href attribute instead of onclick.
+
+* 2008-08-03 So
+
+  + *Next and previous sibling* ::
+    Shortcuts: '=N=' and '=P='.
+
+* 2008-07-27 So
+
+  + Close the minibuffer, when reading ::
+    do this, when a link ('next'...) is clicked.
+  + Close help screen on ANY key press ::
+    ...not only if a printable key was pressed.
+
+* 2008-07-25 Fr
+
+  + Broken links for 'l' and 'L' ::
+    Thank's again to Carsten for reporting.
+  + Startup help is now optional ::
+    We have a little 'HELP' link now to click on.
+
+* 2008-07-23 Mi
+
+  + Any key to proceed ::
+    Now it's realy any key that shuts down the minibuffer.
+  + More hardcoded styles ::
+    ...to avoid a border around the input field in the minibuffer and too much
+    padding in the minibuffers =<td>= elements.
+
+  + Divide the script in sections ::
+    The script is now roughly devided in sections by form-feeds. Thus we can
+    move section wise using the common emacs commands for this purpos ('=M-x
+    ]=' and  '=M-x ]='). This was done to ease editing of the script.
+
+    The sections are:
+      1. The comment block on top of the file.
+      2. Everything around =OrgNodes=.
+      3. =org_html_manager= constructor and setup.
+      4. =org_html_manager= folding and view related stuff.
+      5. =org_html_manager= history related methods.
+      6. =org_html_manager= minibuffer handling.
+      7. =org_html_manager= user input.
+      8. =org_html_manager= search functonality.
+      9. =org_html_manager= misc.
+      10. Global functions.
+
+* 2008-07-09 Mi
+
+  + Missing shortcuts in help ::
+    '=F=' and '=B='.
+  + Use two lines to be more verbose ::
+    Since the new read-mode, there are many occasions when you have to press RET
+    to close the minibuffer. Thus we should always have a parenthesis saying
+    '/press X to close/'.
+  + Implement the 'standard minibuffer' ::
+    A little bit more visible, two lines, a narrow gray border.
+  + Scroll to the very top for sec. 0 in plain view mode ::
+    Scrolling the NODE.div into view seemed unnatural.
+  + Standard height for minibuffer ::
+    This was done to hide and show the minibuffer quite correct.
+  + Reduce flicker after reading ::
+    =hideConsole()= is only called, if the result of the last read command does
+    not lead to an error. =showConsole()= looks, wether the the minibuffer is
+    hidden.
+
+* 2008-06-26 Do
+
+  + Stop searching empty strings.
+  + Use the local stylesheet again.
+  + Show a startup message ::
+    One out of many ideas from Carsten. This one is cutomizable. Use
+    =org_html_manager.set("STARTUP_MESSAGE", "0");= to inhibit.
+
+* 2008-06-24 Di
+
+  + '=L=' and '=l=' use the new read mode ::
+    This means we may use =CTRL-c= to copy the link. Close the minibuffer
+    using =RET=.
+  + '=L=' and '=l=' choose link type ::
+    If the search string is not empty, the visitor is prompted to choose
+    between a link to the current section or an 'occur' link.
+  + Error in docs ::
+    :Carsten Dominik schrieb:
+    :> One more:
+    :>
+    :> index.html still says that "l" shows the list of shortcuts.  This is no
+    :> longer the case.
+    :>
+    :> - Carsten
+  + Absolute path to stylesheet ::
+    Avoid missing stylesheet. Now this file links to the absolute URL.
+  + RET hides minibuffer ::
+    ...in every case now.
+  + 's RET' does the same as 'S' ::
+    One of the many good ideas of Carsten. \\
+    Implementation: if the search string has not changed, '=s=' and '=r=' move on
+    to the next/previous section. Else the current section is searched first.
+  + Clear the search highlight ::
+    If a new search/occur is started, the search highlight is cleared. It may
+    still be cleared by pressing '=c=' (clear).
+  + CSS styles renamed ::
+    All the style classes and IDs in use are renamed, to avoid clashing with
+    styles in other packages in Worg.git/code/*. All the styles are now
+    prefixed by =org-info-js_= (see [[CSS]]).
+
+* 2008-06-23 Mo
+
+  + Position of minibuffer ::
+    Typo. Fixed.
+  + Remove nested search highlight ::
+    If searching for /org/ and after that for /rg/, the highlight was not
+    removed when pressing '=c=' (clear search highlight). Fixed.
+  + Build regexp from user input ::
+    To be able to search for e.g. '>' and '<' these characters are replaced with
+    '=&gt;=' and '=&lt;=' respectively. It's now possible to search for the
+    following characters:
+    :< > \ = ? * +
+    This is still a compromise since syntax highlighting is done using html
+    tags. Thus searching for '=<script=' will not work for passages wehre the
+    angle bracket has a different color than the word '=script='.
+  + Occur mode ::
+    Press '=o=' to get prompted for a string to search. The document switches
+    to plain view mode and opens all sections containing the search
+    string. Matches will be highlighted. Neither connected to the navigation
+    history nor any special navigation so far. But you may walk through all
+    the occurences using '=S=' and '=R='.
+  + URL suffix for occur ::
+    See section Section [[*Linking to Files using the Script]] for an example.
+  + Shortcut table ::
+    Thanks to Carsten Dominik for the great org radio table trick and the new
+    shortcut table.
+
+* 2008-06-22 So
+
+  This update introduced some changes concerning keyboard shortcuts.
+
+  *This one is not tested in IE yet!*
+
+  + Search ::
+    You may use '=s=' to search forward and '=r=' to search
+    backwards. These two prompt for input. To repeat the last search, use
+    '=S=' and '=R=' to search forward and backwards respectively.
+    Use '=c=' to remove all the match highlights.
+
+    Absolutely Beta...
+
+  + goto-section ::
+    Since '=s=' was the candidate for searching, it could no longer be used
+    for the /goto section/ command. This is now remapped to '=g=' (goto).
+  + No more popups ::
+    The minibuffer can be switched to read mode. Thus it may be used to read
+    input. No need for popup windows (=window.prompt()=) anymore.
+
+* 2008-06-17 Di
+
+  + New Variable org-export-section-number-format ::
+    Adjusted the script to detect the IDs correctly for use with the new
+    OrgMode version 6.05 (the section number format can now be adjusted in
+    OrgMode via =org-export-section-number-format=). This Change is backward
+    compatible.
+  + Display HTML links ::
+    '=l=' now displays a HTML link to the current section whereas '=L=' now
+    shows the OrgMode link. Thanks to Carsten for this idea.
+
+* 2008-05-23 Fr
+
+  + *T.O.C. fixed accidentally*
+  + Jump to link in sidebar ::
+
+    If =FIXED\_TOC= is set, '=i=' focusses the first link in the T.O.C. =TAB=
+    may be used to traverse the links.
+
+* 2008-05-18 So
+
+  + Docs where wrong ::
+    Still some outdated stuff here.
+  + Allow overwrites ::
+    Changed the code to explicitly allow a certain URL overwrite. Otherwise
+    visitors could overwrite any variable internally used by the
+    =org_html_manger=.
+
+* 2008-05-18 So
+
+  + URL Parsing ::
+    Now the user may call the script and pass options to overwrite the authors
+    settings using this syntax:
+    : http://localhost/index.html?TOC=0&VIEW=showall&MOUSE_HINT=rgb(255,133,0)
+    Some links for testing are provided in section [[Linking to Files using the Script]]
+
+  + Focus the T.O.C. ::
+    '=i=' tries to focus the T.O.C. if =FIXED_TOC= is ="1"=. This is still
+    very primitive. Just the first step. '=i=' simply focusses the first
+    anchor in the T.O.C. Tabindexes empower the user to run through the links
+    in the table of contents using the TAB key.
+
+  + FIX: Show Start Section ::
+    The start section (index.html#sec-X.Y) was not shown in plain view
+    mode. Now this section is always shown regardless of initial folding state
+    and view mode.
+
+  + FIX: Hitting '=u=' several times ::
+    Hitting '=u=' multiple times made the script focus the root node so that
+    '=n=' went to the first section. Fixed.
+
+  + IE and onclick ::
+    Trying a different technique to make IE handle the clicks on
+    headlines. Can't test this now in IE but don't want to forget the trick :)
+
+*  2008-05-16 Fr
+
+   + Org Links ::
+     '=l=' prints an Org link in the minibuffer for copying to an org
+     file. Currently it's only possible to copy the link using the mouse. A
+     change of this is on my TODO list.
+
+* 2008-05-12 Mo
+
+  + *New key to go to the first section* ::
+    Since '=i=' now shows the T.O.C. there was a shortcut missing to go to the
+    first section (which might as well be the T.O.C. if =#+INFOJS_OPT:
+    toc:t=). This key is now '=t=' or '=<='. For toggling the view mode, '=m=' is used
+    from now on.
+  + *New key for last section* ::
+    '=E=' or '=>=' move to the last section.
+  + *&iquest;* ::
+    To show the help screen one may use the '=¿=' key. The help-screen got
+    upated using '=&iquest;=' now to avoid distorted displaying of this
+    character.
+  + *org-info-info-navigation* ::
+    Style class for the navigation bar in info view mode.
+  + *Documentation* ::
+    Documentation reworked. Should be fairly uptodate now.
+
+* 2008-05-12 Mo
+
+  + *Removal of Minibuffer* ::
+    The minibuffer was not removed when unsing the mouse to navigate. Fixed.
+
+* 2008-05-09 Fr
+
+  + *First Section* ::
+    '=n=' now unfolds the current section if folded when in plain view
+    mode. Thus the first section will be shown after startup in folded view.
+  + *Startup in info view mode* ::
+    This one was broken. Fixed.
+
+* 2008-05-04 So
+
+  + *OrgHtmlManager class* ::
+    No more OrgHtmlManager class anymore. Script uses the
+    :var org_html_manager = { property: value, /* ... */ };
+    syntax now. This was done to avoid inheritance and instantiation of more
+    than one OrgHtmlManager.
+
+  + *Help display* ::
+    The displaying of Keyboard shortcuts now behaves like the (hidden)
+    TOC. I.e. keyboard shortcuts are displayed when pressing '=?=' and any
+    hidden again when pressing any key. The old view mode is restored when
+    hiding the help display.
+
+  + *Fixed: external links* ::
+    External links now work again.
+
+* 2008-05-02 Fr
+
+  + *Minibuffer Handling* ::
+    If the document is neither in info view mode nor displayed with a fixed
+    TOC, the minibuffer will be shown right above the current headline. This
+    is not the final fix for this, but a work around for the wrong IE
+    behaviout concerning /position:fixed/.
+
+  + *Keyboard Input on keypress* ::
+    The script now takes the =onkeypress= function to read user input. This is
+    more compatible then =onkeydown= or =onkeyup=. Thus the keys work now in
+    IE too (and the '?' key in Firefox). Holding the '=n=' key down for a
+    while can be used for fast searching.
+
+  + *Scrolling in IE* ::
+    ...is fixed. But it is not possible to scroll in IE if =FIXED_TOC= is on.
+
+* 2008-04-17 Do
+
+  + *RUNS DROPPED* ::
+    The option '=RUNS=' is dropped now. The =org_html_manager= now tries to
+    scan the document until it's entirely loaded. There is an internal limit
+    now set to some hundred runs which will makes a max. ~2 minute scan
+    phase.
+
+* 2008-04-15 Di
+
+  These two changes where ideas of Carsten Dominik.
+
+  + *Local TOC* ::
+    ...shows now subsections only.
+  + *Cut the TOC* ::
+    Now the table of contents may be cutted to a certain depth. Navigation is
+    not affected. The name of the new =set()= option is '=TOC\_DEPTH='.
+
+* 2008-04-13 So
+
+  + *Overall history* ::
+    History now records all commands that change the current section.
+  + *Hide TOC but show when 'i' is pressed* ::
+    The TOC is now always shown, when '=i=' is pressed, even if hidden from
+    the document. The fun is, that each following navigation command triggers
+    a history-back event. This way the hidden TOC does not show up when moving
+    in the history thereafter. Hence now it's possible to read section 5.1,
+    take a short look in the TOC and the next '=n=', '=p=' or '=b=' command
+    takes you back to the section last visited (5.1 in this case).
+
+* 2008-04-09 Mi
+
+  - *Minibuffer fixed for IE* ::
+    It now appears and hides again. Thanks to Tobias Prinz for the trick with
+    negative margins.
+
+* 2008-04-06 So
+
+  + *Adjusted to new Setup*
+    Carsten Dominik added the new possibility to configure the script using
+    typical org syntax. Users may even use customize to set up the script
+    now. Names of options passed to the =set()= functions are now adjusted to
+    the ones we discussed. Internal variable names where changed to reflect
+    this change.
+
+    * TODO search my mails to figure out the correct date!!!
+
+
+* 2008-03-31 Mo
+
+  + *Fixed subindexes* ::
+    ...when using =HIDE\_TOC=. First section had no subindex in this case.
+  + *Added key q* ::
+    ...to close the window.
+
+* << 2008-03-30 So >>
+
+  + Internal links working ::
+    Internal links are now converted to work with this script. The user has
+    to go back using the `=s=' key since the history is not
+    updated. Could Browsers understand this? Or is there a possibility to
+    catch the `/back/' button event?
+  + org-file.html#sec-x.y.z ::
+    is now working too. That is, http://path/to/org-file.html#sec-x.y.z makes
+    the script displaying that section in the configured view mode.
+
+  + Folding now on by default. ::
+
+  + Scrolling ::
+    '=v=' and '=V=' now scroll the window by the visible height of the
+    document window. A little bit less though for better orientation.
+
+  + Deleted setup section using export options template ::
+    This one was not working. I'm not shure it ever was... but I think so. I
+    should look up this one in the documentation again.
+
+  + Plain view mode is default ::
+
+  + FIXED Bugs ::
+    - The view mode was dependend on the folding feature.
+    - When folding was of an error was shown when trying to fold.
+
+* << 2008-03-23 So>>
+
+  + Clicking a headline makes it the current section ::
+    and thus the candidate for displaying in next info view and the point
+    from where 'next' and 'previous' work.
+
+* << 2008-03-22 Sa >>
+
+  + TOC, title and global folding ::
+    The title was doubled in some cases. This should be fixed now. The TOC
+    is now a node as all the other sections to.
+
+  + Keyboard ::
+    Some more work on this. There seems to be some locale related problem
+    concerning the keyboard input of a `?´ (help) in Firefox. Added a
+    workaround for this one, but probably only working here.
+
+  + *Documentation updated.*
+
+  + Stylesheet ::
+    now with indentation. This demonstrates the folding somewhat better.
+
+  + Hide T.O.C. ::
+    The table of contents can now be hidden completely due to the new option
+    =HIDE_TOC=. Hence the documents have to be exported with T.O.C., but may
+    be displayed without it.
+
+* << 2008-03-21 Fr >>
+
+  + Commands reworked ::
+    The '/minibuffer/' is now invisible by default. Commands can be entered
+    into the =document= itself. Still, the chars entered are appended to the
+    minibuffers contents, to keep the possibility to enter more complex
+    commands in the future. The minibuffer is still needed for commands to
+    work in firefox.
+
+  + Section numbers are now read through =window.prompt()= ::
+    This was done to simplify the command interface code. Now the commands
+    entered are just one char in length.
+
+  + Global folding now working ::
+    There was not much to do left for this one to do.
+
+* << 2008-03-13 Do >>
+
+  *Added new config options:*
+
+  + LINK\_UP ::
+    May be set, to link to an other file, preferably the main index page. This
+    link will be displayed as
+    :<a href="LINK_UP">HOME</a>
+    Command: '=h=' - home
+  + LINK\_TO\_MAIN ::
+    May be set, to link to an other file, preferably the main index page. This
+    link will be displayed as
+    :<a href="LINK_TO_MAIN">Up</a>
+    Command: '=H=' - HOME
+
+    This way we can link files into a tree, if all subdirectories in the
+    project follow the same conventions. Like containing some
+    =subdir/index.org= and a homepage somwhere else.
+
+* << 2008-03-12 Mi >>
+
+  + Folding. ::
+    First attempt to get the global folding working. Hmm.
+  + New Commands ::
+    - '=?=' - show the little help screen.
+    - '=n=' - go to next section.
+    - '=p=' - go to previous section.
+    - '=i=' - go to Index.
+    - '=f=' - fold current section when in plain view mode.
+    - '=g=' - fold globally when in plain view mode.
+    - '=u=' - up to parent section.
+    - '=t=' - toggle view mode.
+    - '=v=' - scroll down.
+    - '=V=' - scroll up.
+
+* << 2008-03-11 Di >>
+
+  + Radical code cleanup. ::
+    Removed unused variables and functions. More secure, less
+    errorprone. This cood be even better.
+  + *Org mode like toggling of headlines now basically works.*
+  + Commands can be input through a little 'minibuffer' on top of the screen. ::
+    This needs some special style settings for IE (position fixed). I will
+    append a minimal stylesheet for this purpos the next days in this
+    documentation for copy and paste.
+    This is partially working. Implemented Commands are:
+    - '=help=' - show a little help screen. This done with =alert()= and
+      thus a TODO.
+    - '=t=' - toggle view mode.
+    - '=k=' - kill the /minibuffer/.
+    - '=N=' - where =N= is a section number: goto section =N=. This could be
+      working in both modes very easy, but currently also only in info view
+      mode implemented.
+  + *Code relies now on next generation XHTML-Export format.*
+  + Some kind of rudimentary debugging system. ::
+    May be turned on bei seting config options:
+    :org_html_manager.set("WINDOW_BORDER", "true");
+    :org_html_manager.set("DEBUG", org_html_manager.DEBUG_FATAL);
+  + Better way of configuration for the enduser. Fault tolerant. No undefined ::
+    variables when scanning starts. The users my use the =set(key, value)=
+    function of the =OrgHtmlManger= class like this:
+    :org_html_manager.set ( "LOCAL_TOC",        0);
+    :org_html_manager.set ( "VIEW_BUTTONS", "true");
+    :org_html_manager.set ( "FOLDING",            "true");
+    :org_html_manager.set ( "MOUSE_HINT",         "underline");
+    :org_html_manager.set ( "CONSOLE",            "true");
+    :org_html_manager.setup ();
+  + New configuration accepts these options ::
+    - =SUB\_INDEXES= ::
+      Create subindexes for sections containing sections.
+    - =INFO\_SWITCH\_ALWAYS= ::
+      Show the small '/toggle view/' link next to every Headline to toggle
+      the view easily without scrolling back to top of the page in plain
+      view mode.
+    - =FOLDING= ::
+      This is for the new folding. Turn it on. This will be the default when
+      the moving and toggling has an acceptable form.
+    - =MOUSE\_HINT= ::
+      I love this one. Accepts the keyword '=underline=' or any other
+      value. But if not '=underline=', it should be a valid value to set the
+      =background-color= in CSS. So preferebly something like
+      '=#eeeeee='. In plain view mode with toggle feature turned on the
+      headline with mouse in it will be either hightlighted, if you pass a
+      color, or underlined.
+    - =CONSOLE= ::
+      Display the /minibuffer/ on top of the screen. Turn this one on. It's
+      fun and you can kill it simply by pressing '=k='.
+    - =VIEW= ::
+      Set the initial view mode. Set to =org\_html\_manager.PLAIN\_VIEW= or
+      =org\_html\_manager.INFO\_VIEW=.
+
+* COMMENT html style specifications
+
+# Local Variables:
+# org-export-html-style: "<link rel=\"stylesheet\" type=\"text/css\" href=\"stylesheet.css\" />"
+# End:
