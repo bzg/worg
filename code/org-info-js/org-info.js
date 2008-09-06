@@ -114,6 +114,19 @@ OrgNode.showElement = function (e)
   }
 };
 
+OrgNode.unhideElement = function (e)
+{
+  e.style.display="";
+  e.style.visibility="";
+};
+
+OrgNode.isHidden = function(e)
+{
+  if(e.style.display=='none' || e.style.visibility=='hidden')
+    return true;
+  return false;
+};
+
 OrgNode.toggleElement = function (e)
 {
   if(e.style.display == 'none') {
@@ -1031,46 +1044,65 @@ var org_html_manager = {
     this.ROOT.hideAllChildren();
     OrgNode.hideElement(this.TOC.div);
     if(this.POSTAMBLE) OrgNode.hideElement(this.POSTAMBLE);
-    if(!skip_show_section)
-      this.showSection(sec);
-    document.onclick = function(){org_html_manager.scheduleClick("org_html_manager.nextSection()");};
-    document.ondblclick = function(){org_html_manager.scheduleClick("org_html_manager.previousSection()");};
+    this.adjustSlide(sec);
+    if(!skip_show_section) this.showSection(sec);
   },
 
-  executeClick: function(func)
+  // hide/show List-items. show > 0: show next listitem, < 0 hide last listitem. null means new section.
+  adjustSlide: function(sec, show)
   {
-    eval(func);
-    if(null != this.CLICK_TIMEOUT) this.CLICK_TIMEOUT = null;
-  },
+    var nextForward = true;
+    var nextBack = true;
+    var next = false;
+    if(sec > this.NODE.idx) next = true;
+    if(null == show) next = true;
 
-  scheduleClick: function(func, when)
-  {
-    if(null == when) when = 250;
-    if(null == this.CLICK_TIMEOUT) {
-      this.CLICK_TIMEOUT = window.setTimeout("org_html_manager.executeClick(" + func + ")", when);
+    if(next) {
+      for(var n=this.SECS[sec].folder.firstChild;null != n;n=n.nextSibling){
+        if("UL" == n.nodeName){
+          var lis=n.getElementsByTagName("li");
+          for(var i=1;i<lis.length;++i) {
+            var l = lis[i];
+            OrgNode.hideElement(l); nextForward = false;
+          }
+        }
+      }
     }
     else {
-      window.clearTimeout(this.CLICK_TIMEOUT);
-      this.CLICK_TIMEOUT = null;
+      var lists = this.WINDOW.getElementsByTagName("ul");
+      for(var n=0; n < lists.length; ++n){
+        var lis=lists[n].getElementsByTagName("li");
+        for(var i=1;i<lis.length;++i) {
+          var l = lis[i];
+          if(show > 0){
+            if(OrgNode.isHidden(l)) {
+              OrgNode.unhideElement(l);
+              if(i< (lis.length-1)) nextForward=false;
+              if(0<i) nextBack=false;
+              break;
+            }
+          }
+          else { // show < 0
+            if(!OrgNode.isHidden(l)) {
+              if(1<i) {
+                nextBack=false;
+                OrgNode.hideElement(lis[i - 1]);
+                break;
+              }
+            }
+          }
+        }
+      }
     }
-  },
 
-  nextSection: function()
-  {
-    var i = this.NODE.idx + 1;
-    if(i<this.SECS.length)
-      this.navigateTo(i);
-    else if (this.VIEW == this.SLIDE_VIEW)
-      this.navigateTo(0);
-  },
-
-  previousSection: function()
-  {
-    var i = this.NODE.idx;
-    if(i>0)
-      this.navigateTo(i-1);
-    else if (this.VIEW == this.SLIDE_VIEW)
-      this.navigateTo(this.SECS.length - 1);
+    if(nextForward)
+      document.onclick = function(){org_html_manager.scheduleClick("org_html_manager.nextSection(org_html_manager.NODE.idx + 1)");};
+    else
+      document.onclick = function(){org_html_manager.scheduleClick("org_html_manager.adjustSlide(org_html_manager.NODE.idx, +1)");};
+    if(nextBack)
+      document.ondblclick = function(){org_html_manager.scheduleClick("org_html_manager.previousSection()");};
+    else
+      document.ondblclick = function(){org_html_manager.scheduleClick("org_html_manager.adjustSlide("+this.NODE.idx+", -1)");};
   },
 
   toggleView: function (sec)
@@ -1123,8 +1155,43 @@ var org_html_manager = {
     this.ROOT.durty = false;
   },
 
+
+
+  executeClick: function(func)
+  {
+    if     (this.READING)   { this.endRead(); this.hideConsole(); }
+    else if(this.MESSAGING) { this.removeWarning(); }
+    eval(func);
+    if(null != this.CLICK_TIMEOUT) this.CLICK_TIMEOUT = null;
+  },
+
+  scheduleClick: function(func, when)
+  {
+    if(null == when) when = 250;
+    if(null == this.CLICK_TIMEOUT) {
+      this.CLICK_TIMEOUT = window.setTimeout("org_html_manager.executeClick(" + func + ")", when);
+    }
+    else {
+      window.clearTimeout(this.CLICK_TIMEOUT);
+      this.CLICK_TIMEOUT = null;
+    }
+  },
 
 
+
+  nextSection: function()
+  {
+    var i = this.NODE.idx + 1;
+    if(i<this.SECS.length) this.navigateTo(i);
+    else this.warn("Already last section.");
+  },
+
+  previousSection: function()
+  {
+    var i = this.NODE.idx;
+    if(i>0) this.navigateTo(i-1);
+    else this.warn("Already first section.");
+  },
 
 
   /**
@@ -1135,6 +1202,7 @@ var org_html_manager = {
   {
     if     (this.READING)   { this.endRead(); this.hideConsole(); }
     else if(this.MESSAGING) { this.removeWarning(); }
+    if(this.VIEW == this.SLIDE_VIEW) this.adjustSlide(sec);
     this.pushHistory(sec, this.NODE.idx);
     this.showSection(sec);
   },
