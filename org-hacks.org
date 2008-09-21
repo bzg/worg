@@ -281,3 +281,18 @@ This is useful to make sure what task you are operating on.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
 #+END_SRC emacs-lisp
+
+Under XEmacs:
+
+#+BEGIN_SRC emacs-lisp
+;; hl-line seems to be only for emacs
+(require 'highline)
+(add-hook 'org-agenda-mode-hook '(lambda () (highline-mode 1)))
+
+;; highline-mode does not work straightaway in tty mode.
+;; I use a black background
+(custom-set-faces
+  '(highline-face ((((type tty) (class color)) 
+                    (:background "white" :foreground "black")))))
+#+END_SRC emacs-lisp
+
