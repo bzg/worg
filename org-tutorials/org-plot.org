@@ -22,6 +22,10 @@ demonstrations of some of the many types of graphs which can be
 generated automatically from tables in your org-mode files using
 org-plot.
 
+While graphs will be included in the html version of this tutorial, if
+you would like to play along at home you can download the original org
+file @<a href="org-plot.org">org-plot.org@</a>.
+
 * Getting Set up
 
 ** Requirements
@@ -56,6 +60,8 @@ table are read and applied to the plot.  Notice that the second
 =#+PLOT:= line specifies labels for each column, if this line is
 removed the labels will default to the column headers in the table,
 try removing this line and re-plotting.
+
+[[file:../images/org-plot/example-1.png]]
 
 For a complete list of all of the options and their meanings see the
 [[options]] section at the end of this file.  For more information on
@@ -102,6 +108,8 @@ table.  Notice that the column specified as =ind= contains textual
 non-numeric data, when this is the case org-plot will use the data as
 labels for the x-axis using the gnuplot =xticlabels()= function.
 
+[[file:../images/org-plot/example-2.png]]
+
 #+PLOT: title:"Citas" ind:1 deps:(3) type:2d with:histograms set:"yrange [0:]"
 | Sede      | Max cites | H-index |
 |-----------+-----------+---------|
@@ -117,16 +125,22 @@ the following options on the first table on this page, and replot
 1) remove the =ind:1= option
 2) replace the =with:lines= option with =with:histograms=
 
+[[file:../images/org-plot/example-3.png]]
+
 ** 3d grid plots
 
 There are also some functions for plotting 3d or grid data.  To see an
 example of a grid plot call org-plot/gnuplot =C-M-g= which will plot
 the following table as a grid.
 
+[[file:../images/org-plot/example-4.png]]
+
 To see the effect of =map= try setting it to =t=, and then
 re-plotting.
 
-#+PLOT:  type:grid map:nil title:"org mode"
+[[file:../images/org-plot/example-5.png]]
+
+#+PLOT:  type:grid map:t title:"org mode"
 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -148,6 +162,8 @@ graph.  The following example borrows a short description of org-mode
 from Bernt Hansen on the mailing list (a more practical usage would
 label every single row with something informative).
 
+[[file:../images/org-plot/example-6.png]]
+
 #+PLOT:  type:grid map:t title:"Org-Mode" ind:1
 | text       | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 |            | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -167,11 +183,17 @@ label every single row with something informative).
 
 Finally the last type of graphing currently supported is 3d graphs of
 data in a table.  This will probably require some more knowledge of
-gnuplot to make full use of the many options available.  For some
-simple demonstrations try the following graph using some different
-=with:= options =with:points=, =with:lines=, and =with:pm3d=.
+gnuplot to make full use of the many options available.
 
-#+PLOT: type:3d with:points
+[[file:../images/org-plot/example-7.png]]
+
+For some simple demonstrations try the following graph using some
+different =with:= options =with:points=, =with:lines=, and
+=with:pm3d=.
+
+[[file:../images/org-plot/example-8.png]]
+
+#+PLOT: type:3d with:pm3d
 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | 0 | 2 | 2 | 2 | 2 | 2 | 0 |
 | 0 | 2 | 3 | 3 | 3 | 2 | 0 |
@@ -182,12 +204,10 @@ simple demonstrations try the following graph using some different
 
 * Reference
 
-org-plot requires Emacs, Org-Mode, Gnuplot, and Gnuplot-Mode
+org-plot requires Gnuplot, and Gnuplot-Mode
 
- Emacs        | http://www.gnu.org/software/emacs/ 
- Orgmode      | http://orgmode.org/
- Gnuplot      | http://www.gnuplot.info/
- Gnuplot-Mode | http://cars9.uchicago.edu/~ravel/software/gnuplot-mode.html
+- Gnuplot :: [[http://www.gnuplot.info/]]
+- Gnuplot-Mode :: [[http://cars9.uchicago.edu/~ravel/software/gnuplot-mode.html]]
 
 
 ** Plotting Options
