@@ -66,7 +66,7 @@
 
 * Publishing the /org/ project
 
-  To publish the =~/org/= project to HTML, you'll have to setup the variable
+  To publish the =~/org/= project to HTML, we'll have to setup the variable
   =org-publish-project-alist=. I tend to split each project in three basic
   /components/ as described in the manual. We need these different components,
   since we want org to use two different functions to publish dynamic content
@@ -150,8 +150,8 @@
 ** Pooh - can we publish now?
 
    The good message is *yes, we can*. Just one little hump. Since we've put the
-   definition for our in the =*scratch*= buffer, again, make shure all the
-   /components/ are enclosed by the lines
+   definition for our publishing components in the =*scratch*= buffer, again,
+   make shure all the /components/ are enclosed by the lines
 
    :(require 'org-publish)
    :(setq org-publish-project-alist
@@ -172,7 +172,6 @@
    browser to http://localhost/~user/, if =mod_userdir= is set up. If
    not, simply navigate to file:///home/user/public_html (you might use
    /file -> open/ from the file menu of your browser.
-
 
 * Adding directories
 
@@ -220,6 +219,7 @@
    :#+INFOJS_OPT: view:nil toc:t ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
    :#+LINK_UP:
    :#+LINK_HOME:
+   :#+STYLE:    <link rel="stylesheet" type="text/css" href="../stylesheet.css" />
 
    All we have to do now is to alter the options to match our needs. All the
    options are listed in the wonderful Org-mode manual. Note though, that these
@@ -229,8 +229,8 @@
 
 ** <<<Special comment section>>>
 
-   CSS style variables cannot be supplied in the export options template. For
-   those a special section may be insert/appended to Org-mode files:
+   Also, CSS style variables may be using a special section may be
+   #insert/appended to Org-mode files:
 
    :* COMMENT html style specifications
    :
@@ -251,21 +251,25 @@
   following files there:
 
   + =level-0.org= \\
-    This file contains all export options lines and the special comment section
-    for the stylesheet suitable for each file in the projects root folder
+    This file contains all export options lines. The special comment section
+    will not work for files in subdirectories. Hence we add another export
+    options line:
+    :#+STYLE: <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+    ...suitable for each file in the projects root folder
     (=~/org/= or =~/B/= in the examples). Just drop the =#+TITLE= since this
     will be different for every file and automatically set on export (based on
     the filename if omitted).
   + =level-1.org= \\
-     This file contains all export options lines and the special comment section
-     for the stylesheet suitable for each file in a subfolder of the projects
-     root folder (e.g. =~/org/emacs/= or =~/org/networking/=). Just drop the
-     =#+TITLE= again.
+    This file contains all export options lines for the stylesheet suitable for
+    each file in a subfolder of the projects root folder (e.g. =~/org/emacs/=
+    or =~/org/networking/=). Just drop the =#+TITLE= again. The options line
+    for the stylesheet looks like this:
+    :#+STYLE: <link rel="stylesheet" type="text/css" href="../stylesheet.css" />
+
   + Add more files for more levels.
 
   Now remove the special comment section from the end of your Org-mode files in
-  the project folders (add them to the =level-N.org= files) and change the
-  export options template to
+  the project folders and change the export options template to
 
   :#+SETUPFILE: ~/.emacs.d/org-templates/level-N.org
   :#+TITLE: My Title
@@ -275,6 +279,19 @@
   changes. Subsequent lines still overwrite the settings for just this one file.
 
 
+*** More level files
+
+   Also, these /level-N/ files give us the chance to easily switch between different
+   export setups. As an example, we could have a separate stylesheet and
+   =org-info.js= setup for presentations, and put the appropriate options in a
+   file named =level-0-slides.org=:
+
+   :#+INFOJS_OPT: path:org-info.js
+   :#+INFOJS_OPT: toc:nil view:slide
+   :#+STYLE: <link rel="stylesheet" type="text/css" href="slides.css" />
+
+   Now it's as simple as typing '/-slides/' to change the appearance of any file
+   in our project.
 
 * More Projects
 
@@ -352,7 +369,6 @@
    ...means, =B= =C= =D= and =E= use my local stylesheets and always the latest
    version of =org-info.js=.
 
-
 * Overview
 
   Once there are lots of files and subdirectories, we're in the need of ways to
@@ -417,7 +433,7 @@
 
    For more information you might want to read the great [[http://orgmode.org/#sec-5.1][Org-mode manual]]. One of
    the nicest mailing lists on this planet, BTW, is [[http://lists.gnu.org/archive/html/emacs-orgmode/][emacs-orgmode (archive)]]
-   where you might as well find an answer to your questions.
+   where you might as well find answers to your questions.
 
    Have fun!
 
