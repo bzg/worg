@@ -45,10 +45,10 @@ the great [[file:org-mailing-list.org][Org mailing list]].
 - Veryfy the output of tests with tools like =diff= (think /export/ here).
 - http://www.emacswiki.org/emacs-fr/UnitTesting
 
-* What we to know to actually write tests
+* What we need to know to actually write tests
 
-The tutorial I'd need to write a test is one which lays out code I could copy
-and paste to do the following
+The tutorial I'd need to write a test is one which lays out code I
+could copy and paste to do the following
 
 ** setup the test environment
 
@@ -67,7 +67,7 @@ and paste to do the following
   - create the agenda
   - export .html .ics .dvi file
 
-* How do we specify the correct result???
+** How do we specify the correct result???
 
   - check that the headline folded properly.  What's the lisp code for getting
     the folded string as displayed?
@@ -80,6 +80,33 @@ and paste to do the following
     between them.  That way different people who  run the same test on different
     hosts can get the same result.
 
+** Testing tools
+
+Many of the above questions (how to we setup and tear down tests, and
+how can we make and check assertions) will depend heavily on the
+chosen testing tool.  Two options posited to the list so far are...
+
+- ERT :: (from http://github.com/ohler/ert/tree/master/ert.el) ert is
+         a tool for automated testing, reporting results, as well as
+         debugging errors
+- EmacsLispExpectations :: (from
+     http://www.emacswiki.org/cgi-bin/emacs/EmacsLispExpectations) is
+     a minimalist elisp testing framework based on 
+
+Both of these elisp files have been included in the =tools= directory
+inside this directory.
+
+I've never used EmacsLispExpectations, so I can't make any reasonable
+judgment between the two, perhaps if someone can implement some tests
+in both we could come to some sort of agreement.
+
+*** ERT Example
+
+I implemented a toy test of org's html export facility using ert.el.
+See [[file:ert-publish-test.el]] for the implementation.  To run the test
+open up org-publish-test.el, and =M-x eval-buffer=.  This should load
+ert, and run the simple html export test.
+
 * Clipboard
 
 Running a minimal emacs should suppress custom config files:
@@ -87,3 +114,7 @@ Running a minimal emacs should suppress custom config files:
 
 Getting a list of all variables (incomplete):
 : grep -r defvar lisp/*.el
+
+* COMMENT buffer dictionary
+
+ LocalWords:  ert el EmacsLispExpectations org's
