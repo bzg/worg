@@ -179,6 +179,11 @@ popup window.
     msg "' &") nil nil)))
 #+END_SRC
 
+* Org-Mode + gnome-osd
+
+Richard Riley uses gnome-osd in interaction with Org-Mode to display
+appointments.  You can look at the code on the [[http://www.emacswiki.org/emacs-en/OrgMode-OSD][emacswiki]].
+
 * remind2org 
 
   From Detlef Steuer
@@ -306,35 +311,188 @@ advice that also removes lines that are somewhere inside an
 appointment:
 
 #+begin_src emacs-lisp
+(defun org-time-to-minutes (time)
+  "Convert an HHMM time to minutes"
+  (+ (* (/ time 100) 60) (% time 100)))
+
+(defun org-time-from-minutes (minutes)
+  "Convert a number of minutes to an HHMM time"
+  (+ (* (/ minutes 60) 100) (% minutes 60)))
+
 (defadvice org-agenda-add-time-grid-maybe (around mde-org-agenda-grid-tweakify
-                                                 (list ndays todayp))
- (if (member 'remove-match (car org-agenda-time-grid))
-     (flet ((extract-window
-             (line)
-             (let ((start (get-text-property 1 'time-of-day line))
-                   (dur (get-text-property 1 'duration line)))
-               (cond
-                ((and start dur) (cons start dur))
-                (start start)
-                (t nil))))
-            (duration-add
-             (time duration)
-             (+ time (* 100 (/ duration 60)) (% duration 60))))
-       (let* ((windows (delq nil (mapcar 'extract-window list)))
-              (org-agenda-time-grid
-               (list (car org-agenda-time-grid)
-                     (cadr org-agenda-time-grid)
-                     (remove-if
-                      (lambda (time)
-                        (find-if (lambda (w)
-                                   (if (numberp w)
-                                       (equal w time)
-                                     (and (>= time (car w))
-                                          (< time (duration-add
-                                                   (car w) (cdr w))))))
-                                 windows))
-                      (caddr org-agenda-time-grid)))))
-         ad-do-it))
-   ad-do-it))
+                                                  (list ndays todayp))
+  (if (member 'remove-match (car org-agenda-time-grid))
+      (flet ((extract-window
+              (line)
+              (let ((start (get-text-property 1 'time-of-day line))
+                    (dur (get-text-property 1 'duration line)))
+                (cond
+                 ((and start dur)
+                  (cons start
+                        (org-time-from-minutes
+                         (+ dur (org-time-to-minutes start)))))
+                 (start start)
+                 (t nil)))))
+        (let* ((windows (delq nil (mapcar 'extract-window list)))
+               (org-agenda-time-grid
+                (list (car org-agenda-time-grid)
+                      (cadr org-agenda-time-grid)
+                      (remove-if
+                       (lambda (time)
+                         (find-if (lambda (w)
+                                    (if (numberp w)
+                                        (equal w time)
+                                      (and (>= time (car w))
+                                           (< time (cdr w)))))
+                                  windows))
+                       (caddr org-agenda-time-grid)))))
+          ad-do-it))
+    ad-do-it))
 (ad-activate 'org-agenda-add-time-grid-maybe)
+#+end_src
+
+* Group task list by a property
+
+This advice allows you to group a task list in Org-Mode.  To use it,
+set the variable =org-agenda-group-by-property= to the name of a
+property in the option list for a TODO or TAGS search.  The resulting
+agenda view will group tasks by that property prior to searching.
+
+#+begin_src emacs-lisp
+(defvar org-agenda-group-by-property nil
+  "Set this in org-mode agenda views to group tasks by property")
+
+(defun org-group-bucket-items (prop items)
+  (let ((buckets ()))
+    (dolist (item items)
+      (let* ((marker (get-text-property 0 'org-marker item))
+             (pvalue (org-entry-get marker prop t))
+             (cell (assoc pvalue buckets)))
+        (if cell
+            (setcdr cell (cons item (cdr cell)))
+          (setq buckets (cons (cons pvalue (list item))
+                              buckets)))))
+    (setq buckets (mapcar (lambda (bucket)
+                            (cons (car bucket)
+                                  (reverse (cdr bucket))))
+                          buckets))
+    (sort buckets (lambda (i1 i2)
+                    (string< (car i1) (car i2))))))
+
+(defadvice org-finalize-agenda-entries (around org-group-agenda-finalize
+                                               (list &optional nosort))
+  "Prepare bucketed agenda entry lists"
+  (if org-agenda-group-by-property
+      ;; bucketed, handle appropriately
+      (let ((text ""))
+        (dolist (bucket (org-group-bucket-items
+                         org-agenda-group-by-property
+                         list))
+          (let ((header (concat "Property "
+                                org-agenda-group-by-property
+                                " is "
+                                (or (car bucket) "<nil>") ":\n")))
+            (add-text-properties 0 (1- (length header))
+                                 (list 'face 'org-agenda-structure)
+                                 header)
+            (setq text
+                  (concat text header
+                          ;; recursively process
+                          (let ((org-agenda-group-by-property nil))
+                            (org-finalize-agenda-entries
+                             (cdr bucket) nosort))
+                          "\n\n"))))
+        (setq ad-return-value text))
+    ad-do-it))
+(ad-activate 'org-finalize-agenda-entries)
+#+end_src
+* Link to Gnus messages by Message-Id
+
+In a [[http://thread.gmane.org/gmane.emacs.orgmode/8860][recent thread]] on the Org-Mode mailing list, there was some
+discussion about linking to Gnus messages without encoding the folder
+name in the link.  The following code hooks in to the store-link
+function in Gnus to capture links by Message-Id when in nnml folders,
+and then provides a link type "mid" which can open this link.  The
+=mde-org-gnus-open-message-link= function uses the
+=mde-mid-resolve-methods= variable to determine what Gnus backends to
+scan.  It will go through them, in order, asking each to locate the
+message and opening it from the first one that reports success.
+
+It has only been tested with a single nnml backend, so there may be
+bugs lurking here and there.
+
+The logic for finding the message was adapted from [[http://www.emacswiki.org/cgi-bin/wiki/FindMailByMessageId][an Emacs Wiki
+article]].
+
+#+begin_src emacs-lisp
+;; Support for saving Gnus messages by Message-ID
+(defun mde-org-gnus-save-by-mid ()
+  (when (memq major-mode '(gnus-summary-mode gnus-article-mode))
+    (when (eq major-mode 'gnus-article-mode)
+      (gnus-article-show-summary))
+    (let* ((group gnus-newsgroup-name)
+           (method (gnus-find-method-for-group group)))
+      (when (eq 'nnml (car method))
+        (let* ((article (gnus-summary-article-number))
+               (header (gnus-summary-article-header article))
+               (from (mail-header-from header))
+               (message-id
+                (save-match-data
+                  (let ((mid (mail-header-id header)))
+                    (if (string-match "<\\(.*\\)>" mid)
+                        (match-string 1 mid)
+                      (error "Malformed message ID header %s" mid)))))
+               (date (mail-header-date header))
+               (subject (gnus-summary-subject-string)))
+          (org-store-link-props :type "mid" :from from :subject subject
+                                :message-id message-id :group group
+                                :link (org-make-link "mid:" message-id))
+          (apply 'org-store-link-props
+                 :description (org-email-link-description)
+                 org-store-link-plist)
+          t)))))
+
+(defvar mde-mid-resolve-methods '()
+  "List of methods to try when resolving message ID's.  For Gnus,
+it is a cons of 'gnus and the select (type and name).")
+(setq mde-mid-resolve-methods
+      '((gnus nnml "")))
+
+(defvar mde-org-gnus-open-level 1
+  "Level at which Gnus is started when opening a link")
+(defun mde-org-gnus-open-message-link (msgid)
+  "Open a message link with Gnus"
+  (require 'gnus)
+  (require 'org-table)
+  (catch 'method-found
+    (message "[MID linker] Resolving %s" msgid)
+    (dolist (method mde-mid-resolve-methods)
+      (cond
+       ((and (eq (car method) 'gnus)
+             (eq (cadr method) 'nnml))
+        (funcall (cdr (assq 'gnus org-link-frame-setup))
+                 mde-org-gnus-open-level)
+        (when gnus-other-frame-object
+          (select-frame gnus-other-frame-object))
+        (let* ((msg-info (nnml-find-group-number
+                          (concat "<" msgid ">")
+                          (cdr method)))
+               (group (and msg-info (car msg-info)))
+               (message (and msg-info (cdr msg-info)))
+               (qname (and group
+                           (if (gnus-methods-equal-p
+                                (cdr method)
+                                gnus-select-method)
+                               group
+                             (gnus-group-full-name group (cdr method))))))
+          (when msg-info
+            (gnus-summary-read-group qname nil t)
+            (gnus-summary-goto-article message nil t))
+          (throw 'method-found t)))
+       (t (error "Unknown link type"))))))
+
+(eval-after-load 'org-gnus
+  '(progn
+     (add-to-list 'org-store-link-functions 'mde-org-gnus-save-by-mid)
+     (org-add-link-type "mid" 'mde-org-gnus-open-message-link)))
 #+end_src

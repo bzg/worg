@@ -1,0 +1,120 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) NEW(n)
+#+TITLE:      Testing Org
+#+AUTHOR:     Worg people
+#+EMAIL:      bzg AT altern DOT org
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+# This file is the default header for new Org files in Worg.  Feel free
+# to tailor it to your needs.
+
+[[file:../index.org][{Back to Worg's index}]]
+
+
+Org-mode has grown a big and feature rich application. Help is always needed and
+highly appreciated. If you're not a lisp programmer, you still might help to
+prevent regressions and greatly improve the stability of Org-mode.
+
+This page is meant to provide help with this kind of helping. We hope to provide
+all the information needed here, and hope to create tests for non-programmers
+too.
+
+Currently we are in a very early planning phase, so will find only what we
+_want_ to do. If you're not a worger yet, you may as well post ideas or code to
+the great [[file:org-mailing-list.org][Org mailing list]].
+
+
+* Aims
+
+- Help all non-programmers to help:
+  - Link to tutorials on debugging, emacs debugger...
+
+- Create simple packages with test data, and place them here for download:
+  - Directory trees with org-files for export-stress-testing.
+  - One Org-file per bug to prevent regression.
+  - Name and add corner cases.
+
+- Create automated tests to programm against.
+
+* Ideas for test
+
+- Veryfy the output of tests with tools like =diff= (think /export/ here).
+- http://www.emacswiki.org/emacs-fr/UnitTesting
+
+* What we need to know to actually write tests
+
+The tutorial I'd need to write a test is one which lays out code I
+could copy and paste to do the following
+
+** setup the test environment
+
+   - create a test directory
+   - create a sample test.org file
+   - put the cursor in a particular place
+
+** run the command we need to test
+
+  - hit the 'TAB' key, or C-c C-c (some folks might need to be reminded how to
+    find out exactly what command is actually being run  when you hit a
+    keystroke. And some of me might need to be told what  lisp-code to use when
+    the keystroke runs different commands at  different places in a file)
+  - reformat a table
+  - clock in/out
+  - create the agenda
+  - export .html .ics .dvi file
+
+** How do we specify the correct result???
+
+  - check that the headline folded properly.  What's the lisp code for getting
+    the folded string as displayed?
+  - check that the cursor is where it should be? especially when the cursor is
+    near elipses...
+  - check that the agenda is built properly.  What's the lisp code for getting
+    the agenda as a string?
+  - check that the exported files are correct.  Maybe the right suggestion is to
+    run the export on two different files, so the test  can focus on the 'diff'
+    between them.  That way different people who  run the same test on different
+    hosts can get the same result.
+
+** Testing tools
+
+Many of the above questions (how to we setup and tear down tests, and
+how can we make and check assertions) will depend heavily on the
+chosen testing tool.  Two options posited to the list so far are...
+
+- ERT :: (from http://github.com/ohler/ert/tree/master/ert.el) ert is
+         a tool for automated testing, reporting results, as well as
+         debugging errors
+- EmacsLispExpectations :: (from
+     http://www.emacswiki.org/cgi-bin/emacs/EmacsLispExpectations) is
+     a minimalist elisp testing framework based on 
+
+Both of these elisp files have been included in the =tools= directory
+inside this directory.
+
+I've never used EmacsLispExpectations, so I can't make any reasonable
+judgment between the two, perhaps if someone can implement some tests
+in both we could come to some sort of agreement.
+
+*** ERT Example
+
+I implemented a toy test of org's html export facility using ert.el.
+See [[file:ert-publish-test.el]] for the implementation.  To run the test
+open up org-publish-test.el, and =M-x eval-buffer=.  This should load
+ert, and run the simple html export test.
+
+* Clipboard
+
+Running a minimal emacs should suppress custom config files:
+: emacs -q -l yourtest.el
+
+Getting a list of all variables (incomplete):
+: grep -r defvar lisp/*.el
+
+* COMMENT buffer dictionary
+
+ LocalWords:  ert el EmacsLispExpectations org's
