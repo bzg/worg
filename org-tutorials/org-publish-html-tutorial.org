@@ -4,13 +4,10 @@
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c)
 #+TITLE:      Publishing Org-mode files to HTML
 #+AUTHOR:     Sebastian Rose
-#+EMAIL:      sebastian_rose@gmx.de
+#+EMAIL:      sebastian_rose gmx de
 #+LANGUAGE:   en
 #+PRIORITIES: A C B
 #+CATEGORY:   worg-tutorial
-
-# This file is the default header for new Org files in Worg.  Feel free
-# to tailor it to your needs.
 
 [[file:../index.org][{Back to Worg's index}]]
 
@@ -21,14 +18,26 @@
   from our =*.org= files and to access them via web browser. Simply exporting the
   Org-mode files to HTML would leave them in =~/org/=.
 
+  The XHTML files we create will work every where, on any host, with or without
+  network access, and even when accessed through the =file:///= protocol. To
+  achieve this goal, we use
+
+  - no absolute paths in HTML,
+  - no server side scripting to navigate our output directories,
+  - no =base= element (which is optional as of XHTML 1.0 strict) and
+  - no software, but emacs, Org-mode and a web browser.
+
+  All this means, we are able to check and use the result of work immediately,
+  everywhere.
+
+* Basics
+
   Throughout this tutorial, let's assume that all our Org-mode files live beneath
   =~/org/= and we publish them to =~/public_html/=.
 
   Let's further assume you're already familiar with the note taking basics in
   org and add a little content to the Org-mode files we add to our project
   during this tutorial. Please add at least one headline to each of the files.
-
-* Basics
 
   The first thing to do is to create the folder =~/org=. This is where our notes
   files live. Inside =~/org/= we have a folder =css/= for stylesheets and
@@ -242,56 +251,56 @@
    =../css/stylesheet.css= in a subfolder (first level), \\
    =../../css/stylesheet.css= for a file in a sub-sub-folder.
 
-** Tired of export templates?
+* Tired of export templates?
 
-  If you're like me, you will soon get tired of adding the same export options
-  template to numerous files and adjust the title and paths in it. Luckily,
-  Org-mode supports laziness and offers an additional way to set up files. All
-  we need is a directory (e.g. =~/.emacs.d/org-templates/=) and create the
-  following files there:
+ If you're like me, you will soon get tired of adding the same export options
+ template to numerous files and adjust the title and paths in it. Luckily,
+ Org-mode supports laziness and offers an additional way to set up files. All
+ we need is a directory (e.g. =~/.emacs.d/org-templates/=) and create the
+ following files there:
 
-  + =level-0.org= \\
-    This file contains all export options lines. The special comment section
-    will not work for files in subdirectories. Hence we always use the export
-    options line
-    :#+STYLE: <link rel="stylesheet" type="text/css" href="stylesheet.css" />
-    ...suitable for each file in the projects root folder
-    (=~/org/= or =~/B/= in the examples). Just drop the =#+TITLE= since this
-    will be different for every file and automatically set on export (based on
-    the filename if omitted).
-  + =level-1.org= \\
-    This file contains all export options lines for the stylesheet suitable for
-    each file in a subfolder of the projects root folder (e.g. =~/org/emacs/=
-    or =~/org/networking/=). Just drop the =#+TITLE= again. The options line
-    for the stylesheet looks like this:
-    :#+STYLE: <link rel="stylesheet" type="text/css" href="../stylesheet.css" />
+ + =level-0.org= \\
+   This file contains all export options lines. The special comment section
+   will not work for files in subdirectories. Hence we always use the export
+   options line
+   :#+STYLE: <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+   ...suitable for each file in the projects root folder
+   (=~/org/= or =~/B/= in the examples). Just drop the =#+TITLE= since this
+   will be different for every file and automatically set on export (based on
+   the filename if omitted).
+ + =level-1.org= \\
+   This file contains all export options lines for the stylesheet suitable for
+   each file in a subfolder of the projects root folder (e.g. =~/org/emacs/=
+   or =~/org/networking/=). Just drop the =#+TITLE= again. The options line
+   for the stylesheet looks like this:
+   :#+STYLE: <link rel="stylesheet" type="text/css" href="../stylesheet.css" />
 
-  + Add more files for more levels.
+ + Add more files for more levels.
 
-  Now remove the special comment section from the end of your Org-mode files in
-  the project folders and change the export options template to
+ Now remove the special comment section from the end of your Org-mode files in
+ the project folders and change the export options template to
 
-  :#+SETUPFILE: ~/.emacs.d/org-templates/level-N.org
-  :#+TITLE: My Title
+ :#+SETUPFILE: ~/.emacs.d/org-templates/level-N.org
+ :#+TITLE: My Title
 
-  Replace =N= with distance to the root folder (=0=, =1= etc.) of your project
-  and press =C-c= twice while still on this line to apply the
-  changes. Subsequent lines still overwrite the settings for just this one file.
+ Replace =N= with distance to the root folder (=0=, =1= etc.) of your project
+ and press =C-c= twice while still on this line to apply the
+ changes. Subsequent lines still overwrite the settings for just this one file.
 
 
-*** More level files
+** More level files
 
-   Also, these /level-N/ files give us the chance to easily switch between different
-   export setups. As an example, we could have a separate stylesheet and
-   =org-info.js= setup for presentations, and put the appropriate options in a
-   file named =level-0-slides.org=:
+  Also, these /level-N/ files give us the chance to easily switch between different
+  export setups. As an example, we could have a separate stylesheet and
+  =org-info.js= setup for presentations, and put the appropriate options in a
+  file named =level-0-slides.org=:
 
-   :#+INFOJS_OPT: path:org-info.js
-   :#+INFOJS_OPT: toc:nil view:slide
-   :#+STYLE: <link rel="stylesheet" type="text/css" href="slides.css" />
+  :#+INFOJS_OPT: path:org-info.js
+  :#+INFOJS_OPT: toc:nil view:slide
+  :#+STYLE: <link rel="stylesheet" type="text/css" href="slides.css" />
 
-   Now it's as simple as typing '/-slides/' to change the appearance of any file
-   in our project.
+  Now it's as simple as typing '/-slides/' to change the appearance of any file
+  in our project.
 
 * More Projects
 
