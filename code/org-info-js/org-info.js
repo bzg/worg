@@ -1,12 +1,16 @@
 /**
  * @file
- *       org-info.js, v.0.0.7.6c
+ *       org-info.js, v.0.0.8.1
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
  *
  * This software is subject to the GNU General Public Licens version 2:
  * see: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ * Requirements:
+ *
+ *   Org-mode 6.12a
  *
  * Usage:
  *
@@ -336,8 +340,7 @@ var org_html_manager = {
   SECS: new Array(),           // The OrgNode tree
   REGEX: /(#sec\-)(.*$)/, // identify a section link in toc
   EXCHANGE: /(sec-.*)$/,  // extract the section number
-  FOOTNOTE_REGEX: /^(#fn\.\d*$)/,       // identify a link to a footnote
-  FOOTNOTE_BACK_REGEX: /^(#fnr\.\d*$)/, // identify a link to a footnote src
+  FOOTNOTE_REGEX: /(#fn\.\d*$)/, // identify a link to a footnote
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
   EMPTY_START: /^(\s*)(.*)/,   // Trim (s. getKey())
   EMPTY_END: /\s$/,            // Trim (s. getKey())
@@ -442,10 +445,11 @@ var org_html_manager = {
 
   removeTags: function (str)
   {
-    while(str.match(this.UNTAG_REGEX)) {
-      str = str.substr(0, str.indexOf('<')) + str.substr(str.indexOf('>') + 1);
-      if(this.DEBUG > 5) this.debug += str + "\n";
-    }
+    if(str) {
+      while(str.match(this.UNTAG_REGEX)) {
+        str = str.substr(0, str.indexOf('<')) + str.substr(str.indexOf('>') + 1);
+        if(this.DEBUG > 5) this.debug += str + "\n";
+      }}
     return str;
   },
 
@@ -643,6 +647,30 @@ var org_html_manager = {
     if(! this.ulToOutlines(theIndex))
       return false;
 
+    var fn = document.getElementById('footnotes');
+    if(fn) {
+      var fnheading = null;
+      var c = fn.childNodes;
+      for(var i=0;i<c.length;++i) {
+        if("footnotes"== c[i].className) {
+          fnheading=c[i];
+          break;}}
+      var folder = document.getElementById("footnotes-text");
+      if(null!=folder && null!=fnheading){
+        var sec =  this.SECS.length;
+        fnheading.onclick = function() {org_html_manager.fold("" + sec);};
+        fnheading.style.cursor = "pointer";
+        if(this.MOUSE_HINT) {
+          fnheading.onmouseover = function() {org_html_manager.highlight_headline("" + sec);};
+          fnheading.onmouseout = function() {org_html_manager.unhighlight_headline("" + sec);};
+        }
+        var link = 'javascript:org_html_manager.navigateTo(' + sec + ')';
+        var fnsec= new OrgNode ( fn, fnheading, link, 1, this.SECS[0], "footnotes");
+        fnsec.folder=folder;
+        this.SECS.push(fnsec);
+      }
+    }
+
     if(this.TOC_DEPTH) {
       this.cutToc(theIndex, 1);
     }
@@ -711,6 +739,7 @@ var org_html_manager = {
       }
       li.scanned_for_org = 1;
     }
+    return true;
   },
 
   /**
@@ -909,34 +938,40 @@ var org_html_manager = {
   convertLinks: function ()
   {
     var i = (this.HIDE_TOC ? 0 : 1);
+    var j;
     var last_section = this.SECS.length - 1;
-    for(i; i < this.SECS.length; ++i)
-      {
-        if(this.SECS[i].folder)
-          {
-            var links = this.SECS[i].folder.getElementsByTagName("a");
+    for(i; i < this.SECS.length; ++i) {
+      var links = this.SECS[i].folder.getElementsByTagName("a");
+      for(j=0; j<links.length; ++j) this.doConvertLinks(links[j], i, last_section);
+      links = this.SECS[i].heading.getElementsByTagName("a");
+      for(j=0; j<links.length; ++j) this.doConvertLinks(links[j], i, last_section);
+    }
+  },
 
-            for(var j=0; j<links.length; ++j) {
-              var href = links[j].href.replace(this.BASE_URL, '');
-              if(0 == href.indexOf('#')) {
-                if(links[j].href.match(this.REGEX)) {
-                  var matches = this.EXCHANGE.exec(href);
-                  if(matches) {
-                    var id = matches[1].substr(4);
-                    // could use quicksort like search here:
-                    for(var k = 0; k < this.SECS.length; ++k) {
-                      if(this.SECS[k].base_id == id) {
-                        links[j].href="javascript:org_html_manager.navigateTo("+k+")";
-                        break;
-                      }}}}
-                else if (links[j].href.match(this.FOOTNOTE_REGEX)) {
-                  var matches = this.FOOTNOTE_REGEX.exec(href);
-                  if(matches) {
-                    var id = matches[1].substr(4);
-                    var fn_name = matches[1].substr(1);
-                    links[j].href="javascript:org_html_manager.navigateTo("+last_section+")";
-                    document.getElementsByName(fn_name)[0].href="javascript:org_html_manager.navigateTo("+i+")";
-                  }}}}}}
+
+  doConvertLinks: function(link, sec, foot_sec)
+  {
+    var href = link.href.replace(this.BASE_URL, '');
+
+    if(0 == href.indexOf('#')) {
+      if(href.match(this.REGEX)) {
+        var matches = this.EXCHANGE.exec(href);
+        if(matches) {
+          var id = matches[1].substr(4);
+          // could use quicksort like search here:
+          for(var k = 0; k < this.SECS.length; ++k) {
+            if(this.SECS[k].base_id == id) {
+              link.href="javascript:org_html_manager.navigateTo("+k+")";
+              break;
+            }}}}
+      else if (href.match(this.FOOTNOTE_REGEX)) {
+        var matches = this.FOOTNOTE_REGEX.exec(href);
+        if(matches) {
+          var id = matches[1].substr(4);
+          var fn_name = matches[1].substr(1);
+          link.href="javascript:org_html_manager.navigateTo("+foot_sec+")";
+          document.getElementsByName(fn_name)[0].href="javascript:org_html_manager.navigateTo("+sec+")";
+        }}}
   },
 
 
