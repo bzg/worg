@@ -91,6 +91,17 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
     this.folder = folder;
   }
 
+  this.isTargetFor = new Object();
+  this.isTargetFor[this.base_id] = 1;
+  if(_div) {
+    var a = _div.getElementsByTagName("a");
+    if(a) {
+      for(var i=0;i<a.length;++i) {
+        var n = a[i].getAttribute('name');
+        if(n) this.isTargetFor['#' + n] = 1;
+      }
+    }
+  }
 }
 
 // static variables
@@ -340,7 +351,6 @@ var org_html_manager = {
   SECS: new Array(),           // The OrgNode tree
   REGEX: /(#sec\-)(.*$)/, // identify a section link in toc
   EXCHANGE: /(sec-.*)$/,  // extract the section number
-  FOOTNOTE_REGEX: /(#fn\.\d*$)/, // identify a link to a footnote
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
   EMPTY_START: /^(\s*)(.*)/,   // Trim (s. getKey())
   EMPTY_END: /\s$/,            // Trim (s. getKey())
@@ -471,25 +481,22 @@ var org_html_manager = {
       }
     }
 
-    if(this.BASE_URL.match(this.REGEX)) {
-      // cut the '#sec-x.y.z' from base url.
-      var matches = this.EXCHANGE.exec(this.BASE_URL);
-      var id = matches[1].substr(4);
-      for(var i=0;i<this.SECS.length;++i) {
-        if(this.SECS[i].base_id == id) {
-          this.START_SECTION = i;
-          break;
+    if(scanned_all) {
+      if(-1 != this.BASE_URL.indexOf('?'))
+        this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('?'));
+      if(-1 != this.BASE_URL.indexOf('#')) {
+        this.START_SECTION = this.BASE_URL.substring(this.BASE_URL.indexOf('#'));
+        this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('#'));
+        // change START_SECTION to number:
+        for(var i=0;i<this.SECS.length;++i) {
+          if(this.SECS[i].isTargetFor[this.START_SECTION]) {
+            this.START_SECTION = i;
+            break;
+          }
         }
       }
-    }
-    if(-1 != this.BASE_URL.indexOf('?'))
-      this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('?'));
-    if(-1 != this.BASE_URL.indexOf('#'))
-      this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('#'));
+      this.convertLinks(); // adjust internal links. BASE_URL has to be stripped.
 
-    this.convertLinks(); // adjust internal links. BASE_URL has to be stripped.
-
-    if(scanned_all) {
       var pa=document.getElementById('postamble');
       if(pa) this.POSTAMBLE=pa;
       // Temporary FIX for missing P element if skip:nil
@@ -939,39 +946,17 @@ var org_html_manager = {
   {
     var i = (this.HIDE_TOC ? 0 : 1);
     var j;
-    var last_section = this.SECS.length - 1;
+    var foot_sec = this.SECS.length - 1;
     for(i; i < this.SECS.length; ++i) {
-      var links = this.SECS[i].folder.getElementsByTagName("a");
-      for(j=0; j<links.length; ++j) this.doConvertLinks(links[j], i, last_section);
-      links = this.SECS[i].heading.getElementsByTagName("a");
-      for(j=0; j<links.length; ++j) this.doConvertLinks(links[j], i, last_section);
-    }
-  },
-
-
-  doConvertLinks: function(link, sec, foot_sec)
-  {
-    var href = link.href.replace(this.BASE_URL, '');
-
-    if(0 == href.indexOf('#')) {
-      if(href.match(this.REGEX)) {
-        var matches = this.EXCHANGE.exec(href);
-        if(matches) {
-          var id = matches[1].substr(4);
-          // could use quicksort like search here:
-          for(var k = 0; k < this.SECS.length; ++k) {
-            if(this.SECS[k].base_id == id) {
-              link.href="javascript:org_html_manager.navigateTo("+k+")";
-              break;
-            }}}}
-      else if (href.match(this.FOOTNOTE_REGEX)) {
-        var matches = this.FOOTNOTE_REGEX.exec(href);
-        if(matches) {
-          var id = matches[1].substr(4);
-          var fn_name = matches[1].substr(1);
-          link.href="javascript:org_html_manager.navigateTo("+foot_sec+")";
-          document.getElementsByName(fn_name)[0].href="javascript:org_html_manager.navigateTo("+sec+")";
-        }}}
+      var links = this.SECS[i].div.getElementsByTagName("a");
+      for(j=0; j<links.length; ++j) {
+        var href = links[j].href.replace(this.BASE_URL, '');
+            // could use quicksort like search here:
+            for(var k = 0; k < this.SECS.length; ++k) {
+              if(this.SECS[k].isTargetFor[href]) {
+                links[j].href="javascript:org_html_manager.navigateTo("+k+")";
+                break;
+              }}}}
   },
 
 
