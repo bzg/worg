@@ -75,24 +75,40 @@ string."
     prop))
 
 (defun org-dblock-write:propview (params)
-  "collect the column specification from the #+cols line
-preceeding the dblock, then update the contents of the dblock."
+  "Generates org-collector propview table.
+
+It collects the column specifications from the :cols parameter
+preceeding the dblock, then update the contents of the dblock
+with data from headings selected by the :id parameter. It can be:
+
+ * global      - data from whole document is processed
+ * local       - only current subtree
+ * <org-id>    - only headings with this property :ID:.
+
+If no inheritance is wanted set paramter :no-inherit, to gain
+speed."
   (interactive)
   (condition-case er
-      (let ((cols (plist-get params :cols))
-	    id table)
+      (let* ((cols (plist-get params :cols))
+	     (id (plist-get params :id))
+	     (inherit (not (plist-get params :no-inherit)))
+	     (org-use-tag-inheritance inherit)
+	     (org-use-property-inheritance inherit)
+	     table idpos)
 	(save-excursion
-	  (when (setq id (plist-get params :id))
-	    (cond ((not id) nil)
-		  ((eq id 'global) (goto-char (point-min)))
-		  ((eq id 'local)  nil)
-		  ((setq idpos (org-find-entry-with-id id))
-		   (goto-char idpos))
-		  (t (error "Cannot find entry with :ID: %s" id))))
+	  (cond ((not id) nil)
+		((eq id 'global)
+		 (goto-char (point-min))
+		 (outline-next-heading))
+		((eq id 'local)  nil)
+		((setq idpos (org-find-entry-with-id id))
+		 (goto-char idpos))
+		(t (error "Cannot find entry with :ID: %s" id)))
 	  (org-narrow-to-subtree)
 	  (setq table (org-propview-to-table (org-propview-collect cols)))
 	  (widen))
-	(insert table) (org-cycle))
+	(insert table)
+	(org-cycle))
     (org-collector-error (widen) (error "%s" er))
     (error (widen) (error "%s" er))))
 
