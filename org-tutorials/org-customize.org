@@ -1,0 +1,82 @@
+#+OPTIONS:    H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+TITLE:      Customizing Org-mode
+#+AUTHOR:     Carsten Dominik
+#+EMAIL:      carsten dot dominik at gmail dot com
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+# This file is the default header for new Org files in Worg.  Feel free
+# to tailor it to your needs.
+
+[[file:index.org][{Back to Worg's index}]]
+
+This page contains an illustrated example on how to use the Emacs
+customization system to find the right variable for a particular
+purpose.  Org-mode contains more than 350 options that can be used to
+fine-tune a detail, and it can be daunting to find the right variable
+for a particular job - even though more often than not, the variable
+does exist.
+
+The [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html#Easy-Customization][Emacs customize system]] offers a way out.  Through this system,
+variables of Emacs in general, and of Org-mode in particular can be
+grouped, and organized into a hierarchical system which makes it much
+easier to find the right one.  The best way to start is to /browse a
+customization group/.  This can be done with
+
+#+example
+M-x customize-browse RET
+#+end_example
+
+which enters the top-level group for all of Emacs and lets you drill
+down from there.  Org-mode provides a special command to start
+directory in the Org group:
+
+#+example
+M-x org-customize RET
+#+end_example
+
+You can also access this command from the Org menu under =Org ->
+Customize -> Brows Org Group=.
+
+* How to change the parameters for the clocktable in the Org-mode Daily Agenda
+
+So here is an example.  Recently, Flavio de Souza [[http://article.gmane.org/gmane.emacs.orgmode/9538][asked]] on
+[[http://dir.gmane.org/gmane.emacs.orgmode][emacs-orgmode@gnu.org]] how he could change the maximum level for the
+construction of the clock table in the Org Daily/Weekly agenda.
+
+Here is the illustrated answer:
+
+
+1. In an Org-buffer, use the menu to select
+   Org -> Customize -> Browse Org Group
+
+    [[file:../images/cd/customize-1.png]]
+
+2. Open the "Org Agenda" group by clicking the "+" in front of it.
+
+    [[file:../images/cd/customize-2.png]]
+
+
+3. Inside you find another group: "Daily/Weekly Agenda", and in that group
+   there is the option "Org Agenda Clockreport Parameter Plist":
+
+    [[file:../images/cd/customize-3.png]]
+
+4. When you select this variable, you are in a customization buffer
+   where you can changes the parameters for this option, in your case
+   you will set maxlevel to 3.
+
+    [[file:../images/cd/customize-4.png]]
+
+5. After you are done, click on *Set for current section* and then on
+   *Save for future sessions* near the top of the buffer.
+
+
+It may not always be as simple to find the correct variable, but with
+some clicking around, you will get there.  And if you find that a
+particular variable has a stupid name, or is not in the right group,
+[[mailto:emacs-orgmode@gnu.org][drop us a note on]] so that we can fix things.
