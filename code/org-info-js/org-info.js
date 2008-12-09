@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.8.1
+ *       org-info.js, v.0.0.8.2
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -904,7 +904,7 @@ var org_html_manager = {
         for(var k=0; k < this.SECS[i].children.length; ++k) {
           html += '<li><a href="'
             +this.SECS[i].children[k].link+'">'
-            +this.SECS[i].children[k].heading.innerHTML+'</a></li>';
+            +this.removeTags(this.SECS[i].children[k].heading.innerHTML)+'</a></li>';
         }
         html += '</ul>'; // </li></ul>';
         navi2.innerHTML = html;
