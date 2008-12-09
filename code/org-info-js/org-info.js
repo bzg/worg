@@ -92,7 +92,7 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
   }
 
   this.isTargetFor = new Object();
-  this.isTargetFor[this.base_id] = 1;
+  this.isTargetFor['#sec-' + this.base_id] = 1;
   if(_div) {
     var a = _div.getElementsByTagName("a");
     if(a) {
@@ -900,7 +900,7 @@ var org_html_manager = {
       if(0 < this.SECS[i].children.length && this.LOCAL_TOC)
       {
         var navi2 = document.createElement("div");
-        html = 'Contents:<br /><ul>'; // <li>'+this.SECS[i].heading.innerHTML+'<ul>';
+        html = 'Contents:<br /><ul>';
         for(var k=0; k < this.SECS[i].children.length; ++k) {
           html += '<li><a href="'
             +this.SECS[i].children[k].link+'">'
