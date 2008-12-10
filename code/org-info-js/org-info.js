@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.8.2
+ *       org-info.js, v.0.0.8.3
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -1551,7 +1551,7 @@ var org_html_manager = {
             this.startRead(this.READ_COMMAND_HTML_LINK, "Choose HTML-link type: 's' = section, 'o' = occur");
           } else {
             this.startRead(s, "HTML-link:",
-                           '<a href="' + this.BASE_URL + "#sec-" + this.NODE.base_id + '">' +
+                           '<a href="' + this.BASE_URL +  this.getDefaultTarget() + '">' +
                            document.title + ", Sec. '" + this.removeTags(this.NODE.heading.innerHTML) + "'</a>",
                            "C-c to copy, ");
             window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
@@ -1563,7 +1563,7 @@ var org_html_manager = {
             this.startRead(this.READ_COMMAND_ORG_LINK, "Choose Org-link type: 's' = section, 'o' = occur");
           } else {
             this.startRead(s, "Org-link:",
-                           '[[' + this.BASE_URL + "#sec-" + this.NODE.base_id + '][' +
+                           '[[' + this.BASE_URL + this.getDefaultTarget() + '][' +
                            document.title + ", Sec. '" + this.removeTags(this.NODE.heading.innerHTML) + "']]",
                            "C-c to copy, ");
             window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
@@ -1755,7 +1755,7 @@ var org_html_manager = {
       var c = result.charAt(0);
       if('s' == c) {
         this.startRead(this.READ_COMMAND_NULL, "Org-link to this section:",
-                       '[[' + this.BASE_URL + "#sec-" + this.NODE.base_id + '][' +
+                       '[[' + this.BASE_URL + this.getDefaultTarget() + '][' +
                        document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "']]",
                        "C-c to copy, ");
         window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
@@ -1774,7 +1774,7 @@ var org_html_manager = {
       var c = result.charAt(0);
       if('s' == c) {
         this.startRead(this.READ_COMMAND_NULL, "HTML-link to this section:",
-                       '<a href="' + this.BASE_URL + "#sec-" + this.NODE.base_id + '">' +
+                       '<a href="' + this.BASE_URL + this.getDefaultTarget() + '">' +
                        document.title + ", Sec. '" +  this.removeTags(this.NODE.heading.innerHTML) + "'</a>",
                        "C-c to copy, ");
         window.setTimeout(function(){org_html_manager.CONSOLE_INPUT.select();}, 100);
@@ -1788,7 +1788,16 @@ var org_html_manager = {
         this.warn(c + ": No such link type!");
       }
     }
+  },
 
+  getDefaultTarget: function(node)
+  {
+    if(null == node) node = this.NODE;
+    var loc = "#sec-" + this.NODE.base_id;
+    for(var s in node.isTargetFor) {
+      if(! s.match(this.REGEX)){loc = s; break;}
+    }
+    return loc;
   },
 
 
