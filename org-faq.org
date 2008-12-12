@@ -10,6 +10,7 @@
 * General
 
 ** How do I keep current with Org mode development?
+#<<keeping-current-with-Org-mode-development>>
 
    Org mode is developed in [[http://en.wikipedia.org/wiki/Git_(software)][Git]].  You can keep up-to-date with Org
    mode developement by cloning Org mode repository and refreshing
@@ -69,7 +70,9 @@
       reduces the size of the repository and speeds up data access to
       the objects.
 
+
 ** What is the difference between Org and TaskPaper?
+#<<Org-and-TaskPaper>>
 
   There is really no difference.  Org is as /simple/ as [[http://hogbaysoftware.com/products/taskpaper][TaskPaper]].  It
   is just that, when using Org within Emacs, it lets you do many things
@@ -81,12 +84,14 @@
   Read [[http://article.gmane.org/gmane.emacs.orgmode/6224][Carsten's enlightening statement]] on this.
 
 ** Can I use editing features of org-mode in other modes?
+#<<use-editing-features-in-other-modes>>
 
    Not really.  For tables there is =orgtbl-mode= which implements the
    table editor as a minor mode.  For other features you need to switch
    to Org-mode temporarily, or prepare text in a different buffer.
 
 ** Can I get the visibility-cycling features in outline-mode and outline-minor-mode?
+#<<use-visibility-cycling-in-outline-mode>>
 
    Yes, these functions are written in a way that they are independent of
    the outline setup.  The following setup provides standard Org-mode
@@ -110,71 +115,86 @@ promotion and demotion functionality.  /outline-magic.el/ is
 available at [[http://www.astro.uva.nl/~dominik/Tools/OutlineMagic][Outline Magic]].
 
 ** How can I keep track of changes in my Org files?
+#<<track-of-changes-in-Org-files>>
 
   Use git to track the history of the files, use a cronjob to check in
   changes regularly.  Such a setup is described by Bernt Bernt Hansen
   in [[http://article.gmane.org/gmane.emacs.orgmode/6233][this message]] on [[http://dir.gmane.org/gmane.emacs.orgmode][emacs-orgmode]].
 
 ** Can I use the remember buffer to clock a customer phone call?
+#<<use-remember-buffer-to-clock-phone-call>>
 
   Yes, you can.  Take a look at the [[http://thread.gmane.org/gmane.emacs.orgmode/5482][setup described by Bernt Hansen]]
   and check out (in the same thread) what Nick Docos had to fix to
   make Bernt's set-up work for him.
 
 ** Can I implement a GTD workflow with Org-mode?
+#<<GTD-workflow-with-Org-mode>>
 
   Yes, you can.  Check for discussions and pointers [[http://orgmode.org/worg/org-gtd-etc.org][here]].
 
 ** How can I cycle through the TODO keyword of an entry?
+#<<cycle-TODO-keywords>>
 
   =C-c C-t= or =S-<left/right>= is what you need.
 
 ** How can I quickly set the tag of an entry?
+#<<quickly-set-tag-of-entry>>
 
    Use =C-c C-c= on the headline.
 
 ** Can I select the TODO keywords with a tag-like interface?
+#<<select-TODO-keywords-with-tag-like-interface>>
 
   Yes.  Use =(setq org-use-fast-todo-selection t)=
 
 ** Isearch does not find string hidden in links.  What can I do?
+#<<isearch-in-links>>
 
   M-x =visible-mode= will display the full link, making them searchable.
 
 ** C-k is killing whole subtrees!  I lost my work!
+#<<C-k-is-killing-subtrees>>
 
   =(setq org-special-ctrl-k t)= before losing your work.
 
 ** How can I set up automatic reminders based on Org information?
+#<<automatic-reminders>>
 
   See [[http://article.gmane.org/gmane.emacs.orgmode/5271][this post]] by N. Dokos on the list.
 
 ** I want to add my Org scheduled/deadlined entries in my diary!
+#<<add-Org-scheduled/deadlined-entries-to-diary!>>
 
   Put this in your ~/.diary:
 
   :&%%(org-diary :scheduled :timestamp :deadline)
 
 ** How do I track state changes for tasks in Org?
+#<<track-state-changes-for-tasks>>
 
   Take a look at the [[http://thread.gmane.org/gmane.emacs.orgmode/6082][post by Bernt Hansen]] for setting up TODO keyword
   states and logging timestamps for task state changes.
 
 * Errors
 ** When I try to use Org-mode, I always get the error message =(wrong-type-argument keymapp nil)=
+#<<wrong-type-argument-keymapp>>
 
    This is a conflict with an outdated version of the /allout.el/, see
    the [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] section in the manual
 
 ** Org-mode takes over the S-cursor keys.  I also want to use CUA-mode, is there a way to fix this conflict?
+#<<CUA-mode>>
 
 Yes, see the  [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] section of the manual.
 
 ** Org-mode takes over the S-cursor keys.  I also want to use windmove.el, is there a way to fix this conflict?
+#<<windmove.el>>
 
 Yes, see the [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] section of the manual.
 
 ** Is there a good way to create a description list?
+#<<description-lists>>
 
   Yes, these are now built-in:
 
@@ -188,6 +208,7 @@ Yes, see the [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] s
 * Setup and Structure
 
 ** Can I use Org-mode as the default mode for all README files?
+#<<Org-mode-as-default-mode>>
 
 Add the following to your .emacs file:
 
@@ -199,20 +220,24 @@ mode using
 : (setq default-major-mode 'org-mode)
 
 ** Emacs outlines are unreadable.  Can I get rid of all those stars?
+#<<Emacs-outlines-are-unreadable>>
 
    See the section [[http://orgmode.org/manual/Clean-view.html#Clean-view][Clean outline view]] in the manual.
 
 ** Can I have two windows on the same Org-mode file, with different outline visibilities?
+#<<indirect-buffers>>
 
    You may use /indirect buffers/ which do exactly this.  See the
    documentation on the command =make-indirect-buffer=.
 
 ** How can I insert an empty line before each newly inserted headline, but not before each newly inserted plain-list item?
+#<<empty-line-before-each-new-headline-but-not-item>>
 
 : (setq org-blank-before-new-entry
 :       '((heading . t) (plain-list-item . nil))
 
 ** Can I use ido.el for completing stuff in Org?
+#<<ido-complete>>
 
    Yes, you can.  If you are an ido user and ido-mode is active, the
    following setting will make Org use =ido-completing-read= for most
@@ -220,12 +245,14 @@ mode using
 
 : (setq org-completion-use-ido t)
 
-** How can I reduce the amount of context shown is sparse trees?
+** How can I reduce the amount of context shown in sparse trees?
+#<<context-in-sparse-trees>>
 
    Take a look at the variables =org-show-hierarchy-above= and
    =org-show-following-headline=.
 
 ** How can I combine the results of two calls to =org-occur=?
+#<<two-calls-to-org-occur>>
 
    You can construct a regular expression that matches all targets you
    want.  Alternatively, use a =C-u= prefix with the second and any
@@ -235,11 +262,12 @@ mode using
 * Hyperlinks
 
 ** Why do I have to confirm the execution of each shell/elisp link?
+#<<confirm-shell/elisp-link>>
 
    The confirmation is there to protect you from unwantingly execute
    potentially dangerous commands.  For example, imagine a link
 
-   :[[shell:rm -rf ~/*][ Google Search]]
+   :[ [shell:rm -rf ~/*] [ Google Search] ]
 
    In an Org-mode buffer, this command would look like /Google Search/,
    but really it would remove your home directory.  If you wish, you can
@@ -253,6 +281,7 @@ mode using
    recommend against this.  Be warned.
 
 ** Can I use RET or TAB to follow a link?
+#<<RET-or-TAB-to-follow-link>>
 
    Yes, this is how:
 
@@ -260,6 +289,7 @@ mode using
    : (setq org-tab-follows-link t)
 
 ** Can I keep mouse-1 clicks from following a link?
+#<<mouse-1-following-link>>
 
    Activating links with =mouse-1= is a new feature in Emacs 22, to make
    link behavior similar to other applications like web browsers.  If
@@ -273,6 +303,7 @@ mode using
 * Remember
 
 ** Can I automatically start the clock when opening a remember template?
+#<<start-clock-when-opening-remember-template>>
 
    Yes, this is possible.  Use the following code and make sure that
    after executing it, `my-start-clock-if-needed' is in
@@ -293,6 +324,7 @@ mode using
 * Export
 
 ** Can I get TODO items exported to HTML as lists, rather than as headlines?
+#<<export-TODO-items-as-lists>>
 
    If you plan to use ASCII or HTML export, make sure things you want to
    be exported as item lists are level 4 at least, even if that does
@@ -310,11 +342,13 @@ mode using
    : #+OPTIONS:   H:2; ...
 
 ** Can I export only a single subtree?
+#<<export-single-subtree>>
 
    If you want to export a subtree, mark the subtree as region and then
    export.  Marking can be done with =C-c @ C-x C-x=, for example.
 
 ** How can I get Mac OSX 10.3 iCal to import my Org-exported .ics files?
+#<<iCal-import-ics-files-old>>
 
    When using iCal under Apple MacOS X Tiger, you can create a new
    calendar /OrgMode/ (the default name for the calendar created by =C-c
@@ -334,6 +368,7 @@ mode using
 
 
 ** How can I get Mac OSX 10.4 or later iCal to import my Org-exported .ics files?
+#<<iCal-import-ics-files-new>>
 
    For Mac OS X 10.4, you need to write the ics file to
    =/Library/WebServer/Documents/= and then subscribe iCalendar to
@@ -342,12 +377,14 @@ mode using
 * Tables
 
 ** Can I plot data from a table?
+#<<plotting-table-data>>
 
    Yes, you can, using org-plot.el written by James TD Smith and now
    bundled with Org.  See [[http://orgmode.org/manual/Org-Plot.html#Org-Plot][the manual section about this]].
 
 ** How can I fill a table column with incremental numbers?
-#<<incremental-column>>
+#<<fill-table-column-with-incremental-numbers>>
+
 Here is how: Use a field formula to set the first value in the column:
 
 #+begin_src org
@@ -388,6 +425,7 @@ incremental numbers:
 Note that you could use arbitrary starting values and column formulas.
 
 ** Why does my table column get filled with #ERROR?
+#<<table-column-filled-with-ERROR>>
 
    Org-mode tried to compute the column from other fields using a
    formula stored in the =#+TBLFM:= line just below the table, and
@@ -395,6 +433,7 @@ Note that you could use arbitrary starting values and column formulas.
    formula, or fix the formula, or remove it!
 
 ** How can I stop the table editor from creating new lines?
+#<<table-editor-creates-new-lines>>
 
    When I am in the last column of a table and just above a horizontal
    line in the table, pressing TAB creates a new table line before the
@@ -407,6 +446,7 @@ Note that you could use arbitrary starting values and column formulas.
    : (setq org-table-tab-jumps-over-hlines t)
 
 ** How can I get table fields starting with "="?
+#<<table-fields-starting-with-=>>
 
    With the setting
 
@@ -416,11 +456,13 @@ Note that you could use arbitrary starting values and column formulas.
    commands @<tt>C-c =@</tt> and @<tt>C-u C-c =@</tt>
 
 ** How can I change the indentation of an entire table without fixing every line by hand?
+#<<change-indentation-entire-table>>
 
    The indentation of a table is set by the first line.  So just fix the
    indentation of the first line and realign with =TAB=.
 
 ** In my huge table the realigning after each TAB takes too long.  What can I do?
+#<<table-realigning-after-TAB-takes-long>>
 
    Either split the table into several by inserting an empty line every
    100 lines or so.  Or turn off the automatic re-align with
@@ -432,6 +474,7 @@ Note that you could use arbitrary starting values and column formulas.
    during editing.
 
 ** Recalculation of my table takes too long.  What can I do?
+#<<Recalculation-of-my-table-takes-too-long>>
 
    Nothing, really.  The spreadsheet in org is mostly done to make
    calculations possible, not so much to make them fast.  Since Org-mode
@@ -454,6 +497,7 @@ Note that you could use arbitrary starting values and column formulas.
    all.  If you have a good case, you could try to convince me.
 
 ** =S-RET= in a table keeps increasing the copied numbers.  How can I stop this?
+#<<S-RET-in-a-table-increases-copied-numbers>>
 
    Well, it is /supposed/ to be a feature, to make it easy to create a
    column with increasing numbers.  If this gets into your way, turn it
@@ -465,6 +509,7 @@ Note that you could use arbitrary starting values and column formulas.
 * Agenda
 
 ** Is it possible to include entries from org-mode files into my emacs diary?
+#<<include-entries-from-org-mode-files-into-emacs-diary>>
 
    Since the org-mode agenda is much more powerful and can contain the
    diary, you should think twice before deciding to do this.  If you
@@ -495,14 +540,30 @@ Note that you could use arbitrary starting values and column formulas.
    only in the agenda buffer.
 
 ** How can I make =appt= notice my Org appointments?
+#<<appt-notice-my-Org-appointments>>
 
   :M-x org-agenda-to-appt RET
 
 ** Can I send myself an email containing tasks or other agenda info?
+#<<email-containing-tasks-or-other-agenda-info>>
 
    Yes.  See [[http://article.gmane.org/gmane.emacs.orgmode/6112][this thread]] on the list.
 
 * COMMENT HTML style specifications
+
+(defun org-faq-make-target ()
+  "Make hard target for current headline."
+  (interactive)
+  (if (not (org-on-heading-p))
+      (error "Not on a headline"))
+  (let ((h (org-trim (org-get-heading 'no-tags))))
+    (if (string-match "[ \t]*\\?\\'" h)
+	(setq h (replace-match "" t t h)))
+    (while (string-match "[ \t]+" h)
+	(setq h (replace-match "-" t t h)))
+    (beginning-of-line 2)
+    (insert "#<<" h ">>\n")))
+
 
 # Local Variables:
 # org-export-html-style-extra: "<link rel=stylesheet href=\"org-faq.css\" type=\"text/css\"> <style type=\"text/css\"> </style>"
