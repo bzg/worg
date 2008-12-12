@@ -461,7 +461,7 @@ Note that you could use arbitrary starting values and column formulas.
 
    : (setq org-org-table-copy-increment nil)
 
-
+   
 * Agenda
 
 ** Is it possible to include entries from org-mode files into my emacs diary?
@@ -501,6 +501,64 @@ Note that you could use arbitrary starting values and column formulas.
 ** Can I send myself an email containing tasks or other agenda info?
 
    Yes.  See [[http://article.gmane.org/gmane.emacs.orgmode/6112][this thread]] on the list.
+
+** How can I filter the agenda view by category and/or filetags?
+
+   It is often convenient to group org files into separate categories,
+   such as "home" and "work" (or "personal" and "professional"). One
+   of the main reasons for such classification is to create agenda
+   views that are limited by type of work or area of responsibility.
+   For instance, while at work, one may want to see only one's
+   professional tasks; while away from work, one may want to see only
+   one's personal tasks.
+
+   There are a couple of easy methods to accomplish this in org-mode.
+
+   One way to categorize files and tasks is to use a "#+FILETAGS"
+   declaration at the top of each file, such as
+
+   : #+FILETAGS: work
+
+   As long as org-use-tag-inheritance is turned on, the filetags will
+   be inherited by all tasks in the file. A file can have multiple
+   filetags. And, of course, tags can be added to individual headings.
+ 
+   Tasks can be quickly filtered by tag from within the agenda by
+   typing "/" and the name of the tag. The full key sequence to filter
+   for work items in an agenda view would be:
+
+   : C-c a a / work [or a tag shortcut if you are using them]
+
+   Another way to filter agenda views by type of work is to use a
+   "#+CATEGORY" declaration at the top of each file, such as
+
+   : #+CATEGORY: work
+
+   Categories can also be added to individual headings within a file:
+
+   : * Big project
+   :   :PROPERTIES:
+   :   :CATEGORY: work
+   :   :END:
+
+   All todos belonging to the category "work" can be found a with a
+   simple tags-todo search:
+
+   : C-c a M 
+   
+   At the prompt, type:
+   
+   : CATEGORY="work"
+
+   The same results can be achieved with custom agenda commands, such as:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("h" tags-todo "CATEGORY=\"home\"")
+	("w" tags-todo "CATEGORY=\"work\"")
+	;; other custom agenda commands here
+	))
+#+END_SRC 
 
 * COMMENT HTML style specifications
 
