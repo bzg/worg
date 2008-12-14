@@ -99,6 +99,8 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
       for(var i=0;i<a.length;++i) {
         var n = a[i].getAttribute('name');
         if(n) this.isTargetFor['#' + n] = 1;
+        n = a[i].getAttribute('id');
+        if(n) this.isTargetFor['#' + n] = 1;
       }
     }
   }
