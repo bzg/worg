@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.8.3
+ *       org-info.js, v.0.0.8.4
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -97,10 +97,10 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
     var a = _div.getElementsByTagName("a");
     if(a) {
       for(var i=0;i<a.length;++i) {
-        var n = a[i].getAttribute('name');
+        var n =  a[i].getAttribute('id');
         if(n) this.isTargetFor['#' + n] = 1;
-        n = a[i].getAttribute('id');
-        if(n) this.isTargetFor['#' + n] = 1;
+        else if(n = a[i].getAttribute('name'))
+        this.isTargetFor['#' + n] = 1;
       }
     }
   }
