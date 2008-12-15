@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.8.4
+ *       org-info.js, v.0.0.8.5
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -10,7 +10,7 @@
  *
  * Requirements:
  *
- *   Org-mode 6.12a
+ *   Org-mode >= 6.12a
  *
  * Usage:
  *
@@ -93,17 +93,8 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
 
   this.isTargetFor = new Object();
   this.isTargetFor['#sec-' + this.base_id] = 1;
-  if(_div) {
-    var a = _div.getElementsByTagName("a");
-    if(a) {
-      for(var i=0;i<a.length;++i) {
-        var n =  a[i].getAttribute('id');
-        if(n) this.isTargetFor['#' + n] = 1;
-        else if(n = a[i].getAttribute('name'))
-        this.isTargetFor['#' + n] = 1;
-      }
-    }
-  }
+  OrgNode.findTargetsIn(this.isTargetFor, this.folder);
+  OrgNode.findTargetsIn(this.isTargetFor, this.heading);
 }
 
 // static variables
@@ -114,6 +105,19 @@ OrgNode.STATE_UNFOLDED = 2;
 //
 // static functions
 //
+
+OrgNode.findTargetsIn = function(safe, container)
+{
+  if(container) {
+    var a = container.getElementsByTagName("a");
+    if(a) {
+      for(var i=0;i<a.length;++i) {
+        var n =  a[i].getAttribute('id');
+        if(n) safe['#' + n] = 1;
+        else {
+          n = a[i].getAttribute('name');
+          if(n) safe['#' + n] = 1;
+        }}}}};
 
 OrgNode.hideElement = function (e)
 {
@@ -280,8 +284,6 @@ OrgNode.prototype.fold = function (hide_folder)
       for(var i=0;i<this.children.length;++i) { this.children[i].setState(OrgNode.STATE_FOLDED); }
     }
   }
-  // else
-  //   alert("folder == null\nCheck your org export version.");
 };
 
 /**
@@ -486,6 +488,7 @@ var org_html_manager = {
     if(scanned_all) {
       if(-1 != this.BASE_URL.indexOf('?'))
         this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('?'));
+      var start_section_found = 0;
       if(-1 != this.BASE_URL.indexOf('#')) {
         this.START_SECTION = this.BASE_URL.substring(this.BASE_URL.indexOf('#'));
         this.BASE_URL = this.BASE_URL.substring(0, this.BASE_URL.indexOf('#'));
@@ -493,10 +496,12 @@ var org_html_manager = {
         for(var i=0;i<this.SECS.length;++i) {
           if(this.SECS[i].isTargetFor[this.START_SECTION]) {
             this.START_SECTION = i;
+            start_section_found = 1;
             break;
           }
         }
       }
+      if(! start_section_found) this.START_SECTION = 0;
       this.convertLinks(); // adjust internal links. BASE_URL has to be stripped.
 
       var pa=document.getElementById('postamble');
