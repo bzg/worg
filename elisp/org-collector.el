@@ -42,6 +42,14 @@
 ;; |        |     |     |                         |                          |           |
 ;; #+END:
 ;; 
+;;; History:
+;;
+;; Simplified org-propview-to-table and made unquoted headers (removed
+;; extra format %S call). /mfo 2008-12-16
+;;
+;; Added a :no-inherit feature to gain speed together with some
+;; documentation. /mfo 2008-11-25
+;;
 ;;; Code:
 (require 'org)
 (require 'org-table)
@@ -127,7 +135,7 @@ speed."
     (append
      (list
       ;; create an output list of the headers for each output col
-      (mapcar (lambda (el) (format "%S" el)) cols)
+      cols
       'hline)
      (mapcar ;; for each header's entries
       (lambda (props)
@@ -145,25 +153,17 @@ speed."
 						      (org-read-prop (cdr (assoc (symbol-name el) props)))
 						      el))
 				     (cdr col))))
-		   (message (format "vals-%S" vals))
+		   ;; (message (format "vals-%S" vals))
 		   (condition-case col-er
 		       (and (and-rest vals) (org-read-prop (eval (cons (car col) vals))))
 		     (error (signal 'org-collector-error
-				    (list (format "%S while processing: %S" col-er col)))))
-		   ))
+				    (list (format "%S while processing: %S" col-er col)))))))
 	    :na)) ;; else return an appropriate default
 	 cols))
       header-props))))
 
 (defun org-propview-to-table (results)
-  ;; (message (format "cols:%S" cols))
-  (orgtbl-to-orgtbl
-   (mapcar
-    (lambda (row)
-      (if (equal row 'hline)
-	  'hline
-	(mapcar (lambda (el) (format "%S" el)) row)))
-    (delq nil results)) '()))
+  (orgtbl-to-orgtbl results '(:fmt "%S" :remove-nil-lines)))
 
 (provide 'org-collector)
 ;;; org-collector ends here
