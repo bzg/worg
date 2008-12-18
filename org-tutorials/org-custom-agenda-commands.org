@@ -1,0 +1,265 @@
+#+OPTIONS:    H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+TITLE:      Custom Agenda Commands
+#+AUTHOR:     Matt Lundin
+#+EMAIL:      mdl at imapmail dot org
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+# This file is the default header for new Org files in Worg.  Feel free
+# to tailor it to your needs.
+
+[[file:index.org][{Back to Worg's index}]]
+
+Org-mode's built-in agenda commands are powerful tools for searching
+your notes and for gathering, sorting, filtering, and displaying your
+tasks. As you become familiar with the power of the agenda commands,
+you may want to:
+
+- create shortcuts for frequent agenda searches (e.g., a search for
+  all TODOs with the tag "@computer").
+- combine different different searches into a single [[http://orgmode.org/org.html#Block-agenda][block agenda]].
+  (e.g., a daily agenda plus all TODO items with the tag "@work" and
+  the tag "@computer").
+- change the query and display options for specific agenda searches
+  (sorting, appearance, files used, etc.).
+- set up automatic export of custom agenda views to a variety of
+  formats (html, ps, txt).
+- call user-defined functions from the [[http://orgmode.org/org.html#Agenda-dispatcher][agenda dispatcher]].
+
+All of these things can be accomplished with the variable
+org-agenda-custom-commands.
+
+* How to create custom agenda commands 
+
+The [[http://orgmode.org/org.html][org-mode manual]] provides a [[http://orgmode.org/org.html#Custom-agenda-views][comprehensive explanation]] of custom
+agenda commands. This tutorial is meant to supplement the manual by
+exploring some of the uses and benefits of such customization.
+
+If you have not previously created a custom agenda command, the
+easiest way to get started is to type:
+
+: M-x customize-variable RET org-agenda-custom-commands
+
+The customization buffer for the variable provides a nice interface
+for setting custom commands as well as a full explanation of the
+different components of the setting.
+
+As the documentation explains, the configuration for each custom is a
+list consisting of the following:
+
+- 1) Key :: The shortcut for invoking the command in the agenda
+            dispatcher ("h", "J", etc.).
+- 2) Description (optional) :: The description of the command that
+                    will be displayed in the agenda dispatcher
+                    (optional).
+- 3) Type of search :: The desired agenda display/search. The options
+     include agenda, todo, search, tags, alltodo, tags-todo,
+     todo-tree, tags-tree, occur-tree, or a user-defined function.
+- 4) Search term :: Depending on the type of search, this will be a
+                    TODO keyword, a tag (or property), a word, or a
+                    regular expression.
+- 5) Settings (optional) :: How the agenda command should search and
+     display information. These are local settings, active only for
+     the command in which they are set.
+- 6) Export files (optional) :: If you want the agenda view to be
+     automatically exported when you type C-c a e, then you can
+     include the path to the exported file here. The file extension
+     will determine the export format.
+     
+Here is a sample custom agenda command as one might set it in an
+.emacs file:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands 
+      '(("c" "Desk Work" tags-todo "computer" ;; (1) (2) (3) (4)
+	 ((org-agenda-files '("~/org/widgets.org" "~/org/clients.org")) ;; (5)
+	  (org-agenda-sorting-strategy '(priority-up effort-down))) ;; (5) cont.
+	 ("~/computer.html")) ;; (6)
+	;; ...other commands here
+	))
+#+END_SRC
+	 
+The first line in this custom command contains: 
+
+1. the key to trigger the search ("c")
+2. a description of the search for the agenda dispatcher ("Desk Work")
+3. the type of search (todo items matching a tag)
+4. the tag to search for ("computer")
+
+The next two lines (5) set local options for this agenda command only.
+Any options you set here will not interfere with your global agenda
+settings. In this particular command, the files widgets.org and
+clients.org will be searched and the agenda display will sort the
+todos first by priority, then by estimated effort---regardless or your
+global org-agenda-sorting-strategy.
+
+The last line (6) specifies that this agenda view should be exported
+as HTML to "~/computer.html" when the agenda export function is called
+(C-c a e).
+
+Of course, you need not include all of these components in every
+custom command. A more minimalistic set of instructions might look
+like this:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("w" todo "STARTED") ;; (1) (3) (4)
+	;; ...other commands here
+	))
+#+END_SRC
+
+This will produce a list of all tasks with the todo keyword
+STARTED.[1]
+
+[1] If you omit a description the agenda dispatcher will simply show
+the search type and search string in place of a description.
+
+In addition to agenda views, custom agenda commands can also be used
+to store commonly used searches, such as sparse trees and occur trees.
+See the [[http://orgmode.org/org.html#Sparse-trees][manual's section on sparse trees]] for further information.
+
+As the examples above illustrate, agenda commands can range from
+simple stored searches to elaborate agenda views that diverge
+substantially from your normal agenda settings (different agenda
+files, different sorting strategies, different display options, etc.).
+
+Now, let's look at a few usage scenarios.
+
+* Block agenda views
+
+Perhaps the most common use of custom commands is to save the results
+of frequent agenda searches and (optionally) to combine multiple
+searches together in a single view.
+
+Let's imagine you've just settled in at your office desk in the
+morning, ready for a good day's labor. You want to review your work
+before you get started. As part of your typical routine, you'd like to
+see:
+
+1. your scheduled tasks and upcoming deadlines
+2. any tasks you can do at your computer or in your office or on the
+   phone
+3. any headlines tagged "project" for which CATEGORY="elephants"
+3. any headlines tagged "review" in the file "circuspeanuts.org"
+4. any items that have the todo keyword "WAITING"
+
+You could do a number of agenda searches by hand, first calling the
+agenda, then the tag-todo search, then a tag search, then a tag search
+restricted to the file circuspeanuts.org, and finally the todo keyword
+search. In other words:
+
+: C-c a a
+: C-c a M computer|phone|office
+: C-c a m project+CATEGORY="elephants"
+: C-x b circuspeanuts.org
+: C-c a m < review
+: C-c a T WAITING
+
+That's a lot of manual labor before you've even begun your work. You
+can make your life easier by combining these searches into a single
+agenda command that will compile the results of all the searches:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("O" "Office block agenda"
+	 ((agenda "" ((org-agenda-ndays 1))) 
+	              ;; limits the agenda display to a single day
+	  (tags-todo "computer|office|phone")
+	  (tags "project+CATEGORY=\"elephants\"")
+	  (tags "review" ((org-agenda-files '("~/org/circuspeanuts.org"))))
+	                  ;; limits the tag search to the file circuspeanuts.org
+	  (todo "WAITING"))
+	 ((org-agenda-compact-blocks t))) ;; options set here apply to the entire block
+        ;; ...other commands here
+	))
+#+END_SRC 
+	
+You'll notice that you can set local settings for each of the searches
+in a block agenda. This powerful option enables fine-grained control
+of the agenda display. You could, for instance, create a block agenda
+that display all headlines tagged "office" in the file "widgets.org",
+followed by all headlines tagged "computer" in the file "clients.org",
+and so on.
+       
+If you're into GTD, you can use org-agenda-custom-commands to create
+block views for the weekly review, such as:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("W" "Weekly Review"
+	 ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
+	                                   ;; type "l" in the agenda to review logged items 
+	  (stuck "") ;; review stuck projects as designated by org-stuck-projects
+	  (todo "PROJECT") ;; review all projects (assuming you use todo keywords to designate projects)
+	  (todo "MAYBE") ;; review someday/maybe items
+	  (todo "WAITING"))) ;; review waiting items 
+	 ;; ...other commands here
+	))
+#+END_SRC 
+
+* Making the most of local options 
+   
+Agenda commands can be used for much more than managing workload. They
+are also powerful ways to search and display notes in org files.
+
+One use of custom agenda commands is to create different sets of
+search options. Let's say, for instance, that you have three separate
+directories of org-files:
+
+  - "~/org/" for your project files
+  - "~/website/" for your published files 
+  - "~/archive/" for old projects and notes
+
+Most of the time, you only want to search your project files, so you
+set the global option appropriately:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-files (file-expand-wildcards "~/org/*.org"))
+#+END_SRC
+
+But there are no doubt times when you need to search your website or
+your archive files. To make this possible, you could create the
+following commands:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("Q" . "Custom queries") ;; gives label to "Q" 
+	("Qa" "Archive search" search ""
+	 ((org-agenda-files (file-expand-wildcards "~/archive/*.org")))) 
+	("Qw" "Website search" search ""
+	 ((org-agenda-files (file-expand-wildcards "~/website/*.org"))))
+	("Qb" "Projects and Archive" search ""
+	 ((org-agenda-text-search-extra-files (file-expand-wildcards "~/archive/*.org"))))
+	        ;; searches both projects and archive directories
+	("QA" "Archive tags search" org-tags-view "" 
+	 ((org-agenda-files (file-expand-wildcards "~/archive/*.org"))))
+	;; ...other commands here
+	 ))
+#+END_SRC
+
+Now, you are only a key command away from searching different sets of
+org files.
+
+Note that the key triggers in the example above consist of two
+characters. If you have numerous custom agenda commands, this is a
+nice way to organize the agenda dispatcher into subpages. Only "Q"
+will appear on the main dispatcher view; the commands themselves will
+appear in a second view after you press "Q".
+
+The possibilities for using local search settings are myriad. One
+could, for instance, tweak display options for sparse tree searches by
+using the variables org-show-hierarchy-above and org-show-entry-below
+(see [[http://orgmode.org/org.html#Setting-Options][this section of the manual]]). Or, as Carsten explained in [[http://article.gmane.org/gmane.emacs.orgmode/9984][this
+mailing list post]], one can create custom agenda commands that default
+to a column view:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("x" "With deadline columns" alltodo ""
+	 ((org-agenda-overriding-columns-format "%20ITEM %DEADLINE")
+	  (org-agenda-start-view-columns-initially t)))))
+#+END_SRC
