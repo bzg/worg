@@ -145,18 +145,20 @@ before you get started. As part of your typical routine, you'd like to
 see:
 
 1. your scheduled tasks and upcoming deadlines
-2. any tasks you can do at your computer or in your office or on the
+2. any urgent tasks with the priority "A"
+3. any tasks you can do at your computer or in your office or on the
    phone
-3. any headlines tagged "project" for which CATEGORY="elephants"
-3. any headlines tagged "review" in the file "circuspeanuts.org"
-4. any items that have the todo keyword "WAITING"
+4. any headlines tagged "project" for which CATEGORY="elephants"
+5. any headlines tagged "review" in the file "circuspeanuts.org"
+6. any items that have the todo keyword "WAITING"
 
 You could do a number of agenda searches by hand, first calling the
-agenda, then the tag-todo search, then a tag search, then a tag search
-restricted to the file circuspeanuts.org, and finally the todo keyword
-search. In other words:
+agenda, then the tag-todo search (twice), then a tag search, then a
+tag search restricted to the file circuspeanuts.org, and finally the
+todo keyword search. In other words:
 
 : C-c a a
+: C-c a M +PRIORITY="A"
 : C-c a M computer|office|phone
 : C-c a m project+CATEGORY="elephants"
 : C-x b circuspeanuts.org
@@ -165,14 +167,14 @@ search. In other words:
 
 That would be a lot of manual labor before you had even begun your
 work. You could make your life easier by combining these searches into
-a single agenda command that will compile the results of all the
-searches:
+a single agenda command that compiles the results of all the searches:
 
 #+BEGIN_SRC emacs-lisp
 (setq org-agenda-custom-commands
       '(("O" "Office block agenda"
 	 ((agenda "" ((org-agenda-ndays 1))) 
 	              ;; limits the agenda display to a single day
+	  (tags-todo "+PRIORITY=\"A\"")
 	  (tags-todo "computer|office|phone")
 	  (tags "project+CATEGORY=\"elephants\"")
 	  (tags "review" ((org-agenda-files '("~/org/circuspeanuts.org"))))
@@ -269,4 +271,48 @@ to a column view:
       '(("x" "With deadline columns" alltodo ""
 	 ((org-agenda-overriding-columns-format "%20ITEM %DEADLINE")
 	  (org-agenda-start-view-columns-initially t)))))
+#+END_SRC
+
+* Other configuration ideas
+
+This section is for additional ideas for configuring
+org-agenda-custom-commands. Feel free to add your own configurations
+here.
+
+** GTD contexts
+   
+Keyboard shortcuts to search by GTD contexts. 
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("g" . "GTD contexts")
+	("go" "Office" tags-todo "office")
+	("gc" "Computer" tags-todo "computer")
+	("gp" "Phone" tags-todo "phone")
+	("gh" "Home" tags-todo "home")
+	("ge" "Errands" tags-todo "errands")
+	("G" "GTD Block Agenda"
+	 ((tags-todo "office")
+	  (tags-todo "computer")
+	  (tags-todo "phone")
+	  (tags-todo "home")
+	  (tags-todo "errands"))
+	 nil                      ;; i.e., no local settings
+	 ("~/next-actions.html")) ;; exports block to this file with C-c a e
+       ;; ..other commands here
+	))
+#+END_SRC
+	
+** Priorities 
+   
+Shortcuts to display tasks by priority level:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("p" . "Priorities")
+	("pa" "A items" tags-todo "+PRIORITY=\"A\"")
+	("pb" "B items" tags-todo "+PRIORITY=\"B\"")
+	("pc" "C items" tags-todo "+PRIORITY=\"C\"")
+        ;; ...other commands here
+	))
 #+END_SRC
