@@ -80,13 +80,25 @@
   just a matter of discipline and common sense, not one of Org's design.
 
   Read [[http://article.gmane.org/gmane.emacs.orgmode/6224][Carsten's enlightening statement]] on this.
-
-** Can I use editing features of org-mode in other modes?
+  
+** Can I use the editing features of org-mode in other modes?
 #<<use-editing-features-in-other-modes>>
 
-   Not really.  For tables there is =orgtbl-mode= which implements the
-   table editor as a minor mode.  For other features you need to switch
-   to Org-mode temporarily, or prepare text in a different buffer.
+   Not really---but there are a few editing features you can use in
+   other modes.
+
+   - For tables there is =orgtbl-mode= which implements the table
+     editor as a minor mode. (To enable, type =M-x orgtbl-mode=.)
+   - For ordered lists there is =orgstuct-mode= which allows for easy
+     list editing as a minor mode. (To enable, type =M-x orgstruct-mode=.)
+   
+   You can activate these modes automatically by using hooks:
+
+   : (add-hook 'mail-mode-hook 'turn-on-orgtbl)
+   : (add-hook 'mail-mode-hook 'turn-on-orgstruct)
+
+   For other features you need to switch to Org-mode temporarily, or
+   prepare text in a different buffer.
 
 ** Can I get the visibility-cycling features in outline-mode and outline-minor-mode?
 #<<use-visibility-cycling-in-outline-mode>>
@@ -135,12 +147,12 @@ available at [[http://www.astro.uva.nl/~dominik/Tools/OutlineMagic][Outline Magi
 #<<cycle-TODO-keywords>>
 
   =C-c C-t= or =S-<left/right>= is what you need.
-
+  
 ** How can I quickly set the tag of an entry?
 #<<quickly-set-tag-of-entry>>
 
    Use =C-c C-c= on the headline.
-
+   
 ** Can I select the TODO keywords with a tag-like interface?
 #<<select-TODO-keywords-with-tag-like-interface>>
 
@@ -226,6 +238,19 @@ mode using
 
    You may use /indirect buffers/ which do exactly this.  See the
    documentation on the command =make-indirect-buffer=.
+   
+   Org-mode has built-in commands that allow you create an indirect
+   buffer from a subtree of an outline. To open a subtree in new
+   window, type =C-c C-x b=. Any changes you make in the new window
+   will be saved to the original file, but the visibility of both
+   buffers will remain independent of one another.
+
+   For multiple indirect buffers from the same file, you must use the
+   prefix =C-u= when creating the second (or third) buffer. Otherwise
+   the new indirect buffer will replace the old.
+
+   You can also create an independent view of an outline subtree by
+   typing =b= on an item in the agenda.
 
 ** How can I insert an empty line before each newly inserted headline, but not before each newly inserted plain-list item?
 #<<empty-line-before-each-new-headline-but-not-item>>
