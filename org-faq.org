@@ -527,7 +527,6 @@ Note that you could use arbitrary starting values and column formulas.
    : (setq org-org-table-copy-increment nil)
 
 * Agenda
-
 ** Is it possible to include entries from org-mode files into my emacs diary?
 #<<include-entries-from-org-mode-files-into-emacs-diary>>
 
@@ -628,6 +627,27 @@ Note that you could use arbitrary starting values and column formulas.
 	;; other custom agenda commands here
 	))
 #+END_SRC 
+
+** How can include all org files in a directory in my agenda?
+#<<set-agenda-files-using-wildcards>>
+
+You can use the file-expand-wildcards function to all files ending in
+=org= in a directory to your agenda files list:
+
+: (setq org-agenda-files (file-expand-wildcards "~/org/.*org"))
+
+** Can I add files recursively to my list of agenda files?
+#<<set-agenda-files-recursively>>
+   
+Yes, you can use the library "find-lisp."
+
+: (load-library "find-lisp")
+: (setq org-agenda-files (find-lisp-find-files "~/org" "\.org$"))
+
+This will add all files ending in =org= in the directory "~/org"
+*and* all of its subdirectories to your list of agenda files.
+
+See [[http://thread.gmane.org/gmane.emacs.orgmode/8992][this thread]] on the mailing list for more information.
 
 * COMMENT HTML style specifications
 
