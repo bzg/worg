@@ -13,22 +13,374 @@
 
 [[file:index.org][{Back to Worg's index}]]
 
-This is the list of Org-mode hooks with their default values:
+This is the list of Org-mode hooks and function variables, with their
+documentation strings:
 
-| Hook                             | Default value                       |
-|----------------------------------+-------------------------------------|
-| org-load-hook                    | nil                                 |
-| org-cycle-hook                   | '(org-cycle-hide-archived-subtrees) |
-| org-insert-heading-hook          | nil                                 |
-| org-occur-hook                   | '(org-first-headline-recenter)      |
-| org-follow-link-hook             | nil                                 |
-| org-after-todo-state-change-hook | nil                                 |
-| org-finalize-agenda-hook         | nil                                 |
+* Hooks and Function variables
+
+** =org-load-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook that is run after org.el has been loaded.
+#+end_example
+** =org-cycle-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook that is run after `org-cycle' has changed the buffer visibility.
+    The function(s) in this hook must accept a single argument which indicates
+    the new state that was set by the most recent `org-cycle' command.  The
+    argument is a symbol.  After a global state change, it can have the values
+    `overview', `content', or `all'.  After a local state change, it can have
+    the values `folded', `children', or `subtree'.
+#+end_example
+** =org-insert-heading-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook being run after inserting a new heading.
+#+end_example
+** =org-occur-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook that is run after `org-occur' has constructed a sparse tree.
+    This can be used to recenter the window to show as much of the structure
+    as possible.
+#+end_example
+** =org-make-link-description-function=
+Defined in: /org.el/
+#+begin_example
+    Function to use to generate link descriptions from links. If
+    nil the link location will be used. This function must take two
+    parameters; the first is the link and the second the description
+    org-insert-link has generated, and should return the description
+    to use.
+#+end_example
+** =org-link-translation-function=
+Defined in: /org.el/
+#+begin_example
+    Function to translate links with different syntax to Org syntax.
+    This can be used to translate links created for example by the Planner
+    or emacs-wiki packages to Org syntax.
+    The function must accept two parameters, a TYPE containing the link
+    protocol name like \"rmail\" or \"gnus\" as a string, and the linked path,
+    which is everything after the link protocol.  It should return a cons
+    with possibly modified values of type and path.
+    Org contains a function for this, so if you set this variable to
+    `org-translate-link-from-planner', you should be able follow many
+    links created by planner.
+#+end_example
+** =org-follow-link-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook that is run after a link has been followed.
+#+end_example
+** =org-confirm-shell-link-function=
+Defined in: /org.el/
+#+begin_example
+    Non-nil means, ask for confirmation before executing shell links.
+    Shell links can be dangerous: just think about a link
+    
+         [[shell:rm -rf ~/*][Google Search]]
+    
+    This link would show up in your Org-mode document as \"Google Search\",
+    but really it would remove your entire home directory.
+    Therefore we advise against setting this variable to nil.
+    Just change it to `y-or-n-p' of you want to confirm with a
+    single keystroke rather than having to type \"yes\".
+#+end_example
+** =org-confirm-elisp-link-function=
+Defined in: /org.el/
+#+begin_example
+    Non-nil means, ask for confirmation before executing Emacs Lisp links.
+    Elisp links can be dangerous: just think about a link
+    
+         [[elisp:(shell-command \"rm -rf ~/*\")][Google Search]]
+    
+    This link would show up in your Org-mode document as \"Google Search\",
+    but really it would remove your entire home directory.
+    Therefore we advise against setting this variable to nil.
+    Just change it to `y-or-n-p' of you want to confirm with a
+    single keystroke rather than having to type \"yes\".
+#+end_example
+** =org-after-todo-state-change-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook which is run after the state of a TODO item was changed.
+    The new state (a string with a TODO keyword, or nil) is available in the
+    Lisp variable `state'.
+#+end_example
+** =org-after-tags-change-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook that is run after the tags in a line have changed.
+#+end_example
+** =org-columns-modify-value-for-display-function=
+Defined in: /org.el/
+#+begin_example
+    Function that modifies values for display in column view.
+    For example, it can be used to cut out a certain part from a time stamp.
+    The function must take 2 arguments:
+    
+    column-title    The title of the column (*not* the property name)
+    value           The value that should be modified.
+    
+    The function should return the value that should be displayed,
+    or nil if the normal value should be used.
+#+end_example
+** =org-finish-function=
+Defined in: /org.el/
+#+begin_example
+    Function to be called when `C-c C-c' is used.
+    This is for getting out of special buffers like remember.
+#+end_example
+** =org-mode-hook=
+Defined in: /org.el/
+#+begin_example
+    Mode hook for Org-mode, run after the mode was turned on.
+#+end_example
+** =org-font-lock-hook=
+Defined in: /org.el/
+#+begin_example
+    Functions to be called for special font lock stuff.
+#+end_example
+** =org-store-link-functions=
+Defined in: /org.el/
+#+begin_example
+    List of functions that are called to create and store a link.
+    Each function will be called in turn until one returns a non-nil
+    value.  Each function should check if it is responsible for creating
+    this link (for example by looking at the major mode).
+    If not, it must exit and return nil.
+    If yes, it should return a non-nil value after a calling
+    `org-store-link-props' with a list of properties and values.
+    Special properties are:
+    
+    :type         The link prefix. like \"http\".  This must be given.
+    :link         The link, like \"http://www.astro.uva.nl/~dominik\".
+                  This is obligatory as well.
+    :description  Optional default description for the second pair
+                  of brackets in an Org-mode link.  The user can still change
+                  this when inserting this link into an Org-mode buffer.
+    
+    In addition to these, any additional properties can be specified
+    and then used in remember templates.
+#+end_example
+** =org-create-file-search-functions=
+Defined in: /org.el/
+#+begin_example
+    List of functions to construct the right search string for a file link.
+    These functions are called in turn with point at the location to
+    which the link should point.
+    
+    A function in the hook should first test if it would like to
+    handle this file type, for example by checking the major-mode or
+    the file extension.  If it decides not to handle this file, it
+    should just return nil to give other functions a chance.  If it
+    does handle the file, it must return the search string to be used
+    when following the link.  The search string will be part of the
+    file link, given after a double colon, and `org-open-at-point'
+    will automatically search for it.  If special measures must be
+    taken to make the search successful, another function should be
+    added to the companion hook `org-execute-file-search-functions',
+    which see.
+    
+    A function in this hook may also use `setq' to set the variable
+    `description' to provide a suggestion for the descriptive text to
+    be used for this link when it gets inserted into an Org-mode
+    buffer with \\[org-insert-link].
+#+end_example
+** =org-execute-file-search-functions=
+Defined in: /org.el/
+#+begin_example
+    List of functions to execute a file search triggered by a link.
+    
+    Functions added to this hook must accept a single argument, the
+    search string that was part of the file link, the part after the
+    double colon.  The function must first check if it would like to
+    handle this search, for example by checking the major-mode or the
+    file extension.  If it decides not to handle this search, it
+    should just return nil to give other functions a chance.  If it
+    does handle the search, it must return a non-nil value to keep
+    other functions from trying.
+    
+    Each function can access the current prefix argument through the
+    variable `current-prefix-argument'.  Note that a single prefix is
+    used to force opening a link in Emacs, so it may be good to only
+    use a numeric or double prefix to guide the search function.
+    
+    In case this is needed, a function in this hook can also restore
+    the window configuration before `org-open-at-point' was called using:
+    
+        (set-window-configuration org-window-config-before-follow-link)
+#+end_example
+** =org-blocker-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions that are allowed to block a state change.
+    
+    Each function gets as its single argument a property list, see
+    `org-trigger-hook' for more information about this list.
+    
+    If any of the functions in this hook returns nil, the state change
+    is blocked.
+#+end_example
+** =org-trigger-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions that are triggered by a state change.
+    
+    Each function gets as its single argument a property list with at least
+    the following elements:
+    
+     (:type type-of-change :position pos-at-entry-start
+      :from old-state :to new-state)
+    
+    Depending on the type, more properties may be present.
+    
+    This mechanism is currently implemented for:
+    
+    TODO state changes
+    ------------------
+    :type  todo-state-change
+    :from  previous state (keyword as a string), or nil
+    :to    new state (keyword as a string), or nil
+#+end_example
+** =org-after-todo-statistics-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook that is called after a TODO statistics cookie has been updated.
+    Each function is called with two arguments: the number of not-done entries
+    and the number of done entries.
+    
+    For example, the following function, when added to this hook, will switch
+    an entry to DONE when all children are done, and back to TODO when new
+    entries are set to a TODO status.  Note that this hook is only called
+    when there is a statistics cookie in the headline!
+    
+     (defun org-summary-todo (n-done n-not-done)
+       \"Switch entry to DONE when all subentries are done, to TODO otherwise.\"
+       (let (org-log-done org-log-states)   ; turn off logging
+         (org-todo (if (= n-not-done 0) \"DONE\" \"TODO\"))))
+#+end_example
+** =org-finalize-agenda-hook=
+Defined in: /org-agenda.el/
+#+begin_example
+    Hook run just before displaying an agenda buffer.
+#+end_example
+** =org-agenda-mode-hook=
+Defined in: /org-agenda.el/
+#+begin_example
+    Hook for org-agenda-mode, run after the mode is turned on.
+#+end_example
+** =org-agenda-skip-function=
+Defined in: /org-agenda.el/
+#+begin_example
+    Function to be called at each match during agenda construction.
+    If this function returns nil, the current match should not be skipped.
+    Otherwise, the function must return a position from where the search
+    should be continued.
+    This may also be a Lisp form, it will be evaluated.
+    Never set this variable using `setq' or so, because then it will apply
+    to all future agenda commands.  Instead, bind it with `let' to scope
+    it dynamically into the agenda-constructing command.  A good way to set
+    it is through options in org-agenda-custom-commands.
+#+end_example
+** =org-agenda-after-show-hook=
+Defined in: /org-agenda.el/
+#+begin_example
+    Normal hook run after an item has been shown from the agenda.
+    Point is in the buffer where the item originated.
+#+end_example
+** =org-clock-heading-function=
+Defined in: /org-clock.el/
+#+begin_example
+    When non-nil, should be a function to create `org-clock-heading'.
+    This is the string shown in the mode line when a clock is running.
+    The function is called with point at the beginning of the headline.
+#+end_example
+** =org-export-preprocess-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook for preprocessing an export buffer.
+    Pretty much the first thing when exporting is running this hook.
+#+end_example
+** =org-export-preprocess-after-include-files-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook for preprocessing an export buffer.
+    This is run after the contents of included files have been inserted.
+#+end_example
+** =org-export-preprocess-after-tree-selection-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook for preprocessing an export buffer.
+    This is run after selection of trees to be exported has happened.
+    This selection includes tags-based selection, as well as removal
+    of commented and archived trees.
+#+end_example
+** =org-export-preprocess-before-backend-specifics-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook run before backend-specific functions are called during preprocessing.
+#+end_example
+** =org-export-preprocess-final-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook for preprocessing an export buffer.
+    This is run as the last thing in the preprocessing buffer, just before
+    returning the buffer string to the backend.
+#+end_example
+** =org-before-save-iCalendar-file-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook run before  an iCalendar file has been saved.
+    This can be used to modify the result of the export.
+#+end_example
+** =org-after-save-iCalendar-file-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook run after an iCalendar file has been saved.
+    The iCalendar buffer is still current when this hook is run.
+    A good way to use this is to tell a desktop calendar application to re-read
+    the iCalendar file.
+#+end_example
+** =org-mouse-context-menu-function=
+Defined in: /org-mouse.el/
+#+begin_example
+    Function to create the context menu.
+    The value of this variable is the function invoked by
+    `org-mouse-context-menu' as the context menu.
+#+end_example
+** =org-publish-before-export-hook=
+Defined in: /org-publish.el/
+#+begin_example
+    Hook run before export on the Org file.
+    If the functions in this hook modify the original Org buffer, the
+    modified buffer will be used for export, but the buffer will be
+    restored and saved back to its initial state after export.
+#+end_example
+** =org-publish-after-export-hook=
+Defined in: /org-publish.el/
+#+begin_example
+    Hook run after export on the exported buffer.
+    If functions in this hook modify the buffer, it will be saved.
+#+end_example
+** =org-remember-before-finalize-hook=
+Defined in: /org-remember.el/
+#+begin_example
+    Hook that is run right before a remember process is finalized.
+    The remember buffer is still current when this hook runs.
+#+end_example
+** =org-remember-mode-hook=
+Defined in: /org-remember.el/
+#+begin_example
+    Hook for the minor `org-remember-mode'.
+#+end_example
+* Examples for using hooks
 
 Feel free to give example of how do you use these hooks.  Ideas for
 other hooks are also welcome.
 
-* org-follow-link-hook						 :bzg:
+** org-follow-link-hook							:bzg:
 
 If  you want to display dormant article when following Gnus articles:
 
