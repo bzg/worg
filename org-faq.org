@@ -186,6 +186,21 @@ available at [[http://www.astro.uva.nl/~dominik/Tools/OutlineMagic][Outline Magi
   Take a look at the [[http://thread.gmane.org/gmane.emacs.orgmode/6082][post by Bernt Hansen]] for setting up TODO keyword
   states and logging timestamps for task state changes.
 
+** Why aren't commands working on regions?
+#<<transient-mark-mode>>
+
+Some org-mode commands, such as M-right and M-left for demoting or
+promoting headlines (see [[demote-multiple-headlines][this FAQ]]), can be applied to entire regions.
+These commands, however, will only work on active regions set with
+[[http://www.gnu.org/software/emacs/manual/html_node/emacs/Transient-Mark.html#Transient-Mark][transient mark mode]]. Transient mark mode is enabled by default in
+Emacs 23. To enable it in earlier versions of emacs, put the following
+in your =.emacs= file:
+
+: (setq transient-mark-mode t)
+
+Alternatively, you may turn off transient mark mode and use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Momentary-Mark.html][a
+momentary mark]] (=C-<SPC> C-<SPC>=).
+
 * Errors
 ** When I try to use Org-mode, I always get the error message =(wrong-type-argument keymapp nil)=
 #<<wrong-type-argument-keymapp>>
@@ -314,6 +329,9 @@ region and then hit =M-<right>= to demote all the headlines at once.
 
 Note: =M-S-<right>= will not work on a selected region. Its use is to
 demote a single subtree (i.e., a headline and all sub-headlines).
+
+If M-<right> doesn't seem to work, make sure transient mark mode is
+enabled. See [[transient-mark-mode][this FAQ]].
 
 * Hyperlinks
 ** Why do I have to confirm the execution of each shell/elisp link?
