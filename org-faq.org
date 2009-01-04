@@ -210,6 +210,26 @@ in your =.emacs= file:
 Alternatively, you may turn off transient mark mode and use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Momentary-Mark.html][a
 momentary mark]] (=C-<SPC> C-<SPC>=).
 
+** How can I keep local changes and still track Org mode development?
+
+  Say you want to make minor changes to the Makefile to reflect your location for
+  =emacs= and the install =prefix=.
+
+  Create a local branch for your changes on top of origin/master as follows:
+
+#+BEGIN_EXAMPLE
+$ git checkout -b local origin/master
+$ git config branch.local.rebase true
+# Make your changes to the Makefile and create a new commit
+$ git add Makefile
+$ git commit -m 'My local Makefile configurations'
+# Update git to a newer version
+$ git pull
+#+END_EXAMPLE
+
+  Now each time you pull new commits from the distribution repository your local commits will be
+  rewound and replayed on top of the new origin/master.
+
 * Errors
 ** When I try to use Org-mode, I always get the error message =(wrong-type-argument keymapp nil)=
 #<<wrong-type-argument-keymapp>>
