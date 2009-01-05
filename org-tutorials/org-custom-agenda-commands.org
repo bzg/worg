@@ -330,3 +330,32 @@ Shortcuts to display tasks by priority level:
         ;; ...other commands here
 	))
 #+END_SRC
+** Schedules and deadlines
+
+The following code is useful if you want to see a weekly planner
+containing only appointments---that is, no tasks with schedules and
+deadlines:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("c" "Weekly schedule" agenda ""
+	 ((org-agenda-ndays 7)		;; agenda will start in week view
+	  (org-agenda-repeating-timestamp-show-all t)   ;; ensures that repeating events appear on all relevant dates
+	  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))))  
+	;; limits agenda view to timestamped items
+	;; ...other commands here
+	))
+#+END_SRC
+
+And you can use the following custom command to see appointments
+deadlines due within the next 60 days---that is, no scheduled tasks:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("d" "Upcoming deadlines" agenda ""
+	 ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
+	  (org-deadline-warning-days 60)
+	  (org-agenda-time-grid nil)))
+	;; ...other commands here
+	))
+#+END_SRC
