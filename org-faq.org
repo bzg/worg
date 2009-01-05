@@ -230,6 +230,129 @@ $ git pull
   Now each time you pull new commits from the distribution repository your local commits will be
   rewound and replayed on top of the new origin/master.
 
+-----------
+
+  You would normally work on your =local= branch which includes your custom commits; there's no need to
+  switch back to the =master= branch.
+*** An Example Of Conflict Resolution
+
+For this example we have the following Makefile
+
+#+BEGIN_EXAMPLE
+#
+# Example Makefile
+#
+
+EMACS=emacs
+
+VERSION=V1.0
+#+END_EXAMPLE
+
+and we need to change the =EMACS=emacs= line to =EMACS=myemacs= to make it work well on our system.
+
+To do this we
+
+  - create a local branch for our work
+
+#+BEGIN_EXAMPLE
+$ git checkout -b local origin/master
+$ git config branch.local.rebase true
+#+END_EXAMPLE
+
+    This marks the branch so that all local commits on it are rebased on top of any new commits we get in origin/master during a =git pull= operation.
+
+  - Make our custom changes
+
+    Edit the makefile so it looks like this:
+
+#+BEGIN_EXAMPLE
+#
+# Example Makefile
+#
+
+EMACS=myemacs
+
+VERSION=V1.0
+#+END_EXAMPLE
+
+   - Create a commit with our custom changes
+#+BEGIN_EXAMPLE
+$ git add Makefile
+$ git commit -m 'My local Makefile configurations'
+#+END_EXAMPLE
+
+   - Later we do a =git pull= but that fails with conflicts.
+
+#+BEGIN_EXAMPLE
+$ git pull
+remote: Counting objects: 5, done.
+...
+Patch failed at 0001.
+
+When you have resolved this problem run "git rebase --continue".
+If you would prefer to skip this patch, instead run "git rebase --skip".
+To restore the original branch and stop rebasing run "git rebase --abort".
+#+END_EXAMPLE
+
+     If you get a conflict during a =git pull= you will need to edit the
+     file with the conflict to fix up the conflicting lines and then tell
+     git that you have resolved the conflict.
+
+     Conflict resolution goes something like this:
+
+     - =git pull= fails with a conflict
+     - edit the file
+     - =git add= the file to mark the conflict resolved
+     - =git rebase --continue=
+
+   - Fix the conflict in your favourite editor
+
+     Conflict markers look like this:
+
+#+CAPTION: Example conflict markers
+#+BEGIN_EXAMPLE
+<<<<<<< HEAD:Makefile
+EMACS=emacs22
+=======
+EMACS=myemacs
+>>>>>>> Change emacs location:Makefile
+#+END_EXAMPLE
+
+     This attempted =git pull= caused a conflict.  Fire up your
+     favourite editor and fix the conflict in the Makefile.  The
+     conflict markers are <<<<<<<<<< , ======= , and >>>>>>>>>>.  Fix the
+     Makefile appropriately and delete the conflict markers.  You
+     already edited these lines earlier so fixing it should be
+     trivial.
+
+     In this case we changed =EMACS=emacs= to =EMACS=myemacs= and
+     upstream changed =EMACS=emacs= to =EMACS=emacs22=.  Just fix the
+     file and save it by deleting the conflict markers and keeping the
+     code you need (in this case the =EMACS=myemacs= line which we
+     originally modified.)
+
+   - Mark the file's conflict resolved
+
+#+BEGIN_EXAMPLE
+$ git add Makefile
+#+END_EXAMPLE
+
+     You use =git add= because you are adding new content to be tracked - you're not adding a file, but you are adding changes in content.
+
+   - Continue the rebase operation
+
+#+BEGIN_EXAMPLE
+$ git rebase --continue
+#+END_EXAMPLE
+
+If any other conflicts arise you fix them the same way - edit the file, mark the conflict resolved, and continue.
+
+At anytime during the rebase conflict resolution you can say "oops this is all wrong - put it back the way it was before I did a pull" 
+using
+#+BEGIN_EXAMPLE
+$ git rebase --abort
+#+END_EXAMPLE
+
 * Errors
 ** When I try to use Org-mode, I always get the error message =(wrong-type-argument keymapp nil)=
 #<<wrong-type-argument-keymapp>>
