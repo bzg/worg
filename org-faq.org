@@ -73,23 +73,19 @@
 ** How can I keep local changes and still track Org mode development?
 #<<keeping-local-changes-current-with-Org-mode-development>>
 
-*** Basic setup
-
   Say you want to make minor changes to the Makefile to reflect your
   location for =emacs=.
 
   Create a local branch for your changes on top of origin/master as
   follows:
 
-#+BEGIN_EXAMPLE
-$ git checkout -b local origin/master
-$ git config branch.local.rebase true
-# Make your changes to the Makefile and create a new commit
-$ git add Makefile
-$ git commit -m 'My local Makefile configurations'
-# Update git to a newer version
-$ git pull
-#+END_EXAMPLE
+  : $ git checkout -b local origin/master
+  : $ git config branch.local.rebase true
+  : # Make your changes to the Makefile and create a new commit
+  : $ git add Makefile
+  : $ git commit -m 'My local Makefile configurations'
+  : # Update git to a newer version
+  : $ git pull
 
   Now each time you pull new commits from the distribution repository
   your local commits will be rewound and replayed on top of the new
@@ -101,19 +97,31 @@ $ git pull
   custom commits; there's no need to switch back to the =master=
   branch.
 
-*** An Example Of Conflict Resolution
+-----------
 
-For this example we have the following Makefile
+Here is an example of dealing with conflict resultion during git pull.
 
-#+BEGIN_EXAMPLE
-#
-# Example Makefile
-#
+If you get a conflict during a =git pull= you will need to edit the
+file with the conflict to fix up the conflicting lines and then tell
+git that you have resolved the conflict.
 
-EMACS=emacs
+Conflict resolution goes something like this:
 
-VERSION=V1.0
-#+END_EXAMPLE
+1. =git pull= fails with a conflict
+2. edit the file
+3. =git add= the file to mark the conflict resolved
+4. =git rebase --continue=
+5. lather, rinse, and repeat 2-4 as needed
+
+For this example we have the following Makefile:
+
+: #
+: # Example Makefile
+: #
+: 
+: EMACS=emacs
+: 
+: VERSION=V1.0
 
 and we need to change the =EMACS=emacs= line to =EMACS=myemacs= to
 make it work well on our system.
@@ -122,10 +130,8 @@ To do this we
 
   - create a local branch for our work
 
-#+BEGIN_EXAMPLE
-$ git checkout -b local origin/master
-$ git config branch.local.rebase true
-#+END_EXAMPLE
+    : $ git checkout -b local origin/master
+    : $ git config branch.local.rebase true
 
     This marks the branch so that all local commits on it are rebased
     on top of any new commits we get in origin/master during a =git
@@ -135,94 +141,66 @@ $ git config branch.local.rebase true
 
     Edit the makefile so it looks like this:
 
-#+BEGIN_EXAMPLE
-#
-# Example Makefile
-#
-
-EMACS=myemacs
-
-VERSION=V1.0
-#+END_EXAMPLE
+    : #
+    : # Example Makefile
+    : #
+    : 
+    : EMACS=myemacs
+    : 
+    : VERSION=V1.0
 
   - Create a commit with our custom changes
-#+BEGIN_EXAMPLE
-$ git add Makefile
-$ git commit -m 'My local Makefile configurations'
-#+END_EXAMPLE
+    : $ git add Makefile
+    : $ git commit -m 'My local Makefile configurations'
 
   - Later we do a =git pull= but that fails with conflicts.
 
-#+BEGIN_EXAMPLE
-$ git pull
-remote: Counting objects: 5, done.
-...
-Patch failed at 0001.
-
-When you have resolved this problem run "git rebase --continue".
-If you would prefer to skip this patch, instead run "git rebase --skip".
-To restore the original branch and stop rebasing run "git rebase --abort".
-#+END_EXAMPLE
-
-     If you get a conflict during a =git pull= you will need to edit the
-     file with the conflict to fix up the conflicting lines and then tell
-     git that you have resolved the conflict.
-
-     Conflict resolution goes something like this:
-
-     - =git pull= fails with a conflict
-     - edit the file
-     - =git add= the file to mark the conflict resolved
-     - =git rebase --continue=
+    : $ git pull
+    : remote: Counting objects: 5, done.
+    : ...
+    : Patch failed at 0001.
+    : 
+    : When you have resolved this problem run "git rebase --continue".
+    : If you would prefer to skip this patch, instead run "git rebase --skip".
+    : To restore the original branch and stop rebasing run "git rebase --abort".
 
   - Fix the conflict in your favourite editor
 
-     Conflict markers look like this:
+    Conflict markers look like this:
 
-#+CAPTION: Example conflict markers
-#+BEGIN_EXAMPLE
-<<<<<<< HEAD:Makefile
-EMACS=emacs22
-=======
-EMACS=myemacs
->>>>>>> Change emacs location:Makefile
-#+END_EXAMPLE
+    : <<<<<<< HEAD:Makefile
+    : EMACS=emacs22
+    : =======
+    : EMACS=myemacs
+    : >>>>>>> Change emacs location:Makefile
 
-     This attempted =git pull= caused a conflict.  Fire up your
-     favourite editor and fix the conflict in the Makefile.  The
-     conflict markers are <<<<<<<<<< , ======= , and >>>>>>>>>>.  Fix the
-     Makefile appropriately and delete the conflict markers.  You
-     already edited these lines earlier so fixing it should be
-     trivial.
+    This attempted =git pull= caused a conflict.  Fire up your
+    favourite editor and fix the conflict in the Makefile.  The
+    conflict markers are <<<<<<<<<< , ======= , and >>>>>>>>>>.  Fix
+    the Makefile appropriately and delete the conflict markers.  You
+    already edited these lines earlier so fixing it should be trivial.
 
-     In this case we changed =EMACS=emacs= to =EMACS=myemacs= and
-     upstream changed =EMACS=emacs= to =EMACS=emacs22=.  Just fix the
-     file and save it by deleting the conflict markers and keeping the
-     code you need (in this case the =EMACS=myemacs= line which we
-     originally modified.)
+    In this case we changed =EMACS=emacs= to =EMACS=myemacs= and
+    upstream changed =EMACS=emacs= to =EMACS=emacs22=.  Just fix the
+    file and save it by deleting the conflict markers and keeping the
+    code you need (in this case the =EMACS=myemacs= line which we
+    originally modified.)
 
   - Mark the file's conflict resolved
 
-#+BEGIN_EXAMPLE
-$ git add Makefile
-#+END_EXAMPLE
+    : $ git add Makefile
 
-     You use =git add= because you are adding new content to be tracked - you're not adding a file, but you are adding changes in content.
+    You use =git add= because you are adding new content to be tracked - you're not adding a file, but you are adding changes in content.
 
   - Continue the rebase operation
 
-#+BEGIN_EXAMPLE
-$ git rebase --continue
-#+END_EXAMPLE
+    : $ git rebase --continue
 
-If any other conflicts arise you fix them the same way - edit the file, mark the conflict resolved, and continue.
+    If any other conflicts arise you fix them the same way - edit the file, mark the conflict resolved, and continue.
 
 At anytime during the rebase conflict resolution you can say "oops this is all wrong - put it back the way it was before I did a pull" 
 using
-#+BEGIN_EXAMPLE
-$ git rebase --abort
-#+END_EXAMPLE
-
+: $ git rebase --abort
 
 ** What is the difference between Org and TaskPaper?
 #<<Org-and-TaskPaper>>
