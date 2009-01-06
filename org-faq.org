@@ -300,9 +300,9 @@ available at [[http://www.astro.uva.nl/~dominik/Tools/OutlineMagic][Outline Magi
    You can set tags even more quickly by setting one character
    shortcuts for [[http://orgmode.org/manual/Setting-tags.html#Setting-tags][fast tag selection]].
    
-   For global settings, put something like the following in your
-   =.emacs= file or create the same settings by typing =M-x
-   customize-variable RET org-tag-alist=.
+   To set tag shortcuts for all org buffers, put something like the
+   following in your =.emacs= file (or create the same settings by
+   typing =M-x customize-variable RET org-tag-alist=):
    
 : (setq org-tag-alist '(("computer" . ?c) ("office" . ?o) ("home" . ?h)))
    
@@ -375,18 +375,6 @@ Yes, see the  [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] 
 #<<windmove.el>>
 
 Yes, see the [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] section of the manual.
-
-** Is there a good way to create a description list?
-#<<description-lists>>
-
-  Yes, these are now built-in:
-
-#+BEGIN_EXAMPLE
-- item1 :: Description of this item 1
-- item2 :: Description of this item 2
-- item1 :: Description of this item 3
-      also in multiple lines
-#+END_EXAMPLE
 
 * Setup and Structure
 ** Can I use Org-mode as the default mode for all README files?
@@ -490,6 +478,17 @@ demote a single subtree (i.e., a headline and all sub-headlines).
 
 If M-<right> doesn't seem to work, make sure transient mark mode is
 enabled. See [[transient-mark-mode][this FAQ]].
+** Is there a good way to create a description list?
+#<<description-lists>>
+
+  Yes, these are now built-in:
+
+#+BEGIN_EXAMPLE
+- item1 :: Description of this item 1
+- item2 :: Description of this item 2
+- item1 :: Description of this item 3
+      also in multiple lines
+#+END_EXAMPLE
 
 * Hyperlinks
 ** Why do I have to confirm the execution of each shell/elisp link?
@@ -858,6 +857,30 @@ This will add all files ending in =org= in the directory "~/org"
 and all of its subdirectories to your list of agenda files.
 
 See [[http://thread.gmane.org/gmane.emacs.orgmode/8992][this thread]] on the mailing list for more information.
+
+** How can I change the lead time for deadline warnings?
+##<<warning-period-for-deadlines>>
+
+Deadline warnings appear in the daily agenda view a specified number
+of days before the deadline is due. The default setting is 14 days.
+You can change this with the variable =org-deadline-warning-days=.
+(See [[http://orgmode.org/manual/Deadlines-and-scheduling.html#Deadlines-and-scheduling][this section]] of the manual.)
+
+For instance, 
+
+: (setq org-deadline-warning-days 30)
+
+would cause warnings for each deadline to appear 30 days in advance.
+
+Naturally, you might not want warnings for all of your deadlines to
+appear so far in advance. Thus, you can change the lead time for
+individual items as follows:
+
+: * TODO Get a gift for the party
+:   DEADLINE: <2009-01-16 Fri -2d>
+
+The "-2d" above changes the lead time for this deadline warning to two
+days in advance. You can also use "w" for weeks and "m" for months.
 
 * COMMENT HTML style specifications
 
