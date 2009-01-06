@@ -330,15 +330,15 @@ Shortcuts to display tasks by priority level:
         ;; ...other commands here
 	))
 #+END_SRC
-** Schedules and deadlines
+** Calendar style views
 
 The following code is useful if you want to see a weekly planner
-containing only appointments---that is, no tasks with schedules and
-deadlines:
+containing only appointments---that is, with deadlines and scheduled
+items omitted:
 
 #+BEGIN_SRC emacs-lisp
 (setq org-agenda-custom-commands
-      '(("c" "Weekly schedule" agenda ""
+'(("c" "Weekly schedule" agenda ""
 	 ((org-agenda-ndays 7)		;; agenda will start in week view
 	  (org-agenda-repeating-timestamp-show-all t)   ;; ensures that repeating events appear on all relevant dates
 	  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))))  
@@ -347,15 +347,64 @@ deadlines:
 	))
 #+END_SRC
 
-And you can use the following custom command to see appointments
-deadlines due within the next 60 days---that is, no scheduled tasks:
+Another example: you could use the following custom command to see
+deadlines due within the next 60 days:
 
 #+BEGIN_SRC emacs-lisp
 (setq org-agenda-custom-commands
       '(("d" "Upcoming deadlines" agenda ""
 	 ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
+	  (org-agenda-ndays 1)
 	  (org-deadline-warning-days 60)
 	  (org-agenda-time-grid nil)))
 	;; ...other commands here
+	))
+#+END_SRC
+	
+** Printed agenda
+   
+Here's a fairly complex example of an agenda. The command below will
+create a black-and-white block agenda that lists:
+
+1. An overview of appointments for the next seven days.
+   - I.e., timestamped items but not deadlines or scheduled tasks
+2. A compact daily agenda.
+3. A list of todos sorted by context.
+
+The sorted todos look like this:
+
+: [ ] errands:  Wash car
+: [ ] errands:  Grocery shopping
+: [ ] home:  Do laundry
+: [ ] home:  Take out trash
+
+And the entire agenda will be saved in two-column, landscape
+postscript file when you type =C-c a e=.
+
+Here's the code:
+ 
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("P" "Printed agenda"
+	 ((agenda "" ((org-agenda-ndays 7)			;; overview of appointments
+		      (org-agenda-start-on-weekday nil)		;; calendar begins today
+		      (org-agenda-repeating-timestamp-show-all t)
+		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))))
+	  (agenda "" ((org-agenda-ndays 1)			;; daily agenda
+		      (org-agenda-todo-keyword-format "")
+		      (org-agenda-scheduled-leaders '("" "%dx"))
+		      (org-agenda-prefix-format "[ ] %t% s")))
+	  (todo "TODO"						;; todos sorted by context
+		((org-agenda-prefix-format "[ ] %T: ")
+		 (org-agenda-sorting-strategy '(tag-up priority-down))
+		 (org-agenda-todo-keyword-format "")
+		 (org-agenda-overriding-header "\nTasks by Context\n------------------\n"))))
+	 ((org-agenda-with-colors nil)
+	  (org-agenda-compact-blocks t)
+	  (org-agenda-remove-tags t)
+	  (ps-number-of-columns 2)
+	  (ps-landscape-mode t))
+	 ("~/agenda.ps"))
+	;; other commands go here
 	))
 #+END_SRC
