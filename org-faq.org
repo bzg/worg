@@ -233,9 +233,9 @@ using
    
    For footnotes, there is the function =org-footnote-action=, which
    works in non-org buffers. This function is a powerful tool for
-   creating and sorting footnotes. To use it globally, you might want
-   to add the following line to your =.emacs= file (requires Org 6.17
-   or greater):
+   creating and sorting footnotes. To use it globally, you can add the
+   following keybinding to your =.emacs= file (requires Org 6.17 or
+   greater):
    
    : (global-set-key (kbd "C-c f") 'org-footnote-action)
    
@@ -478,6 +478,7 @@ demote a single subtree (i.e., a headline and all sub-headlines).
 
 If M-<right> doesn't seem to work, make sure transient mark mode is
 enabled. See [[transient-mark-mode][this FAQ]].
+
 ** Is there a good way to create a description list?
 #<<description-lists>>
 
@@ -594,7 +595,6 @@ enabled. See [[transient-mark-mode][this FAQ]].
    :  (lambda ()
    :   (shell-command
    :    "osascript -e 'tell application \"iCal\" to reload calendars'")))
-
 
 ** How can I get Mac OSX 10.4 or later iCal to import my Org-exported .ics files?
 #<<iCal-import-ics-files-new>>
@@ -858,7 +858,7 @@ and all of its subdirectories to your list of agenda files.
 
 See [[http://thread.gmane.org/gmane.emacs.orgmode/8992][this thread]] on the mailing list for more information.
 
-** How can I change the lead time for deadline warnings?
+** How can I change the advanced warning time for deadlines?
 ##<<warning-period-for-deadlines>>
 
 Deadline warnings appear in the daily agenda view a specified number
@@ -881,6 +881,26 @@ individual items as follows:
 
 The "-2d" above changes the lead time for this deadline warning to two
 days in advance. You can also use "w" for weeks and "m" for months.
+
+** How can I postpone a task until a certain date?
+#<<deferring-tasks>>
+   
+The easiest way to postpone a task is to schedule it in the future.
+For instance, typing =C-c C-s +2w= on a headline will push a task two
+weeks into the future, so that it won't show up on the daily agenda
+until two weeks from now.
+
+If you also don't want the task to show up on your global todo list,
+you have a couple of options.
+
+1. You can set the variable =org-agenda-todo-ignore-scheduled= to =t=.
+   This will exclude any scheduled items from your global list of
+   active todos (=C-c a t=). (The variable
+   =org-agenda-todo-ignore-with-date= will exclude both scheduled and
+   deadline items from your todo list).
+2. You can remove the todo keyword from the item (C-c C-t <SPC>). The
+   item will still appear on your agenda two weeks from today, but it
+   won't show up on your todo lists.
 
 * COMMENT HTML style specifications
 
