@@ -566,6 +566,16 @@ enabled. See [[transient-mark-mode][this FAQ]].
 
    : (setq org-mouse-1-follows-link nil)
 
+** How can I get completion of file names when creating a link?
+#<<auto-completion-of-file-links>>
+   
+You can use org-insert-link with a prefix argument:
+
+: C-u C-c C-l
+
+You will be greeted with prompt in the minibuffer that allows for file
+completion using your preferred Emacs method for finding files.
+
 * Remember
 ** Can I automatically start the clock when opening a remember template?
 #<<start-clock-when-opening-remember-template>>
@@ -948,20 +958,43 @@ list, you have a couple of options.
    item will still appear on your agenda two weeks from today, but it
    won't show up on your todo lists.
 
+** How can I shedule an weekly appointment that lasts only until a certain date?
+#<<diary-sexp-in-org-files>>
+
+Org-mode's active timestamps work very well for scheduling individual
+or recurring appointments, such as:
+
+: * 8:00am Dentist appointment <2009-01-16 Fri>
+
+or 
+
+: * Weekly meeting with boss
+:   <2009-01-20 Tue 14:00 +1w>
+
+Sometimes, however, you need to set up more complicated recurring
+appointments. Org-mode has built-in support for many of [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Sexp-Diary-Entries.html][the powerful
+sexp entries]] that work in [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Diary.html#Diary][Emacs diary]]. Let's say, for instance, that
+you teach a class that meets every Monday evening between February 16
+and April 20, 2009. The way to enter this an org-mode file is:
+
+: ** My evening 7:00pm-9:00pm
+: <%%(and (= 1 (calendar-day-of-week date)) (diary-block 2 16 2009 4 20 2009))>
+
+The expression above designates all Mondays (1) that fall between
+February 16 and April 20.
+
+For more ideas on how to create such expressions, see [[http://www.emacswiki.org/cgi-bin/wiki/DiaryMode][this page on the
+Emacs wiki]].
+
+
 * COMMENT HTML style specifications
 
-(defun org-faq-make-target ()
-  "Make hard target for current headline."
-  (interactive)
-  (if (not (org-on-heading-p))
-      (error "Not on a headline"))
-  (let ((h (org-trim (org-get-heading 'no-tags))))
-    (if (string-match "[ \t]*\\?\\'" h)
-	(setq h (replace-match "" t t h)))
-    (while (string-match "[ \t]+" h)
-	(setq h (replace-match "-" t t h)))
-    (beginning-of-line 2)
-    (insert "#<<" h ">>\n")))
+(defun org-faq-make-target () "Make hard target for current headline."
+  (interactive) (if (not (org-on-heading-p)) (error "Not on a
+  headline")) (let ((h (org-trim (org-get-heading 'no-tags)))) (if
+  (string-match "[ \t]*\\?\\'" h) (setq h (replace-match "" t t h)))
+  (while (string-match "[ \t]+" h) (setq h (replace-match "-" t t h)))
+  (beginning-of-line 2) (insert "#<<" h ">>\n")))
 
 
 # Local Variables:
