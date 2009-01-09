@@ -7,7 +7,43 @@
 #+INFOJS_OPT: view:info toc:1 path:http://orgmode.org/worg/code/org-info-js/org-info.js tdepth:1 ftoc:t buttons:0 mouse:underline
 #+OPTIONS:   H:3 num:nil toc:t \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
 
-* General
+* Welcome
+  
+Welcome to the Org-mode FAQ. 
+
+You can navigate the FAQ by clicking on any of the topics in the Table
+of Contents.
+
+If your browser supports JavaScript, you can...
+
+- Move through the topics by typing "n" (next) and "p" (previous) .
+
+- For an expandable outline view of the FAQ, type "m" or click "toggle
+  view" (above).
+
+- To search the FAQ, type "s" (basic search) or "o" (occur tree). 
+
+- For a full list of navigation commands, type "?" or click on "Help"
+  (above).
+
+* What is org-mode?
+** Can I implement a GTD workflow with Org-mode?
+#<<GTD-workflow-with-Org-mode>>
+
+  Yes, you can.  Check for discussions and pointers [[http://orgmode.org/worg/org-gtd-etc.php][here]].
+
+** What is the difference between Org and TaskPaper?
+#<<Org-and-TaskPaper>>
+
+  There is really no difference.  Org is as /simple/ as [[http://hogbaysoftware.com/products/taskpaper][TaskPaper]].  It
+  is just that, when using Org within Emacs, it lets you do many things
+  that you wouldn't be able to do with TaskPaper.  Yes, TaskPaper is
+  fiddle-proof and people using Emacs tends to like fiddling (which is
+  orthogonal to the idea of using todo-list efficiently), but this is
+  just a matter of discipline and common sense, not one of Org's design.
+
+  Read [[http://article.gmane.org/gmane.emacs.orgmode/6224][Carsten's enlightening statement]] on this.
+* Keeping current
 ** How do I keep current with Org mode development?
 #<<keeping-current-with-Org-mode-development>>
 
@@ -68,7 +104,6 @@
       which will consolidate loose git objects into pack files.  This
       reduces the size of the repository and speeds up data access to
       the objects.
-
 
 ** How can I keep local changes and still track Org mode development?
 #<<keeping-local-changes-current-with-Org-mode-development>>
@@ -201,19 +236,8 @@ To do this we
 At anytime during the rebase conflict resolution you can say "oops this is all wrong - put it back the way it was before I did a pull" 
 using
 : $ git rebase --abort
-
-** What is the difference between Org and TaskPaper?
-#<<Org-and-TaskPaper>>
-
-  There is really no difference.  Org is as /simple/ as [[http://hogbaysoftware.com/products/taskpaper][TaskPaper]].  It
-  is just that, when using Org within Emacs, it lets you do many things
-  that you wouldn't be able to do with TaskPaper.  Yes, TaskPaper is
-  fiddle-proof and people using Emacs tends to like fiddling (which is
-  orthogonal to the idea of using todo-list efficiently), but this is
-  just a matter of discipline and common sense, not one of Org's design.
-
-  Read [[http://article.gmane.org/gmane.emacs.orgmode/6224][Carsten's enlightening statement]] on this.
   
+* Setup
 ** Can I use the editing features of org-mode in other modes?
 #<<use-editing-features-in-other-modes>>
 
@@ -273,76 +297,26 @@ available at [[http://www.astro.uva.nl/~dominik/Tools/OutlineMagic][Outline Magi
   changes regularly.  Such a setup is described by Bernt Hansen
   in [[http://article.gmane.org/gmane.emacs.orgmode/6233][this message]] on [[http://dir.gmane.org/gmane.emacs.orgmode][emacs-orgmode]].
 
-** Can I use the remember buffer to clock a customer phone call?
-#<<use-remember-buffer-to-clock-phone-call>>
+** Can I use Org-mode as the default mode for all README files?
+#<<Org-mode-as-default-mode>>
 
-  Yes, you can.  Take a look at the [[http://thread.gmane.org/gmane.emacs.orgmode/5482][setup described by Bernt Hansen]]
-  and check out (in the same thread) what Nick Docos had to fix to
-  make Bernt's set-up work for him.
+Add the following to your .emacs file:
 
-** Can I implement a GTD workflow with Org-mode?
-#<<GTD-workflow-with-Org-mode>>
+: (add-to-list 'auto-mode-alist '("README$" . org-mode))
 
-  Yes, you can.  Check for discussions and pointers [[http://orgmode.org/worg/org-gtd-etc.php][here]].
-  
-** How can I cycle through the TODO keyword of an entry?
-#<<cycle-TODO-keywords>>
+You can even make it the default mode for any files with unspecified
+mode using
 
-  =C-c C-t= or =S-<left/right>= is what you need.
-  
-** How can I quickly set the tag of an entry?
-#<<quickly-set-tag-of-entry>>
+: (setq default-major-mode 'org-mode)
 
-   Use =C-c C-c= or =C-c C-q= on the headline. =C-c C-q= is useful for
-   setting tabs in a [[http://orgmode.org/manual/Remember.html#Remember][remember]] buffer, since =C-c C-c= is the default
-   keybinding for filing a note from the remember buffer.
-  
-   You can set tags even more quickly by setting one of the character
-   shortcuts for [[http://orgmode.org/manual/Setting-tags.html#Setting-tags][fast tag selection]].
-   
-   To set tag shortcuts for all org buffers, put something like the
-   following in your =.emacs= file (or create the same settings by
-   typing =M-x customize-variable RET org-tag-alist=):
-   
-: (setq org-tag-alist '(("computer" . ?c) ("office" . ?o) ("home" . ?h)))
-   
-   To set tag shortcuts for a single buffer, put something like the
-   following at the top of your org file: 
-   
-: #+TAGS: computer(c) office(o) home(h)
-   
-** Can I select the TODO keywords with a tag-like interface?
-#<<select-TODO-keywords-with-tag-like-interface>>
+** Can I use ido.el for completing stuff in Org?
+#<<ido-complete>>
 
-  Yes.  Use =(setq org-use-fast-todo-selection t)=
+   Yes, you can.  If you are an ido user and ido-mode is active, the
+   following setting will make Org use =ido-completing-read= for most
+   of its completing prompts.
 
-** Isearch does not find string hidden in links.  What can I do?
-#<<isearch-in-links>>
-
-  M-x =visible-mode= will display the full link, making them searchable.
-
-** C-k is killing whole subtrees!  I lost my work!
-#<<C-k-is-killing-subtrees>>
-
-  =(setq org-special-ctrl-k t)= before losing your work.
-
-** How can I set up automatic reminders based on Org information?
-#<<automatic-reminders>>
-
-  See [[http://article.gmane.org/gmane.emacs.orgmode/5271][this post]] by N. Dokos on the list.
-
-** I want to add my Org scheduled/deadlined entries in my diary!
-#<<add-Org-scheduled/deadlined-entries-to-diary!>>
-
-  Put this in your ~/.diary:
-
-  :&%%(org-diary :scheduled :timestamp :deadline)
-
-** How do I track state changes for tasks in Org?
-#<<track-state-changes-for-tasks>>
-
-  Take a look at the [[http://thread.gmane.org/gmane.emacs.orgmode/6082][post by Bernt Hansen]] for setting up TODO keyword
-  states and logging timestamps for task state changes.
+: (setq org-completion-use-ido t)
 
 ** Should I use one big org file or multiple files?
 #<<how-to-organize-org-mode-files>>
@@ -379,21 +353,6 @@ Here are a few ideas for organizing org-mode files:
 For more ideas, see some of the links on the [[file:org-tutorials/index.org][org-tutorial index]] or
 [[file:org-gtd-etc.org][this page on org-mode and GTD]].
 
-** Why aren't commands working on regions?
-#<<transient-mark-mode>>
-
-Some org-mode commands, such as M-right and M-left for demoting or
-promoting headlines (see [[demote-multiple-headlines][this FAQ]]), can be applied to entire regions.
-These commands, however, will only work on active regions set with
-[[http://www.gnu.org/software/emacs/manual/html_node/emacs/Transient-Mark.html#Transient-Mark][transient mark mode]]. Transient mark mode is enabled by default in
-Emacs 23. To enable it in earlier versions of emacs, put the following
-in your =.emacs= file:
-
-: (transient-mark-mode 1)
-
-Alternatively, you may turn off transient mark mode and use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Momentary-Mark.html][a
-momentary mark]] (=C-<SPC> C-<SPC>=).
-
 * Errors
 ** When I try to use Org-mode, I always get the error message =(wrong-type-argument keymapp nil)=
 #<<wrong-type-argument-keymapp>>
@@ -411,24 +370,7 @@ Yes, see the  [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] 
 
 Yes, see the [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] section of the manual.
 
-* Setup and Structure
-** Can I use Org-mode as the default mode for all README files?
-#<<Org-mode-as-default-mode>>
-
-Add the following to your .emacs file:
-
-: (add-to-list 'auto-mode-alist '("README$" . org-mode))
-
-You can even make it the default mode for any files with unspecified
-mode using
-
-: (setq default-major-mode 'org-mode)
-
-** Emacs outlines are unreadable.  Can I get rid of all those stars?
-#<<Emacs-outlines-are-unreadable>>
-
-   See the section [[http://orgmode.org/manual/Clean-view.html#Clean-view][Clean outline view]] in the manual.
-
+* Outline
 ** Can I have two windows on the same Org-mode file, with different outline visibilities?
 #<<indirect-buffers>>
 
@@ -448,58 +390,29 @@ mode using
    You can also create an independent view of an outline subtree by
    typing =b= on an item in the agenda.
 
-** How can I insert an empty line before each newly inserted headline, but not before each newly inserted plain-list item?
-#<<empty-line-before-each-new-headline-but-not-item>>
+** Emacs outlines are unreadable.  Can I get rid of all those stars?
+#<<Emacs-outlines-are-unreadable>>
 
-: (setq org-blank-before-new-entry
-:       '((heading . t) (plain-list-item . nil))
+   See the section [[http://orgmode.org/manual/Clean-view.html#Clean-view][Clean outline view]] in the manual.
+** C-k is killing whole subtrees!  I lost my work!
+#<<C-k-is-killing-subtrees>>
 
-** Can I use ido.el for completing stuff in Org?
-#<<ido-complete>>
+  =(setq org-special-ctrl-k t)= before losing your work.
 
-   Yes, you can.  If you are an ido user and ido-mode is active, the
-   following setting will make Org use =ido-completing-read= for most
-   of its completing prompts.
+** Why aren't commands working on regions?
+#<<transient-mark-mode>>
 
-: (setq org-completion-use-ido t)
+Some org-mode commands, such as M-right and M-left for demoting or
+promoting headlines (see [[demote-multiple-headlines][this FAQ]]), can be applied to entire regions.
+These commands, however, will only work on active regions set with
+[[http://www.gnu.org/software/emacs/manual/html_node/emacs/Transient-Mark.html#Transient-Mark][transient mark mode]]. Transient mark mode is enabled by default in
+Emacs 23. To enable it in earlier versions of emacs, put the following
+in your =.emacs= file:
 
-** How can I reduce the amount of context shown in sparse trees?
-#<<context-in-sparse-trees>>
+: (transient-mark-mode 1)
 
-   Take a look at the variables =org-show-hierarchy-above= and
-   =org-show-following-headline=.
-
-** How can I combine the results of two calls to =org-occur=?
-#<<two-calls-to-org-occur>>
-
-   You can construct a regular expression that matches all targets you
-   want.  Alternatively, use a =C-u= prefix with the second and any
-   further calls to =org-occur= to keep the current visibility and
-   highlighting in addition to the new ones.
-
-** How can I convert itemized lists to enumerated lists?
-#<<convert-itemized-to-enumerated-lists>>
-   
-   You can use =C-c -= or =S-<left>/<right>= to cycle through the various
-   bullet headlines available for lists: =-, +, *, 1., 1)=.
-   
-   See [[http://orgmode.org/manual/Plain-lists.html#Plain-lists][this section of the manual]] for more information.
-
-** How can I convert plain lists to headlines and vice versa?
-#<<convert-plain-lists-to-headlines>>
-  
-   To convert a plain list item or line to a headline, type =C-c *= on
-   the headline. This will make the line a subheading of the current
-   headline.
-    
-   To convert a headline to a plain list item, type =C-c -= while the
-   cursor is on the headline.
-   
-   To convert a headline to an unadorned line of text, type =C-c *= on
-   the headline.
-  
-   You can use query replace to accomplish the same things, as Bernt
-   Hansen explains in [[http://article.gmane.org/gmane.emacs.orgmode/10148][this mailing list post]].
+Alternatively, you may turn off transient mark mode and use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Momentary-Mark.html][a
+momentary mark]] (=C-<SPC> C-<SPC>=).
    
 ** How can I promote or demote multiple headlines at once? 
 #<<demote-multiple-headlines>>
@@ -513,18 +426,44 @@ demote a single subtree (i.e., a headline and all sub-headlines).
 
 If M-<right> doesn't seem to work, make sure transient mark mode is
 enabled. See [[transient-mark-mode][this FAQ]].
+  
+* Todos and Tags
+** How can I cycle through the TODO keyword of an entry?
+#<<cycle-TODO-keywords>>
 
-** Is there a good way to create a description list?
-#<<description-lists>>
+  =C-c C-t= or =S-<left/right>= is what you need.
 
-  Yes, these are now built-in:
+** How do I track state changes for tasks in Org?
+#<<track-state-changes-for-tasks>>
 
-#+BEGIN_EXAMPLE
-- item1 :: Description of this item 1
-- item2 :: Description of this item 2
-- item1 :: Description of this item 3
-      also in multiple lines
-#+END_EXAMPLE
+  Take a look at the [[http://thread.gmane.org/gmane.emacs.orgmode/6082][post by Bernt Hansen]] for setting up TODO keyword
+  states and logging timestamps for task state changes.
+   
+** Can I select the TODO keywords with a tag-like interface?
+#<<select-TODO-keywords-with-tag-like-interface>>
+
+  Yes.  Use =(setq org-use-fast-todo-selection t)=
+  
+** How can I quickly set the tag of an entry?
+#<<quickly-set-tag-of-entry>>
+
+   Use =C-c C-c= or =C-c C-q= on the headline. =C-c C-q= is useful for
+   setting tabs in a [[http://orgmode.org/manual/Remember.html#Remember][remember]] buffer, since =C-c C-c= is the default
+   keybinding for filing a note from the remember buffer.
+  
+   You can set tags even more quickly by setting one of the character
+   shortcuts for [[http://orgmode.org/manual/Setting-tags.html#Setting-tags][fast tag selection]].
+   
+   To set tag shortcuts for all org buffers, put something like the
+   following in your =.emacs= file (or create the same settings by
+   typing =M-x customize-variable RET org-tag-alist=):
+   
+: (setq org-tag-alist '(("computer" . ?c) ("office" . ?o) ("home" . ?h)))
+   
+   To set tag shortcuts for a single buffer, put something like the
+   following at the top of your org file: 
+   
+: #+TAGS: computer(c) office(o) home(h)
 
 * Hyperlinks
 ** Why do I have to confirm the execution of each shell/elisp link?
@@ -567,7 +506,7 @@ enabled. See [[transient-mark-mode][this FAQ]].
    : (setq org-mouse-1-follows-link nil)
 
 ** How can I get completion of file names when creating a link?
-#<<auto-completion-of-file-links>>
+#<<completion-of-file-links>>
    
 You can use org-insert-link with a prefix argument:
 
@@ -575,89 +514,48 @@ You can use org-insert-link with a prefix argument:
 
 You will be greeted with prompt in the minibuffer that allows for file
 completion using your preferred Emacs method for finding files.
+* Plain Lists
+** How can I insert an empty line before each newly inserted headline, but not before each newly inserted plain-list item?
+#<<empty-line-before-each-new-headline-but-not-item>>
 
-* Remember
-** Can I automatically start the clock when opening a remember template?
-#<<start-clock-when-opening-remember-template>>
+: (setq org-blank-before-new-entry
+:       '((heading . t) (plain-list-item . nil))
 
-   Yes, this is possible.  Use the following code and make sure that
-   after executing it, `my-start-clock-if-needed' is in
-   `remember-mode-hook' /after/ `org-remember-apply-template'.
+** How can I convert itemized lists to enumerated lists?
+#<<convert-itemized-to-enumerated-lists>>
+   
+   You can use =C-c -= or =S-<left>/<right>= to cycle through the various
+   bullet headlines available for lists: =-, +, *, 1., 1)=.
+   
+   See [[http://orgmode.org/manual/Plain-lists.html#Plain-lists][this section of the manual]] for more information.
 
-   : (add-hook 'remember-mode-hook 'my-start-clock-if-needed 'append)
-   : (defun my-start-clock-if-needed ()
-   :   (save-excursion
-   :     (goto-char (point-min))
-   :     (when (re-search-forward " *CLOCK-IN *" nil t)
-   :       (replace-match "")
-   :       (org-clock-in))))
+** How can I convert plain lists to headlines and vice versa?
+#<<convert-plain-lists-to-headlines>>
+  
+   To convert a plain list item or line to a headline, type =C-c *= on
+   the headline. This will make the line a subheading of the current
+   headline.
+    
+   To convert a headline to a plain list item, type =C-c -= while the
+   cursor is on the headline.
+   
+   To convert a headline to an unadorned line of text, type =C-c *= on
+   the headline.
+  
+   You can use query replace to accomplish the same things, as Bernt
+   Hansen explains in [[http://article.gmane.org/gmane.emacs.orgmode/10148][this mailing list post]].
 
-   Then, when a template contains the key string CLOCK-IN, the clock
-   will be started.  Starting with Org-mode version 5.20, the clock will
-   automatically be stopped when storing the remember buffer.
+** Is there a good way to create a description list?
+#<<description-lists>>
 
-* Export
+  Yes, these are now built-in:
 
-** Can I get TODO items exported to HTML as lists, rather than as headlines?
-#<<export-TODO-items-as-lists>>
-
-   If you plan to use ASCII or HTML export, make sure things you want to
-   be exported as item lists are level 4 at least, even if that does
-   mean there is a level jump.  For example:
-
-   : * Todays top priorities
-   : **** TODO write a letter to xyz
-   : **** TODO Finish the paper
-   : **** Pick up kids at the school
-
-   Alternatively, if you need a specific value for the heading/item
-   transition in a particular file, use the =#+OPTIONS= line to
-   configure the H switch.
-
-   : #+OPTIONS:   H:2; ...
-
-** Can I export only a single subtree?
-#<<export-single-subtree>>
-
-   If you want to export a subtree, mark the subtree as region and then
-   export.  Marking can be done with =C-c @ C-x C-x=, for example.
-
-** How can I get Mac OSX 10.3 iCal to import my Org-exported .ics files?
-#<<iCal-import-ics-files-old>>
-
-   When using iCal under Apple MacOS X Tiger, you can create a new
-   calendar /OrgMode/ (the default name for the calendar created by =C-c
-   C-e c=, see the variables =org-icalendar-combined-name= and
-   =org-combined-agenda-icalendar-file=).  Then set Org-mode to
-   overwrite the corresponding file /~/Library/Calendars/OrgMode.ics/.
-   You may even use AppleScript to make iCal re-read the calendar files
-   each time a new version of /OrgMode.ics/ is produced.  Here is the
-   setup needed for this:
-
-   : (setq org-combined-agenda-icalendar-file
-   :     "~/Library/Calendars/OrgMode.ics")
-   : (add-hook 'org-after-save-iCalendar-file-hook
-   :  (lambda ()
-   :   (shell-command
-   :    "osascript -e 'tell application \"iCal\" to reload calendars'")))
-
-** How can I get Mac OSX 10.4 or later iCal to import my Org-exported .ics files?
-#<<iCal-import-ics-files-new>>
-
-   For Mac OS X 10.4, you need to write the ics file to
-   =/Library/WebServer/Documents/= and then subscribe iCalendar to
-   =http: //localhost/orgmode.ics=
-
-** How can I remove timestamps and todo keywords from my exported file?
-#<<export-options-remove-timestamps>>
-
-You can place an options line at the top of your org file:
-
-: #+OPTIONS: <:nil todo:nil
-
-There is a whole host of export options you can set with an in-buffer
-options or via global variables. See [[http://orgmode.org/manual/Export-options.html#Export-options][this section]] of the manual for a
-full list.
+#+BEGIN_EXAMPLE
+- item1 :: Description of this item 1
+- item2 :: Description of this item 2
+- item1 :: Description of this item 3
+      also in multiple lines
+#+END_EXAMPLE
 
 * Tables
 ** Can I plot data from a table?
@@ -791,43 +689,94 @@ Note that you could use arbitrary starting values and column formulas.
 
    : (setq org-org-table-copy-increment nil)
 
+* Remember
+** Can I use the remember buffer to clock a customer phone call?
+#<<use-remember-buffer-to-clock-phone-call>>
+
+  Yes, you can.  Take a look at the [[http://thread.gmane.org/gmane.emacs.orgmode/5482][setup described by Bernt Hansen]]
+  and check out (in the same thread) what Nick Docos had to fix to
+  make Bernt's set-up work for him.
+** Can I automatically start the clock when opening a remember template?
+#<<start-clock-when-opening-remember-template>>
+
+   Yes, this is possible.  Use the following code and make sure that
+   after executing it, `my-start-clock-if-needed' is in
+   `remember-mode-hook' /after/ `org-remember-apply-template'.
+
+   : (add-hook 'remember-mode-hook 'my-start-clock-if-needed 'append)
+   : (defun my-start-clock-if-needed ()
+   :   (save-excursion
+   :     (goto-char (point-min))
+   :     (when (re-search-forward " *CLOCK-IN *" nil t)
+   :       (replace-match "")
+   :       (org-clock-in))))
+
+   Then, when a template contains the key string CLOCK-IN, the clock
+   will be started.  Starting with Org-mode version 5.20, the clock will
+   automatically be stopped when storing the remember buffer.
+
+* Searches
+** Isearch does not find string hidden in links.  What can I do?
+#<<isearch-in-links>>
+
+  M-x =visible-mode= will display the full link, making them searchable.
+
+** How can I reduce the amount of context shown in sparse trees?
+#<<context-in-sparse-trees>>
+
+   Take a look at the variables =org-show-hierarchy-above= and
+   =org-show-following-headline=.
+** How can I combine the results of two calls to =org-occur=?
+#<<two-calls-to-org-occur>>
+
+   You can construct a regular expression that matches all targets you
+   want.  Alternatively, use a =C-u= prefix with the second and any
+   further calls to =org-occur= to keep the current visibility and
+   highlighting in addition to the new ones.
+
 * Agenda
-** Is it possible to include entries from org-mode files into my emacs diary?
-#<<include-entries-from-org-mode-files-into-emacs-diary>>
+** How can I change the advanced warning time for deadlines?
+##<<warning-period-for-deadlines>>
 
-   Since the org-mode agenda is much more powerful and can contain the
-   diary, you should think twice before deciding to do this.  If you
-   insist, however, integrating Org-mode information into the diary is
-   possible.  You need to turn on /fancy diary display/ by setting in
-   .emacs:
+Deadline warnings appear in the daily agenda view a specified number
+of days before the deadline is due. The default setting is 14 days.
+You can change this with the variable =org-deadline-warning-days=.
+(See [[http://orgmode.org/manual/Deadlines-and-scheduling.html#Deadlines-and-scheduling][this section]] of the manual.)
 
-   : (add-hook 'diary-display-hook 'fancy-diary-display)
+For instance, 
 
-   Then include the following line into your ~/diary file, in
-   order to get the entries from all files listed in the variable
-   =org-agenda-files=
+: (setq org-deadline-warning-days 30)
 
-   : &%%(org-diary)
+would cause warnings for each deadline to appear 30 days in advance.
 
-   You may also select specific files with
+Naturally, you might not want warnings for all of your deadlines to
+appear so far in advance. Thus, you can change the lead time for
+individual items as follows:
 
-   : &%%(org-diary) ~/path/to/some/org-file.org
-   : &%%(org-diary) ~/path/to/another/org-file.org
+: * TODO Get a gift for the party
+:   DEADLINE: <2009-01-16 Fri -2d>
 
-   If you now launch the calendar and press @<tt>d@</tt> to display a
-   diary, the headlines of entries containing a timestamp, date range,
-   schedule, or deadline referring to the selected date will be listed.
-   Just like Org-mode's agenda view, the diary for /today/ contains
-   additional entries for overdue deadlines and scheduled items.  See
-   also the documentation of the =org-diary= function.  Under XEmacs, it
-   is not possible to jump back from the diary to the org, this works
-   only in the agenda buffer.
+The "-2d" above changes the lead time for this deadline warning to two
+days in advance. You can also use "w" for weeks and "m" for months.
+** How can I postpone a task until a certain date?
+#<<deferring-tasks>>
+   
+The easiest way to postpone a task is to schedule it in the future.
+For instance, typing =C-c C-s +2w= on a headline will push a task two
+weeks into the future, so that it won't show up on the daily agenda
+until two weeks from now.
 
-** How can I make =appt= notice my Org appointments?
-#<<appt-notice-my-Org-appointments>>
+If you'd like to prevent the task from showing up on your global todo
+list, you have a couple of options.
 
-  :M-x org-agenda-to-appt RET
-
+1. You can set the variable =org-agenda-todo-ignore-scheduled= to =t=.
+   This will exclude any scheduled items from your global list of
+   active todos (=C-c a t=). (The variable
+   =org-agenda-todo-ignore-with-date= will exclude both scheduled and
+   deadline items from your todo list).
+2. You can remove the todo keyword from the item (C-c C-t <SPC>). The
+   item will still appear on your agenda two weeks from today, but it
+   won't show up on your todo lists.
 ** Can I send myself an email containing tasks or other agenda info?
 #<<email-containing-tasks-or-other-agenda-info>>
 
@@ -914,49 +863,22 @@ and all of its subdirectories to your list of agenda files.
 
 See [[http://thread.gmane.org/gmane.emacs.orgmode/8992][this thread]] on the mailing list for more information.
 
-** How can I change the advanced warning time for deadlines?
-##<<warning-period-for-deadlines>>
+* Appointments/Diary
+** I want to add my Org scheduled/deadlined entries in my diary!
+#<<add-Org-scheduled/deadlined-entries-to-diary!>>
 
-Deadline warnings appear in the daily agenda view a specified number
-of days before the deadline is due. The default setting is 14 days.
-You can change this with the variable =org-deadline-warning-days=.
-(See [[http://orgmode.org/manual/Deadlines-and-scheduling.html#Deadlines-and-scheduling][this section]] of the manual.)
+  Put this in your ~/.diary:
 
-For instance, 
+  :&%%(org-diary :scheduled :timestamp :deadline)
 
-: (setq org-deadline-warning-days 30)
+** How can I set up automatic reminders based on Org information?
+#<<automatic-reminders>>
 
-would cause warnings for each deadline to appear 30 days in advance.
+  See [[http://article.gmane.org/gmane.emacs.orgmode/5271][this post]] by N. Dokos on the list.
+** How can I make =appt= notice my Org appointments?
+#<<appt-notice-my-Org-appointments>>
 
-Naturally, you might not want warnings for all of your deadlines to
-appear so far in advance. Thus, you can change the lead time for
-individual items as follows:
-
-: * TODO Get a gift for the party
-:   DEADLINE: <2009-01-16 Fri -2d>
-
-The "-2d" above changes the lead time for this deadline warning to two
-days in advance. You can also use "w" for weeks and "m" for months.
-
-** How can I postpone a task until a certain date?
-#<<deferring-tasks>>
-   
-The easiest way to postpone a task is to schedule it in the future.
-For instance, typing =C-c C-s +2w= on a headline will push a task two
-weeks into the future, so that it won't show up on the daily agenda
-until two weeks from now.
-
-If you'd like to prevent the task from showing up on your global todo
-list, you have a couple of options.
-
-1. You can set the variable =org-agenda-todo-ignore-scheduled= to =t=.
-   This will exclude any scheduled items from your global list of
-   active todos (=C-c a t=). (The variable
-   =org-agenda-todo-ignore-with-date= will exclude both scheduled and
-   deadline items from your todo list).
-2. You can remove the todo keyword from the item (C-c C-t <SPC>). The
-   item will still appear on your agenda two weeks from today, but it
-   won't show up on your todo lists.
+  :M-x org-agenda-to-appt RET
 
 ** How can I shedule an weekly appointment that lasts only until a certain date?
 #<<diary-sexp-in-org-files>>
@@ -985,6 +907,98 @@ February 16 and April 20.
 
 For more ideas on how to create such expressions, see [[http://www.emacswiki.org/cgi-bin/wiki/DiaryMode][this page on the
 Emacs wiki]].
+** Is it possible to include entries from org-mode files into my emacs diary?
+#<<include-entries-from-org-mode-files-into-emacs-diary>>
+
+   Since the org-mode agenda is much more powerful and can contain the
+   diary, you should think twice before deciding to do this.  If you
+   insist, however, integrating Org-mode information into the diary is
+   possible.  You need to turn on /fancy diary display/ by setting in
+   .emacs:
+
+   : (add-hook 'diary-display-hook 'fancy-diary-display)
+
+   Then include the following line into your ~/diary file, in
+   order to get the entries from all files listed in the variable
+   =org-agenda-files=
+
+   : &%%(org-diary)
+
+   You may also select specific files with
+
+   : &%%(org-diary) ~/path/to/some/org-file.org
+   : &%%(org-diary) ~/path/to/another/org-file.org
+
+   If you now launch the calendar and press @<tt>d@</tt> to display a
+   diary, the headlines of entries containing a timestamp, date range,
+   schedule, or deadline referring to the selected date will be listed.
+   Just like Org-mode's agenda view, the diary for /today/ contains
+   additional entries for overdue deadlines and scheduled items.  See
+   also the documentation of the =org-diary= function.  Under XEmacs, it
+   is not possible to jump back from the diary to the org, this works
+   only in the agenda buffer.
+
+* Export
+** Can I get TODO items exported to HTML as lists, rather than as headlines?
+#<<export-TODO-items-as-lists>>
+
+   If you plan to use ASCII or HTML export, make sure things you want to
+   be exported as item lists are level 4 at least, even if that does
+   mean there is a level jump.  For example:
+
+   : * Todays top priorities
+   : **** TODO write a letter to xyz
+   : **** TODO Finish the paper
+   : **** Pick up kids at the school
+
+   Alternatively, if you need a specific value for the heading/item
+   transition in a particular file, use the =#+OPTIONS= line to
+   configure the H switch.
+
+   : #+OPTIONS:   H:2; ...
+
+** Can I export only a single subtree?
+#<<export-single-subtree>>
+
+   If you want to export a subtree, mark the subtree as region and then
+   export.  Marking can be done with =C-c @ C-x C-x=, for example.
+
+** How can I get Mac OSX 10.3 iCal to import my Org-exported .ics files?
+#<<iCal-import-ics-files-old>>
+
+   When using iCal under Apple MacOS X Tiger, you can create a new
+   calendar /OrgMode/ (the default name for the calendar created by =C-c
+   C-e c=, see the variables =org-icalendar-combined-name= and
+   =org-combined-agenda-icalendar-file=).  Then set Org-mode to
+   overwrite the corresponding file /~/Library/Calendars/OrgMode.ics/.
+   You may even use AppleScript to make iCal re-read the calendar files
+   each time a new version of /OrgMode.ics/ is produced.  Here is the
+   setup needed for this:
+
+   : (setq org-combined-agenda-icalendar-file
+   :     "~/Library/Calendars/OrgMode.ics")
+   : (add-hook 'org-after-save-iCalendar-file-hook
+   :  (lambda ()
+   :   (shell-command
+   :    "osascript -e 'tell application \"iCal\" to reload calendars'")))
+
+** How can I get Mac OSX 10.4 or later iCal to import my Org-exported .ics files?
+#<<iCal-import-ics-files-new>>
+
+   For Mac OS X 10.4, you need to write the ics file to
+   =/Library/WebServer/Documents/= and then subscribe iCalendar to
+   =http: //localhost/orgmode.ics=
+
+** How can I remove timestamps and todo keywords from my exported file?
+#<<export-options-remove-timestamps>>
+
+You can place an options line at the top of your org file:
+
+: #+OPTIONS: <:nil todo:nil
+
+There is a whole host of export options you can set with an in-buffer
+options or via global variables. See [[http://orgmode.org/manual/Export-options.html#Export-options][this section]] of the manual for a
+full list.
 
 
 * COMMENT HTML style specifications
@@ -1000,3 +1014,4 @@ Emacs wiki]].
 # Local Variables:
 # org-export-html-style-extra: "<link rel=stylesheet href=\"org-faq.css\" type=\"text/css\"> <style type=\"text/css\"> </style>"
 # End:
+  
