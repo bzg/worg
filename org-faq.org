@@ -864,6 +864,36 @@ and all of its subdirectories to your list of agenda files.
 See [[http://thread.gmane.org/gmane.emacs.orgmode/8992][this thread]] on the mailing list for more information.
 
 * Appointments/Diary
+** Is it possible to include entries from org-mode files into my emacs diary?
+#<<include-entries-from-org-mode-files-into-emacs-diary>>
+
+   Since the org-mode agenda is much more powerful and can contain the
+   diary, you should think twice before deciding to do this.  If you
+   insist, however, integrating Org-mode information into the diary is
+   possible.  You need to turn on /fancy diary display/ by setting in
+   .emacs:
+
+   : (add-hook 'diary-display-hook 'fancy-diary-display)
+
+   Then include the following line into your ~/diary file, in
+   order to get the entries from all files listed in the variable
+   =org-agenda-files=
+
+   : &%%(org-diary)
+
+   You may also select specific files with
+
+   : &%%(org-diary) ~/path/to/some/org-file.org
+   : &%%(org-diary) ~/path/to/another/org-file.org
+
+   If you now launch the calendar and press @<tt>d@</tt> to display a
+   diary, the headlines of entries containing a timestamp, date range,
+   schedule, or deadline referring to the selected date will be listed.
+   Just like Org-mode's agenda view, the diary for /today/ contains
+   additional entries for overdue deadlines and scheduled items.  See
+   also the documentation of the =org-diary= function.  Under XEmacs, it
+   is not possible to jump back from the diary to the org, this works
+   only in the agenda buffer.
 ** I want to add my Org scheduled/deadlined entries in my diary!
 #<<add-Org-scheduled/deadlined-entries-to-diary!>>
 
@@ -907,37 +937,6 @@ February 16 and April 20.
 
 For more ideas on how to create such expressions, see [[http://www.emacswiki.org/cgi-bin/wiki/DiaryMode][this page on the
 Emacs wiki]].
-
-** Is it possible to include entries from org-mode files into my emacs diary?
-#<<include-entries-from-org-mode-files-into-emacs-diary>>
-
-   Since the org-mode agenda is much more powerful and can contain the
-   diary, you should think twice before deciding to do this.  If you
-   insist, however, integrating Org-mode information into the diary is
-   possible.  You need to turn on /fancy diary display/ by setting in
-   .emacs:
-
-   : (add-hook 'diary-display-hook 'fancy-diary-display)
-
-   Then include the following line into your ~/diary file, in
-   order to get the entries from all files listed in the variable
-   =org-agenda-files=
-
-   : &%%(org-diary)
-
-   You may also select specific files with
-
-   : &%%(org-diary) ~/path/to/some/org-file.org
-   : &%%(org-diary) ~/path/to/another/org-file.org
-
-   If you now launch the calendar and press @<tt>d@</tt> to display a
-   diary, the headlines of entries containing a timestamp, date range,
-   schedule, or deadline referring to the selected date will be listed.
-   Just like Org-mode's agenda view, the diary for /today/ contains
-   additional entries for overdue deadlines and scheduled items.  See
-   also the documentation of the =org-diary= function.  Under XEmacs, it
-   is not possible to jump back from the diary to the org, this works
-   only in the agenda buffer.
 
 * Export
 ** Can I get TODO items exported to HTML as lists, rather than as headlines?
