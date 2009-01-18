@@ -25,7 +25,7 @@ If your browser supports JavaScript, you can...
 
 - see a full list of navigation commands by typing "?" or clicking
   "Help" (above).
-
+  
 * What is org-mode?
 ** Can I implement a GTD workflow with Org-mode?
 #<<GTD-workflow-with-Org-mode>>
@@ -911,6 +911,62 @@ You can use the file-expand-wildcards function to all files ending in
 =org= in a directory to your agenda files list:
 
 : (setq org-agenda-files (file-expand-wildcards "~/org/*.org"))
+
+** Why aren't items disappearing from my agenda once they are marked done?
+#<<removing-done-items-from-agenda>>
+
+If items remain on your daily/weekly agenda after they are marked
+done, check the configuration of the following variables:
+
+: org-agenda-skip-scheduled-if-done
+: org-agenda-skip-deadline-if-done
+: org-agenda-skip-timestamp-if-done
+
+For instance, type:
+
+: M-x customize-variable RET org-agenda-skip-scheduled-if-done
+
+If this variable is on (=t=), then scheduled items will remain on the
+agenda even after they are marked done.
+
+If the variable is nil, then scheduled items will disappear from the
+agenda after they are marked done.
+
+If these settings seem not to behave the way you expect, then make
+sure you understand [[scheduled-vs-deadline-vs-timestamp][the difference between SCHEDULED, DEADLINE, and
+timestamps]].
+
+** What is the difference between SCHEDULED, DEADLINE, and regular timestamps?
+#<<scheduled-vs-deadline-vs-timestamp>>
+
+1. SCHEDULED items (set with =C-c C-s=) will appear on your agenda on
+   the day they are scheduled and on every day thereafter until they
+   are done. Schedule a task if you want to be reminded to do
+   something on a certain day.
+
+: ** TODO Scheduled item
+:    SCHEDULED: <2009-03-01 Sun>
+
+2. Items with a DEADLINE timestamp (set with =C-c C-d=) appear on your
+   agenda in advance of the when they are do and remain on your agenda
+   until they are done. Add a DEADLINE to an item if you want to make
+   sure to complete it by a certain date. (The variable
+   org-deadline-warning-days determines how far in advance items with
+   deadlines will show up in the agenda. See [[warning-period-for-deadlines][this FAQ]] for more
+   information.)
+
+: ** TODO Item with a deadline
+:    DEADLINE: <2009-01-20 Tue>
+
+3. An active timestamp (set with =C-c .=) will appear on your agenda
+   only on the day it is scheduled. Use a timestamp for appointments
+   or any reminders you want to show up only on a particular day.
+
+: ** TODO Item with an active timestamp
+: <2009-04-18 Sat>
+
+Note: items with inactive timestamps (set with C-c ! and marked by
+square brackets) will not show up in the agenda at all.
 
 ** Can I add files recursively to my list of agenda files?
 #<<set-agenda-files-recursively>>
