@@ -1,0 +1,187 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+TITLE:      Custom Agenda Commands
+#+AUTHOR:     Matt Lundin
+#+EMAIL:      mdl at imapmail dot org
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+[[file:index.org][{Back to Worg's index}]]
+
+* Introduction
+
+Task management systems such as GTD are good for keeping track of
+projects and todos, as well as periodically recurring tasks. But what
+is the best way for remembering the daily tasks that one wants to
+develop as habits? Exercise, relaxation, household cleaning, diet,
+kindness to others---such habitual obligations can often get lost in
+the constant clamor of urgent todos. In the midst of everything else,
+how can you learn to stop biting your nails?
+
+Though the ultimate aim of developing good habits is to internalize
+them so deeply that one needs no reminders (because they become
+"second nature"), the most difficult stage is the month or so it takes
+to learn a new habit. Success often depends both on a commitment to
+develop a habit /and/ some external means of monitoring one's
+progress.
+
+This tutorial offers a couple of ideas of how to use org-mode to track
+habits---with the ultimate aim, of course, of kicking bad habits and
+learning good ones. A program as powerful as org-mode, of course, has
+multiple routes to the same end, but these are a few of the techniques
+that I have found helpful.
+
+* Repeating Tasks
+
+A habit is often something you'd like to do every day (or, in some
+cases, every other day or every week). Org-mode makes scheduling such
+repeating tasks very easy. To create a recurring task in org-mode,
+simply schedule the task for the day you'd like to start and add a
+"repeater" such as =+1d= for every day, =+2d= for every other day,
+=+1w= for every week, and so on. Here's an example:
+
+: ** TODO Lift weights
+:    SCHEDULED: <2009-01-18 Sun +2d>
+
+Now the agenda will remind you to lift weights every other day. When
+you mark the item DONE, it will be reactivated as a TODO and
+pushed two days into the future (in this case to January 20).
+
+(If you are procrastinating often, you can add a period in front of
+the repeater, such as =.+2d= which will reschedule the completed item
+two days /after it is completed/.)
+
+* Tracking Completion
+
+Scheduling a habitual task is only a small step on the path to
+internalizing it. You also need to provide yourself with some
+incentive to learn the habit. Without such incentive, it is easy to
+procrastinate, rescheduling the daily habits---the least urgent
+todos---to tomorrow...and tomorrow...and tomorrow.
+
+Some productivity guides suggest an simple method for learning a
+habit. Let's say you want to exercise daily. Take a calendar and cross
+out each day you exercise. Your goal is to keep the chain of X's
+going.
+
+Org-mode can provide similar tracking for recurring tasks via the
+variable =org-log-repeat=. If this variable is set to "time", then a
+timestamp will be recorded each time the item is marked done. For the
+example above, the results would look like this:
+
+: ** TODO Lift weights
+:    SCHEDULED: <2009-01-22 Thu +2d> 
+:    - State "DONE"       [2009-01-16 Fri 23:14]
+:    - State "DONE"       [2009-01-14 Wed 17:25]
+
+You can see whether you've "broken the chain" by reviewing the log of
+when you completed the item. If you want even more detailed tracking
+(or want to leave yourself encouraging notes), you can set
+=org-log-repeat= to "note". Then, each time you complete a recurring
+task, you will be prompted to enter a note.
+
+If you want to enable such logging only for particular tasks, then you
+can do so via properties:
+
+: ** TODO Lift weights
+:    SCHEDULED: <2009-01-20 Tue +2d>
+:    - State "DONE"       [2009-01-18 Sun 23:22] \\
+:      Way to go!
+:   :PROPERTIES:
+:   :LOGGING:  lognoterepeat
+:   :END:
+
+* Monitoring Progress
+
+It's nice to have a record of how well you're learning your new habit.
+But it's especially nice to get a visual representation that gives you
+a quick overview of how often you've "broken the chain"---i.e., let
+the new habit slip.
+
+One easy way to get a visual representation of a habit is to keep a
+quick chart in a table. If you want to make sure you exercise every
+day, you could type the following:
+
+: | Week Starting | Mon | Tues | Wed | Thurs | Fri | Sat | Sun 
+
+And then press tab to create a nice table that you can fill in:
+
+: | Week Starting | Mon | Tues | Wed | Thurs | Fri | Sat | Sun |
+: |---------------+-----+------+-----+-------+-----+-----+-----|
+: | Jan 12        | x   | x    | x   | x     |     | x   | x   |
+: | Jan 20        | x   | x    | x   |       | x   | x   | x   |
+
+Ooops. I forgot to exercise a couple of times.
+
+For a more robust habit tracking, I use the following technique:
+
+For each daily habit I want to develop, I create a recurring task. I
+also add a special tag "DAILY". Then I make sure to check the task as
+DONE each day I complete it:
+
+: * Habits
+: ** TODO Do dishes							 :DAILY:
+:    SCHEDULED: <2009-01-22 Thu +1d> 
+:    - State "DONE"       [2009-01-20 Tue 12:59]
+:    - State "DONE"       [2009-01-21 Wed 20:10]
+: ** TODO Exercise							 :DAILY:
+:    SCHEDULED: <2009-01-22 Thu +1d> 
+:    - State "DONE"       [2009-01-19 Mon 19:59]
+:    - State "DONE"       [2009-01-21 Wed 07:58]
+: ** TODO Floss								 :DAILY:
+:   SCHEDULED: <2009-01-22 Thu +1d> 
+:   - State "DONE"       [2009-01-19 Mon 17:15]
+:   - State "DONE"       [2009-01-20 Tue 11:05]
+
+In my agenda view I can quickly filter for daily habits using a
+secondary query:
+
+: C-c a / DAILY
+
+Or I can filter out DAILY tasks to unclutter the agenda view:
+
+: C-c a / - DAILY
+
+Finally, I can see how well I've kept up with my habits by using a
+custom agenda command:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("h" "Daily habits" 
+	 ((agenda ""))
+	 ((org-agenda-show-log t)
+	  (org-agenda-ndays 7)
+	  (org-agenda-log-mode-items '(state))
+	  (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":DAILY:"))))
+	;; other commands here
+	))
+#+END_SRC
+
+This command gives me a weekly view of whether and when I accomplished my
+daily goals:
+
+: Week-agenda (W04):
+: Monday     19 January 2009 W04
+:   habits:     17:15...... State:     (DONE) TODO Floss                   :DAILY:
+:   habits:     19:59...... State:     (DONE) TODO Exercise                :DAILY:
+: Tuesday    20 January 2009
+:   habits:     11:05...... State:     (DONE) TODO Floss                   :DAILY:
+:   habits:     12:59...... State:     (DONE) TODO Do dishes               :DAILY:
+: Wednesday  21 January 2009
+:   habits:      7:58...... State:     (DONE) TODO Exercise                :DAILY:
+:   habits:     20:10...... State:     (DONE) TODO Do dishes               :DAILY:
+: Thursday   22 January 2009
+:   habits:     Scheduled:  TODO Do dishes                                 :DAILY:
+:   habits:     Scheduled:  TODO Exercise                                  :DAILY:
+:   habits:     Scheduled:  TODO Floss                                     :DAILY:
+: Friday     23 January 2009
+: Saturday   24 January 2009
+: Sunday     25 January 2009
+
+Again, these are just a couple ideas about how one can keep track of
+regular habits using org-mode. I hope this brief tutorial gives you
+some additional ideas for using this wonderful time management
+program.
