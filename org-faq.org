@@ -438,6 +438,21 @@ Yes, see the  [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] 
 
 Yes, see the [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] section of the manual.
 
+** Org behaves strangely: some keys don't work, some features are missing, my settings have no effect, ...
+#<<loaded-old-org>>
+
+When this sort of things happen, it probably is because Emacs is loading an old version of Org-mode instead of the one you expected. Check it with =M-x org-version=.
+
+This happens because Emacs loads first the system org-mode (the one included with Emacs) before the one in your directory. Check the =load-path= variable; you might see that your org-mode appears /after/ the system-wide path; this is bad.
+
+You should add your directories to the =load-path= at the beginning:
+
+:  (add-to-list 'load-path "~/.emacs.d/org-mode/lisp") (require 'org-install)
+
+Function =add-to-list= adds at the beginning. Don't use =append= because it appends at the end. Also be sure to use =(require 'org-install)= and not =(require 'org)=.
+
+This wrong version loading may also happen if you have a byte-compiled =org.elc= from an old version together with a new =org.el=. Since Emacs prefers loading byte-compiled files (even if the =.el= is newer), it will load the old Org-mode.
+
 * Outline
 ** Can I have two windows on the same Org-mode file, with different outline visibilities?
 #<<indirect-buffers>>
