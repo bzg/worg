@@ -553,6 +553,35 @@ enabled. See [[transient-mark-mode][this FAQ]].
    
 : #+TAGS: computer(c) office(o) home(h)
 
+** How can I change the colors of TODO keywords?
+
+You can use the variable org-todo-keyword-faces. Here are some sample
+settings:
+
+#+begin_src emacs-lisp
+(setq org-todo-keyword-faces
+      '(
+	("TODO"  . (:foreground "firebrick2" :weight bold))
+	("WAITING"  . (:foreground "olivedrab" :weight bold))
+	("LATER"  . (:foreground "sienna" :weight bold))
+	("PROJECT"  . (:foreground "steelblue" :weight bold))
+	("DONE"  . (:foreground "forestgreen" :weight bold))
+	("MAYBE"  . (:foreground "dimgrey" :weight bold))
+	("CANCELED"  . shadow)
+	))
+#+end_src
+
+If you want to change the color of all active todos or all inactive
+todos, type:
+
+: =M-x customize-face RET org-todo"
+: =M-x customize-face RET org-done"
+
+You can also set values for each of these in your =.emacs= file:
+
+: (set-face-foreground 'org-todo "firebrick2")
+: (set-face-foreground 'org-done "forestgreen")
+
 * Hyperlinks
 ** Why do I have to confirm the execution of each shell/elisp link?
 #<<confirm-shell/elisp-link>>
