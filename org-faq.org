@@ -452,6 +452,33 @@ Function =add-to-list= adds at the beginning. Don't use =append= because it appe
 
 This wrong version loading may also happen if you have a byte-compiled =org.elc= from an old version together with a new =org.el=. Since Emacs prefers loading byte-compiled files (even if the =.el= is newer), it will load the old Org-mode.
 
+** Why doesn't org-batch-agenda work under Win32?
+#<<org-batch-agenda-under-win32>>
+
+When I run the example batch files to print my agenda to the console
+under Win32 I get the failure:
+
+: End of file during parsing
+
+and no agenda is printed.
+
+The problem is the use of single quotes surrounding the eval in the
+emacs command-line. This gets confused under Win32. All string
+parameters with spaces must be surrounded in double quotes. This means
+that double quotes being passed to the eval must be escaped.
+
+Therefore, instead of the following:
+
+: <path to emacs>\emacs.exe -batch -l ~/_emacs_org \
+:     -eval '(org-batch-agenda "a")'
+
+you need to use the following:
+
+:  <path to emacs>\emacs.exe -batch -l ~/_emacs_org \
+:     -eval "(org-batch-agenda \"a\")"
+
+(all on one line, of course).
+
 * Outline
 ** Can I have two windows on the same Org-mode file, with different outline visibilities?
 #<<indirect-buffers>>
