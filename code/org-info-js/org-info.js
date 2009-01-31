@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.8.5
+ *       org-info.js, v.0.0.8.7
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -401,6 +401,7 @@ var org_html_manager = {
   SORTED_TAGS: new Array(),    // Sorted tags
   TAGS_INDEX: null,            // Caches the tags-index screen
   CLICK_TIMEOUT: null,         // Mousehandling
+  TEXT_BEFORE_LTOC: null,      // Text or local toc first?
 
   /**
    * Setup the OrgHtmlManager for scanning.
@@ -681,6 +682,7 @@ var org_html_manager = {
         var link = 'javascript:org_html_manager.navigateTo(' + sec + ')';
         var fnsec= new OrgNode ( fn, fnheading, link, 1, this.SECS[0], "footnotes");
         fnsec.folder=folder;
+        OrgNode.findTargetsIn(fnsec.isTargetFor, folder);
         this.SECS.push(fnsec);
       }
     }
@@ -915,11 +917,18 @@ var org_html_manager = {
         }
         html += '</ul>'; // </li></ul>';
         navi2.innerHTML = html;
-        if(this.SECS[i].folder)
-          this.SECS[i].folder.insertBefore(navi2, this.SECS[i].folder.firstChild);
-        else
-          this.SECS[i].div.insertBefore
-        (navi2, this.SECS[i].div.getElementsByTagName("h"+this.SECS[i].depth)[0].nextSibling);
+        if(null != this.TEXT_BEFORE_LTOC) {
+          if(this.SECS[i].folder)
+            this.SECS[i].folder.appendChild(navi2);
+          else
+            this.SECS[i].div.appendChild(navi2);
+        } else {
+          if(this.SECS[i].folder)
+            this.SECS[i].folder.insertBefore(navi2, this.SECS[i].folder.firstChild);
+          else
+            this.SECS[i].div.insertBefore(
+              navi2, this.SECS[i].div.getElementsByTagName("h"+this.SECS[i].depth)[0].nextSibling);
+        }
       }
     }
     // Setup the Tags for sorted output:
