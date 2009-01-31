@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.0.8.7
+ *       org-info.js, v.0.0.8.8
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -670,22 +670,18 @@ var org_html_manager = {
         if("footnotes"== c[i].className) {
           fnheading=c[i];
           break;}}
-      var folder = document.getElementById("footnotes-text");
-      if(null!=folder && null!=fnheading){
-        var sec =  this.SECS.length;
-        fnheading.onclick = function() {org_html_manager.fold("" + sec);};
-        fnheading.style.cursor = "pointer";
-        if(this.MOUSE_HINT) {
-          fnheading.onmouseover = function() {org_html_manager.highlight_headline("" + sec);};
-          fnheading.onmouseout = function() {org_html_manager.unhighlight_headline("" + sec);};
-        }
-        var link = 'javascript:org_html_manager.navigateTo(' + sec + ')';
-        var fnsec= new OrgNode ( fn, fnheading, link, 1, this.SECS[0], "footnotes");
-        fnsec.folder=folder;
-        OrgNode.findTargetsIn(fnsec.isTargetFor, folder);
-        this.SECS.push(fnsec);
+      var sec =  this.SECS.length;
+      fnheading.onclick = function() {org_html_manager.fold("" + sec);};
+      fnheading.style.cursor = "pointer";
+      if(this.MOUSE_HINT) {
+        fnheading.onmouseover = function() {org_html_manager.highlight_headline("" + sec);};
+        fnheading.onmouseout = function() {org_html_manager.unhighlight_headline("" + sec);};
       }
+      var link = 'javascript:org_html_manager.navigateTo(' + sec + ')';
+      var fnsec= new OrgNode ( fn, fnheading, link, 1, this.ROOT, "footnotes");
+      this.SECS.push(fnsec);
     }
+
 
     if(this.TOC_DEPTH) {
       this.cutToc(theIndex, 1);
