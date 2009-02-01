@@ -943,17 +943,17 @@ var org_html_manager = {
       var info = this.INFO_VIEW;
       var slide = this.SLIDE_VIEW;
       eval("this."+eval_key+"="+eval_val+";");
-      return;
     }
     else if("HELP" == eval_key)
       eval("this.STARTUP_MESSAGE="+eval_val+";");
-
-    if(eval_val)
-      eval("this."+eval_key+"='"+eval_val+"';");
-    else
-      eval("this."+eval_key+"=0;");
+    else {
+      if(eval_val)
+        eval("this."+eval_key+"='"+eval_val+"';");
+      else
+        eval("this."+eval_key+"=0;");
+    }
   },
-
+  
   convertLinks: function ()
   {
     var i = (this.HIDE_TOC ? 0 : 1);
