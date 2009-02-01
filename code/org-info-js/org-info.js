@@ -332,7 +332,7 @@ var org_html_manager = {
   INFO_VIEW: 3,                // We're in info view mode
   SLIDE_VIEW: 4,               // Slidemode.
   VIEW: this.OVER_VIEW,        // Default view mode (s. setup())
-  LOCAL_TOC: false,            // Create sub indexes (s. setup())
+  LOCAL_TOC: false,            // Create sub indexes (s. setup()): "0", "1" "above", "below" (==1, default)
   LINK_HOME: 0,                // Link to this.LINK_HOME?
   LINK_UP: 0,                  // Link to this.LINK_UP?
   LINKS: "",                   // Prepare the links for later use (see setup),
@@ -402,7 +402,6 @@ var org_html_manager = {
   SORTED_TAGS: new Array(),    // Sorted tags
   TAGS_INDEX: null,            // Caches the tags-index screen
   CLICK_TIMEOUT: null,         // Mousehandling
-  LTOC_BEFORE_TEXT: false,      // Text or local toc first?
 
   /**
    * Setup the OrgHtmlManager for scanning.
@@ -442,9 +441,8 @@ var org_html_manager = {
     this.VIEW  = this.VIEW ? this.VIEW : this.PLAIN_VIEW;
     this.VIEW_BUTTONS = (this.VIEW_BUTTONS && this.VIEW_BUTTONS != "0") ? true : false;
     this.STARTUP_MESSAGE = (this.STARTUP_MESSAGE && this.STARTUP_MESSAGE != "0") ? true : false;
-    this.LOCAL_TOC = (this.LOCAL_TOC && this.LOCAL_TOC != "0") ? true : false;
+    this.LOCAL_TOC = (this.LOCAL_TOC && this.LOCAL_TOC != "0") ? this.LOCAL_TOC : false;
     this.HIDE_TOC = (this.TOC && this.TOC != "0") ? false : true;
-    this.LTOC_BEFORE_TEXT = (this.LTOC_BEFORE_TEXT != "0") ? false : true;
     if(this.FIXED_TOC && this.FIXED_TOC != "0") {
       this.FIXED_TOC = true;
       this.HIDE_TOC = false;
@@ -915,17 +913,17 @@ var org_html_manager = {
         }
         html += '</ul>'; // </li></ul>';
         navi2.innerHTML = html;
-        if(this.LTOC_BEFORE_TEXT) {
-          if(this.SECS[i].folder)
-            this.SECS[i].folder.appendChild(navi2);
-          else
-            this.SECS[i].div.appendChild(navi2);
-        } else {
+        if("above" == this.LOCAL_TOC) {
           if(this.SECS[i].folder)
             this.SECS[i].folder.insertBefore(navi2, this.SECS[i].folder.firstChild);
           else
             this.SECS[i].div.insertBefore(
               navi2, this.SECS[i].div.getElementsByTagName("h"+this.SECS[i].depth)[0].nextSibling);
+        } else {
+          if(this.SECS[i].folder)
+            this.SECS[i].folder.appendChild(navi2);
+          else
+            this.SECS[i].div.appendChild(navi2);
         }
       }
     }
