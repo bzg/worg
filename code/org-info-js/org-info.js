@@ -359,6 +359,7 @@ var org_html_manager = {
   EMPTY_START: /^(\s*)(.*)/,   // Trim (s. getKey())
   EMPTY_END: /\s$/,            // Trim (s. getKey())
   SECEX: /([\d\.]*)/,          // Section number (command 's')
+  FNREF_REGEX: /(fnr\.*)/,       // Footnote ref
   TOC: null,                   // toc.
   runs: 0,                     // Count the scan runs.
   HISTORY: new Array(50),      // Save navigation history.
@@ -401,7 +402,7 @@ var org_html_manager = {
   SORTED_TAGS: new Array(),    // Sorted tags
   TAGS_INDEX: null,            // Caches the tags-index screen
   CLICK_TIMEOUT: null,         // Mousehandling
-  TEXT_BEFORE_LTOC: null,      // Text or local toc first?
+  LTOC_BEFORE_TEXT: false,      // Text or local toc first?
 
   /**
    * Setup the OrgHtmlManager for scanning.
@@ -443,6 +444,7 @@ var org_html_manager = {
     this.STARTUP_MESSAGE = (this.STARTUP_MESSAGE && this.STARTUP_MESSAGE != "0") ? true : false;
     this.LOCAL_TOC = (this.LOCAL_TOC && this.LOCAL_TOC != "0") ? true : false;
     this.HIDE_TOC = (this.TOC && this.TOC != "0") ? false : true;
+    this.LTOC_BEFORE_TEXT = (this.LTOC_BEFORE_TEXT != "0") ? false : true;
     if(this.FIXED_TOC && this.FIXED_TOC != "0") {
       this.FIXED_TOC = true;
       this.HIDE_TOC = false;
@@ -913,7 +915,7 @@ var org_html_manager = {
         }
         html += '</ul>'; // </li></ul>';
         navi2.innerHTML = html;
-        if(null != this.TEXT_BEFORE_LTOC) {
+        if(this.LTOC_BEFORE_TEXT) {
           if(this.SECS[i].folder)
             this.SECS[i].folder.appendChild(navi2);
           else
@@ -1807,7 +1809,7 @@ var org_html_manager = {
     if(null == node) node = this.NODE;
     var loc = "#sec-" + this.NODE.base_id;
     for(var s in node.isTargetFor) {
-      if(! s.match(this.REGEX)){loc = s; break;}
+      if(! s.match(this.REGEX) && !s.match(this.FNREF_REGEX)){loc = s; break;}
     }
     return loc;
   },

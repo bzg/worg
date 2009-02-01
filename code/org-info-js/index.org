@@ -10,30 +10,29 @@
 
 * The Name of the Game
 
-  The org-info.js JavaScript (subsequently called /the script/) and its setup
-  are still under development and might change frequently. This documentation
-  might as well be outdated by the time you read this. If you don't mind using
-  it anyway and adjust your org export options at times we wish you good luck
-  and hope the fun will outweigh your effort.
+  *WARNING This documentation is likely to be out of date.*
 
-  The aim of this little script is to implement a part of emacs Org-mode
-  facilities (folding in the first place) in the XHTML-exported files and to
-  display them in a linuxdoc like way. This documentation is one XHTML file,
-  exported from one *.org file using a single keyboard shortcut. No additional
-  postprocessing was done.
+  org-info-js (subsequently called /the script/) implements part of
+  Emacs Org-mode in it's XHTML-exported files, allowing them to be
+  rendered and browsed in a linuxdoc/texinfo style.
 
-  There are no external dependencies. The script is quite small and fast enough
-  for larger files too. I tested it with the file =ORGWEBPAGE/Changes.org= in
-  the =Org-mode= package which gave me 225 pages to handle and on my old
-  omnibook it still worked nicely. The current version tries to do so over the
-  net too (see [[http://orgmode.org/Changes.html]]).
+  This documentation is one XHTML file, exported from one *.org file
+  using a single keyboard shortcut. No additional postprocessing was
+  done.  There are no external dependencies and the script is small
+  and fast, even for large files.  It is used on the [[http://orgmode.org/Changes.html][org-mode site]] to
+  display =ORGWEBPAGE/Changes.org= which has over 220.
 
-  There are some drawbacks though. It is currently not possible to open internal
-  links in another tab (e.g. using middle click in Firefox) due my poor
-  JavaScript knowledge. This is not very high on my TODO list since the history
-  mechanism of the script is a good alternative to tab usage.
+  If you don't mind using it despite the /health warnings/ and
+  adjusting your org export options occaisionally we wish you good
+  luck and hope the fun will outweigh your effort.
 
-  A list of Changes can be found [[file:changes.ord][here]] (separat file).
+  There are some drawbacks though. It is currently not possible to
+  open internal links in another tab (e.g. using middle click in
+  Firefox) due my poor JavaScript knowledge. This is not very high on
+  my TODO list since the history mechanism of the script is a good
+  alternative to tab usage.
+
+  A list of Changes can be found [[changes.org][here]] (separat file).
 
   Go to the next section by pressing '=n='.
 
@@ -90,8 +89,6 @@
      containing subsections not exceeding =org-export-headline-levels=. This
      was done to get a more texinfo/linuxdoc kind of feel and a better
      orientaton.
-     You may decide where to display those local TOCs: above or below the
-     section's text before the first subsection.
    + *Startupview customizable* ::
      Choose how to display the document on load. Info-like or plain and more.
    + *Toggle links everywhere / only on top* ::
@@ -210,46 +207,42 @@
 
 * <<<Setup>>>
 
-  This section describes the setup of your org files for the utilisation of the
-  script. [[Export-Setup - the new Way]] will guide you to setup your org XHTML
-  export. That section refers to an Org-mode version >= 6.02. For those using an
+  This section describes how to setup your org files to use the
+  script. [[Export-Setup - the new Way]] covers setting up org XHTML
+  export with Org-mode version >= 6.02. For those using an older
   Org-mode version < 6.02 the next section ([[Export-Setup - the old Way]])
   remains. [[Using Set()]] contains a list of all supported options for adjusting
   the =org\_html\_manager= to suit your needs.
 
-  A sufficient up to date version is available for download on [[http://orgmode.org/#sec-3][orgmode.org]] or
-  in the git repo:
+  A reasonably recent org version is available for download on [[http://orgmode.org/#sec-4][orgmode.org]]
+  whilst the latest version of the script is in the git repo:
 
-  :git-clone git://repo.or.cz/org-mode.git
+  :git-clone git://github.com/SebastianRose/org-info-js.git
 
-  This script will not work with the XHTML export as distributed with the
-  current Org-mode package (and hence emacs 22.x) anymore (??). But I'm afraid
-  there are good chances the new exporter is in emacs before this thing here
-  enters a somewhat stable state :-)
+  This script will not work with the XHTML exporter that comes with
+  Org-mode in Emacs 22.x.
 
-  To produce this XHTML file I used the current version of Org-mode and it's
-  XHTML export. The structure of the exported XHTML has changed a bit in
-  beginning of March 2008 to support scripting an other tools that work on
-  =XML=. Thanks to Carsten Dominik who found the time to modify the current
-  export modul to produce the draft version of the next generation XHTML.  The
-  new structure won't break any of your stylesheets though.
+  The current version of Org-mode was used to produce this XHTML file
+  with the new exporter which was revised by Carsten Dominik in March
+  2008 (in Org-mode v5.23a+) to better support =XML=.  You can use
+  =M-x org-version= to see which version of Org-mode you have
+  installed.
 
-  The new export made it into git somewhere around version 5.23a+. Try =M-x
-  org-version= to find out about your Org-mode version.
+  The new XHTML structure won't break any of your stylesheets.
 
 ** <<Export-Setup - the new Way>>
 
-    There is no need to do something you don't do occasionally in Org-mode when
-    it comes to XHTML export. Just use one of the ordinary ways to include
-    something into the head of the resulting html file.
+   org-info-js now supports the standard Org-mode methods for
+   exporting XHTML, and including extra data in the head of the
+   exported file.
 
-    The modern way of org export setup provides extra options to include and
-    configure the script, as well as a emacs customize interface for this same
-    purpose. Options set in customize may be overwritten on a per-file basis
-    using one or more special =#+INFOJS_OPT:= lines in the head of your org
-    file.
+   The modern way of org export setup provides extra options to include and
+   configure the script, as well as a emacs customize interface for this same
+   purpose. Options set in customize may be overwritten on a per-file basis
+   using one or more special =#+INFOJS_OPT:= lines in the head of your org
+   file.
 
-    As an example, the head of this org file looks like:
+   As an example, the head of this org file looks like:
 #+BEGIN_SRC org
 #+INFOJS_OPT: path:org-info.js
 #+INFOJS_OPT: toc:nil localtoc:t view:info mouse:underline
@@ -480,10 +473,10 @@ org_html_manager.setup ();
   The functionality of the script is based on =DOM=. This leads to some
   incompatibility with legacy browsers. But hey, it's 2008, isn't it?
 
-  So what browsers are supported then? Well - I do not know for
-  shure. JavaScript™ 1.4 plus =DOM= should make
+  So what browsers are supported then? Well - I don't know for
+  sure. JavaScript™ 1.4 plus =DOM= should make
     + Netscape 6.0 and higher
-    + Internet Explorer 5.5 and up
+    + Internet Explorer 5.0 and up
     + Firefox 1.0 ++  - 2.0.0.12 and 3.0 Beta tested
     + Opera 7.0 and higher - v.9.26 tested.
     + Safari 1.0
@@ -725,7 +718,7 @@ org_html_manager.setup ();
   And again big thanks to Carsten Dominik for making the inclusion and
   configuration of the script so easy for the users, all the inspired ideas and
   the great org radio table trick. A lot of the power of the final make up is
-  your merit! We all love to read the best of all mailing lists because of the
+  your merit! We all love to read the Org-mode mailing lists because of the
   kind and relaxed tone that is yours.
 
   Thanks a lot for OrgMode!
