@@ -1,0 +1,481 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+TITLE:      org-R: Computing and data visualisation in Org-mode using R
+#+AUTHOR:     Dan Davison
+#+EMAIL:      davison@stats.ox.ac.uk
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg-tutorial
+
+# #+INFOJS_OPT: view:overview
+
+;; Local Variables:
+;; org-export-html-inline-images: t
+;; End:
+
+# replace .. with ..
+
+[[file:../index.org][{Back to Worg's index}]]
+
+* Introduction
+  org-R is an org-mode extension that performs numerical
+  computations and generates graphics. Numerical output is stored in
+  the org buffer in org tables, and the input can also come from an
+  org table. Rather than starting off by documenting everything
+  systematically, I'll provide several commented examples. Afterwards,
+  I'll try to give a complete documentation.
+
+ Although, behind the scenes, it uses [[http:www.r-project.org][R]], you do not need to know
+  anything about R. Common operations are provided `off the shelf' on
+  lines starting with #+TBLR: (and more can be added on
+  request). Having said that, org-R also accepts raw R code
+  (TBLRR: lines). For those who don't yet know R, but think they might
+  be interested, try the showcode:t option. It displays the R code
+  corresponding to the action you requested, and so provides a good
+  starting point for fine-tuning your analysis. But that's getting
+  ahead of things.
+
+* Setting things up
+  The code is currently [[http://www.stats.ox.ac.uk/~davison/software/org-R/org-tblR.el][here.]] Soon it will be in the contrib
+  directory. The other things you need are R (Windows/OS X binaries
+  available on the [[http:www.r-project.org][R website]]; widely available in linux package
+  repositories) and the emacs mode [[http://ess.r-project.org/][Emacs Speaks Statistics]] (ESS). ESS
+  installation instructions are [[http://ess.r-project.org/Manual/readme.html#Installation][here.]]  Personally, under linux, I have
+  something like
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "/path/to/ess/lisp")
+(require 'ess-site)
+#+END_SRC
+
+* Using org-R
+  org-R uses two different option lines to specify an
+  analysis/plot: #+TBLR: and #+TBLRR:. #+TBLRR: is the one that
+  accepts R code, so we'll ignore that for now. To make the action
+  happen, use M-x org-R-apply with point in the #+TBLR:
+  line. That's the only function you need, and it would make sense to
+  bind it to some key. So, first example.
+
+* Computing on org tables: tabulating values
+   Here's a command to tabulate the values in the second column. Issue
+   M-x org-R-apply in the following #+TBLR line.
+
+#+begin_example
+
+| col1 | col2 |
+|------+------|
+| A    | A    |
+| A    | B    |
+| B    | B    |
+#+TBLR: action:tabulate columns:2
+
+#+end_example
+
+  That results in
+
+#+begin_example
+
+| value | count |
+|-------+-------|
+| A     |     1 |
+| B     |     2 |
+
+#+end_example
+
+  . So the values in column 2 were tabulated as requested. However,
+  the original data got overwritten. That leads us to
+
+* Table references
+   
+   We can specify input data for analysis/plotting in 3 different
+   ways:
+   
+   1. by providing a reference to an org table with
+      intable:name-or-id. name-or-id may be either an org-id entry
+      identifier, or the #+TBLNAME name of a table. In the latter
+      case, infile:/path/to/file.org can optionally be used to specify
+      the file containing the table; otherwise the table is looked for
+      in the current buffer.
+
+   2. by pointing it to a csv file, locally or via http:, using
+     infile:/path/to/file.csv or infile:http://somewhere/file.csv
+
+   3. by doing neither, in which case it looks for a table immediately
+     above the #+TBLR(R) line(s).
+
+Case (3) is what happened above -- the input data came from a table
+immediately above the #+TBLR line. The default behaviour is to replace
+any such table with the output; this allows us to tweak the option
+line and update the analysis. However, normally we'll want to separate
+the data from the analysis output. So let's keep the data as a named
+table in the org file, and refer to it by name:
+
+#+begin_example
+
+#+TBLNAME:data-set-1
+| col1 | col2 |
+|------+------|
+| A    | A    |
+| A    | B    |
+| B    | B    |
+
+[arbitrary other content of org buffer]
+
+#+TBLR: intable:data-set-1 action:tabulate
+
+#+end_example
+
+which results in
+
+#+begin_example
+
+|   | A | B |
+|---+---+---|
+| A | 1 | 1 |
+| B | 0 | 1 |
+
+#+end_example
+
+Note that this time we did a different analysis: I removed the
+columns:2 option, so that tabulate was passed the whole table. As a
+result the output contains counts of joint occurrences of values in
+the two columns: out of the 4 possibilities, the only one we didn't
+observe was "B in column 1 and A in column 2". We could have achieved
+the same result with columns:(1 2). (But don't try to tabulate more
+than 2 columns: org does not do multi-dimensional tables).
+
+* Plotting data
+** Available off-the-shelf plotting commands
+  At the risk of this starting to sound like a bad and boring
+  undergraduate statistics textbook, the sort of plots that are
+  appropriate depend on the sort of data. Let's divide it up as
+
+ - discrete-valued data
+    [e.g. data-set-1 above, or the list of org variables customised by users]
+ - continuous-valued data
+   [e.g. the wing lengths of all Eagle Owls in Europe]
+ - indexed data 
+   [e.g. a data set in which each point is a time,
+    together with the size of the org source code base at that time]
+
+    Here are the available plotting actions, classified by type of data.
+
+| action:  | data type      | description                                                           |
+|----------+----------------+-----------------------------------------------------------------------|
+| barplot  | discrete       | produces 'side-by-side' bar plots if multiple columns selected        |
+| tabulate | discrete       | not a plotting action; it outputs a new org table                     |
+|----------+----------------+-----------------------------------------------------------------------|
+| plot     | indexed        | if only 1 column selected, index is automatic: 1,2,...                |
+| lines    | indexed        | same as plot                                                          |
+| points   | indexed        | same as plot but don't join points with lines                         |
+|----------+----------------+-----------------------------------------------------------------------|
+| hist     | continuous     | histogram                                                             |
+| density  | continuous     | like a smoothed histogram (i.e. a curve)                              |
+|----------+----------------+-----------------------------------------------------------------------|
+| image    | grid of values | draws a grid, with cells coloured according to their numerical values |
+|          |                |                                                                       |
+
+[Apart from tabulate, the action: names are the same as the names of
+the R functions which implement them. `tabulate' is really called
+`table' in R.]
+
+** Continuous data example:
+    :PROPERTIES:
+    :ID:       2ce0fc04-b308-4b8d-8acc-805a9e5fed7d
+    :END:
+    We're going to need some data. So let's prove that org can also
+    speak statistics and use org-R to simulate the data. This
+    requires some raw R code, so skip this bit if you're not
+    interested.
+
+    The following #+TBLRR line simulates 10 values from a Normal
+    distribution with mean -3, and 10 values from a Normal
+    distribution with mean 3, and lumps them together. The point is that
+    the numbers we get should be concentrated around two different
+    values, and we should be able to see that in a histogram and/or
+    density plot.
+
+#+begin_example
+
+#+TBLRR: x <- c(rnorm(10, mean=-3, sd=1), rnorm(10, mean=3, sd=1))
+#+TBLR: title:"continuous-data" output-to-buffer:t
+
+#+end_example
+
+    [Note that currently a degenerate empty org table (| |) is needed,
+    although not used. I'm going to get rid of that requirement.]
+
+Here's what I got.  Note that the title: option set the name of the
+table with "#+TBLNAME"; we'll use that to refer to these data.
+
+#+begin_example
+
+#+TBLNAME:continuous-data
+|                   |
+|-------------------|
+| -2.48627002467785 |
+|  -4.0196287273144 |
+| -3.43471960580471 |
+| -5.21985294534255 |
+| -3.84201126431028 |
+| -1.72912705369668 |
+| -2.86703950990613 |
+| -2.82292622464752 |
+| -4.43246430621368 |
+| -1.03188727658288 |
+| 0.882823532068805 |
+|  3.28641606039499 |
+|  3.56029698321959 |
+|  2.91946660223152 |
+|  2.32506089804876 |
+|   3.3606298511366 |
+|  5.19883523425104 |
+|  4.86141359164329 |
+|  2.90073505260204 |
+|  4.21163939487907 |
+#+end_example    
+
+Now to plot the data. Let's have some colour as well, and this time
+the title: option will be used to put a title on the plot (and also to
+name the file link to the graphical output).
+
+
+#+begin_example
+
+[[file:../org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-652oJT.png][histogram example]]
+#+TBLR: action:hist columns:1 colour:hotpink 
+#+TBLR: intable:continuous-data outfile:"png" title:"histogram example"
+
+#+end_example
+[[file:../org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-652oJT.png][histogram example]]
+
+[Note that you can use multiple TBLR lines rather than cramming all
+the options on to one line.]
+
+An alternative would be to produce a density plot. We don't have
+enough data points to justify that here, but we'll do it anyway just
+to show the sort of plots that are produced. This time we'll specify
+the output file for the png image using the output: option. (For the
+histogram we used output:"png". That's a special case; it doesn't
+create a file called "png" but instead uses org-attach to store the
+output in the org-attach dir for this entry. Same thing for the other
+available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
+"tiff")
+
+#+begin_example
+
+[[file:density.png][density plot example]]
+#+TBLR: action:density columns:1 colour:tomato4
+#+TBLR: intable:continuous-data outfile:"density.png" title:"density plot example"
+
+#+end_example
+[[file:density.png][density plot example]]
+
+** Disrete data example: the configuration variables survey
+
+The raw data, as collected by Manish, is in a table called
+org-variables-table, in a file called variable-popcon.org. We use the
+file: option to specify the org file containing the data, and the
+table: option to specify the name of the table within that file. [An
+alternative be to give the entry containing the table a unique id with
+org-id-get-create, refer to it with table:<uid>, and rely on the
+org-id mechanism to find it.].
+
+Now we tabulate the data. (We're not currently taking the sensible
+step that Manish did of checking whether the variables were given
+values different from their default).
+
+ Rather than cluttering up this org file with all the count data,
+we'll store them in a separate org file:
+
+#+begin_example
+
+[[file:org-variables-counts.org][org-variables-counts]]
+#+TBLR: action:tabulate columns:2 sort:t
+#+TBLR: infile:"variable-popcon.org" intable:"org-variables-table"
+#+TBLR: outfile:"org-variables-counts.org" title:"org-variables-counts"
+
+#+end_example
+[[file:org-variables-counts.org][org-variables-counts]]
+
+We can see the top few rows of the table by using action:head
+
+#+begin_example
+
+| rownames(x) | value                       | count |
+|-------------+-----------------------------+-------|
+|           1 | org-agenda-files            |    22 |
+|           2 | org-agenda-start-on-weekday |    22 |
+|           3 | org-log-done                |    22 |
+|           4 | org-todo-keywords           |    22 |
+|           5 | org-agenda-include-diary    |    19 |
+|           6 | org-hide-leading-stars      |    19 |
+#+TBLR: action:head
+#+TBLR: infile:"org-variables-counts.org" intable:"org-variables-counts" output-to-buffer:t
+
+#+end_example
+
+
+Here's a histogram of the counts.
+
+#+begin_example
+
+
+[[file:org-variables-hist.png][org-variables-hist]]
+#+TBLR: action:hist rownames:t columns:1
+#+TBLR: infile:"org-variables-counts.org" intable:"org-variables-counts"
+#+TBLR: outfile:"org-variables-hist.png" title:"org-variables-hist"
+
+#+end_example
+[[file:org-variables-hist.png][org-variables-hist]]
+    
+*** Something more complicated: clustering org variables, and org users
+
+     OK, let's make a bit more use of R's capabilities. We can use the
+     org-variables data set to define distances between pairs of org
+     users (how similar their customisations are), and distances
+     between pairs of org variables (the extent to which people who
+     customise one of them customise the other). Then we can use those
+     distance matrices to cluster org users, and org variables.
+
+     First, let's create a table that's restricted to variables that
+     were customised by more than four users. That's going to require
+     a bit of R code:
+
+#+begin_example
+
+[[file:variable-popcon-restricted.org][org-variables-table]]
+#+TBLR: infile:"variable-popcon.org" intable:"org-variables-table"
+#+TBLR: outfile:"variable-popcon-restricted.org" title:"org-variables-table"
+#+TBLRR: tab <- table(x[,2])
+#+TBLRR: x <- subset(x, Variable %in% names(tab[tab > 4]))
+
+#+end_example
+[[file:variable-popcon-restricted.org][org-variables-table]]
+
+Now let's make a table with a row for each variable, and a column for
+each org user, and fill it with 1s and 0s according to whether user j
+customised variable i. We can do that without writing any R code:
+
+#+begin_example
+
+[[file:org-variables-incidence.org][incidence-matrix]]
+#+TBLR: action:tabulate columns:(1 2) rownames:t
+#+TBLR: infile:"variable-popcon-restricted.org" intable:"org-variables-table"
+#+TBLR: outfile:"org-variables-incidence.org" title:"incidence-matrix"
+
+#+end_example
+[[file:org-variables-incidence.org][incidence-matrix]]
+
+  First we'll cluster org users. We use the R function dist to compute
+ a distance matrix from the incidence matrix, then hclust to run a
+ hierarchical clustering algorithm, and then plot to plot the results
+ as a dendrogram:
+
+#+begin_example
+
+[[file:org-users-tree.png][org-users-tree.png]]
+#+TBLRR: plot(hclust(dist(x, method="binary")))
+#+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
+#+TBLR: outfile:"org-users-tree.png" title:"org-users-tree.png"
+
+#+end_example
+[[file:org-users-tree.png][org-users-tree.png]]
+
+And to cluster org variables, we use the transpose of that incidence matrix:
+
+#+begin_example
+
+[[file:org-variables-tree.png][org-variables-tree.png]]
+#+TBLRR: plot(hclust(dist(t(x), method="binary")))
+#+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
+#+TBLR: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:800
+
+#+end_example
+[[file:org-variables-tree.png][org-variables-tree.png]]
+
+** Indexed data example
+   :PROPERTIES:
+   :ID:       45f39291-3abc-4d5b-96c9-3a32f77877a5
+   :END:
+    Let's plot the same data as Eric Schulte used in the [[../org-plot.org][org-plot tutorial]] on worg.
+
+#+begin_example
+
+[[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png][png output]]
+#+TBLR: action:lines columns:((1)(2 3))
+#+TBLR: infile:"../org-plot.org"
+#+TBLR: intable:"org-plot-example-1" outfile:"png"
+
+#+end_example
+[[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png][png output]]
+
+* Table of available options
+  In addition to the action:<some-action> option (described [[*Table of available actions][here)]], the
+  following options are available:
+| *Input options*                               |                                                                                                                                        |
+|-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| infile:/path/to/file.csv                      | input data comes from file.csv                                                                                                         |
+| infile:http://www.somewhere/file.csv          | input data comes from file.csv somewhere on the web                                                                                    |
+| infile:/path/to/file.org                      | input data comes from file.org; must also specify table with intable:<name-or-id>                                                      |
+| intable:table-name                            | input data is in table named with #+TBLNAME:table-name (in same buffer unless infile:/path/to/file.org is specified)                   |
+| intable:table-id                              | input data is first table under entry with table-id as unique ID. Doesn't make sense with infile:/path/to/file.org                     |
+| rownames:t                                    | does first column contain row names? (default: nil). If t other column indices are as if first column not present --  this may change) |
+| colnames:nil                                  | does first row contain column names? (default: t)                                                                                      |
+| columns:2 columns:(2)                         | operate only on column 2                                                                                                               |
+| columns:"wing length" columns:("wing length") | operate only on column named "wing length"                                                                                             |
+| columns:((1)(2 3))                            | (when plotting) plot columns 2 and 3 on y-axis against column 1 on x-axis                                                              |
+| columns:(("age")("wing length" "fierceness")) | (when plotting) plot columns named "wing length" and "fierceness" on y-axis against "age" on x-axis                                    |
+|-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| *Action options*                              |                                                                                                                                        |
+|-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| action:some-action                            | off-the-shelf plotting action or computation (see [[*Table of available actions][separate list]]), or any R function that makes sense (e.g. head, summary)              |
+| lines:t                                       | (when plotting) join points with lines (similar to action:lines)                                                                       |
+|-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| *Output options*                              |                                                                                                                                        |
+|-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| outfile:/path/to/image.png                    | save image to file and insert link into org buffer (also: .pdf, .ps, .jpg, .jpeg, .bmp, .tiff)                                         |
+| outfile:png                                   | save image to file in org-attach directory and insert link                                                                             |
+| outfile:/path/to/file.csv                     | would make sense but not implemented yet                                                                                               |
+| height:1000                                   | set height of graphical output in (pixels for png, jpeg, bmp, tiff; default 480) / (inches for pdf, ps; default 7)                     |
+| width:1000                                    | set width of graphical output in pixels (default 480 for png)                                                                          |
+| title:"title of table/plot"                   | title to be used in plot, and as #+TBLNAME of table output, and as name of link to output                                              |
+| colour:hotpink col:hotpink color:hotpink      | main colour for plot (i.e. `col' argument in R, enter colors() at R prompt for list of available colours.)                             |
+| sort:t                                        | with action:tabulate, sort in decreasing count order (default is alphabetical on names)                                                |
+| output-to-buffer:t                            | force numerical output to org buffer (shouldn't be necessary)                                                                          |
+| inline:t                                      | don't name links to output (so that graphics are inline when exported to HTML)                                                         |
+|-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| *Misc options*                                |                                                                                                                                        |
+|-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| showcode:t                                    | Display a buffer containing the R code that was generated to do what was requested.                                                    |
+  
+* Table of available actions
+# <<action list>>  
+  The following actions can be specified using the
+  action:<some-action> option. In addition, if you specify an action
+  which is not recognised, it is assumed to be the name of an existing
+  R function, and the code will attempt to apply it to the table.
+* Getting help with R
+  - Bring up an R prompt with R at a shell prompt, or M-x R in emacs (if you have installed ESS)
+  - Type ?function.name for help on function `function.name'
+  - Type RSiteSearch("words") for online help matching "words"
+* Brief advert for R
+  Seeing as this has made use of R, I'll briefly say my bit on it for
+  those who are unfamiliar.
+  1. It's good for simple numerical work, as well as trying to impress
+     with fancy cutting-edge statistical procedures.
+  2. It's great for producing graphics quickly, and also for fine
+     tuning every last detail of the graphics.
+  3. It's a pleasant, user-friendly, interpreted programming language,
+     that is often used interactively (it comes with its own
+     shell/command-line environment, and runs within emacs using
+     ESS). In particular, its functional programming style stuff might
+     well appeal to elisp programmers. For example, you want to
+     construct an arbitrarily nested data structure, then pass some
+     function over the tips, returning a data structure of the same
+     shape as the input? No problem ([[http://stat.ethz.ch/R-manual/R-patched/library/base/html/rapply.html][rapply]]).
+  4. There's a *lot* of add-on packages for it (CRAN link on left hand
+     side of [[http://www.r-project.org/][website]].).
+  5. How many programming languages will get [[http://www.nytimes.com/2009/01/07/technology/business-computing/07program.html][their own article]] in the
+     New York Times this year?
