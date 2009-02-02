@@ -3,10 +3,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 lang="en" xml:lang="en">
 <head>
-<title>org-R: Computation and data visualisation for org-mode using R</title>
+<title>org-R: Computing and data visualisation in Org-mode using R</title>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2009-02-02 17:19:33 EST"/>
+<meta name="generated" content="2009-02-02 17:54:00 EST"/>
 <meta name="author" content="Dan Davison"/>
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
@@ -64,14 +64,8 @@ lang="en" xml:lang="en">
 /*]]>*/-->
 </script>
 </head><body>
-<h1 class="title">org-R: Computation and data visualisation for org-mode using R</h1>
+<h1 class="title">org-R: Computing and data visualisation in Org-mode using R</h1>
 
-
-<p>
-;; Local Variables:
-;; org-export-html-inline-images: t
-;; End:
-</p>
 
 <p>
 <a href="../index.html">{Back to Worg's index}</a>
@@ -233,12 +227,9 @@ ways:
 </p>
 <ol>
 <li>
-by providing a reference to an org table with
-intable:name-or-id. name-or-id may be either an org-id entry
-identifier, or the #+TBLNAME name of a table. In the latter
-case, infile:/path/to/file.org can optionally be used to specify
-the file containing the table; otherwise the table is looked for
-in the current buffer.
+by providing a reference to an org table with the intable:
+option. You can optionally specify the file that the table is in
+with the infile: option;
 
 </li>
 <li>
@@ -673,7 +664,7 @@ as a dendrogram:
 <pre class="example">
 
 [[file:org-users-tree.png][org-users-tree.png]]
-#+TBLRR: plot(hclust(dist(x, method="binary")))
+#+TBLRR: plot(hclust(dist(x, method="binary")), xlab="")
 #+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
 #+TBLR: outfile:"org-users-tree.png" title:"org-users-tree.png"
 
@@ -682,9 +673,7 @@ as a dendrogram:
 
 
 <p>
-<div class="figure">
-<p><img src="org-users-tree.png"  alt="org-users-tree.png" /></p>
-</div>
+<a href="org-users-tree.png"><img src="org-users-tree.png"/></a>
 </p>
 <p>
 And to cluster org variables, we use the transpose of that incidence matrix:
@@ -695,7 +684,8 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 <pre class="example">
 
 [[file:org-variables-tree.png][org-variables-tree.png]]
-#+TBLRR: plot(hclust(dist(t(x), method="binary")))
+#+TBLRR: par(bg="black", fg="orange")
+#+TBLRR: plot(hclust(dist(t(x), method="binary")), xlab="")
 #+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
 #+TBLR: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:800
 
@@ -704,9 +694,7 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 
 
 <p>
-<div class="figure">
-<p><img src="org-variables-tree.png"  alt="org-variables-tree.png" /></p>
-</div>
+<a href="org-variables-tree.png"><img src="org-variables-tree.png"/></a>
 </p>
 </div>
 </div>
@@ -724,7 +712,7 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 
 <pre class="example">
 
-[[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png][png output]]
+[[file:../org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png][png output]]
 #+TBLR: action:lines columns:((1)(2 3))
 #+TBLR: infile:"../org-plot.org"
 #+TBLR: intable:"org-plot-example-1" outfile:"png"
@@ -735,7 +723,7 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 
 <p>
 <div class="figure">
-<p><img src="/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png"  alt="/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png" /></p>
+<p><img src="../org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png"  alt="../org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png" /></p>
 </div>
 </p>
 </div>
@@ -841,17 +829,16 @@ Type RSiteSearch("words") for online help matching "words"
 those who are unfamiliar.
 </p><ol>
 <li>
-It's great for any numerical work, whether that's calculating the
-average of a bunch of numbers, or trying to impress with
-fancy cutting-edge computational statistics.
+It's good for simple numerical work, as well as trying to impress
+with fancy cutting-edge statistical procedures.
 </li>
 <li>
 It's great for producing graphics quickly, and also for fine
 tuning every last detail of the graphics.
 </li>
 <li>
-It's a pleasant, user-friendly programming language, that is
-often used interactively (it comes with its own
+It's a pleasant, user-friendly, interpreted programming language,
+that is often used interactively (it comes with its own
 shell/command-line environment, and runs within emacs using
 ESS). In particular, its functional programming style stuff might
 well appeal to elisp programmers. For example, you want to
@@ -866,6 +853,7 @@ side of <a href="http://www.r-project.org/">website</a>.).
 <li>
 How many programming languages will get <a href="http://www.nytimes.com/2009/01/07/technology/business-computing/07program.html">their own article</a> in the
 New York Times this year?
+
 </li>
 </ol>
 </div>
@@ -873,7 +861,7 @@ New York Times this year?
 <div id="postamble"><p class="author"> Author: Dan Davison
 <a href="mailto:davison@stats.ox.ac.uk">&lt;davison@stats.ox.ac.uk&gt;</a>
 </p>
-<p class="date"> Date: 2009-02-02 17:19:33 EST</p>
+<p class="date"> Date: 2009-02-02 17:54:00 EST</p>
 <p>HTML generated by org-mode 6.20f in emacs 22</p>
 </div></body>
 </html>

@@ -11,12 +11,6 @@
 
 # #+INFOJS_OPT: view:overview
 
-;; Local Variables:
-;; org-export-html-inline-images: t
-;; End:
-
-# replace .. with ..
-
 [[file:../index.org][{Back to Worg's index}]]
 
 * Introduction
@@ -91,12 +85,9 @@
    We can specify input data for analysis/plotting in 3 different
    ways:
    
-   1. by providing a reference to an org table with
-      intable:name-or-id. name-or-id may be either an org-id entry
-      identifier, or the #+TBLNAME name of a table. In the latter
-      case, infile:/path/to/file.org can optionally be used to specify
-      the file containing the table; otherwise the table is looked for
-      in the current buffer.
+   1. by providing a reference to an org table with the intable:
+      option. You can optionally specify the file that the table is in
+      with the infile: option;
 
    2. by pointing it to a csv file, locally or via http:, using
      infile:/path/to/file.csv or infile:http://somewhere/file.csv
@@ -248,7 +239,7 @@ name the file link to the graphical output).
 #+TBLR: intable:continuous-data outfile:"png" title:"histogram example"
 
 #+end_example
-[[file:../org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-652oJT.png][histogram example]]
+[[file:../org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-652oJT.png]]
 
 [Note that you can use multiple TBLR lines rather than cramming all
 the options on to one line.]
@@ -270,7 +261,7 @@ available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
 #+TBLR: intable:continuous-data outfile:"density.png" title:"density plot example"
 
 #+end_example
-[[file:density.png][density plot example]]
+[[file:density.png]]
 
 ** Disrete data example: the configuration variables survey
 
@@ -297,7 +288,7 @@ we'll store them in a separate org file:
 #+TBLR: outfile:"org-variables-counts.org" title:"org-variables-counts"
 
 #+end_example
-[[file:org-variables-counts.org][org-variables-counts]]
+[[file:org-variables-counts.org]]
 
 We can see the top few rows of the table by using action:head
 
@@ -328,7 +319,7 @@ Here's a histogram of the counts.
 #+TBLR: outfile:"org-variables-hist.png" title:"org-variables-hist"
 
 #+end_example
-[[file:org-variables-hist.png][org-variables-hist]]
+[[file:org-variables-hist.png]]
     
 *** Something more complicated: clustering org variables, and org users
 
@@ -376,7 +367,7 @@ customised variable i. We can do that without writing any R code:
 #+begin_example
 
 [[file:org-users-tree.png][org-users-tree.png]]
-#+TBLRR: plot(hclust(dist(x, method="binary")))
+#+TBLRR: plot(hclust(dist(x, method="binary")), xlab="")
 #+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
 #+TBLR: outfile:"org-users-tree.png" title:"org-users-tree.png"
 
@@ -388,7 +379,8 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 #+begin_example
 
 [[file:org-variables-tree.png][org-variables-tree.png]]
-#+TBLRR: plot(hclust(dist(t(x), method="binary")))
+#+TBLRR: par(bg="black", fg="orange")
+#+TBLRR: plot(hclust(dist(t(x), method="binary")), xlab="")
 #+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
 #+TBLR: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:800
 
@@ -403,13 +395,13 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 
 #+begin_example
 
-[[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png][png output]]
+[[file:../org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png][png output]]
 #+TBLR: action:lines columns:((1)(2 3))
 #+TBLR: infile:"../org-plot.org"
 #+TBLR: intable:"org-plot-example-1" outfile:"png"
 
 #+end_example
-[[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png][png output]]
+[[file:../org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png]]
 
 * Table of available options
   In addition to the action:<some-action> option (described [[*Table of available actions][here)]], the
@@ -479,3 +471,4 @@ And to cluster org variables, we use the transpose of that incidence matrix:
      side of [[http://www.r-project.org/][website]].).
   5. How many programming languages will get [[http://www.nytimes.com/2009/01/07/technology/business-computing/07program.html][their own article]] in the
      New York Times this year?
+
