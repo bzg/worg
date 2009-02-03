@@ -6,7 +6,7 @@ lang="en" xml:lang="en">
 <title>org-R: Computing and data visualisation in Org-mode using R</title>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2009-02-02 17:54:00 EST"/>
+<meta name="generated" content="2009-02-03 13:27:00 EST"/>
 <meta name="author" content="Dan Davison"/>
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
@@ -93,7 +93,11 @@ lang="en" xml:lang="en">
 </ul>
 </li>
 <li><a href="#sec-7">Table of available options </a></li>
-<li><a href="#sec-8">Table of available actions </a></li>
+<li><a href="#sec-8">Table of available actions </a>
+<ul>
+<li><a href="#sec-8.1">Actions that generate numerical output* </a></li>
+</ul>
+</li>
 <li><a href="#sec-9">Getting help with R </a></li>
 <li><a href="#sec-10">Brief advert for R </a></li>
 </ul>
@@ -131,7 +135,7 @@ ahead of things.
 <div id="text-2">
 
 <p>The code is currently <a href="http://www.stats.ox.ac.uk/~davison/software/org-R/org-tblR.el">here.</a> Soon it will be in the contrib
-directory. The other things you need are R (Windows/OS X binaries
+directory. The other things you need are R (Windows / OS X binaries
 available on the <a href="http:www.r-project.org">R website</a>; widely available in linux package
 repositories) and the emacs mode <a href="http://ess.r-project.org/">Emacs Speaks Statistics</a> (ESS). ESS
 installation instructions are <a href="http://ess.r-project.org/Manual/readme.html#Installation">here.</a>  Personally, under linux, I have
@@ -402,10 +406,6 @@ density plot.
 
 
 <p>
-[Note that currently a degenerate empty org table (| |) is needed,
-although not used. I'm going to get rid of that requirement.]
-</p>
-<p>
 Here's what I got.  Note that the title: option set the name of the
 table with "#+TBLNAME"; we'll use that to refer to these data.
 </p>
@@ -453,7 +453,7 @@ name the file link to the graphical output).
 
 <pre class="example">
 
-[[file:../org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-652oJT.png][histogram example]]
+[[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-16365QHx.png][histogram example]]
 #+TBLR: action:hist columns:1 colour:hotpink 
 #+TBLR: intable:continuous-data outfile:"png" title:"histogram example"
 
@@ -463,7 +463,7 @@ name the file link to the graphical output).
 
 <p>
 <div class="figure">
-<p><img src="../org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-652oJT.png"  alt="../org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-652oJT.png" /></p>
+<p><img src="../../images/org-R/histogram-example.png"  alt="../../images/org-R/histogram-example.png" /></p>
 </div>
 </p>
 <p>
@@ -496,7 +496,7 @@ available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
 
 <p>
 <div class="figure">
-<p><img src="density.png"  alt="density.png" /></p>
+<p><img src="../../images/org-R/density.png"  alt="../../images/org-R/density.png" /></p>
 </div>
 </p>
 </div>
@@ -569,7 +569,8 @@ We can see the top few rows of the table by using action:head
 
 
 <p>
-Here's a histogram of the counts.
+Here's a histogram of the counts. As we've seen, few variables have
+been customised by many users.
 </p>
 
 
@@ -588,7 +589,7 @@ Here's a histogram of the counts.
 
 <p>
 <div class="figure">
-<p><img src="org-variables-hist.png"  alt="org-variables-hist.png" /></p>
+<p><img src="../../images/org-R/org-variables-hist.png"  alt="../../images/org-R/org-variables-hist.png" /></p>
 </div>
 </p>
 
@@ -653,8 +654,8 @@ customised variable i. We can do that without writing any R code:
 <a href="org-variables-incidence.html">incidence-matrix</a>
 </p>
 <p>
-First we'll cluster org users. We use the R function dist to compute
-a distance matrix from the incidence matrix, then hclust to run a
+First we'll cluster org users. We use the R function dist to compute a
+distance matrix from the incidence matrix, then hclust to run a
 hierarchical clustering algorithm, and then plot to plot the results
 as a dendrogram:
 </p>
@@ -673,7 +674,9 @@ as a dendrogram:
 
 
 <p>
-<a href="org-users-tree.png"><img src="org-users-tree.png"/></a>
+<div class="figure">
+<p><img src="../../images/org-R/org-users-tree.png"  alt="../../images/org-R/org-users-tree.png" /></p>
+</div>
 </p>
 <p>
 And to cluster org variables, we use the transpose of that incidence matrix:
@@ -684,17 +687,19 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 <pre class="example">
 
 [[file:org-variables-tree.png][org-variables-tree.png]]
-#+TBLRR: par(bg="black", fg="orange")
+#+TBLRR: par(bg="gray15", fg="turquoise2")
 #+TBLRR: plot(hclust(dist(t(x), method="binary")), xlab="")
 #+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
-#+TBLR: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:800
+#+TBLR: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:1000
 
 </pre>
 
 
 
 <p>
-<a href="org-variables-tree.png"><img src="org-variables-tree.png"/></a>
+<div class="figure">
+<p><img src="../../images/org-R/org-variables-tree.png"  alt="../../images/org-R/org-variables-tree.png" /></p>
+</div>
 </p>
 </div>
 </div>
@@ -723,7 +728,7 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 
 <p>
 <div class="figure">
-<p><img src="../org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png"  alt="../org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png" /></p>
+<p><img src="../../images/org-R/org-plot-example-1.png"  alt="../../images/org-R/org-plot-example-1.png" /></p>
 </div>
 </p>
 </div>
@@ -794,11 +799,62 @@ following options are available:
 <h2 id="sec-8"><a name="action==list" id="action==list"></a>Table of available actions </h2>
 <div id="text-8">
 
-<p>The following actions can be specified using the
-action:&lt;some-action&gt; option. In addition, if you specify an action
-which is not recognised, it is assumed to be the name of an existing
-R function, and the code will attempt to apply it to the table.
-</p></div>
+<p>e.g. action:hist on the TBLR line.
+</p>
+
+</div>
+
+<div id="outline-container-8.1" class="outline-3">
+<h3 id="sec-8.1">Actions that generate numerical output* </h3>
+<div id="text-8.1">
+
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<col align="left"></col><col align="left"></col>
+<thead>
+<tr><th><b>Actions that generate numerical output</b></th><th></th></tr>
+</thead>
+<tbody>
+<tr><td>tabulate</td><td>count occurrences of distinct input values. Input data should be discrete. This is function table in R.</td></tr>
+<tr><td>summary</td><td>summarise data in columns (minimum, 1st quartile, median, mean, 3rd quartile, max)</td></tr>
+<tr><td>head</td><td>show first 6 rows of a larger table</td></tr>
+<tr><td>transpose</td><td>transpose a table</td></tr>
+<tr><td></td><td></td></tr>
+<tr><td><b>Actions that generate graphical output</b></td><td></td></tr>
+</tbody>
+<tbody>
+<tr><td></td><td></td></tr>
+<tr><td><b>Discrete data</b></td><td></td></tr>
+<tr><td>barplot</td><td>produces 'side-by-side' bar plots if multiple columns selected</td></tr>
+<tr><td></td><td></td></tr>
+<tr><td><b>Indexed data</b></td><td></td></tr>
+<tr><td>plot</td><td>if only 1 column selected, index is automatic: 1,2,&hellip;</td></tr>
+<tr><td>lines</td><td>same as plot</td></tr>
+<tr><td>points</td><td>same as plot but don't join points with lines</td></tr>
+<tr><td></td><td></td></tr>
+<tr><td><b>Continuous data</b></td><td></td></tr>
+<tr><td>hist</td><td>histogram</td></tr>
+<tr><td>density</td><td>like a smoothed histogram (i.e. a curve)</td></tr>
+<tr><td></td><td></td></tr>
+<tr><td><b>Grid of values</b></td><td></td></tr>
+<tr><td>image</td><td>a grid image, with cells coloured according to their numerical values</td></tr>
+</tbody>
+</table>
+
+
+
+<p>
+Note that, in addition to the actions listed below, you can also use
+action:R-function, where "R-function" is the name of an existing R
+function. The function must be able to take a data frame as it's first
+argument, and must not <b>require</b> any further arguments (i.e. any
+further arguyments must have suitable default values). Any numerical
+output will be sent to the org buffer (use output-to-buffer:t to force
+this, although if that is necessary then that is a bug).
+</p>
+
+</div>
+</div>
 
 </div>
 
@@ -811,10 +867,10 @@ R function, and the code will attempt to apply it to the table.
 Bring up an R prompt with R at a shell prompt, or M-x R in emacs (if you have installed ESS)
 </li>
 <li>
-Type ?function.name for help on function `function.name'
+Enter ?function.name for help on function `function.name'
 </li>
 <li>
-Type RSiteSearch("words") for online help matching "words"
+Enter RSiteSearch("words") for online help matching "words"
 </li>
 </ul>
 </div>
@@ -829,12 +885,13 @@ Type RSiteSearch("words") for online help matching "words"
 those who are unfamiliar.
 </p><ol>
 <li>
-It's good for simple numerical work, as well as trying to impress
-with fancy cutting-edge statistical procedures.
+It's good for simple numerical work, as well as having
+implementations of a a very large range of more sophisticated
+mathematical and statistical procedures.
 </li>
 <li>
-It's great for producing graphics quickly, and also for fine
-tuning every last detail of the graphics.
+It's good for producing graphics quickly, and also for fine
+tuning every last detail of the graphics for publication.
 </li>
 <li>
 It's a pleasant, user-friendly, interpreted programming language,
@@ -861,7 +918,7 @@ New York Times this year?
 <div id="postamble"><p class="author"> Author: Dan Davison
 <a href="mailto:davison@stats.ox.ac.uk">&lt;davison@stats.ox.ac.uk&gt;</a>
 </p>
-<p class="date"> Date: 2009-02-02 17:54:00 EST</p>
+<p class="date"> Date: 2009-02-03 13:27:00 EST</p>
 <p>HTML generated by org-mode 6.20f in emacs 22</p>
 </div></body>
 </html>

@@ -33,7 +33,7 @@
 
 * Setting things up
   The code is currently [[http://www.stats.ox.ac.uk/~davison/software/org-R/org-tblR.el][here.]] Soon it will be in the contrib
-  directory. The other things you need are R (Windows/OS X binaries
+  directory. The other things you need are R (Windows / OS X binaries
   available on the [[http:www.r-project.org][R website]]; widely available in linux package
   repositories) and the emacs mode [[http://ess.r-project.org/][Emacs Speaks Statistics]] (ESS). ESS
   installation instructions are [[http://ess.r-project.org/Manual/readme.html#Installation][here.]]  Personally, under linux, I have
@@ -194,9 +194,6 @@ the R functions which implement them. `tabulate' is really called
 
 #+end_example
 
-    [Note that currently a degenerate empty org table (| |) is needed,
-    although not used. I'm going to get rid of that requirement.]
-
 Here's what I got.  Note that the title: option set the name of the
 table with "#+TBLNAME"; we'll use that to refer to these data.
 
@@ -234,12 +231,12 @@ name the file link to the graphical output).
 
 #+begin_example
 
-[[file:../org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-652oJT.png][histogram example]]
+[[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-16365QHx.png][histogram example]]
 #+TBLR: action:hist columns:1 colour:hotpink 
 #+TBLR: intable:continuous-data outfile:"png" title:"histogram example"
 
 #+end_example
-[[file:../org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-652oJT.png]]
+[[file:../../images/org-R/histogram-example.png]]
 
 [Note that you can use multiple TBLR lines rather than cramming all
 the options on to one line.]
@@ -261,7 +258,7 @@ available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
 #+TBLR: intable:continuous-data outfile:"density.png" title:"density plot example"
 
 #+end_example
-[[file:density.png]]
+[[file:../../images/org-R/density.png]]
 
 ** Disrete data example: the configuration variables survey
 
@@ -308,7 +305,8 @@ We can see the top few rows of the table by using action:head
 #+end_example
 
 
-Here's a histogram of the counts.
+Here's a histogram of the counts. As we've seen, few variables have
+been customised by many users.
 
 #+begin_example
 
@@ -319,7 +317,7 @@ Here's a histogram of the counts.
 #+TBLR: outfile:"org-variables-hist.png" title:"org-variables-hist"
 
 #+end_example
-[[file:org-variables-hist.png]]
+[[file:../../images/org-R/org-variables-hist.png]]
     
 *** Something more complicated: clustering org variables, and org users
 
@@ -359,10 +357,10 @@ customised variable i. We can do that without writing any R code:
 #+end_example
 [[file:org-variables-incidence.org][incidence-matrix]]
 
-  First we'll cluster org users. We use the R function dist to compute
- a distance matrix from the incidence matrix, then hclust to run a
- hierarchical clustering algorithm, and then plot to plot the results
- as a dendrogram:
+First we'll cluster org users. We use the R function dist to compute a
+distance matrix from the incidence matrix, then hclust to run a
+hierarchical clustering algorithm, and then plot to plot the results
+as a dendrogram:
 
 #+begin_example
 
@@ -372,20 +370,29 @@ customised variable i. We can do that without writing any R code:
 #+TBLR: outfile:"org-users-tree.png" title:"org-users-tree.png"
 
 #+end_example
-[[file:org-users-tree.png][org-users-tree.png]]
+[[file:../../images/org-R/org-users-tree.png]]
 
 And to cluster org variables, we use the transpose of that incidence matrix:
 
 #+begin_example
 
 [[file:org-variables-tree.png][org-variables-tree.png]]
-#+TBLRR: par(bg="black", fg="orange")
+#+TBLRR: par(bg="gray15", fg="turquoise2")
 #+TBLRR: plot(hclust(dist(t(x), method="binary")), xlab="")
 #+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
-#+TBLR: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:800
+#+TBLR: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:1000
 
 #+end_example
-[[file:org-variables-tree.png][org-variables-tree.png]]
+[[file:../../images/org-R/org-variables-tree.png]]
+
+
+Please note that my main aim here was to give some examples of using
+org-R, rather than to show how the org variables data should be mined
+for useful information! The org-variables dendrogram does seem to have
+made some sensible clusterings (e.g. the clusters of agenda-related
+commands), but I'm going to leave it to others to decide whether this
+exercise really served to do more than illustrate org-R. Does anyone
+recognise any usage affinities between the clustered org users?
 
 ** Indexed data example
    :PROPERTIES:
@@ -401,11 +408,12 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 #+TBLR: intable:"org-plot-example-1" outfile:"png"
 
 #+end_example
-[[file:../org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png]]
+[[file:../../images/org-R/org-plot-example-1.png]]
 
 * Table of available options
   In addition to the action:<some-action> option (described [[*Table of available actions][here)]], the
   following options are available:
+|-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
 | *Input options*                               |                                                                                                                                        |
 |-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
 | infile:/path/to/file.csv                      | input data comes from file.csv                                                                                                         |
@@ -443,22 +451,56 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 | showcode:t                                    | Display a buffer containing the R code that was generated to do what was requested.                                                    |
   
 * Table of available actions
-# <<action list>>  
-  The following actions can be specified using the
-  action:<some-action> option. In addition, if you specify an action
-  which is not recognised, it is assumed to be the name of an existing
-  R function, and the code will attempt to apply it to the table.
+# <<action list>> To specify an action from the following list, use
+e.g. action:hist on the TBLR line.
+
+| *Actions that generate numerical output* |                                                                                                         |
+|------------------------------------------+---------------------------------------------------------------------------------------------------------|
+| tabulate                                 | count occurrences of distinct input values. Input data should be discrete. This is function table in R. |
+| summary                                  | summarise data in columns (minimum, 1st quartile, median, mean, 3rd quartile, max)                      |
+| head                                     | show first 6 rows of a larger table                                                                     |
+| transpose                                | transpose a table                                                                                       |
+|                                          |                                                                                                         |
+| *Actions that generate graphical output* |                                                                                                         |
+|------------------------------------------+---------------------------------------------------------------------------------------------------------|
+|                                          |                                                                                                         |
+| *Discrete data*                          |                                                                                                         |
+| barplot                                  | produces 'side-by-side' bar plots if multiple columns selected                                          |
+|                                          |                                                                                                         |
+| *Indexed data*                           |                                                                                                         |
+| plot                                     | if only 1 column selected, index is automatic: 1,2,...                                                  |
+| lines                                    | same as plot                                                                                            |
+| points                                   | same as plot but don't join points with lines                                                           |
+|                                          |                                                                                                         |
+| *Continuous data*                        |                                                                                                         |
+| hist                                     | histogram                                                                                               |
+| density                                  | like a smoothed histogram (i.e. a curve)                                                                |
+|                                          |                                                                                                         |
+| *Grid of values*                         |                                                                                                         |
+| image                                    | a grid image, with cells coloured according to their numerical values                                   |
+
+
+  Note that, in addition to the actions listed below, you can also use
+action:R-function, where "R-function" is the name of an existing R
+function. The function must be able to take a data frame as it's first
+argument, and must not *require* any further arguments (i.e. any
+further arguyments must have suitable default values). Any numerical
+output will be sent to the org buffer (use output-to-buffer:t to force
+this, although if that is necessary then that is a bug).
+
+  
 * Getting help with R
   - Bring up an R prompt with R at a shell prompt, or M-x R in emacs (if you have installed ESS)
-  - Type ?function.name for help on function `function.name'
-  - Type RSiteSearch("words") for online help matching "words"
+  - Enter ?function.name for help on function `function.name'
+  - Enter RSiteSearch("words") for online help matching "words"
 * Brief advert for R
   Seeing as this has made use of R, I'll briefly say my bit on it for
   those who are unfamiliar.
-  1. It's good for simple numerical work, as well as trying to impress
-     with fancy cutting-edge statistical procedures.
-  2. It's great for producing graphics quickly, and also for fine
-     tuning every last detail of the graphics.
+  1. It's good for simple numerical work, as well as having
+     implementations of a a very large range of more sophisticated
+     mathematical and statistical procedures.
+  2. It's good for producing graphics quickly, and also for fine
+     tuning every last detail of the graphics for publication.
   3. It's a pleasant, user-friendly, interpreted programming language,
      that is often used interactively (it comes with its own
      shell/command-line environment, and runs within emacs using
