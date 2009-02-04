@@ -6,7 +6,7 @@ lang="en" xml:lang="en">
 <title>org-R: Computing and data visualisation in Org-mode using R</title>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2009-02-03 22:12:38 EST"/>
+<meta name="generated" content="2009-02-03 22:58:12 EST"/>
 <meta name="author" content="Dan Davison"/>
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
@@ -94,8 +94,9 @@ lang="en" xml:lang="en">
 </li>
 <li><a href="#sec-7">Table of available options </a></li>
 <li><a href="#sec-8">Table of available actions </a></li>
-<li><a href="#sec-9">Getting help with R </a></li>
-<li><a href="#sec-10">Brief advert for R </a></li>
+<li><a href="#sec-9">More detailed description of org-R </a></li>
+<li><a href="#sec-10">Getting help with R </a></li>
+<li><a href="#sec-11">Brief advert for R </a></li>
 </ul>
 </div>
 </div>
@@ -120,6 +121,12 @@ yet know R, but think they might be interested, try the showcode:t
 option. It displays the R code corresponding to the action you
 requested, and so provides a good starting point for fine-tuning
 your analysis. But that's getting ahead of things.
+</p>
+<p>
+My hope is, of course, that this will be of use to people. So at
+this stage any comments, ideas, feedback, bug reports etc would be
+<b>very</b> welcome. I'd be happy to help anyone that's interested in
+using this, via the Org mailing list.
 </p>
 </div>
 
@@ -453,7 +460,7 @@ available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
 <pre class="example">
 
 [[file:density.png][density plot example]]
-#+TBLR: action:density columns:1 colour:chartreuse4 args:(:lwd 4)
+#+TBLR: action:density columns:"values" colour:chartreuse4 args:(:lwd 4)
 #+TBLR: intable:continuous-data outfile:"density.png" title:"density plot example"
 
 </pre>
@@ -466,10 +473,12 @@ available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
 </div>
 </p>
 <p>
-Note the use of the args: option there. It takes the form of a lisp
-property list ("p-list"), specifying extra arguments to pass to the R
-function (in this case density()). Here we used it to set the line
-thickness.
+There were a couple of new features there. Firstly, I referred to
+column 1 using its column label, rather than with the
+integer 1. Secondly, note the use of the args: option. It takes the
+form of a lisp property list ("p-list"), specifying extra arguments to
+pass to the R function (in this case density()). Here we used it to
+set the line thickness (lwd=4).
 </p>
 </div>
 
@@ -699,10 +708,11 @@ recognise any usage affinities between the clustered org users?
 
 <pre class="example">
 
-[[file:tmp.png][png output]]
+[[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-8119M2O.png][An example from the org-plot tutorial, plotted using org-R]]
 #+TBLR: action:lines columns:((1)(2 3))
 #+TBLR: infile:"../org-plot.org"
 #+TBLR: intable:"org-plot-example-1" outfile:"png"
+#+TBLR: title:"An example from the org-plot tutorial, plotted using org-R"
 
 </pre>
 
@@ -748,7 +758,7 @@ following options are available:
 <tbody>
 <tr><td>action:some-action</td><td>off-the-shelf plotting action or computation (see <a href="#sec-8">separate list</a>), or any R function that makes sense (e.g. head, summary)</td></tr>
 <tr><td>lines:t</td><td>(when plotting) join points with lines (similar to action:lines)</td></tr>
-<tr><td>args:(:xlab "\"the x axis title\"" :lwd 4)</td><td>provide extra arguments as a p-list (note the need to quote strings)</td></tr>
+<tr><td>args:(:xlab "\"the x axis title\"" :lwd 4)</td><td>provide extra arguments as a p-list (note the need to quote strings if they are to appear as strings in R)</td></tr>
 </tbody>
 <tbody>
 <tr><td><b>Output options</b></td><td></td></tr>
@@ -839,8 +849,59 @@ this, although if that is necessary then that is a bug).
 </div>
 
 <div id="outline-container-9" class="outline-2">
-<h2 id="sec-9">Getting help with R </h2>
+<h2 id="sec-9">More detailed description of org-R </h2>
 <div id="text-9">
+
+<p>My aim with org-R is to provide a fairly general facility for using
+R with Org. The TBLR lines and TBLRR lines together specify an R
+function, which may take numerical input, and may generate
+graphical output, or numerical output, or both.
+</p>
+<p>
+If any input data have been specified, then the R function receives
+those data as its first argument. The input data may come from an
+Org table, or from a csv spreadsheet file. In either case they are
+tabular (1- or 2-dimensional). The input data are passed to the
+function as an R data frame (a table-like structure in which
+different columns may contain different types of data &ndash; numeric,
+character, etc). Inside the R function, that data frame is called
+'x'. 'x' is also the return value of the R function. Therefore the
+numerical output of org-R is determined by the modifications to the
+variable x that are made inside the function (any graphical output
+is a side effect.)
+</p>
+<p>
+It's worth noting that one mode of using org-R would be to write your
+own code in a separate file, and use the source() function on a TBLRR
+line to evaluate the code in that file.
+</p>
+<p>
+Numerical output of the function should also be tabular, and may be
+received by the Org buffer as an Org table, or sent to file in Org
+table or csv format. R deals transparently with multi-dimensional
+arrays, but Org table and csv format do not.
+</p>
+<p>
+Unless an output file has been specified, graphical output will be
+displayed on screen.
+</p>
+<p>
+The mapping from the TBLR and TBLRR lines to the R function may
+benefit from further thought; currently what happens is that code
+corresponding to the TBLR line is generated, and then any explicit
+user code is appended to this. Thus the TBLRR lines have the 'last
+word' on the output. Since multiple, intermixed, TBLR and TBLRR
+lines can be given, it might make sense instead to follow the order
+of those lines when constructing the code.
+</p>
+
+</div>
+
+</div>
+
+<div id="outline-container-10" class="outline-2">
+<h2 id="sec-10">Getting help with R </h2>
+<div id="text-10">
 
 <ul>
 <li>
@@ -864,9 +925,9 @@ website for "An Introduction to R", and other more technical manuals.
 
 </div>
 
-<div id="outline-container-10" class="outline-2">
-<h2 id="sec-10">Brief advert for R </h2>
-<div id="text-10">
+<div id="outline-container-11" class="outline-2">
+<h2 id="sec-11">Brief advert for R </h2>
+<div id="text-11">
 
 <p>Seeing as this has made use of R, I'll briefly say my bit on it for
 those who are unfamiliar.
@@ -902,6 +963,7 @@ side of <a href="http://www.r-project.org/">website</a>.).
 How many programming languages will get <a href="http://www.nytimes.com/2009/01/07/technology/business-computing/07program.html">their own article</a> in the
 New York Times this year?
 
+
 </li>
 </ol>
 </div>
@@ -909,7 +971,7 @@ New York Times this year?
 <div id="postamble"><p class="author"> Author: Dan Davison
 <a href="mailto:davison@stats.ox.ac.uk">&lt;davison@stats.ox.ac.uk&gt;</a>
 </p>
-<p class="date"> Date: 2009-02-03 22:12:38 EST</p>
+<p class="date"> Date: 2009-02-03 22:58:12 EST</p>
 <p>HTML generated by org-mode 6.20f in emacs 22</p>
 </div></body>
 </html>
