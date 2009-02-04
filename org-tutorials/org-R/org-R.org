@@ -14,30 +14,30 @@
 [[file:../index.org][{Back to Worg's index}]]
 
 * Introduction
-  org-R is an org-mode extension that performs numerical
-  computations and generates graphics. Numerical output is stored in
-  the org buffer in org tables, and the input can also come from an
-  org table. Rather than starting off by documenting everything
-  systematically, I'll provide several commented examples. Afterwards,
-  I'll try to give a complete documentation.
-
- Although, behind the scenes, it uses [[http:www.r-project.org][R]], you do not need to know
-  anything about R. Common operations are provided `off the shelf' on
-  lines starting with #+TBLR: (and more can be added on
-  request). Having said that, org-R also accepts raw R code
-  (TBLRR: lines). For those who don't yet know R, but think they might
-  be interested, try the showcode:t option. It displays the R code
-  corresponding to the action you requested, and so provides a good
-  starting point for fine-tuning your analysis. But that's getting
-  ahead of things.
+  org-R is an org-mode extension that performs numerical computations
+  and generates graphics. Numerical output may be stored in the org
+  buffer in org tables, and the input can also come from an org
+  table. Rather than starting off by documenting everything
+  systematically, I'll provide several commented examples. Towards the
+  end there are lists of [[*Table of available actions][available actions]] and [[*Table of available options][other options]].
+  
+  Although, behind the scenes, it uses [[http:www.r-project.org][R]], you do not need to know
+  anything about R. Common operations are provided `off the shelf' by
+  specifying options on lines starting with #+TBLR:. Having said that,
+  org-R also accepts raw R code (TBLRR: lines). For those who don't
+  yet know R, but think they might be interested, try the showcode:t
+  option. It displays the R code corresponding to the action you
+  requested, and so provides a good starting point for fine-tuning
+  your analysis. But that's getting ahead of things.
 
 * Setting things up
-  The code is currently [[http://www.stats.ox.ac.uk/~davison/software/org-R/org-tblR.el][here.]] Soon it will be in the contrib
+  The code is currently [[http://www.stats.ox.ac.uk/~davison/software/org-R/org-tblR.el][here]]. Soon it will be in the contrib
   directory. The other things you need are R (Windows / OS X binaries
   available on the [[http:www.r-project.org][R website]]; widely available in linux package
   repositories) and the emacs mode [[http://ess.r-project.org/][Emacs Speaks Statistics]] (ESS). ESS
   installation instructions are [[http://ess.r-project.org/Manual/readme.html#Installation][here.]]  Personally, under linux, I have
   something like
+
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "/path/to/ess/lisp")
 (require 'ess-site)
@@ -181,7 +181,7 @@ table with "#+TBLNAME"; we'll use that to refer to these data.
 #+begin_example
 
 #+TBLNAME:continuous-data
-|                   |
+|            values |
 |-------------------|
 | -2.48627002467785 |
 |  -4.0196287273144 |
@@ -212,7 +212,7 @@ name the file link to the graphical output).
 
 #+begin_example
 
-[[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-16365QHx.png][histogram example]]
+[[file:tmp.png][histogram example]]
 #+TBLR: action:hist columns:1 colour:hotpink 
 #+TBLR: intable:continuous-data outfile:"png" title:"histogram example"
 
@@ -235,13 +235,18 @@ available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
 #+begin_example
 
 [[file:density.png][density plot example]]
-#+TBLR: action:density columns:1 colour:tomato4
+#+TBLR: action:density columns:1 colour:chartreuse4 args:(:lwd 4)
 #+TBLR: intable:continuous-data outfile:"density.png" title:"density plot example"
 
 #+end_example
 [[file:../../images/org-R/density.png]]
 
-** Disrete data example: the configuration variables survey
+Note the use of the args: option there. It takes the form of a lisp
+property list ("p-list"), specifying extra arguments to pass to the R
+function (in this case density()). Here we used it to set the line
+thickness.
+
+** Discrete data example: the configuration variables survey
 
 The raw data, as collected by Manish, is in a table called
 org-variables-table, in a file called variable-popcon.org. We use the
@@ -290,13 +295,14 @@ org variables are customised by only one or two users.
 
 #+begin_example
 
-[[file:org-variables-barplot.png][org-variables-barplot]]
+[[file:org-variables-barplot.png][org-variables barplot]]
 #+TBLR: action:barplot rownames:t columns:1 width:800 col:darkblue
 #+TBLR: args:(:names.arg "NULL")
 #+TBLR: infile:"org-variables-counts.org" intable:"org-variables-counts"
-#+TBLR: outfile:"org-variables-barplot.png" title:"org-variables-barplot"
+#+TBLR: outfile:"org-variables-barplot.png" title:"org-variables barplot"
 
-#+end_example    
+#+end_example
+[[file:../../images/org-R/org-variables-barplot.png]]
 
 *** Something more complicated: clustering org variables, and org users
 
@@ -382,7 +388,7 @@ recognise any usage affinities between the clustered org users?
 
 #+begin_example
 
-[[file:../org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png][png output]]
+[[file:tmp.png][png output]]
 #+TBLR: action:lines columns:((1)(2 3))
 #+TBLR: infile:"../org-plot.org"
 #+TBLR: intable:"org-plot-example-1" outfile:"png"
@@ -412,6 +418,7 @@ recognise any usage affinities between the clustered org users?
 |-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
 | action:some-action                            | off-the-shelf plotting action or computation (see [[*Table of available actions][separate list]]), or any R function that makes sense (e.g. head, summary)              |
 | lines:t                                       | (when plotting) join points with lines (similar to action:lines)                                                                       |
+| args:(:xlab "\"the x axis title\"" :lwd 4)    | provide extra arguments as a p-list (note the need to quote strings)                                                                   |
 |-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
 | *Output options*                              |                                                                                                                                        |
 |-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
@@ -478,24 +485,29 @@ this, although if that is necessary then that is a bug).
   - Bring up an R prompt with R at a shell prompt, or M-x R in emacs (if you have installed ESS)
   - Enter ?function.name for help on function `function.name'
   - Enter RSiteSearch("words") for online help matching "words"
+  - Enter ?par to see the full list of graphical parameters
+  - Follow the Documentation link on the left hand side of the R
+    website for "An Introduction to R", and other more technical manuals.
 * Brief advert for R
   Seeing as this has made use of R, I'll briefly say my bit on it for
   those who are unfamiliar.
   1. It's good for simple numerical work, as well as having
      implementations of a a very large range of more sophisticated
      mathematical and statistical procedures.
-  2. It's good for producing graphics quickly, and also for fine
-     tuning every last detail of the graphics for publication.
-  3. It's a pleasant, user-friendly, interpreted programming language,
-     that is often used interactively (it comes with its own
-     shell/command-line environment, and runs within emacs using
-     ESS). In particular, its functional programming style stuff might
-     well appeal to elisp programmers. For example, you want to
-     construct an arbitrarily nested data structure, then pass some
-     function over the tips, returning a data structure of the same
-     shape as the input? No problem ([[http://stat.ethz.ch/R-manual/R-patched/library/base/html/rapply.html][rapply]]).
-  4. There's a *lot* of add-on packages for it (CRAN link on left hand
+  2. It's good for producing graphics quickly, and for fine tuning
+     every last detail of the graphics for publication.
+  3. It's a syntactically reasonable, user-friendly, interpreted
+     programming language, that is often used interactively (it comes
+     with its own shell/command-line environment, and runs within
+     emacs using ESS).
+  4. It's a good language for a functional style of programming (in
+     fact I'd say that's how it should be used), which might well
+     appeal to elisp programmers. For example, you want to construct
+     an arbitrarily nested data structure, then pass some function
+     over the tips, returning a data structure of the same shape as
+     the input? No problem ([[http://stat.ethz.ch/R-manual/R-patched/library/base/html/rapply.html][rapply]]).
+  5. There's a *lot* of add-on packages for it (CRAN link on left hand
      side of [[http://www.r-project.org/][website]].).
-  5. How many programming languages will get [[http://www.nytimes.com/2009/01/07/technology/business-computing/07program.html][their own article]] in the
+  6. How many programming languages will get [[http://www.nytimes.com/2009/01/07/technology/business-computing/07program.html][their own article]] in the
      New York Times this year?
 

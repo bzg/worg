@@ -6,7 +6,7 @@ lang="en" xml:lang="en">
 <title>org-R: Computing and data visualisation in Org-mode using R</title>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2009-02-03 17:36:34 EST"/>
+<meta name="generated" content="2009-02-03 22:12:38 EST"/>
 <meta name="author" content="Dan Davison"/>
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
@@ -84,7 +84,7 @@ lang="en" xml:lang="en">
 <ul>
 <li><a href="#sec-6.1">Available off-the-shelf plotting commands </a></li>
 <li><a href="#sec-6.2">Continuous data example: </a></li>
-<li><a href="#sec-6.3">Disrete data example: the configuration variables survey </a>
+<li><a href="#sec-6.3">Discrete data example: the configuration variables survey </a>
 <ul>
 <li><a href="#sec-6.3.1">Something more complicated: clustering org variables, and org users </a></li>
 </ul>
@@ -104,23 +104,22 @@ lang="en" xml:lang="en">
 <h2 id="sec-1">Introduction </h2>
 <div id="text-1">
 
-<p>org-R is an org-mode extension that performs numerical
-computations and generates graphics. Numerical output is stored in
-the org buffer in org tables, and the input can also come from an
-org table. Rather than starting off by documenting everything
-systematically, I'll provide several commented examples. Afterwards,
-I'll try to give a complete documentation.
+<p>org-R is an org-mode extension that performs numerical computations
+and generates graphics. Numerical output may be stored in the org
+buffer in org tables, and the input can also come from an org
+table. Rather than starting off by documenting everything
+systematically, I'll provide several commented examples. Towards the
+end there are lists of <a href="#sec-8">available actions</a> and <a href="#sec-7">other options</a>.
 </p>
 <p>
 Although, behind the scenes, it uses <a href="http:www.r-project.org">R</a>, you do not need to know
-anything about R. Common operations are provided `off the shelf' on
-lines starting with #+TBLR: (and more can be added on
-request). Having said that, org-R also accepts raw R code
-(TBLRR: lines). For those who don't yet know R, but think they might
-be interested, try the showcode:t option. It displays the R code
-corresponding to the action you requested, and so provides a good
-starting point for fine-tuning your analysis. But that's getting
-ahead of things.
+anything about R. Common operations are provided `off the shelf' by
+specifying options on lines starting with #+TBLR:. Having said that,
+org-R also accepts raw R code (TBLRR: lines). For those who don't
+yet know R, but think they might be interested, try the showcode:t
+option. It displays the R code corresponding to the action you
+requested, and so provides a good starting point for fine-tuning
+your analysis. But that's getting ahead of things.
 </p>
 </div>
 
@@ -130,13 +129,14 @@ ahead of things.
 <h2 id="sec-2">Setting things up </h2>
 <div id="text-2">
 
-<p>The code is currently <a href="http://www.stats.ox.ac.uk/~davison/software/org-R/org-tblR.el">here.</a> Soon it will be in the contrib
+<p>The code is currently <a href="http://www.stats.ox.ac.uk/~davison/software/org-R/org-tblR.el">here</a>. Soon it will be in the contrib
 directory. The other things you need are R (Windows / OS X binaries
 available on the <a href="http:www.r-project.org">R website</a>; widely available in linux package
 repositories) and the emacs mode <a href="http://ess.r-project.org/">Emacs Speaks Statistics</a> (ESS). ESS
 installation instructions are <a href="http://ess.r-project.org/Manual/readme.html#Installation">here.</a>  Personally, under linux, I have
 something like
 </p>
+
 
 
 <pre class="src src-emacs-lisp">
@@ -381,7 +381,7 @@ table with "#+TBLNAME"; we'll use that to refer to these data.
 <pre class="example">
 
 #+TBLNAME:continuous-data
-|                   |
+|            values |
 |-------------------|
 | -2.48627002467785 |
 |  -4.0196287273144 |
@@ -419,7 +419,7 @@ name the file link to the graphical output).
 
 <pre class="example">
 
-[[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/2c/e0fc04-b308-4b8d-8acc-805a9e5fed7d/org-R-output-16365QHx.png][histogram example]]
+[[file:tmp.png][histogram example]]
 #+TBLR: action:hist columns:1 colour:hotpink 
 #+TBLR: intable:continuous-data outfile:"png" title:"histogram example"
 
@@ -453,7 +453,7 @@ available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
 <pre class="example">
 
 [[file:density.png][density plot example]]
-#+TBLR: action:density columns:1 colour:tomato4
+#+TBLR: action:density columns:1 colour:chartreuse4 args:(:lwd 4)
 #+TBLR: intable:continuous-data outfile:"density.png" title:"density plot example"
 
 </pre>
@@ -465,12 +465,18 @@ available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
 <p><img src="../../images/org-R/density.png"  alt="../../images/org-R/density.png" /></p>
 </div>
 </p>
+<p>
+Note the use of the args: option there. It takes the form of a lisp
+property list ("p-list"), specifying extra arguments to pass to the R
+function (in this case density()). Here we used it to set the line
+thickness.
+</p>
 </div>
 
 </div>
 
 <div id="outline-container-6.3" class="outline-3">
-<h3 id="sec-6.3">Disrete data example: the configuration variables survey </h3>
+<h3 id="sec-6.3">Discrete data example: the configuration variables survey </h3>
 <div id="text-6.3">
 
 
@@ -533,21 +539,20 @@ We can see the top few rows of the table by using action:head
 
 
 
-
 <p>
-Here's a histogram of the counts. As we've seen, few variables have
-been customised by many users.
+Here's a barplot of the counts. It makes it clear that over half the
+org variables are customised by only one or two users.
 </p>
 
 
 
 <pre class="example">
 
-
-[[file:org-variables-hist.png][org-variables-hist]]
-#+TBLR: action:hist rownames:t columns:1
+[[file:org-variables-barplot.png][org-variables barplot]]
+#+TBLR: action:barplot rownames:t columns:1 width:800 col:darkblue
+#+TBLR: args:(:names.arg "NULL")
 #+TBLR: infile:"org-variables-counts.org" intable:"org-variables-counts"
-#+TBLR: outfile:"org-variables-hist.png" title:"org-variables-hist"
+#+TBLR: outfile:"org-variables-barplot.png" title:"org-variables barplot"
 
 </pre>
 
@@ -555,7 +560,7 @@ been customised by many users.
 
 <p>
 <div class="figure">
-<p><img src="../../images/org-R/org-variables-hist.png"  alt="../../images/org-R/org-variables-hist.png" /></p>
+<p><img src="../../images/org-R/org-variables-barplot.png"  alt="../../images/org-R/org-variables-barplot.png" /></p>
 </div>
 </p>
 
@@ -694,7 +699,7 @@ recognise any usage affinities between the clustered org users?
 
 <pre class="example">
 
-[[file:../org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-652pRO.png][png output]]
+[[file:tmp.png][png output]]
 #+TBLR: action:lines columns:((1)(2 3))
 #+TBLR: infile:"../org-plot.org"
 #+TBLR: intable:"org-plot-example-1" outfile:"png"
@@ -743,6 +748,7 @@ following options are available:
 <tbody>
 <tr><td>action:some-action</td><td>off-the-shelf plotting action or computation (see <a href="#sec-8">separate list</a>), or any R function that makes sense (e.g. head, summary)</td></tr>
 <tr><td>lines:t</td><td>(when plotting) join points with lines (similar to action:lines)</td></tr>
+<tr><td>args:(:xlab "\"the x axis title\"" :lwd 4)</td><td>provide extra arguments as a p-list (note the need to quote strings)</td></tr>
 </tbody>
 <tbody>
 <tr><td><b>Output options</b></td><td></td></tr>
@@ -846,6 +852,13 @@ Enter ?function.name for help on function `function.name'
 <li>
 Enter RSiteSearch("words") for online help matching "words"
 </li>
+<li>
+Enter ?par to see the full list of graphical parameters
+</li>
+<li>
+Follow the Documentation link on the left hand side of the R
+website for "An Introduction to R", and other more technical manuals.
+</li>
 </ul>
 </div>
 
@@ -864,18 +877,22 @@ implementations of a a very large range of more sophisticated
 mathematical and statistical procedures.
 </li>
 <li>
-It's good for producing graphics quickly, and also for fine
-tuning every last detail of the graphics for publication.
+It's good for producing graphics quickly, and for fine tuning
+every last detail of the graphics for publication.
 </li>
 <li>
-It's a pleasant, user-friendly, interpreted programming language,
-that is often used interactively (it comes with its own
-shell/command-line environment, and runs within emacs using
-ESS). In particular, its functional programming style stuff might
-well appeal to elisp programmers. For example, you want to
-construct an arbitrarily nested data structure, then pass some
-function over the tips, returning a data structure of the same
-shape as the input? No problem (<a href="http://stat.ethz.ch/R-manual/R-patched/library/base/html/rapply.html">rapply</a>).
+It's a syntactically reasonable, user-friendly, interpreted
+programming language, that is often used interactively (it comes
+with its own shell/command-line environment, and runs within
+emacs using ESS).
+</li>
+<li>
+It's a good language for a functional style of programming (in
+fact I'd say that's how it should be used), which might well
+appeal to elisp programmers. For example, you want to construct
+an arbitrarily nested data structure, then pass some function
+over the tips, returning a data structure of the same shape as
+the input? No problem (<a href="http://stat.ethz.ch/R-manual/R-patched/library/base/html/rapply.html">rapply</a>).
 </li>
 <li>
 There's a <b>lot</b> of add-on packages for it (CRAN link on left hand
@@ -892,7 +909,7 @@ New York Times this year?
 <div id="postamble"><p class="author"> Author: Dan Davison
 <a href="mailto:davison@stats.ox.ac.uk">&lt;davison@stats.ox.ac.uk&gt;</a>
 </p>
-<p class="date"> Date: 2009-02-03 17:36:34 EST</p>
+<p class="date"> Date: 2009-02-03 22:12:38 EST</p>
 <p>HTML generated by org-mode 6.20f in emacs 22</p>
 </div></body>
 </html>
