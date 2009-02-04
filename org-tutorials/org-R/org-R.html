@@ -6,7 +6,7 @@ lang="en" xml:lang="en">
 <title>org-R: Computing and data visualisation in Org-mode using R</title>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2009-02-03 22:58:12 EST"/>
+<meta name="generated" content="2009-02-04 09:39:29 EST"/>
 <meta name="author" content="Dan Davison"/>
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
@@ -115,8 +115,8 @@ end there are lists of <a href="#sec-8">available actions</a> and <a href="#sec-
 <p>
 Although, behind the scenes, it uses <a href="http:www.r-project.org">R</a>, you do not need to know
 anything about R. Common operations are provided `off the shelf' by
-specifying options on lines starting with #+TBLR:. Having said that,
-org-R also accepts raw R code (TBLRR: lines). For those who don't
+specifying options on lines starting with #+R:. Having said that,
+org-R also accepts raw R code (#+RR: lines). For those who don't
 yet know R, but think they might be interested, try the showcode:t
 option. It displays the R code corresponding to the action you
 requested, and so provides a good starting point for fine-tuning
@@ -125,8 +125,12 @@ your analysis. But that's getting ahead of things.
 <p>
 My hope is, of course, that this will be of use to people. So at
 this stage any comments, ideas, feedback, bug reports etc would be
-<b>very</b> welcome. I'd be happy to help anyone that's interested in
+very welcome. I'd be happy to help anyone that's interested in
 using this, via the Org mailing list.
+</p>
+<p>
+If you'd like to try out these commands yourself, the Org file that
+created this web page is <a href="org-R.org">here</a>.
 </p>
 </div>
 
@@ -136,7 +140,7 @@ using this, via the Org mailing list.
 <h2 id="sec-2">Setting things up </h2>
 <div id="text-2">
 
-<p>The code is currently <a href="http://www.stats.ox.ac.uk/~davison/software/org-R/org-tblR.el">here</a>. Soon it will be in the contrib
+<p>The code is currently <a href="http://www.stats.ox.ac.uk/~davison/software/org-R/org-R.el">here</a>. Soon it will be in the contrib
 directory. The other things you need are R (Windows / OS X binaries
 available on the <a href="http:www.r-project.org">R website</a>; widely available in linux package
 repositories) and the emacs mode <a href="http://ess.r-project.org/">Emacs Speaks Statistics</a> (ESS). ESS
@@ -147,8 +151,8 @@ something like
 
 
 <pre class="src src-emacs-lisp">
-(add-to-list 'load-path <span style="color: #87cefa;">"/path/to/ess/lisp"</span>)
-(<span style="color: #afeeee; font-weight: bold;">require</span> '<span style="color: #98fb98;">ess-site</span>)
+(add-to-list 'load-path <span style="color: #bc8f8f;">"/path/to/ess/lisp"</span>)
+(<span style="color: #a020f0;">require</span> '<span style="color: #5f9ea0;">ess-site</span>)
 </pre>
 
 
@@ -163,9 +167,9 @@ something like
 <div id="text-3">
 
 <p>org-R uses two different option lines to specify an
-analysis/plot: #+TBLR: and #+TBLRR:. #+TBLRR: is the one that
+analysis/plot: #+R: and #+RR:. #+RR: is the one that
 accepts R code, so we'll ignore that for now. To make the action
-happen, use M-x org-R-apply with point in the #+TBLR:
+happen, use M-x org-R-apply with point in the #+R:
 line. That's the only function you need, and it would make sense to
 bind it to some key. So, first example.
 </p>
@@ -178,7 +182,7 @@ bind it to some key. So, first example.
 <div id="text-4">
 
 <p>Here's a command to tabulate the values in the second column. Issue
-M-x org-R-apply in the following #+TBLR line.
+M-x org-R-apply in the following #+R line.
 </p>
 
 
@@ -190,7 +194,7 @@ M-x org-R-apply in the following #+TBLR line.
 | A    | A    |
 | A    | B    |
 | B    | B    |
-#+TBLR: action:tabulate columns:2
+#+R: action:tabulate columns:2
 
 </pre>
 
@@ -246,13 +250,13 @@ infile:/path/to/file.csv or infile:<a href="http://somewhere/file.csv">http://so
 </li>
 <li>
 by doing neither, in which case it looks for a table immediately
-above the #+TBLR(R) line(s).
+above the #+R(R) line(s).
 
 </li>
 </ol>
 
 <p>Case (3) is what happened above &ndash; the input data came from a table
-immediately above the #+TBLR line. The default behaviour is to replace
+immediately above the #+R line. The default behaviour is to replace
 any such table with the output; this allows us to tweak the option
 line and update the analysis. However, normally we'll want to separate
 the data from the analysis output. So let's keep the data as a named
@@ -272,7 +276,7 @@ table in the org file, and refer to it by name:
 
 [arbitrary other content of org buffer]
 
-#+TBLR: intable:data-set-1 action:tabulate
+#+R: intable:data-set-1 action:tabulate
 
 </pre>
 
@@ -358,7 +362,7 @@ requires some raw R code, so skip this bit if you're not
 interested.
 </p>
 <p>
-The following #+TBLRR line simulates 10 values from a Normal
+The following #+RR line simulates 10 values from a Normal
 distribution with mean -3, and 10 values from a Normal
 distribution with mean 3, and lumps them together. The point is that
 the numbers we get should be concentrated around two different
@@ -370,8 +374,8 @@ density plot.
 
 <pre class="example">
 
-#+TBLRR: x &lt;- c(rnorm(10, mean=-3, sd=1), rnorm(10, mean=3, sd=1))
-#+TBLR: title:"continuous-data" output-to-buffer:t
+#+RR: x &lt;- c(rnorm(10, mean=-3, sd=1), rnorm(10, mean=3, sd=1))
+#+R: title:"continuous-data" output-to-buffer:t
 
 </pre>
 
@@ -427,8 +431,8 @@ name the file link to the graphical output).
 <pre class="example">
 
 [[file:tmp.png][histogram example]]
-#+TBLR: action:hist columns:1 colour:hotpink 
-#+TBLR: intable:continuous-data outfile:"png" title:"histogram example"
+#+R: action:hist columns:1 colour:hotpink 
+#+R: intable:continuous-data outfile:"png" title:"histogram example"
 
 </pre>
 
@@ -440,7 +444,7 @@ name the file link to the graphical output).
 </div>
 </p>
 <p>
-[Note that you can use multiple TBLR lines rather than cramming all
+[Note that you can use multiple #+R lines rather than cramming all
 the options on to one line.]
 </p>
 <p>
@@ -460,8 +464,8 @@ available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
 <pre class="example">
 
 [[file:density.png][density plot example]]
-#+TBLR: action:density columns:"values" colour:chartreuse4 args:(:lwd 4)
-#+TBLR: intable:continuous-data outfile:"density.png" title:"density plot example"
+#+R: action:density columns:"values" colour:chartreuse4 args:(:lwd 4)
+#+R: intable:continuous-data outfile:"density.png" title:"density plot example"
 
 </pre>
 
@@ -490,7 +494,7 @@ set the line thickness (lwd=4).
 
 
 <p>
-The raw data, as collected by Manish, is in a table called
+The raw data, as collected by Manish, are in a table called
 org-variables-table, in a file called variable-popcon.org. We use the
 file: option to specify the org file containing the data, and the
 table: option to specify the name of the table within that file. [An
@@ -513,9 +517,9 @@ we'll store them in a separate org file:
 <pre class="example">
 
 [[file:org-variables-counts.org][org-variables-counts]]
-#+TBLR: action:tabulate columns:2 sort:t
-#+TBLR: infile:"variable-popcon.org" intable:"org-variables-table"
-#+TBLR: outfile:"org-variables-counts.org" title:"org-variables-counts"
+#+R: action:tabulate columns:2 sort:t
+#+R: infile:"variable-popcon.org" intable:"org-variables-table"
+#+R: outfile:"org-variables-counts.org" title:"org-variables-counts"
 
 </pre>
 
@@ -540,8 +544,8 @@ We can see the top few rows of the table by using action:head
 |           4 | org-todo-keywords           |    22 |
 |           5 | org-agenda-include-diary    |    19 |
 |           6 | org-hide-leading-stars      |    19 |
-#+TBLR: action:head
-#+TBLR: infile:"org-variables-counts.org" intable:"org-variables-counts" output-to-buffer:t
+#+R: action:head
+#+R: infile:"org-variables-counts.org" intable:"org-variables-counts" output-to-buffer:t
 
 </pre>
 
@@ -558,10 +562,10 @@ org variables are customised by only one or two users.
 <pre class="example">
 
 [[file:org-variables-barplot.png][org-variables barplot]]
-#+TBLR: action:barplot rownames:t columns:1 width:800 col:darkblue
-#+TBLR: args:(:names.arg "NULL")
-#+TBLR: infile:"org-variables-counts.org" intable:"org-variables-counts"
-#+TBLR: outfile:"org-variables-barplot.png" title:"org-variables barplot"
+#+R: action:barplot rownames:t columns:1 width:800 col:darkblue
+#+R: args:(:names.arg "NULL")
+#+R: infile:"org-variables-counts.org" intable:"org-variables-counts"
+#+R: outfile:"org-variables-barplot.png" title:"org-variables barplot"
 
 </pre>
 
@@ -590,8 +594,10 @@ distance matrices to cluster org users, and org variables.
 </p>
 <p>
 First, let's create a table that's restricted to variables that
-were customised by more than four users. That's going to require
-a bit of R code:
+were customised by more than four users. This isn't necessary,
+but there are a lot of org-variables! This is going to require a
+bit of R code to count the variables and then subset the raw data
+accordingly:
 </p>
 
 
@@ -599,10 +605,10 @@ a bit of R code:
 <pre class="example">
 
 [[file:variable-popcon-restricted.org][org-variables-table]]
-#+TBLR: infile:"variable-popcon.org" intable:"org-variables-table"
-#+TBLR: outfile:"variable-popcon-restricted.org" title:"org-variables-table"
-#+TBLRR: tab &lt;- table(x[,2])
-#+TBLRR: x &lt;- subset(x, Variable %in% names(tab[tab &gt; 4]))
+#+R: infile:"variable-popcon.org" intable:"org-variables-table"
+#+R: outfile:"variable-popcon-restricted.org" title:"org-variables-table"
+#+RR: tab &lt;- table(x[,2])
+#+RR: x &lt;- subset(x, Variable %in% names(tab[tab &gt; 4]))
 
 </pre>
 
@@ -622,9 +628,9 @@ customised variable i. We can do that without writing any R code:
 <pre class="example">
 
 [[file:org-variables-incidence.org][incidence-matrix]]
-#+TBLR: action:tabulate columns:(1 2) rownames:t
-#+TBLR: infile:"variable-popcon-restricted.org" intable:"org-variables-table"
-#+TBLR: outfile:"org-variables-incidence.org" title:"incidence-matrix"
+#+R: action:tabulate columns:(1 2) rownames:t
+#+R: infile:"variable-popcon-restricted.org" intable:"org-variables-table"
+#+R: outfile:"org-variables-incidence.org" title:"incidence-matrix"
 
 </pre>
 
@@ -645,10 +651,10 @@ as a dendrogram:
 <pre class="example">
 
 [[file:org-users-tree.png][org-users-tree.png]]
-#+TBLRR: par(bg="gray15", fg="turquoise2")
-#+TBLRR: plot(hclust(dist(x, method="binary")), ann=FALSE)
-#+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
-#+TBLR: outfile:"org-users-tree.png" title:"org-users-tree.png"
+#+RR: par(bg="gray15", fg="turquoise2")
+#+RR: plot(hclust(dist(x, method="binary")), ann=FALSE)
+#+R: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
+#+R: outfile:"org-users-tree.png" title:"org-users-tree.png"
 
 </pre>
 
@@ -668,10 +674,10 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 <pre class="example">
 
 [[file:org-variables-tree.png][org-variables-tree.png]]
-#+TBLRR: par(bg="gray15", fg="turquoise2")
-#+TBLRR: plot(hclust(dist(t(x), method="binary")), ann=FALSE)
-#+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
-#+TBLR: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:1000
+#+RR: par(bg="gray15", fg="turquoise2")
+#+RR: plot(hclust(dist(t(x), method="binary")), ann=FALSE)
+#+R: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
+#+R: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:1000
 
 </pre>
 
@@ -709,10 +715,10 @@ recognise any usage affinities between the clustered org users?
 <pre class="example">
 
 [[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-8119M2O.png][An example from the org-plot tutorial, plotted using org-R]]
-#+TBLR: action:lines columns:((1)(2 3))
-#+TBLR: infile:"../org-plot.org"
-#+TBLR: intable:"org-plot-example-1" outfile:"png"
-#+TBLR: title:"An example from the org-plot tutorial, plotted using org-R"
+#+R: action:lines columns:((1)(2 3))
+#+R: infile:"../org-plot.org"
+#+R: intable:"org-plot-example-1" outfile:"png"
+#+R: title:"An example from the org-plot tutorial, plotted using org-R"
 
 </pre>
 
@@ -793,7 +799,7 @@ following options are available:
 <div id="text-8">
 
 <p>To specify an action from the following list, use e.g. action:hist on
-the TBLR line.
+the #+R line.
 </p>
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 <col align="left"></col><col align="left"></col>
@@ -853,7 +859,7 @@ this, although if that is necessary then that is a bug).
 <div id="text-9">
 
 <p>My aim with org-R is to provide a fairly general facility for using
-R with Org. The TBLR lines and TBLRR lines together specify an R
+R with Org. The #+R lines and #+RR lines together specify an R
 function, which may take numerical input, and may generate
 graphical output, or numerical output, or both.
 </p>
@@ -872,7 +878,7 @@ is a side effect.)
 </p>
 <p>
 It's worth noting that one mode of using org-R would be to write your
-own code in a separate file, and use the source() function on a TBLRR
+own code in a separate file, and use the source() function on a #+RR
 line to evaluate the code in that file.
 </p>
 <p>
@@ -886,11 +892,11 @@ Unless an output file has been specified, graphical output will be
 displayed on screen.
 </p>
 <p>
-The mapping from the TBLR and TBLRR lines to the R function may
+The mapping from the #+R and #+RR lines to the R function may
 benefit from further thought; currently what happens is that code
-corresponding to the TBLR line is generated, and then any explicit
-user code is appended to this. Thus the TBLRR lines have the 'last
-word' on the output. Since multiple, intermixed, TBLR and TBLRR
+corresponding to the #+R line is generated, and then any explicit
+user code is appended to this. Thus the #+RR lines have the 'last
+word' on the output. Since multiple, intermixed, #+R and #+RR
 lines can be given, it might make sense instead to follow the order
 of those lines when constructing the code.
 </p>
@@ -971,7 +977,7 @@ New York Times this year?
 <div id="postamble"><p class="author"> Author: Dan Davison
 <a href="mailto:davison@stats.ox.ac.uk">&lt;davison@stats.ox.ac.uk&gt;</a>
 </p>
-<p class="date"> Date: 2009-02-03 22:58:12 EST</p>
+<p class="date"> Date: 2009-02-04 09:39:29 EST</p>
 <p>HTML generated by org-mode 6.20f in emacs 22</p>
 </div></body>
 </html>
