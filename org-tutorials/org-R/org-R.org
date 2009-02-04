@@ -150,26 +150,7 @@ than 2 columns: org does not do multi-dimensional tables).
    [e.g. a data set in which each point is a time,
     together with the size of the org source code base at that time]
 
-    Here are the available plotting actions, classified by type of data.
-
-| action:  | data type      | description                                                           |
-|----------+----------------+-----------------------------------------------------------------------|
-| barplot  | discrete       | produces 'side-by-side' bar plots if multiple columns selected        |
-| tabulate | discrete       | not a plotting action; it outputs a new org table                     |
-|----------+----------------+-----------------------------------------------------------------------|
-| plot     | indexed        | if only 1 column selected, index is automatic: 1,2,...                |
-| lines    | indexed        | same as plot                                                          |
-| points   | indexed        | same as plot but don't join points with lines                         |
-|----------+----------------+-----------------------------------------------------------------------|
-| hist     | continuous     | histogram                                                             |
-| density  | continuous     | like a smoothed histogram (i.e. a curve)                              |
-|----------+----------------+-----------------------------------------------------------------------|
-| image    | grid of values | draws a grid, with cells coloured according to their numerical values |
-|          |                |                                                                       |
-
-[Apart from tabulate, the action: names are the same as the names of
-the R functions which implement them. `tabulate' is really called
-`table' in R.]
+The available off-the-shelf actions are listed [[*Table of available actions][here]].
 
 ** Continuous data example:
     :PROPERTIES:
@@ -304,21 +285,19 @@ We can see the top few rows of the table by using action:head
 
 #+end_example
 
-
-Here's a histogram of the counts. As we've seen, few variables have
-been customised by many users.
+Here's a barplot of the counts. It makes it clear that over half the
+org variables are customised by only one or two users.
 
 #+begin_example
 
-
-[[file:org-variables-hist.png][org-variables-hist]]
-#+TBLR: action:hist rownames:t columns:1
+[[file:org-variables-barplot.png][org-variables-barplot]]
+#+TBLR: action:barplot rownames:t columns:1 width:800 col:darkblue
+#+TBLR: args:(:names.arg "NULL")
 #+TBLR: infile:"org-variables-counts.org" intable:"org-variables-counts"
-#+TBLR: outfile:"org-variables-hist.png" title:"org-variables-hist"
+#+TBLR: outfile:"org-variables-barplot.png" title:"org-variables-barplot"
 
-#+end_example
-[[file:../../images/org-R/org-variables-hist.png]]
-    
+#+end_example    
+
 *** Something more complicated: clustering org variables, and org users
 
      OK, let's make a bit more use of R's capabilities. We can use the
@@ -365,7 +344,8 @@ as a dendrogram:
 #+begin_example
 
 [[file:org-users-tree.png][org-users-tree.png]]
-#+TBLRR: plot(hclust(dist(x, method="binary")), xlab="")
+#+TBLRR: par(bg="gray15", fg="turquoise2")
+#+TBLRR: plot(hclust(dist(x, method="binary")), ann=FALSE)
 #+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
 #+TBLR: outfile:"org-users-tree.png" title:"org-users-tree.png"
 
@@ -378,7 +358,7 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 
 [[file:org-variables-tree.png][org-variables-tree.png]]
 #+TBLRR: par(bg="gray15", fg="turquoise2")
-#+TBLRR: plot(hclust(dist(t(x), method="binary")), xlab="")
+#+TBLRR: plot(hclust(dist(t(x), method="binary")), ann=FALSE)
 #+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
 #+TBLR: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:1000
 
@@ -411,7 +391,7 @@ recognise any usage affinities between the clustered org users?
 [[file:../../images/org-R/org-plot-example-1.png]]
 
 * Table of available options
-  In addition to the action:<some-action> option (described [[*Table of available actions][here)]], the
+  In addition to the action:<some-action> option (described [[*Table of available actions][here]], the
   following options are available:
 |-----------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
 | *Input options*                               |                                                                                                                                        |
@@ -451,8 +431,9 @@ recognise any usage affinities between the clustered org users?
 | showcode:t                                    | Display a buffer containing the R code that was generated to do what was requested.                                                    |
   
 * Table of available actions
-# <<action list>> To specify an action from the following list, use
-e.g. action:hist on the TBLR line.
+# <<action list>>
+To specify an action from the following list, use e.g. action:hist on
+the TBLR line.
 
 | *Actions that generate numerical output* |                                                                                                         |
 |------------------------------------------+---------------------------------------------------------------------------------------------------------|
@@ -480,8 +461,12 @@ e.g. action:hist on the TBLR line.
 | image                                    | a grid image, with cells coloured according to their numerical values                                   |
 
 
+Apart from tabulate, the action: names are the same as the names of
+the R functions which implement them. `tabulate' is really called
+`table' in R.
+
   Note that, in addition to the actions listed below, you can also use
-action:R-function, where "R-function" is the name of an existing R
+action:R-function, where "R-function" is the name of any existing R
 function. The function must be able to take a data frame as it's first
 argument, and must not *require* any further arguments (i.e. any
 further arguyments must have suitable default values). Any numerical

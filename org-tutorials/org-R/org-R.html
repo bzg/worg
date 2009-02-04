@@ -6,7 +6,7 @@ lang="en" xml:lang="en">
 <title>org-R: Computing and data visualisation in Org-mode using R</title>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2009-02-03 13:27:00 EST"/>
+<meta name="generated" content="2009-02-03 17:36:34 EST"/>
 <meta name="author" content="Dan Davison"/>
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
@@ -93,11 +93,7 @@ lang="en" xml:lang="en">
 </ul>
 </li>
 <li><a href="#sec-7">Table of available options </a></li>
-<li><a href="#sec-8">Table of available actions </a>
-<ul>
-<li><a href="#sec-8.1">Actions that generate numerical output* </a></li>
-</ul>
-</li>
+<li><a href="#sec-8">Table of available actions </a></li>
 <li><a href="#sec-9">Getting help with R </a></li>
 <li><a href="#sec-10">Brief advert for R </a></li>
 </ul>
@@ -336,40 +332,10 @@ indexed data
 [e.g. a data set in which each point is a time,
 together with the size of the org source code base at that time]
 
-<p>
-Here are the available plotting actions, classified by type of data.
-</p>
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-<col align="left"></col><col align="left"></col><col align="left"></col>
-<thead>
-<tr><th>action:</th><th>data type</th><th>description</th></tr>
-</thead>
-<tbody>
-<tr><td>barplot</td><td>discrete</td><td>produces 'side-by-side' bar plots if multiple columns selected</td></tr>
-<tr><td>tabulate</td><td>discrete</td><td>not a plotting action; it outputs a new org table</td></tr>
-</tbody>
-<tbody>
-<tr><td>plot</td><td>indexed</td><td>if only 1 column selected, index is automatic: 1,2,&hellip;</td></tr>
-<tr><td>lines</td><td>indexed</td><td>same as plot</td></tr>
-<tr><td>points</td><td>indexed</td><td>same as plot but don't join points with lines</td></tr>
-</tbody>
-<tbody>
-<tr><td>hist</td><td>continuous</td><td>histogram</td></tr>
-<tr><td>density</td><td>continuous</td><td>like a smoothed histogram (i.e. a curve)</td></tr>
-</tbody>
-<tbody>
-<tr><td>image</td><td>grid of values</td><td>draws a grid, with cells coloured according to their numerical values</td></tr>
-<tr><td></td><td></td><td></td></tr>
-</tbody>
-</table>
-
-
 </li>
 </ul>
 
-<p>[Apart from tabulate, the action: names are the same as the names of
-the R functions which implement them. `tabulate' is really called
-`table' in R.]
+<p>The available off-the-shelf actions are listed <a href="#sec-8">here</a>.
 </p>
 </div>
 
@@ -665,7 +631,8 @@ as a dendrogram:
 <pre class="example">
 
 [[file:org-users-tree.png][org-users-tree.png]]
-#+TBLRR: plot(hclust(dist(x, method="binary")), xlab="")
+#+TBLRR: par(bg="gray15", fg="turquoise2")
+#+TBLRR: plot(hclust(dist(x, method="binary")), ann=FALSE)
 #+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
 #+TBLR: outfile:"org-users-tree.png" title:"org-users-tree.png"
 
@@ -688,7 +655,7 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 
 [[file:org-variables-tree.png][org-variables-tree.png]]
 #+TBLRR: par(bg="gray15", fg="turquoise2")
-#+TBLRR: plot(hclust(dist(t(x), method="binary")), xlab="")
+#+TBLRR: plot(hclust(dist(t(x), method="binary")), ann=FALSE)
 #+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
 #+TBLR: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:1000
 
@@ -700,6 +667,16 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 <div class="figure">
 <p><img src="../../images/org-R/org-variables-tree.png"  alt="../../images/org-R/org-variables-tree.png" /></p>
 </div>
+</p>
+
+<p>
+Please note that my main aim here was to give some examples of using
+org-R, rather than to show how the org variables data should be mined
+for useful information! The org-variables dendrogram does seem to have
+made some sensible clusterings (e.g. the clusters of agenda-related
+commands), but I'm going to leave it to others to decide whether this
+exercise really served to do more than illustrate org-R. Does anyone
+recognise any usage affinities between the clustered org users?
 </p>
 </div>
 </div>
@@ -740,7 +717,7 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 <h2 id="sec-7">Table of available options </h2>
 <div id="text-7">
 
-<p>In addition to the action:&lt;some-action&gt; option (described <a href="#sec-8">here)</a>, the
+<p>In addition to the action:&lt;some-action&gt; option (described <a href="#sec-8">here</a>, the
 following options are available:
 </p><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 <col align="left"></col><col align="left"></col>
@@ -799,16 +776,9 @@ following options are available:
 <h2 id="sec-8"><a name="action==list" id="action==list"></a>Table of available actions </h2>
 <div id="text-8">
 
-<p>e.g. action:hist on the TBLR line.
+<p>To specify an action from the following list, use e.g. action:hist on
+the TBLR line.
 </p>
-
-</div>
-
-<div id="outline-container-8.1" class="outline-3">
-<h3 id="sec-8.1">Actions that generate numerical output* </h3>
-<div id="text-8.1">
-
-
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 <col align="left"></col><col align="left"></col>
 <thead>
@@ -844,8 +814,13 @@ following options are available:
 
 
 <p>
+Apart from tabulate, the action: names are the same as the names of
+the R functions which implement them. `tabulate' is really called
+`table' in R.
+</p>
+<p>
 Note that, in addition to the actions listed below, you can also use
-action:R-function, where "R-function" is the name of an existing R
+action:R-function, where "R-function" is the name of any existing R
 function. The function must be able to take a data frame as it's first
 argument, and must not <b>require</b> any further arguments (i.e. any
 further arguyments must have suitable default values). Any numerical
@@ -853,7 +828,6 @@ output will be sent to the org buffer (use output-to-buffer:t to force
 this, although if that is necessary then that is a bug).
 </p>
 
-</div>
 </div>
 
 </div>
@@ -918,7 +892,7 @@ New York Times this year?
 <div id="postamble"><p class="author"> Author: Dan Davison
 <a href="mailto:davison@stats.ox.ac.uk">&lt;davison@stats.ox.ac.uk&gt;</a>
 </p>
-<p class="date"> Date: 2009-02-03 13:27:00 EST</p>
+<p class="date"> Date: 2009-02-03 17:36:34 EST</p>
 <p>HTML generated by org-mode 6.20f in emacs 22</p>
 </div></body>
 </html>
