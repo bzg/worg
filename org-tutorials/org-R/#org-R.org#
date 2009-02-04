@@ -23,8 +23,8 @@
   
   Although, behind the scenes, it uses [[http:www.r-project.org][R]], you do not need to know
   anything about R. Common operations are provided `off the shelf' by
-  specifying options on lines starting with #+TBLR:. Having said that,
-  org-R also accepts raw R code (TBLRR: lines). For those who don't
+  specifying options on lines starting with #+R:. Having said that,
+  org-R also accepts raw R code (#+RR: lines). For those who don't
   yet know R, but think they might be interested, try the showcode:t
   option. It displays the R code corresponding to the action you
   requested, and so provides a good starting point for fine-tuning
@@ -50,15 +50,15 @@
 
 * Using org-R
   org-R uses two different option lines to specify an
-  analysis/plot: #+TBLR: and #+TBLRR:. #+TBLRR: is the one that
+  analysis/plot: #+R: and #+RR:. #+RR: is the one that
   accepts R code, so we'll ignore that for now. To make the action
-  happen, use M-x org-R-apply with point in the #+TBLR:
+  happen, use M-x org-R-apply with point in the #+R:
   line. That's the only function you need, and it would make sense to
   bind it to some key. So, first example.
 
 * Computing on org tables: tabulating values
    Here's a command to tabulate the values in the second column. Issue
-   M-x org-R-apply in the following #+TBLR line.
+   M-x org-R-apply in the following #+R line.
 
 #+begin_example
 
@@ -67,7 +67,7 @@
 | A    | A    |
 | A    | B    |
 | B    | B    |
-#+TBLR: action:tabulate columns:2
+#+R: action:tabulate columns:2
 
 #+end_example
 
@@ -98,10 +98,10 @@
      infile:/path/to/file.csv or infile:http://somewhere/file.csv
 
    3. by doing neither, in which case it looks for a table immediately
-     above the #+TBLR(R) line(s).
+     above the #+R(R) line(s).
 
 Case (3) is what happened above -- the input data came from a table
-immediately above the #+TBLR line. The default behaviour is to replace
+immediately above the #+R line. The default behaviour is to replace
 any such table with the output; this allows us to tweak the option
 line and update the analysis. However, normally we'll want to separate
 the data from the analysis output. So let's keep the data as a named
@@ -118,7 +118,7 @@ table in the org file, and refer to it by name:
 
 [arbitrary other content of org buffer]
 
-#+TBLR: intable:data-set-1 action:tabulate
+#+R: intable:data-set-1 action:tabulate
 
 #+end_example
 
@@ -166,7 +166,7 @@ The available off-the-shelf actions are listed [[*Table of available actions][he
     requires some raw R code, so skip this bit if you're not
     interested.
 
-    The following #+TBLRR line simulates 10 values from a Normal
+    The following #+RR line simulates 10 values from a Normal
     distribution with mean -3, and 10 values from a Normal
     distribution with mean 3, and lumps them together. The point is that
     the numbers we get should be concentrated around two different
@@ -175,8 +175,8 @@ The available off-the-shelf actions are listed [[*Table of available actions][he
 
 #+begin_example
 
-#+TBLRR: x <- c(rnorm(10, mean=-3, sd=1), rnorm(10, mean=3, sd=1))
-#+TBLR: title:"continuous-data" output-to-buffer:t
+#+RR: x <- c(rnorm(10, mean=-3, sd=1), rnorm(10, mean=3, sd=1))
+#+R: title:"continuous-data" output-to-buffer:t
 
 #+end_example
 
@@ -218,13 +218,13 @@ name the file link to the graphical output).
 #+begin_example
 
 [[file:tmp.png][histogram example]]
-#+TBLR: action:hist columns:1 colour:hotpink 
-#+TBLR: intable:continuous-data outfile:"png" title:"histogram example"
+#+R: action:hist columns:1 colour:hotpink 
+#+R: intable:continuous-data outfile:"png" title:"histogram example"
 
 #+end_example
 [[file:../../images/org-R/histogram-example.png]]
 
-[Note that you can use multiple TBLR lines rather than cramming all
+[Note that you can use multiple #+R lines rather than cramming all
 the options on to one line.]
 
 An alternative would be to produce a density plot. We don't have
@@ -240,8 +240,8 @@ available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
 #+begin_example
 
 [[file:density.png][density plot example]]
-#+TBLR: action:density columns:"values" colour:chartreuse4 args:(:lwd 4)
-#+TBLR: intable:continuous-data outfile:"density.png" title:"density plot example"
+#+R: action:density columns:"values" colour:chartreuse4 args:(:lwd 4)
+#+R: intable:continuous-data outfile:"density.png" title:"density plot example"
 
 #+end_example
 [[file:../../images/org-R/density.png]]
@@ -273,9 +273,9 @@ we'll store them in a separate org file:
 #+begin_example
 
 [[file:org-variables-counts.org][org-variables-counts]]
-#+TBLR: action:tabulate columns:2 sort:t
-#+TBLR: infile:"variable-popcon.org" intable:"org-variables-table"
-#+TBLR: outfile:"org-variables-counts.org" title:"org-variables-counts"
+#+R: action:tabulate columns:2 sort:t
+#+R: infile:"variable-popcon.org" intable:"org-variables-table"
+#+R: outfile:"org-variables-counts.org" title:"org-variables-counts"
 
 #+end_example
 [[file:org-variables-counts.org]]
@@ -292,8 +292,8 @@ We can see the top few rows of the table by using action:head
 |           4 | org-todo-keywords           |    22 |
 |           5 | org-agenda-include-diary    |    19 |
 |           6 | org-hide-leading-stars      |    19 |
-#+TBLR: action:head
-#+TBLR: infile:"org-variables-counts.org" intable:"org-variables-counts" output-to-buffer:t
+#+R: action:head
+#+R: infile:"org-variables-counts.org" intable:"org-variables-counts" output-to-buffer:t
 
 #+end_example
 
@@ -303,10 +303,10 @@ org variables are customised by only one or two users.
 #+begin_example
 
 [[file:org-variables-barplot.png][org-variables barplot]]
-#+TBLR: action:barplot rownames:t columns:1 width:800 col:darkblue
-#+TBLR: args:(:names.arg "NULL")
-#+TBLR: infile:"org-variables-counts.org" intable:"org-variables-counts"
-#+TBLR: outfile:"org-variables-barplot.png" title:"org-variables barplot"
+#+R: action:barplot rownames:t columns:1 width:800 col:darkblue
+#+R: args:(:names.arg "NULL")
+#+R: infile:"org-variables-counts.org" intable:"org-variables-counts"
+#+R: outfile:"org-variables-barplot.png" title:"org-variables barplot"
 
 #+end_example
 [[file:../../images/org-R/org-variables-barplot.png]]
@@ -327,10 +327,10 @@ org variables are customised by only one or two users.
 #+begin_example
 
 [[file:variable-popcon-restricted.org][org-variables-table]]
-#+TBLR: infile:"variable-popcon.org" intable:"org-variables-table"
-#+TBLR: outfile:"variable-popcon-restricted.org" title:"org-variables-table"
-#+TBLRR: tab <- table(x[,2])
-#+TBLRR: x <- subset(x, Variable %in% names(tab[tab > 4]))
+#+R: infile:"variable-popcon.org" intable:"org-variables-table"
+#+R: outfile:"variable-popcon-restricted.org" title:"org-variables-table"
+#+RR: tab <- table(x[,2])
+#+RR: x <- subset(x, Variable %in% names(tab[tab > 4]))
 
 #+end_example
 [[file:variable-popcon-restricted.org][org-variables-table]]
@@ -342,9 +342,9 @@ customised variable i. We can do that without writing any R code:
 #+begin_example
 
 [[file:org-variables-incidence.org][incidence-matrix]]
-#+TBLR: action:tabulate columns:(1 2) rownames:t
-#+TBLR: infile:"variable-popcon-restricted.org" intable:"org-variables-table"
-#+TBLR: outfile:"org-variables-incidence.org" title:"incidence-matrix"
+#+R: action:tabulate columns:(1 2) rownames:t
+#+R: infile:"variable-popcon-restricted.org" intable:"org-variables-table"
+#+R: outfile:"org-variables-incidence.org" title:"incidence-matrix"
 
 #+end_example
 [[file:org-variables-incidence.org][incidence-matrix]]
@@ -357,10 +357,10 @@ as a dendrogram:
 #+begin_example
 
 [[file:org-users-tree.png][org-users-tree.png]]
-#+TBLRR: par(bg="gray15", fg="turquoise2")
-#+TBLRR: plot(hclust(dist(x, method="binary")), ann=FALSE)
-#+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
-#+TBLR: outfile:"org-users-tree.png" title:"org-users-tree.png"
+#+RR: par(bg="gray15", fg="turquoise2")
+#+RR: plot(hclust(dist(x, method="binary")), ann=FALSE)
+#+R: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
+#+R: outfile:"org-users-tree.png" title:"org-users-tree.png"
 
 #+end_example
 [[file:../../images/org-R/org-users-tree.png]]
@@ -370,10 +370,10 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 #+begin_example
 
 [[file:org-variables-tree.png][org-variables-tree.png]]
-#+TBLRR: par(bg="gray15", fg="turquoise2")
-#+TBLRR: plot(hclust(dist(t(x), method="binary")), ann=FALSE)
-#+TBLR: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
-#+TBLR: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:1000
+#+RR: par(bg="gray15", fg="turquoise2")
+#+RR: plot(hclust(dist(t(x), method="binary")), ann=FALSE)
+#+R: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
+#+R: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:1000
 
 #+end_example
 [[file:../../images/org-R/org-variables-tree.png]]
@@ -396,10 +396,10 @@ recognise any usage affinities between the clustered org users?
 #+begin_example
 
 [[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-8119M2O.png][An example from the org-plot tutorial, plotted using org-R]]
-#+TBLR: action:lines columns:((1)(2 3))
-#+TBLR: infile:"../org-plot.org"
-#+TBLR: intable:"org-plot-example-1" outfile:"png"
-#+TBLR: title:"An example from the org-plot tutorial, plotted using org-R"
+#+R: action:lines columns:((1)(2 3))
+#+R: infile:"../org-plot.org"
+#+R: intable:"org-plot-example-1" outfile:"png"
+#+R: title:"An example from the org-plot tutorial, plotted using org-R"
 
 #+end_example
 [[file:../../images/org-R/org-plot-example-1.png]]
@@ -448,7 +448,7 @@ recognise any usage affinities between the clustered org users?
 * Table of available actions
 # <<action list>>
 To specify an action from the following list, use e.g. action:hist on
-the TBLR line.
+the #+R line.
 
 | *Actions that generate numerical output* |                                                                                                         |
 |------------------------------------------+---------------------------------------------------------------------------------------------------------|
@@ -491,7 +491,7 @@ this, although if that is necessary then that is a bug).
   
 * More detailed description of org-R
   My aim with org-R is to provide a fairly general facility for using
-   R with Org. The TBLR lines and TBLRR lines together specify an R
+   R with Org. The #+R lines and #+RR lines together specify an R
    function, which may take numerical input, and may generate
    graphical output, or numerical output, or both.
 
@@ -508,7 +508,7 @@ If any input data have been specified, then the R function receives
    is a side effect.)
 
 It's worth noting that one mode of using org-R would be to write your
-own code in a separate file, and use the source() function on a TBLRR
+own code in a separate file, and use the source() function on a #+RR
 line to evaluate the code in that file.
 
 Numerical output of the function should also be tabular, and may be
@@ -519,11 +519,11 @@ Numerical output of the function should also be tabular, and may be
 Unless an output file has been specified, graphical output will be
 displayed on screen.
 
-The mapping from the TBLR and TBLRR lines to the R function may
+The mapping from the #+R and #+RR lines to the R function may
    benefit from further thought; currently what happens is that code
-   corresponding to the TBLR line is generated, and then any explicit
-   user code is appended to this. Thus the TBLRR lines have the 'last
-   word' on the output. Since multiple, intermixed, TBLR and TBLRR
+   corresponding to the #+R line is generated, and then any explicit
+   user code is appended to this. Thus the #+RR lines have the 'last
+   word' on the output. Since multiple, intermixed, #+R and #+RR
    lines can be given, it might make sense instead to follow the order
    of those lines when constructing the code.
 
