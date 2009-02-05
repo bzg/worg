@@ -11,29 +11,114 @@
 
 Org-mode is a highly customizable package.  It currently contains
 close to 400 customization variables that can be changed to tweak
-every detail.  Such a large number is clearly intimidating to new
-users.
+every detail, and more than 260 are known to be actually used out
+there.
 
-Therefore, on this page, we have compiled a structured list of
-variables that are [[http://orgmode.org/worg/org-customization-survey.php][changed by many users]].  This list is meant as a
-starting point.  If you start setting up Org-mode for your needs, first
-look at the variables mentioned here.  However, never forget that
-there are many more options, and that the Emacs customization system
-organizes all these variables into a structure that can be used to
-easily [[http://orgmode.org/worg/org-tutorials/org-customize.php][find the one particular option]] you might be looking for.  Also,
-the [[http://orgmode.org/manual/][Org-mode manual]] and the [[http://orgmode.org/worg/org-faq.php][FAQ]] mention many variables in the
-appropriate places.
+However, as a beginner you do not care about this kind of flexibility.
+On this page, we have a list of six settings that you might want to try
+first in order to personalize your system.
 
-* Frequently customized Variables
+Once you are done with that, we also have a list of some 40 variables
+that are [[http://orgmode.org/worg/org-customization-survey.php][changed by many users]].
 
-** Basic setup
+* The Basics
 
-Org-mode can be used without any setup.  However, here are a few things
-about basic setup that many people change.
+** Minimal customization
+
+The minimal customization needed to use Org-mode is -- *Nothing at
+all!* \par Org-mode works out of the box, and besides the steps described
+in the manual to [[http://orgmode.org/manual/Activation.html#Activation][activate]] it, /nothing is needed at all/.  Just open a
+/.org/ file, press =C-c [= to tell org that this is a file you want to
+use in your agenda, and start putting your life into plain text.
+
+OK, for completeness, let's just repeat what is needed to activate
+Org-mode in files with /.org/ extension, and a few important key
+assignments.
+
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-font-lock-mode 1)
+#+end_src
+
+** Six small steps toward a personalized system
+
+*** One: A directory for Org files
+
+Decide about the directory where you will put your basic Org file(s).
+Org-files do not have to be in this directory at all, but it is
+convenient.  The default is "~/org/", and if this is good enough, just
+create the directory.  If not, choose one and put it's path into this
+variable
+
+#+begin_src emacs-lisp
+(setq org-directory "~/path/to/my/directory")
+#+end_src
+
+*** Two: More TODO keywords
+
+Define the TODO states you find useful and single letters for fast
+selection.  Customize the variable =org-todo-keywords= or simply do
+this right in the file with[fn:fn1:press =C-c C-c= in the line after
+changing it]:
+
+#+begin_src org
+,#+TODO: TODO(t) STARTED(s) WAITING(w) | DONE(d) CANCELED(c)
+#+end_src
+
+*** Three: Which tags do you use most?
+
+You can always add tags freely and by hand, but if you configure the
+most important ones along with fast-access keys, life will be better.
+Configure the variable =org-tags-alist= or simply do this right in the
+file with[fn:fn1]
+
+#+begin_src org
+,#+TAGS: home(h) work(w) @computer(c) @phone(p) errants(e)
+#+end_src
+
+*** Four: Which files are relevant for the agenda?
+
+When Org compiles agenda views like the the agenda for the current
+week (=C-c a a=) or the global TODO list (=C-c a t=), it checks all
+files in the variable =org-agenda-files=.  Instead of setting this
+variable explicitly, it is much easier to just add and remove the
+current buffer with =C-c [= and =C-c ]=, respectively.
+
+*** Five: Find what you need to see now
+
+If you need to sharpen the predefined agenda commands, define your [[http://orgmode.org/manual/Custom-agenda-views.html#Custom-agenda-views][own]]
+Agenda commands, using the variable =org-agenda-custom-commands=.
+This is a pretty complex variable, but if you use the customize
+interface[fn:fn2: =M-x customize-variable RET
+org-agenda-custom-commands RET=] to it, it is not too hard.  Everyone
+ends up customizing this one after getting comfortable with Org-mode.
+Do checkout [[http://orgmode.org/worg/org-tutorials/org-custom-agenda-commands.php][this tutorial]] on building your own custom agenda commands
+as well.
+
+*** Six: Capture ideas with predefined templates
+
+Use /remember/ to quickly capture ideas, tasks, and notes.  Add
+#+begin_src emacs-lisp
+(org-remember-insinuate)
+#+end_src
+to your setup and populate[fn:fn3: =M-x customize-variable RET
+org-remember-templates RET=] the variable =org-remember-templates=
+with templates and target locations.
+
+* Pretend to be a power-user
+
+Here is a list of the variables most frequently changed by power
+users.  The variables mentioned above are repeated in this list.  Yes,
+some power users change 60 options or more, but these showed up most
+frequently in the [[org-customization-survey.org][customization survey]].
+
+*** Basic setup
+
+Here are a few things about basic setup that many people change.
 
 - org-directory :: Where are my Org files typically located?
-     This is not used often, but it is good to choose a directory for
-     the bulk of your Org files.
 
 - org-agenda-files :: Which [[http://orgmode.org/manual/Agenda-files.html#Agenda-files][files]] do I want to be checked for entries
      when compiling my agenda?  Many people do not customize this one,
@@ -46,7 +131,7 @@ about basic setup that many people change.
 
 - org-archive-location :: When [[http://orgmode.org/manual/Archiving.html#Archiving][archiving]] an entry, where will it go?
 
-** Editing behavior and appearance
+*** Editing behavior and appearance
 
 Besides being an organizer, Org-mode is also a text mode for writing
 and taking notes.  The following variables that influence basic
@@ -79,7 +164,7 @@ customized:
      what is before the previous entry/item.  Customize this to
      out-smart it.
 
-** The TODO keywords
+*** The TODO keywords
 
 - org-todo-keywords :: Which [[http://orgmode.org/manual/TODO-extensions.html#TODO-extensions][TODO keywords]] should be used?  Also you
      can define keys for [[http://orgmode.org/manual/Fast-access-to-TODO-states.html#Fast-access-to-TODO-states][fast access]] here.  Very many people use this,
@@ -94,7 +179,7 @@ customized:
 - org-enforce-todo-checkbox-dependencies :: Should unfinished
      checkboxes [[http://orgmode.org/manual/TODO-dependencies.html#TODO-dependencies][block]] state changes in the parent?
 
-** Tags
+*** Tags
 
 - org-tag-alist :: Which [[http://orgmode.org/manual/Tags.html#Tags][tags]] should be available?  Note that tags
      besides the configured one can be used, but for the important
@@ -106,13 +191,13 @@ customized:
      interface even faster, if all you normally do is changing a single
      tag.
 
-** Progress logging
+*** Progress logging
 
 - org-log-done :: Do you want to [[http://orgmode.org/manual/Progress-logging.html#Progress-logging][capture]] time stamps and/or notes when
      TODO state changes, in particular when a task is DONE?  A simple
      setting that many use is =(setq org-log-done 'time)=.
 
-** Remember and Refile
+*** Remember and Refile
 
 - org-reverse-note-order :: When adding new entries (or tasks) to a
      list, do I want the entry to be first or last in the list?
@@ -137,8 +222,7 @@ location to the correct project.
 - org-refile-use-outline-path :: How would you like to select refile
      targets. Headline only, or the path along the outline hierarchy?
 
-
-** Agenda Views
+*** Agenda Views
 
 - org-agenda-start-on-weekday :: Should the [[http://orgmode.org/manual/Weekly_002fdaily-agenda.html#Weekly_002fdaily-agenda][agenda]] start on Monday, or
      better today?
@@ -161,7 +245,7 @@ location to the correct project.
 
 - org-stuck-projects :: How to find projects that need [[http://orgmode.org/manual/Stuck-projects.html#Stuck-projects][attention]]?
 
-To reduce clutter in the tasks list for today, many users like to
+To reduce clutter in the task list for today, many users like to
 remove tasks from the daily list right when they are done.  The
 following variables give detailed control to what kind of entries this
 should apply:
@@ -191,7 +275,7 @@ tasks in the agenda anyway.
 - org-agenda-todo-ignore-scheduled :: Don't show scheduled tasks
      in the global TODO list.
 
-** Export/Publishing setup
+*** Export/Publishing setup
 
 - org-export-with-LaTeX-fragments :: Should [[http://orgmode.org/manual/LaTeX-fragments.html#LaTeX-fragments][LaTeX fragments]] be
      converted to inline images for HTML output?
@@ -202,20 +286,13 @@ tasks in the agenda anyway.
 - org-publish-project-alist :: Set up projects that allow many files
      to be exported and [[http://orgmode.org/manual/Publishing.html#Publishing][published]] with a single command.
 
-** Clock setup
 
-/Clocking/ is to [[http://orgmode.org/manual/Clocking-work-time.html#Clocking-work-time][measure]] the time spent on tasks and projects.  People
-who intensively use this system tend to customize these variables:
+* Become a true power user
 
-- org-clock-persist :: Save and restore clock information between
-     Emacs sessions.  This also needs a call to
-     =org-clock-persistence-insinuate= in your startup file.
+If you want to become a true power user, seeFIXME for yourself what
+some users do.  The Emacs customization system[fn:fn5:=M-x
+org-customize RET=] organizes all variables into a structure that can
+be used to easily [[http://orgmode.org/worg/org-tutorials/org-customize.php][find the one particular option]] you might be looking
+for.  Also, the [[http://orgmode.org/manual/][Org-mode manual]] and the [[http://orgmode.org/worg/org-faq.php][FAQ]] mention many variables in
+the appropriate context.
 
-- org-clock-in-resume :: Should a previously running clock be resumed
-     when entering a new Emacs session?
-
-- org-clock-in-switch-to-state :: Should the TODO state change
-     automatically when clocking in?
-
-- org-clock-out-remove-zero-time-clocks :: This makes a lot of sense,
-     but is too magic if you are not prepared.
