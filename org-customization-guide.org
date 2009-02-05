@@ -1,0 +1,221 @@
+#+TITLE:     Org-Mode Customization Guide
+#+AUTHOR:    Carsten Dominik
+#+EMAIL:     carsten.dominik@gmail.com
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:nil toc:1 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:nil skip:t d:nil tags:not-in-toc
+
+* Introduction
+  :PROPERTIES:
+  :ID:       68EE02FB-4F09-4BDC-8577-AD4F60DE1B1B
+  :END:
+
+Org-mode is a highly customizable package.  It currently contains
+close to 400 customization variables that can be changed to tweak
+every detail.  Such a large number is clearly intimidating to new
+users.
+
+Therefore, on this page, we have compiled a structured list of
+variables that are [[http://orgmode.org/worg/org-customization-survey.php][changed by many users]].  This list is meant as a
+staring point.  If you start setting up Org-mode for your needs, first
+look at the variables mentioned here.  However, never forget that
+there are many more options, and that the Emacs customization system
+organizes all these variables into a structure that can be used to
+easily [[http://orgmode.org/worg/org-tutorials/org-customize.php][find the one particular option]] you might be looking for.  Also,
+the [[http://orgmode.org/manual/][Org-mode manual]] and the [[http://orgmode.org/worg/org-faq.php][FAQ]] mention many variables in the
+appropriate places.
+
+* Frequently customized Variables
+
+** Basic setup
+
+Org-mode can be used without any setup.  However, here are a few things
+about basic setup that many people change.
+
+- org-directory :: Where are my Org files typically located?
+     This is not used often, but it is good to choose a directory for
+     the bulk of your Org files.
+
+- org-agenda-files :: Which files do I want to be checked for entries
+     when compiling my agenda?  Many people do not customize this one,
+     but just use =C-c [= and =C-c ]= to add or remove the current
+     file, respectively.
+
+- org-startup-folded :: When visiting an Org file, in what folding
+     state do I first want to see it?  Many use =#+STARTUP= options to
+     set this on a per-file basis.
+
+- org-archive-location :: When archiving an entry, where will it go?
+
+** Editing behavior and appearance
+
+Besides being an organizer, Org-mode is also a text mode for writing
+and taking notes.  The following variables that influence basic
+editing behavior and the appearance of the buffer are often
+customized:
+
+- org-hide-leading-stars :: Make the outline more list-like be hiding
+     all leading stars but one.
+
+- org-odd-levels-only :: Should 2 stars be added per level?  This
+     makes the indentation more like in a book.
+
+- org-special-ctrl-a/e :: Should =C-a= and =C-e= behave specially,
+     considering the headline and not the leading stars, todo
+     keywords, or the trailing tags?  About equal numbers of users set
+     this to =t= or to =reversed=
+
+- org-special-ctrl-k :: Should =C-k= behave specially in headlines,
+     considering tags and visibility state?
+
+- org-completion-use-ido :: Should /ido.el/ be used for completion
+     whenever it makes sense?
+
+- org-return-follows-link :: Should pressing RET on a hyperlink follow
+     the link?  People who are used to this from web browsers often
+     make this choice.
+
+- org-blank-before-new-entry :: Org-mode tries to be smart about
+     inserting blank lines before new entries/items, by looking at
+     what is before the previous entry/item.  Customize this to
+     out-smart it.
+
+** The TODO keywords
+
+- org-todo-keywords :: Which TODO keywords should be used?  Also you
+     can define keys for fast access here.  Very many people use this,
+     or define the keywords with a =#+TODO:= setting in the buffer.
+
+- org-todo-keyword-faces :: Here you can define different faces for
+     different TODO keywords.
+
+- org-enforce-todo-dependencies :: Should unfinished children block
+     state changes in the parent?
+
+- org-enforce-todo-checkbox-dependencies :: Should unfinished
+     checkboxes block state changes in the parent?
+
+** Tags
+
+- org-tag-alist :: Which tags should be available?  Note that tags
+     besides the configured one can be used, but for the important
+     ones you can define keys for fast access here.
+
+- org-tags-column :: How should tags be aligned in the headline?
+
+- org-fast-tag-selection-single-key :: Set this to make the tags
+     interface even faster, if all you normally do is changing a single
+     tag.
+
+** Progress logging
+
+- org-log-done :: Do you want to capture time stamps and/or notes when
+     TODO state changes, in particular when a task is DONE?  A simple
+     setting that many use is =(setq org-log-done 'time)=.
+
+** Remember and Refile
+
+- org-reverse-note-order :: When adding new entries (or tasks) to a
+     list, do I want the entry to be first or last in the list?
+
+/Remember/ is great for fast capture of ideas, notes, and tasks.  It
+is one of the primary capture methods in Org-mode.
+
+- org-remember-templates :: Prepare templates for the typical notes
+     and tasks you want to capture quickly using remember.  I believe
+     everyone using /Remember/ with Org customizes this.  Don't forget
+     to also call =org-remember-insinuate= in your startup file.
+
+- org-default-notes-file :: If you do not set up templates with target
+     files, at least tell Org where to put captured notes.
+
+/Refiling/ means moving entries around, for example from a capturing
+location to the correct project.
+
+- org-refile-targets :: What should be on the menu when you refile
+     tasks with =C-c C-w=?
+
+- org-refile-use-outline-path :: How would you like to select refile
+     targets. Headline only, or the path along the outline hierarchy?
+
+
+** Agenda Views
+
+- org-agenda-start-on-weekday :: Should the agenda start on Monday, or
+     better today?
+
+- org-agenda-ndays :: How many days should the default agenda show?
+     Default is 7, a whole week.
+
+- org-agenda-include-diary :: Should the agenda also show entries from
+     the Emacs diary?
+
+- org-agenda-custom-commands :: Define your own agenda commands.
+     Complex, advanced variable, but pretty much everyone ends up
+     configuring it.  Use customize to configure it, this is the best
+     and safest way.  Do checkout [[http://orgmode.org/worg/org-tutorials/org-custom-agenda-commands.php][this tutorial]] on building your own
+     custom agenda commands as well.
+
+- org-agenda-sorting-strategy :: How should things be sorted in the
+     agenda display.  Even though I think the defaults are very usable,
+     power users tend to tweak this.
+
+- org-stuck-projects :: How to find projects that need attention?
+
+To reduce clutter in the tasks list for today, many users like to
+remove tasks from the daily list right when they are done.  The
+following variables give detailed control to what kind of entries this
+should apply:
+
+- org-agenda-skip-scheduled-if-done :: Scheduled entries.  Many users
+     turn this on.
+
+- org-agenda-skip-deadline-if-done  :: Deadlines.  Many users turn
+     this on.
+
+- org-agenda-skip-timestamp-if-done :: Entries with any timestamp,
+     appointments just like scheduled and deadline entries.
+     Relatively few users select this one.
+
+People who use Org like a day planner, who schedule all tasks to
+specific dates, often like to not have scheduled tasks listed in their
+global TODO list, because scheduling it already means to have taking
+care of it in a sense, and because they know they will run into these
+tasks in the agenda anyway.
+
+- org-agenda-todo-ignore-deadlines :: Don't show deadline tasks in
+     global TODO list.
+
+- org-agenda-todo-ignore-with-date :: Don't show any tasks with a date
+     in the global TODO list.
+
+- org-agenda-todo-ignore-scheduled :: Don't show scheduled tasks
+     in the global TODO list.
+
+** Export/Publishing setup
+
+- org-export-with-LaTeX-fragments :: Should LaTeX fragments be
+     converted to inline images for HTML output?
+
+- org-export-html-style :: Customize the default style for HTML
+     export.
+
+- org-publish-project-alist :: Set up projects that allow many files
+     to be exported and published with a single command.
+
+** Clock setup
+
+/Clocking/ is to measure the time spent on tasks and projects.  People
+who intensively use this system tend to customize these variables:
+
+- org-clock-persist :: Save and restore clock information between
+     Emacs sessions.  This also needs a call to
+     =org-clock-persistence-insinuate= in your startup file.
+
+- org-clock-in-resume :: Should a previously running clock be resumed
+     when entering a new Emacs session?
+
+- org-clock-in-switch-to-state :: Should the TODO state change
+     automatically when clocking in?
+
+- org-clock-out-remove-zero-time-clocks :: This makes a lot of sense,
+     but is too magic if you are not prepared.
