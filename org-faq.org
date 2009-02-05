@@ -420,6 +420,23 @@ and do not conflict with other modes.
 Please see [[http://orgmode.org/manual/Activation.html][this section of the manual]] if you have additional
 questions.
 
+** Why aren't some of the variables I've customized having an effect?
+#<<load-org-after-setting-variables>>
+
+Some org variables have to be set before org.el is loaded or else they
+will not work. (An example is the new variable
+=org-enforce-todo-dependencies=.)
+
+To make sure all your variables work you should not use =(require
+'org). Instead use the following setting:
+
+: (require 'org-install)
+
+To be safe, you should also make sure that you do not require any
+other =org-...= files in your =.emacs= file before you have set your
+org variables, since that will cause org.el to be loaded. So to be
+safe, load org files *after* you have set your variables.
+
 * Errors
 ** When I try to use Org-mode, I always get the error message =(wrong-type-argument keymapp nil)=
 #<<wrong-type-argument-keymapp>>
