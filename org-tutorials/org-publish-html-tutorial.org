@@ -9,6 +9,7 @@
 #+PRIORITIES: A C B
 #+CATEGORY:   worg-tutorial
 
+
 [[file:../index.org][{Back to Worg's index}]]
 
 * Introduction
@@ -36,47 +37,48 @@
   =~/org/= and we publish them to =~/public_html/=.
 
   Let's further assume you're already familiar with the note taking basics in
-  org and add a little content to the Org-mode files we add to our project
+  org and able to a little content to the Org-mode files we add to our project
   during this tutorial. Please add at least one headline to each of the files.
 
   The first thing to do is to create the folder =~/org=. This is where our notes
   files live. Inside =~/org/= we have a folder =css/= for stylesheets and
-  scripts, and a folder calles =img/= (guess what's in there).
+  scripts, and a folder called =img/= (guess what's in there).
 
   The first file we add to that folder (and to subdirectories later on) is called
   =index.org=. This name was choosen, since Org will publish the files to those
-  with the basename of the source file plus the extension =.html= [1]. Thus
+  with the basename of the source file plus the extension =.html= [fn:1]. Thus
   =~/org/index.org= will once be =~/public_html/index.html= -- the startpage.
 
   Let's add another file and call it =~/org/remember.org=. After adding a
   stylesheet, =~/org/= looks like this:
 
-  :~/org/
-  :   |- css/
-  :   |  `- stylesheet.css
-  :   |- img/
-  :   |- index.org
-  :   `- remember.org
+  : ~/org/
+  :    |- css/
+  :    |  `- stylesheet.css
+  :    |- img/
+  :    |- index.org
+  :    `- remember.org
 
   When ever you want to add link to a file, do it the usual way. To link from
   =index.org= to =remember.org=, just write
-  :[[file:remember.org][remember]]
+  : [[file:remember.org][remember]]
   Org will convert those links to HTML links for you on export:
-  :<a href="./remember.html">remember</a>
+  : <a href="./remember.html">remember</a>
 
-  Same is true for images. To add an image, put it =~/org/img/test.jpg= and
+  Same is true for images. To add an image, put it in =~/org/img/test.jpg= and
   refer to it by
-  :[[file:img/test.jpg]]
+  : [[file:img/test.jpg]]
 
   You may test your links by clicking on them. To test image links you may also
-  try to turn on =iimage-mode= [3] which works without problems here.
+  try to turn on =iimage-mode= [fn:2] which works without problems here.
 
-  Optionally, set up the stylesheet as shown in section Special comment section.
+  Optionally, set up the stylesheet as shown in section Special comment
+  section. The recommended way is to use a real stylesheet though.
 
 * Publishing the /org/ project
 
   To publish the =~/org/= project to HTML, we'll have to setup the variable
-  =org-publish-project-alist=. I tend to split each project in three basic
+  =org-publish-project-alist= [fn:3].  I tend to split each project in three basic
   /components/ as described in the manual. We need these different components,
   since we want org to use two different functions to publish dynamic content
   (org => html) and static content like scripts, images, stylesheets or even
@@ -91,13 +93,15 @@
 
   First of all, enter this into the =*scratch*= buffer:
 
-  :(require 'org-publish)
-  :(setq org-publish-project-alist
-  :      '(
-  :
-  :       ;; ... add all the components here (see below)...
-  :
-  :      ))
+#+begin_src emacs-lisp
+(require 'org-publish)
+(setq org-publish-project-alist
+      '(
+
+       ;; ... add all the components here (see below)...
+
+      ))
+#+end_src
 
   Be shure to put all the /components/ bellow right there where the comment line
   is now.
@@ -108,26 +112,28 @@
    =publishing-function= is set to =org-publish-org-to-html=. Here is an example
    of the notes component:
 
-   :("org-notes"
-   :      :base-directory "~/org/"
-   :      :base-extension "org"
-   :      :publishing-directory "~/public_html/"
-   :      :recursive t
-   :      :publishing-function org-publish-org-to-html
-   :      :headline-levels 4             ; Just the default for this project.
-   :      :auto-preamble t
-   :      )
+#+begin_src emacs-lisp
+("org-notes"
+ :base-directory "~/org/"
+ :base-extension "org"
+ :publishing-directory "~/public_html/"
+ :recursive t
+ :publishing-function org-publish-org-to-html
+ :headline-levels 4             ; Just the default for this project.
+ :auto-preamble t
+ )
+#+end_src
 
    Note, that =headline-levels= may be adjusted [[Overwrite the defaults][on a per file basis]] to overwrite
    the default.
 
    The most important settings here are:
 
-   | base-directory       | The components root directory.                                                                                                |
-   | base-extension       | Filename suffix without the dot.                                                                                              |
-   | publishing-directory | The base directory where all our files will be published.                                                                     |
-   | recursive            | If =t=, include subdirectories - we want that. Subdirectories in =:publishing-directory= are created if they don't yet exist. |
-   | publishing-function  | If and how org should process the files in this component. In this case: convert the Org-mode files to HTML.                  |
+   | =base-directory=      | The components root directory.                                                                                            |
+   | =base-extension=      | Filename suffix without the dot.                                                                                          |
+   | =publishing-directory= | The base directory where all our files will be published.                                                                 |
+   | =recursive=           | If =t=, include subdirectories - we want that. Subdirectories in =:publishing-directory= are created if they don't yet exist. |
+   | =publishing-function= | If and how org should process the files in this component. In this case: convert the Org-mode files to HTML.              |
 
 ** The /static/ component
 
@@ -135,12 +141,15 @@
    =:base-directory= to =:publishing-directory= without changing them. Thus
    let's tell Org-mode to use the function =org-publish-attachment=:
 
-   :     ("org-static"
-   :      :base-directory "~/org/"
-   :      :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
-   :      :publishing-directory "~/public_html/"
-   :      :recursive t
-   :      :publishing-function org-publish-attachment)
+#+begin_src emacs-lisp
+("org-static"
+ :base-directory "~/org/"
+ :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
+ :publishing-directory "~/public_html/"
+ :recursive t
+ :publishing-function org-publish-attachment
+ )
+#+end_src
 
    *Note* that =:publishing-function= is set to =org-publish-attachment=.
 
@@ -150,7 +159,9 @@
    component I usually drop the suffix and just use the basename of the
    project.
 
-   :     ("org" :components ("org-notes" "org-static"))
+#+begin_src emacs-lisp
+ ("org" :components ("org-notes" "org-static"))
+#+end_src
 
    Now =M-x org-publish-project RET org RET= publishes everything
    recursively to =~/public_html/=. Target directories are created, if they
@@ -162,13 +173,15 @@
    definition for our publishing components in the =*scratch*= buffer, again,
    make shure all the /components/ are enclosed by the lines
 
-   :(require 'org-publish)
-   :(setq org-publish-project-alist
-   :      '(
-   :
-   :       ;; ... all the components ...
-   :
-   :      ))
+#+begin_src emacs-lisp
+(require 'org-publish)
+(setq org-publish-project-alist
+      '(
+
+       ;; ... all the components ...
+
+      ))
+#+end_src
 
    Move to the end of the first line and press =C-x C-e= to load
    =org-publish=. Now go to the end of the last line and press =C-x C-e=
@@ -218,17 +231,18 @@
    an Org-mode file, =M-x org-insert-export-options-template= does the trick for
    us. This command adds the following lines to the beginning of our file:
 
-   :#+TITLE:     filename.org
-   :#+AUTHOR:    Firstename Lastname
-   :#+EMAIL:     arthur-dent@example.tld
-   :#+DATE:      <2008-08-25 Mo>
-   :#+LANGUAGE:  en
-   :#+TEXT:      Some descriptive text to be emitted.  Several lines OK.
-   :#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:nil skip:nil d:t tags:not-in-toc
-   :#+INFOJS_OPT: view:nil toc:t ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
-   :#+LINK_UP:
-   :#+LINK_HOME:
-   :#+STYLE:    <link rel="stylesheet" type="text/css" href="../stylesheet.css" />
+
+   : #+TITLE:     filename.org
+   : #+AUTHOR:    Firstename Lastname
+   : #+EMAIL:     arthur-dent@example.tld
+   : #+DATE:      <2008-08-25 Mo>
+   : #+LANGUAGE:  en
+   : #+TEXT:      Some descriptive text to be emitted.  Several lines OK.
+   : #+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:nil skip:nil d:t tags:not-in-toc
+   : #+INFOJS_OPT: view:nil toc:t ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+   : #+LINK_UP:
+   : #+LINK_HOME:
+   : #+STYLE:    <link rel="stylesheet" type="text/css" href="../stylesheet.css" />
 
    All we have to do now is to alter the options to match our needs. All the
    options are listed in the wonderful Org-mode manual. Note though, that these
@@ -241,11 +255,11 @@
    Also, CSS style variables may be using a special section may be
    #insert/appended to Org-mode files:
 
-   :* COMMENT html style specifications
+   : * COMMENT html style specifications
    :
-   :# Local Variables:
-   :# org-export-html-style: "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/stylesheet.css\" />"
-   :# End:
+   : # Local Variables:
+   : # org-export-html-style: "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/stylesheet.css\" />"
+   : # End:
 
    =css/stylesheet.css= suits the needs for a file in the root folder. Use \\
    =../css/stylesheet.css= in a subfolder (first level), \\
@@ -280,8 +294,8 @@
  Now remove the special comment section from the end of your Org-mode files in
  the project folders and change the export options template to
 
- :#+SETUPFILE: ~/.emacs.d/org-templates/level-N.org
- :#+TITLE: My Title
+ : #+SETUPFILE: ~/.emacs.d/org-templates/level-N.org
+ : #+TITLE: My Title
 
  Replace =N= with distance to the root folder (=0=, =1= etc.) of your project
  and press =C-c= twice while still on this line to apply the
@@ -295,9 +309,9 @@
   =org-info.js= setup for presentations, and put the appropriate options in a
   file named =level-0-slides.org=:
 
-  :#+INFOJS_OPT: path:org-info.js
-  :#+INFOJS_OPT: toc:nil view:slide
-  :#+STYLE: <link rel="stylesheet" type="text/css" href="slides.css" />
+  : #+INFOJS_OPT: path:org-info.js
+  : #+INFOJS_OPT: toc:nil view:slide
+  : #+STYLE: <link rel="stylesheet" type="text/css" href="slides.css" />
 
   Now it's as simple as typing '/-slides/' to change the appearance of any file
   in our project.
@@ -314,69 +328,74 @@
 
    Once we get tired of copying the static files from one project to another, the
    following configuration does the trick for us. We simply add the /inherit/
-   component, that imports all the static files from our =~/org/= directory [5].
+   component, that imports all the static files from our =~/org/= directory [fn:4].
    From now on, it will be sufficient to edit stylesheets and scripts just
    there.
 
-   :     ("B-inherit"
-   :      :base-directory "~/org/"
-   :      :recursive t
-   :      :base-extension "css\\|js"
-   :      :publishing-directory "~/public_html/B/"
-   :      :publishing-function org-publish-attachment
-   :      )
-   :
-   :     ("B-org"
-   :      :base-directory "~/B/"
-   :      :auto-index t
-   :      :index-filename "sitemap.org"
-   :      :index-title "Sitemap"
-   :      :recursive t
-   :      :base-extension "org"
-   :      :publishing-directory "~/public_html/B/"
-   :      :publishing-function org-publish-org-to-html
-   :      :headline-levels 3
-   :      :auto-preamble t
-   :      )
-   :     ("B-static"
-   :      :base-directory "~/B/"
-   :      :recursive t
-   :      :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
-   :      :publishing-directory "~/public_html/B/"
-   :      :publishing-function org-publish-attachment)
-   :
-   :     ("B" :components ("B-inherit" "B-notes" "B-static"))
+#+begin_src emacs-lisp
+ ("B-inherit"
+  :base-directory "~/org/"
+  :recursive t
+  :base-extension "css\\|js"
+  :publishing-directory "~/public_html/B/"
+  :publishing-function org-publish-attachment
+ )
+
+ ("B-org"
+ :base-directory "~/B/"
+ :auto-index t
+ :index-filename "sitemap.org"
+ :index-title "Sitemap"
+ :recursive t
+ :base-extension "org"
+ :publishing-directory "~/public_html/B/"
+ :publishing-function org-publish-org-to-html
+ :headline-levels 3
+ :auto-preamble t
+ )
+ ("B-static"
+  :base-directory "~/B/"
+  :recursive t
+  :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
+  :publishing-directory "~/public_html/B/"
+  :publishing-function org-publish-attachment)
+
+ ("B" :components ("B-inherit" "B-notes" "B-static"))
+#+end_src
 
    *Note*, that the inheritance trick works for non org directories. You might
    want to keep all your stylesheets and scripts in a single place, or even add
    more /inheritance/ to your projects, to import sources from upstream.
 
-   *Note* also, that =B-inherit= is the first component in =B=. This is
-   important for this trick to work since the components in =B= are executed in
+   *Note* also, that =B-inherit= exports directly to the web. If you want to track
+   the changes to =~org/*.css= directly in =~/B=, you must ensure, that =B-inherit= is
+   the first component in =B= since the components in =B= are executed in
    the sequence listed: first get the new stylesheet into =B=, then execute
    =B-static=.
 
-   *One more Example:*
+*** One more Example
 
-   As I use [[file:../code/org-info-js/index.org][org-info.js]] and track Worg git, I use "=inherit-org-info-js=" in all
-   my =org= projects:
+    As I use [[file:../code/org-info-js/index.org][org-info.js]] and track Worg git, I use "=inherit-org-info-js=" in all
+    my =org= projects:
 
-   :     ("inherit-org-info-js"
-   :      :base-directory "~/develop/org/Worg/code/org-info-js/"
-   :      :recursive t
-   :      :base-extension "js"
-   :      :publishing-directory "~/org/"
-   :      :publishing-function org-publish-attachment)
-   :
-   :     ;; ... all the rest ... ;;
-   :
-   :     ("B" :components ("inherit-org-info-js" "B-inherit" "B-notes" "B-static"))
-   :     ("C" :components ("inherit-org-info-js" "C-inherit" "C-notes" "C-static"))
-   :     ("D" :components ("inherit-org-info-js" "D-inherit" "D-notes" "D-static"))
-   :     ("E" :components ("inherit-org-info-js" "E-inherit" "E-notes" "E-static"))
+#+begin_src emacs-lisp
+ ("inherit-org-info-js"
+  :base-directory "~/develop/org/Worg/code/org-info-js/"
+  :recursive t
+  :base-extension "js"
+  :publishing-directory "~/org/"
+  :publishing-function org-publish-attachment)
 
-   ...means, =B= =C= =D= and =E= use my local stylesheets and always the latest
-   version of =org-info.js=.
+ ;; ... all the rest ... ;;
+
+ ("B" :components ("inherit-org-info-js" "B-inherit" "B-notes" "B-static"))
+ ("C" :components ("inherit-org-info-js" "C-inherit" "C-notes" "C-static"))
+ ("D" :components ("inherit-org-info-js" "D-inherit" "D-notes" "D-static"))
+ ("E" :components ("inherit-org-info-js" "E-inherit" "E-notes" "E-static"))
+#+end_src
+
+    ...means, =B= =C= =D= and =E= use my local stylesheets and always the latest
+    version of =org-info.js=.
 
 * Overview
 
@@ -388,13 +407,16 @@
 
    Org-modes great publishing also generates a recursive sitemap (called /index
    file/ in the manual). It's name defaults to =index.org=, which get's in our
-   way, since we have a real startpage as =index.html= [4]. Fortunately there is
+   way, since we have a real startpage as =index.html= [fn:5]. Fortunately there is
    a configuration option to change the name of the generated sitemap. To
    generate the sitemap, add these lines to the /notes/ component:
 
-   :      :auto-index t                  ; Generate index.org automagically...
-   :      :index-filename "sitemap.org"  ; ... call it sitemap.org ...
-   :      :index-title "Sitemap"         ; ... with title 'Sitemap'.
+
+#+begin_src emacs-lisp
+ :auto-index t                  ; Generate index.org automagically...
+ :index-filename "sitemap.org"  ; ... call it sitemap.org ...
+ :index-title "Sitemap"         ; ... with title 'Sitemap'.
+#+end_src
 
    The sitemap will reflect the tree structure of the project. To access the
    sitemap easily, we could do two things:
@@ -413,7 +435,7 @@
    [[file:../code/org-info-js/index.org][org-info.js]]. Let's set it up like this (either in every file, or in
    =org-level-N.org=, where =N > 0=):
 
-   :#+LINK_UP: index.html
+   : #+LINK_UP: index.html
 
    This makes the little /UP/ link ('=h=') point to the =index.html= in the
    current directory.
@@ -421,15 +443,15 @@
    The =index.org= in the root of the project has the /index file/ as section 2
    (which I may reach pressing '=n=' then), and the same option set like this:
 
-   :#+LINK_UP: sitemap.html
+   : #+LINK_UP: sitemap.html
 
    For an =index.org= in a subdirectory:
 
-   :#+LINK_UP: ../index.html
+   : #+LINK_UP: ../index.html
 
    The =LINK_HOME= always points to the same file:
 
-   :#+LINK_HOME: http://localhost/~user/index.html
+   : #+LINK_HOME: http://localhost/~user/index.html
 
    Please consider replacing the last one with a relative path (which will be
    different for every level of subdirectories).
@@ -437,29 +459,33 @@
    No matter where we are, we may always press =H n= and we face the sitemap.
    No matter where we are, we may always press =h= to move up the tree.
 
-   
+
 * Further reading
 
-   For more information you might want to read the great [[http://orgmode.org/#sec-5.1][Org-mode manual]]. One of
-   the nicest mailing lists on this planet, BTW, is [[http://lists.gnu.org/archive/html/emacs-orgmode/][emacs-orgmode (archive)]]
-   where you might as well find answers to your questions.
+   For more information you might want to read the great [[http://orgmode.org/manual/][Org-mode manual]]
+   ([[http://orgmode.org/#sec-4][download]]). One of the nicest mailing lists on this planet, BTW, is
+   [[http://lists.gnu.org/archive/html/emacs-orgmode/][emacs-orgmode (archive)]] where you might as well find answers to your
+   questions.
+
 
    Have fun!
 
 
 
 
----- Footnotes: ---------------
+* Footnotes
 
- [1]  You may customize the file suffix for exported files like this:
+[fn:1]  You may customize the file suffix for exported files like this:
  =M-x customize RET org-export-html-extension=.
 
- [3] ...by typing =M-x iimage-mode RET=. iimage-mode even shows *.svg images, if
+[fn:2]  ...by typing =M-x iimage-mode RET=. iimage-mode even shows *.svg images, if
  =librsvg= was present on compile time. FIXME: is this true for emacs22 ?
 
- [4]  This is primarily because of the sitemap file. Since all directories are
- listet as links, =/Emacs/= leeds to =/Emacs/index.html= which should be the page
- entitled /Emacs/.
+[fn:3]  All components of =org-publish-projects-alist= are documented in the [[http://orgmode.org/manual/Project-alist.html#Project-alist][Org Mode
+    Manual]].
 
- [5]  Files may be copied from arbitrary src directories to any target directory
+[fn:4]  Files may be copied from arbitrary src directories to any target directory
  desired.
+
+[fn:5]  This is primarily because of the behaviour of servers. When we navigate
+ to http://orgmode.org/worg/ we will face the =index.html= if present.
