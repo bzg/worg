@@ -101,7 +101,7 @@
 
    2. by pointing it to a csv file, locally or via http:, using
      infile:/path/to/file.csv or e.g.
-     infile:http://orgmode.org/worg/org-tutorials/org-R/file.csv
+     infile:http://www.stats.ox.ac.uk/~davison/software/org-R/file.csv
 
    3. by doing neither, in which case it looks for a table immediately
      above the #+R(R) line(s).
@@ -415,43 +415,43 @@ recognise any usage affinities between the clustered org users?
 * Table of available options
   In addition to the action:<some-action> option (described [[*Table of available actions][here]], the
   following options are available:
-|-------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| *Input options*                                             |                                                                                                                                        |
-|-------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| infile:/path/to/file.csv                                    | input data comes from file.csv                                                                                                         |
-| infile:http://orgmode.org/worg/org-tutorials/org-R/file.csv | input data comes from file.csv somewhere on the web                                                                                    |
-| infile:/path/to/file.org                                    | input data comes from file.org; must also specify table with intable:<name-or-id>                                                      |
-| intable:table-name                                          | input data is in table named with #+TBLNAME:table-name (in same buffer unless infile:/path/to/file.org is specified)                   |
-| intable:table-id                                            | input data is first table under entry with table-id as unique ID. Doesn't make sense with infile:/path/to/file.org                     |
-| rownames:t                                                  | does first column contain row names? (default: nil). If t other column indices are as if first column not present --  this may change) |
-| colnames:nil                                                | does first row contain column names? (default: t)                                                                                      |
-| columns:2 columns:(2)                                       | operate only on column 2                                                                                                               |
-| columns:"wing length" columns:("wing length")               | operate only on column named "wing length"                                                                                             |
-| columns:((1)(2 3))                                          | (when plotting) plot columns 2 and 3 on y-axis against column 1 on x-axis                                                              |
-| columns:(("age")("wing length" "fierceness"))               | (when plotting) plot columns named "wing length" and "fierceness" on y-axis against "age" on x-axis                                    |
-|-------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| *Action options*                                            |                                                                                                                                        |
-|-------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| action:some-action                                          | off-the-shelf plotting action or computation (see [[*Table of available actions][separate list]]), or any R function that makes sense (e.g. head, summary)              |
-| lines:t                                                     | (when plotting) join points with lines (similar to action:lines)                                                                       |
-| args:(:xlab "\"the x axis title\"" :lwd 4)                  | provide extra arguments as a p-list (note the need to quote strings if they are to appear as strings in R)                             |
-|-------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| *Output options*                                            |                                                                                                                                        |
-|-------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| outfile:/path/to/image.png                                  | save image to file and insert link into org buffer (also: .pdf, .ps, .jpg, .jpeg, .bmp, .tiff)                                         |
-| outfile:png                                                 | save image to file in org-attach directory and insert link                                                                             |
-| outfile:/path/to/file.csv                                   | would make sense but not implemented yet                                                                                               |
-| height:1000                                                 | set height of graphical output in (pixels for png, jpeg, bmp, tiff; default 480) / (inches for pdf, ps; default 7)                     |
-| width:1000                                                  | set width of graphical output in pixels (default 480 for png)                                                                          |
-| title:"title of table/plot"                                 | title to be used in plot, and as #+TBLNAME of table output, and as name of link to output                                              |
-| colour:hotpink col:hotpink color:hotpink                    | main colour for plot (i.e. `col' argument in R, enter colors() at R prompt for list of available colours.)                             |
-| sort:t                                                      | with action:tabulate, sort in decreasing count order (default is alphabetical on names)                                                |
-| output-to-buffer:t                                          | force numerical output to org buffer (shouldn't be necessary)                                                                          |
-| inline:t                                                    | don't name links to output (so that graphics are inline when exported to HTML)                                                         |
-|-------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| *Misc options*                                              |                                                                                                                                        |
-|-------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| showcode:t                                                  | Display a buffer containing the R code that was generated to do what was requested.                                                    |
+|-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| *Input options*                                                   |                                                                                                                                        |
+|-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| infile:/path/to/file.csv                                          | input data comes from file.csv                                                                                                         |
+| infile:http://www.stats.ox.ac.uk/~davison/software/org-R/file.csv | input data comes from file.csv somewhere on the web                                                                                    |
+| infile:/path/to/file.org                                          | input data comes from file.org; must also specify table with intable:<name-or-id>                                                      |
+| intable:table-name                                                | input data is in table named with #+TBLNAME:table-name (in same buffer unless infile:/path/to/file.org is specified)                   |
+| intable:table-id                                                  | input data is first table under entry with table-id as unique ID. Doesn't make sense with infile:/path/to/file.org                     |
+| rownames:t                                                        | does first column contain row names? (default: nil). If t other column indices are as if first column not present --  this may change) |
+| colnames:nil                                                      | does first row contain column names? (default: t)                                                                                      |
+| columns:2 columns:(2)                                             | operate only on column 2                                                                                                               |
+| columns:"wing length" columns:("wing length")                     | operate only on column named "wing length"                                                                                             |
+| columns:((1)(2 3))                                                | (when plotting) plot columns 2 and 3 on y-axis against column 1 on x-axis                                                              |
+| columns:(("age")("wing length" "fierceness"))                     | (when plotting) plot columns named "wing length" and "fierceness" on y-axis against "age" on x-axis                                    |
+|-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| *Action options*                                                  |                                                                                                                                        |
+|-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| action:some-action                                                | off-the-shelf plotting action or computation (see [[*Table of available actions][separate list]]), or any R function that makes sense (e.g. head, summary)              |
+| lines:t                                                           | (when plotting) join points with lines (similar to action:lines)                                                                       |
+| args:(:xlab "\"the x axis title\"" :lwd 4)                        | provide extra arguments as a p-list (note the need to quote strings if they are to appear as strings in R)                             |
+|-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| *Output options*                                                  |                                                                                                                                        |
+|-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| outfile:/path/to/image.png                                        | save image to file and insert link into org buffer (also: .pdf, .ps, .jpg, .jpeg, .bmp, .tiff)                                         |
+| outfile:png                                                       | save image to file in org-attach directory and insert link                                                                             |
+| outfile:/path/to/file.csv                                         | would make sense but not implemented yet                                                                                               |
+| height:1000                                                       | set height of graphical output in (pixels for png, jpeg, bmp, tiff; default 480) / (inches for pdf, ps; default 7)                     |
+| width:1000                                                        | set width of graphical output in pixels (default 480 for png)                                                                          |
+| title:"title of table/plot"                                       | title to be used in plot, and as #+TBLNAME of table output, and as name of link to output                                              |
+| colour:hotpink col:hotpink color:hotpink                          | main colour for plot (i.e. `col' argument in R, enter colors() at R prompt for list of available colours.)                             |
+| sort:t                                                            | with action:tabulate, sort in decreasing count order (default is alphabetical on names)                                                |
+| output-to-buffer:t                                                | force numerical output to org buffer (shouldn't be necessary)                                                                          |
+| inline:t                                                          | don't name links to output (so that graphics are inline when exported to HTML)                                                         |
+|-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| *Misc options*                                                    |                                                                                                                                        |
+|-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
+| showcode:t                                                        | Display a buffer containing the R code that was generated to do what was requested.                                                    |
   
 * Table of available actions
 # <<action list>>
