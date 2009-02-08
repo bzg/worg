@@ -1,0 +1,78 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE:      Org configuration(s)
+#+AUTHOR:     Worg people
+#+EMAIL:      bzg AT altern DOT org
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+# This file is the default header for new Org files in Worg.  Feel free
+# to tailor it to your needs.
+
+* GTD setups
+
+- David O'Toole [[file:../elisp/dto-org-gtd.el][GTD configuration file]]
+  
+* General Configuration/Customization
+
+** Some useful keybindings
+
+Here is a subset of my personal org-mode key-bindings that others may
+find useful.
+
+# please anyone else should feel free to edit/change/remove parts of
+# this example
+
+#+begin_example 
+(add-hook 'org-mode-hook (lambda ()
+                           (local-set-key "\M-n" 'outline-next-visible-heading)
+                           (local-set-key "\M-p" 'outline-previous-visible-heading)
+			   ;; table
+			   (local-set-key "\M-\C-w" 'org-table-copy-region)
+			   (local-set-key "\M-\C-y" 'org-table-paste-rectangle)
+			   (local-set-key "\M-\C-l" 'org-table-sort-lines)
+			   ;; display images
+			   (local-set-key "\M-I" 'org-toggle-iimage-in-org)
+			   ;; fix tab
+			   (local-set-key "\C-y" 'yank)
+			   ;; yasnippet (allow yasnippet to do it's thing in org files)
+			   (make-variable-buffer-local 'yas/trigger-key)
+			   (setq yas/trigger-key [tab])
+			   (define-key yas/keymap [tab] 'yas/next-field-group)))
+#+end_example
+
+References and Explanations of the above:
+- see [[* iimage in org (display images in org files)]] for an explanation
+  of the =org-toggle-iimage-in-org= function (inline images in
+  org-mode files).
+- [[http://code.google.com/p/yasnippet/][yasnippet]] is a tools for snippet expansion in Emacs.  Since Org-Mode
+  is descendant of text-mode, all text snippets will work inside of
+  org files, I also use the following to simplify the creation of
+  example and source code blocks.
+
+block
+#+begin_example 
+#name : #+begin_...#+end_
+# --
+#+begin_$1 $2
+$0
+#+end_$1
+#+end_example
+
+
+** iimage in org (display images in org files)
+Thanks to many on the mailing list for this great addition to
+Org-Mode.  See [[http://www.netlaputa.ne.jp/~kose/Emacs/iimage.html][iimage]] for information on iimage-minor-mode.
+
+#+begin_example 
+(defun org-toggle-iimage-in-org ()
+  "display images in your org file"
+  (interactive)
+  (if (face-underline-p 'org-link)
+      (set-face-underline-p 'org-link nil)
+      (set-face-underline-p 'org-link t))
+  (iimage-mode))
+#+end_example
