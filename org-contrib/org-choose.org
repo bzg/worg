@@ -1,0 +1,160 @@
+#+TITLE:     org-choose.el -- decision management for org-mode
+#+OPTIONS:   ^:{} author:nil
+#+STARTUP: odd
+
+Org-choose supports decision management.
+
+* General 
+
+org-choose operates on a group of sibling items in org-mode.  It
+treats them as potential choices in some decision.
+
+The items have marks such as "CHOSEN", "MAYBE", or "REJECTED".  You
+can configure the set of marks.  The marks behave similarly to TODO
+marks.  org-choose keeps the marks in a consistent overall state.
+
+A sibling item that has no mark is assumed to not represent an
+alternative; so is an item with a mark from another keyword set.
+
+
+* How to use it
+
+*** Overview of use
+
+org-choose contains no user commands.  You use it by:
+
+  * Loading it
+
+  * Setting up at least one set of TODO keywords with the
+    interpretation "choose".
+
+  * Operating on single items with the TODO commands.
+
+*** Loading it (No surprises here)
+
+The easiest way is by 
+
+	M-x customize-apropos org-modules
+
+Check the line for org-choose.  This will cause it to be loaded every
+time you start org-mode.
+
+You'll still have to load it manually the first time.
+
+Of course, you can also just try it out by loading it manually.
+
+*** Setting up a keyword set
+
+To use org-choose, you need to set up at least one set of TODO
+keywords with the interpretation "choose".  There are two basic ways.
+Both are essentially the same as for other TODO marks.
+
+    * By using the file directive #+CHOOSE_TODO: 
+
+    * By M-x customize-apropos org-todo-keywords
+
+**** The markings
+
+The format of marks is essentially that of ordinary TODO marks.  The
+marks can have parenthesized arguments that indicate key bindings and
+similar shortcuts.
+
+In addition, they can optionally have a second argument.  The
+arguments are separated by a comma.  The second argument can have one
+of 3 values:
+
+ * 0 :: The mark with this argument is the default mark.  New items
+        will have that mark, if they are from this TODO keyword set.
+
+ * - :: This mark with this argument is at the bottom of the "NOT
+        CHOSEN" range (See [[id:3698439c-93d5-4242-b566-96e760f64108][About consistent state]]).  It should be
+        lower than the default mark (0). If this is omitted,
+        org-choose will not try to keep marks in consistent state.
+
+ * + :: This mark with this argument is at the top of the "CHOSEN"
+        range.  It should be higher than the default mark (0). If this
+        is omitted, org-choose will use the highest mark instead.
+
+No value should be given twice.
+
+This works even if there is no first argument; just give an empty
+string as the first argument.
+
+***** Examples of marks
+
+ * REJECTED :: Makes a mark whose text is "REJECTED".
+ * MAYBE(,0) :: Makes a mark whose text is "MAYBE".  It is the default
+                mark.
+ * CHOSEN(c,+) :: Makes a mark whose text is "CHOSEN".  It is the top
+                  of the high range.  The key "c" will select it,
+                  exactly as the usual TODO hotkey behavior.
+
+**** Examples of mark specs
+
+ * #+CHOOSE_TODO: NO(,-) MAYBE(,0) YES
+ * #+CHOOSE_TODO: REJECTED(r) NOT_CHOSEN(n,-) MAYBE(,0) LEANING_TOWARDS(l) CHOSEN(c,+)
+
+*** Operating on items
+
+You can operate on single items with the usual TODO commands.
+
+    * Use C-S-right to change the keyword set.  Use this to change to
+      the "choose" keyword set that you just defined.
+
+    * Use S-right to advance the TODO mark to the next setting.  
+
+      For "choose", that means you like this alternative more than
+      before.  Other alternatives will be automatically demoted to
+      keep your settings consistent.
+
+    * Use S-left to demote TODO to the previous setting.  
+
+      For "choose", that means you don't like this alternative as much
+      as before.  Other alternatives will be automatically promoted,
+      if this item was all that was keeping them down.
+
+    * All the other TODO commands are available and behave essentially
+      the normal way.
+
+
+      
+* About consistent state
+   :PROPERTIES:
+   :ID:       3698439c-93d5-4242-b566-96e760f64108
+   :END:
+
+org-choose tries to keep each group of items in a consistent state.
+
+It knows about 2 ranges of marks that relate to each other in mirror
+image fashion.  We can call them the "CHOSEN" range and the "NOT
+CHOSEN" range.
+
+If some item is marked in the "CHOSEN" range, other items can't be
+marked higher than the mirror-corresponding entry in the "NOT CHOSEN"
+range.
+
+*** An example
+
+For this example, assume we're using the marks from the second example
+spec,
+
+	"REJECTED(r) NOT_CHOSEN(n,-) MAYBE(,0) LEANING_TOWARDS(l)
+	CHOSEN(c,+)"
+
+Then org-choose enforces the following constraints:
+
+| If any   |   | then the other |   |
+| item is: |   | items can't be |   |
+|          |   | higher than:   |   |
+|----------+---+----------------+---|
+| CHOSEN   | 1 | NOT CHOSEN     | 4 |
+| FAVORED  | 2 | MAYBE          | 3 |
+|----------+---+----------------+---|
+
+
+* Credits
+
+org-choose was written by Tom Breton, with much-appreciated advice
+from Carsten Dominik.
+
+ 
