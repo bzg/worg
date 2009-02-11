@@ -1258,6 +1258,32 @@ There is a whole host of export options you can set with an in-buffer
 options or via global variables. See [[http://orgmode.org/manual/Export-options.html#Export-options][this section]] of the manual for a
 full list.
 
+** How can I preserve faces when I export an agenda from the command line?
+#<<preserving-faces-during-batch-export>>
+
+Normally, when you export an org file or an agenda view from within
+emacs, htmlize will convert your face definitions to css styles,
+resulting in an html output that preserves the general look of your
+org buffers and agenda views.
+
+Let's say you generate an export from the command line, such as the
+following:
+
+: emacs -batch -l ~/.emacs -eval '(org-batch-agenda "e")'
+
+In such an instance, the exported html will contain only very basic
+color styles. The reason is that when emacs is run in batch mode, it
+does not have a display and therefore only rudimentary face
+definitions. If you'd like to use more complex styles, you'll have to
+use a CSS file. To generate a CSS file based on you're current
+org-mode faces, you can use the following function:
+
+: M-x org-export-htmlize-generate-css RET
+
+If you'd like to get rid of the redundant css styles in your exported
+html, then you can bind htmlize-output-type to 'css' for the duration
+of the export.
+
 
 * COMMENT HTML style specifications
 
