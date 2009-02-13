@@ -1,0 +1,67 @@
+#+TITLE:     org-eval-light.el --- Display result of evaluating code in various languages (light)
+#+OPTIONS:   ^:{} author:nil
+#+STARTUP: odd
+
+* General 
+
+Org-eval-light enables the execution of source code embedded in
+org-mode files.
+
+
+* How to use it
+
+** Quick Example
+
+As a quick demonstration of use of =org-eval-light= first [[* load it][load it]] as
+described below.  Then place a =#+begin_src= block like that below in
+an org-file on your system.  Place the cursor *inside* of the block
+(in this case on the same line as the word =date=) and press
+=\C-c\C-c= calling =org-eval-light-current-snippet=.  This will run
+the =date= command in your shell, and will place the output into your
+org file after the block.  In the case of short output like below,
+=org-eval-light= will use the consise =:= style comments, but larger
+output (the cutoff default to 10 lines, but can be changed by setting
+the =org-eval-light-example-size-cutoff= variable) will be placed in
+an example block.
+
+: #+begin_src shell
+:  date
+: #+end_src
+
+
+** Loading it (No surprises here)
+The easiest way is by 
+
+	M-x customize-apropos org-modules
+
+Check the line for eval-light.  This will cause it to be loaded every
+time you start org-mode.
+
+You'll still have to load it manually the first time.
+
+Of course, you can also just try it out by loading it manually.
+
+If you prefer to manually customize your emacs then make sure that the
+path to org's contrib directory is in your load-path and add the
+following to your =.emacs=.
+
+: (require 'org-eval-light)
+
+
+** Adding new source-code types
+=org-eval-light= is extensible.  If you would like to add a new type
+of source code to =org-eval-light= you may do so by adding the name of
+your new lang (let say =new_lang=) to the
+=org-eval-light-interpreters= variable.  You will then need to add a
+new conditional statement to the =org-eval-light-code= function
+(*note*: you should only try this if you are willing to get your hands
+dirty with some elisp).
+
+If you add a new code type, and get it working please share your
+changes with the mailing list.
+
+
+* Credits
+
+Eric Schulte adapted org-eval-light from org-eval, with
+much-appreciated code and advice from Carsten Dominik.
