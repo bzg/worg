@@ -1,0 +1,107 @@
+#+TITLE:     org-exp-blocks.el --- pre-process blocks when exporting org files
+#+OPTIONS:   ^:{} author:nil
+#+STARTUP: odd
+
+* General 
+
+=org-exp-blocks= can be used to pre-process blocks when exporting org
+files.  An extensible framework for block exportation is provided, as
+well as block exporters for [[http://ditaa.sourceforge.net/][ditaa]], [[http://www.graphviz.org/][dot]], comments, and [[http://www.r-project.org/][R]] code in a
+manner similar to [[http://en.wikipedia.org/wiki/Sweave][Sweave]].
+
+
+* How to use it
+
+** Quick Examples
+
+To use =org-exp-blocks= first [[* Loading it][load it]] as described below.  Then try
+one of the following.
+
+*** ditaa
+
+[[http://ditaa.sourceforge.net/][ditaa]] is a tool for converting ASCII images into actual images.  I
+believe ditaa is distributed with newer versions of org-mode.  To make
+sure that you have ditaa installed check the value of
+`org-ditaa-jar-path', it should point to a =ditaa.jar= file.  Once
+ditaa is installed and the `org-ditaa-jar-path' variable is set
+appropriately copy the following block in an org-mode file
+
+: #+begin_ditaa blue.png -r -S
+: +---------+
+: | cBLU    |
+: |         |
+: |    +----+
+: |    |cPNK|
+: |    |    |
+: +----+----+
+: #+end_ditaa
+
+Then export that file to HTML or LaTeX.  You should see an image like
+the following appear in the exported file.
+
+[[file:../images/org-exp-blocks/blue.png]]
+
+
+*** dot
+
+dot is a language for representing structural information as diagrams
+of abstract graphs and networks.  It is part of [[http://www.graphviz.org/][Graphviz]].  To try out
+=org-exp-blocks= dot export install the =dot= shell command on your
+system, copy the following into an org-mode file
+
+: #+begin_dot dot.png -Tpng
+: digraph data_relationships {
+:   "org-mode"
+:   "org-exp-blocks"
+:   "dot"
+:   "ditaa"
+:   "HTML" [shape=Mrecord, label="{HTML|publish on the web\l}"]
+:   "LaTeX" [shape=Mrecord, label="{LaTeX|publish in PDF\l}"]
+:   "org-mode" -> "org-exp-blocks"
+:   "dot" -> "org-exp-blocks"
+:   "ditaa" -> "org-exp-blocks"
+:   "org-exp-blocks" -> "HTML"
+:   "org-exp-blocks" -> LaTeX
+: }
+: #+end_dot
+
+Then export that file to HTML or LaTeX.  You should see an image like
+the following appear in the exported file.
+
+[[file:../images/org-exp-blocks/dot.png]]
+
+
+** Loading it (No surprises here)
+The easiest way is by 
+
+	M-x customize-apropos org-modules
+
+Check the line for exp-blocks.  This will cause it to be loaded every
+time you start org-mode.
+
+You'll still have to load it manually the first time.
+
+Of course, you can also just try it out by loading it manually.
+
+If you prefer to manually customize your emacs then make sure that the
+path to org's contrib directory is in your load-path and add the
+following to your =.emacs=.
+
+: (require 'org-exp-blocks)
+
+
+** Adding new source-code types
+=org-exp-blocks= is extensible.  If you would like to add a new block
+type code to =org-exp-blocks= you may do so by defining an export
+function for that block which will be called by
+`org-export-blocks-preprocess'.  Then add the block name, and the name
+of the function to the `org-export-blocks' variable.
+
+If you add a new block type, and get it working please share your
+changes with the mailing list.
+
+
+* Credits
+
+=org-exp-blocks= was developed by Eric Schulte with much-appreciated
+help from Carsten Dominik.
