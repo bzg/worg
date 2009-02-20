@@ -108,6 +108,39 @@ Defined in: /org.el/
     The new state (a string with a TODO keyword, or nil) is available in the
     Lisp variable `state'.
 #+end_example
+** =org-blocker-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions that are allowed to block a state change.
+    
+    Each function gets as its single argument a property list, see
+    `org-trigger-hook' for more information about this list.
+    
+    If any of the functions in this hook returns nil, the state change
+    is blocked.
+#+end_example
+** =org-trigger-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions that are triggered by a state change.
+    
+    Each function gets as its single argument a property list with at least
+    the following elements:
+    
+     (:type type-of-change :position pos-at-entry-start
+      :from old-state :to new-state)
+    
+    Depending on the type, more properties may be present.
+    
+    This mechanism is currently implemented for:
+    
+    TODO state changes
+    ------------------
+    :type  todo-state-change
+    :from  previous state (keyword as a string), or nil, or a symbol
+           'todo' or 'done', to indicate the general type of state.
+    :to    new state, like in :from
+#+end_example
 ** =org-after-tags-change-hook=
 Defined in: /org.el/
 #+begin_example
@@ -212,37 +245,47 @@ Defined in: /org.el/
     
         (set-window-configuration org-window-config-before-follow-link)
 #+end_example
-** =org-blocker-hook=
+** =org-todo-setup-filter-hook=
 Defined in: /org.el/
 #+begin_example
-    Hook for functions that are allowed to block a state change.
+    Hook for functions that pre-filter todo specs.
     
-    Each function gets as its single argument a property list, see
-    `org-trigger-hook' for more information about this list.
+    Each function takes a todo spec and returns either `nil' or the spec
+    transformed into canonical form." )
+     
+    (defvar org-todo-get-default-hook nil
+      "Hook for functions that get a default item for todo.
+     
+    Each function takes arguments (NEW-MARK OLD-MARK) and returns either
+    `nil' or a string to be used for the todo mark." )
     
-    If any of the functions in this hook returns nil, the state change
-    is blocked.
-#+end_example
-** =org-trigger-hook=
-Defined in: /org.el/
-#+begin_example
-    Hook for functions that are triggered by a state change.
+    (defvar org-agenda-headline-snapshot-before-repeat)
+    (defun org-todo (&optional arg)
+      "Change the TODO state of an item.
+    The state of an item is given by a keyword at the start of the heading,
+    like
+         *** TODO Write paper
+         *** DONE Call mom
     
-    Each function gets as its single argument a property list with at least
-    the following elements:
+    The different keywords are specified in the variable `org-todo-keywords'.
+    By default the available states are \"TODO\" and \"DONE\".
+    So for this example: when the item starts with TODO, it is changed to DONE.
+    When it starts with DONE, the DONE is removed.  And when neither TODO nor
+    DONE are present, add TODO at the beginning of the heading.
     
-     (:type type-of-change :position pos-at-entry-start
-      :from old-state :to new-state)
+    With C-u prefix arg, use completion to determine the new state.
+    With numeric prefix arg, switch to that state.
+    With a double C-u prefix, switch to the next set of TODO keywords (nextset).
+    With a tripple C-u prefix, circumvent any state blocking.
     
-    Depending on the type, more properties may be present.
-    
-    This mechanism is currently implemented for:
-    
-    TODO state changes
-    ------------------
-    :type  todo-state-change
-    :from  previous state (keyword as a string), or nil
-    :to    new state (keyword as a string), or nil
+    For calling through lisp, arg is also interpreted in the following way:
+    'none             -> empty state
+    \"\"(empty string)  -> switch to empty state
+    'done             -> switch to DONE
+    'nextset          -> switch to the next set of keywords
+    'previousset      -> switch to the previous set of keywords
+    \"WAITING\"         -> switch to the specified keyword, but only if it
+                         really is a member of `org-todo-keywords'.
 #+end_example
 ** =org-after-todo-statistics-hook=
 Defined in: /org.el/
@@ -260,6 +303,71 @@ Defined in: /org.el/
        \"Switch entry to DONE when all subentries are done, to TODO otherwise.\"
        (let (org-log-done org-log-states)   ; turn off logging
          (org-todo (if (= n-not-done 0) \"DONE\" \"TODO\"))))
+#+end_example
+** =org-ctrl-c-ctrl-c-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions attaching themselves to  `C-c C-c'.
+    This can be used to add additional functionality to the C-c C-c key which
+    executes context-dependent commands.
+    Each function will be called with no arguments.  The function must check
+    if the context is appropriate for it to act.  If yes, it should do its
+    thing and then return a non-nil value.  If the context is wrong,
+    just do nothing.
+#+end_example
+** =org-metaleft-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions attaching themselves to `M-left'.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+#+end_example
+** =org-metaright-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions attaching themselves to `M-right'.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+#+end_example
+** =org-metaup-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions attaching themselves to `M-up'.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+#+end_example
+** =org-metadown-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions attaching themselves to `M-down'.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+#+end_example
+** =org-shiftmetaleft-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions attaching themselves to `M-S-left'.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+#+end_example
+** =org-shiftmetaright-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions attaching themselves to `M-S-right'.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+#+end_example
+** =org-shiftmetaup-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions attaching themselves to `M-S-up'.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+#+end_example
+** =org-shiftmetadown-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions attaching themselves to `M-S-down'.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+#+end_example
+** =org-metareturn-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions attaching themselves to `M-RET'.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
 #+end_example
 ** =org-finalize-agenda-hook=
 Defined in: /org-agenda.el/
@@ -375,6 +483,8 @@ Defined in: /org-remember.el/
 #+begin_example
     Hook for the minor `org-remember-mode'.
 #+end_example
+
+
 * Examples for using hooks
 
 Feel free to give example of how do you use these hooks.  Ideas for
