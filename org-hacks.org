@@ -224,46 +224,24 @@ get something like this:
 
 * Reload Org
 
-This function by Bernt Hansen reloads Org's compiled files.  This is
-useful when you update and compile Org often.
+As of Org version 6.23b (released Sunday Feb 22, 2009) there is a new
+function to reload org files.
 
-By default it reloads compiled org files.  If you call it with a prefix
-argument it reloads source files.
+Normally you want to use the compiled files since they are faster.
+If you update your org files you can easily reload them with
 
-#+BEGIN_SRC emacs-lisp
-;; Your org-mode directory
+:M-x org-reload
 
-(setq my-org-mode-git-directory "~/git/org-mode")
+If you run into a bug and want to generate a useful backtrace you can
+reload the source files instead of the compiled files with
 
-(defun org-reload-org (&optional source)
-  "Reload Compiled Org lisp files."
-  (interactive "p")
-  (message "source is %s" source)
-  (if (equal source 4)
-      (setq my-org-files "\\.el\\'")
-    (setq my-org-files "\\.elc\\'"))
-  (mapc (lambda(f) (load (car f)))
-	(directory-files-and-attributes (concat my-org-mode-git-directory "/lisp") t my-org-files)))
-
-(defun org-reload-org nil
-  "Reload Org lisp files."
-  (interactive)
-  (mapc (lambda(f) (load (car f)))
-	(directory-files-and-attributes 
-	  (concat my-org-mode-git-directory "/lisp") t "\\.elc\\'")))
-#+END_SRC
-
-Normally you want to use the compiled files since they are faster. If
-you run into a bug and want to generate a useful backtrace for the maintainer
-you can reload the source files and enter debugger on error with
-
-:C-u M-x org-reload-org
+:C-u M-x org-reload
 
 and turn on the "Enter Debugger On Error" option.  Redo the action
-that generates the error and cut and paste the resulting backtrace
-into an email.  To switch back to the compiled version just reload again with
+that generates the error and cut and paste the resulting backtrace.
+To switch back to the compiled version just reload again with
 
-:M-x org-reload-org
+:M-x org-reload
 
 * Split horizontally for agenda
 
