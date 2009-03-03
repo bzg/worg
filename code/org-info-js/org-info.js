@@ -475,10 +475,13 @@ var org_html_manager = {
     this.runs++;
     this.BODY = document.getElementById("content");
     if(null == this.BODY) {
+      if(5 > this.runs) {
       this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", this.RUN_INTERVAL);
       return;
-    }
-    if(1 ==  this.runs) {
+      } else { // be backward compatible
+        this.BODY = document.getElementsByTagName("body")[0];
+      }}
+    if(! this.WINDOW) {
       this.WINDOW = document.createElement("div");
       if(this.WINDOW_BORDER) this.WINDOW.style.border="1px dashed black";
     }
