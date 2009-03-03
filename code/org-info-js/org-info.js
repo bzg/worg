@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.1.0.1
+ *       org-info.js, v.0.1.0.2
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -1526,7 +1526,7 @@ var org_html_manager = {
           else if(document.documentElement.clientHeight)
             window.scrollBy(0, document.documentElement.clientHeight - 30);
           else
-            window.scrollBy(0, this.BODY.clientHeight - 30);
+            window.scrollBy(0, document.body.clientHeight - 30);
         }
         else if ('V' == s) {
           if(window.innerHeight)
@@ -1534,7 +1534,7 @@ var org_html_manager = {
           else if(document.documentElement.clientHeight)
             window.scrollBy(0, -(document.documentElement.clientHeight - 30));
           else
-            window.scrollBy(0, -(this.BODY.clientHeight - 30));
+            window.scrollBy(0, -(document.body.clientHeight - 30));
         }
         else if ('u' == s) {
           if(this.NODE.parent != this.ROOT) {
