@@ -326,6 +326,7 @@ OrgNode.prototype.setState = function (state)
 var org_html_manager = {
   // Option
   MOUSE_HINT: 0,               // Highlight heading under mouse?
+  BODY:null,                   // The container all the contents live in.
   PLAIN_VIEW: 0,               // We're in plain view mode. On startup:= overview
   CONTENT_VIEW: 1,             // plain view show structure
   ALL_VIEW: 2,                 // plain view show all
@@ -472,6 +473,11 @@ var org_html_manager = {
   init: function ()
   {
     this.runs++;
+    this.BODY = document.getElementById("content");
+    if(null == this.BODY) {
+      this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", this.RUN_INTERVAL);
+      return;
+    }
     if(1 ==  this.runs) {
       this.WINDOW = document.createElement("div");
       if(this.WINDOW_BORDER) this.WINDOW.style.border="1px dashed black";
@@ -508,7 +514,7 @@ var org_html_manager = {
       var pa=document.getElementById('postamble');
       if(pa) this.POSTAMBLE=pa;
       // Temporary FIX for missing P element if skip:nil
-      var b = document.getElementsByTagName('body')[0];
+      var b = this.BODY;
       var n = b.firstChild;
       if(3 == n.nodeType) { // IE has no ....
         var neu = n.cloneNode(true);
@@ -572,7 +578,7 @@ var org_html_manager = {
     this.CONSOLE.style.border = "1px solid #cccccc";
     this.CONSOLE.id = 'org-info-js_console-container';
 
-    document.body.insertBefore(this.CONSOLE, document.body.firstChild);
+    this.BODY.insertBefore(this.CONSOLE, this.BODY.firstChild);
     this.MESSAGING = false;
     this.CONSOLE_LABEL = document.getElementById("org-info-js_console-label");
     this.CONSOLE_INPUT = document.getElementById("org-info-js_console-input");
@@ -612,7 +618,7 @@ var org_html_manager = {
         if(this.FIXED_TOC) {
           heading.setAttribute('onclick', 'org_html_manager.toggleGlobaly();');
           this.ROOT = new OrgNode( null,
-                                   document.body.getElementsByTagName("h1")[0],
+                                   this.BODY.getElementsByTagName("h1")[0],
                                    'javascript:org_html_manager.navigateTo(0);',
                                    0,
                                    null ); // the root node
@@ -625,7 +631,7 @@ var org_html_manager = {
         }
         else {
           this.ROOT = new OrgNode( null,
-                                   document.body.getElementsByTagName("h1")[0],
+                                   this.BODY.getElementsByTagName("h1")[0],
                                    'javascript:org_html_manager.navigateTo(0);',
                                    0,
                                    null ); // the root node
@@ -700,7 +706,7 @@ var org_html_manager = {
     this.build();
     this.NODE = this.SECS[0];
 
-    document.body.insertBefore(this.WINDOW, this.NODE.div);
+    this.BODY.insertBefore(this.WINDOW, this.NODE.div);
 
     return true;
   },
@@ -953,7 +959,7 @@ var org_html_manager = {
         eval("this."+eval_key+"=0;");
     }
   },
-  
+
   convertLinks: function ()
   {
     var i = (this.HIDE_TOC ? 0 : 1);
@@ -1344,7 +1350,7 @@ var org_html_manager = {
     if(!this.MESSAGING) {
       if(this.VIEW == this.PLAIN_VIEW) {
         // Maybe clone the CONSOLE?
-        document.body.removeChild(document.body.firstChild);
+        this.BODY.removeChild(this.BODY.firstChild);
         this.NODE.div.insertBefore(this.CONSOLE, this.NODE.div.firstChild);
         this.NODE.div.scrollIntoView(true);
         this.MESSAGING = this.MESSAGING_INPLACE;
@@ -1366,7 +1372,7 @@ var org_html_manager = {
       this.CONSOLE_INPUT.value = "";
       if(this.MESSAGING_INPLACE == this.MESSAGING) {
         this.NODE.div.removeChild(this.NODE.div.firstChild);
-        document.body.insertBefore(this.CONSOLE, document.body.firstChild);
+        this.BODY.insertBefore(this.CONSOLE, this.BODY.firstChild);
         if(this.NODE.idx != 0) this.NODE.div.scrollIntoView();
       }
       this.MESSAGING = false;
@@ -1514,7 +1520,7 @@ var org_html_manager = {
           else if(document.documentElement.clientHeight)
             window.scrollBy(0, document.documentElement.clientHeight - 30);
           else
-            window.scrollBy(0, document.body.cleintHeight - 30);
+            window.scrollBy(0, this.BODY.clientHeight - 30);
         }
         else if ('V' == s) {
           if(window.innerHeight)
@@ -1522,7 +1528,7 @@ var org_html_manager = {
           else if(document.documentElement.clientHeight)
             window.scrollBy(0, -(document.documentElement.clientHeight - 30));
           else
-            window.scrollBy(0, -(document.body.cleintHeight - 30));
+            window.scrollBy(0, -(this.BODY.clientHeight - 30));
         }
         else if ('u' == s) {
           if(this.NODE.parent != this.ROOT) {
