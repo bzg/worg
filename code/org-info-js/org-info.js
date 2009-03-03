@@ -12,6 +12,9 @@
  *
  *   Org-mode >= 6.12a
  *
+ *   Org-mode > 6.23 (commit a68eb4b1e64cbe6e495fdd2c1eaf8ae597bf8602):
+ *     You'll need at least org-info.js v.0.1.0.1
+ *
  * Usage:
  *
  * Include this scipt into the Header of your HTML-exported org files by
