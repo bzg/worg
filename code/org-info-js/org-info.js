@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.1.0.2
+ *       org-info.js, v.0.1.0.3
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -354,6 +354,7 @@ var org_html_manager = {
   ROOT: null,                  // Root element or our OrgNode tree
   NODE: null,                  // The current node
   TITLE: null,                 // Save the title for hide/show
+  INNER_TITLE: null,           // The cloned title in sec-1.
   LOAD_CHECK: null,            // Saves the setTimeout()'s value
   WINDOW: null,                // A div to display info view mode
   SECS: new Array(),           // The OrgNode tree
@@ -682,7 +683,7 @@ var org_html_manager = {
         if("footnotes"== c[i].className) {
           fnheading=c[i];
           break;}}
-      var sec =  this.SECS.length;
+      var sec = this.SECS.length;
       fnheading.onclick = function() {org_html_manager.fold("" + sec);};
       fnheading.style.cursor = "pointer";
       if(this.MOUSE_HINT) {
@@ -702,9 +703,14 @@ var org_html_manager = {
     // Move the title into the first visible section.
     // TODO: show title above everything if FIXED_TOC !!!
     this.TITLE = document.getElementsByTagName("h1")[0];
-    if(!this.FIXED_TOC && !this.VIEW == this.SLIDE_VIEW) {
-      var title = this.TITLE.cloneNode(true);
-      this.SECS[0].div.insertBefore(title, this.SECS[0].div.firstChild);
+    if(!this.FIXED_TOC && this.VIEW != this.SLIDE_VIEW) {
+      this.INNER_TITLE = this.TITLE.cloneNode(true);
+      /* TODO: this is still based on wrong behaviour of browsers (same id for two elements)
+       * But this here does not work:
+       * this.INNER_TITLE.style = this.TITLE.style;
+       * this.INNER_TITLE.id = "org-info-js-inner-title";
+       */
+      this.SECS[0].div.insertBefore(this.INNER_TITLE, this.SECS[0].div.firstChild);
       OrgNode.hideElement(this.TITLE);
     }
 
@@ -1045,7 +1051,8 @@ var org_html_manager = {
     document.ondblclick = null;
     this.VIEW = this.PLAIN_VIEW;
     OrgNode.hideElement(this.WINDOW);
-    // OrgNode.showElement(this.TITLE);
+    OrgNode.hideElement(this.INNER_TITLE);
+    OrgNode.showElement(this.TITLE);
     // For Opera and accesskeys we have to remove the navigation here to get it
     // working when toggeling back to info view again:
     if(this.WINDOW.firstChild) // might not be set after init
@@ -1070,6 +1077,7 @@ var org_html_manager = {
     if(!this.FIXED_TOC)
       OrgNode.hideElement(this.TITLE);
     OrgNode.showElement(this.WINDOW);
+    OrgNode.showElement(this.INNER_TITLE);
     this.ROOT.hideAllChildren();
     if(this.TOC && !this.FIXED_TOC) OrgNode.hideElement(this.TOC.div);
     if(this.POSTAMBLE) OrgNode.showElement(this.POSTAMBLE);
@@ -1082,6 +1090,7 @@ var org_html_manager = {
     this.VIEW = this.SLIDE_VIEW;
     this.unhighlight_headline(this.NODE.idx);
     OrgNode.hideElement(this.TITLE);
+    OrgNode.hideElement(this.INNER_TITLE);
     if(this.TOC) OrgNode.hideElement(this.TOC.div);
     OrgNode.showElement(this.TITLE);
     OrgNode.showElement(this.WINDOW);
