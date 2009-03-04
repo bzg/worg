@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.1.0.4
+ *       org-info.js, v.0.1.0.5
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -354,7 +354,7 @@ var org_html_manager = {
   ROOT: null,                  // Root element or our OrgNode tree
   NODE: null,                  // The current node
   TITLE: null,                 // Save the title for hide/show
-  INNER_TITLE: null,           // The cloned title in sec-1.
+  INNER_TITLE: false,           // The cloned title in sec-1.
   LOAD_CHECK: null,            // Saves the setTimeout()'s value
   WINDOW: null,                // A div to display info view mode
   SECS: new Array(),           // The OrgNode tree
@@ -448,6 +448,7 @@ var org_html_manager = {
     this.STARTUP_MESSAGE = (this.STARTUP_MESSAGE && this.STARTUP_MESSAGE != "0") ? true : false;
     this.LOCAL_TOC = (this.LOCAL_TOC && this.LOCAL_TOC != "0") ? this.LOCAL_TOC : false;
     this.HIDE_TOC = (this.TOC && this.TOC != "0") ? false : true;
+    this.INNER_TITLE = (this.INNER_TITLE && this.INNER_TITLE != "title_above") ? false : true;
     if(this.FIXED_TOC && this.FIXED_TOC != "0") {
       this.FIXED_TOC = true;
       this.HIDE_TOC = false;
@@ -703,7 +704,7 @@ var org_html_manager = {
     // Move the title into the first visible section.
     // TODO: show title above everything if FIXED_TOC !!!
     this.TITLE = document.getElementsByTagName("h1")[0];
-    if(!this.FIXED_TOC && this.VIEW != this.SLIDE_VIEW) {
+    if(this.INNER_TITLE && !this.FIXED_TOC && this.VIEW != this.SLIDE_VIEW) {
       this.INNER_TITLE = this.TITLE.cloneNode(true);
       /* TODO: this is still based on wrong behaviour of browsers (same id for two elements)
        * But this here does not work:
@@ -955,10 +956,16 @@ var org_html_manager = {
   set: function (eval_key, eval_val)
   {
     if("VIEW" == eval_key) {
+      var pos = eval_val.indexOf('_');
+      if(-1 != pos) {
+        this.INNER_TITLE=eval_val.substr(pos + 1); // might be info_title_above now.
+        eval_val=eval_val.substr(0, pos);
+      }
       var overview = this.PLAIN_VIEW;
       var content = this.CONTENT_VIEW;
       var showall = this.ALL_VIEW;
       var info = this.INFO_VIEW;
+      var info_title_above = this.INFO_VIEW;
       var slide = this.SLIDE_VIEW;
       eval("this."+eval_key+"="+eval_val+";");
     }
@@ -1051,7 +1058,7 @@ var org_html_manager = {
     document.ondblclick = null;
     this.VIEW = this.PLAIN_VIEW;
     OrgNode.hideElement(this.WINDOW);
-    OrgNode.hideElement(this.INNER_TITLE);
+    if(this.INNER_TITLE) OrgNode.hideElement(this.INNER_TITLE);
     OrgNode.showElement(this.TITLE);
     // For Opera and accesskeys we have to remove the navigation here to get it
     // working when toggeling back to info view again:
@@ -1074,7 +1081,7 @@ var org_html_manager = {
     document.ondblclick = null;
     this.VIEW = this.INFO_VIEW;
     this.unhighlight_headline(this.NODE.idx);
-    if(!this.FIXED_TOC) {
+    if(this.INNER_TITLE && !this.FIXED_TOC) {
       OrgNode.showElement(this.INNER_TITLE);
       OrgNode.hideElement(this.TITLE);
     }
@@ -1091,7 +1098,7 @@ var org_html_manager = {
     this.VIEW = this.SLIDE_VIEW;
     this.unhighlight_headline(this.NODE.idx);
     OrgNode.hideElement(this.TITLE);
-    OrgNode.hideElement(this.INNER_TITLE);
+    if(this.INNER_TITLE) OrgNode.hideElement(this.INNER_TITLE);
     if(this.TOC) OrgNode.hideElement(this.TOC.div);
     OrgNode.showElement(this.TITLE);
     OrgNode.showElement(this.WINDOW);
