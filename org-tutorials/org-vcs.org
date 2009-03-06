@@ -1,0 +1,567 @@
+#+TITLE: Putting Your org Files Under Version Control.
+#+AUTHOR: Ian Barton.
+#+EMAIL: ian@manor-farm.org
+#+SEQ_TODO:  TODO DONE
+#+LANGUAGE: en
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    hidestars 
+
+
+* Introduction.
+Since I discovered org mode it has gradually become my "Information
+sink" and most of my life seems to have moved into it. I wanted a
+system that allowed me to move my org files around between different
+computers which was easy to use and kept my files under version control.
+
+I use bzr for my version control, but the system I describe should
+work with any of the distributed VCS systems, such as Mercurial and
+git. Since org mode is maintained in git and many org users are using
+git, I have tried to give examples using both bzr and git.
+
+This isn't intended to be an in depth discussion of version control,
+but more of a quick overview of how you can use a version control
+system with org to keep various computer in sync and as a backup system.
+
+At home I normally work with my org files on an nfs share using one of
+our desktop computers. The org files themselves are stored on my local
+server. They are also automatically mirrored with a repository on my Web
+server each night.
+
+If I go away before I set off, I will update the local branch of my
+org files that I keep on my notebook using bzr. If I forget to update
+my local copy, I can update my notebook repository from my home
+server, or my web server as long as I have an Internet connection.
+
+If I can't connect to the Internet, the org files on my notebook are
+not usually more than 24 hours out of sync with the copy on my
+server. I can carry on working and then merge my changes when I get
+home, or can access the Internet.
+
+* Requirements.
+I am assuming you already have Emacs and org installed. If you are
+using a Debian based system installing git and bzr is simply a matter
+of:
+
+#+BEGIN_SRC emacs-shell
+apt-get install bzr bzrtools
+apt-get git-core  
+#+END_SRC
+
+If you want to push changes to a remote server, you might also want to
+install the ncftp client.
+
+* Getting Started.
+** Creating a Repository.
+  The first step is to create a repository in the directory where you
+  keep your org files:
+#+BEGIN_SRC emacs-shell
+cd ~/Documents/org
+bzr init
+  
+#+END_SRC
+
+If you are using git:
+
+#+BEGIN_SRC emacs-shell
+git init  
+#+END_SRC
+
+*** Excluding Files from the Repository.
+You might have things, such as emacs backup files, in your org
+directory that you don't want included in your VCS. A simple way to
+avoid them being added is to create a .bzrignore file in the org file
+directory:
+
+In my .bzrignore I simply have:
+
+#+BEGIN_SRC emacs-shell
+*~  
+#+END_SRC
+
+With git you  can create a .gitignore file, which has a very similar
+syntax to .bzrignore.
+ 
+** Adding Files to Your Repository.
+Now you need to add your org files to the repository. In the directory
+where you keep you org files:
+
+#+BEGIN_SRC emacs-shell
+bzr add *.org  
+#+END_SRC
+
+For git users:
+
+#+BEGIN_SRC emacs-shell
+git add *.org  
+#+END_SRC
+
+** Committing Changes.
+Once you have added your files to the repository you need to commit
+the changes to update the repository:
+
+#+BEGIN_SRC emacs-shell
+bzr commit -m "Imported sources."  
+#+END_SRC
+
+For git users:
+
+#+BEGIN_SRC emacs-shell
+git commit -a -m "Imported sources."  
+#+END_SRC
+
+Commit makes a snapshot of the working state of the files. You can
+choose to commit changes at any time. There are several Emacs
+packages, which will let you do this directly from Emacs. I also run a
+cron job which commits any changes automatically each evening. The
+shell script I use is:
+
+#+BEGIN_SRC emacs-shell
+#!/bin/sh
+cd ~/Documents/org
+bzr commit -m "automatic commit via cron."  
+#+END_SRC
+
+If you want to commit files selectively, rather than all uncommited
+files, you can specify the file names on the command line:
+
+#+BEGIN_SRC emacs-shell
+bzr commit -m "Made some changes." myfile.org another_file.org  
+#+END_SRC
+
+* Working With Your org Files On More Than One Computer.
+You will probably want to work on your org files on more than one
+computer. The traditional method would be to copy all your org files
+between your various computers. This is error prone and you
+might end up accidentally overwriting new files with older versions.
+
+A better way to synchronise files between your computers is to use
+your version control system. Not only do your org files get updated,
+but you also get their complete version history. The steps you need to
+take to maintain versions of your org files on different computers are
+described below.
+
+Note that there are several methods which you could use, the one I
+describe works for me.
+
+** Creating a Local Branch.
+First create a local copy of your org files by making a branch. You
+can then continue working on your files locally and then use bzr or git to
+merge changes back to your main copy of org when required.
+
+To create an initial working branch on your local computer:
+
+#+BEGIN_SRC emacs-shell
+bzr branch ~nfs/firewall/Documents/org ~/Documents/org  
+#+END_SRC
+
+For git users:
+#+BEGIN_SRC emacs-shell
+  git clone ~nfs/firewall/Documents/org ~/Documents/org
+#+END_SRC
+
+This command creates a local branch on my notebook from the repository
+on my file server. Note that bzr and git will create the directory for
+the branch. If the directory already exists you will get an error.
+
+The general format of the branch command is:
+
+bzr branch location directory
+
+bzr understands a wide variety of transport protocols, which you
+could use to create your initial branch:
+
+|------------+-------------------------------------------------------------|
+| aftp://    | Access using active FTP.                                    |
+| bzr://     | Fast access using the Bazaar smart server.                  |
+| bzr+ssh:// | Fast access using the Bazaar smart server over SSH.         |
+| file://    | Access using the standard filesystem (default)              |
+| ftp://     | Access using passive FTP.                                   |
+| http://    | Read-only access of branches exported on the web.           |
+| https://   | Read-only access of branches exported on the web using SSL. |
+| sftp://    | Access using SFTP (most SSH servers provide SFTP).          |
+|------------+-------------------------------------------------------------|
+
+You now have a complete copy of your org files from the file server
+and their version history in ~/Documents/org. You can simply fire up
+Emacs and work on the org files in that directory.
+
+If you use git the syntax is very similar. This example uses ssh:
+
+git clone url directory
+
+git clone ssh://ian@mycomputer.co.uk/~/Documents/org ~/Documents/org
+
+At any point you can commit your changes to the local repository using
+the commit command:
+
+#+BEGIN_SRC emacs-shell
+  bzr commit -m "Committing changes made on my notebook."
+#+END_SRC
+
+** Merging Changes from a Local Branch to Your Server.
+When you return back home or to the office, you will probably want to
+update the copy of org on your local server from your notebook:
+
+- First you need to commit any local changes that you have made. 
+
+- Next you need to use the push command to send your changes back to
+the server. The basic command is:
+
+#+BEGIN_SRC emacs-shell
+  bzr push  
+#+END_SRC
+
+If you don't specify a destination location the push is made to the
+branch that this branch originated from. If you are the only person
+working with your org files, the push should update your remote copy
+without requiring any further action. If there are any conflicts take
+a look at the bzr manual on Resolving Conflicts for more information
+on how to fix the conflicts.
+
+Note that once the push has completed the it needs to be
+committed on the server to update your working tree:
+
+#+BEGIN_SRC emacs-shell
+cd ~/nfs/firewall/Documents/org
+bzr commit -m "Merged changes from my notebook."  
+#+END_SRC
+
+Up to the point of committing the merge you can choose to throw away
+any changes by using the revert option in bzr.
+
+Git uses the same command:
+
+#+BEGIN_SRC emacs-shell
+git push 
+#+END_SRC
+
+Unlike bzr, git will auto commit changes after a merge. If you don't
+like this behaviour use the --no-commit option to make it behave like
+bzr.
+
+** Updating an Existing Branch of Your org Files.
+Once you have a local branch on your computer, you can update it from
+your server at any time using the following command:
+
+#+BEGIN_SRC emacs-shell
+bzr pull  
+#+END_SRC
+
+By default pull uses the location where you originally branched
+from. this will pull any changes from the remote location and merge
+them with your local copy.
+
+The command with git is the same
+
+#+BEGIN_SRC emacs-shell
+git pull   
+#+END_SRC
+
+* Creating a Central Repository.
+In order to give your system maximum resilience you may want to create
+a central repository somewhere off site that is accessible from the
+Internet. Using an off site server will also increase your backup
+karma.
+
+Typically you will only want to store history and not working copies
+of your files in your central repository. So you can create the repository with the
+no-trees option:
+
+#+BEGIN_SRC emacs-shell
+bzr init-repo --no-trees sftp://myserver.com/bzr/myrepo  
+#+END_SRC
+
+You can now use bzr to push your local branch to the central
+repository:
+
+#+BEGIN_SRC emacs-shell
+cd ~/Documents/org
+bzr push sftp://myserver.com/bzr/myrepo/org-files  
+#+END_SRC
+
+Git is a bit more complicated. See http://www.netsplit.com/?p=192 for
+a laconic view of the problems. The first time you want to push your
+changes to a remote server you need to create the bare repository on
+the remote server:
+
+#+BEGIN_SRC emacs-shell
+  git clone --bare . ssh://myserver.com/git-repo/org.git
+#+END_SRC
+
+Once you have created the remote repo, you should be able to push
+subsequent changes using:
+
+#+BEGIN_SRC emacs-shell
+  git-push push origin master
+#+END_SRC
+** Using a USB Stick as a Central Repository.
+You can create a central repository on a USB stick. You might want to
+do this if you take files between your home and work computers and
+can't use the internet to synchronize your files because there is a
+firewall in the way.
+
+There are some special considerations required when using a usb stick:
+
+- You need to specify that you can used mixed case in filenames, or
+  you will have problems creating names like HEAD with git. Note this
+  is only a problem with usb sticks formatted as FAT or VFAT.
+
+If you are using the gnome desktop fire up gconf-editor and navigate to
+system->storage->default_options->vfat. Edit the key "mount_options"
+and change its value to [shortname=mixed,uid=].
+
+This option is the default with recent versions of Ubuntu such as
+Intrepid.
+
+*** Creating the Repository on the USB Stick.
+Using bzr to create a bare repository:
+
+#+BEGIN_SRC emacs-shell
+bzr init-repo --no-trees /media/disk/bzr-repo    
+#+END_SRC
+
+Now populate the repository with your org files:
+
+#+BEGIN_SRC emacs-shell
+  bzr push file:///media/disk/bzr-repo
+#+END_SRC
+
+Using git the comand is:
+
+#+BEGIN_SRC emacs-shell
+  git clone --bare ~/Documents/org /media/disk/org.git
+#+END_SRC
+
+Once you have made the initial push you can sync your changes to the
+usb stick like this:
+
+#+BEGIN_SRC emacs-shell
+  cd ~/Documents/org
+
+  # bzr will default to using the saved initial location,
+  # so you don't need to specify a location. 
+  bzr-push
+#+END_SRC
+
+#+BEGIN_SRC emacs-shell
+  git push origin master
+#+END_SRC
+
+The git example assumes that the remote on the usb stick is named
+"origin" (the default) and the branch that you want to push from is
+named "master" (the default).
+
+*** Getting Your org Files from the USB Stick.
+To get your org files from the usb stick on another computer for the
+first time.
+
+With bzr:
+
+#+BEGIN_SRC emacs-shell
+  bzr branch /media/usbdisk/bzr-repo ~/Documents/org
+#+END_SRC
+With git:
+
+#+BEGIN_SRC emacs-shell
+  git clone /media/disk/org.git ~/Documents/org
+#+END_SRC
+
+In subsequent sessions, once the local repository has been populated,
+you should use the "pull" command.
+
+*** Getting Your Local Changes onto the USB Stick.
+When you have finished working on your local org files you need to
+commit your changes to the local repository:
+
+#+BEGIN_SRC emacs-shell
+  bzr commit -m "Commit before push to usb stick."
+#+END_SRC
+
+#+BEGIN_SRC emacs-shell
+  git commit -m "Commit before push to usb stick."
+#+END_SRC
+
+To update the repo on your USB stick you need to push your changes:
+
+#+BEGIN_SRC emacs-shell
+  bzr push
+#+END_SRC
+
+#+BEGIN_SRC emacs-shell
+  git push
+#+END_SRC
+*** Day to Day Use.
+Assuming that you have sucessfully set up a repo on your usb stick and
+have repos on your work and home computers your work flow would look
+something like:
+
+Home.
+Edit your org files
+Commit your changes (bzr commit)
+Push the changes to your usb stick (bzr push)
+
+Work.
+- Plug in your usb stick.
+- Get the changes - bzr pull
+- Work on your files in Emacs.
+- Commit the changes you made - bzr commit -m "Commit before push to usb
+stick."
+- Push your changes to the usb stick - bzr push
+- Unplug the usb stick and go home.
+** Update the Local Branch on Your Notebook from the Central Repository.
+Sometimes you might want to update your local branch from your central
+repository, rather than from your local server. One reason for wanting
+to do this is if you are away from home and your local computer's
+branch is quite out of date. If you automatically update your central
+repository daily from a cron script, the files on there should never
+be more than one day old, so if you have an Internet connection you
+can get a more recent version of your files from the central repository.
+
+The pull command will do this, but you need to specify the location on
+the command line:
+
+#+BEGIN_SRC emacs-shell
+bzr pull sftp://myserver.co.uk/my_repo/org  
+#+END_SRC
+   
+* Day to Day Usage.
+I have three different scenarios for using my system:
+
+** Working at Home.
+My org files are on my home server in a directory accessible via
+nfs. I can either load my files via an nfs share, or run Emacs in a
+terminal on the file server.
+
+** Away from Home.
+Update the files on my laptop before I leave:
+
+#+BEGIN_SRC emacs-shell
+  cd ~/Documents/org
+  bzr pull
+#+END_SRC
+
+Launch Emacs using a different .emacs, which has its org configuration
+set to point to the files on my local hard disk, rather than the nfs
+share.
+
+When I get back home I can update the files on my server by doing a
+
+#+BEGIN_SRC emacs-shell
+cd ~/Documents/org
+bzr push  
+#+END_SRC
+
+Note that push updates the repository, but not the working copy of the
+files. To update the working copy on your server you need to run bzr
+update. Alternatively, you can use the Push and Update plugin from
+https://launchpad.net/bzr-push-and-update , which automates this
+process for you.
+
+You can set up anacron to update the org files on your laptop when you
+startup, or shutdown which keeps the files on your local hard drive up
+to date in most circumstances.
+
+** Away from Home and I Forgot to Update My Files Before Leaving.
+If the files on my laptop aren't up to date, I can use bzr to pull a
+copy from my web server via my mobile phone. If I can't get a signal,
+or find a wifi hotspot, the files on my laptop shouldn't be more than
+24 hrs out of date. I can just work on my local copy and merge the
+changes when I get back home.
+
+* Conclusion.
+So far my system has proved quite robust. it's also useful having the full version
+history of my org files on each computer.
+* Further Information.
+You can find out more about bzr at:
+http://doc.bazaar-vcs.org/bzr.dev/en/user-reference/bzr_man.html and
+http://doc.bazaar-vcs.org/latest/en/mini-tutorial/index.html .
+
+Git's home page can be found at: http://git.or.cz/
+
+** Useful bzr Plugins.
+| rspush     | http://bazaar-vcs.org/BzrPushExample | Pushes changes using rsync. Useful if your collection of files is very large. |
+| fastimport | https://launchpad.net/bzr-fastimport | Import exports streams to bzr repositories.                                   |
+| automirror | https://launchpad.net/bzr-automirror | Automatically mirror the project's current state to another branch.           |
+
+** Moving Data Between bzr and git.
+While I was writing this tutorial I needed to move my data between my
+bzr repository and a git repository, so I could test out the various
+git commands. In the process I learnt quite a bit about moving data
+between bzr and git, which I thought I would record here in case
+someone finds it useful.
+
+*** Moving Your Data from bzr to git.
+Like most things this is easy once you know how. You need the bzr
+fast-import plugin. You can get this from
+https://launchpad.net/bzr-fastimport . Note that although the plugin
+is named fastimport it does fast exporting too!
+
+First you need to create an empty git repo:
+
+#+BEGIN_SRC emacs-shell
+  mkdir ~/devel/org-git
+  cd ~/devel/org-git
+  git init
+#+END_SRC
+
+Now import your bzr repo into the empty git repo:
+
+#+BEGIN_SRC emacs-shell
+  bzr fast-export --export-marks=.git/bzr.mark ~/Documents/org/.bzr | git-fast-import --export-marks=.git/git.mark
+#+END_SRC
+
+If all goes well all your revisions will be imported into the git
+repo. To start working on your org files you first need to check them
+out:
+
+#+BEGIN_SRC emacs-shell
+  git checkout master
+#+END_SRC
+
+You should also be able to import new bzr changes incrementally into
+git:
+
+#+BEGIN_SRC emacs-shell
+  bzr fast-export --import-marks=.git/bzr.mark --export-marks=.git/bzr.mark ~/Documents/org.bzr/trunk | git fast-import --import-marks=.git/git.mark --export-marks=.git/git.mark
+#+END_SRC
+
+*** Moving Data from git to bzr.
+You can also move your data from a git repository to a bzr one. As
+above you will need to install the bzr fastimport plugin. The
+procedure is based on the one described in the bzr documentation: http://bazaar-vcs.org/Scenarios/ConvertFromGit
+
+Create an empty bzr repository:
+
+#+BEGIN_SRC emacs-shell
+  bzr init-repo bzr-org
+#+END_SRC
+
+Now use git's fast-export to export all the brnaches and pipe the
+output to bzr's fast-import.
+
+#+BEGIN_SRC emacs-shell
+  $ git fast-export -M --all | (cd bzr-org; bzr fast-import -)
+#+END_SRC
+
+Using git fast-export's -M flag embeds git's inferred filenames into
+the output. If you don't want this, drop the -M flag.
+** Git Screencasts.
+I find screencasts a good way of learning things. Unfortunately there
+don't seem to be any for bzr at the time of writing. However, there
+are several excellent ones for git:
+
+- Linus (author of git) on Git:
+http://video.google.com/videoplay?docid=-2199332044603874737
+
+- Randal Schwartz on Git:
+  http://video.google.com/videoplay?docid=-3999952944619245780
+
+Randal's screencast gives an excellent overview of git, without
+getting too bogged down in the details.
+
+- Gitcasts:
+  http://video.google.com/videoplay?docid=-3999952944619245780
+
+Gitcasts are a series of short screencasts (approximately 5 mins),
+each covering a particular aspect of git.
+
