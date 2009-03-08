@@ -1,0 +1,59 @@
+#+TITLE:   org-checklist.el --- org functions for checklist handling
+#+OPTIONS: ^:{} author:nil
+#+STARTUP: odd
+
+* General
+
+  =org-checklist= provides two actions which can be triggered when a task is
+  marked done. These are:
+
+  1) Clearing the state of all checkboxes in the task.
+
+  2) Creating, and optionally printing, a file containing a copy of the task
+     with all items in the checked state removed.
+
+* How to use it
+
+** Quick example
+
+   Load =org-checklist= as described in the [[* Loading it][next section]]. You will then need to
+   create a recurring task.
+
+: * Morning routine
+:   SCHEDULED: <2009-02-19 Thu 08:00 +1d>
+:   - [ ] Shower
+:   - [ ] Brush teeth
+:   - [ ] Get dressed
+:   - [ ] Eat breakfast
+:   - [ ] Check email
+
+   Then add the property =RESET_CHECKBOXES= with a value of =t=. When the item
+   is marked done,
+
+** Loading it
+
+   =org-checklist= requires =a2ps=.
+
+   Ensure the org contrib directory is in =load-path= and add =(require
+   'org-checklist)= to your =.emacs=.
+
+** Configurable options
+
+   =org-checklist= has four main configurable options:
+
+   - =org-checklist-time-format= :: the format of the timestamp added to the
+     export file. See =format-time-string= for valid % escapes.
+
+   - =org-checklist-export-function= :: org export function to use to create the
+     printable version of the export file. Any of the org export functions will
+     work. The default is =org-export-as-ascii=.
+
+   - =org-checklist-export-params= :: parameters for the export function. See
+     the docs for the exporter you are using for useful values.
+
+   - =org-checklist-a2ps-params= :: parameters for a2ps-print. If you choose to
+     print the exported file, these parameters will be used in place of a2ps-switches.
+
+* Credits
+
+  =org-checklist= was written by James TD Smith
