@@ -1,0 +1,116 @@
+#+TITLE:     org-depend.el -- TODO dependencies for Org-mode
+#+OPTIONS:   ^:{} author:nil
+#+STARTUP: odd
+
+* General 
+
+/org-depend.el/ demonstrates a mechanism for creating TODO
+dependencies.  Note that Org-mode does already have [[http://orgmode.org/manual/TODO-dependencies.html#TODO-dependencies][built-in local
+dependencies]] which are simpler and cover most of what one usually
+wants to do.  However, the built-in implementation covers only the
+following two concepts:
+
+- blocking an entry from changing its state to DONE while it still has
+  children that are not done, or checkboxes that are unchecked
+- blocking an entry from changing its state to DONE while it still has
+  un-done siblings above it, in this way enforcing sequential work on
+  the siblings
+
+/org-depend.el/ was originally a proof-of-concept implementation of
+TODO dependencies, using two special hooks, =org-blocker-hook= and
+=org-trigger-hook=.  It remains in the distribution as an example on
+how more complex dependencies between entries can be implemented.  In
+particular it shows how to implement the following:
+
+1. Dependencies on remote entries identified by ID.  These entries do
+   not have to be near-by and may even be located in a different file.
+2. The possibility to /trigger/ actions in other entries.
+
+* What i implemented?
+
+** Triggering
+
+1) If an entry contains a TRIGGER property that contains the string
+   =chain-siblings(KEYWORD)=, then switching that entry to DONE does
+   do the following:
+   - The sibling following this entry switched to todo-state KEYWORD.
+   - The sibling also gets a TRIGGER property =chain-sibling(KEYWORD)=,
+     property, to make sure that, when *it* is DONE, the chain will
+     continue.
+
+2) If an entry contains a TRIGGER property that contains the string
+   =chain-siblings-scheduled=, then switching that entry to DONE does
+   the following actions, similarly to =chain-siblings(KEYWORD)=:
+   - The sibling receives the same scheduled time as the entry
+     marked as DONE (or, in the case, in which there is no scheduled
+     time, the sibling does not get any either).
+   - The sibling also gets the same TRIGGER property
+     =chain-siblings-scheduled=, so the chain can continue.
+
+3) If the TRIGGER property contains any other words like
+   =XYZ(KEYWORD)=, these are treated as entry IDs with keywords.
+   That means, Org-mode will search for an entry with the ID property
+   XYZ and switch that entry to KEYWORD as well.
+
+** Blocking
+
+1) If an entry contains a BLOCKER property that contains the word
+   =previous-sibling=, the sibling above the current entry is
+   checked when you try to mark it DONE.  If it is still in a TODO
+   state, the current state change is blocked.
+
+2) If the BLOCKER property contains any other words, these are
+   treated as entry IDs.  That means, Org-mode will search for an
+   entry with the ID property exactly equal to this word.  If any
+   of these entries is not yet marked DONE, the current state change
+   will be blocked.
+
+3) Whenever a state change is blocked, an org-mark is pushed, so that
+   you can find the offending entry with =C-c &=.
+
+* Example
+
+When trying this example, make sure that the settings for TODO keywords
+have been activated, i.e. include the following line and press C-c C-c
+on the line before working with the example:
+
+#+begin_src 
+#+TYP_TODO: TODO NEXT | DONE
+#+end_src
+
+OK, here is the example.
+
+#+begin_src org
+,* TODO Win a million in Las Vegas
+,  The "third" TODO (see above) cannot become a TODO without this money.
+
+,  :PROPERTIES:
+,    :ID: I-cannot-do-it-without-money
+,  :END:
+
+,* Do this by doing a chain of TODOs
+,** NEXT This is the first in this chain
+,   :PROPERTIES:
+,     :TRIGGER: chain-siblings(NEXT)
+,   :END:
+, 
+,** This is the second in this chain
+
+,** This is the third in this chain
+,   :PROPERTIES:
+,     :BLOCKER: I-cannot-do-it-without-money
+,   :END:
+
+,** This is the forth in this chain
+,   When this is DONE, we will also trigger entry XYZ-is-my-id
+,   :PROPERTIES:
+,     :TRIGGER: XYZ-is-my-id(TODO)
+,   :END:
+
+,** This is the fifth in this chain
+, 
+,* Start writing report
+,   :PROPERTIES:
+,     :ID: XYZ-is-my-id
+,   :END:
+#+end_src
