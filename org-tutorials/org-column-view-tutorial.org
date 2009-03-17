@@ -35,7 +35,7 @@ properties. The first highlighted line of the buffer briefly tells you
 what property is displayed in each columns.  In this screenshot it
 reads:
 
-:ITEM for the headline title) 
+: ITEM for the headline title) 
 :   T for the TODO keyword  
 :   P for the priority cookie
 :   T for the tags
@@ -47,7 +47,7 @@ your own.
 This default setup is driven by the variable
 =org-columns-default-format=, which global value is:
 
-:#+COLUMNS: %25ITEM %TODO %3PRIORITY %TAGS
+: #+COLUMNS: %25ITEM %TODO %3PRIORITY %TAGS
 
 | Element    | Description                                     |
 |------------+-------------------------------------------------|
@@ -63,7 +63,7 @@ Okay, so now we're like to customize the column display.
 For example, we'd like to change the /width/ of the "priority" field and
 the "tags" field in the column:
 
-:#+COLUMNS: %25ITEM %5TODO %1PRIORITY %10TAGS
+: #+COLUMNS: %25ITEM %5TODO %1PRIORITY %10TAGS
 
 [[file:../images/org-col-default-customized-view1.png][file:../images/thumbs/org-col-default-customized-view1.png]]
 
@@ -75,7 +75,7 @@ Now we'd like to change the /title/ of the columns.  For example -- and
 since we are such *hardworkers* -- each so-called item is in fact... a
 "task" :
 
-:#+COLUMNS: %25ITEM(Task) %5TODO(To-do) %1PRIORITY %10TAGS
+: #+COLUMNS: %25ITEM(Task) %5TODO(To-do) %1PRIORITY %10TAGS
 
 [[file:../images/org-col-default-customized-view2.png][file:../images/thumbs/org-col-default-customized-view2.png]]
 
@@ -88,25 +88,25 @@ What if you want to display *other properties* in the column view? For
 example, we'd like to display the =SCHEDULED= property. Then we need to
 redefine the global #+COLUMNS option like this:
 
-:#+COLUMNS: %30ITEM %10SCHEDULED %TODO %3PRIORITY %TAGS
+: #+COLUMNS: %30ITEM %10SCHEDULED %TODO %3PRIORITY %TAGS
 
-Refresh your Org buffer to take this change into account, then C-c C-x
-C-c again on the entry.  The column now shows the =SCHEDULED= property.
+Refresh your Org buffer to take this change into account, then =C-c C-x
+C-c= again on the entry.  The column now shows the =SCHEDULED= property.
 
 [[file:../images/org-col-default-customized-view3.png][file:../images/thumbs/org-col-default-customized-view3.png]]
 
-:** Exemple of outline item with a SCHEDULED property
-:   SCHEDULED: <2007-10-14 dim>
+: ** Exemple of outline item with a SCHEDULED property
+:    SCHEDULED: <2007-10-14 dim>
 
 What is the list of available properties?  Here it is:
 
-:ITEM         The content of the headline.
-:TODO         The TODO keyword of the entry.
-:TAGS         The tags defined directly in the headline.
-:ALLTAGS      All tags, including inherited ones.
-:PRIORITY     The priority of the entry, a string with a single letter.
-:DEADLINE     The deadline time string, without the angular brackets.
-:SCHEDULED    The scheduling time stamp, without the angular brackets.
+: ITEM         The content of the headline.
+: TODO         The TODO keyword of the entry.
+: TAGS         The tags defined directly in the headline.
+: ALLTAGS      All tags, including inherited ones.
+: PRIORITY     The priority of the entry, a string with a single letter.
+: DEADLINE     The deadline time string, without the angular brackets.
+: SCHEDULED    The scheduling time stamp, without the angular brackets.
 
 These are all *special properties*, but of course you can define your
 own properties.
@@ -120,23 +120,23 @@ different subtrees.
 To define a colum view for a specific item, just add the special
 property =:COLUMNS:= to it:
 
-:** Top node for columns view
-:   :PROPERTIES:
-:   :COLUMNS:  %25ITEM %TAGS %PRIORITY %TODO
-:   :END:
+: ** Top node for columns view
+:    :PROPERTIES:
+:    :COLUMNS:  %25ITEM %TAGS %PRIORITY %TODO
+:    :END:
 
 This view will be used for the entry and its entire subtree -- unless
 some of its children has its own column view.
 
 See for example this:
 
-:** Top node for columns view
-:   :PROPERTIES:
-:   :COLUMNS: %25ITEM %TAGS %PRIORITY %TODO
-:   :END:
-:*** TODO Example 1
-:*** TODO Example 2
-:*** DONE Example 3
+: ** Top node for columns view
+:    :PROPERTIES:
+:    :COLUMNS: %25ITEM %TAGS %PRIORITY %TODO
+:    :END:
+: *** TODO Example 1
+: *** TODO Example 2
+: *** DONE Example 3
 
 [[file:../images/org-col-default-customized-view4.png][file:../images/thumbs/org-col-default-customized-view4.png]]
 
@@ -159,10 +159,10 @@ it's time to play with user-defined properties.
 
 Let's define a new entry with its own column view and a few properties:
 
-:** My project 
-:   :PROPERTIES:
-:   :COLUMNS:  %20ITEM %9Approved(Approved?){X} %Owner %11Status %10Time_Spent{:}
-:   :END:
+: ** My project 
+:    :PROPERTIES:
+:    :COLUMNS:  %20ITEM %9Approved(Approved?){X} %Owner %11Status %10Time_Spent{:}
+:    :END:
 
 [[file:../images/org-col-default-customized-view5.png][file:../images/thumbs/org-col-default-customized-view5.png]]
 
@@ -207,17 +207,17 @@ status like "In progress" "Not started yet" "Finished".
 You can restrict the allowed values for any property using the =_ALL=
 suffix like this:
 
-:** My project 
-:   :PROPERTIES:
-:   :COLUMNS:  %20ITEM %9Approved(Approved?){X} %Owner %11Status %10Time_Spent{:}
-:   :Owner_ALL:    Tammy Mark Karl Lisa Don
-:   :Status_ALL:   "In progress" "Not started yet" "Finished" ""
-:   :Approved_ALL: "[ ]" "[X]"
-:   :END:
+: ** My project 
+:    :PROPERTIES:
+:    :COLUMNS:  %20ITEM %9Approved(Approved?){X} %Owner %11Status %10Time_Spent{:}
+:    :Owner_ALL:    Tammy Mark Karl Lisa Don
+:    :Status_ALL:   "In progress" "Not started yet" "Finished" ""
+:    :Approved_ALL: "[ ]" "[X]"
+:    :END:
 
-:| Owner_ALL    | only accept Tammy Mark Karl Lisa Don                   |
-:| Status_ALL   | only accept "In progress" "Not started yet" "Finished" |
-:| Approved_ALL | only accept "[ ]" "[X]"                                |
+: | Owner_ALL    | only accept Tammy Mark Karl Lisa Don                   |
+: | Status_ALL   | only accept "In progress" "Not started yet" "Finished" |
+: | Approved_ALL | only accept "[ ]" "[X]"                                |
 
 Note: =*_ALL= properties are meta-properties, defining rules on how to
 use the properties themselves.
@@ -231,34 +231,34 @@ current set of allowed values and you will be able to edit it.
 Here is a example on how the column view affect the display of an entry
 and its subtree.  Take it and test it.
 
-:** My project 
-:   :PROPERTIES:
-:   :COLUMNS:  %20ITEM %9Approved(Approved?){X} %Owner %11Status %10Time_Spent{:}
-:   :Owner_ALL:    Tammy Mark Karl Lisa Don
-:   :Status_ALL:   "In progress" "Not started yet" "Finished" ""
-:   :Approved_ALL: "[ ]" "[X]"
-:   :END:
-:
-:*** Item 1
+: ** My project 
 :    :PROPERTIES:
-:    :Owner:    Tammy
-:    :Time_spent:   1:45
-:    :Status:   Finished
+:    :COLUMNS:  %20ITEM %9Approved(Approved?){X} %Owner %11Status %10Time_Spent{:}
+:    :Owner_ALL:    Tammy Mark Karl Lisa Don
+:    :Status_ALL:   "In progress" "Not started yet" "Finished" ""
+:    :Approved_ALL: "[ ]" "[X]"
 :    :END:
-:
-:*** Item 2
-:    :PROPERTIES:
-:    :Owner:    Tammy
-:    :Status:   In progress
-:    :Time_spent:   0:15
-:    :END:
-:
-:*** Item 3
-:    :PROPERTIES:
-:    :Owner:    Lisa
-:    :Status:   Not started yet
-:    :Approved: [X]
-:    :END:
+: 
+: *** Item 1
+:     :PROPERTIES:
+:     :Owner:    Tammy
+:     :Time_spent:   1:45
+:     :Status:   Finished
+:     :END:
+: 
+: *** Item 2
+:     :PROPERTIES:
+:     :Owner:    Tammy
+:     :Status:   In progress
+:     :Time_spent:   0:15
+:     :END:
+: 
+: *** Item 3
+:     :PROPERTIES:
+:     :Owner:    Lisa
+:     :Status:   Not started yet
+:     :Approved: [X]
+:     :END:
  
 * Editing properties from the column view
 
@@ -267,21 +267,21 @@ lets you access and edit any property very quickly.
 
 See this:
 
-:** My project 
-:   :PROPERTIES:
-:   :COLUMNS:  %20ITEM %10Approved(Approved?){X} %Owner %11Status %10Time_Spent{:}
-:   :Owner_ALL:    Tammy Mark Karl Lisa Don
-:   :Status_ALL:   "In progress" "Not started yet" "Finished" ""
-:   :Approved_ALL: "[ ]" "[X]"
-:   :END:
+: ** My project 
+:    :PROPERTIES:
+:    :COLUMNS:  %20ITEM %10Approved(Approved?){X} %Owner %11Status %10Time_Spent{:}
+:    :Owner_ALL:    Tammy Mark Karl Lisa Don
+:    :Status_ALL:   "In progress" "Not started yet" "Finished" ""
+:    :Approved_ALL: "[ ]" "[X]"
+:    :END:
 
-Use `v' to display the field value in the minibuffer.
+Use =v= to display the field value in the minibuffer.
 
-Use `e' to interactively select/edit the value.
+Use =e= to interactively select/edit the value.
 
-Use `S-left/right' to cycle through the allowed values in a field.
+Use =S-left/right= to cycle through the allowed values in a field.
 
-Use `a' to edit the allowed values for this property.
+Use =a= to edit the allowed values for this property.
 
 Nice, isn't?
 
@@ -290,8 +290,8 @@ Nice, isn't?
 Okay, that's all for today. But let me drop two last hints to let you
 explore column views further:
 
-- =#1= You can use the column view and cycle through visibility.
-- =#2= The column view also works in agenda buffers.
+1. You can use the column view and cycle through visibility.
+2. The column view also works in agenda buffers.
 
 I guess this is already suggestive enough...
 

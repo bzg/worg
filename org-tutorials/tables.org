@@ -22,14 +22,14 @@ The easiest way to create a table is to directly type the "|" character
 at the beginning of a line, or after any amount of white space.  This
 will put you in the first field of an atomic table.
 
-:| This is the content of the first cell
+: | This is the content of the first cell
 
 Once you've finished editing this cell, you can jump to the next one by
 pressing =TAB=.  Since the row you just started only contains one cell,
 the next cell is really the first cell of the next row.
 
-:| This is the content of the first cell |
-:| < Here I am after pressing TAB        |
+: | This is the content of the first cell |
+: | < Here I am after pressing TAB        |
 
 ** By creating the structure and filling it
 
@@ -37,9 +37,9 @@ You can also create a table from scratch with =C-c |=.  You will be
 asked for the structure of the table, the default being 5x2 (see
 =org-table-default-size=), five columns and two rows:
 
-:|   |   |   |   |   |
-:|---+---+---+---+---|
-:|   |   |   |   |   |
+: |   |   |   |   |   |
+: |---+---+---+---+---|
+: |   |   |   |   |   |
 
 Then you can jump from one field to another with the =TAB= key (jump to
 the /next/ cell) or =S-<TAB>= (jump to the /previous/ cell).  =RET= will
@@ -52,11 +52,11 @@ line.)
 Org provides useful ways of converting a region into a table.  For this,
 select a region and press =C-c |=.  For example, press =C-c |= on this:
 
-:some, comma, separated, values
+: some, comma, separated, values
 
 will automagically produce this:
 
-:| some | comma | separated | values |
+: | some | comma | separated | values |
 
 Usually, this command should be smart enough to guess what is the field
 separator for the region.  If each line of the active region contains a
@@ -66,8 +66,7 @@ separator for the region.  If each line of the active region contains a
 
 - If you want to force TAB as a field separator, press =C-u C-u C-c |=.
 
-- If you want to force a specific number of spaces -- say 3 -- use =C-u
-  3 C-c |=.
+- If you want to force a specific number of spaces -- say 3 -- use =C-u 3 C-c |=.
 
 * Editing the structure of a table
 
@@ -77,23 +76,23 @@ Editing table with Org is pure magic.
 
 Let's say for example that you have this basic table:
 
-:| A | B | C |
-:| 1 | 2 | 3 |
-:| a | b | c |
+: | A | B | C |
+: | 1 | 2 | 3 |
+: | a | b | c |
 
 With the cursor in the A field, pressing =M-<right>= will move the A
 column to the right:
 
-:| B | A | C |
-:| 2 | 1 | 3 |
-:| b | a | c |
+: | B | A | C |
+: | 2 | 1 | 3 |
+: | b | a | c |
 
 With the cursor in the first row, pressing =M-<down>= will move the
 first row down:
 
-:| 1 | 2 | 3 |
-:| A | B | C |
-:| a | b | c |
+: | 1 | 2 | 3 |
+: | A | B | C |
+: | a | b | c |
 
 ** Inserting rows/columns
 
@@ -102,34 +101,34 @@ a new row, instead of moving it.  For example, with the cursor initially
 in the =B= cell, =S-M-<right>= will insert a new column between =A= and
 =B=
 
-:| A |   | B | C |
-:| 1 |   | 2 | 3 |
-:| a |   | b | c |
+: | A |   | B | C |
+: | 1 |   | 2 | 3 |
+: | a |   | b | c |
 
 ... leaving the cursor in the newly created column.
 
 And =S-M-<down>= when cursor is in the first row will insert a new row
 at the beginning of the table:
 
-:|   |   |   |
-:| A | B | C |
-:| 1 | 2 | 3 |
-:| a | b | c |
+: |   |   |   |
+: | A | B | C |
+: | 1 | 2 | 3 |
+: | a | b | c |
 
 * Narrowing the visible part of a column
 
 Sometimes cells can get really wide.  If you want to restrict the width
 visible width of a cell, you need to add a new row to your table.
 
-:| <10>             | <15>                        |
-:| A very wide cell | Another very very wide cell |
+: | <10>             | <15>                        |
+: | A very wide cell | Another very very wide cell |
 
 Pressing =C-c C-c= on this table will update the display so that the
 first and second columns are respectively narrowed to 10 and 15
 characters:
 
-:| <10>     | <15>            |
-:| A very=> | Another very => |
+: | <10>     | <15>            |
+: | A very=> | Another very => |
 
 When columns are narrowed, it might be useful to temporary see the
 content of a cell with =C-c <TAB>= (or =C-u C-c `=) or to edit the
@@ -139,8 +138,8 @@ content in a separate window with =C-c `=.
 
 This table :
 
-:| A | B |
-:| 1 | 2 |
+: | A | B |
+: | 1 | 2 |
 
 will be exported like this:
 
@@ -151,9 +150,9 @@ will be exported like this:
 
 This table :
 
-:| A | B |
-:|---+---|
-:| 1 | 2 |
+: | A | B |
+: |---+---|
+: | 1 | 2 |
 
 will be exported like this:
 
@@ -168,13 +167,13 @@ consider the first line is the table header.
 
 You can group columns like this:
 
-:|   |  N | N^2 | N^3 | N^4 | sqrt(n) | sqrt[4](N) |
-:|---+----+-----+-----+-----+---------+------------|
-:| / | <> |   < |     |   > |       < |          > |
-:| # |  1 |   1 |   1 |   1 |       1 |          1 |
-:| # |  2 |   4 |   8 |  16 |  1.4142 |     1.1892 |
-:| # |  3 |   9 |  27 |  81 |  1.7321 |     1.3161 |
-:|---+----+-----+-----+-----+---------+------------|
+: |   |  N | N^2 | N^3 | N^4 | sqrt(n) | sqrt[4](N) |
+: |---+----+-----+-----+-----+---------+------------|
+: | / | <> |   < |     |   > |       < |          > |
+: | # |  1 |   1 |   1 |   1 |       1 |          1 |
+: | # |  2 |   4 |   8 |  16 |  1.4142 |     1.1892 |
+: | # |  3 |   9 |  27 |  81 |  1.7321 |     1.3161 |
+: |---+----+-----+-----+-----+---------+------------|
 
 Here is the output:
 
