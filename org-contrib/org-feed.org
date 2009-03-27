@@ -1,0 +1,122 @@
+#+TITLE:     org-feed.el -- add RSS feed items to Org files
+#+OPTIONS:   ^:{} author:nil
+#+STARTUP: odd
+
+This module allows to create and change entries in an Org-mode
+file triggered by items in an RSS feed.  The basic functionality is
+geared toward simply adding new items found in a feed as outline nodes
+to an Org file.  Using hooks, arbitrary actions can be triggered for
+new or changed items.
+
+* Example
+
+This module is configured through a single variable, =org-feed-alist=.
+Here is an example, using a notes/tasks feed from reQall.com.
+#+begin_src emacs-lisp
+(setq org-feed-alist
+      '(("ReQall"
+	 "http://www.reqall.com/user/feeds/rss/a1b2c3....."
+	 "~/org/feeds.org" "ReQall Entries")
+#+end_src
+
+With this setup, the command =M-x org-feed-update-all= will
+collect new entries in the feed at the given URL and create
+entries as subheadings under the "ReQall Entries" heading in the
+file "~/org-feeds.org".  Each feed needs to have its own heading.
+
+Besides these standard elements that need to be specified for each
+feed,, keyword-value pairs can set additional options.  For example,
+to de-select transitional entries with a title containing /reQall is
+typing what you said/ you could use the =:filter= argument:
+
+#+begin_src emacs-lisp
+(setq org-feed-alist
+      '(("ReQall"
+	 "http://www.reqall.com/user/feeds/rss/a1b2c3....."
+	 "~/org/feeds.org" "ReQall Entries"
+	 :filter my-reqall-filter)))
+
+(defun my-reqall-filter (e)
+  (if (string-match "reQall is typing what you said"
+		    (plist-get e :title))
+      nil
+    e))
+#+end_src
+
+See the docstring for =org-feed-alist= for more details.
+
+* Keeping track of previously added entries
+
+Since Org allows you to delete, archive, or move outline nodes,
+org-feed.el needs to keep track of which feed items have been handled
+before, so that they will not be handled again.  For this, org-feed.el
+stores information in a special drawer, FEEDSTATUS, under the heading
+that received the input of the feed.  You should add FEEDSTATUS
+to your list of drawers in the files that receive feed input:
+
+#+begin_src org
+,#+DRAWERS: PROPERTIES LOGBOOK FEEDSTATUS
+#+end_src
+
+
+* Detailed description of =org-feed-alist=
+
+Alist specifying RSS feeds that should create inputs for Org.
+Each entry in this list specified an RSS feed tat should be queried
+to create inbox items in Org.  Each entry is a list with the following items:
+
+
+- name     :: a custom name for this feed
+- URL      :: the Feed URL
+- file     :: the target Org file where entries should be listed
+- headline :: the headline under which entries should be listed
+
+Additional arguments can be given using keyword-value pairs.  Many of
+these specify functions that receive one or a list of "entries" as
+their single argument.  An entry is a property list that describes a
+feed item.  The property list has properties for each field in the
+item, for example =:title= for the =<title>= field and =:pubDate= for
+the publication date.  In addition, it contains the following
+properties:
+
+- =:item-full-text= :: the full text in the =<item>= tag
+- =:guid-permalink= :: t when the guid property is a permalink
+
+Here are the keyword-value elements that can be configured
+
+- :filter filter-function :: A function to select interesting entries
+     in the feed.  It gets a single entry as parameter.  It should
+     return the entry if it is relevant, or nil if it is not.
+
+- :template template-string :: The default action on new items in the
+     feed is to add them as children under the headline for the feed.
+     The template describes how the entry should be formatted.  If not
+     given, it defaults to =org-feed-default-template=.
+
+- :formatter formatter-function :: Instead of relying on a template,
+     you may specify a function to format the outline node to be
+     inserted as a child.  This function gets passed a property list
+     describing a single feed item, and it should return a string that
+     is a properly formatted Org outline node of level 1.
+
+- :new-handler function :: If adding new items as children to the
+     outline is not what you want to do with new items, define a
+     handler function that is called with a list of all new items in
+     the feed, each one represented as a property list.  The handler
+     should do what needs to be done, and org-feed will mark all items
+     given to this handler as \"handled\", i.e. they will not be
+     passed to this handler again in future readings of the feed.
+     When the handler is called, point will be at the feed headline.
+
+- :changed-handler function :: This function gets passed a list of all
+     entries that have been handled before, but are now still in the
+     feed and have *changed* since last handled (as evidenced by a
+     different sha1 hash).  When the handler is called, point will be
+     at the feed headline.
+
+* Acknowledgments
+
+/org-feed.el/ is based on ideas by Brad Bozarth who implemented a
+similar mechanism using shell and awk scripts.
+
+
