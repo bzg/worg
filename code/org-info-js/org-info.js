@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.1.0.5
+ *       org-info.js, v.0.1.0.6
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -124,7 +124,7 @@ OrgNode.findTargetsIn = function(safe, container)
 
 OrgNode.hideElement = function (e)
 {
-  if(e) {
+  if(e && e['style']) { // test for e['style'] is just quick fix for error elsewhere (fixed toc and title)
     e.style.display = 'none';
     e.style.visibility = 'hidden';
   }
@@ -132,7 +132,7 @@ OrgNode.hideElement = function (e)
 
 OrgNode.showElement = function (e)
 {
-  if(e) {
+  if(e && e['style']) {
     e.style.display = 'block';
     e.style.visibility = 'visible';
   }
