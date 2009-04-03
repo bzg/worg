@@ -1,7 +1,21 @@
-#+TITLE:     org-protocol.el -- Intercept calls from emacsclient to trigger custom actions
-#+OPTIONS:   ^:{} author:nil
+#+TITLE:   org-protocol.el -- Intercept calls from emacsclient to trigger custom actions
+#+OPTIONS: H:3 num:nil toc:t \n:nil @:t ::t |:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc ^:{} author:nil
 #+STARTUP: odd
-
+#+STYLE:   <script type="text/javascript">
+#+STYLE:   <!--/*--><![CDATA[/*><!--*/
+#+STYLE:   function makeUrl() {
+#+STYLE:     return encodeURIComponent(location.href)+
+#+STYLE:            '/'+encodeURIComponent(document.title)+
+#+STYLE:            '/'+encodeURIComponent(window.getSelection());
+#+STYLE:   }
+#+STYLE:   function storeLink() {
+#+STYLE:     document.location.href='org-protocol://store-link://'+makeUrl();
+#+STYLE:   }
+#+STYLE:   function remember() {
+#+STYLE:     document.location.href='org-protocol://remember://'+makeUrl();
+#+STYLE:   }
+#+STYLE:   /*]]>*///-->
+#+STYLE:   </script>
 
 org-protocol intercepts calls from emacsclient to trigger custom actions without
 external dependencies. Only one protocol has to be configured with your external
@@ -9,7 +23,7 @@ applications or the operating system, to trigger an arbitrary number of custom
 actions. Just register your custom sub-protocol and handler with the variable
 `org-protocol-protocol-alist'.
 
-
+# <<about>>
 * About org-protocol.el
 
   =org-protocol.el= is based on code and ideas from [[file:./org-annotation-helper.org][org-annotation-helper.el]] and
@@ -33,6 +47,7 @@ actions. Just register your custom sub-protocol and handler with the variable
   =org-protocol-projects=.
 
 
+# <<installation>>
 * Installation
 
   - To load org-protocol.el add the following to your =.emacs=:
@@ -101,40 +116,17 @@ REGEDIT4
 #+end_example
 
 # <<test-org-protocol>>
-*** A little testfile
+*** Verify the installation
 
-    Here is a little testfile. Just save it, open it and click the links.
+    After your protocol is registered with your browse/OS, these links here
+    should work. Klick them and see if emacs reacts:
 
-#+begin_src html
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
-   <title>Test: org-protocol</title>
-   <script type="text/javascript">
-   <!--/*--><![CDATA[/*><!--*/
-   function makeUrl() {
-     return encodeURIComponent(location.href)+
-            '/'+encodeURIComponent(document.title)+
-            '/'+encodeURIComponent(window.getSelection());
-   }
-   function storeLink() {
-     document.location.href='org-protocol://store-link://'+makeUrl();
-   }
-   function remember() {
-     document.location.href='org-protocol://remember://'+makeUrl();
-   }
-   /*]]>*///-->
-   </script>
-  </head>
-<body>
+#+begin_html
  <ul>
   <li><a href="javascript:storeLink();">Org store-link</a></li>
   <li><a href="javascript:remember();">Org remember</a></li>
  </ul>
-</body>
-</html>
-#+end_src
+#+end_html
 
 
 # <<default-location>>
@@ -258,6 +250,7 @@ REGEDIT4
     [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][Org-mode manual]].
 
 
+# <<org-protocol-remember>>
 *** Edit published content: =org-protocol-open-source=
 
     This one was designed to help with opening sources for editing when
