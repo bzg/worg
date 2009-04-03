@@ -110,7 +110,7 @@ REGEDIT4
           "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-   <title>Bli</title>
+   <title>Test: org-protocol</title>
    <script type="text/javascript">
    <!--/*--><![CDATA[/*><!--*/
    function makeUrl() {
@@ -137,27 +137,21 @@ REGEDIT4
 #+end_src
 
 
-* The default handler functions
+* Using org-protocol
 
-  The three standard handlers all use a similar scheme. The description here is
-  somewhat browser centric because that's where these handlers will used
-  mostly.
+  To actually use org-protcol add a bookmark to Firefox or opera.
 
-  Here is the URL to use as "/Location/" for browser bookmarks (please remove the
-  line breaks):
+  Here is the URL to use as "/Location/" for browser bookmarks. Just remove the
+  line breaks and replace "=sub-protocol=" with the real sub-protocol to use:
 
   : location.href='org-protocol://sub-protocol://'+
   :       encodeURIComponent(location.href)+'/'+
   :       encodeURIComponent(document.title)+'/'+
   :       encodeURIComponent(window.getSelection())
 
-  This URL could be used for all three standard handlers in
-  =org-protocol.el=. Some of the values will be ignored (e.g. =store-link:/= will
-  use the URL and title only).
-
-  emacsclient compresses double and tripple slashes to one. That's why it
-  doesn't really matter how many slashes succeed the scheme part of the URL,
-  also known as /protocol/.
+  This URL may be used for all three standard handlers in =org-protocol.el=. Some
+  of the values will be ignored (e.g. =store-link:/= will use the URL and title
+  only).
 
 *** Links and bookmarks: =org-protocol-store-link=
 
@@ -173,12 +167,14 @@ REGEDIT4
 [[URL][TITLE]]
 #+end_example
 
-    In addition, =URL= will be pushed on the =kill-ring= for yanking. You will have
-    to encode =URL= and/or =TITLE= if they contain slashes, and probably quote those
-    for the shell.
+    In addition, =URL= will be pushed on the =kill-ring= for yanking ('=C-y='). You
+    will have to encode =URL= and/or =TITLE= if they contain slashes, and probably
+    quote those for the shell.
 
-    If more than two fields of data (seperated by '=/=') are submitted, all but
-    the first two will be discarded.
+    To use this feature, add a bookmark with an arbitrary name (e.g.
+    "/Org: store-link/") and enter this as "=Location=":
+
+    : location.href='org-protocol://store-link://'+encodeURIComponent(location.href)
 
 
 *** Note taking and citations: =org-protocol-remember=
@@ -189,7 +185,17 @@ REGEDIT4
     : emacsclient org-protocol:/remember:/URL/TITLE/BODY
 
     will pop up an /*Remember*/ buffer and fill the template with the data
-    submitted. The result depends on the template used:
+    submitted.
+
+    To use this feature, add a bookmark with an arbitrary name (e.g.
+    "/Org: remember/") and enter this as "=Location=":
+
+    : location.href='org-protocol://remember://'+
+    :       encodeURIComponent(location.href)+'/'+
+    :       encodeURIComponent(document.title)+'/'+
+    :       encodeURIComponent(window.getSelection())
+
+    The result depends on the template used:
 
     | Field | Template-escape filled | Description                                                                   |
     |-------+------------------------+-------------------------------------------------------------------------------|
@@ -225,6 +231,35 @@ REGEDIT4
       Here we choose to use the '=?x=' template:
 
       : emacsclient org-protocol:/remember:/x/URL/TITLE/BODY
+
+      And, again, as bookmark location:
+      : location.href='org-protocol://remember://x/'+
+      :       encodeURIComponent(location.href)+'/'+
+      :       encodeURIComponent(document.title)+'/'+
+      :       encodeURIComponent(window.getSelection())
+
+***** An example remember template
+
+#+begin_src emacs-lisp
+(setq org-remember-templates
+      '((?w "* %^{Title}\n\n  Source: %u, %c\n\n  %i" nil "Notes")))
+#+end_src
+
+      - '=?w=' :: makes this one the default template used for
+                "=org-protocol://remember://=" URLs.
+      - '=c=' :: will be replaced by an Org-link pointing to the location of the
+               page you have been visiting when clicking on the link. The page
+               title will be the links description.
+      - '=%i=' :: will be replaced by the selected text in your browser window if
+                any.
+
+      In addition, you may use the following placeholders in your template:
+
+      | Placeholders  | Replacment                |
+      |---------------+---------------------------|
+      | =%:link=        | URL of the web-page       |
+      | =%:description= | The title of the web-page |
+      | =%:initial %i=  | Selected text.            |
 
 
 *** Edit published content: =org-protocol-open-source=
