@@ -1,0 +1,187 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+TITLE:      Defining custom handlers for use with org-protocol
+#+AUTHOR:     Sebastian Rose
+#+EMAIL:      sebastian_rose gmx de
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg-tutorial
+
+
+org-protocol intercepts calls from emacsclient to trigger custom actions without
+external dependencies. Please refer to [[file:../org-contrib/org-protocol.org][this file]] for the basic setup required.
+
+
+* Defining custom handlers
+
+  To defun a custom org-protocol handler basically means to define two basic
+  elements:
+
+  1. a sub-protocol that triggers the action
+  2. a function that consumes the data (i.e. the part of an URL that follows
+     "=org-protocol://sub-protocol://=")
+
+  To install the custom handler's protocol, we add an entry to
+  =org-protocol-protocol-alist=:
+
+#+begin_src emacs-lisp
+(add-to-list 'org-protocol-protocol-alist
+             '("Hello World"
+               :protocol "hello-world"
+               :function my-hello-world))
+#+end_src
+
+  The =:protocol= property is the sub-protocol, that triggers the action. Note,
+  that names of protcols (or URL schemas) are only allowed to consist of a
+  restricted set of characters. See [[http://www.ietf.org/rfc/rfc1738.txt][rfc1738]], section 2.1.
+
+  The =:function= is an arbitrary function that takes exactly one argument: the
+  string that follows our protocol, found in a filename passed to emacs through
+  emacsclient. All the three standard handlers split and decode that string
+  using a helper function in =org-protocol.el=:
+
+  : org-protocol-split-data (data &optional unhexify separator)
+  You may use different separators for your custom handlers and pass them to
+  =org-protocol-split-data=.
+
+
+
+  Here is a simple definition:
+
+#+begin_src emacs-lisp
+(defun hello-world (data)
+  "Say hello to the world."
+  (message data)
+nil)
+#+end_src
+
+  Now the URL =org-protocol://hello-world://encoded-data= will call our fuction
+  with the string "=encoded-data=". Hence an
+
+  : emacsclient org-protocol://hello-world://encoded-data
+
+  will put "=encoded-data=" into the minibuffer.
+
+
+*** Return values
+
+    Note, that our handler explicitly returns =nil=. This tells =org-protocol= to
+    remove the filename from the list of files passed to the emacs-server. If
+    more than one filename was supplied, all those filenames are searched for
+    protocols. Only filenames without protocolls are passed to the emacs-server
+    as usual.
+
+    Another possible return value is a string. If the string is a valid
+    filename, and if that file can be read, =org-protocol= replaces the original
+    filename with the one returned from the handler.
+
+
+*** Using more than one value
+
+    Passing one argument to our custom handler is nice, but sometimes more
+    parameters are needed. We would have to encode the the data and split it
+    into parts using a separator.
+
+    This is where =org-protocol-split-data= comes into play. It takes a string as
+    its first argument, an optional boolean value to tell if the string should
+    be considered URL-encoded and finally an optional separator. By default, no
+    URL-encoding is assumed and '=/=' is used as the separator.
+
+    The return value is a list of strings. If a non-nil value was supplied as
+    the second argument, each elements of the returned list will be
+    URL-decoded (TODO: take a decoder function).
+
+    This is a rewrite of our handler:
+
+#+begin_src emacs-lisp
+(defun hello-world (data)
+  "Say hello to the world."
+  (let* ((parts (org-protocol-split-data data nil '::my-separator::'))
+         (one (car parts))
+         (two (cadr parts))
+         (three (caddr parts)))
+    ;; ... do something with  one, two and three
+    )
+  nil)
+#+end_src
+
+
+*** Using more than one value /the greedy way/
+
+    Finally, it is possible to define a /greedy/ handler. Basically it will
+    discard _all_ the filenames from the servers list of files that follow the
+    filename that triggered the handler.
+
+    A handler is greedy, if you add the =:greedy= property to
+    =org-protocol-protocol-alist=, regardless of it's return value:
+
+#+begin_src emacs-lisp
+(add-to-list 'org-protocol-protocol-alist
+             '("Greedy"
+               :protocol "greedy"
+               :function my-greedy-handler))
+#+end_src
+
+    The one argument to greedy handlers is the rest of the list of filenames, the
+    one that triggered the handler included. But read on, please.
+
+*** Killing the client
+
+    If your handler uses interactive functions that could be canceld by the user
+    by typing '=C-g=', considere to supply the '=:kill-client=' property when you
+    define the protocol.
+
+    This is what we did for the remember handler:
+
+    : (defconst org-protocol-protocol-alist-default
+    :   '(("org-remember" :protocol "remember"
+    :                     :function org-protocol-remember
+    :                     :kill-client t)
+    :     ... ))
+
+    Otherwise, if the user has an interactive property defined in her remember
+    template, discarding it through '=C-g=' would leed to emacsclient waiting for
+    ever (and the appropriate questions when exiting emacs).
+
+
+*** The list of filenames
+
+    Here I have to admit, that I was lying all the time. emacsclient does not
+    pass a list of filenames to the emacs-server. It's a list of lists. And the
+    list is the list of emacsclient's arguments reversed.
+
+    As an example, the following commandline:
+
+    : emacsclient org-protocol:/greedy:/one two three +15:43
+
+    is passed as
+
+    : ((three . 15 . 42) (two) (org-protocol:/greedy:/one))
+
+    to the emacs-server, where =org-protocol= grabs it and reverses it to make it
+    look like this:
+
+    : ((org-protocol:/greedy:/one) (two) (three . 15 . 42))
+
+    This is now, what our greedy handler will receive as it's only parameter.
+
+    You may set =org-protocol-reverse-list-of-files= to =nil= to inhibit the
+    reversion. But that leads to strange results. In this example, the only
+    filename left would be the one that triggered the actions. That seems not
+    very greedy, and reversing the arguments on the commandline seems
+    unnatural. Note though, that the sequence is not changed for the server.
+
+
+
+* General remarks
+
+  emacsclient compresses double and tripple slashes to one. That's why it
+  doesn't really matter how many slashes succeed the scheme part of the URL,
+  also known as /protocol/.
+
+  This behaviour is the one of the reason, why the slash was choosen as the
+  default separator for data fields. Keeping the slashes is insecure, since some
+  of the data fields could contain slashes themselves, like the title of this
+  page: http://de.selfhtml.org/javascript/index.htm.
