@@ -44,18 +44,47 @@ actions. Just register your custom sub-protocol and handler with the variable
 
 * Browser / system setup
 
+  Windows users proceed to the section [[windows-setup][Windows]].
+
+# <<firefox-setup>>
+*** Firefox
+
   As of March 2009 Firefox users follow the steps documented on
-  http://kb.mozillazine.org/Register_protocol.
+  http://kb.mozillazine.org/Register_protocol. Here is a summary:
+
+  1. Type "=about:config=" into the location bar and press enter.
+  2. Click "/I'll be careful, I promise!/" to continue.
+  3. Right-click on the grid
+  4. Choose "/New/" -> "/String/" from the context menu.
+  5. Enter "=network.protocol-handler.app.org-protocol=" as the properties name.
+  6. Click "/OK/".
+  7. Leave the value blank.
+  8. Next time you try to open a location "=org-protocol://...=" FF will ask you for
+     the program to use. Enter the path to emacsclient.
+
+# <<opera-setup>>
+*** Opera
 
   Opera setup is described here:
   http://www.opera.com/support/kb/view/535/.
 
-  See also the description found in [[file:./org-annotation-helper.org][org-annotation-helper.html]].
+  To set up opera for use with org-protocol, follow these steps:
+
+  1. Choose "/Tools/" -> "/Prefences/" from the menu.
+  2. Select the tab "/Advanced/".
+  3. Choose "/Programs/" from the list on the left.
+  4. Now click the button "/Add/" on the very right.
+  5. In the new dialog window, enter "=org-protocol=" as "/Protocol/", choose the
+     radio button "/Open with other application/" and enter the path to
+     emacsclient.
+
+# <<windows-setup>>
+*** Windows setup
 
   Windows users may register the "=org-protocol=" once for all by adjusting the
   following to their facts, save it as *.reg file and double-click it. This
   worked for me on Windows-XP Professional and the emasc23 from ourcomments.org
-  ([[http://ourcomments.org/cgi-bin/emacsw32-dl-latest.pl]]). I'm no windows user
+  ([[http://ourcomments.org/cgi-bin/emacsw32-dl-latest.pl]]). I'm no Windows user
   though and enhancements are more than welcome (org-mode mailinglist). The
   original file is from http://kb.mozillazine.org/Register_protocol.
 
@@ -65,22 +94,57 @@ REGEDIT4
 [HKEY_CLASSES_ROOT\org-protocol]
 @="URL:Org Protocol"
 "URL Protocol"=""
-
 [HKEY_CLASSES_ROOT\org-protocol\shell]
-
 [HKEY_CLASSES_ROOT\org-protocol\shell\open]
-
 [HKEY_CLASSES_ROOT\org-protocol\shell\open\command]
 @="\"C:\\Programme\\Emacs\\emacs\\bin\\emacsclientw.exe\" \"%1\""
 #+end_example
+
+# <<test-org-protocol>>
+*** A little testfile
+
+    Here is a little testfile. Just save it, open it and clicki the links.
+
+#+begin_src html
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+   <title>Bli</title>
+   <script type="text/javascript">
+   <!--/*--><![CDATA[/*><!--*/
+   function makeUrl() {
+     return encodeURIComponent(location.href)+
+            '/'+encodeURIComponent(document.title)+
+            '/'+encodeURIComponent(window.getSelection());
+   }
+   function storeLink() {
+     document.location.href='org-protocol://store-link://'+makeUrl();
+   }
+   function remember() {
+     document.location.href='org-protocol://remember://'+makeUrl();
+   }
+   /*]]>*///-->
+   </script>
+  </head>
+<body>
+ <ul>
+  <li><a href="javascript:storeLink();">Org store-link</a></li>
+  <li><a href="javascript:remember();">Org remember</a></li>
+ </ul>
+</body>
+</html>
+#+end_src
 
 
 * The default handler functions
 
   The three standard handlers all use a similar scheme. The description here is
   somewhat browser centric because that's where these handlers will used
-  mostly. Here is a general example of an URL that could be used for browser
-  bookmarks (please remove the line breaks):
+  mostly.
+
+  Here is the URL to use as "/Location/" for browser bookmarks (please remove the
+  line breaks):
 
   : location.href='org-protocol://sub-protocol://'+
   :       encodeURIComponent(location.href)+'/'+
@@ -88,14 +152,8 @@ REGEDIT4
   :       encodeURIComponent(window.getSelection())
 
   This URL could be used for all three standard handlers in
-  =org-protocol.el=.
-  While you may use the above bookmark URL for all those three handlers, some of
-  the values will be ignored (e.g. =store-link:/= will use the URL only).
-
-  Note, that we encode all slashes (that's why the JavaScript function
-  =encodeURIComponent()= is used) in the three parts of information we pass to
-  emacs because the slash is the separator used internally (and also the default
-  in =org-protocol-split-data=).
+  =org-protocol.el=. Some of the values will be ignored (e.g. =store-link:/= will
+  use the URL and title only).
 
   emacsclient compresses double and tripple slashes to one. That's why it
   doesn't really matter how many slashes succeed the scheme part of the URL,
