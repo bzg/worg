@@ -137,6 +137,7 @@ REGEDIT4
 #+end_src
 
 
+# <<default-location>>
 * Using org-protocol
 
   To actually use org-protcol add a bookmark to Firefox or opera.
@@ -153,6 +154,8 @@ REGEDIT4
   of the values will be ignored (e.g. =store-link:/= will use the URL and title
   only).
 
+
+# <<org-protocol-store-link>>
 *** Links and bookmarks: =org-protocol-store-link=
 
     =org-store-link= stores an Org-link insertable through =M-x org-insert-link= and
@@ -177,6 +180,7 @@ REGEDIT4
     : location.href='org-protocol://store-link://'+encodeURIComponent(location.href)
 
 
+# <<org-protocol-remember>>
 *** Note taking and citations: =org-protocol-remember=
 
     This one is triggered through the sub-protocol "=remember=" and consumes up to
@@ -195,20 +199,8 @@ REGEDIT4
     :       encodeURIComponent(document.title)+'/'+
     :       encodeURIComponent(window.getSelection())
 
-    The result depends on the template used:
-
-    | Field | Template-escape filled | Description                                                                   |
-    |-------+------------------------+-------------------------------------------------------------------------------|
-    | =URL=   | =%c %x %:link=           | URL part of a link. The last one is the pure =URL=.                             |
-    | =TITLE= | =%c %x %:description=    | Description part of a link. Please use the last one to access =TITLE= only.     |
-    | =BODY=  | =%i=                     | Initial content, =BODY= in this example (e.g. selection in your browser window) |
-
-    As you can see from this table, there is more than one way to use =URL= and
-    =TITLE= because =org-protocol-remember= creates an Org-link from both of them
-    and kills it.
-
-    You may read more about templates and their special escape characters in the
-    [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][Org-mode manual]].
+    The result depends on the template used. See [[example-template][An example remember template]]
+    further down.
 
     Note, that this one, as opposed to the other two standard handlers, does not
     mix with more parameters to emacsclient. All parameters but the
@@ -238,6 +230,7 @@ REGEDIT4
       :       encodeURIComponent(document.title)+'/'+
       :       encodeURIComponent(window.getSelection())
 
+# <<example-template>>
 ***** An example remember template
 
 #+begin_src emacs-lisp
@@ -260,6 +253,9 @@ REGEDIT4
       | =%:link=        | URL of the web-page       |
       | =%:description= | The title of the web-page |
       | =%:initial %i=  | Selected text.            |
+
+    You may read more about templates and their special escape characters in the
+    [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][Org-mode manual]].
 
 
 *** Edit published content: =org-protocol-open-source=
