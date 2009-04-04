@@ -9,6 +9,7 @@
 #+PRIORITIES: A C B
 #+CATEGORY:   worg-tutorial
 
+[[file:index.org][{Back to Worg's tutorial index}]]
 
 org-protocol intercepts calls from emacsclient to trigger custom actions without
 external dependencies. Please refer to [[file:../org-contrib/org-protocol.org][this file]] for the basic setup required.
@@ -46,7 +47,10 @@ external dependencies. Please refer to [[file:../org-contrib/org-protocol.org][t
   emacsclient. All the three standard handlers split and decode that string
   using a helper function in =org-protocol.el=:
 
-  : org-protocol-split-data (data &optional unhexify separator)
+#+begin_src emacs-lisp
+ org-protocol-split-data (data &optional unhexify separator)
+#+end_src
+
   You may use different separators for your custom handlers and pass them to
   =org-protocol-split-data=.
 
@@ -106,7 +110,7 @@ nil)
          (one (car parts))
          (two (cadr parts))
          (three (caddr parts)))
-    ;; ... do something with  one, two and three
+    ;; ... do something with one, two and three
     )
   nil)
 #+end_src
@@ -185,6 +189,6 @@ nil)
   doesn't really matter how many slashes succeed the scheme part of the URL,
   also known as /protocol/.
 
-  This behaviour is the one of the reasons, why the slash was choosen as the
+  This behaviour is the main reasons, why the slash was choosen as the
   default separator for data fields. Keeping the slashes is insecure, since some
   of the data fields could contain double or tripple slashes themselves.
