@@ -1,7 +1,23 @@
-#+TITLE:     org-protocol.el -- Intercept calls from emacsclient to trigger custom actions
-#+OPTIONS:   ^:{} author:nil
+#+TITLE:   org-protocol.el -- Intercept calls from emacsclient to trigger custom actions
+#+OPTIONS: H:3 num:nil toc:t \n:nil @:t ::t |:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc ^:{} author:nil
 #+STARTUP: odd
+#+STYLE:   <script type="text/javascript">
+#+STYLE:   <!--/*--><![CDATA[/*><!--*/
+#+STYLE:   function makeUrl() {
+#+STYLE:     return encodeURIComponent(location.href)+
+#+STYLE:            '/'+encodeURIComponent(document.title)+
+#+STYLE:            '/'+encodeURIComponent(window.getSelection());
+#+STYLE:   }
+#+STYLE:   function storeLink() {
+#+STYLE:     document.location.href='org-protocol://store-link://'+makeUrl();
+#+STYLE:   }
+#+STYLE:   function remember() {
+#+STYLE:     document.location.href='org-protocol://remember://'+makeUrl();
+#+STYLE:   }
+#+STYLE:   /*]]>*///-->
+#+STYLE:   </script>
 
+[[file:index.org][{Back to Worg's contibutions index}]]
 
 org-protocol intercepts calls from emacsclient to trigger custom actions without
 external dependencies. Only one protocol has to be configured with your external
@@ -9,15 +25,14 @@ applications or the operating system, to trigger an arbitrary number of custom
 actions. Just register your custom sub-protocol and handler with the variable
 `org-protocol-protocol-alist'.
 
-
+# <<about>>
 * About org-protocol.el
 
   =org-protocol.el= is based on code and ideas from [[file:./org-annotation-helper.org][org-annotation-helper.el]] and
   =org-browser-url.el=.
 
-  =org-protocol= scanns the list of filenames passed to the emacs-server for
-  "=org-protocol:/sub-protocol:/=" and triggers actions assossiated with
-  =sub-protocol= through the custom variable =org-protocol-protocol-alist=.
+  "=org-protocol:/sub-protocol:/=" triggers actions assossiated with =sub-protocol=
+  through the custom variable =org-protocol-protocol-alist=.
 
   It comes with three predefined handlers:
     - =org-protocol-store-link= ::
@@ -30,11 +45,12 @@ actions. Just register your custom sub-protocol and handler with the variable
       "=open-source=". Maps URLs to local filenames. Use this to open sources of
       already published contents in emacs for editing.
 
-  =org-protocol= helps creating custom handlers and so called
+  =org-protocol= helps creating custom handlers [[file:../org-tutorials/org-protocol-custom-handler.org][(tutorial)]] and so called
   =org-protocol-projects=.
 
 
-* TODO Installation
+# <<installation>>
+* Installation
 
   - To load org-protocol.el add the following to your =.emacs=:
 
@@ -43,153 +59,217 @@ actions. Just register your custom sub-protocol and handler with the variable
     : (require 'org-protocol)
 
 
-* Usage
+* Browser / system setup
+
+  Windows users proceed to the section [[windows-setup][Windows]].
+
+# <<firefox-setup>>
+*** Firefox
 
   As of March 2009 Firefox users follow the steps documented on
-  http://kb.mozillazine.org/Register_protocol.
+  http://kb.mozillazine.org/Register_protocol. Here is a summary:
+
+  1. Type "=about:config=" into the location bar and press enter.
+  2. Click "/I'll be careful, I promise!/" to continue.
+  3. Right-click on the grid
+  4. Choose "/New/" -> "/String/" from the context menu.
+  5. Enter "=network.protocol-handler.app.org-protocol=" as the properties name.
+  6. Click "/OK/".
+  7. Leave the value blank.
+  8. Next time you try to open a location "=org-protocol://...=" FF will ask you for
+     the program to use. Enter the path to emacsclient.
+
+# <<opera-setup>>
+*** Opera
 
   Opera setup is described here:
   http://www.opera.com/support/kb/view/535/.
 
-  See also the description found in [[file:./org-annotation-helper.org][org-annotation-helper.html]].
+  To set up opera for use with org-protocol, follow these steps:
+
+  1. Choose "/Tools/" -> "/Prefences/" from the menu.
+  2. Select the tab "/Advanced/".
+  3. Choose "/Programs/" from the list on the left.
+  4. Now click the button "/Add/" on the very right.
+  5. In the new dialog window, enter "=org-protocol=" as "/Protocol/", choose the
+     radio button "/Open with other application/" and enter the path to
+     emacsclient.
+
+# <<windows-setup>>
+*** Windows setup
 
   Windows users may register the "=org-protocol=" once for all by adjusting the
   following to their facts, save it as *.reg file and double-click it. This
   worked for me on Windows-XP Professional and the emasc23 from ourcomments.org
-  ([[http://ourcomments.org/cgi-bin/emacsw32-dl-latest.pl]]). I'm no windows users
-  though and enhancements are more than welcome (org-mode mailinglist).
+  ([[http://ourcomments.org/cgi-bin/emacsw32-dl-latest.pl]]). I'm no Windows user
+  though and enhancements are more than welcome on the org-mode mailinglist. The
+  original file is from http://kb.mozillazine.org/Register_protocol.
 
 #+begin_example
 REGEDIT4
 
 [HKEY_CLASSES_ROOT\org-protocol]
-@="URL:worglet Protocol"
+@="URL:Org Protocol"
 "URL Protocol"=""
-
 [HKEY_CLASSES_ROOT\org-protocol\shell]
-
 [HKEY_CLASSES_ROOT\org-protocol\shell\open]
-
 [HKEY_CLASSES_ROOT\org-protocol\shell\open\command]
 @="\"C:\\Programme\\Emacs\\emacs\\bin\\emacsclientw.exe\" \"%1\""
 #+end_example
 
-*** TODO gconf
+# <<test-org-protocol>>
+*** Verify the installation
+
+    After your protocol is registered with your browse/OS, these links here
+    should work. Klick them and see if emacs reacts:
+
+#+begin_html
+ <ul>
+  <li><a href="javascript:storeLink();">Org store-link</a></li>
+  <li><a href="javascript:remember();">Org remember (select some text please)</a></li>
+ </ul>
+#+end_html
 
 
-* The default handler functions
+# <<default-location>>
+* Using org-protocol
 
-  The three standard handlers all use a similar scheme. The description here is
-  somewhat browser centric because that's where these handlers will used
-  mostly. Here is a general example of an URL that could be used for browser
-  bookmarks (please remove the line breaks):
+  To actually use org-protcol add a bookmark to Firefox or opera.
+
+  Here is the URL to use as "/Location/" for browser bookmarks. Just remove the
+  line breaks and replace "=sub-protocol=" with the real sub-protocol to use:
 
   : location.href='org-protocol://sub-protocol://'+
   :       encodeURIComponent(location.href)+'/'+
   :       encodeURIComponent(document.title)+'/'+
   :       encodeURIComponent(window.getSelection())
 
-  This URL could be used for all three standard handlers in
-  =org-protocol.el=. The handlers themselves will receive just one parameter:
-  everything following the protocols as one string. All the three standard
-  handlers split and decode that string using a helper function in
-  =org-protocol.el=:
-
-  : org-protocol-split-data (data &optional unhexify separator)
-
-  While you may use the above bookmark URL for all those three handlers, some of
-  the values will be ignored (e.g. =store-link:/= will use the URL only).
-
-  Note, that we encode all slashes (that's why the JavaScript function
-  =encodeURIComponent()= is used) in the three parts of information we pass to
-  emacs because the slash is the separator used internally (and also the default
-  in =org-protocol-split-data=). You may use different separators for your custom
-  handlers and pass them to =org-protocol-split-data=.
-
-  In general it should be enough to hexify '=/=' and '=%=' (if followed by digits).
+  This URL may be used for all three standard handlers in =org-protocol.el=. Some
+  of the values will be ignored (e.g. =store-link:/= will use the URL and title
+  only).
 
 
-*** Links and bookmarks: =org-protocol-store-link=
+# <<org-protocol-store-link>>
+* Links and bookmarks: =org-protocol-store-link=
 
-    =org-store-link= stores an Org-link insertable through =M-x org-insert-link= and
-    pushes the URL found on the =kill-ring= for yanking (=C-y=). The sub-protocol
-    used is "=store-link=":
+  =org-store-link= stores an Org-link insertable through =M-x org-insert-link= and
+  pushes the URL found on the =kill-ring= for yanking (=C-y=). The sub-protocol used
+  is "=store-link=":
 
-    : emacsclient org-protocol:/store-link:/URL/TITLE
+  : emacsclient org-protocol:/store-link:/URL/TITLE
 
-    will store this Org-link:
+  will store this Org-link:
 
 #+begin_example
 [[URL][TITLE]]
 #+end_example
 
-    In addition, =URL= will be pushed on the =kill-ring= for yanking. You will have
-    to encode =URL= and/or =TITLE= if they contain slashes, and probably quote those
-    for the shell.
+  In addition, =URL= will be pushed on the =kill-ring= for yanking ('=C-y='). You will
+  have to encode =URL= and/or =TITLE= if they contain slashes, and probably quote
+  those for the shell.
 
-    If more than two fields of data (seperated by '=/=') are submitted, all but
-    the first two will be discarded.
+  To use this feature, add a bookmark with an arbitrary name (e.g.
+  "/Org: store-link/") and enter this as "=Location=":
+
+  : location.href='org-protocol://store-link://'+encodeURIComponent(location.href)
 
 
-*** Note taking and citations: =org-protocol-remember=
+# <<org-protocol-remember>>
+* Note taking and citations: =org-protocol-remember=
 
-    This one is triggered through the sub-protocol "=remember=" and consumes up to
-    three data fields:
+  This one is triggered through the sub-protocol "=remember=" and consumes up to
+  three data fields:
 
-    : emacsclient org-protocol:/remember:/URL/TITLE/BODY
+  : emacsclient org-protocol:/remember:/URL/TITLE/BODY
 
-    will pop up an /*Remember*/ buffer and fill the template with the data
-    submitted. The result depends on the template used:
+  will pop up an /*Remember*/ buffer and fill the template with the data
+  submitted.
 
-    | Field | Template-escape filled | Description                |
-    |-------+------------------------+----------------------------|
-    | =URL=   | =%a %A %c=               | URL part of a link.        |
-    | =TITLE= | =%a %c=                  | Description part of a link |
-    | =BODY=  | =%i=                     | Initial content            |
+  To use this feature, add a bookmark with an arbitrary name (e.g.
+  "/Org: remember/") and enter this as "=Location=":
 
-    As you can see from this table, there is more than one way to use =URL= and
-    =TITLE= because =org-protocol-remember= creates an Org-link from both of them
-    and kills it.
+  : location.href='org-protocol://remember://'+
+  :       encodeURIComponent(location.href)+'/'+
+  :       encodeURIComponent(document.title)+'/'+
+  :       encodeURIComponent(window.getSelection())
+
+  The result depends on the template used. See [[example-template][An example remember template]]
+  further down.
+
+  Note, that this one, as opposed to the other two standard handlers, does not
+  mix with more parameters to emacsclient. All parameters but the
+  #'=org-protocol://org-remember://...=' one will be discarded.
+
+*** Which remember template is used?
+
+    You don't need to setup a remember template to use =org-protocol-remember=,
+    since Org-mode provides a default template for those cases. But, for
+    historical reasons, if a template with the template char '=?w=' is defined,
+    this one will be choosen by default. This is to make bookmarks used for
+    [[file:./org-annotation-helper.el][org-annotation-helper]] work without changing the template.
+
+    The problem with this solution would be, that only one template can be used
+    with the fuction. Luckily, =org-protocol-remember= understands a slightly
+    extended syntax to choose between several templates: If the first field of
+    the data submitted is exactly one character in length, this character will
+    be used to select the template.
+
+    Here we choose to use the '=?x=' template:
+
+    : emacsclient org-protocol:/remember:/x/URL/TITLE/BODY
+
+    And, again, as bookmark location:
+    : location.href='org-protocol://remember://x/'+
+    :       encodeURIComponent(location.href)+'/'+
+    :       encodeURIComponent(document.title)+'/'+
+    :       encodeURIComponent(window.getSelection())
+
+# <<example-template>>
+*** An example remember template
+
+#+begin_src emacs-lisp
+(setq org-remember-templates
+      '((?w "* %^{Title}\n\n  Source: %u, %c\n\n  %i" nil "Notes")))
+#+end_src
+
+    - '=?w=' :: makes this one the default template used for
+              "=org-protocol://remember://=" URLs.
+    - '=c=' :: will be replaced by an Org-link pointing to the location of the
+             page you have been visiting when clicking on the link. The page
+             title will be the links description.
+    - '=%i=' :: will be replaced by the selected text in your browser window if
+              any.
+
+    In addition, you may use the following placeholders in your template:
+
+    | Placeholders  | Replacment                |
+    |---------------+---------------------------|
+    | =%:link=        | URL of the web-page       |
+    | =%:description= | The title of the web-page |
+    | =%:initial=     | Selected text.            |
 
     You may read more about templates and their special escape characters in the
     [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][Org-mode manual]].
 
-***** Which remember template is used?
 
-      You don't need to setup a remember template to use =org-protocol-remember=,
-      since Org-mode provides a default template for those cases. But, for
-      historical reasons, if a template with the template char '=?w=' is defined,
-      this one will be choosen by default. This is to make bookmarks used for
-      [[file:./org-annotation-helper.el][org-annotation-helper]] work without changing the template.
+# <<org-protocol-remember>>
+* Edit published content: =org-protocol-open-source=
 
-      The problem with this solution would be, that only one template can be
-      used with the fuction. Luckily, =org-protocol-remember= understands a
-      slightly extended syntax to choose between several templates: If the first
-      field of the data submitted is exactly one character in length, this
-      character will be used to select the template.
+  This one was designed to help with opening sources for editing when browsing
+  in the first place. =org-protocol-open-source= uses the custom variable
+  =org-protocol-project-alist= to map URLs to (local) filenames.
 
-      Here we choose to use the '=?x=' template:
+  Let's take http://orgmode.org/worg/ as our example.
 
-      : emacsclient org-protocol:/remember:/x/URL/TITLE/BODY
+  Our intention is to click a bookmark (or link) to open the source of the
+  published file we are reading in our favourite editor. The bookmark-URL above
+  could be used again. But since =org-protocol-open-source= regards the first
+  field only, this here will do:
 
+  : location.href='org-protocol://open-source://'+encodeURIComponent(location.href)
 
-*** Edit published content: =org-protocol-open-source=
-
-    This one was designed to help with opening sources for editing when
-    browsing in the first place. =org-protocol-open-source= uses the custom
-    variable =org-protocol-project-alist= to map URLs to (local) filenames.
-
-    Let's take http://orgmode.org/worg/ as our example.
-
-    Our intention is to click a bookmark (or link) to open the source of the
-    published file we are reading in our favourite editor. The bookmark-URL
-    above could be used again. But since =org-protocol-open-source= regards the
-    first field only, this here will do:
-
-    : location.href='org-protocol://open-source://'+encodeURIComponent(location.href)
-
-    To open files publihed on Worg locally, =org-protocol-project-alist= should
-    look like this (you may skip the second project):
+  To open files publihed on Worg locally, =org-protocol-project-alist= should look
+  like this (you may skip the second project):
 
 #+begin_src emacs-lisp
 (setq org-protocol-project-alist
@@ -205,160 +285,13 @@ REGEDIT4
          :working-suffix ".org")))
 #+end_src
 
-    If you're now browsing http://orgmode.org/worg/org-tutorials/org-protocol.el
-    and find a typo or have an idea how to enhance the documentation, simply
-    click the bookmark and start editing.
+  If you're now browsing http://orgmode.org/worg/org-tutorials/org-protocol.el
+  and find a typo or have an idea how to enhance the documentation, simply click
+  the bookmark and start editing.
 
-    There are to functions to help you filling =org-protocol-project-alist= with
-    valid contents. First of which is =org-protocol-create= that guides you
-    through the process. If you're editing an Org-mode file that is part of a
-    publishing project in =org-publish-project-alist=, try
+  There are to functions to help you filling =org-protocol-project-alist= with
+  valid contents. First of which is =org-protocol-create= that guides you through
+  the process. If you're editing an Org-mode file that is part of a publishing
+  project in =org-publish-project-alist=, try
 
-    : M-x org-protocol-create-for-org RET
-
-
-* Defining custom handlers
-
-  To defun a custom org-protocol handler basically means to define two basic
-  elements:
-
-  1. a sub-protocol that triggers the action
-  2. a function that consumes the data (i.e. the part of an URL that follows
-     "=org-protocol://sub-protocol://=")
-
-  To install the custom handler's protocol, we add an entry to
-  =org-protocol-protocol-alist=:
-
-#+begin_src emacs-lisp
-(add-to-list 'org-protocol-protocol-alist
-             '("Hello World"
-               :protocol "hello-world"
-               :function my-hello-world))
-#+end_src
-
-  The =:protocol= property is the sub-protocol, that triggers the action. Note,
-  that names of protcols (or URL schemas) are only allowed to consist of a
-  restricted set of characters. See [[http://www.ietf.org/rfc/rfc1738.txt][rfc1738]], section 2.1.
-
-  The =:function= is an arbitrary function that takes exactly one argument: the
-  string that follows our protocol, found in a filename passed to emacs through
-  emacsclient.
-
-  Here is a simple definition:
-
-#+begin_src emacs-lisp
-(defun hello-world (data)
-  "Say hello to the world."
-  (message data)
-nil)
-#+end_src
-
-  Now the URL =org-protocol://hello-world://encoded-data= will call our fuction
-  with the string "=encoded-data=". Hence an
-
-  : emacsclient org-protocol://hello-world://encoded-data
-
-  will put "=encoded-data=" into the minibuffer.
-
-
-*** Return values
-
-    Note, that our handler explicitly returns =nil=. This tells =org-protocol= to
-    remove the filename from the list of files passed to the emacs-server. If
-    more than one filename was supplied, all those filenames are searched for
-    protocols. Only filenames without protocolls are passed to the emacs-server
-    as usual.
-
-    Another possible return value is a string. If the string is a valid
-    filename, and if that file can be read, =org-protocol= replaces the original
-    filename with the one returned from the handler.
-
-
-*** Using more than one value
-
-    Passing one argument to our custom handler is nice, but sometimes more
-    parameters are needed. We would have to encode the the data and split it
-    into parts using a separator.
-
-    This is where =org-protocol-split-data= comes into play. It takes a string as
-    its first argument, an optional boolean value to tell if the string should
-    be considered URL-encoded and finally an optional separator. By default, no
-    URL-encoding is assumed and '=/=' is used as the separator.
-
-    The return value is a list of strings. If a non-nil value was supplied as
-    the second argument, each elements of the returned list will be
-    URL-decoded (TODO: take a decoder function).
-
-    This is a rewrite of our handler:
-
-#+begin_src emacs-lisp
-(defun hello-world (data)
-  "Say hello to the world."
-  (let* ((parts (org-protocol-split-data data nil '::my-separator::'))
-         (one (car parts))
-         (two (cadr parts))
-         (three (caddr parts)))
-    ;; ... do something with  one, two and three
-    )
-  nil)
-#+end_src
-
-
-*** Using more than one value /the greedy way/
-
-    Finally, it is possible to define a /greedy/ handler. Basically it will
-    discard _all_ the filenames from the servers list of files that follow the
-    filename that triggered the handler.
-
-    A handler is greedy, if you add the =:greedy= property to
-    =org-protocol-protocol-alist=, regardless of it's return value:
-
-#+begin_src emacs-lisp
-(add-to-list 'org-protocol-protocol-alist
-             '("Greedy"
-               :protocol "greedy"
-               :function my-greedy-handler))
-#+end_src
-
-    The one argument to greedy handlers is the rest of the list of filenames, the
-    one that triggered the handler included. But read on, please.
-
-*** The list of filenames
-
-    Here I have to admit, that I was lying all the time. emacsclient does not
-    pass a list of filenames to the emacs-server. It's a list of lists. And the
-    list is the list of emacsclient's arguments reversed.
-
-    As an example, the following commandline:
-
-    : emacsclient org-protocol:/greedy:/one two three +15:43
-
-    is passed as
-
-    : ((three . 15 . 42) (two) (org-protocol:/greedy:/one))
-
-    to the emacs-server, where =org-protocol= grabs it and reverses it to make it
-    look like this:
-
-    : ((org-protocol:/greedy:/one) (two) (three . 15 . 42))
-
-    This is now, what our greedy handler will receive as it's only parameter.
-
-    You may set =org-protocol-reverse-list-of-files= to =nil= to inhibit the
-    reversion. But that leads to strange results. In this example, the only
-    filename left would be the one that triggered the actions. That seems not
-    very greedy, and reversing the arguments on the commandline seems
-    unnatural. Note though, that the sequence is not changed for the server.
-
-
-
-* General remarks
-
-  emacsclient compresses double and tripple slashes to one. That's why it
-  doesn't really matter how many slashes succeed the scheme part of the URL,
-  also known as /protocol/ (which is slightly incorrect?).
-
-  This behaviour is the one of the reason, why the slash was choosen as the
-  default separator for data fields. Keeping the slashes is insecure, since some
-  of the data fields could contain slashes themselves, like the title of this
-  page: http://de.selfhtml.org/javascript/index.htm.
+  : M-x org-protocol-create-for-org RET
