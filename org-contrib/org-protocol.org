@@ -150,126 +150,126 @@ REGEDIT4
 
 
 # <<org-protocol-store-link>>
-*** Links and bookmarks: =org-protocol-store-link=
+* Links and bookmarks: =org-protocol-store-link=
 
-    =org-store-link= stores an Org-link insertable through =M-x org-insert-link= and
-    pushes the URL found on the =kill-ring= for yanking (=C-y=). The sub-protocol
-    used is "=store-link=":
+  =org-store-link= stores an Org-link insertable through =M-x org-insert-link= and
+  pushes the URL found on the =kill-ring= for yanking (=C-y=). The sub-protocol used
+  is "=store-link=":
 
-    : emacsclient org-protocol:/store-link:/URL/TITLE
+  : emacsclient org-protocol:/store-link:/URL/TITLE
 
-    will store this Org-link:
+  will store this Org-link:
 
 #+begin_example
 [[URL][TITLE]]
 #+end_example
 
-    In addition, =URL= will be pushed on the =kill-ring= for yanking ('=C-y='). You
-    will have to encode =URL= and/or =TITLE= if they contain slashes, and probably
-    quote those for the shell.
+  In addition, =URL= will be pushed on the =kill-ring= for yanking ('=C-y='). You will
+  have to encode =URL= and/or =TITLE= if they contain slashes, and probably quote
+  those for the shell.
 
-    To use this feature, add a bookmark with an arbitrary name (e.g.
-    "/Org: store-link/") and enter this as "=Location=":
+  To use this feature, add a bookmark with an arbitrary name (e.g.
+  "/Org: store-link/") and enter this as "=Location=":
 
-    : location.href='org-protocol://store-link://'+encodeURIComponent(location.href)
+  : location.href='org-protocol://store-link://'+encodeURIComponent(location.href)
 
 
 # <<org-protocol-remember>>
-*** Note taking and citations: =org-protocol-remember=
+* Note taking and citations: =org-protocol-remember=
 
-    This one is triggered through the sub-protocol "=remember=" and consumes up to
-    three data fields:
+  This one is triggered through the sub-protocol "=remember=" and consumes up to
+  three data fields:
 
-    : emacsclient org-protocol:/remember:/URL/TITLE/BODY
+  : emacsclient org-protocol:/remember:/URL/TITLE/BODY
 
-    will pop up an /*Remember*/ buffer and fill the template with the data
-    submitted.
+  will pop up an /*Remember*/ buffer and fill the template with the data
+  submitted.
 
-    To use this feature, add a bookmark with an arbitrary name (e.g.
-    "/Org: remember/") and enter this as "=Location=":
+  To use this feature, add a bookmark with an arbitrary name (e.g.
+  "/Org: remember/") and enter this as "=Location=":
 
-    : location.href='org-protocol://remember://'+
+  : location.href='org-protocol://remember://'+
+  :       encodeURIComponent(location.href)+'/'+
+  :       encodeURIComponent(document.title)+'/'+
+  :       encodeURIComponent(window.getSelection())
+
+  The result depends on the template used. See [[example-template][An example remember template]]
+  further down.
+
+  Note, that this one, as opposed to the other two standard handlers, does not
+  mix with more parameters to emacsclient. All parameters but the
+  #'=org-protocol://org-remember://...=' one will be discarded.
+
+*** Which remember template is used?
+
+    You don't need to setup a remember template to use =org-protocol-remember=,
+    since Org-mode provides a default template for those cases. But, for
+    historical reasons, if a template with the template char '=?w=' is defined,
+    this one will be choosen by default. This is to make bookmarks used for
+    [[file:./org-annotation-helper.el][org-annotation-helper]] work without changing the template.
+
+    The problem with this solution would be, that only one template can be used
+    with the fuction. Luckily, =org-protocol-remember= understands a slightly
+    extended syntax to choose between several templates: If the first field of
+    the data submitted is exactly one character in length, this character will
+    be used to select the template.
+
+    Here we choose to use the '=?x=' template:
+
+    : emacsclient org-protocol:/remember:/x/URL/TITLE/BODY
+
+    And, again, as bookmark location:
+    : location.href='org-protocol://remember://x/'+
     :       encodeURIComponent(location.href)+'/'+
     :       encodeURIComponent(document.title)+'/'+
     :       encodeURIComponent(window.getSelection())
 
-    The result depends on the template used. See [[example-template][An example remember template]]
-    further down.
-
-    Note, that this one, as opposed to the other two standard handlers, does not
-    mix with more parameters to emacsclient. All parameters but the
-    #'=org-protocol://org-remember://...=' one will be discarded.
-
-***** Which remember template is used?
-
-      You don't need to setup a remember template to use =org-protocol-remember=,
-      since Org-mode provides a default template for those cases. But, for
-      historical reasons, if a template with the template char '=?w=' is defined,
-      this one will be choosen by default. This is to make bookmarks used for
-      [[file:./org-annotation-helper.el][org-annotation-helper]] work without changing the template.
-
-      The problem with this solution would be, that only one template can be
-      used with the fuction. Luckily, =org-protocol-remember= understands a
-      slightly extended syntax to choose between several templates: If the first
-      field of the data submitted is exactly one character in length, this
-      character will be used to select the template.
-
-      Here we choose to use the '=?x=' template:
-
-      : emacsclient org-protocol:/remember:/x/URL/TITLE/BODY
-
-      And, again, as bookmark location:
-      : location.href='org-protocol://remember://x/'+
-      :       encodeURIComponent(location.href)+'/'+
-      :       encodeURIComponent(document.title)+'/'+
-      :       encodeURIComponent(window.getSelection())
-
 # <<example-template>>
-***** An example remember template
+*** An example remember template
 
 #+begin_src emacs-lisp
 (setq org-remember-templates
       '((?w "* %^{Title}\n\n  Source: %u, %c\n\n  %i" nil "Notes")))
 #+end_src
 
-      - '=?w=' :: makes this one the default template used for
-                "=org-protocol://remember://=" URLs.
-      - '=c=' :: will be replaced by an Org-link pointing to the location of the
-               page you have been visiting when clicking on the link. The page
-               title will be the links description.
-      - '=%i=' :: will be replaced by the selected text in your browser window if
-                any.
+    - '=?w=' :: makes this one the default template used for
+              "=org-protocol://remember://=" URLs.
+    - '=c=' :: will be replaced by an Org-link pointing to the location of the
+             page you have been visiting when clicking on the link. The page
+             title will be the links description.
+    - '=%i=' :: will be replaced by the selected text in your browser window if
+              any.
 
-      In addition, you may use the following placeholders in your template:
+    In addition, you may use the following placeholders in your template:
 
-      | Placeholders  | Replacment                |
-      |---------------+---------------------------|
-      | =%:link=        | URL of the web-page       |
-      | =%:description= | The title of the web-page |
-      | =%:initial=     | Selected text.            |
+    | Placeholders  | Replacment                |
+    |---------------+---------------------------|
+    | =%:link=        | URL of the web-page       |
+    | =%:description= | The title of the web-page |
+    | =%:initial=     | Selected text.            |
 
     You may read more about templates and their special escape characters in the
     [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][Org-mode manual]].
 
 
 # <<org-protocol-remember>>
-*** Edit published content: =org-protocol-open-source=
+* Edit published content: =org-protocol-open-source=
 
-    This one was designed to help with opening sources for editing when
-    browsing in the first place. =org-protocol-open-source= uses the custom
-    variable =org-protocol-project-alist= to map URLs to (local) filenames.
+  This one was designed to help with opening sources for editing when browsing
+  in the first place. =org-protocol-open-source= uses the custom variable
+  =org-protocol-project-alist= to map URLs to (local) filenames.
 
-    Let's take http://orgmode.org/worg/ as our example.
+  Let's take http://orgmode.org/worg/ as our example.
 
-    Our intention is to click a bookmark (or link) to open the source of the
-    published file we are reading in our favourite editor. The bookmark-URL
-    above could be used again. But since =org-protocol-open-source= regards the
-    first field only, this here will do:
+  Our intention is to click a bookmark (or link) to open the source of the
+  published file we are reading in our favourite editor. The bookmark-URL above
+  could be used again. But since =org-protocol-open-source= regards the first
+  field only, this here will do:
 
-    : location.href='org-protocol://open-source://'+encodeURIComponent(location.href)
+  : location.href='org-protocol://open-source://'+encodeURIComponent(location.href)
 
-    To open files publihed on Worg locally, =org-protocol-project-alist= should
-    look like this (you may skip the second project):
+  To open files publihed on Worg locally, =org-protocol-project-alist= should look
+  like this (you may skip the second project):
 
 #+begin_src emacs-lisp
 (setq org-protocol-project-alist
@@ -285,13 +285,13 @@ REGEDIT4
          :working-suffix ".org")))
 #+end_src
 
-    If you're now browsing http://orgmode.org/worg/org-tutorials/org-protocol.el
-    and find a typo or have an idea how to enhance the documentation, simply
-    click the bookmark and start editing.
+  If you're now browsing http://orgmode.org/worg/org-tutorials/org-protocol.el
+  and find a typo or have an idea how to enhance the documentation, simply click
+  the bookmark and start editing.
 
-    There are to functions to help you filling =org-protocol-project-alist= with
-    valid contents. First of which is =org-protocol-create= that guides you
-    through the process. If you're editing an Org-mode file that is part of a
-    publishing project in =org-publish-project-alist=, try
+  There are to functions to help you filling =org-protocol-project-alist= with
+  valid contents. First of which is =org-protocol-create= that guides you through
+  the process. If you're editing an Org-mode file that is part of a publishing
+  project in =org-publish-project-alist=, try
 
-    : M-x org-protocol-create-for-org RET
+  : M-x org-protocol-create-for-org RET
