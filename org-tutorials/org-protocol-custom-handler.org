@@ -73,35 +73,57 @@ nil)
   will put "=encoded-data=" into the minibuffer.
 
 
-** Return values
+* Killing the client
 
-    Note, that our handler explicitly returns =nil=. This tells =org-protocol= to
-    remove the filename from the list of files passed to the emacs-server. If
-    more than one filename was supplied, all those filenames are searched for
-    protocols. Only filenames without protocolls are passed to the emacs-server
-    as usual.
+  If your handler uses interactive functions that could be canceld by the user
+  by typing '=C-g=', consider to supply the '=:kill-client=' property when you
+  define the protocol.
 
-    Another possible return value is a string. If the string is a valid
-    filename, and if that file can be read, =org-protocol= replaces the original
-    filename with the one returned from the handler.
+  This is what we did for the remember handler:
+
+  : (defconst org-protocol-protocol-alist-default
+  :   '(("org-remember" :protocol "remember"
+  :                     :function org-protocol-remember
+  :                     :kill-client t)
+  :     ... ))
+
+  Otherwise, if the user has an interactive property defined in her remember
+  template, discarding it through '=C-g=' would leed to emacsclient waiting for
+  ever, thus to the appropriate questions when exiting emacs.
+
+  All filenames passing from emacsclient to the emacs will be ignored if you
+  set =:kill-client= to a non-nil value.
 
 
-** Using more than one value
+* Return values
 
-    Passing one argument to our custom handler is nice, but sometimes more
-    parameters are needed. We would have to encode the the data and split it
-    into parts using a separator.
+  Note, that our =hello-world= handler explicitly returns =nil=. This tells
+  =org-protocol= to remove the filename from the list of files passed to the
+  emacs-server. If more than one filename was supplied, all those filenames are
+  searched for protocols. Only filenames without protocolls are passed to the
+  emacs-server as usual.
 
-    This is where =org-protocol-split-data= comes into play. It takes a string as
-    its first argument, an optional boolean value to tell if the string should
-    be considered URL-encoded and finally an optional separator. By default, no
-    URL-encoding is assumed and '=/=' is used as the separator.
+  Another possible return value is a string. If the string is a valid filename,
+  and if that file can be read, =org-protocol= replaces the original filename with
+  the one returned from the handler.
 
-    The return value is a list of strings. If a non-nil value was supplied as
-    the second argument, each elements of the returned list will be
-    URL-decoded (TODO: take a decoder function).
 
-    This is a rewrite of our handler:
+* Using more than one value
+
+  Passing one argument to our custom handler is nice, but sometimes more
+  parameters are needed. We would have to encode the the data and split it into
+  parts using a separator.
+
+  This is where =org-protocol-split-data= comes into play. It takes a string as
+  its first argument, an optional boolean value to tell if the string should be
+  considered URL-encoded and finally an optional separator. By default, no
+  URL-encoding is assumed and '=/=' is used as the separator.
+
+  The return value is a list of strings. If a non-nil value was supplied as the
+  second argument, each elements of the returned list will be URL-decoded (TODO:
+  take a decoder function).
+
+  This is a rewrite of our handler:
 
 #+begin_src emacs-lisp
 (defun hello-world (data)
@@ -116,14 +138,14 @@ nil)
 #+end_src
 
 
-** Using more than one value /the greedy way/
+* Using more than one value /the greedy way/
 
-    Finally, it is possible to define a /greedy/ handler. Basically it will
-    discard _all_ the filenames from the servers list of files that follow the
-    filename that triggered the handler.
+  Finally, it is possible to define a /greedy/ handler. Basically it will discard
+  _all_ the filenames from the servers list of files that follow the filename that
+  triggered the handler.
 
-    A handler is greedy, if you add the =:greedy= property to
-    =org-protocol-protocol-alist=, regardless of it's return value:
+  A handler is greedy, if you add the =:greedy= property to
+  =org-protocol-protocol-alist=, regardless of it's return value:
 
 #+begin_src emacs-lisp
 (add-to-list 'org-protocol-protocol-alist
@@ -132,56 +154,72 @@ nil)
                :function my-greedy-handler))
 #+end_src
 
-    The one argument to greedy handlers is the rest of the list of filenames, the
-    one that triggered the handler included. But read on, please.
-
-** Killing the client
-
-    If your handler uses interactive functions that could be canceld by the user
-    by typing '=C-g=', consider to supply the '=:kill-client=' property when you
-    define the protocol.
-
-    This is what we did for the remember handler:
-
-    : (defconst org-protocol-protocol-alist-default
-    :   '(("org-remember" :protocol "remember"
-    :                     :function org-protocol-remember
-    :                     :kill-client t)
-    :     ... ))
-
-    Otherwise, if the user has an interactive property defined in her remember
-    template, discarding it through '=C-g=' would leed to emacsclient waiting for
-    ever, thus to the appropriate questions when exiting emacs.
+  The one argument to greedy handlers is the rest of the list of filenames, the
+  one that triggered the handler included. But read on, please.
 
 
 ** The list of filenames
 
-    Here I have to admit, that I was lying all the time. emacsclient does not
-    pass a list of filenames to the emacs-server. It's a list of lists. And the
-    list is the list of emacsclient's arguments reversed.
+   Here I have to admit, that I was lying all the time. emacsclient does not
+   pass a list of filenames to the emacs-server. It's a list of lists. And the
+   list is the list of emacsclient's arguments reversed.
 
-    As an example, the following commandline:
+   As an example, the following commandline:
 
-    : emacsclient org-protocol:/greedy:/one two three +15:43
+   : emacsclient org-protocol:/greedy:/one two three +15:42
 
-    is passed as
+   is passed as
 
-    : ((three . 15 . 42) (two) (org-protocol:/greedy:/one))
+   : ((/dir/three (15 . 42)) (/dir/two) (/dir/org-protocol:/greedy:/one))
 
-    to the emacs-server, where =org-protocol= grabs it and reverses it to make it
-    look like this:
+   to the emacs-server, where =org-protocol= grabs it and reverses it to make it
+   look like this:
 
-    : ((org-protocol:/greedy:/one) (two) (three . 15 . 42))
+   : ((/dir/org-protocol:/greedy:/one) (/dir/two) (/dir/three  (15 . 42)))
 
-    This is now, what our greedy handler will receive as it's only parameter.
+   This is now, what our greedy handler will receive as it's only parameter.
 
-    You may set =org-protocol-reverse-list-of-files= to =nil= to inhibit the
-    reversion. But that leads to strange results. In this example, the only
-    filename left would be the one that triggered the actions. That seems not
-    very greedy, and reversing the arguments on the commandline seems
-    unnatural. Note though, that the sequence is not changed for the server.
+   The "=/dir/=" prefix is added by emacsclient. It's the absolute path to its
+   working directory.
+
+   You may set =org-protocol-reverse-list-of-files= to =nil= to inhibit the
+   reversion. But that leads to unexpected results. In this example, the only
+   filename left would be the one that triggered the actions. That seems not
+   very greedy, and reversing the arguments on the commandline seems
+   unnatural. Note though, that the sequence is not changed for the server.
 
 
+** Flatten the list of arguments
+
+   =org-protocol.el= provides a function to flatten the list of arguments for
+   greedy handlers:
+
+   : org-protocol-flatten-greedy (param-list &optional strip-path replacement)
+
+   This function takes the list of lists your greedy handler gets as its only
+   parameter, and turns it into a flat list. Also, all prefixes and protocols
+   are stripped from the element that triggered your handler.
+
+   This is, what the first parameter might look like:
+
+   : (("/dir/org-protocol:/greedy:/one") ("/dir/two") ("/dir/three" (15 . 42)))
+
+   If only the first parameter is supplied, =org-protocol-flatten-greedy= will
+   return this list:
+
+   : ("/dir/one" "/dir/two" "/dir/three" 15 42)
+
+   If you supply a non-nil value as the second parameter for the function:
+
+   : ("one" "two" "three" 15 42)
+
+   And, last not least, if you supply a replacement "=REPL-=" (must be a string):
+
+   : ("REPL-one" "REPL-two" "REPL-three" 15 42)
+
+   Note, that this works exactly this way regardless of your setting of
+   "=org-protocol-reverse-list-of-files=". The sequence of the returned list will
+   always reflect the sequence of arguments on the command line.
 
 * General remarks
 
