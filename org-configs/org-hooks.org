@@ -111,6 +111,20 @@ Defined in: /org.el/
     Just change it to `y-or-n-p' if you want to confirm with a
     single keystroke rather than having to type \"yes\".
 #+end_example
+** =org-refile-target-verify-function=
+Defined in: /org.el/
+#+begin_example
+    Function to verify if the headline at point should be a refile target.
+    The function will be called without arguments, with point at the
+    beginning of the headline.  It should return t and leave point
+    where it is if the headline is a valid target for refiling.
+    
+    If the target should not be selected, the function must return nil.
+    In addition to this, it may move point to a place from where the search
+    should be continued.  For example, the function may decide that the entire
+    subtree of the current entry should be excluded and move point to the end
+    of the subtree.
+#+end_example
 ** =org-after-todo-state-change-hook=
 Defined in: /org.el/
 #+begin_example
@@ -330,7 +344,38 @@ Defined in: /org.el/
     Each function will be called with no arguments.  The function must check
     if the context is appropriate for it to act.  If yes, it should do its
     thing and then return a non-nil value.  If the context is wrong,
-    just do nothing.
+    just do nothing and return nil.
+#+end_example
+** =org-tab-first-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions to attach themselves to TAB.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+    This hook runs as the first action when TAB is pressed, even before
+    `org-cycle' messes around with the `outline-regexp' to cater for
+    inline tasks and plain list item folding.
+    If any function in this hook returns t, not other actions like table
+    field motion visibility cycling will be done.
+#+end_example
+** =org-tab-after-check-for-table-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions to attach themselves to TAB.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+    This hook runs after it has been established that the cursor is not in a 
+    table, but before checking if the cursor is in a headline or if global cycling
+    should be done.
+    If any function in this hook returns t, not other actions like visibility
+    cycling will be done.
+#+end_example
+** =org-tab-after-check-for-cycling-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions to attach themselves to TAB.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+    This hook runs after it has been established that not table field motion and
+    not visibility should be done because of current context.  This is probably
+    the place where a package like yasnippets can hook in.
 #+end_example
 ** =org-metaleft-hook=
 Defined in: /org.el/
@@ -465,26 +510,26 @@ Defined in: /org-exp.el/
     This is run as the last thing in the preprocessing buffer, just before
     returning the buffer string to the backend.
 #+end_example
-** =org-before-save-iCalendar-file-hook=
-Defined in: /org-exp.el/
-#+begin_example
-    Hook run before  an iCalendar file has been saved.
-    This can be used to modify the result of the export.
-#+end_example
-** =org-after-save-iCalendar-file-hook=
-Defined in: /org-exp.el/
-#+begin_example
-    Hook run after an iCalendar file has been saved.
-    The iCalendar buffer is still current when this hook is run.
-    A good way to use this is to tell a desktop calendar application to re-read
-    the iCalendar file.
-#+end_example
 ** =org-feed-after-adding-hook=
 Defined in: /org-feed.el/
 #+begin_example
     Hook that is run after new items have been added to a file.
     Depending on `org-feed-save-after-adding', the buffer will already
     have been saved.
+#+end_example
+** =org-before-save-iCalendar-file-hook=
+Defined in: /org-icalendar.el/
+#+begin_example
+    Hook run before  an iCalendar file has been saved.
+    This can be used to modify the result of the export.
+#+end_example
+** =org-after-save-iCalendar-file-hook=
+Defined in: /org-icalendar.el/
+#+begin_example
+    Hook run after an iCalendar file has been saved.
+    The iCalendar buffer is still current when this hook is run.
+    A good way to use this is to tell a desktop calendar application to re-read
+    the iCalendar file.
 #+end_example
 ** =org-mouse-context-menu-function=
 Defined in: /org-mouse.el/
@@ -517,7 +562,6 @@ Defined in: /org-remember.el/
 #+begin_example
     Hook for the minor `org-remember-mode'.
 #+end_example
-
 
 * Examples for using hooks
 
