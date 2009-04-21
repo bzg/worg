@@ -115,13 +115,15 @@ nil)
   parts using a separator.
 
   This is where =org-protocol-split-data= comes into play. It takes a string as
-  its first argument, an optional boolean value to tell if the string should be
-  considered URL-encoded and finally an optional separator. By default, no
-  URL-encoding is assumed and '=/=' is used as the separator.
+  its first argument, an optional parameter to tell if the string should be
+  considered URL-encoded UTF-8 text and finally an optional separator. By
+  default, no URL-encoding is assumed and '=/=' is used as the separator.
 
-  The return value is a list of strings. If a non-nil value was supplied as the
-  second argument, each elements of the returned list will be URL-decoded (TODO:
-  take a decoder function).
+  The return value is a list of strings. If a non-nil value is supplied as the
+  second argument, each elements of the returned list will be URL-decoded using
+  =org-protocol-unhex-string=. If the second argument is a function, that function
+  is used to decode each element of the list. The function should take a string
+  as it's only parameter, and return the decoded value [fn:1].
 
   This is a rewrite of our handler:
 
@@ -230,3 +232,10 @@ nil)
   This behaviour is the main reasons, why the slash was choosen as the
   default separator for data fields. Keeping the slashes is insecure, since some
   of the data fields could contain double or tripple slashes themselves.
+
+
+
+* Footnotes
+
+[fn:1]  The function feature was added with the Org-mode 6.26 release (commit
+        6a9acfa9a3ec4ad889951d02c9809f55ac7491fb).
