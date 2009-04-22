@@ -359,7 +359,7 @@ var org_html_manager = {
   WINDOW: null,                // A div to display info view mode
   SECS: new Array(),           // The OrgNode tree
   REGEX: /(#)(.*$)/,           // identify a section link in toc
-  EXCHANGE: /(sec-.*)$/,  // extract the section number TODO: OBSOLETE
+  SIDREX: /^(#sec-)(.+$)/,      // detect section-IDs and extract the section number
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
   EMPTY_START: /^(\s*)(.*)/,   // Trim (s. getKey())
   EMPTY_END: /\s$/,            // Trim (s. getKey())
@@ -1835,7 +1835,7 @@ var org_html_manager = {
     if(null == node) node = this.NODE;
     var loc = "#" + this.NODE.base_id;
     for(var s in node.isTargetFor) {
-      if(1 == node.isTargetFor[s]){loc = s; break;}
+      if(! s.match(this.SIDREX)){loc = s; break;}
     }
     return loc;
   },
