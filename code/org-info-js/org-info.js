@@ -2,11 +2,10 @@ function OrgNode(a,d,c,b,h,f){this.div=a;this.base_id=f;this.idx=-1;this.heading
 this.link=c;this.hasHighlight=false;this.parent=h;this.durty=false;this.state=OrgNode.STATE_FOLDED;
 this.depth=b;this.folder=null;this.children=new Array();this.info_navigation="";this.buttons=null;
 if(null!=this.parent){this.parent.addChild(this);this.hide();}var e=document.getElementById("text-"+this.base_id);
-if(null==e&&f){var g=f.substring(4);alert(g);e=document.getElementById("text-"+g);
-}if(null!=e){e.isOrgNodeFolder=true;this.folder=e;}this.isTargetFor=new Object();
-this.isTargetFor["#"+this.base_id]=2;OrgNode.findTargetsIn(this.isTargetFor,this.heading,1);
-OrgNode.findTargetsIn(this.isTargetFor,this.folder,3);}OrgNode.STATE_FOLDED=0;OrgNode.STATE_HEADLINES=1;
-OrgNode.STATE_UNFOLDED=2;OrgNode.findTargetsIn=function(f,c,e){if(c){var b=c.getElementsByTagName("a");
+if(null==e&&f){var g=f.substring(4);e=document.getElementById("text-"+g);}if(null!=e){e.isOrgNodeFolder=true;
+this.folder=e;}this.isTargetFor=new Object();this.isTargetFor["#"+this.base_id]=2;
+OrgNode.findTargetsIn(this.isTargetFor,this.heading,1);OrgNode.findTargetsIn(this.isTargetFor,this.folder,3);
+}OrgNode.STATE_FOLDED=0;OrgNode.STATE_HEADLINES=1;OrgNode.STATE_UNFOLDED=2;OrgNode.findTargetsIn=function(f,c,e){if(c){var b=c.getElementsByTagName("a");
 if(b){for(var d=0;d<b.length;++d){var g=b[d].getAttribute("id");if(g){f["#"+g]=e;
 }else{g=b[d].getAttribute("name");if(g){f["#"+g]=e;}}}}}};OrgNode.hideElement=function(a){if(a&&a.style){a.style.display="none";
 a.style.visibility="hidden";}};OrgNode.showElement=function(a){if(a&&a.style){a.style.display="block";

@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.1.1.1
+ *       org-info.js, v.0.1.1.2
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -89,6 +89,10 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
   }
 
   var folder = document.getElementById("text-"+this.base_id);
+  if(null == folder && _base_id) {
+    var fid =  _base_id.substring(4);
+    folder = document.getElementById("text-"+fid); // try old schema
+  }
   if(null != folder) {
     folder.isOrgNodeFolder = true;
     this.folder = folder;
@@ -361,7 +365,6 @@ var org_html_manager = {
   WINDOW: null,                // A div to display info view mode
   SECS: new Array(),           // The OrgNode tree
   REGEX: /(#)(.*$)/,           // identify a section link in toc
-  SIDREX: /^(#sec-)(.+$)/,      // detect section-IDs and extract the section number
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
   TRIMMER: /^(\s*)([^\s].*)(\s*)$/, // Trim
   FNREF_REGEX: /(fnr\.*)/,     // Footnote ref
@@ -805,7 +808,6 @@ var org_html_manager = {
   {
     if(s.match(this.REGEX)) {
       var matches = this.REGEX.exec(s);
-      var ret = 'javascript:org_html_manager.navigateTo("'+matches[1]+'");';
       this.debug += matches[1]+" + "+matches[2]+"\n";
       var id = matches[2];
       var heading = document.getElementById(id);
