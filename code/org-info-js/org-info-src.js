@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.1.1.0
+ *       org-info.js, v.0.1.1.2
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -65,7 +65,7 @@
 function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
 {
   this.div = _div;
-  this.base_id = _base_id;
+  this.base_id = _base_id;                // The suffix that's common to the heading and the diffs.
   this.idx = -1;                          // The index in OrgHtmlManager::SECS[]
   this.heading = _heading;
   this.link = _link;
@@ -89,6 +89,10 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
   }
 
   var folder = document.getElementById("text-"+this.base_id);
+  if(null == folder && _base_id) {
+    var fid =  _base_id.substring(4);
+    folder = document.getElementById("text-"+fid); // try old schema
+  }
   if(null != folder) {
     folder.isOrgNodeFolder = true;
     this.folder = folder;
@@ -104,6 +108,8 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
 OrgNode.STATE_FOLDED = 0;
 OrgNode.STATE_HEADLINES = 1;
 OrgNode.STATE_UNFOLDED = 2;
+
+
 
 //
 // static functions
@@ -359,12 +365,9 @@ var org_html_manager = {
   WINDOW: null,                // A div to display info view mode
   SECS: new Array(),           // The OrgNode tree
   REGEX: /(#)(.*$)/,           // identify a section link in toc
-  EXCHANGE: /(sec-.*)$/,  // extract the section number TODO: OBSOLETE
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
-  EMPTY_START: /^(\s*)(.*)/,   // Trim (s. getKey())
-  EMPTY_END: /\s$/,            // Trim (s. getKey())
-  SECEX: /([\d\.]*)/,          // Section number (command 's')
-  FNREF_REGEX: /(fnr\.*)/,       // Footnote ref
+  TRIMMER: /^(\s*)([^\s].*)(\s*)$/, // Trim
+  FNREF_REGEX: /(fnr\.*)/,     // Footnote ref
   TOC: null,                   // toc.
   runs: 0,                     // Count the scan runs.
   HISTORY: new Array(50),      // Save navigation history.
@@ -407,6 +410,8 @@ var org_html_manager = {
   SORTED_TAGS: new Array(),    // Sorted tags
   TAGS_INDEX: null,            // Caches the tags-index screen
   CLICK_TIMEOUT: null,         // Mousehandling
+  SECNUM_MAP: {},              // Map section numbers to OrgNodes
+  SECNUM_REGEX: /^section-number-(\d)+/, // class of the span containing section numbers.
 
   /**
    * Setup the OrgHtmlManager for scanning.
@@ -463,6 +468,11 @@ var org_html_manager = {
     this.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", 50);
   },
 
+  trim: function(s)
+  {
+    var r = this.TRIMMER.exec(s);
+    return RegExp.$2;
+  },
 
   removeTags: function (str)
   {
@@ -798,7 +808,6 @@ var org_html_manager = {
   {
     if(s.match(this.REGEX)) {
       var matches = this.REGEX.exec(s);
-      var ret = 'javascript:org_html_manager.navigateTo("'+matches[1]+'");';
       this.debug += matches[1]+" + "+matches[2]+"\n";
       var id = matches[2];
       var heading = document.getElementById(id);
@@ -846,6 +855,9 @@ var org_html_manager = {
               }
               this.TAGS[tags[j]].push(sec);
             }
+          }
+          else if(spans[i].className.match(this.SECNUM_REGEX)) {
+            this.SECNUM_MAP[this.trim(spans[i].innerHTML)] = this.NODE;
           }
         }
       }
@@ -1440,10 +1452,7 @@ var org_html_manager = {
       s = "b";
     }
     else {
-      if(s.match(this.EMPTY_START))
-        s = s.match(this.EMPTY_START)[2];
-      if(s.length && s.match(this.EMPTY_END))
-        s = s.substr(0, s.length - 1);
+      s = this.trim(s);
     }
 
     if (1 == s.length)    // one char wide commands
@@ -1667,7 +1676,7 @@ var org_html_manager = {
   evalReadCommand: function()
   {
     var command = this.READ_COMMAND;
-    var result  = this.CONSOLE_INPUT.value;
+    var result  = this.trim(this.CONSOLE_INPUT.value);
 
     this.endRead();
 
@@ -1677,20 +1686,14 @@ var org_html_manager = {
     }
 
     if(command == 'g') { // goto section
-      var matches = this.SECEX.exec(result);
-      var sec = matches[1];
-      var sec_found = false;
-      for(var i = 0; i < this.SECS.length; ++i) {
-        if(this.SECS[i].base_id == sec) {
-          this.hideConsole();
-          this.navigateTo(this.SECS[i].idx);
-          return;
-        }
-      }
-      if(! sec_found) {
-        this.warn("Goto section: no such section.", false, sec);
+      var sec = this.SECNUM_MAP[result];
+      if(null != sec) {
+        this.hideConsole();
+        this.navigateTo(sec.idx);
         return;
       }
+      this.warn("Goto section: no such section.", false, result);
+      return;
     }
 
     else if(command == 's') { // search
@@ -1835,7 +1838,7 @@ var org_html_manager = {
     if(null == node) node = this.NODE;
     var loc = "#" + this.NODE.base_id;
     for(var s in node.isTargetFor) {
-      if(1 == node.isTargetFor[s]){loc = s; break;}
+      if(! s.match(this.SIDREX)){loc = s; break;}
     }
     return loc;
   },
