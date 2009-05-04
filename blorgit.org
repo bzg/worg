@@ -197,16 +197,59 @@ git add .
 git commit -a -m "initial commit"
 #+end_example
 
-** Change blogs directory / Deploying to a Server
+** Change blogs directory
 
-To change the location of the blogs directory, or for pointers on
-deploying behind a web-server, see the =blorgit.yml= global
-configuration file and the =run.ru= rackup file.  To run using the
-=run.ru= rackup file use a command like the following (requires the
-=thin= gem =sudo gem install thin=)
+To change the location of the blogs directory see the =blorgit.yml=
+global configuration file in the base of your blorgit directory.
+
+** Deploying to a Remote Server
+
+**** Thin web server
+To run using the =run.ru= rackup file use a command like the following
+(requires the =thin= gem =sudo gem install -v=1.0.0 thin=)
 
 #+begin_example 
 ./run.ru -sthin -p4567
+#+end_example
+
+**** Deploying behind a url prefix
+If you don't want blorgit to sit at the top level of your webserver,
+but would rather is exist behind a url prefix set the =url_prefix=
+variable in the run.ru file.
+
+**** Remote Emacs Server
+Blorgit requires a running Emacs to handle the actual export of
+org-mode pages to html (through the =emacsclient= command).  This
+requires that an instance of Emacs be left running on the remote
+server, which I be problematic.  I use [[http://www.gnu.org/software/screen/][gnu-screen]] to start and detach
+from this Emacs instance as follows...
+
+1) ssh into your remote server
+2) start your screen session with the =screen= command
+#+begin_example 
+screen
+#+end_example
+3) cd to your blorgit directory
+#+begin_example 
+cd ~/src/blorgit
+#+end_example
+4) start emacs loading the =org-interaction.el= file
+#+begin_example 
+emacs -l backend/acts_as_org/elisp/org-interaction.el
+#+end_example
+5) optionally run your webserver through screen as well by 
+   1) switching to a new screen window with =\C-a c=
+   2) start your webserver
+#+begin_example 
+./run.ru -sthin
+#+end_example
+6) disconnect form screen leaving emacs and the webserver running with
+   =\C-a d=
+7) logoff from the server
+8) at any later date you can log back into the server and reattach to
+   the original screen session with
+#+begin_example 
+screen -r
 #+end_example
 
 ** Extending Blorgit
