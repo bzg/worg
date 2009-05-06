@@ -1,0 +1,46 @@
+* Example
+
+#+BEGIN: propview :id "december" :conds ((string= spendtype "food")) :cols (ITEM amount)
+| "ITEM"                           | "amount" |
+|----------------------------------+----------|
+| "Grocery Store [2008-12-01 Mon]" |    56.77 |
+| "Restaurant [2008-12-08 Mon]"    |    30.67 |
+|----------------------------------+----------|
+|                                  |          |
+#+END:
+
+#+BEGIN: propview :cols (ITEM (+ 400 amount)) :scope tree :match "example"
+| "ITEM"                                                                          | "(+ 400 amount)" |
+|---------------------------------------------------------------------------------+------------------|
+| "December Spending                                                   :example:" |                0 |
+| "Week One"                                                                      |                0 |
+| "Grocery Store [2008-12-01 Mon]"                                                |           456.77 |
+| "Athletic club [2008-12-02 Tue]"                                                |            475.0 |
+| "Week Two "                                                                     |                0 |
+| "Restaurant [2008-12-08 Mon]"                                                   |           430.67 |
+|---------------------------------------------------------------------------------+------------------|
+|                                                                                 |                  |
+#+END:
+
+** December Spending						       :example:
+   :PROPERTIES:
+   :ID:       december
+   :END:
+
+*** Week One
+**** Grocery Store [2008-12-01 Mon]
+     :PROPERTIES:
+     :amount: 56.77
+     :spendtype: food
+     :END:
+**** Athletic club [2008-12-02 Tue]
+     :PROPERTIES:
+     :amount: 75.00
+     :spendtype: health
+     :END:
+*** Week Two 
+**** Restaurant [2008-12-08 Mon]
+     :PROPERTIES:
+     :amount: 30.67
+     :spendtype: food
+     :END:

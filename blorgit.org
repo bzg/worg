@@ -1,0 +1,261 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE:      Blorgit: Org-Mode based, git amenable, blogging engine
+#+AUTHOR:     Eric Schulte
+#+EMAIL:      schulte.eric at gmail dot com
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+# This file is the default header for new Org files in Worg.  Feel free
+# to tailor it to your needs.
+
+[[file:index.org][{Back to Worg's index}]]
+
+* Introduction
+
+Blorgit is a blogging engine which uses [[http://orgmode.org][Org-Mode]] for markup, runs on
+the [[http://www.sinatrarb.com/][Sinatra]] mini web framework, and is amenable to posting and
+maintenance through [[http://git-scm.com/][git]].  With the addition of a little [[http://www.ruby-lang.org/en/][Ruby]] blorgit
+creates interactive web pages with [[http://orgmode.org][Org-Mode]].
+
+** Features
+
+[[file:images/blorgit/blorgit_features.png]]
+
+1) *In Browser Editing* Org-mode files can be edited through the
+     browser.  Upon submitting an edit the original org-mode file is
+     overwritten and the web-page is re-exported.  Edits can be turned
+     on off or with the =editable= [[* Changing Configuration Options][configuration option]] and can be
+     password protected by setting the =auth= [[* Changing Configuration Options][configuration option]]
+2) *Export to org-mode and LaTeX formats*  The raw *Org-mode* source,
+     and *LaTeX* exports of all pages can be downloaded.
+3) *Search* The search bar compares your search terms as a
+   /perl-style/ regular expression (in most cases working just like a
+   simple term search) against the org-mode source of each page
+   returning a ranked list.  [[file:images/blorgit/blorgit_search.png]]
+4) *Sidebar with Recent changes and Directory Listing* The top =N=
+     recently edited pages, and/or directory listings can optionally
+     be presented in a sidebar.  These are controlled through the
+     =recent= and =dir_list= configuration options.
+5) *Themes* The [[http://github.com/eschulte/blorgit_themes/tree/master][blorgit\_themes]] git repository holds prepackaged
+   themes for blorgit.  These can be applied to your instillation
+   using the supplied rake commands.  For a list of available themes
+   run =rake themes= from the root of your blorgit instillation.
+   Please share any new themes you might
+   create. [[file:images/blorgit/themes.png]]
+6) *Comments in org-mode files* Pages can optionally be opened for
+   comments, all comments will be stored in a special =* COMMENT
+   Comments= outline header appended to the end of the org file.
+7) *Git Synchronization* By setting the =git_commit= [[* Changing Configuration Options][configuration
+   option]] to =true= blorgit can be made to automatically commit and
+   push to a git repository after every comment or edit of an org-mode
+   file.
+
+
+* Getting Started (instillation and use)
+
+0) *Install Ruby*
+
+   If you don't already have ruby installed on your system then you
+   will need to install [[http://www.ruby-lang.org/en/][Ruby]] and [[http://rubygems.org/][Ruby Gems]] (Ruby's package managment
+   system).*  Be sure to install Ruby 1.8 (should be default option)
+   *not* Ruby 1.9.
+
+1) *Install the Required Gems*
+
+#+begin_example 
+sudo gem install rake sinatra haml activesupport
+#+end_example
+
+2) *Install blorgit*
+
+#+begin_example 
+git clone git://github.com/eschulte/blorgit.git
+#+end_example
+
+   Update the submodules of blorgit to provide file based persistence
+   ([[http://github.com/eschulte/active_file/tree/master][active\_file]]), org-mode interaction ([[http://github.com/eschulte/acts_as_org/tree/master][acts\_as\_org]]), and themes
+   ([[http://github.com/eschulte/blorgit_themes/tree/master][blorgit\_themes]]).
+
+#+begin_example 
+cd blorgit
+git submodule init
+git submodule update
+#+end_example
+
+3) *Create Blogs Directory*
+
+   Create a blogs directory (in =~/blogs/=) with the default
+   configuration (To change the location of the blogs directory edit
+   =blorgit.yml= in this directory).  Apply the default minimal theme
+   (for a list of available themes run =rake themes=)
+
+#+begin_example 
+rake new
+rake themes:default
+#+end_example
+
+4) *Start Servers*
+  - *Emacs Server*
+
+    Starting your emacs server allows Emacs to act as a server which
+    can then export org-mode file to html.  To do this we simply need
+    to load the =org-interaction.el= file in =acts_as_org=.  You can
+    do this by executing the following in emacs
+
+#+begin_example 
+M-x load-file /path/to/blorgit/backend/acts_as_org/elisp/org-interaction.el
+#+end_example
+
+    or with the following shell command
+
+#+begin_example 
+emacs -l backend/acts_as_org/elisp/org-interaction.el
+#+end_example
+
+  - *Web Server*
+
+    Start your sinatra web server with the following command
+
+#+begin_example 
+ruby blorgit.rb
+#+end_example
+
+5) *View in Browser*
+
+   [[http://localhost:4567]]
+
+
+* Additional Information
+** Common Tasks
+Ruby has it's own make tool called [[http://rake.rubyforge.org/][Rake]].  For a list of the blorgit
+rake commands run =rake -T= from the root of your blorgit
+instillation.  At the time of writing the available rake tasks are...
+
+#+begin_example
+$ rake -T
+(in /Users/eschulte/src/blorgit)
+rake exported:delete  # delete all temporary exported files
+rake exported:list    # list all temporary exported files
+rake index            # drop a minimal index page into /Users/eschulte/Site...
+rake info             # return configuration information about the current ...
+rake new              # create a new blorgit instance
+rake themes           # list the available themes
+rake themes:default   # a default theme, should serve as a good starting point
+rake themes:food      # a food theme for my recipes
+rake themes:org       # an org-mode theme featuring the folding unicorn
+#+end_example
+
+** Changing Configuration Options
+
+The configuration is controlled through a [[http://www.yaml.org][YAML]] file located at
+=blorgit.yml= in the base of your blorgit instillation.  Configuration
+variables can be used to control the *title*, *index page*,
+*stylesheet*, the number of *recent entries* and *directory\_listings*
+shown in the sidebar, automatic synchronization with a *git*
+repository, *commentability*, *editability* and optional *password
+protection* for posting edits, .  The default configuration is...
+
+#<<configuration_options>>
+#+begin_example 
+--- 
+title: Blorgit
+index: index
+style: stylesheet.css
+recent: 5
+dir_list: false
+git_commit: false
+commentable: true
+editable: false
+auth: 
+- admin
+- password
+#+end_example
+
+*** Directory Local Configuration
+It is possible to specify configuration options for each individual
+directories of your blorgit site.  To do so write the configuration
+options you wish to specify to a file named =.blorgit.yml=.  These
+options will be used when displaying files in the same directory as
+the =.blorgit.yml= file.  This file follows the same format shown [[* Changing Configuration
+ Options][above]].
+
+** Git
+
+If you're wondering where git comes in, initialize your new blogs
+directory as a git repo, and post all future blogs, moderate comments
+and commentability of blogs, and manage configuration through git.
+
+#+begin_example 
+cd ./blogs
+git init
+echo ".exported_*" > .gitignore # ignore export files created automatically by blorgit
+git add .
+git commit -a -m "initial commit"
+#+end_example
+
+** Change blogs directory
+
+To change the location of the blogs directory see the =blorgit.yml=
+global configuration file in the base of your blorgit directory.
+
+** Deploying to a Remote Server
+
+**** Thin web server
+To run using the =run.ru= rackup file use a command like the following
+(requires the =thin= gem =sudo gem install -v=1.0.0 thin=)
+
+#+begin_example 
+./run.ru -sthin -p4567
+#+end_example
+
+**** Deploying behind a url prefix
+If you don't want blorgit to sit at the top level of your webserver,
+but would rather is exist behind a url prefix set the =url_prefix=
+variable in the run.ru file.
+
+**** Remote Emacs Server
+Blorgit requires a running Emacs to handle the actual export of
+org-mode pages to html (through the =emacsclient= command).  This
+requires that an instance of Emacs be left running on the remote
+server, which I be problematic.  I use [[http://www.gnu.org/software/screen/][gnu-screen]] to start and detach
+from this Emacs instance as follows...
+
+1) ssh into your remote server
+2) start your screen session with the =screen= command
+#+begin_example 
+screen
+#+end_example
+3) cd to your blorgit directory
+#+begin_example 
+cd ~/src/blorgit
+#+end_example
+4) start emacs loading the =org-interaction.el= file
+#+begin_example 
+emacs -l backend/acts_as_org/elisp/org-interaction.el
+#+end_example
+5) optionally run your webserver through screen as well by 
+   1) switching to a new screen window with =\C-a c=
+   2) start your webserver
+#+begin_example 
+./run.ru -sthin
+#+end_example
+6) disconnect form screen leaving emacs and the webserver running with
+   =\C-a d=
+7) logoff from the server
+8) at any later date you can log back into the server and reattach to
+   the original screen session with
+#+begin_example 
+screen -r
+#+end_example
+
+** Extending Blorgit
+Simplicity and a small hackable code base were key goals in the
+construction of blorgit.  The =blorgit.rb= file in the base of the
+application contains all of the logic and html.  Any extensions should
+be possible through modification of this single file.  For information
+on the structure of this file, or on the framework on which it is run
+see [[http://www.sinatrarb.com/][Sinatra]].
