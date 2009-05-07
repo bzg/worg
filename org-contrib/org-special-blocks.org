@@ -1,0 +1,82 @@
+#+TITLE:     org-special-blocks.el --- turn blocks into LaTeX envs and HTML divs
+#+OPTIONS:   ^:{} author:nil
+#+AUTHOR:  Chris Gray
+#+STARTUP: odd
+
+* General
+
+=org-special-blocks= turns org blocks into LaTeX environments and HTML
+divs. 
+  
+* How to use it
+
+** Quick Example
+
+   After [[* Loading it][loading]] =org-special-blocks=, you can begin using blocks in
+   org files.  For example, let's look at Fermat's Last Theorem:
+
+: #+begin_theorem
+: If an integer $n$ is greater than 2, then the equation $a^n + b^n = c^n$
+: has no solutions in non-zero integers $a$, $b$, and $c$.
+: #+end_theorem
+
+: #+begin_proof
+: I have a truly /marvelous/ proof of this proposition that this margin is too
+: narrow to contain.
+: #+end_proof
+
+   This is exported into LaTeX as follows:
+
+: \begin{theorem}
+: If an integer $n$ is greater than 2, then the equation $a^n + b^n = c^n$
+: has no solutions in non-zero integers $a$, $b$, and $c$.
+: \end{theorem}
+
+: \begin{proof}
+: I have a truly \emph{marvelous} proof of this proposition that this
+: margin is too narrow to contain.
+: \end{proof}
+   
+   Note that the standard org markup works inside the blocks.  If you
+   were to use LaTeX environments inside an org file, this would not
+   be true.  Also make sure that the name of the environment is
+   something that LaTeX knows about -- otherwise it will not be able
+   to compile your file.
+
+   The org file can also be exported into HTML.  In that case, the
+   exported file would look something like this:
+
+: <div class="theorem">
+: ...
+: </div>
+
+: <div class="proof">
+: ...
+: </div>
+
+   It is up to you to make sure that the div classes are styled
+   properly.  
+
+** Loading it (No surprises here)
+The easiest way is by 
+
+	M-x customize-apropos org-modules
+
+Check the line for special-blocks.  This will cause it to be loaded every
+time you start org-mode.
+
+You'll still have to load it manually the first time.
+
+Of course, you can also just try it out by loading it manually.
+
+If you prefer to manually customize your emacs then make sure that the
+path to org's contrib directory is in your load-path and add the
+following to your =.emacs=.
+
+: (require 'org-special-blocks)
+
+
+* Credits
+
+  Chris Gray wrote =org-special-blocks= with the help of Carsten
+  Dominik.
