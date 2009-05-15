@@ -71,7 +71,7 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
   this.link = _link;
   this.hasHighlight = false;              // Node highlighted (search)
   this.parent = _parent;
-  this.durty = false;                     // Node is durty, when children get
+  this.dirty = false;                     // Node is dirty, when children get
                                           // folded seperatly.
   this.state = OrgNode.STATE_FOLDED;
   this.depth = _depth;                    // The Rootelement will have
@@ -250,7 +250,7 @@ OrgNode.prototype.hideAllChildren = function ()
 
 /**
  * This one is called onclick() to toggle the folding state of the node.
- * This one sets it's parent durty, since node is folded individually. Hence the
+ * This one sets it's parent dirty, since node is folded individually. Hence the
  * next folding of parent has to collapse all.
  * @param show_childrens_folders Boolean. This is only used for the special way
  * of toggling of the ROOT element. If true, prevents this OrgNode from showing
@@ -259,9 +259,9 @@ OrgNode.prototype.hideAllChildren = function ()
 OrgNode.prototype.fold = function (hide_folder)
 {
   if(this.parent)
-    this.parent.durty = true;
-  if(this.durty) {
-    this.durty = false;
+    this.parent.dirty = true;
+  if(this.dirty) {
+    this.dirty = false;
     this.state = OrgNode.STATE_UNFOLDED; // so next state is FOLDED. See below.
   }
 
@@ -402,7 +402,7 @@ var org_html_manager = {
   READ_COMMAND_NULL: "_0",
   READ_COMMAND_HTML_LINK: "_1",
   READ_COMMAND_ORG_LINK: "_2",
-  READ_COMMAND_PLAIN_URL_LINK: "_03",  
+  READ_COMMAND_PLAIN_URL_LINK: "_03",
   LAST_WAS_SEARCH: false,      // if this is true, and OCCUR unchanged, skip to next section if repeated search.
   last_view_mode:0,
   TAB_INDEX: 1000,             // Users could have defined tabindexes!
@@ -1200,7 +1200,7 @@ var org_html_manager = {
 
   toggleGlobaly: function ()
   {
-    if(this.ROOT.durty) {
+    if(this.ROOT.dirty) {
       this.ROOT.state = OrgNode.STATE_UNFOLDED;
     }
 
@@ -1224,8 +1224,8 @@ var org_html_manager = {
       this.ROOT.state = OrgNode.STATE_UNFOLDED;
     }
 
-    // All this sets ROOT durty again. So clean it:
-    this.ROOT.durty = false;
+    // All this sets ROOT dirty again. So clean it:
+    this.ROOT.dirty = false;
   },
 
 
@@ -1793,7 +1793,7 @@ var org_html_manager = {
 
       this.hideConsole();
       if(this.PLAIN_VIEW != this.VIEW) this.plainView();
-      this.ROOT.durty = true;
+      this.ROOT.dirty = true;
       this.toggleGlobaly();
       for(var i = 0; i < this.SECS.length; ++i) {
         OrgNode.showElement(this.SECS[i].div);
