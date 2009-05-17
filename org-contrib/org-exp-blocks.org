@@ -98,10 +98,54 @@ function for that block which will be called by
 of the function to the `org-export-blocks' variable.
 
 If you add a new block type, and get it working please share your
-changes with the mailing list.
-
+changes with the mailing list or post them [[additional-block-types][here]].
 
 * Credits
 
 =org-exp-blocks= was developed by Eric Schulte with much-appreciated
 help from Carsten Dominik.
+
+* Additional Block Types
+#<<additional-block-types>>
+
+** Asymptote
+
+Asymptote is a "powerful descriptive vector graphics language for
+technical drawing".  For more information see
+[[http://asymptote.sourceforge.net/]].
+
+The following can be used to add asymptote support to
+=org-exp-blocks=.
+
+#+begin_src emacs-lisp
+(setq org-export-blocks
+      (cons '(asy org-export-blocks-format-asy) org-export-blocks))
+
+(defun org-export-blocks-format-asy (body &rest headers)
+  "Pass block BODY to the asy utility creating an image.
+Specify the path at which the image should be saved as the first
+element of headers, any additional elements of headers will be
+passed to the asy utility as command line arguments. The default
+output format is pdf, but you can specify any format supported by
+Imagemagick convert program with '-f outformat'."
+  (message "asy-formatting...")
+  (let ((out-file (if headers (car headers)))
+	(args (if (cdr headers) (mapconcat 'identity (cdr headers) " ")))
+	(data-file (make-temp-file "org-asy")))
+    (setq body (if (string-match "^\\([^:\\|:[^ ]\\)" body)
+		   body
+		 (mapconcat (lambda (x) (substring x (if (> (length x) 1) 2 1)))
+			    (org-split-string body "\n")
+			    "\n")))
+    (cond 
+     ((or htmlp latexp)
+      (with-temp-file data-file (insert body))
+      (message (concat "asy -globalwrite -f pdf -o " out-file " " args " " data-file))
+      (shell-command (concat "asy -globalwrite -f pdf -o " out-file " " args " " data-file))
+      (format "\n[[file:%s]]\n" out-file))
+     (t (concat
+	 "\n#+BEGIN_EXAMPLE\n"
+	 body (if (string-match "\n$" body) "" "\n")
+	 "#+END_EXAMPLE\n")))))
+#+end_src
+
