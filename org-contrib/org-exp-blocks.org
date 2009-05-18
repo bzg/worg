@@ -1,6 +1,5 @@
 #+TITLE:     org-exp-blocks.el --- pre-process blocks when exporting org files
-#+OPTIONS:   ^:{} author:nil
-#+STARTUP: odd
+#+OPTIONS:   ^:{} author:nil toc:3
 
 * General 
 
@@ -8,7 +7,6 @@
 files.  An extensible framework for block exportation is provided, as
 well as block exporters for [[http://ditaa.sourceforge.net/][ditaa]], [[http://www.graphviz.org/][dot]], comments, and [[http://www.r-project.org/][R]] code in a
 manner similar to [[http://en.wikipedia.org/wiki/Sweave][Sweave]].
-
 
 * How to use it
 
@@ -114,6 +112,8 @@ Asymptote is a "powerful descriptive vector graphics language for
 technical drawing".  For more information see
 [[http://asymptote.sourceforge.net/]].
 
+*** Instillation
+
 The following can be used to add asymptote support to
 =org-exp-blocks=.
 
@@ -149,3 +149,28 @@ Imagemagick convert program with '-f outformat'."
 	 "#+END_EXAMPLE\n")))))
 #+end_src
 
+*** Example
+Here is a simple asymptote block :
+
+: #+begin_asy out.pdf
+: import graph;
+: 
+: size(0,4cm);
+: 
+: real f(real t) {return 1+cos(t);}
+: 
+: path g=polargraph(f,0,2pi,operator ..)--cycle;
+: filldraw(g,pink);
+: 
+: xaxis("$x$",above=true);
+: yaxis("$y$",above=true);
+: 
+: dot("$(a,0)$",(1,0),N);
+: dot("$(2a,0)$",(2,0),N+E);
+: #+end_asy
+
+The output should be 
+http://asymptote.sourceforge.net/gallery/cardioid.pdf
+
+*** Credit
+Thanks to Nicolas Goaziou for adding support for asymptote.
