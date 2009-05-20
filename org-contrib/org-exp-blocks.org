@@ -130,30 +130,33 @@ passed to the asy utility as command line arguments. The default
 output format is pdf, but you can specify any format supported by
 Imagemagick convert program with '-f outformat'."
   (message "asy-formatting...")
-  (let ((out-file (if headers (car headers)))
-	(args (if (cdr headers) (mapconcat 'identity (cdr headers) " ")))
-	(data-file (make-temp-file "org-asy")))
+  (let* ((out-file (if headers (car headers)))
+         (format (or (and (string-match ".+\\.\\(.+\\)" out-file)
+                          (match-string 1 out-file))
+                     "pdf"))
+         (args (if (cdr headers) (mapconcat 'identity (cdr headers) " ")))
+         (data-file (make-temp-file "org-asy")))
     (setq body (if (string-match "^\\([^:\\|:[^ ]\\)" body)
-		   body
-		 (mapconcat (lambda (x) (substring x (if (> (length x) 1) 2 1)))
-			    (org-split-string body "\n")
-			    "\n")))
+                   body
+                 (mapconcat (lambda (x) (substring x (if (> (length x) 1) 2 1)))
+                            (org-split-string body "\n")
+                            "\n")))
     (cond 
      ((or htmlp latexp)
       (with-temp-file data-file (insert body))
-      (message (concat "asy -globalwrite -f pdf -o " out-file " " args " " data-file))
-      (shell-command (concat "asy -globalwrite -f pdf -o " out-file " " args " " data-file))
+      (message (concat "asy -globalwrite -f " format " -o " out-file " " args " " data-file))
+      (shell-command (concat "asy -globalwrite -f " format " -o " out-file " " args " " data-file))
       (format "\n[[file:%s]]\n" out-file))
      (t (concat
-	 "\n#+BEGIN_EXAMPLE\n"
-	 body (if (string-match "\n$" body) "" "\n")
-	 "#+END_EXAMPLE\n")))))
+         "\n#+BEGIN_EXAMPLE\n"
+         body (if (string-match "\n$" body) "" "\n")
+         "#+END_EXAMPLE\n")))))
 #+end_src
 
 **** Example
 Here is a simple asymptote block :
 
-: #+begin_asy out.pdf
+: #+begin_asy out.png
 : import graph;
 : 
 : size(0,4cm);
@@ -170,7 +173,7 @@ Here is a simple asymptote block :
 : dot("$(2a,0)$",(2,0),N+E);
 : #+end_asy
 
-The output should be [[file:../images/org-exp-blocks/cardioid.pdf]]
+The output should be [[file:../images/org-exp-blocks/cardioid.png]]
 
 **** Credit
 Thanks to Nicolas Goaziou for adding support for asymptote.
