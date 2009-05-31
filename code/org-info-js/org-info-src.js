@@ -387,7 +387,7 @@ var org_html_manager = {
   CONSOLE_OFFSET: "50px",
   OCCUR: "",                   // The search string.
   SEARCH_REGEX: "",
-  SEARCH_HL_REG: new RegExp('>([^<]*)?(<span [^>]*?"org-info-js_search-highlight"[^>]*?>)(.*?)(<\/span>)([^>]*)?<', "ig"),
+  SEARCH_HL_REG: new RegExp('(<span class="org-info-js_search-highlight">)([^<]*?)(<\/span>)', "gi"),
   console_first_time: true,    // Cookie would be cool maybe.
   MESSAGING: 0,                // Is there a message in the console?
   MESSAGING_INPLACE: 1,
@@ -1878,8 +1878,14 @@ var org_html_manager = {
 
   makeSearchRegexp: function()
   {
-    var tmp = this.OCCUR.replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/=/g, "\\=").replace(/\\/g, "\\\\").replace(/\?/g, "\\?").replace(/\*/g, "\\*").replace(/\+/g, "\\+").replace(/\"/g, "&quot;");
-    this.SEARCH_REGEX =  new RegExp(">([^<]*)?("+tmp+")([^>]*)?<","ig");
+    var tmp = this.OCCUR.replace(/>/g, "&gt;").
+      replace(/</g, "&lt;").
+      replace(/=/g, "\\=").
+      replace(/\\/g, "\\\\").
+      replace(/\?/g, "\\?").
+      replace(/\./g, "[^<>]").
+      replace(/\"/g, "&quot;");
+    this.SEARCH_REGEX = new RegExp(">([^<]*)?("+tmp+")([^>]*)?<","ig");
   },
 
   searchTextInOrgNode: function(i)
@@ -1916,11 +1922,11 @@ var org_html_manager = {
       if(this.SECS[i].hasHighlight) {
         while(this.SEARCH_HL_REG.test(this.SECS[i].heading.innerHTML)) {
           var tmp = this.SECS[i].heading.innerHTML;
-          this.SECS[i].heading.innerHTML = tmp.replace(this.SEARCH_HL_REG, '>$1$3$5<');
+          this.SECS[i].heading.innerHTML = tmp.replace(this.SEARCH_HL_REG, '$2');
         }
         while(this.SEARCH_HL_REG.test(this.SECS[i].folder.innerHTML)) {
           var tmp = this.SECS[i].folder.innerHTML;
-          this.SECS[i].folder.innerHTML = tmp.replace(this.SEARCH_HL_REG, '>$1$3$5<');
+          this.SECS[i].folder.innerHTML = tmp.replace(this.SEARCH_HL_REG, '$2');
         }
         this.SECS[i].hasHighlight = false;
       }
