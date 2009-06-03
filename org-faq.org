@@ -527,6 +527,24 @@ files *after* you have set your variables.
    This is a conflict with an outdated version of the /allout.el/, see
    the [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] section in the manual
 
+** Org-mode takes over the TAB key.  I also want to use YASnippet, is there a way to fix this conflict?
+   :PROPERTIES:
+   :CUSTOM_ID: YASnippet
+   :END:
+
+The way Org-mode binds the =TAB= key (binding to =[tab]= instead of
+=\t=) overrules yasnippets' access to this key.  The following code
+fixes this problem:
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook
+	  (lambda ()
+	    (org-set-local 'yas/trigger-key [tab])
+	    (define-key yas/keymap [tab] 'yas/next-field-group)))
+#+end_src
+
+Rick Moynihan maintains a [[http://github.com/RickMoynihan/yasnippet-org-mode][git repository]] with YASnippets for Org-mode.
+
 ** Org-mode takes over the S-cursor keys.  I also want to use CUA-mode, is there a way to fix this conflict?
    :PROPERTIES:
    :CUSTOM_ID: CUA-mode
