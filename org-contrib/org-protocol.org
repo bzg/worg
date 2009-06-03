@@ -332,29 +332,28 @@ following snippets of code to your .conkerorrc file.[fn:tassilosblog]
 For org-store-link, add the following to .conkerorrc:
 
 : function org_store_link (url, title, window) {
-:     var cmd_str = 'emacsclient org-protocol://store-link://' + url + '/' + title;
+:     var cmd_str = 'emacsclient \"org-protocol://store-link://'+url+'/'+title+'\"';
 :     if (window != null) {
 : 	window.minibuffer.message('Issuing ' + cmd_str);
 :     }
 :     shell_command_blind(cmd_str);
 : }
-
+: 
 : interactive("org-store-link", "Stores [[url][title]] as org link and copies url to emacs kill ring",
 : 	    function (I) {
 : 		org_store_link(encodeURIComponent(I.buffer.display_URI_string), encodeURIComponent(I.buffer.document.title), I.window);
 : 	    });
 
-
 For org-remember, use the following:
 
 : function org_remember (url, title, selection, window) {
-:     var cmd_str = 'emacsclient org-protocol://remember://' + url + '/' + title + '/' + selection;
+:     var cmd_str = 'emacsclient \"org-protocol://remember://'+url+'/'+title+'/'+selection+'\"';
 :     if (window != null) {
 : 	window.minibuffer.message('Issuing ' + cmd_str);
 :     }
 :     shell_command_blind(cmd_str);
 : }
-
+: 
 : interactive("org-remember", "Clip url, title, and selection to remember via org-protocol",
 : 	    function (I) {
 : 		org_remember(encodeURIComponent(I.buffer.display_URI_string), encodeURIComponent(I.buffer.document.title), encodeURIComponent(I.buffer.top_frame.getSelection()), I.window);
