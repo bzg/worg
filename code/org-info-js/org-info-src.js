@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.1.1.3
+ *       org-info.js, v.0.1.1.3b
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -850,11 +850,12 @@ var org_html_manager = {
           if(spans[i].className == "tag") {
             var tags = spans[i].innerHTML.split("&nbsp;");
             for(var j = 0; j < tags.length; ++j) {
-              if(! this.TAGS[tags[j]]) {
-                this.TAGS[tags[j]] = new Array();
-                this.SORTED_TAGS.push(tags[j]);
+              var t = this.removeTags(tags[j]);
+              if(! this.TAGS[t]) {
+                this.TAGS[t] = new Array();
+                this.SORTED_TAGS.push(t);
               }
-              this.TAGS[tags[j]].push(sec);
+              this.TAGS[t].push(sec);
             }
           }
           else if(spans[i].className.match(this.SECNUM_REGEX)) {
