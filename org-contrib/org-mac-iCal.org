@@ -1,0 +1,86 @@
+#+TITLE:     org-mac-iCal.el -- import Mac OS X iCal.app events into Emacs diary
+#+OPTIONS:   ^:{} author:nil
+#+STARTUP: odd
+
+[[file:index.org][{Back to Worg's contibutions index}]]
+
+If you find iCal.app the most convenient way to manage your diary, but
+would still like to view your appointments in org agenda, then this
+module may help.
+
+*N.B.* org-mac-iCal.el has only been tested on OS X 10.5. Apple's
+handling of ics files changed between 10.4 and 10.5 to allow Spotlight
+to index events. Unfortunately, the author no longer has access to
+10.4 and 10.4 support is based entirely on his memory. The author
+would welcome reports of success or failure of org-mac-iCal.el with OS
+X 10.4 or earlier.
+
+* Installation
+  - To load org-mac-iCal.el by default:
+
+    : (add-to-list 'org-modules 'org-mac-iCal)
+
+    Note that =org-modules= must be set before org-mode is loaded.
+
+  - To view Emacs diary entries in the org agenda, ensure that 
+
+    : (setq org-agenda-include-diary t)
+
+    is set.
+
+* Usage
+  =(org-mac-iCal)= will import all /checked/ iCal.app calendars into
+  your Emacs diary when called either interactively or as part of
+  another function.
+
+  *Warning: (org-mac-iCal) is destructive and will overwrite the
+  current contents of your Emacs diary.*
+
+** Customizable variables
+   - =org-mac-iCal-range= ::
+
+     Sets the number of months (default: 2) of events imported from
+     iCal.app calendars.
+
+     Because all-day and multi-day events are imported into the Emacs
+     diary as sexps, a large number of these can cause the Emacs
+     calendar view to slow down unacceptably. =org-mac-iCal-range=
+     sets how many months of events to import, /centred around the
+     current day/. Thus the default value of 2 imports events from one
+     month in the past to one month in the future.
+
+** Examples of usage
+   The following code creates a custom command in the agenda
+   dispatcher to import iCal.app events and then display the agenda:
+
+#+begin_src emacs-lisp
+(setq org-agenda custom-commands
+      '(("I" "Import diary from iCal" agenda ""
+	 ((org-agenda-mode-hook
+	   (lambda ()
+	     (org-mac-iCal)))))))
+#+end_src
+
+   A common problem with all-day and multi-day events in org agenda
+   view is that they become separated from timed events and are placed
+   below all =TODO= items. Likewise, additional fields such as
+   =Location:= are orphaned from their parent events. The following
+   hook will ensure that all events are correctly placed in the
+   agenda:
+
+#+begin_src emacs-lisp
+(add-hook 'org-agenda-cleanup-fancy-diary-hook
+	  (lambda ()
+	    (goto-char (point-min))
+	    (save-excursion
+	      (while (re-search-forward "^[a-z]" nil t)
+		(goto-char (match-beginning 0))
+		(insert "0:00-24:00 ")))
+	    (while (re-search-forward "^ [a-z]" nil t)
+	      (goto-char (match-beginning 0))
+	      (save-excursion
+		(re-search-backward "^[0-9]+:[0-9]+-[0-9]+:[0-9]+ " nil t))
+	      (insert (match-string 0)))))
+#+end_src
+
+	     
