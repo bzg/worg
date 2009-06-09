@@ -25,6 +25,284 @@ tutorials I wrote.
 - [[file:org-tutorials/org-spreadsheet-intro.org][Introduction to Org spreadsheet system]]
 - [[file:org-tutorials/orgtutorial_dto-fr.org][Translation of David O'Toole tutorial]]
 - [[file:org-tutorials/tables.org][Introduction to tables in Org]]
+- [[http://lumiere.ens.fr/~guerry/org-playing-with-lists-screencast.php]["Playing with plain lists" screencast]]
+
+* My configuration
+
+Here is my Org configuration.
+
+** Agenda variables
+
+| Variable                              | Value                                              | Why?                               |
+|                                       | <50>                                               |                                    |
+|---------------------------------------+----------------------------------------------------+------------------------------------|
+| org-agenda-file-regexp                | "\\.org\\'"                                        |                                    |
+| org-agenda-files                      | '("~/org/bzg.org" "~/install/git/Worg/worg-todo.org") |                                    |
+| org-agenda-include-diary              | nil                                                | I don't use the diary anymore      |
+| org-agenda-remove-tags                | t                                                  | Don't clutter the agenda view      |
+| org-agenda-restore-windows-after-quit | t                                                  | I think this should be the default |
+| org-agenda-skip-deadline-if-done      | t                                                  |                                    |
+| org-agenda-skip-scheduled-if-done     | t                                                  |                                    |
+| org-agenda-skip-timestamp-if-done     | t                                                  |                                    |
+| org-agenda-sorting-strategy           | '((agenda time-up priority-down category-keep) (todo priority-down category-keep) (tags priority-down category-keep) (search category-keep)) |                                    |
+| org-agenda-start-on-weekday           | 1                                                  | Week starts on monday, right?      |
+| org-combined-agenda-icalendar-file    | "~/org/org.ics"                                    | I want to use a single file        |
+| org-deadline-warning-days             | 7                                                  |                                    |
+| org-icalendar-include-todo            | 'all                                               |                                    |
+| org-stuck-projects                    | '("+LEVEL=1" ("NEXT" "TODO" "DONE"))               |                                    |
+| org-scheduled-past-days               | 100                                                |                                    |
+|---------------------------------------+----------------------------------------------------+------------------------------------|
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(;; Daily agenda view
+        (" " "Today" agenda "List of tasks for today" 
+         ((org-agenda-ndays 1)
+          (org-deadline-warning-days 3)
+          (org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+
+        ;; Everything that has a NEXT keyword
+        ("," . "NEXT")
+	(",," tags-todo "Status={Work}/NEXT" nil)
+	(",!" tags-todo "-Status={Work}/NEXT" nil)
+	(",+" tags-todo "Status={Leisure}/NEXT" nil)
+	(",?" tags-todo "Status={GTD}/NEXT" nil)
+	(",#" tags-todo "Status={WOT}/NEXT" nil)
+	(",*" todo "NEXT" nil)
+
+        ;; Everything that has a TODO keyword
+        (";" . "TODO")
+	(";;" tags-todo "Status={Work}/TODO" nil)
+	(";!" tags-todo "-Status={Work}/TODO" nil)
+	(";+" tags-todo "Status={Leisure}/TODO" nil)
+	(";?" tags-todo "Status={GTD}/TODO" nil)
+	(";#" tags-todo "Status={WOT}/TODO" nil)
+	(";*" todo "TODO" nil)
+
+        ;; Everything that has a NEXT or a TODO keyword
+        ("." . "NEXT|TODO")
+	(".." tags-todo "Status={Work}/NEXT|TODO" nil)
+	(".!" tags-todo "-Status={Work}/NEXT|TODO" nil)
+	(".+" tags-todo "Status={Leisure}/NEXT|TODO" nil)
+	(".?" tags-todo "Status={GTD}/NEXT|TODO" nil)
+	(".#" tags-todo "Status={WOT}/NEXT|TODO" nil)
+	(".*" todo "NEXT|TODO" nil)
+
+        ;; Everything that is in progress
+        (":" . "In progress")
+        ("::" tags-todo "+Progress={[0-9]+%}Status={Work}")
+        (":!" tags-todo "+Progress={[0-9]+%}-Status={Work}")
+        (":+" tags-todo "+Progress={[0-9]+%}+Status={Leisure}")
+        (":?" tags-todo "+Progress={[0-9]+%}+Status={GTD}")
+        (":#" tags-todo "+Progress={[0-9]+%}+Status={WOT}")
+        (":*" tags-todo "+Progress={[0-9]+%}"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+
+        ;; Everything that has a "Read" tag
+	("R" tags-todo "Status={Work}+Read/NEXT" ; shortcut for `C-c a r ,'
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down effort-up))))
+        ("r" . "Read")
+	("rr" tags-todo "Status={Work}+Read/NEXT" nil)
+	("r." tags-todo "Read/NEXT|TODO" nil)
+	("r," tags-todo "Read/NEXT" nil)
+	("r;" tags-todo "Read/TODO" nil)
+	("r:" tags "+Progress={[0-9]+%}+Read" nil)
+	("r!" tags-todo "-Status={Work}+Read/NEXT" nil)
+	("r+" tags-todo "+Status={Leisure}+Read/NEXT" nil)
+        ("r?" tags-todo "+Status={GTD}+Read/NEXT" nil)
+        ("r#" tags-todo "+Status={WOT}+Read/NEXT" nil)
+	("r*" tags "Read"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+;;	("r_" tags "Read+LEVEL<3" nil)
+	("rF" tags "+Read+@Offline" nil)
+	("r@" tags "+Read+Mail" nil)
+
+        ;; Everything that has a "Write" tag
+	("W" tags-todo "Status={Work}+Write/NEXT"  ; shortcut for `C-c a w ,'
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down effort-up))))
+        ("w" . "Write")
+	("ww" tags-todo "Status={Work}+Write/NEXT" nil)
+	("w." tags-todo "Write/NEXT|TODO" nil)
+	("w," tags-todo "Write/NEXT" nil)
+	("w;" tags-todo "Write/TODO" nil)
+	("w:" tags "+Progress={[0-9]+%}+Write" nil)
+	("w!" tags-todo "-Status={Work}+Write/NEXT" nil)
+	("w+" tags-todo "+Status={Leisure}+Write/NEXT" nil)
+        ("w?" tags-todo "+Status={GTD}+Write/NEXT" nil)
+        ("w#" tags-todo "+Status={WOT}+Write/NEXT" nil)
+	("wo" tags "+Write+@Online" nil)
+	("w@" tags "+Write+Mail" nil)
+	("w*" tags "Write" 
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+
+	;; Working on bugs
+        ("b" . "Bug")
+        ("bb" tags-todo "+Bug"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+        ("b," tags-todo "+Bug/NEXT"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+        ("b." tags-todo "+Bug/NEXT|TODO"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+        ("b;" tags-todo "+Bug/TODO"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+        ("b:" tags-todo "+Bug+Progress={[0-9]+%}"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+
+	;; Working on code
+        ("$" . "Code")
+        ("$$" tags-todo "+Code"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+        ("$," tags-todo "+Code/NEXT"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+        ("$." tags-todo "+Code/NEXT|TODO"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+        ("$;" tags-todo "+Code/TODO"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+        ("$:" tags-todo "+Code+Progress={[0-9]+%}"
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+	
+	;; Others contexts
+	("F" tags "@Offline" 
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+        ("p" tags "Print" 
+         ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+	("?" todo "WAITING")
+	("D" todo "DELEGATED")
+	("v" tags "Watch" ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+	("g" tags "Blog" ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+	("l" tags "Listen" ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down))))
+	("@" tags "Mail" ((org-agenda-sorting-strategy '(time-up todo-state-up priority-down)))) ;; necessary?
+	))
+#+END_SRC
+
+** Export variables
+
+| Variable                                | Value       | Why?                      |
+|-----------------------------------------+-------------+---------------------------|
+| org-export-default-language             | "fr"        | Nobody's perfect          |
+| org-export-highlight-first-table-line   | t           |                           |
+| org-export-html-extension               | "php"       | I use this for my website |
+| org-export-html-style                   | ""          |                           |
+| org-export-html-style-default           | ""          |                           |
+| org-export-html-with-timestamp          | t           |                           |
+| org-export-skip-text-before-1st-heading | nil         |                           |
+| org-export-with-LaTeX-fragments         | t           |                           |
+| org-export-with-archived-trees          | nil         |                           |
+| org-export-with-drawers                 | '("HIDE")   |                           |
+| org-export-with-section-numbers         | nil         |                           |
+| org-export-with-sub-superscripts        | '{}         |                           |
+| org-export-with-tags                    | 'not-in-toc |                           |
+| org-export-with-timestamps              | t           |                           |
+|-----------------------------------------+-------------+---------------------------|
+
+#+BEGIN_SRC emacs-lisp
+(setq org-publish-project-alist
+      '(
+        ("homepage"
+	 :base-directory "~/org/homepage/"
+	 :base-extension "org"
+	 :publishing-directory "/home/guerry/public_html/org/homepage/"
+	 :publishing-function org-publish-org-to-html
+	 :section-numbers nil
+	 :table-of-contents nil
+	 :style "<link rel=\"stylesheet\" href=\"u/org.css\" type=\"text/css\" />"
+	 :auto-preamble t
+	 :auto-postamble nil
+	 :xml_declaration "<?php echo '<?xml version=\"1.0\" encoding=\"%s\"?>'; ?>")
+	("homepage_articles"
+	 :base-directory "~/org/homepage/articles/"
+	 :base-extension "org"
+	 :publishing-directory "/home/guerry/public_html/org/homepage/articles/"
+	 :publishing-function org-publish-org-to-html
+	 :section-numbers nil
+	 :table-of-contents nil
+	 :style "<link rel=\"stylesheet\" href=\"../u/org.css\" type=\"text/css\" />"
+	 :auto-preamble t
+	 :auto-postamble nil
+	 :xml_declaration "<?php echo '<?xml version=\"1.0\" encoding=\"%s\"?>'; ?>")))
+#+END_SRC
+
+** Tags / TODO / Remember / Logging
+
+| Variable                          | Value   | Why?                           |
+|-----------------------------------+---------+--------------------------------|
+| org-fast-tag-selection-single-key | 'expert | Good to be an expert somewhere |
+| org-tag-alist                           | '(("Read" . ?r) ("Write" . ?w) ("Watch" . ?v) ("Blog" . ?g) ("Listen" . ?l) ("Code" . ?c) ("Bug" . ?b) ("@HOME" . ?H) ("@LAB" . ?L)  ("@Online" . ?O) ("@Offline" . ?F) ("Mail" . ?m) ("Print" . ?p)) |                                                |
+| org-tags-column                         | -74                                                |                                                |
+| org-tags-match-list-sublevels           | t                                                  |                                                |
+| org-todo-keywords                       | '((type "NEXT" "TODO" "WAITING" " " "DONE" "DELEGATED" "CANCELED")) |                                                |
+| org-use-fast-todo-selection             | t                                                  |                                                |
+| org-use-property-inheritance            | t                                                  |                                                |
+| org-use-tag-inheritance                 | t                                                  |                                                |
+| org-log-into-drawer                     | t                                                  |                                                |
+| org-log-note-headings                   | '((done . "CLOSING NOTE %t") (state . "State %-12s %t") (clock-out . "")) |                                                |
+| org-remember-default-headline           | "Notes"                                            |                                                |
+| org-remember-store-without-prompt       | t                                                  |                                                |
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-remember-templates 
+        '(; caps are for projects I'm active on
+          ("Eyrolles" ?E "* TODO %a\n\n%i%?" "~/org/bzg.org" "Eyrolles" nil)
+          ("UID" ?U "* TODO %a\n\n%i%?" "~/org/bzg.org" "UID" nil)
+          ("Webmaster" ?W "* TODO %a\n\n%i%?" "~/org/bzg.org" "Webmaster" nil)
+          ("OLPC" ?O "* TODO %a\n\n%i%?" "~/org/bzg.org" "OLPC" nil)
+          ; small letters for other projects:
+          ("Parkway" ?p "* TODO %a\n\n%i%!" "~/org/bzg.org" "Parkway" nil)
+          ("Basement" ?b "* TODO %a\n\n%i%?" "~/org/bzg.org" "Basement" nil)
+          ("Garden" ?g "* TODO %a\n\n%i%?" "~/org/bzg.org" "Garden" nil)
+          ("Attic" ?a "* TODO %a\n\n%i%?" "~/org/bzg.org" "Attic" nil)
+          ("Emacs" ?e "* TODO %a\n\n%i%?" "~/org/bzg.org" "Emacs" nil)
+          ("Infos" ?i "* TODO %a\n\n%i%?%!" "~/org/bzg.org" "Infos" nil)
+          ("Compas" ?c "* TODO %a\n\n%i%?" "~/org/bzg.org" "Compas" nil)
+          ("ITIC" ?t "* TODO %a\n\n%i%?" "~/org/bzg.org" "ITIC" nil)
+          ("WikiProf" ?w "* TODO %a\n\n%i%?" "~/org/bzg.org" "Wikiprof" nil)
+          ("Org" ?o "* TODO %a\n\n%i%?" "~/org/bzg.org" "Org" nil)))
+#+END_SRC
+
+** Other variables
+
+| Variable                              | Value                                            | Why?                                           |
+|---------------------------------------+--------------------------------------------------+------------------------------------------------|
+| org-confirm-elisp-link-function       | nil                                              |                                                |
+| org-confirm-shell-link-function       | nil                                              |                                                |
+| org-context-in-file-links             | t                                                |                                                |
+| org-cycle-include-plain-lists         | nil                                              | Avoid confusion. Cycling is just for headlines |
+| org-default-notes-file                | "~/org/notes.org"                                | (I don't use this anyway...)                   |
+| org-directory                         | "~/org/"                                         |                                                |
+| org-drawers                           | '("PROPERTIES" "CLOCK" "HIDE")                   | I just added "HIDE" to the defaults.           |
+| org-ellipsis                          | nil                                              |                                                |
+| org-email-link-description-format     | "%c: %.50s"                                      | %.50s is a bit too much perhaps                |
+| org-fontify-done-headline             | t                                                |                                                |
+| org-fontify-emphasized-text           | t                                                |                                                |
+| org-footnote-define-inline            | t                                                | I recommend reading more about Org [[http://orgmode.org/manual/Footnotes.html][footnotes]]   |
+| org-hide-emphasis-markers             | nil                                              | Keep Org plain text, no WYSIWYG.               |
+| org-link-frame-setup                  | '((gnus . gnus) (file . find-file-other-window)) |                                                |
+| org-link-mailto-program               | '(browse-url-mail "mailto:%a?subject=%s")        |                                                |
+| org-priority-start-cycle-with-default | nil                                              |                                                |
+| org-refile-targets                    | '((org-agenda-files . (:maxlevel . 2)))          |                                                |
+| org-refile-use-outline-path           | t                                                |                                                |
+| org-return-follows-link               | t                                                |                                                |
+| org-reverse-note-order                | t                                                |                                                |
+| org-show-following-heading            | '((default nil) (occur-tree t))                  |                                                |
+| org-show-hierarchy-above              | '((default nil) (occur-tree t))                  |                                                |
+| org-show-hierarchy-above              | '((default nil) (tags-tree . t))                 |                                                |
+| org-special-ctrl-a/e                  | 'reversed                                        |                                                |
+| org-special-ctrl-k                    | t                                                |                                                |
+|---------------------------------------+--------------------------------------------------+------------------------------------------------|
+
+#+BEGIN_SRC emacs-lisp
+(setq org-link-abbrev-alist
+      '(("google"   . "http://www.google.com/search?q=%s")
+	("googledef" . "http://www.google.fr/search?q=define%3A%s")
+	("googlemap" . "http://maps.google.com/maps?f=q&hl=fr&q=%s&ie=UTF8&iwloc=addr&om=1")
+	("homepage"  . "http://www.cognition.ens.fr/~guerry/%s.html")
+	("delicious" . "http://delicious.com/tag/%s")
+	("mydelicious" . "http://delicious.com/bzg/%s")
+	("wpfr" . "http://fr.wikipedia.org/wiki/%s")
+	("wpen" . "http://en.wikipedia.org/wiki/%s")
+	("emacswiki" . "http://www.emacswiki.org/cgi-bin/wiki?search=%s")))
+#+END_SRC
+
 
 
 
