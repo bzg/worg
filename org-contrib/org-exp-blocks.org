@@ -177,3 +177,62 @@ The output should be [[file:../images/org-exp-blocks/cardioid.png]]
 
 **** Credit
 Thanks to Nicolas Goaziou for adding support for asymptote.
+
+*** Dot with EPS
+While dot is capable of generating pdf images directly the results are
+more pleasing when =dot= is used to generate an eps file and
+=epstopdf= is used to generate the actual pdf.
+
+The following block type takes the name of a file, and generates both
+and EPS and a PDF file at that base name.
+
+**** Instillation
+The following can be used to add =dot-and-eps= block support to
+=org-exp-blocks=.
+
+#+begin_src emacs-lisp
+(defun org-export-blocks-format-dot-and-eps (body &rest headers)
+  "Pass block BODY to the dot graphing utility creating an eps
+file which is then processed by eps to create a pdf.  Specify the
+path at which the final pdf image should be created as the first
+element of headers, any additional elements of headers will be
+passed to the dot utility as command line arguments.
+
+#+begin_dot_and_eps duh
+digraph test {
+a -> { b c d e };
+e -> { f g h i };
+};
+#+end_dot"
+  (message "dot-and-eps-formatting...")
+  (let ((out-file (if headers (car headers)))
+	(args (if (cdr headers) (mapconcat 'identity (cdr headers) " ")))
+	(data-file (make-temp-file "org-dot")))
+    (cond
+     ((or htmlp latexp docbookp)
+      (with-temp-file data-file (insert body))
+      (shell-command (message (concat "dot -Teps " data-file " " args " -o " out-file ".eps")))
+      (shell-command (message (concat "epstopdf " out-file ".eps")))
+      (format "\n[[file:%s.pdf]]\n" out-file))
+     (t (concat
+	 "\n#+BEGIN_EXAMPLE\n"
+	 body (if (string-match "\n$" body) "" "\n")
+	 "#+END_EXAMPLE\n")))))
+
+(org-export-blocks-add-block '(dot-and-eps org-export-blocks-format-dot-and-eps nil))
+#+end_src
+
+**** Example
+Here is an example =dot-and-eps= block
+
+: #+begin_dot-and-eps out-w-eps
+: digraph test {
+: a -> { b c d e };
+: e -> { f g h i };
+: };
+: #+end_dot-and-eps
+
+**** Credit
+Thanks to Russell Adams for noticing this need, and supplying the
+command lines.
+
