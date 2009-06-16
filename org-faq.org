@@ -1507,6 +1507,43 @@ Emacs wiki]].
    If you want to export a subtree, mark the subtree as region and then
    export.  Marking can be done with =C-c @ C-x C-x=, for example.
 
+** How can I tell my calendar web application about appointments in my agenda files?
+
+Here is what you need to do:
+
+1. a script that calls Emacs in batch mode and produce a .ics file
+2. a script that uploads this .ics file somewhere on the web
+3. tell your webapp to fetch this .ics file on the web
+
+Here is the script I use for the first step:
+
+#+begin_src shell-script-mode
+#!/bin/bash
+
+/usr/local/bin/emacs --batch --eval \
+"(progn (load-file \"~/install/git/org-mode/org.el\") \
+        (load-file \"~/elisp/config/org-batch-config.el\") \
+        (setq org-combined-agenda-icalendar-file \"~/org/cal/org.ics\")
+        (setq org-agenda-files (quote (\"~/org/bzg.org\"))))" \
+    -f org-export-icalendar-combine-agenda-files
+#+end_src
+
+Depending on your configuration, you might change the load sequence.
+
+Here is the script I use for the second step:
+
+#+begin_src shell-script-mode
+#!/bin/bash
+/usr/bin/rsync -rtv ~/org/org.ics -e ssh me@my_server:/home/me/public_html/
+#+end_src
+
+Note: if you want to cron this rsync script, you will need to let
+=my_server= to know about your SSH public key.  Check [[http://troy.jdmz.net/rsync/index.html][this page]] as a
+starter.
+
+Now you can cron the two scripts above and your webapp will always be
+up to date with your Org agendas.
+
 ** How can I get Mac OSX 10.3 iCal to import my Org-exported .ics files?
    :PROPERTIES:
    :CUSTOM_ID: iCal-import-ics-files-old
