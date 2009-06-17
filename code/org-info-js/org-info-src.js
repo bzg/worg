@@ -1277,7 +1277,7 @@ var org_html_manager = {
     if     (this.READING)   { this.endRead(); this.hideConsole(); }
     else if(this.MESSAGING) { this.removeWarning(); }
     if(this.VIEW == this.SLIDE_VIEW) this.adjustSlide(sec);
-    document.location.replace(this.BASE_URL + "#"+this.SECS[sec]['base_id']);
+    if ('toc' != sec) document.location.replace(this.BASE_URL + "#"+this.SECS[sec]['base_id']);
     this.pushHistory(sec, this.NODE.idx);
     this.showSection(sec);
   },

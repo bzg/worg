@@ -193,8 +193,8 @@ this.hideConsole();}else{if(this.MESSAGING){this.removeWarning();}}eval(func);if
 if(a<this.SECS.length){this.navigateTo(a);}else{this.warn("Already last section.");
 }},previousSection:function(){var a=this.NODE.idx;if(a>0){this.navigateTo(a-1);}else{this.warn("Already first section.");
 }},navigateTo:function(a){if(this.READING){this.endRead();this.hideConsole();}else{if(this.MESSAGING){this.removeWarning();
-}}if(this.VIEW==this.SLIDE_VIEW){this.adjustSlide(a);}document.location.replace(this.BASE_URL+"#"+this.SECS[a]["base_id"]);
-this.pushHistory(a,this.NODE.idx);this.showSection(a);},pushHistory:function(b,a){if(!this.SKIP_HISTORY){this.HISTORY[this.HIST_INDEX]=new Array(b,a);
+}}if(this.VIEW==this.SLIDE_VIEW){this.adjustSlide(a);}if("toc"!=a){document.location.replace(this.BASE_URL+"#"+this.SECS[a]["base_id"]);
+}this.pushHistory(a,this.NODE.idx);this.showSection(a);},pushHistory:function(b,a){if(!this.SKIP_HISTORY){this.HISTORY[this.HIST_INDEX]=new Array(b,a);
 this.HIST_INDEX=(this.HIST_INDEX+1)%50;}this.SKIP_HISTORY=false;this.CONSOLE_INPUT.value="";
 },popHistory:function(b){if(b){if(this.HISTORY[this.HIST_INDEX]){var a=parseInt(this.HISTORY[this.HIST_INDEX][0]);
 if(!isNaN(a)||"toc"==this.HISTORY[this.HIST_INDEX][0]){this.showSection(this.HISTORY[this.HIST_INDEX][0]);
