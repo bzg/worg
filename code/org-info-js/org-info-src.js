@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.1.1.4
+ *       org-info.js, v.0.1.1.5
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -1313,9 +1313,13 @@ var org_html_manager = {
           this.getKey();
         }
         this.HIST_INDEX = (this.HIST_INDEX + 1) % 50;
+        this.HBO=0;
       }
-      else
-        this.warn("History: No where to foreward go from here.");
+      else if(this.HFO && history.length) history.forward();
+      else {
+        this.HFO=1;
+        this.warn("History: No where to foreward go from here. Any key and `B' to move to next file in history.");
+      }
     } else {
       if(this.HISTORY[this.HIST_INDEX - 1]) {
         this.HIST_INDEX = this.HIST_INDEX == 0 ? 49 : this.HIST_INDEX - 1;
@@ -1329,9 +1333,13 @@ var org_html_manager = {
           this.CONSOLE_INPUT.value = this.HISTORY[this.HIST_INDEX][1];
           this.getKey();
         }
+        this.HFO=0;
       }
-      else
-        this.warn("History: No where to back go from here.");
+      else if(this.HBO && history.length) history.back();
+      else {
+        this.HBO=1;
+        this.warn("History: No where to back go from here. Any key and `b' to move to previous file in history.");
+      }
     }
   },
 
