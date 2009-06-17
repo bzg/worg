@@ -141,7 +141,7 @@ e<d.length;++e){var c=d[e].href.replace(this.BASE_URL,"");for(var b=0;b<this.SEC
 break;}}}}},showSection:function(c){var d=parseInt(c);var b=this.NODE;if(this.HIDE_TOC&&this.NODE==this.TOC&&!this.FIXED_TOC){OrgNode.hideElement(this.TOC.div);
 if(this.PLAIN_VIEW==this.VIEW){this.ROOT.showAllChildren();for(var a=0;a<this.ROOT.children.length;
 ++a){this.ROOT.children[a].state=OrgNode.STATE_UNFOLDED;this.ROOT.children[a].fold();
-}}}if("toc"==c||(!isNaN(d)&&this.SECS[d])){if("toc"==c&&this.HIDE_TOC){this.NODE=this.TOC;
+}}}if("?/toc/?"==c||(!isNaN(d)&&this.SECS[d])){if("?/toc/?"==c&&this.HIDE_TOC){this.NODE=this.TOC;
 this.ROOT.hideAllChildren();if(this.INFO_VIEW==this.VIEW){this.WINDOW.innerHTML=this.NODE.div.innerHTML;
 }else{this.NODE.setState(OrgNode.STATE_UNFOLDED);}window.scrollTo(0,0);}else{this.NODE=this.SECS[d];
 if(this.SLIDE_VIEW==this.VIEW||this.INFO_VIEW==this.VIEW){OrgNode.hideElement(this.NODE.buttons);
@@ -193,15 +193,15 @@ this.hideConsole();}else{if(this.MESSAGING){this.removeWarning();}}eval(func);if
 if(a<this.SECS.length){this.navigateTo(a);}else{this.warn("Already last section.");
 }},previousSection:function(){var a=this.NODE.idx;if(a>0){this.navigateTo(a-1);}else{this.warn("Already first section.");
 }},navigateTo:function(a){if(this.READING){this.endRead();this.hideConsole();}else{if(this.MESSAGING){this.removeWarning();
-}}if(this.VIEW==this.SLIDE_VIEW){this.adjustSlide(a);}if("toc"!=a){document.location.replace(this.BASE_URL+"#"+this.SECS[a]["base_id"]);
+}}if(this.VIEW==this.SLIDE_VIEW){this.adjustSlide(a);}if("?/toc/?"!=a){document.location.replace(this.BASE_URL+"#"+this.SECS[a]["base_id"]);
 }this.pushHistory(a,this.NODE.idx);this.showSection(a);},pushHistory:function(b,a){if(!this.SKIP_HISTORY){this.HISTORY[this.HIST_INDEX]=new Array(b,a);
 this.HIST_INDEX=(this.HIST_INDEX+1)%50;}this.SKIP_HISTORY=false;this.CONSOLE_INPUT.value="";
 },popHistory:function(b){if(b){if(this.HISTORY[this.HIST_INDEX]){var a=parseInt(this.HISTORY[this.HIST_INDEX][0]);
-if(!isNaN(a)||"toc"==this.HISTORY[this.HIST_INDEX][0]){this.showSection(this.HISTORY[this.HIST_INDEX][0]);
+if(!isNaN(a)||"?/toc/?"==this.HISTORY[this.HIST_INDEX][0]){this.showSection(this.HISTORY[this.HIST_INDEX][0]);
 this.CONSOLE_INPUT.value="";}else{this.SKIP_HISTORY=true;this.CONSOLE_INPUT.value=this.HISTORY[this.HIST_INDEX][0];
 this.getKey();}this.HIST_INDEX=(this.HIST_INDEX+1)%50;}else{this.warn("History: No where to foreward go from here.");
 }}else{if(this.HISTORY[this.HIST_INDEX-1]){this.HIST_INDEX=this.HIST_INDEX==0?49:this.HIST_INDEX-1;
-var a=parseInt(this.HISTORY[this.HIST_INDEX][1]);if(!isNaN(a)||"toc"==this.HISTORY[this.HIST_INDEX][1]){this.showSection(this.HISTORY[this.HIST_INDEX][1]);
+var a=parseInt(this.HISTORY[this.HIST_INDEX][1]);if(!isNaN(a)||"?/toc/?"==this.HISTORY[this.HIST_INDEX][1]){this.showSection(this.HISTORY[this.HIST_INDEX][1]);
 this.CONSOLE_INPUT.value="";}else{this.SKIP_HISTORY=true;this.CONSOLE_INPUT.value=this.HISTORY[this.HIST_INDEX][1];
 this.getKey();}}else{this.warn("History: No where to back go from here.");}}},warn:function(b,c,a){if(null==a){a="";
 }this.CONSOLE_INPUT.value=a;if(!c){this.CONSOLE_LABEL.style.color="red";}this.CONSOLE_LABEL.innerHTML="<span style='float:left;'>"+b+"</span><span style='float:right;color:#aaaaaa;font-weight:normal;'>(press any key to proceed)</span>";
@@ -226,7 +226,7 @@ return;}else{if(this.HELPING){this.showHelp();this.CONSOLE_INPUT.value="";return
 }else{b=this.trim(b);}if(1==b.length){if("b"==b){this.popHistory();}else{if("B"==b){this.popHistory(true);
 }else{if("c"==b){this.removeSearchHighlight();if(this.VIEW==this.INFO_VIEW||this.VIEW==this.SLIDE_VIEW){this.showSection(this.NODE.idx);
 }}else{if("i"==b){if(this.FIXED_TOC){this.TOC.folder.getElementsByTagName("A")[0].focus();
-}else{if(this.HIDE_TOC){this.navigateTo("toc");}else{if(0!=this.NODE.idx){this.navigateTo(0);
+}else{if(this.HIDE_TOC){this.navigateTo("?/toc/?");}else{if(0!=this.NODE.idx){this.navigateTo(0);
 }}}}else{if("m"==b){this.toggleView(this.NODE.idx);}else{if("x"==b){this.slideView(this.NODE.idx);
 }else{if("n"==b){if(this.NODE.state==OrgNode.STATE_FOLDED&&this.VIEW==this.PLAIN_VIEW){this.showSection(this.NODE.idx);
 }else{if(this.NODE.idx<this.SECS.length-1){this.navigateTo(this.NODE.idx+1);return;

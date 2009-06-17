@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.1.1.3b
+ *       org-info.js, v.0.1.1.4
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -1027,8 +1027,8 @@ var org_html_manager = {
         }
       }
     }
-    if('toc' == sec || (!isNaN(section) && this.SECS[section])) {
-      if('toc' == sec && this.HIDE_TOC)
+    if('?/toc/?' == sec || (!isNaN(section) && this.SECS[section])) {
+      if('?/toc/?' == sec && this.HIDE_TOC)
         {
           this.NODE = this.TOC;
           this.ROOT.hideAllChildren();
@@ -1277,7 +1277,7 @@ var org_html_manager = {
     if     (this.READING)   { this.endRead(); this.hideConsole(); }
     else if(this.MESSAGING) { this.removeWarning(); }
     if(this.VIEW == this.SLIDE_VIEW) this.adjustSlide(sec);
-    if ('toc' != sec) document.location.replace(this.BASE_URL + "#"+this.SECS[sec]['base_id']);
+    if ('?/toc/?' != sec) document.location.replace(this.BASE_URL + "#"+this.SECS[sec]['base_id']);
     this.pushHistory(sec, this.NODE.idx);
     this.showSection(sec);
   },
@@ -1303,7 +1303,7 @@ var org_html_manager = {
     if(foreward) {
       if(this.HISTORY[this.HIST_INDEX]) {
         var s = parseInt(this.HISTORY[this.HIST_INDEX][0]);
-        if(! isNaN(s) || 'toc' == this.HISTORY[this.HIST_INDEX][0]) {
+        if(! isNaN(s) || '?/toc/?' == this.HISTORY[this.HIST_INDEX][0]) {
           this.showSection(this.HISTORY[this.HIST_INDEX][0]);
           this.CONSOLE_INPUT.value = "";
         }
@@ -1320,7 +1320,7 @@ var org_html_manager = {
       if(this.HISTORY[this.HIST_INDEX - 1]) {
         this.HIST_INDEX = this.HIST_INDEX == 0 ? 49 : this.HIST_INDEX - 1;
         var s = parseInt(this.HISTORY[this.HIST_INDEX][1]);
-        if(! isNaN(s) || 'toc' == this.HISTORY[this.HIST_INDEX][1]) {
+        if(! isNaN(s) || '?/toc/?' == this.HISTORY[this.HIST_INDEX][1]) {
           this.showSection(this.HISTORY[this.HIST_INDEX][1]);
           this.CONSOLE_INPUT.value = "";
         }
@@ -1477,7 +1477,7 @@ var org_html_manager = {
           if(this.FIXED_TOC) {
             this.TOC.folder.getElementsByTagName("A")[0].focus();
           }
-          else if (this.HIDE_TOC) this.navigateTo('toc');
+          else if (this.HIDE_TOC) this.navigateTo('?/toc/?');
           else if(0 != this.NODE.idx) this.navigateTo(0);
         }
         else if ('m' == s) {
