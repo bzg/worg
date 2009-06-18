@@ -341,7 +341,7 @@ var org_html_manager = {
   ALL_VIEW: 2,                 // plain view show all
   INFO_VIEW: 3,                // We're in info view mode
   SLIDE_VIEW: 4,               // Slidemode.
-  VIEW: this.OVER_VIEW,        // Default view mode (s. setup())
+  VIEW: this.CONTENT_VIEW,     // Default view mode (s. setup())
   LOCAL_TOC: false,            // Create sub indexes (s. setup()): "0", "1" "above", "below" (==1, default)
   LINK_HOME: 0,                // Link to this.LINK_HOME?
   LINK_UP: 0,                  // Link to this.LINK_UP?
@@ -349,7 +349,6 @@ var org_html_manager = {
   RUN_MAX: 1200,               // Max attempts to scan (results in ~2 minutes)
   RUN_INTERVAL: 100,           // Interval of scans in milliseconds.
   DEBUG: 0,                    // Gather and show debugging info?
-  WINDOW_BORDER: false,        // Draw a border aroung info window
   HIDE_TOC: false,             // Hide the table of contents.
   TOC_DEPTH: 0,                // Level to cut the table of contents. No cutting if 0.
   STARTUP_MESSAGE: 0,          // Show info at startup?
@@ -363,9 +362,11 @@ var org_html_manager = {
   INNER_TITLE: false,           // The cloned title in sec-1.
   LOAD_CHECK: null,            // Saves the setTimeout()'s value
   WINDOW: null,                // A div to display info view mode
+  WINDOW_BORDER: false,        // Draw a border aroung info window
   SECS: new Array(),           // The OrgNode tree
   REGEX: /(#)(.*$)/,           // identify a section link in toc
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
+  ORGTAG_REGEX: /^(.*)<span\s+class=[\'\"]tag[\'\"]>(<span[^>]>[^<]<\/span>)+<\/span>/i, // Remove Org tags
   TRIMMER: /^(\s*)([^\s].*)(\s*)$/, // Trim
   FNREF_REGEX: /(fnr\.*)/,     // Footnote ref
   TOC: null,                   // toc.
@@ -379,7 +380,6 @@ var org_html_manager = {
   DEBUG_FATAL: 1,              // Fatale Fehler anzeigen.
   DEBUG_BUILD: 1 << 5,
   DEBUG_TREE: 1 << 10,
-  WINDOW_BORDER: false,        // Draw a border aroung info window
   // Commands:
   CONSOLE: null,               // The div containing the minibuffer.
   CONSOLE_INPUT: null,
@@ -440,7 +440,6 @@ var org_html_manager = {
           case 'VIEW':
           case 'HIDE_TOC':
           case 'LOCAL_TOC':
-          case 'VIEW':
           case 'OCCUR':
             this.set(k, decodeURIComponent(v));
             break;
@@ -475,14 +474,23 @@ var org_html_manager = {
     return RegExp.$2;
   },
 
-  removeTags: function (str)
+  removeTags: function (s)
   {
-    if(str) {
-      while(str.match(this.UNTAG_REGEX)) {
-        str = str.substr(0, str.indexOf('<')) + str.substr(str.indexOf('>') + 1);
-        if(this.DEBUG > 5) this.debug += str + "\n";
+    if(s) {
+      while(s.match(this.UNTAG_REGEX)) {
+        s = s.substr(0, s.indexOf('<')) + s.substr(s.indexOf('>') + 1);
+        if(this.DEBUG > 5) this.debug += s + "\n";
       }}
-    return str;
+    return s;
+  },
+
+  removeOrgTags: function (s)
+  {
+    if(s.match(this.ORGTAG_REGEX)) {
+      var matches = this.REGEX.exec(s);
+      return matches[1];
+    }
+    return s;
   },
 
 
@@ -941,7 +949,7 @@ var org_html_manager = {
         for(var k=0; k < this.SECS[i].children.length; ++k) {
           html += '<li><a href="'
             +this.SECS[i].children[k].link+'">'
-            +this.removeTags(this.SECS[i].children[k].heading.innerHTML)+'</a></li>';
+            +this.removeOrgTags(this.SECS[i].children[k].heading.innerHTML)+'</a></li>';
         }
         html += '</ul>'; // </li></ul>';
         navi2.innerHTML = html;
