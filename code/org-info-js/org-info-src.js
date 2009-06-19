@@ -365,8 +365,8 @@ var org_html_manager = {
   WINDOW_BORDER: false,        // Draw a border aroung info window
   SECS: new Array(),           // The OrgNode tree
   REGEX: /(#)(.*$)/,           // identify a section link in toc
+  SIDREX: /(#)(sec-\d[.\d]*$)/,           // identify a section link in toc
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
-  ORGTAG_REGEX: /^(.*)<span\s+class=[\'\"]tag[\'\"]>(<span[^>]>[^<]<\/span>)+<\/span>/i, // Remove Org tags
   TRIMMER: /^(\s*)([^\s].*)(\s*)$/, // Trim
   FNREF_REGEX: /(fnr\.*)/,     // Footnote ref
   TOC: null,                   // toc.
@@ -474,23 +474,14 @@ var org_html_manager = {
     return RegExp.$2;
   },
 
-  removeTags: function (s)
+  removeTags: function (str)
   {
-    if(s) {
-      while(s.match(this.UNTAG_REGEX)) {
-        s = s.substr(0, s.indexOf('<')) + s.substr(s.indexOf('>') + 1);
-        if(this.DEBUG > 5) this.debug += s + "\n";
+    if(str) {
+      while(str.match(this.UNTAG_REGEX)) {
+        str = str.substr(0, str.indexOf('<')) + str.substr(str.indexOf('>') + 1);
+        if(this.DEBUG > 5) this.debug += str + "\n";
       }}
-    return s;
-  },
-
-  removeOrgTags: function (s)
-  {
-    if(s.match(this.ORGTAG_REGEX)) {
-      var matches = this.REGEX.exec(s);
-      return matches[1];
-    }
-    return s;
+    return str;
   },
 
 
@@ -949,7 +940,7 @@ var org_html_manager = {
         for(var k=0; k < this.SECS[i].children.length; ++k) {
           html += '<li><a href="'
             +this.SECS[i].children[k].link+'">'
-            +this.removeOrgTags(this.SECS[i].children[k].heading.innerHTML)+'</a></li>';
+            +this.removeTags(this.SECS[i].children[k].heading.innerHTML)+'</a></li>';
         }
         html += '</ul>'; // </li></ul>';
         navi2.innerHTML = html;
@@ -1285,9 +1276,9 @@ var org_html_manager = {
     if     (this.READING)   { this.endRead(); this.hideConsole(); }
     else if(this.MESSAGING) { this.removeWarning(); }
     if(this.VIEW == this.SLIDE_VIEW) this.adjustSlide(sec);
-    if ('?/toc/?' != sec) document.location.replace(this.BASE_URL + "#"+this.SECS[sec]['base_id']);
     this.pushHistory(sec, this.NODE.idx);
     this.showSection(sec);
+    if ('?/toc/?' != sec) document.location.replace(this.BASE_URL + this.getDefaultTarget());
   },
 
   /**
