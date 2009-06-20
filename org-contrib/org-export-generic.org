@@ -1,0 +1,42 @@
+TITLE:     org-export-generic.el -- export org files to anything!
+OPTIONS:   ^:{} author:Wes Hardaker
+STARTUP: odd
+
+* Overview
+
+org-export-generic is basically a simple translation system that
+knows how to parse at least most of a .org buffer and then add
+various formatting prefixes before and after each section type.
+
+* Using It
+
+org-export-generic does it's work by examining a property list stored
+in org-generic-alist.  The pre-defined list currently includes a
+simplex text exporter, a simple html exporter, a wikipedia exporter,
+an exporter to IETF internet-draft format, and a "demo" exporter which
+shows off all of the potential variables you can set.
+
+You can also dynamically add propety lists of your own using the
+org-set-generic-type function:
+
+   (org-set-generic-type
+    "really-basic-text" 
+    '(:file-suffix
+      ".txt"
+
+      :title-format "=== %s ===\n"
+      :body-header-section-numbers t
+      :body-header-section-number-format "%s) "
+      :body-section-header-prefix  "\n"
+      :body-section-header-suffix "\n"
+      :body-line-format "  %s\n"
+      :body-line-wrap   75
+      ))
+
+Currently there is no dynamic selection of types you add yet (unlike
+the predefined ones).  So to change the setting of the output style
+set the org-generic-export-type and then hit the space bar at the
+selection prompt:
+
+  (setq org-generic-export-type "really-basic-text")
+
