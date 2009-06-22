@@ -3,28 +3,27 @@
 #+AUTHOR: Sebastian Rose
 #+EMAIL:
 #+LANGUAGE: en
+#+OPTIONS: d:nil
 #+INFOJS_OPT: path:org-info.js
-#+INFOJS_OPT: toc:nil localtoc:t view:info mouse:underline
+#+INFOJS_OPT: toc:nil ltoc:above view:info mouse:underline buttons:nil
 #+INFOJS_OPT: up:http://orgmode.org/worg/
-#+INFOJS_OPT: home:http://orgmode.org buttons:nil
+#+INFOJS_OPT: home:http://orgmode.org
+#+STYLE: <link rel="stylesheet" type="text/css" href="stylesheet.css" />
 
 * The Name of the Game
 
-  *WARNING This documentation is likely to be out of date.*
+  org-info-js (subsequently called /the script/) implements part of Emacs Org-mode
+  in it's XHTML-exported files, allowing them to be rendered and browsed in a
+  linuxdoc/texinfo style.
 
-  org-info-js (subsequently called /the script/) implements part of
-  Emacs Org-mode in it's XHTML-exported files, allowing them to be
-  rendered and browsed in a linuxdoc/texinfo style.
+  This documentation is one XHTML file, exported from one *.org file using a
+  single keyboard shortcut. No additional postprocessing was done.  There are no
+  external dependencies and the script is small and fast, even for large files.
+  It is used on the [[http://orgmode.org/Changes.html][org-mode site]] to display =ORGWEBPAGE/Changes.org= which
+  consists of more than 220 sections.
 
-  This documentation is one XHTML file, exported from one *.org file
-  using a single keyboard shortcut. No additional postprocessing was
-  done.  There are no external dependencies and the script is small
-  and fast, even for large files.  It is used on the [[http://orgmode.org/Changes.html][org-mode site]] to
-  display =ORGWEBPAGE/Changes.org= which has over 220.
-
-  If you don't mind using it despite the /health warnings/ and
-  adjusting your org export options occaisionally we wish you good
-  luck and hope the fun will outweigh your effort.
+  If you don't mind using it despite the /health warnings/ we wish you good luck
+  and hope the fun will outweigh your effort.
 
   There are some drawbacks though. It is currently not possible to
   open internal links in another tab (e.g. using middle click in
@@ -32,19 +31,29 @@
   my TODO list since the history mechanism of the script is a good
   alternative to tab usage.
 
-  A list of Changes can be found [[changes.org][here]] (separat file).
-
   Go to the next section by pressing '=n='.
 
-  Find out about shortcuts in section [[Shortcuts]] (and come back here
-  pressing '=b=').
+  Find out about shortcuts in section [[#shortcuts][Shortcuts]] (and come back here
+  pressing '=b='). In addition, '=?=' will show all shortcuts available.
 
-  '=?=' will show all shortcuts available.
+** <<<Download>>>
+
+   - A list of Changes can be found [[file:changes.org][here]] (separat file).
+   - Download the [[file:org-info.js][minified version]] or the [[file:org-info-src.js][sourc code]].
+   - Create the minified versions from the sources using the [[file:Makefile][Makefile]] and a
+     little [[file:sed.txt][sed script]].
+
+   Development of the script takes place on github
+   (http://github.com/SebastianRose/org-info-js/tree/master), but every working
+   release is published here on Worg synchronously. That said, you can follow
+   the development by tracking the Worg repo as well, available at
+   [[http://repo.or.cz/w/Worg.git]].
 
 ** <<Terms used throughout this Document>>
 
-   I tend to talk about view modes. One may toggle the view mode by pressing
-   '=m=' or click the /toggle view/ link. Currently two view modes exist.
+   The script knows three different so called /view modes/. One may toggle the
+   view mode by pressing '=m=' or click the /toggle view/ link the script adds to
+   your pages. Currently three view modes exist:
 
    + *info view mode* ::
      This mode displays the sections one by one, paged like the typical
@@ -54,15 +63,16 @@
    + *plain view mode* ::
      This mode displays the entire file. In this mode the sections are foldable
      by clicking the headlines or pressing '=f=' (fold). The entire structure
-     of the document my be (un-)folded using '=F='.
+     of the document my be (un-)folded using '=F='. You may determin what's
+     visible on pageload.
 
    + *presentation mode* ::
      This mode displays sections one by as slides. Still
      very rustic and experimental. Rick Moynihan embarked and we plan a separat
-     tool for presentations.
+     tool for presentations, but...
 
-   *T.O.C.* is used for the table of contents. The table of contents may be
-   visited using '=i=' (index) regardless of its visibility.
+   The table of contents (*TOC*) is required, albeit it may be hidden (CSS). The TOC may
+   be visited using '=i=' (index) regardless of its visibility.
 
    A *section* is everything with a headline.
 
@@ -105,16 +115,16 @@
    + *Tooltips* ::
      Moving the mouse on the navigation links shows a tooltip with name of
      next/previous section.
-   + *Hide T.O.C.* ::
-     The T.O.C. can be hidden completly. Hitting '=i=' still will show it. When
-     showing the T.O.C. hitting '=i=' any navigation command ('=n=', '=p=',
-     '=s='...) will trigger an history-back. Thus the T.O.C. will not get in your
+   + *Hide TOC* ::
+     The TOC can be hidden completly. Hitting '=i=' still will show it. When
+     showing the TOC hitting '=i=' any navigation command ('=n=', '=p=',
+     '=s='...) will trigger an history-back. Thus the TOC will not get in your
      way when navigating the history later on.
 
 ** Keyboard navigation
 
    + *Easy keyboard navigation* ::
-     See Section [[Shortcuts]] for a list of shortcuts.
+     See Section [[#shortcuts][Shortcuts]] for a list of shortcuts.
    + Navigation history ::
      Navigating a file through the keyboard shortcuts is recorded in an internal
      history. You may go back and forth in this history. Once an end is reached,
@@ -124,17 +134,23 @@
      like following footnotes.
    + *Customizable features* ::
      All features are customizable simply by setting up your export options
-     template (see [[Usage]]).
+     template (see [[#setup][Setup]]).
    + *Folding* ::
      Emulates the way of folding in emacs Org-mode. Mouse supported.
 
 ** Searching
 
-   + *Full text-search with highlighting* ::
-     Search forward, backwards, repeated search... This is still experimental.
+   + *Full text-search with highlighting* :: Search forward, backwards, repeated
+     search... (experimental). Simple regular expressions are supported. Try to
+     search for =a[e-h].*n= for example. All searches are case
+     insensitive. Grouping is not supported. We couldn't search for round
+     brackets otherwise. Supported are wildcards (e.g. =.*=) and ranges
+     (e.g. =[a-g]=). Sometimes only one match is found between to HTML tags. The
+     longer the expression, the better the matches.
    + *Occur mode* ::
      As experimental as the text-search, but I love this one. You may link to a
-     file using this script like this: =index.html?OCCUR=java=
+     file using this script like this: =index.html?OCCUR=java=. Use regular
+     expressions likewise.
    + *Tags index* ::
      '=C=' shows a table of contents based on tags. Inherited tags are not
      supported yet. This was an [[http://lists.gnu.org/archive/html/emacs-orgmode/2008-07/msg00434.html][idea of Rick Moynihan]].
@@ -153,115 +169,106 @@
      after startup.
    + *Structure is taken from export preferences* ::
      The paging is done according to your setting of
-     =org-export-headline-levels=. Scanning the T.O.C. is a good way to get
-     around browser detection. An option to hide the T.O.C. exists.
+     =org-export-headline-levels=. Scanning the TOC is a good way to get
+     around browser detection. An option to hide the TOC exists.
    + *Startup information* ::
      Show a little message on page load to tell the visitor about the script
      usage.
-   + *Wrap text before first headline* ::
-     This is a temporary fix for the
-     missing =<p>= element around the text before the first headline,
-     available since version 0.0.7.3a. If you export with =skip:nil=, you
-     may add this to your stylesheet:
-     :#text-before-first-headline {color:red;font-weight:bold;}
+   + *Wrap text before first headline* :: This is a temporary fix for the missing
+     =<p>= element around the text before the first headline, available since
+     version 0.0.7.3a (fixed in current Org-mode versions). If you export with
+     =skip:nil=, you may add this to your stylesheet:
+     : #text-before-first-headline {color:red;font-weight:bold;}
 
 
-* <<<Shortcuts>>>
+* Shortcuts
+  :PROPERTIES:
+  :CUSTOM_ID: shortcuts
+  :END:
 
   The visitor of this file (and every XHTML-exported org file that includes the
   script) may use the mouse or the following keys to navigate. '=?=' should give
-  you a list of shortcuts too.
+  you a list of shortcuts.
 
   The script always tries to keep the last selected section visible. This is
   somewhat strange when scrolling, but really helpfull for keyboard navigation.
-
-  If the keyboard shortcuts work for you, drop me a mail and tell me your
-  browser and its version so we can put it on list of [[Supported Browsers][supported browsers]].
 
   The TOC is handled specially, when hidden. If you press '=i=', the TOC is
   displayed. Any subsequent key press goes back to where you've been before. The
   TOC does not show up the history. Same applies to the keyboard help.
 
-  | Key   | Function                                                   |
-  |-------+------------------------------------------------------------|
-  | ? / ¿ | show this help screen                                      |
-  |-------+------------------------------------------------------------|
-  |       | *Moving around*                                              |
-  | n / p | goto the next / previous section                           |
-  | N / P | goto the next / previous sibling                           |
-  | t / E | goto the first / last section                              |
-  | g     | goto section...                                            |
-  | u     | go one level up (parent section)                           |
-  | i / C | show table of contents / tags index                        |
-  | b / B | go back to last / forward to next visited section.         |
-  | h / H | go to main index in this directory / link HOME page        |
-  |-------+------------------------------------------------------------|
-  |       | *View*                                                       |
-  | m / x | toggle the view mode between info and plain / presentation |
-  | f / F | fold current section / whole document (plain view only)    |
-  |-------+------------------------------------------------------------|
-  |       | *Searching*                                                  |
-  | s / r | search forward / backward....                              |
-  | S / R | search again forward / backward                            |
-  | o     | occur-mode                                                 |
-  | c     | clear search highlights                                    |
-  |-------+------------------------------------------------------------|
-  |       | *Misc*                                                       |
-  | l / L | display HTML link / Org link                               |
-  | v / V | scroll down / up                                           |
+  | Key       | Function                                                |
+  |-----------+---------------------------------------------------------|
+  | ? / ¿     | show this help screen                                   |
+  |-----------+---------------------------------------------------------|
+  |           | *Moving around*                                           |
+  | n / p     | goto the next / previous section                        |
+  | N / P     | goto the next / previous sibling                        |
+  | t / E     | goto the first / last section                           |
+  | g         | goto section...                                         |
+  | u         | go one level up (parent section)                        |
+  | i / C     | show table of contents / tags index                     |
+  | b / B     | go back to last / forward to next visited section.      |
+  | h / H     | go to main index in this directory / link HOME page     |
+  |-----------+---------------------------------------------------------|
+  |           | *View*                                                    |
+  | m / x     | toggle the view mode between info and plain / slides    |
+  | f / F     | fold current section / whole document (plain view only) |
+  |-----------+---------------------------------------------------------|
+  |           | *Searching*                                               |
+  | s / r     | search forward / backward....                           |
+  | S / R     | search again forward / backward                         |
+  | o         | occur-mode                                              |
+  | c         | clear search-highlight                                  |
+  |-----------+---------------------------------------------------------|
+  |           | *Misc*                                                    |
+  | l / L / U | display HTML link / Org link / Plain-URL                |
+  | v / V     | scroll down / up                                        |
 
   Thanks Carsten, for this beautifull table!
 
-* <<<Setup>>>
+* Setup
+  :PROPERTIES:
+  :CUSTOM_ID: setup
+  :END:
 
   This section describes how to setup your org files to use the
-  script. [[Export-Setup - the new Way]] covers setting up org XHTML
+  script. [[#the-new-way][Export-Setup - the new Way]] covers setting up org XHTML
   export with Org-mode version >= 6.02. For those using an older
-  Org-mode version < 6.02 the next section ([[Export-Setup - the old Way]])
-  remains. [[Using Set()]] contains a list of all supported options for adjusting
+  Org-mode version < 6.02 the next section ([[the-old-way][Export-Setup - the old Way]])
+  remains. [[#using-set][Using Set()]] contains a list of all supported options for adjusting
   the =org\_html\_manager= to suit your needs.
 
-  A reasonably recent org version is available for download on [[http://orgmode.org/#sec-4][orgmode.org]]
-  whilst the latest version of the script is in the git repo:
+  See the Download section on how to obtain a version of the script.
 
-  :git-clone git://github.com/SebastianRose/org-info-js.git
+  The first version of this document was created with the new XHTML exporter
+  which was revised by Carsten Dominik in March 2008 (in Org-mode v5.23a+) to
+  better support =XML=.  You can use =M-x org-version= to see which version of
+  Org-mode you have installed.
 
-  This script will not work with the XHTML exporter that comes with
-  Org-mode in Emacs 22.x.
-
-  The current version of Org-mode was used to produce this XHTML file
-  with the new exporter which was revised by Carsten Dominik in March
-  2008 (in Org-mode v5.23a+) to better support =XML=.  You can use
-  =M-x org-version= to see which version of Org-mode you have
-  installed.
-
-  The new XHTML structure won't break any of your stylesheets.
-
-** <<Export-Setup - the new Way>>
-
-   org-info-js now supports the standard Org-mode methods for
-   exporting XHTML, and including extra data in the head of the
-   exported file.
+** Export-Setup - the new Way
+   :PROPERTIES:
+   :CUSTOM_ID: the-new-way
+   :END:
 
    The modern way of org export setup provides extra options to include and
-   configure the script, as well as a emacs customize interface for this same
+   configure the script, as well as an emacs customize interface for this very
    purpose. Options set in customize may be overwritten on a per-file basis
-   using one or more special =#+INFOJS_OPT:= lines in the head of your org
-   file.
+   using one or more special =#+INFOJS_OPT:= lines in the head of your org file.
 
    As an example, the head of this org file looks like:
 
 #+BEGIN_SRC org
-#+INFOJS_OPT: path:org-info.js
-#+INFOJS_OPT: toc:nil localtoc:t view:info mouse:underline
-#+INFOJS_OPT: up:http://www.legito.net/
-#+INFOJS_OPT: home:http://orgmode.org buttons:nil
+,#+INFOJS_OPT: path:org-info.js
+,#+INFOJS_OPT: toc:nil localtoc:t view:info mouse:underline buttons:nil
+,#+INFOJS_OPT: up:http://orgmode.org/worg/
+,#+INFOJS_OPT: home:http://orgmode.org
 #+END_SRC
 
 *** Using customize
 
     To use customize type
-    :M-x customize-group RET org-export-html RET
+    : M-x customize-group RET org-export-html RET
     scroll to the bottom and click =Org Export HTML INFOJS=.
 
     On this page three main options may be configured. /Org Export Html Use
@@ -312,14 +319,16 @@
         soon as the entire document is scanned.
 
       + =buttons= ::
-        Affects plain view mode only.
+        Affects plain view mode only. If '=t=', display the little
+        /Up|HOME|HELP|Toggle view/ links next to _each_ headline in plain view
+        mode.
 
 *** Per File Basis: #+INFOJS\_OPT
 
     A single file may overwrite the global options using a line like this:
 
 #+BEGIN_SRC org
-#+INFOJS_OPT: view:info mouse:underline up:index.html home:http://www.mydomain.tpl toc:t
+  ,#+INFOJS_OPT: view:info mouse:underline up:index.html home:http://www.mydomain.tpl toc:t
 #+END_SRC
 
     Possible options are the same as in the previous section. Additional (?)
@@ -330,13 +339,16 @@
     + =up= ::
       An URL pointing to some main page. The text displayed is =Up=.
 
-** <<Export-Setup - the old Way>>
+** Export-Setup - the old Way
+   :PROPERTIES:
+   :CUSTOM_ID: the-old-way
+   :END:
 
    This section describes the old way to setup the script using the
    =org-export-html-style= configuration. If you own a current version (6.00
-   ++) of Org-mode you should better use [[Export-Setup - the new Way]] of setting
-   up the export for script usage. You might want to read the sections [[The XHTML]]
-   for more information. [[Using Set()]] contains a list of all supported options
+   ++) of Org-mode you should better use [[#the-new-way][Export-Setup - the new Way]] of setting
+   up the export for script usage. You might want to read the sections [[#xhtml][The XHTML]]
+   for more information. [[#using-set][Using Set()]] contains a list of all supported options
    recognised by the script.
 
 *** Using a special * COMMENT Section
@@ -384,7 +396,9 @@ org_html_manager.setup ();
 </script>
 #+END_SRC
 
-      This way all your files will be exported using the script in the future.
+      This way all your files will be exported using the script in the
+      future. If you publish entire directories, supply an absolute URI to the
+      =src= attribute of the first script tag above.
 
 *** Export-Setup per Project
 
@@ -420,7 +434,7 @@ org_html_manager.setup ();
   One may overwrite the author's settings using special suffixes appended to the
   URL of the script. Here are some examples linking to this section and changing
   the intial view mode. Currently only the '/internal/' options are used (see
-  [[Using set()]] for a list).
+  [[#using-set][Using set()]] for a list).
 
 #+BEGIN_HTML
     <ul>
@@ -449,40 +463,66 @@ org_html_manager.setup ();
 
 * <<CSS>>
 
-  There is currently only one CSS class used in the script. More style classes
-  will follow in the future.
-
-  + =org-info-info-navigation= ::
-    Style for the navigation table in info view mode. I needed this one to avoid
-    border around that table. You may add lines like these to your stylesheet:
+  Here is an excerpt from the stylesheet for this file. Be carful not to mess
+  things up when trying to position the console.
 
 #+BEGIN_SRC css
-/* Style for org-info.js */
+/* Styles for org-info.js */
 
 .org-info-js_info-navigation
 {
   border-style:none;
 }
+
+#org-info-js_console
+{
+  color:#333333;
+  margin:0px;
+  background-color:#ffffff;
+}
+
+#org-info-js_console-input
+{
+  background-color:#ffffff;
+  border-style:none;
+  color:#333333;
+  padding-left:10px;
+  vertical-align:middle;
+}
+
 #org-info-js_console-label
 {
-  font-size:10px;
+  font-size:11px;
   font-weight:bold;
-  white-space:nowrap;
+  padding-left:10px;
+  font-family:Verdana,Arial,sans-serif;
+  vertical-align:middle;
 }
+
+.org-info-js_console-label-warning
+{
+  color:#cc0000;
+}
+
+#org-info-js_console-container
+{
+  border:1px solid #cccccc;
+}
+
 .org-info-js_search-highlight
 {
-  background-color:#ffff00;
+  background-color:#adefef; /* emacs default */
   color:#000000;
   font-weight:bold;
 }
+/* END STYLES FOR org-info.js */
 #+END_SRC
-
 
 
 * <<Supported Browsers>>
 
   The functionality of the script is based on =DOM=. This leads to some
-  incompatibility with legacy browsers. But hey, it's 2008, isn't it?
+  incompatibility with legacy browsers. But hey, it's 2009, isn't it?
 
   So what browsers are supported then? Well - I don't know for
   sure. JavaScript™ 1.4 plus =DOM= should make
@@ -492,12 +532,11 @@ org_html_manager.setup ();
     + Opera 7.0 and higher - v.9.26 tested.
     + Safari 1.0
 
-  I have written and tested the script only in current Firefox, Opera and IE 6
-  so far for a lack of spare time, operating systems on my laptop, and installed
-  browsers. IE is not fully supported (position fixed...) but fairly
-  working. Firefox 2 is anyoing slow as with all web pages heavily utilising
-  JavaScript. I recently installed Firefox 3.0 Beta which works much better. For
-  once in my life I have to admit that Opera is the best here.
+  I try to test the script before each release in Firefox 3.x.x and Opera 10 on
+  Linux, and in FF 3, IE 6 and Safari on windows. Because of the number of
+  features and browsers, some bugs might remain undiscovered. Please report bugs
+  to the emacs-orgmode mailing list. In most cases we manage to fix them within
+  the next 24 hours.
 
 ** <<People reported it works in>>
 
@@ -519,16 +558,19 @@ org_html_manager.setup ();
 * <<Why Do I Need a T.O.C?>>
 
   Currently the script depends on the table of contents in the resulting
-  XHTML. The T.O.C. can be hidden though.
+  XHTML. The TOC can be hidden though.
 
   The main reason is the behaviour of browsers. There is no safe way to detect
   if the entire document is loaded at a certain point in time. Opera for example
   returns =true= if we ask it =if(document.body)=. The =init()= function of the
-  =OrgHtmlManager= is aware of the possibility, that not even the T.O.C. might
+  =OrgHtmlManager= is aware of the possibility, that not even the TOC might
   be loaded when this function is called. Hence it should work for slow
-  connections too. There should be tons of other bugs though :)
+  connections too.
 
-* <<The XHTML>>
+* The XHTML
+  :PROPERTIES:
+  :CUSTOM_ID: xhtml
+  :END:
 
   End users may consider this section obsolete as of org version 6.00-pre-3,
   since there is a new configuration interface in org now to setup the script
@@ -540,7 +582,7 @@ org_html_manager.setup ();
   document structure has to be exactly the one produced by the current XHTML
   export of emacs Org-mode.
   You may pass options to the =org\_html\_manager= by utilising its =set()=
-  method. For a list of options see section [[Using Set()]]. This is what the
+  method. For a list of options see section [[#using-set][Using Set()]]. This is what the
   head section should look like:
 
 #+BEGIN_SRC html
@@ -583,14 +625,17 @@ org_html_manager.setup ();
   which is valid XHTML but not understood by all browsers. I'll use the first
   version throughout this document where ever the space allows to do so.
 
-** <<Using Set()>>
+** Using Set()
+   :PROPERTIES:
+   :CUSTOM_ID: using-set
+   :END:
 
    Before calling
-   :org_html_manager.setup ();
-   one may configure the script by using the =org_html_manager='s function
+   : org_html_manager.setup ();
+   one may configure the script by using the =org\_html\_manager='s function
    =set(key, val)=. There is one important rule for all of these options. If
    you set a string value containing single quotes, do it this way:
-   :org_html_manager.set("key", "value with \\'single quotes\\'");
+   : org_html_manager.set("key", "value with \\'single quotes\\'");
 
    + =VIEW= :: Set to a true value to start in textinfo kind of view. Note: you
      could also use =org\_html\_manager.INFO\_VIEW=,
@@ -611,53 +656,49 @@ org_html_manager.setup ();
    + =MOUSE\_HINT= ::
      Highlight the heading under the mouse. This can be a background color
      (like '=#ff0000=', '=red=' or '=rgb(230,230,230)=') or the keyword
-     #'=underline='.
+     '=underline='.
    + =LINK\_UP= ::
      May be set, to link to an other file, preferably the main index page of a
      subdirectory. You might consider using an absolute URL here. This link will be
      displayed as
-     :<a href="LINK_UP">Up</a>
-     Command: '=h=' - home::
+     : <a href="LINK_UP">Up</a>
      This way we can link files into a tree, if all subdirectories in the
-     project follow the same conventions. Like containing some
-     =subdir/index.org= and a homepage somwhere else.
+     project follow the same conventions. The '=h=' shortcut will
+     bring you there as well.
    + =LINK\_HOME= ::
-     May be set, to link to an other file, preferably the main home page. You
-     must use an absolute URL here. This link will be displayed as
-     :<a href="LINK_HOME">Up</a>
-     Command: '=H=' - HOME::
-     This way we can link files into a tree, if all subdirectories in the
-     project follow the same conventions. Like containing some
-     =subdir/index.org= and a homepage somwhere else.
+     May be set, to link to an other file, preferably the main home page. This
+     link will be displayed as
+     : <a href="LINK_HOME">Up</a>
+     The '=H=' shortcut will trigger this action.
    + =TOC\_DEPTH= ::
-     Cut the T.O.C. at a certain level. This was done to support big big
+     Cut the TOC at a certain level. This was done to support big big
      files and was requested by Carsten Dominik. If '=0=' or not provided at
-     all the T.O.C. will not be cut. If set to a number greater than '=0=',
-     the T.O.C. will cut to only show headlines down to that very level.
+     all the TOC will not be cut. If set to a number greater than '=0=',
+     the TOC will cut to only show headlines down to that very level.
    + =HELP= ::
      Display a little message on page load? Defaults to no message. Set to =1=
      to display the startup message.
 
 * How it works
 
-  First of all the script is included  in the header as described in [[Usage]].  The
-  document has  to be exported with T.O.C.  since the script depends  on it (See
+  First of all the script is included  in the header as described in [[#setup][Setup]].  The
+  document has  to be exported with TOC  since the script depends  on it (See
   [[Why Do I Need a T.O.C?]]).
 
   When   included,   it   creates    a   global   JavaScript™   variable   named
   =org\_html\_manager=.
 
   The  =org\_html\_manager::setup()=  function,  that  you  will  have  to  call
-  yourself  (see examples in  [[Usage]]), sets  up a  timeout function  calling it's
+  yourself  (see examples in  [[#setup][Setup]]), sets  up a  timeout function  calling it's
   =init()= function after  50ms. After those 50 ms  The =init()= function starts
-  it's first attempt  to scan the document, using the T.O.C.  as a guide. During
+  it's first attempt  to scan the document, using the TOC  as a guide. During
   this scan the  =org\_html\_manager= builds a tree of  nodes, each caching some
   data for later use. Once an element of the document is scanned it is marked by
   setting a property =scanned\_for\_org= to =1=. This way it will not be scanned
   a second time in  subsquent runs (it will be checked though,  but no work will
   be done for it).
 
-  If the document  (or the T.O.C.) is not  entirely loaded, =org\_html\_manager=
+  If the document  (or the TOC) is not  entirely loaded, =org\_html\_manager=
   stops  scanning,  sets  the  timeout  again  to start  an  other  scan  50  ms
   later. Once the  entire document is loaded and scanned no  new timeout will be
   set, and the document is displayed in the desired way (hopefully).
@@ -666,14 +707,11 @@ org_html_manager.setup ();
   was dropped, since we can not know in advance how fast the document will be
   loaded on the client side.
 
-  The =org\_html\_manager= also  changes the document a bit to  make it react on
-  certain input  events and follow your  wishes. The old  '/event handling/' was
+  The =org\_html\_manager= also changes the document a bit to make it react on
+  certain input events and follow your wishes. The old '/event handling/' was
   entirely based on the normal link functions using so called =accesskeys=. This
-  has changed a little, but is  still only in experimental state. The accesskeys
-  will stay cause there is no reason to remove them.
-
-  There is still  the idea of a new /emacs like/  keyboard handling to implement
-  complex commands (which is still in the far future).
+  has changed long ago, but the accesskeys will stay cause there is no reason to
+  remove them.
 
 * Presentations with org-info.js
 
@@ -688,12 +726,12 @@ org_html_manager.setup ();
   If you're at the end of the presentation, a click does not trigger a
   warning. Same applies to a doubleclick when in the first section.
 
-  There is no plan to extend this feature very much. We plan to write a separate
-  tool to handle slides.
+  There is no plan to extend this feature very much. A better plan might be to
+  write a separate tool to handle slides.
 
 * History
 
-  The aim of this little script is to implement a part of emacs Org-mode
+  The aim of this little script was to implement a part of emacs Org-mode
   facilities of folding. Oh, no - not originaly.
 
   My first idea was to view some of my larger org files without scrolling. I
@@ -746,23 +784,18 @@ org_html_manager.setup ();
   patents, I have to apply some license to my work to protect it and stay
   unprotected.
 
-  Hence the script itself is provided under the [[http://www.gnu.org/licenses/old-licenses/gpl-2.0.html][GPL version 2]]. This document is
-  subject to [[http://www.fsf.org/licensing/licenses/fdl.txt][GFDL]].
+  Hence the script was originally licensed under GPL 2. Since v.0.1.1.6 the
+  license was changed to [[http://www.gnu.org/licenses/old-licenses/gpl-2.0.html][GPL version 3]]. This document is subject to [[http://www.fsf.org/licensing/licenses/fdl.txt][GFDL]].
 
 * THE END
 
-  This document in emacs23 with Org-mode v. 5.22a+. The visibilty of the
-  contents of a individual section or subsection can be toggled by clicking the
-  stars in front of the headlines or moving there and hitting =TAB=. The
-  visibility of the entire document structure can be changed by pressing
-  =SHIFT+TAB= anywhere. When on a headline, pressing =ALT+UP/DOWN= moves the
-  entire subtree to different location in the tree, keeping it's level of
-  indentation. =ALT+LEFT/RIGHT= promotes and demotes the subtree.
+  The original version of this document was written in emacs23 with Org-mode
+  v. 5.22a+.  The visibilty of the contents of a individual section or
+  subsection can be toggled by clicking the stars in front of the headlines or
+  moving there and hitting =TAB=. The visibility of the entire document structure
+  can be changed by pressing =SHIFT+TAB= anywhere. When on a headline, pressing
+  =ALT+UP/DOWN= moves the entire subtree to different location in the tree,
+  keeping it's level of indentation. =ALT+LEFT/RIGHT= promotes and demotes the
+  subtree.
 
   [[file:img/emacs23-org.js.org.png]]
-
-* COMMENT html style specifications
-
-# Local Variables:
-# org-export-html-style: "<link rel=\"stylesheet\" type=\"text/css\" href=\"stylesheet.css\" />"
-# End:
