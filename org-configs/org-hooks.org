@@ -298,14 +298,15 @@ Defined in: /org.el/
     
     Each function takes a todo spec and returns either `nil' or the spec
     transformed into canonical form." )
-     
+    
     (defvar org-todo-get-default-hook nil
       "Hook for functions that get a default item for todo.
-     
+    
     Each function takes arguments (NEW-MARK OLD-MARK) and returns either
     `nil' or a string to be used for the todo mark." )
     
     (defvar org-agenda-headline-snapshot-before-repeat)
+    
     (defun org-todo (&optional arg)
       "Change the TODO state of an item.
     The state of an item is given by a keyword at the start of the heading,
@@ -350,6 +351,13 @@ Defined in: /org.el/
        (let (org-log-done org-log-states)   ; turn off logging
          (org-todo (if (= n-not-done 0) \"DONE\" \"TODO\"))))
 #+end_example
+** =org-todo-statistics-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook that is run whenever Org thinks TODO statistics should be updated.
+    This hook runs even if there is no statisics cookie present, in which case
+    `org-after-todo-statistics-hook' would not run.
+#+end_example
 ** =org-ctrl-c-ctrl-c-hook=
 Defined in: /org.el/
 #+begin_example
@@ -377,7 +385,7 @@ Defined in: /org.el/
 #+begin_example
     Hook for functions to attach themselves to TAB.
     See `org-ctrl-c-ctrl-c-hook' for more information.
-    This hook runs after it has been established that the cursor is not in a 
+    This hook runs after it has been established that the cursor is not in a
     table, but before checking if the cursor is in a headline or if global cycling
     should be done.
     If any function in this hook returns t, not other actions like visibility
@@ -493,6 +501,26 @@ Defined in: /org-clock.el/
     This is the string shown in the mode line when a clock is running.
     The function is called with point at the beginning of the headline.
 #+end_example
+** =org-clock-in-hook=
+Defined in: /org-clock.el/
+#+begin_example
+    Hook run when starting the clock.
+#+end_example
+** =org-clock-out-hook=
+Defined in: /org-clock.el/
+#+begin_example
+    Hook run when stopping the current clock.
+#+end_example
+** =org-clock-cancel-hook=
+Defined in: /org-clock.el/
+#+begin_example
+    Hook run when cancelling the current clock.
+#+end_example
+** =org-clock-goto-hook=
+Defined in: /org-clock.el/
+#+begin_example
+    Hook run when selecting the currently clocked-in entry.
+#+end_example
 ** =org-export-preprocess-hook=
 Defined in: /org-exp.el/
 #+begin_example
@@ -563,6 +591,13 @@ Defined in: /org-latex.el/
 #+begin_example
     Hook run during LaTeX export, after blockquote, verse, center are done.
 #+end_example
+** =org-checkbox-statistics-hook=
+Defined in: /org-list.el/
+#+begin_example
+    Hook that is run whenever Org thinks checkbox statistics should be updated.
+    This hook runs even if `org-provide-checkbox-statistics' is nil, to it can
+    be used to implement alternative ways of collecting statistics information.
+#+end_example
 ** =org-mouse-context-menu-function=
 Defined in: /org-mouse.el/
 #+begin_example
@@ -594,14 +629,19 @@ Defined in: /org-remember.el/
 #+begin_example
     Hook for the minor `org-remember-mode'.
 #+end_example
-
-
-
-
-
-
-
-
+** =org-src-mode-hook=
+Defined in: /org-src.el/
+#+begin_example
+    Hook  run after Org switched a source code snippet to its Emacs mode.
+    This hook will run
+    
+    - when editing a source code snippet with \"C-c '\".
+    - When formatting a source code snippet for export with htmlize.
+    
+    You may want to use this hook for example to turn off `outline-minor-mode'
+    or similar things which you want to have when editing a source code file,
+    but which mess up the display of a snippet in Org exported files.
+#+end_example
 
 * Examples for using hooks
 
