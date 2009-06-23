@@ -1031,7 +1031,6 @@ var org_html_manager = {
             t.NODE.hide();
             OrgNode.hideElement(document.body);
             if ('?/toc/?' != sec) window.location.replace(t.BASE_URL + t.getDefaultTarget());
-            window.scrollTo(0, 0);
             OrgNode.showElement(document.body);
             document.body.focus();
           }
@@ -1045,7 +1044,6 @@ var org_html_manager = {
             else {
               OrgNode.hideElement(document.body);
               window.location.replace(t.BASE_URL + t.getDefaultTarget());
-              window.scrollTo(0, 0);
               OrgNode.showElement(document.body);
               document.body.focus();
             }
