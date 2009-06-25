@@ -44,8 +44,8 @@ if(null==l.B){if(5>l.RUNS){l.LOAD_CHECK=window.setTimeout("OrgHtmlManagerLoadChe
 return;}else{l.B=document.getElementsByTagName("body")[0];}}if(!l.W){l.W=document.createElement("div");
 l.W.style.marginBottom="40px";l.W.id="org-info-js-window";}var k=document.getElementById("table-of-contents");
 if(!l.initFromTOC()){if(l.RUNS<l.RUN_MAX){l.LOAD_CHECK=window.setTimeout("OrgHtmlManagerLoadCheck()",l.RUN_INTERVAL);
-return;}}var d=0;if(""!=location.hash){d=location.hash;l.BU=l.BU.substring(0,l.BU.indexOf("#"));
-for(var e=0;e<l.S.length;++e){if(l.S[e].iTF[d]){d=e;break;}}}if(""!=location.search){l.BU=l.BU.substring(0,l.BU.indexOf("?"));
+return;}}var d=0;if(""!=location.hash){l.BU=l.BU.substring(0,l.BU.indexOf("#"));for(var e=0;
+e<l.S.length;++e){if(l.S[e].iTF[location.hash]){d=e;break;}}}if(""!=location.search){l.BU=l.BU.substring(0,l.BU.indexOf("?"));
 }l.convertLinks();var h=document.getElementById("postamble");if(h){l.P=h;}var g=l.B;
 var c=g.firstChild;if(3==c.nodeType){var f=c.cloneNode(true);var a=document.createElement("p");
 a.id="text-before-first-headline";a.appendChild(f);g.replaceChild(a,c);}l.C=document.createElement("div");

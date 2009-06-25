@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.1.1.7
+ *       org-info.js, v.0.1.1.7.1
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -510,11 +510,10 @@ var org_html_manager = {
     var start_section = 0;
 
     if("" != location.hash) {
-      start_section = location.hash;
       t.BASE_URL = t.BASE_URL.substring(0, t.BASE_URL.indexOf('#'));
       // Search for the start section:
       for(var i=0;i<t.SECS.length;++i) {
-        if(t.SECS[i].isTargetFor[start_section]) {
+        if(t.SECS[i].isTargetFor[location.hash]) {
           start_section = i;
           break;
         }
