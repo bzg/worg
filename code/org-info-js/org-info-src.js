@@ -1,6 +1,6 @@
 /**
  * @file
- *       org-info.js, v.0.1.1.7.1
+ *       org-info.js, v.0.1.1.7.2
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -975,17 +975,16 @@ var org_html_manager = {
     var i = (this.HIDE_TOC ? 0 : 1);
     var j;
     var foot_sec = this.SECS.length - 1;
-    for(i; i < this.SECS.length; ++i) {
-      var links = this.SECS[i].DIV.getElementsByTagName("a");
-      for(j=0; j<links.length; ++j) {
-        var href = links[j].href.replace(this.BASE_URL, '');
-            // could use quicksort like search here:
-            for(var k = 0; k < this.SECS.length; ++k) {
-              if(this.SECS[k].isTargetFor[href]) {
-                links[j].href="javascript:org_html_manager.navigateTo("+k+")";
-                break;
-              }}}}
-  },
+    // for(i; i < this.SECS.length; ++i) {
+    var links = document.getElementsByTagName("a"); // must be document!
+    for(j=0; j<links.length; ++j) {
+      var href = links[j].href.replace(this.BASE_URL, '');
+      // could use quicksort like search here:
+      for(var k = 0; k < this.SECS.length; ++k) {
+        if(this.SECS[k].isTargetFor[href]) {
+          links[j].href="javascript:org_html_manager.navigateTo("+k+")";
+          break;
+        }}}},
 
 
 
