@@ -1,6 +1,8 @@
 /**
  * @file
- *       org-info.js, v.0.1.1.7.2
+ * org-info.js
+ *
+ * Version: 0.1.1.8
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -2024,7 +2026,8 @@ var org_html_manager = {
       if(t.PLAIN_VIEW == t.VIEW) t.infoView(true);
       t.WINDOW.innerHTML = 'Press any key or <a href="javascript:org_html_manager.showHelp();">click here</a> to proceed.'
         +'<h2>Keyboard Shortcuts</h2>'
-        +'<table cellpadding="3" rules="groups" frame="hsides" style="margin:20px;border-style:none;" border="0";>'
+        +'<table cellpadding="3" rules="groups" frame="hsides" style="caption-side:bottom;margin:20px;border-style:none;" border="0";>'
+        +'<caption><small>org-info.js, v.###VERSION###</small></caption>'
     +'<tbody>'
       // BEGIN RECEIVE ORGTBL Shortcuts
 	+'<tr><td><code><b>? / &iquest;</b></code></td><td>show this help screen</td></tr>'
