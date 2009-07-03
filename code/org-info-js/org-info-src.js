@@ -2,7 +2,7 @@
  * @file
  * org-info.js
  *
- * Version: 0.1.1.8
+ * Version: 0.1.1.9
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -1029,9 +1029,7 @@ var org_html_manager = {
             if(t.SLIDE_VIEW == t.VIEW) t.WINDOW.innerHTML = t.NODE.DIV.innerHTML;
             else t.WINDOW.innerHTML = t.NODE.NAV + t.NODE.DIV.innerHTML;
             t.NODE.hide();
-            OrgNode.hideElement(document.body);
             if ('?/toc/?' != sec) window.location.replace(t.BASE_URL + t.getDefaultTarget());
-            OrgNode.showElement(document.body);
             document.body.focus();
           }
           else {
@@ -1039,14 +1037,8 @@ var org_html_manager = {
             OrgNode.showElement(t.NODE.BUTTONS);
             t.NODE.setState(OrgNode.UNFOLDED);
             t.NODE.show();
-            if(0 < t.NODE.IDX)
-              t.NODE.DIV.scrollIntoView(true);
-            else {
-              OrgNode.hideElement(document.body);
-              window.location.replace(t.BASE_URL + t.getDefaultTarget());
-              OrgNode.showElement(document.body);
-              document.body.focus();
-            }
+            t.NODE.DIV.scrollIntoView(true);
+            window.location.replace(t.BASE_URL + t.getDefaultTarget());
           }
         }
     }
