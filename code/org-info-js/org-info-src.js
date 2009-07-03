@@ -1,6 +1,8 @@
 /**
  * @file
- *       org-info.js, v.0.1.1.7
+ * org-info.js
+ *
+ * Version: 0.1.1.8
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -510,11 +512,10 @@ var org_html_manager = {
     var start_section = 0;
 
     if("" != location.hash) {
-      start_section = location.hash;
       t.BASE_URL = t.BASE_URL.substring(0, t.BASE_URL.indexOf('#'));
       // Search for the start section:
       for(var i=0;i<t.SECS.length;++i) {
-        if(t.SECS[i].isTargetFor[start_section]) {
+        if(t.SECS[i].isTargetFor[location.hash]) {
           start_section = i;
           break;
         }
@@ -976,17 +977,16 @@ var org_html_manager = {
     var i = (this.HIDE_TOC ? 0 : 1);
     var j;
     var foot_sec = this.SECS.length - 1;
-    for(i; i < this.SECS.length; ++i) {
-      var links = this.SECS[i].DIV.getElementsByTagName("a");
-      for(j=0; j<links.length; ++j) {
-        var href = links[j].href.replace(this.BASE_URL, '');
-            // could use quicksort like search here:
-            for(var k = 0; k < this.SECS.length; ++k) {
-              if(this.SECS[k].isTargetFor[href]) {
-                links[j].href="javascript:org_html_manager.navigateTo("+k+")";
-                break;
-              }}}}
-  },
+    // for(i; i < this.SECS.length; ++i) {
+    var links = document.getElementsByTagName("a"); // must be document!
+    for(j=0; j<links.length; ++j) {
+      var href = links[j].href.replace(this.BASE_URL, '');
+      // could use quicksort like search here:
+      for(var k = 0; k < this.SECS.length; ++k) {
+        if(this.SECS[k].isTargetFor[href]) {
+          links[j].href="javascript:org_html_manager.navigateTo("+k+")";
+          break;
+        }}}},
 
 
 
@@ -2026,7 +2026,8 @@ var org_html_manager = {
       if(t.PLAIN_VIEW == t.VIEW) t.infoView(true);
       t.WINDOW.innerHTML = 'Press any key or <a href="javascript:org_html_manager.showHelp();">click here</a> to proceed.'
         +'<h2>Keyboard Shortcuts</h2>'
-        +'<table cellpadding="3" rules="groups" frame="hsides" style="margin:20px;border-style:none;" border="0";>'
+        +'<table cellpadding="3" rules="groups" frame="hsides" style="caption-side:bottom;margin:20px;border-style:none;" border="0";>'
+        +'<caption><small>org-info.js, v.###VERSION###</small></caption>'
     +'<tbody>'
       // BEGIN RECEIVE ORGTBL Shortcuts
 	+'<tr><td><code><b>? / &iquest;</b></code></td><td>show this help screen</td></tr>'

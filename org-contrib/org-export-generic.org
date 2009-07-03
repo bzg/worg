@@ -39,4 +39,149 @@ key bindings may conflict with future export-generic publications.
 
 Then run org-export (ctrl-c ctrl-e) and select generic or run
 org-export-generic.  You'll then be prompted with a list of export types
-to choose from which will include your new type assigned to the key "r".
+to choose from which will include your new type assigned to the key "R".
+
+* Property List Definitions
+
+  The property list items that can be used to format the output are
+  defined in the table below.
+
+  Generally speaking, many parts are
+  often divided into sections such that every parsed org /thing/
+  frequently has 3 output specifiers too it.  E.G., /thing/ might have
+  /thing-prefix/, /thing-suffix and /thing-format/.  The first is a prefix
+  placed before the output contents, the second is a suffix and 
+  /thing-format/ is a format string where a %s is expected to be in
+  it.  There is a bit of redundancy with this triple combination but
+  it provides flexibility (and in a few places, it's actually needed
+  because the format string may be called multiple times and the
+  prefix and suffix only once).
+
+*** Property List Value Types
+
+    Many of the property list values can be one of a different types.
+    In particular, all of the /prefix/ and /suffix/ tags can be one of
+    the following types:
+
+    - A string (e.g., "<foo>")
+    - A character, which gets repeated by the length of he line to be
+      converted.  This is most useful for headers where you wish to
+      place a line underneath the header text.  EG:
+
+:     :header-prefix             ?=
+
+      Will produce:
+
+:     Property List Value Types
+:     =========================
+     
+      For this section.
+
+    - A list of the above two types.  The list elements will be taken
+      based on the order of the header indent amount (ie, the number
+      of asterisks).  The list can be a mix of types too:
+    
+:     :header-prefix             (?= ?- "<h3>" "<h4>")
+
+*** The Full List of Value Types:
+
+***** Configuration Tags:
+
+      |--------------+---------|
+      | TAG          | EXAMPLE |
+      |--------------+---------|
+      | :file-suffix | ".txt"  |
+      | :key-binding | ?d      |
+      |--------------+---------|
+
+***** Data Output Tags:
+
+      |--------------------------------+---------------------------------------------------------------|
+      | TAG                            | EXAMPLE                                                       |
+      |--------------------------------+---------------------------------------------------------------|
+      | :header-prefix                 | "<header>\n"                                                  |
+      | :header-suffix                 | "</header>\n"                                                 |
+      |                                |                                                               |
+      | :author-export                 | t                                                             |
+      | :tags-export                   | t                                                             |
+      |                                |                                                               |
+      | :drawers-export                | t                                                             |
+      |                                |                                                               |
+      |                                |                                                               |
+      | :title-prefix                  | ?=                                                            |
+      | :title-format                  | "<h1>%s</h1>\n"                                               |
+      | :title-suffix                  | ?=                                                            |
+      |                                |                                                               |
+      | :date-export                   | t                                                             |
+      | :date-prefix                   | "<date>"                                                      |
+      | :date-format                   | "<br /><b>Date:</b> <i>%s</i><br />"                          |
+      | :date-suffix                   | "</date>\n\n"                                                 |
+      |                                |                                                               |
+      | :toc-export                    | t                                                             |
+      | :toc-header-prefix             | "<tocname>\n"                                                 |
+      | :toc-header-format             | "__%s__\n"                                                    |
+      | :toc-header-suffix             | "</tocname>\n"                                                |
+      |                                |                                                               |
+      | :toc-prefix                    | "<toc>\n"                                                     |
+      | :toc-suffix                    | "</toc>\n"                                                    |
+      |                                |                                                               |
+      | :toc-section-numbers           | t                                                             |
+      | :toc-section-number-format     | "\#(%s) "                                                     |
+      | :toc-format                    | "--%s--"                                                      |
+      | :toc-format-with-todo          | "!!%s!!\n"                                                    |
+      | :toc-indent-char               | ?\                                                            |
+      | :toc-indent-depth              | 4                                                             |
+      |                                |                                                               |
+      | :toc-tags-export               | t                                                             |
+      | :toc-tags-prefix               | "   <tags>"                                                   |
+      | :toc-tags-format               | "*%s*"                                                        |
+      | :toc-tags-suffix               | "</tags>\n"                                                   |
+      | :toc-tags-none-string          | "\n"                                                          |
+      |                                |                                                               |
+      | :body-header-section-numbers   | 3    ; t = all, nil = none                                    |
+      |                                |                                                               |
+      | :body-section-header-prefix    | ("<h1>" "<h2>" "<h3>" "<h4>" "<h5>" "<h6>")                   |
+      | :body-section-header-format    | "%s"                                                          |
+      | :body-section-header-suffix    | ("</h1>\n" "</h2>\n" "</h3>\n" "</h4>\n" "</h5>\n" "</h6>\n") |
+      |                                |                                                               |
+      | :timestamps-export             | t                                                             |
+      | :priorities-export             | t                                                             |
+      | :todo-keywords-export          | t                                                             |
+      |                                |                                                               |
+      | :body-tags-export              | t                                                             |
+      | :body-tags-prefix              | "  <tags>"                                                    |
+      | :body-tags-suffix              | "</tags>\n"                                                   |
+      |                                |                                                               |
+      | :body-section-prefix           | "<secprefix>\n"                                               |
+      | :body-section-suffix           | "</secsuffix>\n"                                              |
+      |                                |                                                               |
+      |                                |                                                               |
+      | :body-line-export-preformated  | t                                                             |
+      | :body-line-fixed-prefix        | "<pre>\n"                                                     |
+      | :body-line-fixed-suffix        | "\n</pre>\n"                                                  |
+      | :body-line-fixed-format        | "%s\n"                                                        |
+      |                                |                                                               |
+      |                                |                                                               |
+      | :body-list-prefix              | "<list>\n"                                                    |
+      | :body-list-suffix              | "</list>\n"                                                   |
+      | :body-list-format              | "<li>%s</li>\n"                                               |
+      |                                |                                                               |
+      | :body-number-list-prefix       | "<ol>\n"                                                      |
+      | :body-number-list-suffix       | "</ol>\n"                                                     |
+      | :body-number-list-format       | "<li>%s</li>\n"                                               |
+      | :body-number-list-leave-number | t                                                             |
+      |                                |                                                               |
+      | :body-list-checkbox-todo       | "<checkbox type=\"todo\">"                                    |
+      | :body-list-checkbox-todo-end   | "</checkbox (todo)>"                                          |
+      | :body-list-checkbox-done       | "<checkbox type=\"done\">"                                    |
+      | :body-list-checkbox-done-end   | "</checkbox (done)>"                                          |
+      | :body-list-checkbox-half       | "<checkbox type=\"half\">"                                    |
+      | :body-list-checkbox-half-end   | "</checkbox (half)>"                                          |
+      |                                |                                                               |
+      | :body-line-format              | "%s"                                                          |
+      | :body-line-wrap                | 60  ; wrap at 60 chars                                        |
+      |                                |                                                               |
+      | :body-text-prefix              | "<p>\n"                                                       |
+      | :body-text-suffix              | "</p>\n"                                                      |
+      |--------------------------------+---------------------------------------------------------------|
+
