@@ -2,7 +2,7 @@
  * @file
  * org-info.js
  *
- * Version: 0.1.1.9
+ * Version: 0.1.2.0
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -901,7 +901,7 @@ var org_html_manager = {
 
       // buttons:
       this.SECS[i].BUTTONS = document.createElement("div");
-      this.SECS[i].BUTTONS.innerHTML = '<div style="display:inline;float:right;text-align:right;font-size:70%;font-weight:normal;">'
+      this.SECS[i].BUTTONS.innerHTML = '<div class="org-info-js_header-navigation" style="display:inline;float:right;text-align:right;font-size:70%;font-weight:normal;">'
         + this.LINKS
         + '<a accesskey="t" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></div>';
       if(this.SECS[i].FOLDER)
@@ -917,6 +917,7 @@ var org_html_manager = {
       if(0 < this.SECS[i].CHILDREN.length && this.LOCAL_TOC)
       {
         var navi2 = document.createElement("div");
+        navi2.className="org-info-js_local-toc";
         html = 'Contents:<br /><ul>';
         for(var k=0; k < this.SECS[i].CHILDREN.length; ++k) {
           html += '<li><a href="'
@@ -1578,6 +1579,15 @@ var org_html_manager = {
             t.showSection(t.NODE.IDX);
           }
         }
+        else if ('W' == s) {
+          t.plainView(t.NODE.IDX);
+          t.ROOT.DIRTY = true;
+          t.ROOT_STATE = OrgNode.STATE_UNFOLDED;
+          t.toggleGlobaly();
+          t.toggleGlobaly();
+          t.toggleGlobaly();
+          window.print();
+        }
         else if ('f' == s) {
           if(t.VIEW != t.INFO_VIEW) {
             t.NODE.fold();
@@ -2011,6 +2021,7 @@ var org_html_manager = {
       |              | <b>Misc</b>                                             |
       | l / L / U    | display HTML link / Org link / Plain-URL                |
       | v / V        | scroll down / up                                        |
+      | W            | Print                                                   |
       */
     t.HELPING = t.HELPING ? 0 : 1;
     if (t.HELPING) {
@@ -2047,6 +2058,7 @@ var org_html_manager = {
 	+'<tr><td><code><b></b></code></td><td><b>Misc</b></td></tr>'
 	+'<tr><td><code><b>l / L / U</b></code></td><td>display HTML link / Org link / Plain-URL</td></tr>'
 	+'<tr><td><code><b>v / V</b></code></td><td>scroll down / up</td></tr>'
+	+'<tr><td><code><b>W</b></code></td><td>Print</td></tr>'
       // END RECEIVE ORGTBL Shortcuts
        +'</tbody>'
        +'</table><br />Press any key or <a href="javascript:org_html_manager.showHelp();">click here</a> to proceed.';
