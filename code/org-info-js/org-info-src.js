@@ -2,7 +2,7 @@
  * @file
  * org-info.js
  *
- * Version: 0.1.2.0
+ * Version: 0.1.2.1
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -402,6 +402,7 @@ var org_html_manager = {
   CLICK_TIMEOUT: null,         // Mousehandling
   SECNUM_MAP: {},              // Map section numbers to OrgNodes
   SECNUM_REGEX: /^section-number-(\d)+/, // class of the span containing section numbers.
+  TOC_LINK: null,              // Last link used in TOC
 
   /**
    * Setup the OrgHtmlManager for scanning.
@@ -753,6 +754,8 @@ var org_html_manager = {
           else {
             c.href = newHref;
             c.tabIndex = this.TAB_INDEX;
+            c.onfocus=function(){org_html_manager.TOC_LINK=this;void 0;};
+            if(null==this.TOC_LINK) this.TOC_LINK=c;
             this.TAB_INDEX++;
           }
           break;
@@ -867,10 +870,10 @@ var org_html_manager = {
       var html = '<table class="org-info-js_info-navigation" width="100%" border="0" style="border-bottom:1px solid black;">'
         +'<tr><td colspan="3" style="text-align:left;border-style:none;vertical-align:bottom;">'
         +'<span style="float:left;display:inline;text-align:left;">'
-        +'Top: <a accesskey="i" href="javascript:org_html_manager.navigateTo(0);">'+index_name+'</a></span>'
+        +'Top: <a accesskey="t" href="javascript:org_html_manager.navigateTo(0);">'+index_name+'</a></span>'
         +'<span style="float:right;display:inline;text-align:right;font-size:70%;">'
         + this.LINKS
-        +'<a accesskey="t" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></span>'
+        +'<a accesskey="m" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></span>'
         +'</td></tr><tr><td style="text-align:left;border-style:none;vertical-align:bottom;width:22%">';
 
       if(i>0)
@@ -903,7 +906,7 @@ var org_html_manager = {
       this.SECS[i].BUTTONS = document.createElement("div");
       this.SECS[i].BUTTONS.innerHTML = '<div class="org-info-js_header-navigation" style="display:inline;float:right;text-align:right;font-size:70%;font-weight:normal;">'
         + this.LINKS
-        + '<a accesskey="t" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></div>';
+        + '<a accesskey="m" href="javascript:org_html_manager.toggleView('+i+');">toggle view</a></div>';
       if(this.SECS[i].FOLDER)
         // this.SECS[i].HEADING.appendChild(this.SECS[i].BUTTONS);
         this.SECS[i].DIV.insertBefore(this.SECS[i].BUTTONS, this.SECS[i].HEADING); //div.firstChild.nextSibling);
@@ -1008,13 +1011,14 @@ var org_html_manager = {
         }
       }
     }
+    if('?/toc/?' != sec && null != t.TOC_LINK) t.TOC_LINK.blur();
     if('?/toc/?' == sec || (!isNaN(section) && t.SECS[section])) {
       if('?/toc/?' == sec && t.HIDE_TOC)
         {
           t.NODE = t.TOC;
           t.ROOT.hideAllChildren();
           if(t.INFO_VIEW == t.VIEW)
-            t.WINDOW.innerHTML =  t.NODE.DIV.innerHTML;
+            t.WINDOW.innerHTML = t.NODE.DIV.innerHTML;
           else
             t.NODE.setState(OrgNode.STATE_UNFOLDED);
           window.scrollTo(0, 0);
@@ -1030,8 +1034,13 @@ var org_html_manager = {
             if(t.SLIDE_VIEW == t.VIEW) t.WINDOW.innerHTML = t.NODE.DIV.innerHTML;
             else t.WINDOW.innerHTML = t.NODE.NAV + t.NODE.DIV.innerHTML;
             t.NODE.hide();
+            // Hide the body, to avoid jumping page when replacing the
+            // location. Unfortunatly we cannot do this with a fixed TOC,
+            // because the fixed TOC will jump then, causing links towards the
+            // bottom to disapear again.
+            if(! t.FIXED_TOC) OrgNode.hideElement(document.body);
             if ('?/toc/?' != sec) window.location.replace(t.BASE_URL + t.getDefaultTarget());
-            document.body.focus();
+            if(! t.FIXED_TOC) OrgNode.showElement(document.body);
           }
           else {
             if(! t.VIEW_BUTTONS) OrgNode.hideElement(last_node.BUTTONS);
@@ -1458,8 +1467,11 @@ var org_html_manager = {
     t.CONSOLE_INPUT.blur();
 
     // Always remove TOC from history, if HIDE_TOC
-    if(t.HIDE_TOC && t.TOC == t.NODE && "v" != s && "V" != s) {
+    if(t.HIDE_TOC && t.TOC == t.NODE && "v" != s && "V" != s && "\t" != s) {
       s = "b";
+    }
+    else if("\t" == s) {
+      return true;
     }
     else {
       s = t.trim(s);
@@ -1483,11 +1495,15 @@ var org_html_manager = {
           }
         }
         else if ('i' == s) {
-          if(t.FIXED_TOC) {
-            t.TOC.FOLDER.getElementsByTagName("A")[0].focus();
+          if(! t.FIXED_TOC) {
+            // here we should handle the TOC_LINK differently because of
+            // cloning. Or, better, avoid cloning? The tabIndex is no good
+            // solution...
+            if (t.HIDE_TOC) t.navigateTo('?/toc/?');
+            // No cloning here:
+            else if(0 != t.NODE.IDX) t.navigateTo(0);
           }
-          else if (t.HIDE_TOC) t.navigateTo('?/toc/?');
-          else if(0 != t.NODE.IDX) t.navigateTo(0);
+          if(null != t.TOC_LINK) t.TOC_LINK.focus();
         }
         else if ('m' == s) {
           t.toggleView(t.NODE.IDX);
