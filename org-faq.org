@@ -1108,13 +1108,46 @@ Note that you could use arbitrary starting values and column formulas.
 
    : (setq org-org-table-copy-increment nil)
 
+* Remember
+  :PROPERTIES:
+  :CUSTOM_ID: Remember
+  :END:
+** Can I use the remember buffer to clock a customer phone call?
+   :PROPERTIES:
+   :CUSTOM_ID: use-remember-buffer-to-clock-phone-call
+   :END:
+
+  Yes, you can.  Take a look at the [[http://thread.gmane.org/gmane.emacs.orgmode/5482][setup described by Bernt Hansen]]
+  and check out (in the same thread) what Nick Docos had to fix to
+  make Bernt's set-up work for him.
+** Can I automatically start the clock when opening a remember template?
+   :PROPERTIES:
+   :CUSTOM_ID: start-clock-when-opening-remember-template
+   :END:
+
+   Yes, this is possible.  Use the following code and make sure that
+   after executing it, `my-start-clock-if-needed' is in
+   `remember-mode-hook' /after/ `org-remember-apply-template'.
+
+   : (add-hook 'remember-mode-hook 'my-start-clock-if-needed 'append)
+   : (defun my-start-clock-if-needed ()
+   :   (save-excursion
+   :     (goto-char (point-min))
+   :     (when (re-search-forward " *CLOCK-IN *" nil t)
+   :       (replace-match "")
+   :       (org-clock-in))))
+
+   Then, when a template contains the key string CLOCK-IN, the clock
+   will be started.  Starting with Org-mode version 5.20, the clock will
+   automatically be stopped when storing the remember buffer.
+
 * Footnotes
   :PROPERTIES:
   :CUSTOM_ID: Footnotes
   :END:
 ** How can I get automatic renumbering of footnotes in org-mode?
    :PROPERTIES:
-   :CUSTOM_ID:       org-footnote-auto-adjust
+   :CUSTOM_ID:       footnote-auto-adjust
    :END:
 
 You can add the following line to your .emacs file:
@@ -1158,39 +1191,6 @@ the end of a document or at the end of the outline heading in which
 they appear. Users who change this setting while editing a document
 may be disconcerted to find all of their footnotes rearranged
 automatically.
-
-* Remember
-  :PROPERTIES:
-  :CUSTOM_ID: Remember
-  :END:
-** Can I use the remember buffer to clock a customer phone call?
-   :PROPERTIES:
-   :CUSTOM_ID: use-remember-buffer-to-clock-phone-call
-   :END:
-
-  Yes, you can.  Take a look at the [[http://thread.gmane.org/gmane.emacs.orgmode/5482][setup described by Bernt Hansen]]
-  and check out (in the same thread) what Nick Docos had to fix to
-  make Bernt's set-up work for him.
-** Can I automatically start the clock when opening a remember template?
-   :PROPERTIES:
-   :CUSTOM_ID: start-clock-when-opening-remember-template
-   :END:
-
-   Yes, this is possible.  Use the following code and make sure that
-   after executing it, `my-start-clock-if-needed' is in
-   `remember-mode-hook' /after/ `org-remember-apply-template'.
-
-   : (add-hook 'remember-mode-hook 'my-start-clock-if-needed 'append)
-   : (defun my-start-clock-if-needed ()
-   :   (save-excursion
-   :     (goto-char (point-min))
-   :     (when (re-search-forward " *CLOCK-IN *" nil t)
-   :       (replace-match "")
-   :       (org-clock-in))))
-
-   Then, when a template contains the key string CLOCK-IN, the clock
-   will be started.  Starting with Org-mode version 5.20, the clock will
-   automatically be stopped when storing the remember buffer.
 
 * Searches
   :PROPERTIES:
