@@ -1108,6 +1108,54 @@ Note that you could use arbitrary starting values and column formulas.
 
    : (setq org-org-table-copy-increment nil)
 
+* Footnotes
+** How can I get automatic renumbering of footnotes in org-mode?
+   :PROPERTIES:
+   :ID:       org-footnote-auto-adjust
+   :END:
+
+You can add the following line to your .emacs file:
+
+: (setq org-footnote-auto-adjust t)
+
+Or, if you prefer, you can turn this option on locally by placing the
+following line at the top of your org file:
+
+: #+STARTUP: fnadjust
+
+When auto-adjust is turned on, footnotes in the file with numerical
+labels will be renumbered whenever a new footnote is added. Meanwhile,
+all footnotes, including those with custom labels such
+=[fn:custom-label]=, will be sorted in the order of their appearance
+in the text.
+
+This emulates the footnote behavior that many users may be familiar
+with from word-processing programs or from the footnote-mode included
+with emacs.
+
+If you do not turn on org-footnote-auto-adjust, you sort and/or
+renumber footnotes at any time by calling org-footnote-action with a
+prefix argument.
+
+** Why isn't auto renumbering of footnotes turned on by default?
+   :PROPERTIES:
+   :ID:       why-no-default-auto-adjust
+   :END:
+
+Org mode has a very robust footnote mechanism allowing for a variety
+of types of footnotes. With some of the following footnote notations,
+auto-adjust may be either irrelevant or undesired:
+
+ - Automatically numbered 
+ - Footnotes with custom labels
+ - Inline footnotes
+
+In addition, org mode can be customized to place footnotes either at
+the end of a document or at the end of the outline heading in which
+they appear. Users who change this setting while editing a document
+may be disconcerted to find all of their footnotes rearranged
+automatically.
+
 * Remember
   :PROPERTIES:
   :CUSTOM_ID: Remember
