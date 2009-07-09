@@ -476,3 +476,68 @@ it is a cons of 'gnus and the select (type and name).")
      (add-to-list 'org-store-link-functions 'mde-org-gnus-save-by-mid)
      (org-add-link-type "mid" 'mde-org-gnus-open-message-link)))
 #+end_src
+* Dynamically adjust tag position
+Here is a bit of code that allows you to have the tags always
+right-adjusted in the buffer.
+
+This is useful when you have bigger window than default window-size
+and you dislike the aesthetics of having the tag in the middle of the
+line. 
+
+This hack solves the problem of adjusting it whenever you change the
+window size. 
+Before saving it will revert the file to having the tag position be
+left-adjusted so that if you track your files with version control,
+you won't run into artificial diffs just because the window-size
+changed.
+
+*IMPORTANT*: This is probably slow on very big files.
+
+#+begin_src emacs-lisp
+(setq ba/org-adjust-tags-column t)
+
+(defun ba/org-adjust-tags-column-reset-tags ()
+  "In org-mode buffers it will reset tag position according to
+`org-tags-column'."
+  (when (and
+         (not (string= (buffer-name) "*Remember*"))
+         (eql major-mode 'org-mode))
+    (let ((b-m-p (buffer-modified-p)))
+      (condition-case nil
+          (save-excursion
+            (goto-char (point-min))
+            (command-execute 'outline-next-visible-heading)
+            ;; disable (message) that org-set-tags generates
+            (flet ((message (&rest ignored) nil))
+              (org-set-tags 1 t))
+            (set-buffer-modified-p b-m-p))
+        (error nil)))))
+
+(defun ba/org-adjust-tags-column-now ()
+  "Right-adjust `org-tags-column' value, then reset tag position."
+  (set (make-local-variable 'org-tags-column)
+       (- (- (window-width) 3)))
+  (ba/org-adjust-tags-column-reset-tags))
+
+(defun ba/org-adjust-tags-column-maybe ()
+  "If `ba/org-adjust-tags-column' is set to non-nil, adjust tags."
+  (when ba/org-adjust-tags-column
+    (ba/org-adjust-tags-column-now)))
+
+(defun ba/org-adjust-tags-column-before-save ()
+  "Tags need to be left-adjusted when saving."
+  (when ba/org-adjust-tags-column
+     (setq org-tags-column 1)
+     (ba/org-adjust-tags-column-reset-tags)))
+
+(defun ba/org-adjust-tags-column-after-save ()
+  "Revert left-adjusted tag position done by before-save hook."
+  (ba/org-adjust-tags-column-maybe)
+  (set-buffer-modified-p nil))
+
+; automatically align tags on right-hand side
+(add-hook 'window-configuration-change-hook
+          'ba/org-adjust-tags-column-maybe)
+(add-hook 'before-save-hook 'ba/org-adjust-tags-column-before-save)
+(add-hook 'after-save-hook 'ba/org-adjust-tags-column-after-save)
+#+end_src
