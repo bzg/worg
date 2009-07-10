@@ -566,7 +566,6 @@ changed.
     ;; Customize:
     (setq  my/org-compile-sources t)
 
-
     (defun my/compile-org(&optional directory)
       "Compile all *.el files that come with org-mode."
       (interactive)
@@ -575,10 +574,8 @@ changed.
                         (or directory my/org-lisp-directory)) "/"))
 
       (add-to-list 'load-path directory)
-      (dired directory)
-      (dired-mark-files-regexp "\\.el$")
 
-      (let ((list-of-org-files (dired-get-marked-files)))
+      (let ((list-of-org-files (file-expand-wildcards (concat directory "*.el"))))
 
         ;; create the org-install file
         (require 'autoload)
@@ -590,7 +587,8 @@ changed.
               list-of-org-files)
         (insert "\n(provide (quote org-install))\n")
         (save-buffer)
-        (byte-compile-file esf/org-install-file)
+        (kill-buffer)
+        (byte-compile-file esf/org-install-file t)
 
         (dolist (f list-of-org-files)
           (if (file-exists-p (concat f "c")) ; delete compiled files
