@@ -32,31 +32,31 @@ The homepage of the Worg project is here: http://repo.or.cz/w/Worg.git
 
 5. Clone the project somewhere in a working directory:
 
-   :~$ git clone git+ssh://repo.or.cz/srv/git/Worg.git
+   : ~$ git clone git+ssh://repo.or.cz/srv/git/Worg.git
 
 6. Go to the newly created =Worg/= directory and edit some files.
 
 7. If you created files, add them to the git index:
 
-   :~$ git add *.org
+   : ~$ git add *.org
 
 8. Commit changes with the appropriate ChangeLog:
 
-  :~$ git commit -a -m "My changelog"
+  : ~$ git commit -a -m "My changelog"
 
 9. Push your change to Worg:
 
-  :~$ git push
+  : ~$ git push
 
   This stage didn't work for me, instead I had to add a remote like
   so:
 
-  :~$ git remote add public git+ssh://<UserName>@repo.or.cz/srv/git/Worg.git
+  : ~$ git remote add public git+ssh://<UserName>@repo.or.cz/srv/git/Worg.git
 
   Where <UserName> is the username you supplied repo.or.cz.  Then do
   a:
 
-  :~$ git push public
+  : ~$ git push public
 
 * How Worg publishes itself as HTML?
 
@@ -70,6 +70,51 @@ The homepage of the Worg project is here: http://repo.or.cz/w/Worg.git
   So for example, if you push a change in Worg at 0:58am, this will be
   pulled on the server at 1am and will appear on the website at 1:30am.
 
+  Here is the detailed recipe:
+
+  1. Configure your =~/.emacs.el= to know about your publishing projects
+     (more information on publishing [[http://www.gnu.org/software/emacs/manual/html_node/org/Publishing.html][here]] and [[file:org-tutorials/org-publish-html-tutorial.org][here]])
+
+  2. Use =(setq org-export-htmlize-output-type 'css)= in ~/.emacs.el
+     
+     (Do =C-h v org-export-htmlize-output-type= for more information
+     about this.  Also =C-h v org-export-htmlize-generate-css= might 
+     help.)
+
+  3. Create =~/bin/pull-worg.sh= containing this script:
+     
+     #+BEGIN_SRC sh-mode
+     #!/bin/bash
+
+     # unless this is already done elsewhere:
+     export PATH=$PATH:/home/you/bin/
+     
+     # go to the place where you pull Worg
+     cd /home/you/git/Worg/; 
+     
+     # pull Worg
+     /home/you/bin/git-pull
+     #+END_SRC
+
+  4. Create =~/bin/pull-worg.sh= containing this script:
+
+     #+begin_src sh-mode
+     #!/bin/bash                                                                                                                    
+
+     # Adapt it to point at your emacs executable
+     /home/you/bin/emacs23 --batch -l ~/.emacs.el -f org-publish-all
+     #+end_src
+
+  5. Cron the two scripts to run every hour, not at the same time
+
+     #+begin_src 
+     0 * * * * /home/you/bin/pull-worg.sh >> /dev/null 2>&1
+     30 * * * * /home/you/bin/publish-worg.sh >> /dev/null 2>&1
+     #+end_src
+
+  6. Sit and do something else while your Org repository is
+     automagically exported to HTML
+
 * The second time you contribute to Worg
 
 1. Go to your =Worg/= directory.
@@ -78,13 +123,13 @@ The homepage of the Worg project is here: http://repo.or.cz/w/Worg.git
 
 3. Make some changes.
 
-4. Commit your changes on your local repository: 
-   
-   :~$ git commit -a -m "My ChangeLog"
+4. Commit your changes on your local repository:
+
+   : ~$ git commit -a -m "My ChangeLog"
 
 5. Push your change on the remote repository
 
-   :~$ git push
+   : ~$ git push
 
 * Getting organized
 
@@ -92,14 +137,14 @@ The Worg TODO file is =worg-todo.org=.  If you are a Worg zealot, maybe you
 want to add this file to the list of your agenda files.  For example, here
 is my =org-agenda-files= variable:
 
-  :(setq org-agenda-files '("~/org/bzg.org" "~/git/Worg/worg-todo.org")
+  : (setq org-agenda-files '("~/org/bzg.org" "~/git/Worg/worg-todo.org")
 
 I have an agenda custom command for checking tasks that are assigned to me:
 
-  :(org-add-agenda-custom-command '("W" tags "Owner=\"Bastien\""))
+  : (org-add-agenda-custom-command '("W" tags "Owner=\"Bastien\""))
 
 The next time someone assigns a task for me, it will appear in my Worg
-agenda view.  
+agenda view.
 
 * Register your changes under your name
 
@@ -128,12 +173,12 @@ yours.
 
 1. Clone the Worg project as the =mob= user:
 
-   :~$ git clone git+ssh://mob@repo.or.cz/srv/git/Worg.git
+   : ~$ git clone git+ssh://mob@repo.or.cz/srv/git/Worg.git
 
 2. Check out the "mob" branch to avoid conflicts between the =mob=
    branch that you will soon create and any existing =mob= branch:
 
-   :~$ git checkout origin/mob
+   : ~$ git checkout origin/mob
 
    You should get this warning:
 
@@ -146,30 +191,24 @@ yours.
 
 3. Create a new branch named =mob= from this checkout:
 
-   :~$ git checkout -b mob
+   : ~$ git checkout -b mob
 
 4. Edit the files, add new files (=git-add=) and commit (=git-commit=)
    them as usual.
 
 5. Push the =mob= branch into the Worg remote directory:
 
-   :~$ git push origin mob
+   : ~$ git push origin mob
 
 You're done!
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 # FIXME:
+
 # What if two people edit Worg at the same time?
+# bzg [2009-07-15 mer]: No problem.  Just try to push and resolve
+# conflicts if any.
+
 # Can I have private sections in Worg?
+# bzg [2009-07-15 mer]: Sure.  Just add an :AUTHOR: property in
+# the property drawer.
+
