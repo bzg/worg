@@ -596,3 +596,33 @@ changed.
           (if my/org-compile-sources     ; Compile, if `my/org-compile-sources' is t
               (byte-compile-file f)))))
   #+END_SRC
+* Customize the size of the frame for remember
+
+#FIXME: gmane link?
+On emacs-orgmode, Ryan C. Thompson suggested this:
+
+#+begin_quote 
+I am using org-remember set to open a new frame when used,
+and the default frame size is much too large. To fix this, I have
+designed some advice and a custom variable to implement custom
+parameters for the remember frame:
+#+end_quote
+
+#+begin_src emacs-lisp
+  (defcustom remember-frame-alist nil
+    "Additional frame parameters for dedicated remember frame."
+    :type 'alist
+    :group 'remember)
+  
+  (defadvice remember (around remember-frame-parameters activate)
+    "Set some frame parameters for the remember frame."
+    (let ((default-frame-alist (append remember-frame-alist
+                                       default-frame-alist)))
+      ad-do-it))
+#+end_src
+
+Setting remember-frame-alist to =((width . 80) (height . 15)))= give a
+reasonable size for the frame.
+
+
+
