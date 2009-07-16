@@ -58,63 +58,6 @@ The homepage of the Worg project is here: http://repo.or.cz/w/Worg.git
 
   : ~$ git push public
 
-* How Worg publishes itself as HTML?
-
-  The server behind http://orgmode.org website takes care of publishing
-  Worg into =HTML=.  This is done in two steps: the first step is to
-  pull the Worg directly on the server, the second one is to publish the
-  last version of Worg on the website.  Both steps are cron'ed every
-  hour, the first one at 1:00, 2:00, etc. and the second one at 1:30,
-  2:30.
-
-  So for example, if you push a change in Worg at 0:58am, this will be
-  pulled on the server at 1am and will appear on the website at 1:30am.
-
-  Here is the detailed recipe:
-
-  1. Configure your =~/.emacs.el= to know about your publishing projects
-     (more information on publishing [[http://www.gnu.org/software/emacs/manual/html_node/org/Publishing.html][here]] and [[file:org-tutorials/org-publish-html-tutorial.org][here]])
-
-  2. Use =(setq org-export-htmlize-output-type 'css)= in ~/.emacs.el
-     
-     (Do =C-h v org-export-htmlize-output-type= for more information
-     about this.  Also =C-h v org-export-htmlize-generate-css= might 
-     help.)
-
-  3. Create =~/bin/pull-worg.sh= containing this script:
-     
-     #+BEGIN_SRC sh-mode
-     #!/bin/bash
-
-     # unless this is already done elsewhere:
-     export PATH=$PATH:/home/you/bin/
-     
-     # go to the place where you pull Worg
-     cd /home/you/git/Worg/; 
-     
-     # pull Worg
-     /home/you/bin/git-pull
-     #+END_SRC
-
-  4. Create =~/bin/pull-worg.sh= containing this script:
-
-     #+begin_src sh-mode
-     #!/bin/bash                                                                                                                    
-
-     # Adapt it to point at your emacs executable
-     /home/you/bin/emacs23 --batch -l ~/.emacs.el -f org-publish-all
-     #+end_src
-
-  5. Cron the two scripts to run every hour, not at the same time
-
-     #+begin_src 
-     0 * * * * /home/you/bin/pull-worg.sh >> /dev/null 2>&1
-     30 * * * * /home/you/bin/publish-worg.sh >> /dev/null 2>&1
-     #+end_src
-
-  6. Sit and do something else while your Org repository is
-     automagically exported to HTML
-
 * The second time you contribute to Worg
 
 1. Go to your =Worg/= directory.
@@ -159,6 +102,63 @@ Edit it like this:
 Now your changes will be filed under your name.
 
 # I'm not sure this is useful at all:
+
+* How Worg publishes itself as HTML?
+
+  The server behind http://orgmode.org website takes care of publishing
+  Worg into =HTML=.  This is done in two steps: the first step is to
+  pull the Worg directly on the server, the second one is to publish the
+  last version of Worg on the website.  Both steps are cron'ed every
+  hour, the first one at 1:00, 2:00, etc. and the second one at 1:30,
+  2:30.
+
+  So for example, if you push a change in Worg at 0:58am, this will be
+  pulled on the server at 1am and will appear on the website at 1:30am.
+
+  Here is the detailed recipe:
+
+  1. Configure your =~/.emacs.el= to know about your publishing projects
+     (more information on publishing [[http://www.gnu.org/software/emacs/manual/html_node/org/Publishing.html][here]] and [[file:org-tutorials/org-publish-html-tutorial.org][here]])
+
+  2. Use =(setq org-export-htmlize-output-type 'css)= in ~/.emacs.el
+
+     (Do =C-h v org-export-htmlize-output-type= for more information
+     about this.  Also =C-h v org-export-htmlize-generate-css= might
+     help.)
+
+  3. Create =~/bin/pull-worg.sh= containing this script:
+
+     #+BEGIN_SRC sh-mode
+     #!/bin/bash
+
+     # unless this is already done elsewhere:
+     export PATH=$PATH:/home/you/bin/
+
+     # go to the place where you pull Worg
+     cd /home/you/git/Worg/;
+
+     # pull Worg
+     /home/you/bin/git-pull
+     #+END_SRC
+
+  4. Create =~/bin/pull-worg.sh= containing this script:
+
+     #+BEGIN_SRC sh-mode
+     #!/bin/bash
+
+     # Adapt it to point at your emacs executable
+     /home/you/bin/emacs23 --batch -l ~/.emacs.el -f org-publish-all
+     #+end_src
+
+  5. Cron the two scripts to run every hour, not at the same time
+
+     #+BEGIN_SRC generic-mode
+     0 * * * * /home/you/bin/pull-worg.sh >> /dev/null 2>&1
+     30 * * * * /home/you/bin/publish-worg.sh >> /dev/null 2>&1
+     #+END_SRC
+
+  6. Sit and do something else while your Org repository is
+     automagically exported to HTML
 * COMMENT Anonymous editing through the "mob" user/branch
 
 If you don't want to register a new account on =repo.or.gz= but still
