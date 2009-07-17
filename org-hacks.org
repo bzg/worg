@@ -626,3 +626,37 @@ reasonable size for the frame.
 
 
 
+* Add an effort estimate on the fly when clocking in
+
+You can use =org-clock-in-prepare-hook= to add an effort estimate.  
+This way you can easily have a "tea-timer" for your tasks when they
+don't already have an effort estimate.
+
+#+begin_src emacs-lisp
+(add-hook 'org-clock-in-prepare-hook 
+	  'my-org-mode-ask-effort)
+
+(defun my-org-mode-ask-effort ()
+  "Ask for an effort estimate when clocking in."
+  (unless (org-entry-get (point) "Effort")
+    (let ((effort 
+	   (completing-read 
+	    "Effort: "
+	    (org-entry-get-multivalued-property (point) "Effort"))))
+      (unless (equal effort "")
+	(org-set-property "Effort" effort)))))
+#+end_src
+
+Or you can use a default effort for such a timer:
+
+#+begin_src emacs-lisp
+(add-hook 'org-clock-in-prepare-hook 
+	  'my-org-mode-add-default-effort)
+
+(defvar org-clock-default-effort "1:00")
+
+(defun my-org-mode-add-default-effort ()
+  "Add a default effort estimation."
+  (unless (org-entry-get (point) "Effort")
+    (org-set-property "Effort" org-clock-default-effort)))
+#+end_src
