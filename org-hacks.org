@@ -625,7 +625,6 @@ Setting remember-frame-alist to =((width . 80) (height . 15)))= give a
 reasonable size for the frame.
 
 
-
 * Add an effort estimate on the fly when clocking in
 
 You can use =org-clock-in-prepare-hook= to add an effort estimate.  
@@ -660,3 +659,42 @@ Or you can use a default effort for such a timer:
   (unless (org-entry-get (point) "Effort")
     (org-set-property "Effort" org-clock-default-effort)))
 #+end_src
+* Dates computation in an Org table
+
+** Question ([[http://article.gmane.org/gmane.emacs.orgmode/15692][Xin Shi]])
+
+I have a table in org which stores the date, I'm wondering if there is
+any function to calculate the duration? For example:
+
+| Start Date |   End Date | Duration |
+|------------+------------+----------|
+| 2004.08.07 | 2005.07.08 |          |
+
+I tried to use B&-C&, but failed ...
+
+** Answer ([[http://article.gmane.org/gmane.emacs.orgmode/15694][Nick Dokos]])
+
+Try the following:
+
+| Start Date |   End Date | Duration |
+|------------+------------+----------|
+| 2004.08.07 | 2005.07.08 |      335 |
+#+TBLFM: $3=(date(<$2>)-date(<$1>))
+
+See this thread:
+
+    http://thread.gmane.org/gmane.emacs.orgmode/7741
+
+as well as this post (which is really a followup on the
+above):
+
+    http://article.gmane.org/gmane.emacs.orgmode/7753
+
+The problem that this last article pointed out was solved
+in
+
+    http://article.gmane.org/gmane.emacs.orgmode/8001
+
+and Chris Randle's original musings are at
+
+    http://article.gmane.org/gmane.emacs.orgmode/6536/
