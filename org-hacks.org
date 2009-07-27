@@ -698,3 +698,15 @@ in
 and Chris Randle's original musings are at
 
     http://article.gmane.org/gmane.emacs.orgmode/6536/
+* Org-mode and saveplace.el
+
+Fix a problem with saveplace.el putting you back in a folded position: 
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook
+          (lambda ()
+	    (when (outline-invisible-p)
+	      (save-excursion
+		(outline-previous-visible-heading 1)
+		(org-show-subtree)))))
+#+end_src
