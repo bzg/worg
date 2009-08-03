@@ -1,0 +1,123 @@
+#+TITLE: My org-mode workflow
+* Why I use org-mode
+I've been outlining since I started undergrad in university. I write lecture notes as outlines, and (of course) outline papers. I started using CircusPonies Notebook to do all this.  I had been searching for a F/OSS alternative to CircusPonies Notebook for a while. Notebook is a nice enough application, but it has a limited feature set and would occasionally inform me that my license was invalid and shut itself down (this was a paid-for copy).
+
+I've been using Emacs for a couple years and had occasionally typed up outlines in text-mode. I figured there had to be a better way, but outline-mode didn't seem much better. I started using org-mode for outlining purposes. I knew it was different that outline-mode, but nothing beyond that. Org-mode has all of the features of Notebook plus all of the features of Emacs plus anything I can think of. For example, I duplicated the Notebook keyboard shortcuts in a mode that runs on top of org (known as a "derived mode" in Emacs parlance) called jot-mode.
+
+I started using org as a planner as well. I'm not an adherent of a system like GTD. org-mode maps to my unplanned, organic project-planning techiques.
+
+This document outlines the ways I use org. It's not a comprehensive overview of org's features. I don't use most of them. I have yet to read through the org manual cover-to-cover, and may never. But the small fraction of feature I use with very little effort spent learning about them has already completely changed my workflow, outlining, and project-planning styles.
+
+* Remember-mode
+
+Remember-mode is mapped to C-M-r. If I think of something, I enter it into Remember-mode and let it file it accordingly:
+
+I have four tags for Remember-mode: t, n, r, g
+T is for Todos (including appointments).
+N is for Notes.
+R is for things to Read (or consume, really; music and movies also go here)
+G is for Groceries.
+
+
+Those go into three files:
+todos.org (t)
+notes.org (n, r)
+groceries.org (g)
+
+todos.org
+Everything in todos.org has a date associated with it. Whenever I add anything as a todo, I type C-c C-s to schedule a date.
+
+notes.org
+No dates associated. I just look through this stuff whenever (e.g. when I feel like looking for more reading material).
+
+groceries.org
+I check this when I go grocery shopping.
+
+All of these files are stored on my Dropbox account, so that they stay constant across computers.
+
+org's Agenda knows about these files. So, throughout the day, I have a tab in Emacs (I use elscreen.el for tabs) which has todo.org open and my agenda. If I find myself with time on my hands, I check the agenda to see what needs doing. If I think of something that I need to do, but not immediately, during the day, I add it to todos.org using Remember.
+
+I have org set so that when I mark something as Done, it asks me for a note about the completion. This makes me reflect a bit, and gives me a chance to add new todos that might exist as a result of closing the current one. Then, I archive it (C-c C-x C-s) to todos.org's archive file (todos.org_archive; org-mode creates that).
+
+At the end of the day (although more realistically, every couple of days) I go through todos.org (it's easy, since it's almost always open) and refile things that belong in a different category (this also lends itself to organically planning projects) using C-c C-w.
+
+* Integration with other org-mode features
+
+
+** Outlines: Forms
+
+I use org-mode primarily to make outlines. I make an outline for pretty much everything I'm working on, now. For example, if I'm working on a research proposal where I have to fill out a template in Word, I'll still make an outline like this:
+
+#+BEGIN_SRC org
+* Page 1
+* Page 2
+* Page 3
+#+END_SRC
+etc.
+
+I'll then use C-c C-t to turn them into TODOs.
+
+#+BEGIN_SRC org
+* TODO Page 1
+* TODO Page 2
+* TODO Page 3
+#+END_SRC
+
+When I finish a page, I'll close it using C-c C-t
+#+BEGIN_SRC org
+* DONE Page 1
+  CLOSED: [2009-07-28 Tue 17:23]
+* TODO Page 2
+* TODO Page 3
+#+END_SRC
+
+Or add an explanation for why I couldn't finish it:
+
+#+BEGIN_SRC org
+* DONE Page 1
+  CLOSED: [2009-07-28 Tue 17:23]
+* TODO Page 2
+** Meet with Alex re: statistical tests.
+* TODO Page 3
+#+END_SRC
+
+...and either turn those into TODOs or add them to todo.org using Remember.
+
+This way, I can complete a document without having to look through it for the incomplete parts. It significantly cuts down the trouble involved in filling out forms.
+
+** Regular Outlines
+
+Of course, org-mode works wonderfully for proper outlines, too. I go from brief notes about what a document should be to the full version using a similar workflow. For example, I'll start a manuscript by entering:
+
+#+BEGIN_SRC org
+* TODO Abstract
+* TODO Introduction
+* TODO Methods
+* TODO Results
+* TODO Discussion
+* TODO Contributions
+#+END_SRC
+and fill it in, marking sections as done (and folding them away) as I finish. For huge documents, org-mode's folding (using either TAB to expand at point or S-TAB to see the whole file) is particularly useful because I can quickly see the flow and structure of a document at a glance.
+
+If a document has a lot of TODOs, I can also take advantage of org-agenda. I type C-c a L and see all the TODOs for the current buffer.
+
+
+
+* Lecture notes: jot-mode
+
+Jot-mode is a set of keyboard shortcuts that let me use org-mode when I need to type out a document very quickly, e.g. in lectures or meetings. It is what's called a derived mode: it replaces some features of org, but is otherwise identical.
+
+Jot-mode assumes that by default, you are going to insert a new heading (i.e. that you are thinking in bullet points). So, Return inserts a new bullet at the current level. Tab outdents; S-Tab indents. When I'm done the meeting and want to flesh out this quick and dirty outline, I just switch back to org-mode using M-x org-mode.
+
+* Publishing
+
+Org-mode exports to LaTeX, HTML, and iCal/Google Calendar very nicely. It lets you inline LaTeX code directly without specifying it as such. 
+
+I'm told it can preview LaTeX at point, but I haven't needed that yet.
+
+* Discussion: learning to use org
+org-mode is simple to use but featureful. I've learned to use it the same way I learned Emacs: I read articles about it and started using the bare minimum of features I could keep in my head at once. Occasionally, I will think to myself, "it would be nice to do this on org," and look it up; more often than not, it's already been integrated., I'm using a fraction of org-mode's features, but that's more than enough enough to be far more productive than I am without it.
+
+ There are lots of things that make org worth using on those bases alone. I started using it just for outlines. Then, I found out it could export to LaTeX. And HTML. And let me schedule events. And had an agenda. And worked with Remember...
+
+The take-away message: try it out! And when, in the course of using it, you think, "it would be neat if org could do x," search the (incredibly comprehensive) manual at orgmode.com and learn how org has already implemented it.
