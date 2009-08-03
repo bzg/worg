@@ -26,29 +26,29 @@ applications other than Emacs...
 
 * org-mac-protocol -- interact with [[file:org-contrib/org-protocol.org][org-protocol]] from OS X applications
   Written by /Christopher Suckling/.
- : Version: 0.628
+  
+  : Version: 0.628
 
- A suite of scripts that allow the user to annotate their org-mode
- buffers without switching focus from other OS X applications
- to Emacs.
+  A suite of scripts that allow the user to annotate their org-mode
+  buffers without switching focus from other OS X applications
+  to Emacs.
 
- The AppleScripts interface with org-protocol.el to extract content
- from, and link to, documents and applications. 
+  The AppleScripts interface with org-protocol.el to extract content
+  from, and link to, documents and applications. 
 
- Three modes of interaction are provided:
+  Three modes of interaction are provided:
 
- =org-link= creates an org-mode link and adds it to =*Org Links*= and
- the kill-ring.
+  =org-link= creates an org-mode link and adds it to =*Org Links*= and
+  the kill-ring.
 
- =org-remember= pops up a small =*Remember*= frame with links and,
- where possible, extracted content embedded.
+  =org-remember= pops up a small =*Remember*= frame with links and,
+  where possible, extracted content embedded.
 
- =org-note= pops up a small =*Remember*= frame for note taking
- independent of the document being worked on.
+  =org-note= pops up a small =*Remember*= frame for note taking
+  independent of the document being worked on.
 
 ** Obtaining
-
-   An archive can be downloaded [[http://claviclaws.net/org/org-mac-protocol.dmg][here]].
+   A disk image can be downloaded [[http://claviclaws.net/org/org-mac-protocol.dmg][here]].
 
    A git repository can be found at =git://github.com/claviclaws/org-mac-protocol.git=
 
@@ -90,7 +90,6 @@ applications other than Emacs...
       necessary. =URI Escape.osax= is found on the
       =URIEscape1.1.2.dmg= disk image.
 
-
 *** Edit your .emacs
 **** Require org-mac-protocol.el
 
@@ -100,43 +99,39 @@ applications other than Emacs...
      
      : (add-to-list 'org-modules 'org-mac-protocol)
 
-     (must be set before org-mode is loaded)
+     Note that =org-modules= must be set before org-mode is loaded.
 
 **** Start emacsserver
 
      : (server-start)
 
-**** /Optional:/ Edit the default =*Remember*= templates
+**** Create =*Remember*= templates
 
-     Two default =*Remember*= templates are provided by
-     org-mac-protocol.el.
+     Two separate =*Remember*= templates are required, one for
+     =org-remember= and one for =org-note=:
+    
+     : ("AppleScript remember" ?y "* %?\n\n  Source: %u, %c\n\n  %i" (concat org-directory "inbox.org") "Remember")
      
-     - These can be edited to your tastes
+     : ("AppleScript note" ?z "* %?\n\n  Date: %u\n" (concat org-directory "inbox.org") "Notes")
+     
+     These templates can be fairly flexible. The only essential items
+     are =?y= and =?z= respectively (the template selection
+     characters), and, for =org-remember=, =%c= (the link to the
+     document), and =%i= (the selection within the document).
+     
+     If you choose to alter the template selection characters, you
+     *must* alter =theProtocol= variable in =org-remember.scpt= and
+     =org-note.scpt= to reflect your changes.
 
-       The defaults are:
-
-       : ("AppleScript remember" ?y "* %?\n\n  Source: %u, %c\n\n  %i" (concat org-directory "inbox.org") "Remember")
-       
-       : ("AppleScript note" ?z "* %?\n\n  Source: %u\n" (concat org-directory "inbox.org") "Notes")
-       
-       This template can be fairly flexible. The only essential items
-       are =?y= and =?z= (the template selection characters), and, for
-       =org-remember=, =%c= (the link to the document), and =%i= (the
-       selection within the document).
-
-       If you choose to alter the template selection characters, you
-       *must* alter =theProtocol= variable in =org-remember.scpt= and
-       =org-note.scpt= to reflect your changes.
-
-       Please see the [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][org manual]] and the [[http://orgmode.org/worg/org-contrib/org-protocol.php][org-protocol.el manual]] for
-       further details on template customisation.
+     Please see the [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][org manual]] and the [[http://orgmode.org/worg/org-contrib/org-protocol.php][org-protocol.el manual]] for
+     further details on template customisation.
 
 **** Eval .emacs
 *** Edit orgQSLib/getEmacsClient.scpt
     
     - Set =theEmacsClient= to point to emacsclient for your flavour of Emacs.
       
-      The default setting should work with Carbon Emacs and CVS Emacs.
+      The default setting should work with CVS Emacs and Carbon Emacs.
       Aquamacs users will have to edit this variable.
 
 ** Usage
@@ -207,4 +202,4 @@ applications other than Emacs...
    [[http://homepage.mac.com/tkurita/scriptfactory/Softwares/OSAX/URIEscape/manual/en/index.html][URI Escape]] is by Tetsuro Kurita.
 
    org-info.js and CSS stylesheet by [[http://orgmode.org/worg/code/org-info-js/][Sebastian Rose]]
-  
+   
