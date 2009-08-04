@@ -66,25 +66,25 @@ creates interactive web pages with [[http://orgmode.org][Org-Mode]].
 
 1) *Install the Required Gems*
 
-#+begin_example 
-sudo gem install rake sinatra haml activesupport
-#+end_example
+   #+begin_src sh
+   sudo gem install rake sinatra haml activesupport
+   #+end_src
 
 2) *Install blorgit*
 
-#+begin_example 
-git clone git://github.com/eschulte/blorgit.git
-#+end_example
+   #+begin_src sh 
+   git clone git://github.com/eschulte/blorgit.git
+   #+end_src
 
    Update the submodules of blorgit to provide file based persistence
    ([[http://github.com/eschulte/active_file/tree/master][active\_file]]), org-mode interaction ([[http://github.com/eschulte/acts_as_org/tree/master][acts\_as\_org]]), and themes
    ([[http://github.com/eschulte/blorgit_themes/tree/master][blorgit\_themes]]).
 
-#+begin_example 
-cd blorgit
-git submodule init
-git submodule update
-#+end_example
+   #+begin_src sh 
+   cd blorgit
+   git submodule init
+   git submodule update
+   #+end_src
 
 3) *Create Blogs Directory*
 
@@ -93,10 +93,10 @@ git submodule update
    =blorgit.yml= in this directory).  Apply the default minimal theme
    (for a list of available themes run =rake themes=)
 
-#+begin_example 
-rake new
-rake themes:default
-#+end_example
+   #+begin_src sh 
+   rake new
+   rake themes:default
+   #+end_src
 
 4) *Start Servers*
   - *Emacs Server*
@@ -106,23 +106,23 @@ rake themes:default
     to load the =org-interaction.el= file in =acts_as_org=.  You can
     do this by executing the following in emacs
 
-#+begin_example 
-M-x load-file /path/to/blorgit/backend/acts_as_org/elisp/org-interaction.el
-#+end_example
+   #+begin_src sh 
+   M-x load-file /path/to/blorgit/backend/acts_as_org/elisp/org-interaction.el
+   #+end_src
 
     or with the following shell command
 
-#+begin_example 
-emacs -l backend/acts_as_org/elisp/org-interaction.el
-#+end_example
+   #+begin_src sh 
+   emacs -l backend/acts_as_org/elisp/org-interaction.el
+   #+end_src
 
   - *Web Server*
 
     Start your sinatra web server with the following command
 
-#+begin_example 
-ruby blorgit.rb
-#+end_example
+   #+begin_src sh 
+   ruby blorgit.rb
+   #+end_src
 
 5) *View in Browser*
 
@@ -135,7 +135,7 @@ Ruby has it's own make tool called [[http://rake.rubyforge.org/][Rake]].  For a 
 rake commands run =rake -T= from the root of your blorgit
 instillation.  At the time of writing the available rake tasks are...
 
-#+begin_example
+#+begin_src sh
 $ rake -T
 (in /Users/eschulte/src/blorgit)
 rake exported:delete  # delete all temporary exported files
@@ -147,7 +147,7 @@ rake themes           # list the available themes
 rake themes:default   # a default theme, should serve as a good starting point
 rake themes:food      # a food theme for my recipes
 rake themes:org       # an org-mode theme featuring the folding unicorn
-#+end_example
+#+end_src
 
 ** Changing Configuration Options
 
@@ -160,7 +160,7 @@ repository, *commentability*, *editability* and optional *password
 protection* for posting edits, .  The default configuration is...
 
 #<<configuration_options>>
-#+begin_example 
+#+begin_src sh 
 --- 
 title: Blorgit
 index: index
@@ -173,7 +173,7 @@ editable: false
 auth: 
 - admin
 - password
-#+end_example
+#+end_src
 
 *** Directory Local Configuration
 It is possible to specify configuration options for each individual
@@ -189,13 +189,13 @@ If you're wondering where git comes in, initialize your new blogs
 directory as a git repo, and post all future blogs, moderate comments
 and commentability of blogs, and manage configuration through git.
 
-#+begin_example 
+#+begin_src sh 
 cd ./blogs
 git init
 echo ".exported_*" > .gitignore # ignore export files created automatically by blorgit
 git add .
 git commit -a -m "initial commit"
-#+end_example
+#+end_src
 
 ** Change blogs directory
 
@@ -208,9 +208,9 @@ global configuration file in the base of your blorgit directory.
 To run using the =run.ru= rackup file use a command like the following
 (requires the =thin= gem =sudo gem install -v=1.0.0 thin=)
 
-#+begin_example 
+#+begin_src sh 
 ./run.ru -sthin -p4567
-#+end_example
+#+end_src
 
 **** Deploying behind a url prefix
 If you don't want blorgit to sit at the top level of your webserver,
@@ -226,31 +226,31 @@ from this Emacs instance as follows...
 
 1) ssh into your remote server
 2) start your screen session with the =screen= command
-#+begin_example 
+#+begin_src sh 
 screen
-#+end_example
+#+end_src
 3) cd to your blorgit directory
-#+begin_example 
+#+begin_src sh 
 cd ~/src/blorgit
-#+end_example
+#+end_src
 4) start emacs loading the =org-interaction.el= file
-#+begin_example 
+#+begin_src sh 
 emacs -l backend/acts_as_org/elisp/org-interaction.el
-#+end_example
+#+end_src
 5) optionally run your webserver through screen as well by 
    1) switching to a new screen window with =\C-a c=
    2) start your webserver
-#+begin_example 
+#+begin_src sh 
 ./run.ru -sthin
-#+end_example
+#+end_src
 6) disconnect form screen leaving emacs and the webserver running with
    =\C-a d=
 7) logoff from the server
 8) at any later date you can log back into the server and reattach to
    the original screen session with
-#+begin_example 
+#+begin_src sh 
 screen -r
-#+end_example
+#+end_src
 
 ** Extending Blorgit
 Simplicity and a small hackable code base were key goals in the
@@ -259,3 +259,34 @@ application contains all of the logic and html.  Any extensions should
 be possible through modification of this single file.  For information
 on the structure of this file, or on the framework on which it is run
 see [[http://www.sinatrarb.com/][Sinatra]].
+** Deploying on a Mac with Apache/Passenger Pane
+A handy tool for hosting local sites on Mac OSX is the
+[[http://www.fngtps.com/2008/06/putting-the-pane-back-into-deployment][Apache/Passenger Pane]].  This allows the setup and running of local
+ruby web applications through a System Preferences Pane, and can be
+used with blorgit.
+
+1) First follow the instillation instructions from [[http://www.fngtps.com/2008/06/putting-the-pane-back-into-deployment][putting-the-pane-back-into-deployment]].
+2) clone blorgit to your =~/Sites= directory
+   #+begin_src sh
+   cd ~/Sites
+   git clone git://github.com/eschulte/blorgit.git
+   cd blorgit
+   git submodule init
+   git submodule update
+   #+end_src
+3) Create a public and tmp directory, and copy =run.ru= to =config.ru=
+   to trick [[http://www.modrails.com/][Passenger]] into thinking blorgit is a [[http://rubyonrails.org/][rails]] application.
+   #+begin_src sh
+   mkdir public
+   mkdir tmp
+   cp run.ru config.ru
+   #+end_src
+4) rename the blorgit directory to the name of your local site (in my
+   case "foods")
+   #+begin_src sh
+   cd ~/Sites
+   mv blorgit foods
+   #+end_src
+5) Configure blorgit as you would normally  (see [[* Getting Started (instillation and use)][Getting Started (instillation and use)]])
+6) Add your new blorgit site to Passenger Pane. [[file:images/blorgit/Passenger.png]]
+7) Point your browser at the url displayed in the Passenger Pane. [[file:images/blorgit/foods.png]]
