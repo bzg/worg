@@ -9,6 +9,8 @@
 #+PRIORITIES: A C B
 #+CATEGORY:   worg
 
+#+LINK: fireforgrepofile http://repo.or.cz/w/org-fireforg.git?a=blob_plain;f=%s;hb=HEAD
+
 # This file is the default header for new Org files in Worg.  Feel free
 # to tailor it to your needs.
 
@@ -72,3 +74,74 @@ it might be better to put an exercise example here if someone has one.
       :d: 36
       :f: 2
       :END:
+
+
+#<<fireforg>>
+** Fireforg, a Firefox extension for org interaction (EXPERIMENTAL)
+
+*** Status
+Fireforg is still experimental and the installation is not hassle free. But it's worth it :-)
+
+*** Installation
+
+- Install org-protocol according to its [[file:~/download/worg-git/org-contrib/org-protocol.org][manual]] and verify that it's working using the bookmarks.
+- Get org-fireforg.el from [[fireforgrepofile:lisp/org-fireforg.el][here]] and put the following into your =.emacs=:
+    : (add-to-list 'load-path "~/path/to/org/fireforg/")
+    : (require 'org-fireforg)
+    : (org-fireforg-registry-insinuate)
+  and as the last line the file:
+    : (org-fireforg-registry-initialize t)
+
+- Visit [[fireforgrepofile:build/fireforg.xpi][this]] with Firefox, confirm installation of the extension and restart.
+
+(Windows users will have to adjust: org-registry-file-xml  in Emacs
+and "registry-file" in Fireforgs preferences to be the same file.)
+
+*** Usage
+
+**** The status bar entry
+
+If the currently viewed url is found in your agenda files, the number
+of occurrences together with all associated tags will be shown in the
+status bar. A left click on the status bar entry will show a list of
+all headings associated with the currently viewed url. Selecting one
+of them lets emacs visit that heading.
+
+For example, this heading in one of your agenda files:
+   : * Greatest tool in the world [[http://orgmode.org/][Org mode]]    :Org:
+will yield the following when visiting http://orgmode.org/ and left clicking:
+
+[[file:images/screenshots/org-fireforg-screenshot.png]]
+
+Right clicking on the status bar entry shows a menu that let's you
+trigger org-protocol's "store-link" and "remember".
+
+**** Mark links that occur in the agenda files in websites
+
+Whenever a site is loaded, Fireforg will alter the style of all links
+in it, that occur in the agenda files. The tooltip of those links is
+set to contain the annotations.
+
+This feature can be turned off in
+"Tools->Add-Ons->Fireforg->Preferences->Lookup links on page load".
+The CSS-style used for the marking is customizable through "CSS style
+string for links with annotations" in the preferences.
+Changing the tooltip can be turned off by unchecking "Overwrite tooltip for links with annotations".
+
+**** Bugreporting and discussion
+
+- Discussions go to the org-mode list.
+- Bugreports are better not sent to the list, but rather directly to
+  the [[mailto:andreas%20AT%20burtzlaff%20DOT%20de][author]] (Please add "[Fireforg]" to the subject.), because there are probably too many, yet.
+ 
+**** A checklist for bug tracing
+
+To create a test case put:
+   : * Greatest tool in the world [[http://orgmode.org/][Org mode]]    :Org:
+into one of your agenda files and save it.
+
+If problems arise please go through this checklist to locate the problem:
+
+- Does the file "~/.org-fireforg-registry.xml" exist and does it contain "orgmode.org"?
+ - *No on either*: Send me the last content of the Messages buffer in Emacs
+ - *Yes*: In the Firefox menu: "Tools"->"Error console" look for errors containing: "chrome://fireforg/" and send them to me.
