@@ -1758,6 +1758,57 @@ Add this to your .emacs and evaluate it.
         '((ps-print-color-p 'black-white)))
 #+END_SRC
 
+** How can I get colored source code when exporting to LaTeX?
+   :PROPERTIES:
+   :CUSTOM_ID: fontified_source_code_w_latex
+   :END:
+
+As of Sun Aug 9 2009 the "current" version of Org-mode (see
+[[keeping-current-with-Org-mode-development]]) supports exporting source
+code to LaTeX using the listings package.
+
+To turn on listing export add the following to your Org-mode
+customization.
+#+begin_src emacs-lisp
+  ;; tell org to use listings
+  (setq org-export-latex-listings t)
+  
+  ;; you must include the listings package
+  (add-to-list 'org-export-latex-packages-alist '("" "listings"))
+  
+  ;; if you want colored source code then you need to include the color package
+  (add-to-list 'org-export-latex-packages-alist '("" "color"))
+#+end_src
+
+The listings package will now be used to fontify source code in your
+LaTeX documents.  By default listings will not color any of your
+source code.  If you would like to set colors for keywords and
+comments in your latex documents you can do so using LaTeX directives
+like the following.
+#+begin_src latex
+  \lstset{keywordstyle=\color{blue},
+    commentstyle=\color{red},
+    stringstyle=\color{green}
+  }
+#+end_src
+
+of if you want to get even fancier with your colors you can try
+something like the following
+#+begin_src latex
+\definecolor{keywords}{RGB}{255,0,90}
+\definecolor{comments}{RGB}{60,179,113}
+\definecolor{fore}{RGB}{249,242,215}
+\definecolor{back}{RGB}{51,51,51}
+\lstset{
+  basicstyle=\color{fore},
+  keywordstyle=\color{keywords},  
+  commentstyle=\color{comments},
+  backgroundcolor=\color{back}
+}
+#+end_src
+
+For more complex listings use cases consult the [[ftp://ftp.tex.ac.uk/tex-archive/macros/latex/contrib/listings/listings.pdf][listings manual]].
+
 * COMMENT HTML style specifications
 
 #+begin_src emacs-lisp
