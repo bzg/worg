@@ -89,7 +89,7 @@ Fireforg is still experimental and the installation is not hassle free. But it's
     : (add-to-list 'load-path "~/path/to/org/fireforg/")
     : (require 'org-fireforg)
     : (org-fireforg-registry-insinuate)
-  and as the last line the file:
+  and as the last line of the file:
     : (org-fireforg-registry-initialize t)
 
 - Visit [[fireforgrepofile:build/fireforg.xpi][this]] with Firefox, confirm installation of the extension and restart.
@@ -127,6 +127,52 @@ This feature can be turned off in
 The CSS-style used for the marking is customizable through "CSS style
 string for links with annotations" in the preferences.
 Changing the tooltip can be turned off by unchecking "Overwrite tooltip for links with annotations".
+
+**** Context menu for links
+
+The context menu (accessible by right clicking on a link) has a
+submenu "Fireforg", where all annotations for that link are listed:
+[[file:images/screenshots/org-fireforg-screenshot-context-menu.png]]
+
+*** Import BibTeX using Zotero
+Fireforg is able to retrieve BibTex entries for the all sites supported by [[http://www.zotero.org/][Zotero]]. To achieve this the following additional steps are necessary:
+- Install Zotero 1.0.10 from the [[http://www.zotero.org/][Zotero Website]]
+- Set "Inject Zotero" in the preference dialog.
+  
+  *Warning: On restart a small function is injected into Zotero to catch imported entries. The change to the code is minimal and non-permanent. In a worst case scenario Zotero's database might get corrupted, though that hasn't happened yet.*
+
+- Restart Firefox
+
+Whenever an entry is imported into Zotero - e.g. by clicking the
+symbol in the url - it is exported to BibTeX and sent to org mode
+using org-protocol. In Emacs it is put into the kill ring in a format
+depending on the variable =org-fireforg-received-bibtex-format=:
+
+- =nil=: The BibTeX entry is passed directly into the kill ring.
+- =heading= (Default): A heading is generated with the BibTeX fields as properties with prefix "BIB_":
+  : * [[<link to site>][<Title>]]
+  :  :PROPERTIES:
+  :   :CUSTOM_ID: <BibTeX key>
+  :   :BIB_entryType: <article, ...>
+  :   :BIB_author: ...
+  :   :BIB_title: ...
+  :   ...
+  :   :END:
+
+If the url field is a static url, the link to it will be highlighted in search
+results in every search engine.
+
+To export BibTeX information from all headings in the current buffer
+with at least the "BIB\_entryType" property call:
+- =org-fireforg-export-bibtex-to-file= to export to a file
+- =org-fireforg-export-bibtex-to-new-buffer= to export into a new buffer
+
+*** Updating 
+
+To avoid confusion, always update both org-fireforg.el and the plugin.
+
+The plugin has to be uninstalled and then reinstalled as described
+above. Automatic updating will be used when the testing phase is over.
 
 *** Bugreporting and discussion
 
