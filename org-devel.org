@@ -137,15 +137,17 @@ submenu "Fireforg", where all annotations for that link are listed:
 *** Import BibTeX using Zotero
 Fireforg is able to retrieve BibTex entries for the all sites supported by [[http://www.zotero.org/][Zotero]]. To achieve this the following additional steps are necessary:
 - Install Zotero 1.0.10 from the [[http://www.zotero.org/][Zotero Website]]
-- Set "Inject Zotero" in the preference dialog.
+- Set "Inject Zotero" in Fireforg's preference dialog [fn:ffprefdiag].
   
   *Warning: On restart a small function is injected into Zotero to catch imported entries. The change to the code is minimal and non-permanent. In a worst case scenario Zotero's database might get corrupted, though that hasn't happened yet.*
 
 - Restart Firefox
 
-Whenever an entry is imported into Zotero - e.g. by clicking the
-symbol in the url - it is exported to BibTeX and sent to org mode
-using org-protocol. In Emacs it is put into the kill ring in a format
+Whenever a single entry (*not* a collection) is imported into Zotero - 
+e.g. by clicking the white "document" symbol that appears to the right
+in the url bar if Zotero supports importing the current site - it is
+automatically exported to BibTeX and sent to org mode using
+org-protocol. In Emacs it is put into the kill ring in a format
 depending on the variable =org-fireforg-received-bibtex-format=:
 
 - =nil=: The BibTeX entry is passed directly into the kill ring.
@@ -158,6 +160,8 @@ depending on the variable =org-fireforg-received-bibtex-format=:
   :   :BIB_title: ...
   :   ...
   :   :END:
+- =headingWithPropsAndBibTeXContent=: a heading with properties as described above is generated and the entry in BibTeX format is appended.
+- =headingWithBibTeXContent=: same as the previous one but without the properties
 
 If the url field is a static url, the link to it will be highlighted in search
 results in every search engine.
@@ -166,6 +170,18 @@ To export BibTeX information from all headings in the current buffer
 with at least the "BIB\_entryType" property call:
 - =org-fireforg-export-bibtex-to-file= to export to a file
 - =org-fireforg-export-bibtex-to-new-buffer= to export into a new buffer
+
+*** Workaround for the inability to register a protocol in Firefox on the Mac
+
+A long known bug in Mac Firefox is reported to stop protocol
+registration from working. To work around this Fireforg is able to
+write the org-protocol urls to a temporary file, that is read every
+second and, if non empty, passed to emacsclient and emptied.
+
+To enable this:
+- check "Enable workaround for Mac" in Fireforg's preference dialogue
+  [fn:ffprefdiag: Fireforg's preference dialogue is accessible in Firefox's menu under Tools->Add-ons->Fireforg->Preferences]
+- get pull.sh from [[http://repo.or.cz/w/org-fireforg.git?a=blob_plain;f=ff_mac_workaround/pull.sh;hb=HEAD][the repository]] and run it.
 
 *** Updating 
 
@@ -191,3 +207,11 @@ If problems arise please go through this checklist to locate the problem:
 - Does the file "~/.org-fireforg-registry.xml" exist and does it contain "orgmode.org"?
  - *No on either*: Send me the last content of the Messages buffer in Emacs
  - *Yes*: In the Firefox menu: "Tools"->"Error console" look for errors containing: "chrome://fireforg/" and send them to me.
+
+*** Technical note
+
+Different instances of Zotero's Translator object seem to share state
+in a non-obvious way. This makes coding very fragil and even let's
+some imports fail (silently) after Fireforg has injected its code. The
+failure when importing collections is somehow related to this.  While
+I find it a strange design choice, it is not in my power to change it.
