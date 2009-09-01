@@ -172,6 +172,11 @@ Defined in: /org.el/
     Add key definitions to `minibuffer-local-map', which will be a temporary
     copy.
 #+end_example
+** =org-tags-sort-function=
+Defined in: /org.el/
+#+begin_example
+    When set, tags are sorted using this function as a comparator
+#+end_example
 ** =org-after-tags-change-hook=
 Defined in: /org.el/
 #+begin_example
@@ -205,6 +210,20 @@ Defined in: /org.el/
 Defined in: /org.el/
 #+begin_example
     Functions to be called for special font lock stuff.
+#+end_example
+** =org-after-demote-entry-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook run after an entry has been demoted.
+    The cursor will be at the beginning of the entry.
+    When a subtree is being demoted, the hook will be called for each node.
+#+end_example
+** =org-after-promote-entry-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook run after an entry has been promoted.
+    The cursor will be at the beginning of the entry.
+    When a subtree is being promoted, the hook will be called for each node.
 #+end_example
 ** =org-after-sorting-entries-or-items-hook=
 Defined in: /org.el/
@@ -501,6 +520,14 @@ Defined in: /org-clock.el/
     This is the string shown in the mode line when a clock is running.
     The function is called with point at the beginning of the headline.
 #+end_example
+** =org-clock-in-prepare-hook=
+Defined in: /org-clock.el/
+#+begin_example
+    Hook run when preparing the clock.
+    This hook is run before anything happens to the task that
+    you want to clock in.  For example, you can use this hook
+    to add an effort property.
+#+end_example
 ** =org-clock-in-hook=
 Defined in: /org-clock.el/
 #+begin_example
@@ -643,6 +670,7 @@ Defined in: /org-src.el/
     but which mess up the display of a snippet in Org exported files.
 #+end_example
 
+
 * Examples for using hooks
 
 Feel free to give example of how do you use these hooks.  Ideas for
@@ -657,5 +685,27 @@ If  you want to display dormant article when following Gnus articles:
 	  (lambda () (if (eq major-mode 'gnus-summary-mode)
 			 (gnus-summary-insert-dormant-articles))))
 #+END_SRC
+
+** org-agenda-after-show-hook
+
+To get a compact view during follow mode in the agenda, you could try
+this:
+
+#+begin_src emacs-lisp
+  (defun my-compact-follow ()
+    "Make the view compact, then show the necessary minimum."
+    (ignore-errors
+      (save-excursion
+        (while (org-up-heading-safe))
+        (hide-subtree)))
+    (let ((org-show-siblings nil)
+          (org-show-hierarchy-above t))
+      (org-reveal))
+    (save-excursion
+      (org-back-to-heading t)
+      (show-children)))
+  
+  (add-hook 'org-agenda-after-show-hook 'my-compact-follow)
+#+end_src
 
 # org-add-hook?
