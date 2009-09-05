@@ -710,3 +710,60 @@ Fix a problem with saveplace.el putting you back in a folded position:
 		(outline-previous-visible-heading 1)
 		(org-show-subtree)))))
 #+end_src
+* Easy customization of TODO colors
+  -- Ryan C. Thompson
+
+  Here is some code I came up with some code to make it easier to
+  customize the colors of various TODO keywords. As long as you just
+  want a different color and nothing else, you can customize the
+  variable org-todo-keyword-faces and use just a string color (i.e. a
+  string of the color name) as the face, and then org-get-todo-face
+  will convert the color to a face, inheriting everything else from
+  the standard org-todo face.
+
+  To demonstrate, I currently have org-todo-keyword-faces set to
+
+#+BEGIN_SRC emacs-lisp
+(("IN PROGRESS" . "dark orange")
+ ("WAITING" . "red4")
+ ("CANCELED" . "saddle brown"))
+#+END_SRC emacs-lisp
+
+  Here's the code, in a form you can put in your =.emacs=
+
+#+BEGIN_SRC emacs-lisp
+(eval-after-load 'org-faces
+ '(progn
+    (defcustom org-todo-keyword-faces nil
+      "Faces for specific TODO keywords.
+This is a list of cons cells, with TODO keywords in the car and
+faces in the cdr.  The face can be a symbol, a color, or a
+property list of attributes, like (:foreground \"blue\" :weight
+bold :underline t)."
+      :group 'org-faces
+      :group 'org-todo
+      :type '(repeat
+              (cons
+               (string :tag "Keyword")
+               (choice color (sexp :tag "Face")))))))
+
+(eval-after-load 'org
+ '(progn
+    (defun org-get-todo-face-from-color (color)
+      "Returns a specification for a face that inherits from org-todo
+ face and has the given color as foreground. Returns nil if
+ color is nil."
+      (when color
+        `(:inherit org-warning :foreground ,color)))
+
+    (defun org-get-todo-face (kwd)
+      "Get the right face for a TODO keyword KWD.
+If KWD is a number, get the corresponding match group."
+      (if (numberp kwd) (setq kwd (match-string kwd)))
+      (or (let ((face (cdr (assoc kwd org-todo-keyword-faces))))
+            (if (stringp face)
+                (org-get-todo-face-from-color face)
+              face))
+          (and (member kwd org-done-keywords) 'org-done)
+          'org-todo))))
+#+END_SRC emacs-lisp
