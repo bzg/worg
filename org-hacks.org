@@ -516,7 +516,7 @@ changed.
 (defun ba/org-adjust-tags-column-now ()
   "Right-adjust `org-tags-column' value, then reset tag position."
   (set (make-local-variable 'org-tags-column)
-       (- (- (window-width) 3)))
+       (- (- (window-width) (length org-ellipsis))))
   (ba/org-adjust-tags-column-reset-tags))
 
 (defun ba/org-adjust-tags-column-maybe ()
@@ -540,6 +540,8 @@ changed.
           'ba/org-adjust-tags-column-maybe)
 (add-hook 'before-save-hook 'ba/org-adjust-tags-column-before-save)
 (add-hook 'after-save-hook 'ba/org-adjust-tags-column-after-save)
+(add-hook 'org-agenda-mode-hook '(lambda ()
+                                  (setq org-agenda-tags-column (- (window-width)))))
 #+end_src
 * Compiling Org without make
   :PROPERTIES:
