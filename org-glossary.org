@@ -2,7 +2,7 @@
 #+STARTUP:    align fold nodlcheck oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c)
-#+TITLE:      Org Glossary -- list of Org terms and definitions
+#+TITLE:      Org Glossary: Explanations of Basic Org-Mode Concepts
 #+AUTHOR:     Worg people
 #+EMAIL:      bzg AT altern DOT org
 #+LANGUAGE:   en
@@ -14,7 +14,7 @@
 
 [[file:index.org][{Back to Worg's index}]]
 
-# Please improve this very rough draft!
+# Please feel free to add items.
 
 * Agenda
   :PROPERTIES:
@@ -89,6 +89,57 @@ There are different ways to designate these files:
      - If you enter a directory, all org files in that directory will
        be included in your agenda files.
 
+* Category
+
+The CATEGORY designates the group an item belongs to. 
+
+The CATEGORY is shown in the left hand column of the daily/weekly
+agenda view.
+
+: Day-agenda (W38):
+: Wednesday  16 September 2009
+:   badclient:  Scheduled:  TODO Call angry client to calm him down
+:   appts:      Dinner at Julio's 
+
+By default it is the name of the file to which an item belongs (minus
+the extension).
+
+You can specify a different CATEGORY for a file by placing the
+following line at the top of your org file:
+
+#+begin_src org
+  ,#+CATEGORY: CompanyABC
+#+end_src
+
+Or, you can set a CATEGORY as a property of a subtree. All items in
+that subtree will inherit (i.e., be labeled) with that category.
+
+#+begin_src org
+  ,* Birthdays
+  ,  :PROPERTIES:
+  ,  :CATEGORY: birthdays
+  ,  :END:
+#+end_src
+
+** Uses
+
+The main purpose of a category is to increase visibility in the agenda
+--- i.e., to allow you to see which "group" an item belongs to. Thus,
+many people find CATEGORIES useful for classifying their work.
+
+Apart from visibility and compartmentalization, categories do not add
+much additional functionality to an item. It is certainly *not*
+necessary to set them for every file and/or heading.
+
+You can search for items by CATEGORY in the agenda using the following
+key sequence:
+
+: C-c C-a m CATEGORY="birthdays"
+
+In general, categories are *not* an efficient way of searching
+for and/or filtering tasks. It is much faster to use tags or filetags
+for this.
+
 * Todo Keywords
   :PROPERTIES:
   :CUSTOM_ID: todo-keywords
@@ -132,7 +183,9 @@ an extended workflow. For instance, you might create a special TODO
 keyword sequence for invoices by placing the following at the top of
 your org file:
 
-#+SEQ_TODO: INVOICE(i) MAIL(m) WAITING(w) FOLLOWUP(f) | RECEIVED(r)
+#+begin_src org
+, #+SEQ_TODO: INVOICE(i) MAIL(m) WAITING(w) FOLLOWUP(f) | RECEIVED(r)
+#+end_src
 
 (The "|" separates active from inactive todos.)
 
@@ -140,13 +193,11 @@ You can combine such todo sequences with LOGGING in order to keep a
 record of when each event in the sequence happened.
 
 * COMMENT Unfinished
+** Agenda filtering
 ** Archive
-
 ** Drawer
 
 ** Property
-
-** Category
 
 ** CLOCK 
 
@@ -155,6 +206,7 @@ record of when each event in the sequence happened.
 ** Docstring
 ** Entry
 
+** Inheritance
 ** Project
    
 ** Note
