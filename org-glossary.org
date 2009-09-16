@@ -90,6 +90,65 @@ There are different ways to designate these files:
        be included in your agenda files.
 
 * Archive
+
+Archiving is a way of hiding and/or getting rid of old or unwanted
+items in your org files without deleting them altogether. 
+
+Archiving works on trees in your org-file by doing the following:
+
+  - Preventing them from opening when you cycle visibility with =TAB=
+    or =Shift-TAB=. (They will stay closed unless you explictly open
+    them with =Control-TAB=.)
+
+  - Keeping them out of your [[#agenda][agenda]] views. (They will only be included
+    if you type =v a= or =v A= in the agenda.)
+
+There are three different ways to archiving an item/tree:
+
+  1. C-c C-x a :: Mark the item as archived (i.e., give it an
+     =:ARCHIVE:= tag) but leave it in its current location.
+
+       - The headline remains visible in your org file but its contents
+         will not open during cycling and it will not be included in
+         the agenda.
+
+  2. C-c C-x A :: Move the item to a separate archive headline within
+     the current subtree.
+
+       - This is useful for maintaining a clean org-file, since it
+         removes archived headlines from view.
+
+  3. C-c C-x C-s :: Moves the archive to a separate file. The default
+     name of the file is =[filename].org_archive=. 
+
+       - This is useful for getting rid of subtrees altogether. You
+         might want to use this when you finish a project.
+
+       - Since this is a relatively drastic action, org-mode offers an
+         alternate version of the command (=C-u C-c C-x C-s=) that
+         checks the subtree to make sure there are no active TODOs
+         before archiving it.
+
+** Uses
+
+Archiving is very useful for keeping your org files free of clutter.
+But which type of archiving should you use?
+
+Here are a few ideas:
+
+  - Use #1 when you'd like to archive an item but want to be
+    reminded of its presence (e.g., to be reminded of a completed
+    task) when you view your org file.
+
+  - Use #2 when you want to remove an item from view but want it to
+    remain together with its context (i.e., within the subtree). This
+    is often useful for archiving TODO items that are part of an
+    incomplete project.
+
+  - Use #3 when you are sure you no longer require an item/subtree
+    except for reference. This is often useful for archiving completed
+    projects.
+
 * Category
 
 The CATEGORY designates the group an item belongs to. 
@@ -112,8 +171,8 @@ following line at the top of your org file:
   ,#+CATEGORY: CompanyABC
 #+end_src
 
-Or, you can set a CATEGORY as a property of a subtree. All items in
-that subtree will inherit (i.e., be labeled) with that category.
+Or, you can set a CATEGORY as the property of a [[#tree][tree]]. All items in
+that tree will inherit (i.e., be labeled) with that category.
 
 #+begin_src org
   ,* Birthdays
@@ -140,6 +199,9 @@ key sequence:
 In general, categories are *not* an efficient way of searching
 for and/or filtering tasks. It is much faster to use tags or filetags
 for this.
+
+Here's one way to distinguish between categories and tags: an entry
+can belong to only one category but it can have multiple tags.
 
 * Headline
   :PROPERTIES:
@@ -255,6 +317,7 @@ record of when each event in the sequence happened.
 ** CLOCK 
 
 ** Column view
+** Cycling
 ** DEADLINE 
 ** Docstring
 ** Effort estimate
