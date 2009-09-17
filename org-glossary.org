@@ -427,6 +427,36 @@ An entry is to be distinguished from a [[#tree][tree]], which consists of all
 headlines and entries beneath a particular entry within the outline
 structure. Entries nested within other entries form a tree.
 
+#+begin_src org
+  ,* TODO [#B] Headline                                                   :tags:
+  ,  :PROPERTIES:
+  ,  :DESCRIPTION: This is a sample property.
+  ,  :CATEGORY: documentation
+  ,  :CUSTOM_ID: an-extra-special-headline
+  ,  :END:
+  
+  ,And here is the text of an entry. You can put an unlimited amount of
+  ,text in an entry!
+  
+  ,You can also add lists:
+  
+  , - First item
+  
+  , - Second item
+  
+  , - Third item
+  
+  ,And tables:
+  
+  ,| Meal      | Food            | Calories |
+  ,|-----------+-----------------+----------|
+  ,| Breakfast | Eggs            |      500 |
+  ,| Lunch     | Escargot        |      800 |
+  ,| Dinner    | Bread and Water |      200 |
+  ,|-----------+-----------------+----------|
+  ,| Total     |                 |     1500 |
+#+end_src
+
 * Headline
   :PROPERTIES:
   :CUSTOM_ID: headline
@@ -611,6 +641,127 @@ are they for? Here are some of their uses:
    5. To label a particular tree with a unique ID so that it can be
       referenced easily via hyperlinks.
 
+* Tag
+  :PROPERTIES:
+  :CUSTOM_ID: tag
+  :END:
+** Definition
+
+A tag is a label (or piece of "metadata") that is attached to a
+headline for easy identification and filtering later. Several tags can
+be attached to the same headline.
+
+** Details
+
+Tags are keywords can be added to headlines with the key combination
+=C-c C-q= or =C-c C-c=.
+
+Tags have the following syntax:
+
+#+begin_src org
+  ,* A headline with tags                               :richard:URGENT:errands:
+#+end_src
+
+You may be familiar with tags from blogs or sites like [[http://del.icio.us][del.icio.us]].
+Tags are a way of labeling information without having to rely on a
+rigid hierarchical structure. Unlike categories, you can give a
+headline/entry multiple tags. In many ways, org-mode offers the best
+of both worlds: the hierarchical organization of an outline and the
+impromptu labeling of tags.
+
+The entry above would appear in queries for any of the tags:
+"richard", "URGENT", or "errands".
+
+The syntax for searching tags via the [[#agenda][agenda]] is quite simple. For
+instance, you could create targeted agenda search for all items tagged
+"richard" and "urgent".
+
+: C-c a m richard+URGENT
+
+Or for items tagged richard that are not urgent:
+
+: C-c a m richard-URGENT
+
+You can also use sparse view searches to display all tags within a
+particular org-file.
+
+If you find yourself commonly using certain tags, you can create a
+list of shortcuts for them by typing =M-x customize-variable [RET]
+org-tags-alist=. You can also set special tags for a particular file.
+See [[http://orgmode.org/manual/Setting-tags.html][the manual]] for more details.
+
+** Uses
+
+One common use of tags is as GTD contexts. You might, for instance,
+define a list of tags in org-tags-alist that correspond to the various
+contexts in a "next action" can be completed: @computer, @home,
+@errands, @work, and so on. Then you can quickly filter for these tags
+by pressing "=/=" in the agenda. See [[http://orgmode.org/manual/Agenda-commands.html#Agenda-commands][the manual]] for more details.
+
+Another common use of a tag is to label a group of tasks as belonging
+to a particular project or area of responsibility. For instance, you
+might create a subtree in your file that contains all your house
+repair projects and tag it with ":houserepair:". When Saturday rolls
+around, you want to work exclusively on repairs. Thanks to
+[[#inheritance][inheritance]], you can quickly locate all your tasks that inherit the
+":houserepair:" tag.
+
+Here's what this would look like:
+
+#+begin_src org
+  ,* Tasks around the house                                        :houserepair:
+  
+  ,** TODO Fix sink
+  
+  ,** TODO Mow lawn
+  
+  ,** TODO Tear up carpet
+#+end_src
+
+Tags are also extremely useful for notetaking and research. You might,
+for instance, create a file of reading notes in which each entry is a
+snippet of information tagged with relevant keywords. The beauty of
+org-mode is that these snippets can be easily rearranged within the
+outline and yet remain easy to find via tags.
+
+** Considerations: Tags vs. TODO keywords vs. Properties
+
+One question that often emerges for new users of org mode is when to
+use tags, [[#todo-keyword][TODO keywords]], or [[#property][properties]].
+
+For instance, should you define your projects by creating a special
+todo keyword for them (=PROJECT=) or by giving them a "=:project:="
+tag? Similar, should you create a TODO keyword for items that are
+waiting, or should you add a "=:waiting:=" tag.
+
+Either choice would be fine, of course, but here are a few things to
+keep in mind when you make your choice:
+
+1. Do you want quickly to filter for the item in the agenda view? If
+so, a tag is probably your best choice.
+
+   - Note, you can add a setting to your .emacs that automatically
+     adds a tag whenever you assign a particular TODO keyword. Type
+     "=C-c v org-todo-state-tags-triggers=" for more information.
+
+2. How visible to you want the keyword and/or tag to be? When viewing
+an org-mode file, TODO Keywords are highly visible, tags somewhat less
+so, and properties not at all.
+
+3. Is the keyword part of your workflow? Do you want to be able to log
+information (such as a timestamp and a note) when you add or remove
+the keyword? If so, then use a TODO keyword.
+
+   - An example: While a "waiting" tag might make it easier to filter
+     for items in your todo list that are waiting/pending, a =WAITING=
+     todo keyword would allow you to keep track of when an item
+     entered the "waiting" state and when it left it.
+
+
+
+
+
+
 * Tree (subtree)
   :PROPERTIES:
   :CUSTOM_ID: tree
@@ -705,6 +856,5 @@ record of when each event in the sequence happened.
 ** Restriction lock
 ** Table 
 
-** Tag
 ** Timestamp
 
