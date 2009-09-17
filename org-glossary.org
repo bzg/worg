@@ -21,7 +21,7 @@
 
 The org-manual does a great job of explaining the myriad features of
 org-mode. But for new users, the sheer number of options and features
-can sometimes be overwhelming.
+can be overwhelming.
 
 #+begin_quote
 
@@ -32,7 +32,7 @@ What is a category? How are they different from tags?
 
 #+end_quote
 
-If you find yourself asking those questions, this document is for you.
+If you find yourself asking such questions, this document is for you.
 Below you will find an alphabetical list of basic concepts/features in
 org-mode. Click on any item for an explanation of the feature and a
 description of possible uses.
@@ -135,9 +135,9 @@ you'll discover that you want to keep your "work" and "personal" tasks
 in different files.
 
 Perhaps the main consideration in organizing your files is to consider
-[[#inheritance][inheritance]]. If you'd like a number of items to belong to the same
-category or to have the same tags for easy agenda filtering, then they
-probably belong in the same tree and/or file. 
+[[#inheritance][inheritance]] and [[#file-restriction][restriction]]. If you'd like a number of items to belong
+to the same category or to have the same tags for easy agenda
+filtering, then they probably belong in the same tree and/or file.
 
 An example:
 
@@ -265,6 +265,10 @@ for this.
 Here's one way to distinguish between categories and tags: an entry
 can belong to only one category but it can have multiple tags.
 
+* Drawers
+  :PROPERTIES:
+  :CUSTOM_ID: drawers
+  :END:
 * Entry
   :PROPERTIES:
   :CUSTOM_ID: entry
@@ -348,6 +352,63 @@ data can be nested within one another.
   :CUSTOM_ID: property
   :END:
 ** Explanation
+
+A property is an arbitrary piece of "metadata" you can attach to an
+entry. A property takes the form of a "data pair," which consists of
+a key and its value.
+
+Properties are stored in [[#drawer][drawers]] beneath a headline. Here is a sample
+property drawer:
+
+#+begin_src org
+  ,* Invoice for fixing the toilet
+  ,  :PROPERTIES:
+  ,  :LOGGING:  lognoterepeat
+  ,  :BILLED: 102.13
+  ,  :BILLING_DATE: 2009-09-11
+  ,  :CLIENT:   ABC Company
+  ,  :END:
+#+end_src
+
+Though org-mode reserves a handful of property keys for special uses
+(e.g., LOGGING in the example above), you are otherwise free to add
+whatever property keys and values you'd like.
+
+Though you can type properties by hand, the simplest way to add them
+is to type =C-c C-x p= or =M-x org-set-property=.
+
+** Uses
+
+For new org users, properties can seem a bit puzzling. What exactly
+are they for? 
+
+   1. To specify settings for the local org-mode [[#tree][tree]]. 
+
+      - For instance, though you may not normally want to be prompted
+        for a note when you mark an item as DONE, you may want to be
+        so prompted for a particular task or project. To do so, you
+        can set the LOGGING property to "lognotedone" in the relevant
+        subtree.
+
+   2. To create a small database of information.
+
+      - The manual offers an nice example of this: [[http://orgmode.org/manual/Property-syntax.html#Property-syntax][keeping track
+        of a information about a CD collection]].
+
+      - Similarly, you might keep bibliographical information about
+        books you've read in properties.
+
+   3. To enter data that can be viewed as a "spreadsheet" in column view.
+
+   4. To create more specific labels for headlines than generic tags allow.
+
+      - For instance, if you are keeping track of expenses, you could
+        put the type of expense in a tag, but then it would be mixed
+        up with your other tags. The solution is to create a special
+        property (e.g., EXPENSE_TYPE) to hold the information.
+
+   5. To label a particular tree with a unique ID so that it can be
+      referenced easily via hyperlinks.
 
 * Tree (subtree)
   :PROPERTIES:
