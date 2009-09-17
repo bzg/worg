@@ -34,8 +34,8 @@ What is a category? How are they different from tags?
 
 If you find yourself asking such questions, this document is for you.
 Below you will find an alphabetical list of basic concepts/features in
-org-mode. Click on any item for an explanation of the feature and a
-description of possible uses.
+org-mode. Click on any item for (1) a brief definition, (2) a more
+detailed of the feature, and (3) a description of possible uses.
 
 * Agenda
   :PROPERTIES:
@@ -154,7 +154,10 @@ On the other hand, if you'd prefer to organize your appointments by
 area of responsibility (e.g., work, personal, health, etc.), then it
 would make perfect sense to place them in separate trees and/or files.
 
-* Archive
+* Archiving
+  :PROPERTIES:
+  :CUSTOM_ID: archiving
+  :END:
 ** Definition
 
 Archiving is a way of hiding and/or getting rid of old or unwanted
@@ -278,6 +281,51 @@ can belong to only one category but it can have multiple tags.
   :END:
 
 ** Definition
+
+A drawer is a container that can hide information you don't want to
+see during normal viewing and/or cycling of your outline.
+
+** Details
+
+A drawer looks like this:
+
+#+begin_src org
+  ,* Daily sleep log
+  ,  :LOGBOOK:
+  ,  - Note taken on [2009-09-16 Wed 04:02] \\
+  ,    Didn't sleep at all.
+  ,  - Note taken on [2009-09-15 Tue 05:25] \\
+  ,    Slept fitfully.
+  ,  - Note taken on [2009-09-14 Mon 09:30] \\
+  ,    Slept like a log.
+  ,  :END:
+#+end_src
+
+When you cycle the visibility of your outline, the contents of the
+drawer will remain hidden. 
+
+#+begin_src org
+  ,* Daily sleep log
+  ,  :LOGBOOK:
+#+end_src
+
+The only way to view them is to press =TAB= directly on the drawer.
+
+If you want a new name for a drawer, such as :NOTES:, you must
+customize the variable "org-drawers". Simply type =M-x
+customize-variable [RET] org-drawers" and add a new label.
+
+** Uses
+
+By default, org-mode uses drawers to hide a variety of information,
+such as [[#property][properties]] and clocked times.
+
+But drawers are also quite useful for storing comments that you don't
+want to see all the time. For instance, if you are writing a paper,
+you might add a :COMMENT: drawer to org-drawers. Then you can deposit
+any notes to yourself in such drawers. By default, the information you
+put in drawers will not be exported to HTML, LaTeX, etc.
+
 * Entry
   :PROPERTIES:
   :CUSTOM_ID: entry
@@ -395,7 +443,7 @@ is to type =C-c C-x p= or =M-x org-set-property=.
 ** Uses
 
 For new org users, properties can seem a bit puzzling. What exactly
-are they for? 
+are they for? Here are some of their uses:
 
    1. To specify settings for the local org-mode [[#tree][tree]]. 
 
