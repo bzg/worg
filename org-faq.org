@@ -704,6 +704,36 @@ Here are some other ideas for speeding up the agenda:
    I.e., make sure there are files ending in .elc in your org
    installation directory.
 
+** Visual-line-mode doesn't work well with org-mode
+   :PROPERTIES:
+   :CUSTOM_ID: visual-line-mode
+   :END:
+
+Visual-line-mode "soft wraps" lines so that the visual edge of the
+buffer is considered a line break for purposes of navigation, even
+though there is no line break in reality. 
+
+In older versions of org-mode, org-beginning-of-line and
+org-end-of-line do not work well with visual line mode. (The two
+commands disregard soft line breaks and move to the beginning and end
+of the hard line break.) A patch was introduces to fix this behavior
+in July of 2009. n
+
+If you are using an older version of org mode, you can:
+
+1. Add a hook to turn off visual line mode.
+
+2. Add the following to your =.emacs=:
+
+#+begin_src emacs-lisp
+
+(add-hook 'org-mode-hook
+  (lambda ()
+    (define-key org-mode-map "\C-a" 'move-beginning-of-line)
+    (define-key org-mode-map "\C-a" 'move-end-of-line)))
+
+#+end_src
+
 * Outline
   :PROPERTIES:
   :CUSTOM_ID: Outline
