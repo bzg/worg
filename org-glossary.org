@@ -306,6 +306,57 @@ for this.
 Here's one way to distinguish between categories and tags: an entry
 can belong to only one category but it can have multiple tags.
 
+* DEADLINE 
+** Definition
+
+A deadline is a special timestamp for indicating items that must be
+performed by a certain time. Reminders about items deadlines appear in
+your agenda before they due.
+
+** Details
+
+You can add a deadline to a headline/entry by typing C-c C-d. You can
+remove a deadline by typing C-u C-c C-d.
+
+Here is the syntax for deadlines:
+
+#+begin_src org
+  ,* My big project
+  ,  DEADLINE: <2009-09-20 Sun>
+#+end_src
+
+You will be alerted of this deadline ahead of time when you select the
+daily/weekly agenda (=C-c C-a a=).
+
+:  index:      In   3 d.:  My big project
+
+How soon the warning appears in your agenda is controlled by the
+variable =org-deadline-warning-days=. The default number of days is
+14.
+
+The deadline will remain in your agenda (as an overdue item) until it
+is marked done.
+
+You can change the a warning period for a particular headline by
+adding something like "-3d" (3 days) or "-2m" (two months) to the
+timestamp:
+
+#+begin_src org
+  ,* My big project
+  ,  DEADLINE: <2009-09-20 Sun -2m>
+#+end_src
+
+** COMMENT Uses 
+
+The obvious use of a deadline is to reminder yourself of tasks that
+need to be completed by a certain date. 
+
+Deadlines can also be useful as an "advanced notice" system --- e.g.,
+reminding yourself that you to prepare for an event or project.
+
+You can add both a deadline and a scheduling timestamp to the same
+entry.
+
 * Docstring
   :PROPERTIES:
   :CUSTOM_ID: docstring
@@ -426,6 +477,8 @@ and whatever other text it contains.
 An entry is to be distinguished from a [[#tree][tree]], which consists of all
 headlines and entries beneath a particular entry within the outline
 structure. Entries nested within other entries form a tree.
+
+Here is a sample entry with a lot of data:
 
 #+begin_src org
   ,* TODO [#B] Headline                                                   :tags:
@@ -738,19 +791,19 @@ Either choice would be fine, of course, but here are a few
 considerations to keep in mind:
 
 1. Do you want quickly to filter for the item in the agenda view? If
-so, a tag is probably your best choice.
+   so, a tag is probably your best choice.
 
    - Note, you can add a setting to your .emacs that automatically
      adds a tag whenever you assign a particular TODO keyword. Type
      "=C-c v org-todo-state-tags-triggers=" for more information.
 
 2. How visible to you want the keyword and/or tag to be? When viewing
-an org-mode file, TODO Keywords are highly visible, tags somewhat less
-so, and properties not at all.
+   an org-mode file, TODO Keywords are highly visible, tags somewhat
+   less so, and properties not at all.
 
 3. Is the keyword part of your workflow? Do you want to be able to log
-information (such as a timestamp and a note) when you add or remove
-the keyword? If so, then use a TODO keyword.
+   information (such as a timestamp and a note) when you add or remove
+   the keyword? If so, then use a TODO keyword.
 
    - An example: While a "waiting" tag might make it easier to filter
      for items in your todo list that are waiting/pending, a =WAITING=
@@ -842,7 +895,6 @@ record of when each event in the sequence happened.
 ** CLOCK 
 ** Column view
 ** Cycling
-** DEADLINE 
 ** Effort estimate
 ** Filetag
 ** Project
