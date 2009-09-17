@@ -468,6 +468,60 @@ amount of text). This turns org-mode's deceptively simple outline
 structure into a powerful "database" of information, in which units of
 data can be nested within one another.
 
+* Inheritance
+** Definition
+
+Inheritance is a term used to describe the way in which [[#entry][entries]] in a
+[[#tree][tree]] can share the properties of their "parent" [[#headline][headlines]].
+
+** Details
+
+Org-mode takes full advantage of the hierarchical structure of
+outlines by allowing lower level headlines to "inherit" (or share) the
+properties of their parents.
+
+The most common form of inheritance in org-mode is "[[http://orgmode.org/manual/Tag-inheritance.html][tag inheritance]]".
+This is controlled by the variable org-use-tag-inheritance (true by
+default). When turned on, lower level outline headings share the tags
+of their parents. Thus in the following tree, all the headlines have
+the tag "=:reading:=", even though it is only explicitly set for the
+top level headline:
+
+#+begin_src org
+  ,* Summer reading list                                               :reading:
+  ,  DEADLINE: <1965-06-06 Sun>
+  
+  ,** /To Kill a Mockingbird/
+  
+  ,** /Catch 22/
+  
+  ,** /Herzog/
+#+end_src
+
+Some properties, such as [[#category][category]], are also inherited by default. See
+[[http://orgmode.org/manual/Property-inheritance.html][the manual]] for more details.
+
+** Uses
+
+The most common use of tag inheritance is in agenda views and agenda
+filtering. For instance, if you searched for the tag "reading" in your
+agenda files, all of the headings above would appear. 
+
+As a result it is easy to add a tag and/or category to a whole subtree
+of items simply by adding a single tag to the parent headline.
+
+Let's say for instance, that you want to designate a whole bunch of
+tasks as belonging to the project "topsecret". By adding =:topsecret:=
+to the top headline of the group, you would be able quickly to locate
+any todo items that share the tag "topsecret" by typing =C-c a M [RET]
+topsecret=.
+
+Another common use of inheritance is to allow a special setting (e.g.,
+logging or archive location) to apply to an entire subtree.
+
+Finally, inheritance plays an important role in org-mode's column
+view.
+
 * Property
   :PROPERTIES:
   :CUSTOM_ID: property
@@ -614,7 +668,6 @@ record of when each event in the sequence happened.
 ** DEADLINE 
 ** Effort estimate
 ** Filetag
-** Inheritance
 ** Project
 ** Note
 ** List 
