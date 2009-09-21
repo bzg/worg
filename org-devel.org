@@ -114,7 +114,7 @@ will yield the following when visiting http://orgmode.org/ and left clicking:
 [[file:images/screenshots/org-fireforg-screenshot.png]]
 
 Right clicking on the status bar entry shows a menu that let's you
-trigger org-protocol's "store-link" and "remember".
+trigger org-protocol's "store-link" and "remember" (for customization see [[* Preferences]]).
 
 **** Mark links that occur in the agenda files in websites
 
@@ -137,7 +137,7 @@ submenu "Fireforg", where all annotations for that link are listed:
 *** Import BibTeX using Zotero
 Fireforg is able to retrieve BibTex entries for the all sites supported by [[http://www.zotero.org/][Zotero]]. To achieve this the following additional steps are necessary:
 - Install Zotero 1.0.10 from the [[http://www.zotero.org/][Zotero Website]]
-- Set "Inject Zotero" in Fireforg's preference dialog [fn:ffprefdiag].
+- Set "Inject Zotero" in Fireforg's preference dialog [fn:ffprefdiag:  Fireforg's preference dialogue is accessible in Firefox's menu under Tools->Add-ons->Fireforg->Preferences].
   
   *Warning: On restart a small function is injected into Zotero to catch imported entries. The change to the code is minimal and non-permanent. In a worst case scenario Zotero's database might get corrupted, though that hasn't happened yet.*
 
@@ -170,6 +170,35 @@ To export BibTeX information from all headings in the current buffer
 with at least the "BIB\_entryType" property call:
 - =org-fireforg-export-bibtex-to-file= to export to a file
 - =org-fireforg-export-bibtex-to-new-buffer= to export into a new buffer
+*** Preferences
+ Fireforg's preference dialogue is accessible in Firefox's menu under Tools->Add-ons->Fireforg->Preferences
+**** Registry file
+The file containing an xml tree with all link-headline associations
+generated from the agenda files. You should not need to change
+this. It has to be same as the customizable variable
+=org-fireforg-registry-file-xml= in Emacs.
+**** Lookup links on page load
+When enabled, all links in a web page that have headlines associated
+with them are marked. This is achieve by adding the following CSS style string to the element:
+**** CSS style string for links with annotations
+The string that is appended to the CSS =style= string of a link
+element, if annotations for it exist.
+**** Overwrite tooltip for links with annotations
+If enabled, sets the tooltip for the links, for which annotations exist to contain those annotations.
+**** Inject Zotero
+After restarting Firefox, a function in the Zotero code gets altered
+so that all BibtTeX entries (*not* collections) that are imported are
+sent using org-protocol and are handled in Emacs according to the
+variable =org-fireforg-received-bibtex-format= as described [[* Import BibTeX using Zotero][here]].  Due
+to [[* Technical note][design choices in Zotero]] this is a bit fragile and can yield errors
+and *might possibly even break Zotero's database*. It is not advisable
+to use Zotero for production when enabling this option in Fireforg.
+**** Use remember template
+The character indicating which remember template to use.
+**** Enable workaround for Mac
+see [[* Workaround for the inability to register a protocol in Firefox on the Mac][here]]
+**** Temporary file for Mac workaround
+see [[* Workaround for the inability to register a protocol in Firefox on the Mac][here]]
 
 *** Workaround for the inability to register a protocol in Firefox on the Mac
 
@@ -180,7 +209,7 @@ second and, if non empty, passed to emacsclient and emptied.
 
 To enable this:
 - check "Enable workaround for Mac" in Fireforg's preference dialogue
-  [fn:ffprefdiag: Fireforg's preference dialogue is accessible in Firefox's menu under Tools->Add-ons->Fireforg->Preferences]
+  [fn:ffprefdiag]
 - get pull.sh from [[http://repo.or.cz/w/org-fireforg.git?a=blob_plain;f=ff_mac_workaround/pull.sh;hb=HEAD][the repository]] and run it.
 
 *** Updating 
@@ -211,7 +240,7 @@ If problems arise please go through this checklist to locate the problem:
 *** Technical note
 
 Different instances of Zotero's Translator object seem to share state
-in a non-obvious way. This makes coding very fragil and even lets
+in a non-obvious way. This makes coding very fragile and even lets
 some imports fail (silently) after Fireforg has injected its code. The
 failure when importing collections is somehow related to this.  While
 I find it a strange design choice, it is not in my power to change it.
