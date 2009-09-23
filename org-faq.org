@@ -613,6 +613,15 @@ the following variable:
    :CUSTOM_ID: YASnippet
    :END:
 
+[[http://code.google.com/p/yasnippet/][yasnippet]] is yet another snippet expansion system for Emacs.  It is
+inspired by TextMate's templating syntax.
+- watch the [[http://www.youtube.com/watch?v=vOj7btx3ATg][video on YouTube]]
+- see the [[http://yasnippet.googlecode.com/svn/trunk/doc/index.html][intro and tutorial]]
+
+*Note*: yasnippet is not compatible with =org-indent-mode= currently
+there is no known way to use both successfully with =yas/trigger-key=
+set to =TAB= (or =[tab]= etc...)
+
 The way Org-mode binds the =TAB= key (binding to =[tab]= instead of
 =\t=) overrules yasnippets' access to this key.  The following code
 fixes this problem:
@@ -624,7 +633,24 @@ fixes this problem:
 	    (define-key yas/keymap [tab] 'yas/next-field-group)))
 #+end_src
 
-Rick Moynihan maintains a [[http://github.com/RickMoynihan/yasnippet-org-mode][git repository]] with YASnippets for Org-mode.
+If the above code doesn't work (which it may not with later versions
+of yasnippet).  Then try the following
+
+#+begin_src emacs-lisp
+  (defun yas/org-very-safe-expand ()
+    (let ((yas/fallback-behavior 'return-nil)) (yas/expand)))
+  
+  (add-hook 'org-mode-hook
+            (lambda ()
+              ;; yasnippet (using the new org-cycle hooks)
+              (make-variable-buffer-local 'yas/trigger-key)
+              (setq yas/trigger-key [tab])
+              (add-to-list 'org-tab-first-hook 'yas/org-very-safe-expand)
+              (define-key yas/keymap [tab] 'yas/next-field)))
+#+end_src
+
+Rick Moynihan maintains a [[http://github.com/RickMoynihan/yasnippet-org-mode][git repository]] (or [[http://github.com/eschulte/yasnippet-org-mode][Eric's fork of the same]])
+with YASnippets for Org-mode.
 
 ** Org-mode takes over the S-cursor keys.  I also want to use CUA-mode, is there a way to fix this conflict?
    :PROPERTIES:
