@@ -583,6 +583,19 @@ current settings.
 Finally, if you would like verbose information about the properties of
 the text under the cursor, you can type =C-u C-x ==.
 
+** How can I make sure that timestamps appear in English?
+   :PROPERTIES:
+   :CUSTOM_ID: timestamps-and-system-time-locale
+   :END:
+
+If your system's locale is not set to English, but you would like the
+timestamps in your org-mode files to appear in English, you can set
+the following variable:
+
+#+begin_src emacs-lisp
+  (setq system-time-locale "C")
+#+end_src
+
 * Errors and general problems
   :PROPERTIES:
   :CUSTOM_ID: Errors
@@ -600,6 +613,15 @@ the text under the cursor, you can type =C-u C-x ==.
    :CUSTOM_ID: YASnippet
    :END:
 
+[[http://code.google.com/p/yasnippet/][yasnippet]] is yet another snippet expansion system for Emacs.  It is
+inspired by TextMate's templating syntax.
+- watch the [[http://www.youtube.com/watch?v=vOj7btx3ATg][video on YouTube]]
+- see the [[http://yasnippet.googlecode.com/svn/trunk/doc/index.html][intro and tutorial]]
+
+*Note*: yasnippet is not compatible with =org-indent-mode= currently
+there is no known way to use both successfully with =yas/trigger-key=
+set to =TAB= (or =[tab]= etc...)
+
 The way Org-mode binds the =TAB= key (binding to =[tab]= instead of
 =\t=) overrules yasnippets' access to this key.  The following code
 fixes this problem:
@@ -611,7 +633,24 @@ fixes this problem:
 	    (define-key yas/keymap [tab] 'yas/next-field-group)))
 #+end_src
 
-Rick Moynihan maintains a [[http://github.com/RickMoynihan/yasnippet-org-mode][git repository]] with YASnippets for Org-mode.
+If the above code doesn't work (which it may not with later versions
+of yasnippet).  Then try the following
+
+#+begin_src emacs-lisp
+  (defun yas/org-very-safe-expand ()
+    (let ((yas/fallback-behavior 'return-nil)) (yas/expand)))
+  
+  (add-hook 'org-mode-hook
+            (lambda ()
+              ;; yasnippet (using the new org-cycle hooks)
+              (make-variable-buffer-local 'yas/trigger-key)
+              (setq yas/trigger-key [tab])
+              (add-to-list 'org-tab-first-hook 'yas/org-very-safe-expand)
+              (define-key yas/keymap [tab] 'yas/next-field)))
+#+end_src
+
+Rick Moynihan maintains a [[http://github.com/RickMoynihan/yasnippet-org-mode][git repository]] (or [[http://github.com/eschulte/yasnippet-org-mode][Eric's fork of the same]])
+with YASnippets for Org-mode.
 
 ** Org-mode takes over the S-cursor keys.  I also want to use CUA-mode, is there a way to fix this conflict?
    :PROPERTIES:
@@ -703,6 +742,36 @@ Here are some other ideas for speeding up the agenda:
 
    I.e., make sure there are files ending in .elc in your org
    installation directory.
+
+** Visual-line-mode doesn't work well with org-mode
+   :PROPERTIES:
+   :CUSTOM_ID: visual-line-mode
+   :END:
+
+Visual-line-mode "soft wraps" lines so that the visual edge of the
+buffer is considered a line break for purposes of navigation, even
+though there is no line break in reality. 
+
+In older versions of org-mode, org-beginning-of-line and
+org-end-of-line do not work well with visual line mode. (The two
+commands disregard soft line breaks and move to the beginning and end
+of the hard line break.) A patch was introduces to fix this behavior
+in July of 2009. n
+
+If you are using an older version of org mode, you can:
+
+1. Add a hook to turn off visual line mode.
+
+2. Add the following to your =.emacs=:
+
+#+begin_src emacs-lisp
+
+(add-hook 'org-mode-hook
+  (lambda ()
+    (define-key org-mode-map "\C-a" 'move-beginning-of-line)
+    (define-key org-mode-map "\C-a" 'move-end-of-line)))
+
+#+end_src
 
 * Outline
   :PROPERTIES:
@@ -1186,6 +1255,20 @@ Note that you could use arbitrary starting values and column formulas.
 
    : (setq org-org-table-copy-increment nil)
 
+** When I export tables to html, they don't have borders.
+   :PROPERTIES:
+   :CUSTOM_ID: table-borders-in-html-export
+   :END:
+
+By default, org mode exports tables without borders.
+
+You can changed this by placing an =#+ATTR_HTML= line before the
+table:
+
+:  #+ATTR_HTML: border="2" rules="all" frame="all"
+
+See [[http://orgmode.org/manual/Tables-in-HTML-export.html#Tables-in-HTML-export][the manual]] for more details.
+
 * Markup
   :PROPERTIES:
   :CUSTOM_ID: Footnotes
@@ -1236,6 +1319,23 @@ the end of a document or at the end of the outline heading in which
 they appear. Users who change this setting while editing a document
 may be disconcerted to find all of their footnotes rearranged
 automatically.
+
+** I have auto-fill-mode set and org-mode is inserting unwanted comment markers!
+   :PROPERTIES:
+   :CUSTOM_ID: auto-fill-and-unwanted-comments
+   :END:
+
+If the following occurs:
+
+#+begin_src org
+
+#+OPTIONS: toc:nil
+Some entered text.
+# More entered tex.
+
+#+end_src
+
+Make sure that the variable comment-start is nil.
 
 * Remember
   :PROPERTIES:
@@ -1430,10 +1530,10 @@ list, you have a couple of options.
    :CUSTOM_ID: set-agenda-files-using-wildcards
    :END:
 
-You can use the file-expand-wildcards function to all files ending in
-=org= in a directory to your agenda files list:
+You can simply set the value of org-agenda-files to a directory rather
+than a list of files:
 
-: (setq org-agenda-files (file-expand-wildcards "~/org/*.org"))
+: (setq org-agenda-files "~/my/special/path/org/")
 
 ** Why aren't items disappearing from my agenda once they are marked done?
    :PROPERTIES:
