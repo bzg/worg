@@ -484,6 +484,16 @@ Defined in: /org-agenda.el/
 #+begin_example
     Hook run just before displaying an agenda buffer.
 #+end_example
+** =org-agenda-entry-text-cleanup-hook=
+Defined in: /org-agenda.el/
+#+begin_example
+    Hook that is run after basic cleanup of entry text to be shown in agenda.
+    This cleanup is done in a temporary buffer, so the function may inspect and
+    change the entire buffer.
+    Some default stuff like drawers and scheduling/deadline dates will already
+    have been removed when this is called, as will any matches for regular
+    expressions listed in `org-agenda-entry-text-exclude-regexps'.
+#+end_example
 ** =org-agenda-mode-hook=
 Defined in: /org-agenda.el/
 #+begin_example
@@ -512,6 +522,11 @@ Defined in: /org-agenda.el/
 #+begin_example
     Normal hook run after an item has been shown from the agenda.
     Point is in the buffer where the item originated.
+#+end_example
+** =org-export-ascii-final-hook=
+Defined in: /org-ascii.el/
+#+begin_example
+    Hook run at the end of ASCII export, in the new buffer.
 #+end_example
 ** =org-clock-heading-function=
 Defined in: /org-clock.el/
@@ -547,6 +562,11 @@ Defined in: /org-clock.el/
 Defined in: /org-clock.el/
 #+begin_example
     Hook run when selecting the currently clocked-in entry.
+#+end_example
+** =org-export-docbook-final-hook=
+Defined in: /org-docbook.el/
+#+begin_example
+    Hook run at the end of DocBook export, in the new buffer.
 #+end_example
 ** =org-export-preprocess-hook=
 Defined in: /org-exp.el/
@@ -599,6 +619,11 @@ Defined in: /org-html.el/
 #+begin_example
     Hook run during HTML export, after blockquote, verse, center are done.
 #+end_example
+** =org-export-html-final-hook=
+Defined in: /org-html.el/
+#+begin_example
+    Hook run during HTML export, after blockquote, verse, center are done.
+#+end_example
 ** =org-before-save-iCalendar-file-hook=
 Defined in: /org-icalendar.el/
 #+begin_example
@@ -618,12 +643,53 @@ Defined in: /org-latex.el/
 #+begin_example
     Hook run during LaTeX export, after blockquote, verse, center are done.
 #+end_example
+** =org-export-latex-final-hook=
+Defined in: /org-latex.el/
+#+begin_example
+    Hook run in the finalized LaTeX buffer.
+#+end_example
 ** =org-checkbox-statistics-hook=
 Defined in: /org-list.el/
 #+begin_example
     Hook that is run whenever Org thinks checkbox statistics should be updated.
     This hook runs even if `org-provide-checkbox-statistics' is nil, to it can
     be used to implement alternative ways of collecting statistics information.
+#+end_example
+** =org-mobile-pre-push-hook=
+Defined in: /org-mobile.el/
+#+begin_example
+    Hook run before running `org-mobile-push'.
+    This could be used to clean up `org-mobile-directory', for example to
+    remove files that used to be included in the agenda but no longer are.
+    The presence of such files would not really be a problem, but after time
+    they may accumulate.
+#+end_example
+** =org-mobile-post-push-hook=
+Defined in: /org-mobile.el/
+#+begin_example
+    Hook run after running `org-mobile-push'.
+    If Emacs does not have direct write access to the WebDAV directory used
+    by the mobile device, this hook should be used to copy all files from the
+    local staging directory `org-mobile-directory' to the WebDAV directory,
+    for example using `rsync' or `scp'.
+#+end_example
+** =org-mobile-pre-pull-hook=
+Defined in: /org-mobile.el/
+#+begin_example
+    Hook run before executing `org-mobile-pull'.
+    If Emacs does not have direct write access to the WebDAV directory used
+    by the mobile device, this hook should be used to copy the capture file
+    `mobileorg.org' from the WebDAV location to the local staging
+    directory `org-mobile-directory'.
+#+end_example
+** =org-mobile-post-pull-hook=
+Defined in: /org-mobile.el/
+#+begin_example
+    Hook run after running `org-mobile-pull'.
+    If Emacs does not have direct write access to the WebDAV directory used
+    by the mobile device, this hook should be used to copy the emptied
+    capture file `mobileorg.org' back to the WebDAV directory, for example
+    using `rsync' or `scp'.
 #+end_example
 ** =org-mouse-context-menu-function=
 Defined in: /org-mouse.el/
@@ -668,6 +734,11 @@ Defined in: /org-src.el/
     You may want to use this hook for example to turn off `outline-minor-mode'
     or similar things which you want to have when editing a source code file,
     but which mess up the display of a snippet in Org exported files.
+#+end_example
+** =org-export-xoxo-final-hook=
+Defined in: /org-xoxo.el/
+#+begin_example
+    Hook run after XOXO export, in the new buffer.
 #+end_example
 
 
