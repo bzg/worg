@@ -1966,6 +1966,38 @@ something like the following
 
 For more complex listings use cases consult the [[ftp://ftp.tex.ac.uk/tex-archive/macros/latex/contrib/listings/listings.pdf][listings manual]].
 
+** How can I export to Latex Beamer
+   :PROPERTIES:
+   :CUSTOM_ID: beamer
+   :END:
+The latex [[http://latex-beamer.sourceforge.net/][Beamer Class]] is a useful class for generating slide shows.
+The following can be used to export Org-mode documents to LaTeX
+beamer.
+
+Add the following to your Emacs initialization file.
+#+begin_src emacs-lisp
+  (unless (boundp 'org-export-latex-classes)
+    (setq org-export-latex-classes nil))
+  (add-to-list 'org-export-latex-classes
+               '("beamer"
+                 "\\documentclass[11pt]{beamer}\n\\usepackage[utf8]{inputenc}\n\\usepackage[T1]{fontenc}\n\\usepackage{hyperref}\n\\usepackage{verbatim}\n"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\begin{frame}\\frametitle{%s}" "\\end{frame}"
+                  "\\begin{frame}\\frametitle{%s}" "\\end{frame}")))
+#+end_src
+
+Then by placing
+: #+LaTeX_CLASS: beamer
+in the header of your Org-mode document it will automatically export
+to the Beamer document class on LaTeX export.  With the above
+configuration top-level headers will be mapped to sections in the
+Beamer document, second-level headers will be mapped to frames, and
+lower level headlines will be mapped to itemize objects.
+
+This above is adapted from an [[http://article.gmane.org/gmane.emacs.orgmode/15077/match=beamer+dokos][email by Nick Dokos]], and an [[http://article.gmane.org/gmane.emacs.orgmode/17767/match=beamer+dokos][email by
+Thomas Dye]].  For a much more complex Beamer setup see the [[http://article.gmane.org/gmane.emacs.orgmode/17767/match=beamer+dokos][email by
+Thomas Dye]].
+
 * COMMENT HTML style specifications
 
 #+begin_src emacs-lisp
