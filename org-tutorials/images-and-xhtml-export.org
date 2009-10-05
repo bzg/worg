@@ -1,0 +1,580 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:nil -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+TITLE: Images and XHTML export
+#+AUTHOR:     Sebastian Rose and the Worg people
+#+EMAIL:      sebastian_rose gmx de
+#+LANGUAGE:   en
+#+CATEGORY:   worg-tutorial
+#+MACRO: imageurl /img/org-mode-unicorn.png
+#+MACRO: BeginMiniPage @<div style="border:1px solid #aaaaaa;padding:10px;width:780px;margin-left:auto;margin-right:auto;">
+#+MACRO: EndMiniPage @</div>
+#+MACRO: blindtextstart @<span style="color:#aaaaaa;">
+#+MACRO: blindtextend  @</span>
+#+MACRO: BeginInfoBox @<div class="org-info-box">@<img src="../images/icons/info.png" alt="NOTE" />@<p>
+#+MACRO: EndInfoBox @</p>@<br style="clear:left;height:1px;" />@</div>@<br />
+#+MACRO: BeginWarningBox @<div class="org-info-box">@<img src="../images/icons/warning.png" alt="NOTE" />@<p>
+#+MACRO: EndWarningBox @</p>@<br style="clear:left;height:1px;" />@</div>@<br />
+
+
+[[file:../index.org][{Back to Worg's index}]]
+
+* Image basics
+
+  Images are inserted into an Org file in a fashion similar to links:
+
+  : [[file:{{{imageurl}}}]]
+  : [[file:{{{imageurl}}}][Alt text]]
+
+  The =file:= prefix is optional, as long as a known image type is used. Org-mode
+  recognizes images by the file name suffix. Recognized suffixes are all the
+  members of =org-export-html-inline-image-extensions= which defaults to the list
+  =("png" "jpeg" "jpg" "gif")=. That said, the images above could as well be
+  included using this link:
+
+  : [[{{{imageurl}}}]]
+  : [[{{{imageurl}}}][Alt text]]
+
+  For this tutorial, we assume the variable =org-export-html-inline-images= is
+  unchanged from it's standard setting, i.e. =maybe=. Images are shown in the
+  exported page this way. And we will talk about visible images only.
+
+  Don't be afraid. Most of the text in this little tutorial is just blind text
+  (and in gray color therefor).
+
+  Read the basics about images in XHTML export in the Org-mode manual,
+  [[http://orgmode.org/manual/Images-in-HTML-export.html#Images-in-HTML-export][Section Images]] (e.g. show a thumbnail, that links to a high resolution image...).
+
+
+* A simple image
+
+  Let's simply put an image inside a paragraph like this
+
+  : Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh
+  : [[[[{{{imageurl}}}]]]]
+  : euismod  tincidunt ut laoreet dolore magna aliquam erat volutpat.
+
+  {{{BeginWarningBox}}} Note, that *empty lines are crucial*. The exporter will
+  start a new paragraph, if you add an empty line before or after the image. You
+  can easily try that yourself, simply by adding an empty line before and/or
+  after the image and export again.{{{EndWarningBox}}}
+
+  To see the result, export your Org file to HTML (press =C-x C-e b=) and see the
+  results. Note, that the image is displayed just where you placed it.
+
+  {{{BeginMiniPage}}}
+
+  {{{blindtextstart}}}
+  Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+  nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi
+  enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+  nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in
+  hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu
+  feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui
+  blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla
+  facilisi.{{{blindtextend}}}
+  [[{{{imageurl}}}]]
+  {{{blindtextstart}}}
+  Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+  nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi
+  enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+  nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in
+  hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu
+  feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui
+  blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla
+  facilisi.{{{blindtextend}}}
+
+  {{{EndMiniPage}}}
+
+
+* Image attributes
+
+  Org-mode allows us, to add HTML attributes to the exported image. There are
+  several useful attributes, some of which are mandatory, as the =src= and =alt=
+  attributes. Org-mode adds an empty =alt= attribute for you, if not supplied. You
+  can add additional attributes using a special syntax. E.g. you could change
+  the value of the =alt= attribute this way:
+
+  : #+ATTR_HTML: alt="My fancy value for the alt attribute."
+  : [[{{{imageurl}}}]]
+
+  You may add more attributes to an =#+ATTR_HTML:= line. More than one
+  =#+ATTR_HTML:= line is allowed for readability. Example:
+
+  : #+ATTR_HTML: alt="Zoomed image."
+  : #+ATTR_HTML: width="300" style="border:2px solid black;"
+  : [[{{{imageurl}}}]]
+
+  A full list of valid attributes can be found on
+  [[http://www.w3schools.com/tags/tag_img.asp]].
+
+
+* Align images
+
+  If you want text to flow around your images, the =style= attribute comes handy.
+  To place the image on the left, and let the text flow around the image on the
+  right, use this code:
+
+  : #+ATTR_HTML: style="float:left;"
+
+  Possible values for the =float:= CSS attribute are =left=, =right= and =none= (the
+  default). =left= causes the image to show up on the left of the text succeeding
+  the image, =right= will place the image on the right side of the text succeeding
+  the image.
+
+  You can control the gap between image and surrounding text, using the =margin:=
+  CSS attribute like so:
+
+  : #+ATTR_HTML: style="float:left;margin:20px 20px 20px 0px;"
+
+  The order of the values given, are the distances in the north east south, and
+  west.
+
+  Again: *Please avoid empty lines before and after* the image, if you want to
+  achieve the effect shown in this example: one paragraph of text that flows
+  around two images. The exporter adds a =<p>= element for empty lines otherwise.
+
+  This code shows, how we can add attributes to the =<img ... />= tag in Org-mode:
+
+  : #+ATTR_HTML: style="float:right;margin:0px 0px 20px 20px;"
+  : [[{{{imageurl}}}]]
+  : Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+  : #+ATTR_HTML: style="float:left;margin:20px 20px 20px 0px;"
+  : [[{{{imageurl}}}]]
+  : euismod  tincidunt ut laoreet dolore magna aliquam erat volutpat.
+
+  {{{BeginInfoBox}}}
+  *Note:* The =#+ATTR_HTML:= line as well as the image definition have to be on a
+  single line respectively. Don't put _any_ additional text on those lines or the
+  attributes will not be added to the image tag on export!
+  {{{EndInfoBox}}}
+
+
+  {{{BeginMiniPage}}}
+
+  #+ATTR_HTML: style="float:right;margin:0px 0px 20px 20px;"
+  [[{{{imageurl}}}]]
+  This text is directly succeeds the first image, which is right
+  aligned. Because of the alignment, placing the image after the first few
+  lines would make no difference.{{{blindtextstart}}}
+  Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+  nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi
+  enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+  nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in
+  hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu
+  feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui
+  blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla
+  facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
+  nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat
+  volutpat.{{{blindtextend}}} Text before the second image ends here.<
+  #+ATTR_HTML: style="float:left;margin:20px 20px 20px 0px;"
+  [[{{{imageurl}}}]]
+  >This text is directly following the second image. No empty lines are added.
+  Neither before, nor after the image. We therefor see one big paragraph with
+  two images. Note, that browsers will place this second image where ever they
+  see fit. Browsers will not interrupt the text flow, just to place the image
+  add the exact point between two words.
+  {{{blindtextstart}}}Lorem ipsum dolor sit amet,
+  consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+  laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis
+  nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea
+  commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate
+  velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at
+  vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril
+  delenit augue duis dolore te feugait nulla facilisi.{{{blindtextend}}}
+
+  {{{EndMiniPage}}}
+
+
+** Deprecated HTML attributes
+
+  You could use old-style HTML attributes, but those are deprecated:
+
+  : #+ATTR_HTML: alt="image" hspace="20" vspace="20" align="right"
+
+  The =vspace= and =hspace= attributes denote the vertical and horizontal gap in
+  pixels between the image and the surrounding text respectively.
+
+** Images in a row
+
+   And here is how to fill the width of your display with images and let the
+   lines break automatically. Just add =display:inline;= to the =style= attributes.
+
+   : #+ATTR_HTML: style="display:inline;margin:10px;"
+   : [[{{{imageurl}}}]]
+   : #+ATTR_HTML: style="display:inline;margin:10px;"
+   : [[{{{imageurl}}}]]
+   : #+ATTR_HTML: style="display:inline;margin:10px;"
+   : [[{{{imageurl}}}]]
+   : #+ATTR_HTML: style="display:inline;margin:10px;"
+   : [[{{{imageurl}}}]]
+
+   results in:
+
+   {{{BeginMiniPage}}}
+
+   #+ATTR_HTML: style="display:inline;margin:10px;"
+   [[{{{imageurl}}}]]
+   #+ATTR_HTML: style="display:inline;margin:10px;"
+   [[{{{imageurl}}}]]
+   #+ATTR_HTML: style="display:inline;margin:10px;"
+   [[{{{imageurl}}}]]
+   #+ATTR_HTML: style="display:inline;margin:10px;"
+   [[{{{imageurl}}}]]
+   #+ATTR_HTML: style="display:inline;margin:10px;"
+   [[{{{imageurl}}}]]
+   #+ATTR_HTML: style="display:inline;margin:10px;"
+   [[{{{imageurl}}}]]
+   #+ATTR_HTML: style="display:inline;margin:10px;"
+   [[{{{imageurl}}}]]
+   #+ATTR_HTML: style="display:inline;margin:10px;"
+   [[{{{imageurl}}}]]
+
+   {{{EndMiniPage}}}
+
+
+* Images with Captions
+
+  You might want to attach a caption to your images. You can do so using this
+  code:
+
+  : #+CAPTION: Monocerus Glaucus
+  : #+ATTR_HTML: alt="Monocerus Glaucus"
+  : [[[[{{{imageurl}}}]]]]
+
+  {{{BeginInfoBox}}}
+  In this case, empty lines before and after the image make no difference since
+  the exporter ends paragraphs and restarts them below the image.
+  {{{EndInfoBox}}}
+
+  {{{BeginMiniPage}}}
+
+  #+CAPTION: Monocerus Glaucus
+  #+ATTR_HTML: alt="Monocerus Glaucus"
+  [[{{{imageurl}}}]]
+  {{{blindtextstart}}}Lorem ipsum dolor sit amet, consectetuer
+  adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore
+  magna aliquam erat volutpat.{{{blindtextend}}}
+
+  {{{EndMiniPage}}}
+
+** Captions and floating
+
+   There is no /figure/ element in XHTML and captions are not supported at all. But
+   the exporter wraps the =<img..../>= tag in certain containers to add the caption
+   for you:
+
+   #+BEGIN_SRC html
+    <div class="figure">
+    <p><img src="path/to/img.png" alt="Monocerus Glaucus" /></p>
+    <p>Monocerus Glaucus</p>
+    </div>
+   #+END_SRC
+
+   To make text flow around your image, you need to adjust the styles for the
+   special HTML elements that wrap images with captions. The exporter puts the
+   default styles in the =<head>= section of your XHTML files. This is, what they
+   look like:
+
+   : div.figure { padding: 0.5em; }
+   : div.figure p { text-align: center; }
+
+   To achive the floating, add this to the top of the Org-file:
+
+#+COMMENT: no width neccessary, CSS 2.1
+
+   : #+STYLE: <style type="text/css">
+   : #+STYLE:<!--/*--><![CDATA[/*><!--*/
+   : #+STYLE: div.figure { float:left; }
+   : #+STYLE: /*]]>*/-->
+   : #+STYLE: </style>
+
+
+   The crucial attribute is =float:left;=. Choose =float:right;= to place the images
+   on the right edge of your paragraphs. The styles will apply to _all_ images with
+   captions in your file.
+
+   {{{BeginInfoBox}}}
+   *Note (again):* In this case, empty lines before and after the image make no
+   difference since the exporter ends paragraphs and restarts them below the
+   image. This said, a floating image with a caption will always sit on the top
+   left/right of the following paragraph.
+   {{{EndInfoBox}}}
+
+   Result:
+
+   {{{BeginMiniPage}}}
+
+   {{{blindtextstart}}}
+   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+   nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi
+   enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+   nisl ut aliquip ex ea commodo consequat.{{{blindtextend}}} This text
+   directly preceeds the image and ends here.<
+    #+begin_html
+<div class="figure" style="float:left;">
+<p><img src="{{{imageurl}}}" alt="image" hspace="20" vspace="20" /></p>
+<p>Equus Unicorn Viridis</p>
+</div>
+   #+end_html
+   >This text directly follows the image. No empty are inserted before or after
+   the image. Note, that a new paragraph has started nonetheless.{{{blindtextstart}}}
+   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+   nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi
+   enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+   nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in
+   hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu
+   feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui
+   blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla
+   facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
+   nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat
+   volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper
+   suscipit lobortis nisl ut aliquip ex ea commodo.
+   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+   nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi
+   enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+   nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in
+   hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu
+   feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui
+   blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla
+   facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
+   nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat
+   volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper
+   suscipit lobortis nisl ut aliquip ex ea commodo...{{{blindtextend}}}
+
+   {{{EndMiniPage}}}
+
+
+*** Problems with captions and float
+
+    The =float:left;= style causes following blocks to show up on the right of
+    your image. So did the following paragraph in the previous example.
+    Inevitably, this will happen against your will. In that case, put this after
+    the image:
+
+    : #+begin_html
+    :  <br style="clear:both;" />
+    : #+end_html
+
+    Or you could use the less obtrusive syntax:
+
+    : @<br style="clear:both;" />
+
+
+** Captions in a row
+
+   In addition, =float:left;= changes the alignment of several images with caption
+   in a row. They now fill a row on the display, until the screen width is
+   filled with images. They now behave like simple text.
+
+   #+begin_src org
+     ,    #+CAPTION: Michael
+     ,    #+ATTR_HTML: alt="image"
+     ,    [[{{{imageurl}}}]]
+     ,    #+CAPTION: Steve
+     ,    #+ATTR_HTML: alt="image"
+     ,    [[{{{imageurl}}}]]
+     ,    #+CAPTION: Carla
+     ,    #+ATTR_HTML: alt="image"
+     ,    [[{{{imageurl}}}]]
+     ,    #+CAPTION: Pete
+     ,    #+ATTR_HTML: alt="image"
+     ,    [[{{{imageurl}}}]]
+
+     ,    ... etc. - many more ...
+   #+end_src
+
+    results in:
+
+#+COMMENT: This has to be HTML, because we cannot include the styles into the head section.
+#+COMMENT: Therefor, this has to be reworked if the output of the exporter changes.
+
+   {{{BeginMiniPage}}}
+
+   #+begin_html
+    <div class="figure" style="float:left;">
+    <p><img src="{{{imageurl}}}" alt="image" /></p>
+    <p>Michael</p>
+    </div>
+
+    <div class="figure" style="float:left;">
+    <p><img src="{{{imageurl}}}" alt="image" /></p>
+    <p>Steve</p>
+    </div>
+
+    <div class="figure" style="float:left;">
+    <p><img src="{{{imageurl}}}" alt="image" /></p>
+    <p>Carla</p>
+    </div>
+
+    <div class="figure" style="float:left;">
+    <p><img src="{{{imageurl}}}" alt="image" /></p>
+    <p>Pete</p>
+    </div>
+
+    <div class="figure" style="float:left;">
+    <p><img src="{{{imageurl}}}" alt="image" /></p>
+    <p>Paul</p>
+    </div>
+
+    <div class="figure" style="float:left;">
+    <p><img src="{{{imageurl}}}" alt="image" /></p>
+    <p>Alice</p>
+    </div>
+
+    <div class="figure" style="float:left;">
+    <p><img src="{{{imageurl}}}" alt="image" /></p>
+    <p>Maria</p>
+    </div>
+
+    <div class="figure" style="float:left;">
+    <p><img src="{{{imageurl}}}" alt="image" /></p>
+    <p>Lucien</p>
+    </div>
+    <br style="clear:both;" />
+   #+end_html
+
+   {{{EndMiniPage}}}
+
+
+** Italic captions
+
+   Captions are often printed in italics. To do so, go to the top of your
+   Org-file again, and edit the styles again:
+
+   : #+STYLE: <style type="text/css">
+   : #+STYLE:<!--/*--><![CDATA[/*><!--*/
+   : #+STYLE: div.figure p { font-style:italic; }
+   : #+STYLE: /*]]>*/-->
+   : #+STYLE: </style>
+
+   {{{BeginMiniPage}}}
+
+   #+begin_html
+    <div class="figure" style="float:right;">
+    <p><img src="{{{imageurl}}}" alt="Save the unicorns" /></p>
+    <p style="font-style:italic;">Save the unicorns</p>
+    </div>
+   #+end_html
+   {{{blindtextstart}}}
+   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+   nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi
+   enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+   nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in
+   hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu
+   feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui
+   blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla
+   facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
+   nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat
+   volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper
+   suscipit lobortis nisl ut aliquip ex ea commodo.
+   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+   nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi
+   enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+   nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in
+   hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu
+   feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui
+   blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla
+   facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
+   nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat
+   volutpat.
+   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+   nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi
+   enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
+   nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in
+   hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu
+   feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui
+   blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla
+   facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam
+   nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat
+   volutpat.{{{blindtextend}}}
+
+   {{{EndMiniPage}}}
+
+
+** Final captions example
+
+   Here is a last weird example of what styles can do for you. Let's put the
+   caption to the right of an image.
+
+   : #+STYLE: <style type="text/css">
+   : #+STYLE:<!--/*--><![CDATA[/*><!--*/
+   : #+STYLE: div.figure {
+   : #+STYLE:  width:235px; /* ensure the same width for each. */
+   : #+STYLE:  float:left;
+   : #+STYLE:  margin:5px;
+   : #+STYLE: }
+   : #+STYLE: div.figure p {
+   : #+STYLE:  display:inline;
+   : #+STYLE:  font-style:italic;
+   : #+STYLE: }
+   : #+STYLE: /*]]>*/-->
+   : #+STYLE: </style>
+
+
+   {{{BeginMiniPage}}}
+
+   #+begin_html
+    <div class="figure" style="width:235px;float:left;margin:5px;">
+    <p style="display:inline;"><img src="{{{imageurl}}}" alt="image" style="vertical-align:middle;" /></p>
+    <p style="display:inline;font-style:italic;">Michael</p>
+    </div>
+
+    <div class="figure" style="width:235px;float:left;margin:5px;">
+    <p style="display:inline;"><img src="{{{imageurl}}}" alt="image" style="vertical-align:middle;" /></p>
+    <p style="display:inline;font-style:italic;">Steve</p>
+    </div>
+
+    <div class="figure" style="width:235px;float:left;margin:5px;">
+    <p style="display:inline;"><img src="{{{imageurl}}}" alt="image" style="vertical-align:middle;" /></p>
+    <p style="display:inline;font-style:italic;">Carla</p>
+    </div>
+    <br style="clear:both;" />
+    <div class="figure" style="width:235px;float:left;margin:5px;">
+    <p style="display:inline;"><img src="{{{imageurl}}}" alt="image" style="vertical-align:middle;" /></p>
+    <p style="display:inline;font-style:italic;">Pete</p>
+    </div>
+
+    <div class="figure" style="width:235px;float:left;margin:5px;">
+    <p style="display:inline;"><img src="{{{imageurl}}}" alt="image" style="vertical-align:middle;" /></p>
+    <p style="display:inline;font-style:italic;">Paul</p>
+    </div>
+   #+end_html
+
+   If the sum of three =div.figure='s widths and margins were so wide, that three
+   Monoceri wouldn't fit in one row, this text would start on the very top of
+   this mini page.
+
+   Let's add another little paragraph here, to show how =float= works. How to get
+   out of here? \\
+   =@= =<br style=="=clear:both=;" =/>=
+
+   @<br style="clear:both;" />
+
+   ...did the trick. It's advisable, to add this after the third image
+   above since the first paragraph starts with very short words.
+
+   {{{EndMiniPage}}}
+
+
+* Summary
+
+  1. Images are referenced using Org-mode's link syntax.
+  2. As for simple links, the =file:= prefix is optional, as long as the suffix is
+     a member of =org-export-html-inline-image-extensions=.
+  3. We can add HTML attributes to images
+     - using =#+ATTR_HTML:=
+     - Both, the =#+ATTR_HTML:= line and the image have to be on their own line.
+  4. We prefer the =style= attribute to align images. The most important CSS
+     attributes are =float:= and =margin:=.
+  5. We can add a caption to images, even though (X)HTML doesn't support
+     this. We use the special =#+CAPTION:= line to supply a caption. This has to
+     be on a single line, too.
+  6. The exporter wraps the image and the caption into a =<div class=="=figure">= and
+     two =<p>= elements. The first =<p>= element contains our image, the second one
+     the caption.
+  7. By adding special styles for those elements to the top of our Org-file
+     (=#+STYLE:=), we can align images with captions, too.
+  8. Styles added for images with captions apply to all images with captions in
+     the file.
