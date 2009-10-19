@@ -769,3 +769,23 @@ If KWD is a number, get the corresponding match group."
           (and (member kwd org-done-keywords) 'org-done)
           'org-todo))))
 #+END_SRC emacs-lisp
+* Changelog support for org headers
+  -- James TD Smith
+
+  Put the following in your =.emacs=, and =C-x 4 a= and other functions which
+  use =add-log-current-defun= like =magit-add-log= will pick up the nearest org
+  headline as the "current function" if you add a changelog entry from an org
+  buffer.
+
+  #+BEGIN_SRC emacs-lisp
+    (defun org-log-current-defun ()
+      (save-excursion
+	(org-back-to-heading)
+	(if (looking-at org-complex-heading-regexp)
+	    (match-string 4))))
+
+    (add-hook 'org-mode-hook
+	      (lambda ()
+		(make-variable-buffer-local 'add-log-current-defun-function)
+		(setq add-log-current-defun-function 'org-log-current-defun)))
+  #+END_SRC

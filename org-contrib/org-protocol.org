@@ -372,6 +372,41 @@ following to your .conkerorrc:
 org-remember from inside conkeror," November 14, 2008.
 http://tsdh.wordpress.com/2008/11/14/calling-org-remember-from-inside-conkeror/
 
+* Keybindings for Firefox
+
+  You can add key bindings for the =org-protocol= commands using the keyconfig
+  Firefox extension.
+
+  First, install keyconfig from http://mozilla.dorando.at/keyconfig.xpi.
+
+  Open the keyconfig dialog by going to Tools and then Keyconfig.
+
+  Click the 'Add a new Key' button. Enter "Org store link" as the name.
+  Enter the following in the box with /* CODE */ in it:
+
+  : var orgProtoString = 'org-protocol://store-link://'+
+  :   encodeURIComponent(gBrowser.currentURI.spec) + '/' +
+  :   encodeURIComponent(gBrowser.contentWindow.title) + '/' +
+  :   encodeURIComponent(window.getSelection());
+  :
+  : gBrowser.loadURI(orgProtoString);
+
+  Click OK. You will then need to bind a key by clicking in the box next to the
+  'Apply' button and pressing whatever key combination you want. Click 'Apply' to
+  store the keybinding.
+
+  Repeat the steps, but call the next key "Org remember" and use the code below:
+
+  : var orgProtoString = 'org-protocol://remember://'+
+  :   encodeURIComponent(gBrowser.currentURI.spec) + '/' +
+  :   encodeURIComponent(gBrowser.contentWindow.title) + '/' +
+  :   encodeURIComponent(window.getSelection());
+  :
+  : gBrowser.loadURI(orgProtoString);
+
+  Click Close, then OK, and then restart Firefox. You should then be able to
+  access the org-protocol functions with your chosen keys.
+
 * Screencast: small introduction to org-protocol.el
 
 #+begin_html
