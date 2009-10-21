@@ -3,7 +3,8 @@
 #+OPTIONS:    H:3 num:nil toc:1 \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
 #+STARTUP: oddeven hideblocks
 
-* Tasks [51/74]
+* Tasks [52/76]
+** PROPOSED Support passing of data to source block on stdin?
 ** PROPOSED add data serialization language result types (XML, YAML, JSON, etc...)
 these could be cached in source-code blocks of the appropriate
 serialization language, and could be very useful, especially for
@@ -11,6 +12,38 @@ languages (like ruby) which support dumping object to/from these
 serialization languages.
 
 ** TODO Suitable export of #+srcname and #+resname lines
+** PROPOSED allow references to bound emacs lisp variables?
+   I don't *think* we can do this currently. Something like this? 
+#+begin_src emacs-lisp
+(defun org-babel-ref-literal (ref)
+  "Determine if the right side of a header argument variable
+assignment is a literal value or is a reference to some external
+resource.  If REF is literal then return it's value, otherwise
+return nil."
+  (if (boundp (intern ref)) (eval (intern ref))
+    (let ((out (org-babel-read ref)))
+      (if (equal out ref)
+	  (if (string-match "^\"\\(.+\\)\"$" ref)
+	      (read ref))
+	out))))
+#+end_src
+
+Need to be careful that an attempt is *not* made to interpret quoted
+strings as elisp variables. It would allows stuff like this
+
+#+begin_src emacs-lisp :results silent
+  (setq
+   evecfile (concat dir "/" "evecs")
+   numpcs   10)
+#+end_src
+
+#+srcname: pcaplot(evecf=evecfile, numpcs=numpcs)
+#+begin_src R :file pca.png
+  x <- matrix(scan(evecf), ncol=numpcs)
+  plot(x[,1:2], pch="+")
+#+end_src
+
+
 ** PROPOSED jumping between results and source blocks (evaluation from results)
 see discussion on the Org-mode list
 http://thread.gmane.org/gmane.emacs.orgmode/18407/focus=18419
@@ -43,19 +76,22 @@ you could even track which chunks are up-to-date, and only re-compute
 from the first one not up-to-date in the buffer onwards to the chunk
 you are being asked to process.  This could be yet another option.
 
-** STARTED Reworking output: verbatim, pretty-print, vector/scalar etc
+** DONE Reworking output: verbatim, pretty-print, vector/scalar etc
    See emails on subject between ES, BA, DED.
 *** Draft of conclusions of email discussion
-    - We add two new :results options:
-       - parseable output
-       - pretty-printed output
-     - These only take effect with :results value
-     - We get rid of :results scalar
-     - We rename :results vector -> table (even though this will be
-       the default it is nice to have a name for it, and we need a
-       symbolic name for implementing -- and allowing users to change
-       -- the default behavior)
-     - We force :results output to be empty for elisp
+    - We add two new :results options (which only take effect
+      with :results value):
+       - [X] parseable (code) output
+       - [X] pretty-printed output
+    - We get rid of :results scalar: [EMS] I don't see why results
+      scalar is on the chopping block?  Did we want another name for
+      this value, or is it overcome by the verbatim/code options?  For
+      now I propose we leave the scalar option unchanged.
+    - [X] We rename :results vector -> table (even though this will be
+         the default it is nice to have a name for it, and we need a
+         symbolic name for implementing -- and allowing users to
+         change -- the default behavior)
+   - [X] We force :results output to be empty for elisp
 *** Parseable output
     - output as code block
     - possible :results option names
@@ -81,7 +117,7 @@ you are being asked to process.  This could be yet another option.
 | shell      | NA            | NA                          | no such thing as :results value |
 |            |               |                             |                                 |
 
-*** TODO pretty print source results
+*** DONE pretty print source results
     
     [ see above ]
 
@@ -118,7 +154,7 @@ index 39f5cc7..60671ac 100644
 
 something similar for ruby exists here
 http://www.ruby-doc.org/stdlib/libdoc/pp/rdoc/index.html
-*** TODO Finalise behaviour regarding vector/scalar output
+*** DONE Finalise behaviour regarding vector/scalar output
     [ see above ]
 *** DONE Stop spaces causing vector output
 This simple example of multilingual chaining produces vector output if
@@ -3011,7 +3047,7 @@ dot("$(2a,0)$",(2,0),N+E);
 *** DONE sh
 
 
-* Bugs [45/52]
+* Bugs [45/54]
 ** TODO Juan Reyero bug report
    
 > ... However I can't replicate this
@@ -3037,6 +3073,8 @@ I have stripped bare my .emacs, and still:
 
 jm
 
+** PROPOSED should we allow :results file without explicitly giving path?
+   I.e. should we create a file in /tmp or in the current directory?
 ** PROPOSED should delete temp files after evaluation
 ** DONE Inline fragment not evaluated unless another code block in buffer
 ** TODO tangle is outputting multiple shebang lines with python code
