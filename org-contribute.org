@@ -60,7 +60,7 @@ copyright assignments from contributors?]]
 * Preferred way of submitting patches
 
 Org-mode is developed using /git/ as the version control system.  Git
-provides an amazing frame work to collaborate on a project.  Git
+provides an amazing framework to collaborate on a project.  Git
 can be used to make patches and send them via email - this is fine for
 minor changes.  For more significant contributions, the best
 way to submit patches is through public branches of your repository
@@ -98,45 +98,47 @@ clone.
    to pull commits from all defined remote repositories, in particular
    the org-mode master at /repo.or.cz/.
 
-6. Develop your feature on the topic branch.  It is very helpful if
-   you can make sure that your branch will merge cleanly into whatever
-   the current origin/master is.  There are two alternative ways to
-   achieve this:
+6. Develop your feature on a topic branch.  It is very helpful if
+   you can make sure that your branch will merge cleanly with the
+   current origin/master.
 
-   - *either* test if your branch merges cleanly with
+   Test if your branch merges cleanly with origin/master.
 
-      : git checkout -b tmp origin/master
-      : git merge NEWTOPIC
-      : git checkout master
-      : git branch -d tmp
+   - Use a throw-away temporary branch to try the merge and test for conflicts
 
-      If there are conflicts, merge /origin/master/ into your topic branch
-      and try to resolve the conflicts on your side.
+     Create a temporary branch =tmp= for the test merge
 
-   - *or* keep your branch on top of origin/master by regularly using 
+     : git checkout -b tmp NEWTOPIC  # create test branch 'tmp' to try the merge
+     : git merge origin/master       # Try the merge
+     : git reset --hard              # If we get conflicts just throw them away
+     : git checkout NEWTOPIC         # Return to topic
+     : git branch -D tmp             # Delete the test branch 'tmp'
 
-      : git rebase origin/master
-      
-      to pull all the changes made in origin/master _underneath_ our
-      own changes.
+   - If there were conflicts, rebase your topic on origin/master
+     resolving any conflicts in order to keep the topic commits clean.
 
-7. When you have something workable, publish the git path and branch
-   name on the mailing list, so that people can test it and that I can
-   take a look.
+     : git rebase origin/master
 
-8. When the patch is accepted, I ask you to once again make sure
+     This rebuilds your topic commits on top of the current
+     origin/master.  This will cause the same conflicts you got when
+     trying the merge and you will need to resolve the conflicts to
+     clean up your topic branch.
+
+8. When you have something workable, publish the git path and branch
+   name on the mailing list, so that people can test it and review
+   your work.
+
+9. When the patch is accepted, I ask you to once again make sure
    that it will cleanly apply.  When that is done, I will fetch your
    changes and merge them.  Minor conflicts, such they always arise in
    Emacs-style /ChangeLog/ files I can of course fix while I am doing
    the merge.
 
-9. After your topic has been merged to the project master branch you
-   can delete the topic on your local and remote repositories.
+10. After your topic has been merged to the project master branch you
+    can delete the topic on your local and remote repositories.
 
-   : git branch -d NEWTOPIC
-   : git push REMOTE :NEWTOPIC
-
-
+    : git branch -d NEWTOPIC
+    : git push REMOTE :NEWTOPIC
 
 * Current contributors
 
