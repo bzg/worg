@@ -14,7 +14,7 @@
 
 [[file:index.org][{Back to Worg's index}]]
 
-* Contributing to Org
+* Types of contributions
 
 Every contribution to Org is very welcome.  Here is a list of areas where
 your contribution will be useful:
@@ -55,6 +55,88 @@ form]] and send it to [[mailto:assign@gnu.org][assign@gnu.org]].
 
 If you want to understand /why/, please read this: [[http://www.gnu.org/licenses/why-assign.html][Why the FSF gets
 copyright assignments from contributors?]]
+
+
+* Preferred way of submitting patches
+
+Org-mode is developed using /git/ as the version control system.  Git
+provides an amazing frame work to collaborate on a project.  Git
+can be used to make patches and send them via email - this is fine for
+minor changes.  More more significant contributions, the best
+way to submit patches is through public branches of your repository
+clone.
+
+
+1. Clone our git repository at =http://repo.or.cz/w/org-mode.git=
+
+2. Create a repository that can be publicly accessed, for example on
+   /GitHub/, /repo.or.cz/, or on your own server.
+
+3. Push your topic branches (and optionally the master branch) to your
+   public repository.
+
+   Define a remote for your public respository you push topics to.
+
+   : git remote add REMOTE URL-GOES-HERE
+
+   Push branches to the remote
+
+   : git push REMOTE BRANCH1 [BRANCH2 BRANCH3 ...]
+
+   e.g.
+
+   : git push add github ssh://.../     # Done once to define the remote 'github'
+   : git push github my-topic
+
+4. Do your work on topic-specific branches, give the branch a name
+   that relates to what you are working on.
+
+5. Often do
+
+   : git remote update
+
+   to pull commits from all defined remote repositories, in particular
+   the org-mode master at /repo.or.cz/.
+
+6. Develop your feature on the topic branch.  It is very helpful if
+   you can make sure that your branch will merge cleanly into whatever
+   the current orgigin/master is.  There are two alternative ways to
+   achieve this:
+
+   - *either* test if you branch merges cleanly with
+
+      : git checkout -b tmp origin/master^0
+      : git merge NEWTOPIC
+      : git checkout master
+      : git branch -d tmp
+
+      If there are conflicts, merge /origin/master/ into your topic branch
+      and try to resolve the conflicts on your side.
+
+   - *or* keep your branch on top of origin/master by regularly using 
+
+      : git rebase origin/master
+      
+      to pull all the changes made in origin/mastere _underneath_ our
+      own changes.
+
+7. When you have something workable, publish the git path and branch
+   name on the mailing list, so that people can test it and that I can
+   take a look.
+
+8. When the patch is accepted, I ask you to once again to make sure
+   that it will cleanly apply.  When that is done, I will fetch your
+   changes and merge them.  Minor conflicts, such they always arise in
+   Emacs-style /ChangeLog/ files I can of cause fix while I am doing
+   the merge.
+
+9. After your topic has been merged to the project master branch you
+   can delete the topic on your local and remote repositories.
+
+   : git branch -d NEWTOPIC
+   : git push REMOTE :NEWTOPIC
+
+
 
 * Current contributors
 
