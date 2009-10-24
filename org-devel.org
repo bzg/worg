@@ -16,11 +16,11 @@
 
 [[file:index.org][{Back to Worg's index}]]
 
-* Current Projects
+
 Some org-mode related project currently being developed in worg.
 
 
-** Org Collector
+* Org Collector
 
 Located in the =contrib/lisp/= directory of org-mode.
 
@@ -77,169 +77,269 @@ it might be better to put an exercise example here if someone has one.
 
 
 #<<fireforg>>
-** Fireforg, a Firefox extension for org interaction (EXPERIMENTAL)
+* Fireforg, a Firefox extension for org interaction (EXPERIMENTAL)
+Fireforg is a Firefox extension, that interacts with Emacs Org-mode.
 
-*** Status
-Fireforg is still experimental and the installation is not hassle free. But it's worth it :-)
+For the displayed URL it shows the associated tags in the status bar
+and allows to show a list of annotations that can be instantly visited
+in Emacs.
 
-*** Installation
+Additionally, in every website it marks all links that occur in the agenda files.
 
-- Install org-protocol according to its [[file:org-contrib/org-protocol.org][manual]] and verify that it's working using the bookmarks.
-- Get org-fireforg.el from [[fireforgrepofile:lisp/org-fireforg.el][here]] and put the following into your =.emacs=:
-    : (add-to-list 'load-path "~/path/to/org/fireforg/")
-    : (require 'org-fireforg)
-    : (org-fireforg-registry-insinuate)
-  and as the last line of the file:
-    : (org-fireforg-registry-initialize t)
+For every link in the agenda files the previous heading and its tags
+are associated with it.
 
-- Visit [[fireforgrepofile:build/fireforg.xpi][this]] with Firefox, confirm installation of the extension and restart.
+For *scientific use*, it is possible to *send BibTeX entries* for
+sites supported by the Zotero plugin to Emacs. [[*Import%20BibTeX%20using%20Zotero][Additional steps]] are
+necessary for this to work.
 
-(Windows users will have to adjust: org-fireforg-registry-file-xml  in Emacs
-and "registry-file" in Fireforgs preferences to be the same file.)
+** Caveats
+   :PROPERTIES:
+   :ID:       13179b21-d70a-4255-a8f1-9f4e4e729074
+   :END:
+The following notes should be taken into consideration before using Fireforg:
+ - On the Emacs side a registry of all links in the agenda files will
+   be generated and saved in plain text onto the harddrive.
+   - The generation can take very a long time depending on the size of
+     the agenda files and the number of links in them.
+   - The generated file can become quite large.
+   - When files are *encrypted* having some information from them in
+     plain text on the harddrive might not be what you want.
+ - Firefox will read and look through the registry file for the
+   currently viewed site. Depending on the size of the registry file
+   and on the options [[id:e77f15a8-c358-44fd-a207-8c422fee2d1e][Lookup links on page load]] and [[id:d73476f3-6c09-479c-abea-f33d3e0e074a][Prefetch links to extract DOI]] 
+   this might slow down the browsing experience.
 
-*** Usage
+** Installation
 
-**** The status bar entry
+   - Install org-protocol according to its [[file:org-contrib/org-protocol.org][manual]] and *please verify
+     that it's working* using either the bookmarks or by invoking it directly in the shell:
+     : emacsclient 'org-protocol://remember://w/http%3A%2F%2Forgmode.org%2F/Org-Mode%3A%20Your%20Life%20in%20Plain%20Text%20-%20Mozilla%20Firefox/'
+   - Get org-fireforg.el from [[fireforgrepofile:lisp/org-fireforg.el][here]] and put the following into your
+     =.emacs= *after* the section that initializes org-protocol:
+     : (add-to-list 'load-path "~/path/to/org/fireforg/")
+     : (require 'org-fireforg)
+     : (org-fireforg-registry-insinuate)
+     
+     and as the last line of the file:
+     : (org-fireforg-registry-initialize t)
 
-If the currently viewed url is found in your agenda files, the number
-of occurrences together with all associated tags will be shown in the
-status bar. A left click on the status bar entry will show a list of
-all headings associated with the currently viewed url. Selecting one
-of them lets emacs visit that heading.
+     Note that creating the registry can take a long time depending on
+     the size of the agenda files and the number of links in them.
 
-For example, this heading in one of your agenda files:
-   : * Greatest tool in the world [[http://orgmode.org/][Org mode]]    :Org:
-will yield the following when visiting http://orgmode.org/ and left clicking:
+   - Visit [[fireforgrepofile:build/fireforg.xpi][this link]] with Firefox, confirm installation of the extension and restart.
 
-[[file:images/screenshots/org-fireforg-screenshot.png]]
+     (Windows users will have to adjust: org-fireforg-registry-file-xml  in Emacs
+     and "registry-file" in Fireforgs preferences to be the same file.)
 
-Right clicking on the status bar entry shows a menu that let's you
-trigger org-protocol's "store-link" and "remember" (for customization see [[* Preferences]]).
+*** Installation from a git clone
 
-**** Mark links that occur in the agenda files in websites
+    It is also possible to clone the git repository first, using:
+    : git clone http://repo.or.cz/r/org-fireforg.git
+    , install lisp/org-fireforg.el according to the instructions above
+    and add a file named =fireforg@burtzlaff.de= containing the path
+    to the "fireforg" subdirectory into =~/.mozilla/firefox/<your
+    profile>/extensions/=.
 
-Whenever a site is loaded, Fireforg will alter the style of all links
-in it, that occur in the agenda files. The tooltip of those links is
-set to contain the annotations.
-
-This feature can be turned off in
-"Tools->Add-Ons->Fireforg->Preferences->Lookup links on page load".
-The CSS-style used for the marking is customizable through "CSS style
-string for links with annotations" in the preferences.
-Changing the tooltip can be turned off by unchecking "Overwrite tooltip for links with annotations".
-
-**** Context menu for links
-
-The context menu (accessible by right clicking on a link) has a
-submenu "Fireforg", where all annotations for that link are listed:
-[[file:images/screenshots/org-fireforg-screenshot-context-menu.png]]
-
-*** Import BibTeX using Zotero
-Fireforg is able to retrieve BibTex entries for the all sites supported by [[http://www.zotero.org/][Zotero]]. To achieve this the following additional steps are necessary:
-- Install Zotero 1.0.10 from the [[http://www.zotero.org/][Zotero Website]]
-- Set "Inject Zotero" in Fireforg's preference dialog [fn:ffprefdiag:  Fireforg's preference dialogue is accessible in Firefox's menu under Tools->Add-ons->Fireforg->Preferences].
-  
-  *Warning: On restart a small function is injected into Zotero to catch imported entries. The change to the code is minimal and non-permanent. In a worst case scenario Zotero's database might get corrupted, though that hasn't happened yet.*
-
-- Restart Firefox
-
-Whenever a single entry (*not* a collection) is imported into Zotero - 
-e.g. by clicking the white "document" symbol that appears to the right
-in the url bar if Zotero supports importing the current site - it is
-automatically exported to BibTeX and sent to org mode using
-org-protocol. In Emacs it is put into the kill ring in a format
-depending on the variable =org-fireforg-received-bibtex-format=:
-
-- =nil=: The BibTeX entry is passed directly into the kill ring.
-- =heading= (Default): A heading is generated with the BibTeX fields as properties with prefix "BIB_":
-  : * [[<link to site>][<Title>]]
-  :  :PROPERTIES:
-  :   :CUSTOM_ID: <BibTeX key>
-  :   :BIB_entryType: <article, ...>
-  :   :BIB_author: ...
-  :   :BIB_title: ...
-  :   ...
-  :   :END:
-- =headingWithPropsAndBibTeXContent=: a heading with properties as described above is generated and the entry in BibTeX format is appended.
-- =headingWithBibTeXContent=: same as the previous one but without the properties
-
-If the url field is a static url, the link to it will be highlighted in search
-results in every search engine.
-
-To export BibTeX information from all headings in the current buffer
-with at least the "BIB\_entryType" property call:
-- =org-fireforg-export-bibtex-to-file= to export to a file
-- =org-fireforg-export-bibtex-to-new-buffer= to export into a new buffer
-*** Preferences
- Fireforg's preference dialogue is accessible in Firefox's menu under Tools->Add-ons->Fireforg->Preferences
-**** Registry file
-The file containing an xml tree with all link-headline associations
-generated from the agenda files. You should not need to change
-this. It has to be same as the customizable variable
-=org-fireforg-registry-file-xml= in Emacs.
-**** Lookup links on page load
-When enabled, all links in a web page that have headlines associated
-with them are marked. This is achieve by adding the following CSS style string to the element:
-**** CSS style string for links with annotations
-The string that is appended to the CSS =style= string of a link
-element, if annotations for it exist.
-**** Overwrite tooltip for links with annotations
-If enabled, sets the tooltip for the links, for which annotations exist to contain those annotations.
-**** Inject Zotero
-After restarting Firefox, a function in the Zotero code gets altered
-so that all BibtTeX entries (*not* collections) that are imported are
-sent using org-protocol and are handled in Emacs according to the
-variable =org-fireforg-received-bibtex-format= as described [[* Import BibTeX using Zotero][here]].  Due
-to [[* Technical note][design choices in Zotero]] this is a bit fragile and can yield errors
-and *might possibly even break Zotero's database*. It is not advisable
-to use Zotero for production when enabling this option in Fireforg.
-**** Use remember template
-The character indicating which remember template to use.
-**** Enable workaround for Mac
-see [[* Workaround for the inability to register a protocol in Firefox on the Mac][here]]
-**** Temporary file for Mac workaround
-see [[* Workaround for the inability to register a protocol in Firefox on the Mac][here]]
-
-*** Workaround for the inability to register a protocol in Firefox on the Mac
-
-A long known bug in Mac Firefox is reported to stop protocol
-registration from working. To work around this Fireforg is able to
-write the org-protocol urls to a temporary file, that is read every
-second and, if non empty, passed to emacsclient and emptied.
-
-To enable this:
-- check "Enable workaround for Mac" in Fireforg's preference dialogue [fn:ffprefdiag]
-- get pull.sh from [[http://repo.or.cz/w/org-fireforg.git?a=blob_plain;f=ff_mac_workaround/pull.sh;hb=HEAD][the repository]] and run it.
-
-*** Updating 
-
-To avoid confusion, always update both org-fireforg.el and the plugin.
-
-The plugin has to be uninstalled and then reinstalled as described
-above. Automatic updating will be used when the testing phase is over.
-
-*** Bugreporting and discussion
-
-- Discussions go to the org-mode list.
-- Bugreports are better not sent to the list, but rather directly to
-  the [[mailto:andreas%20AT%20burtzlaff%20DOT%20de][author]] (Please add "[Fireforg]" to the subject.), because there are probably too many, yet.
+    In my setup for example there is a file
+    =~/.mozilla/firefox/4xyx9l73.default/extensions/fireforg\@burtzlaff.de=
+    containing
+    : /home/andy/projects/org-fireforg/fireforg
  
-**** A checklist for bug tracing
+    A restart of Firefox is required for this to work.
 
-To create a test case put:
-   : * Greatest tool in the world [[http://orgmode.org/][Org mode]]    :Org:
-into one of your agenda files and save it.
+** Basic usage
+*** The status bar entry
 
-If problems arise please go through this checklist to locate the problem:
+    If the currently viewed url is found in your agenda files, the number
+    of occurrences together with all associated tags will be shown in the
+    status bar. A left click on the status bar entry will show a list of
+    all headings associated with the currently viewed url. Selecting one
+    of them lets Emacs visit that heading.
 
-- Does the file "~/.org-fireforg-registry.xml" exist and does it contain "orgmode.org"?
- - *No on either*: Send me the last content of the Messages buffer in Emacs
- - *Yes*: In the Firefox menu: "Tools"->"Error console" look for errors containing: "chrome://fireforg/" and send them to me.
+    For example, this heading in one of your agenda files:
+    : * Greatest tool in the world [[http://orgmode.org/][Org mode]]    :Org:
+    will yield the following when visiting http://orgmode.org/ and left clicking:
 
-*** Technical note
+    [[file:images/screenshots/org-fireforg-screenshot.png]]
 
-Different instances of Zotero's Translator object seem to share state
-in a non-obvious way. This makes coding very fragile and even lets
-some imports fail (silently) after Fireforg has injected its code. The
-failure when importing collections is somehow related to this.  While
-I find it a strange design choice, it is not in my power to change it.
+*** Triggering store-link and remember
+    Right clicking on the status bar entry shows a menu that let's you
+    trigger org-protocol's "store-link" and "remember".
+
+    There is an entry for every remember template listed in the [[*List%20of%20characters%20specifying%20available%20remember%20templates][preferences]].
+
+    The entries in the submenu "All tabs" will call remember for every tab
+    in the current window. This option only makes sense if a remember
+    template is used, that stores the note automatically ("%!" in the template string), e.g.:
+    : * %:description \n %:link %!
+
+*** Mark links that occur in the agenda files in websites
+
+    Whenever a site is loaded, Fireforg will alter the style of all links
+    in it, that occur in the agenda files. The tooltip of those links is
+    set to contain the annotations.
+
+    This feature can be turned off using an [[*Lookup%20links%20on%20page%20load][option]] in the [[*Preferences][preferences dialog]].
+    [[*CSS%20style%20string%20for%20links%20with%20annotations][The CSS-style]] used for marking the link and [[*Overwrite%20tooltip%20for%20links%20with%20annotations][whether or not the tooltip is set]] is also customizable.
+
+*** Context menu for links
+
+    The context menu (accessible by right clicking on a link) has a
+    submenu "Fireforg", where all annotations for that link are listed:
+
+    [[file:images/screenshots/org-fireforg-screenshot-context-menu.png]]
+
+** Import BibTeX using Zotero
+   :PROPERTIES:
+   :ID:       e6fc94c6-7fef-4348-b998-f6a6f58eded8
+   :END:
+   Fireforg is able to retrieve BibTex entries for the all sites supported by [[http://www.zotero.org/][Zotero]]. To achieve this the following additional steps are necessary:
+   - Install Zotero 1.0.10 from the [[http://www.zotero.org/][Zotero Website]]
+   - Set "Inject Zotero" in Fireforg's preference dialog [fn:ffprefdiag:  Fireforg's preference dialogue is accessible in Firefox's menu under Tools->Add-ons->Fireforg->Preferences].
+     
+     *Warning: On restart a small function is injected into Zotero to catch imported entries. The change to the code is minimal and non-permanent. In a worst case scenario Zotero's database might get corrupted, though that hasn't happened yet.*
+
+   - Restart Firefox
+
+     Whenever a single entry (*not* a collection) is imported into Zotero - 
+     e.g. by clicking the white "document" symbol that appears to the right
+     in the url bar if Zotero supports importing the current site - it is
+     automatically exported to BibTeX and sent to org mode using
+     org-protocol. In Emacs it is put into the kill ring in a format
+     depending on the variable =org-fireforg-received-bibtex-format=:
+
+   - =nil=: The BibTeX entry is passed directly into the kill ring.
+   - =heading= (Default): A heading is generated with the BibTeX fields as properties with prefix "BIB_":
+     : * [[<link to site>][<Title>]]
+     :  :PROPERTIES:
+     :   :CUSTOM_ID: <BibTeX key>
+     :   :BIB_entryType: <article, ...>
+     :   :BIB_author: ...
+     :   :BIB_title: ...
+     :   ...
+     :   :END:
+   - =headingWithPropsAndBibTeXContent=: a heading with properties as described above is generated and the entry in BibTeX format is appended.
+   - =headingWithBibTeXContent=: same as the previous one but without the properties
+
+     If the 'url' field is a *static URL*, the link to it will be highlighted
+     in search results in every search engine. Otherwise the option
+     [[id:3ab02821-03c4-4fa7-9a3a-e9701245c5d8][Match sites by comparing their DOI with saved bibliography entries]] might help.
+
+     To export BibTeX information from all headings in the current buffer
+     with at least the "BIB_entryType" property call:
+   - =org-fireforg-export-bibtex-to-file= to export to a file
+   - =org-fireforg-export-bibtex-to-new-buffer= to export into a new buffer
+
+*** Digital Object Identifiers (DOI)
+    :PROPERTIES:
+    :ID:       fbd09ba5-6632-40df-bcc0-8e5a7b9eb7a7
+    :END:
+    If a BibTeX entry contains a field 'doi', a URL will be generated by
+    prepending "http://dx.doi.org/" to the corresponding property
+    'BIB_doi'. It will be handled as any other URL. There is a
+    [[id:3ab02821-03c4-4fa7-9a3a-e9701245c5d8][corresponding functionality in the plugin]] that allows to associated
+    pages despite non-static URLs.
+** Preferences
+   Fireforg's preference dialogue is accessible in Firefox's menu under Tools->Add-ons->Fireforg->Preferences
+***** Registry file
+      The file containing an xml tree with all link-headline associations
+      generated from the agenda files. You should not need to change
+      this. It has to be same as the customizable variable
+      =org-fireforg-registry-file-xml= in Emacs.
+***** Lookup links on page load
+      :PROPERTIES:
+      :ID:       e77f15a8-c358-44fd-a207-8c422fee2d1e
+      :END:
+      When enabled, all links in a web page that have headlines
+      associated with them are marked. This is achieve by adding the
+      following CSS style string to the element:
+      Depending on the size of the registry this *might slow Firefox down*.
+***** CSS style string for links with annotations
+      The string that is appended to the CSS =style= string of a link
+      element, if annotations for it exist.
+***** Overwrite tooltip for links with annotations
+      If enabled, sets the tooltip for the links, for which annotations exist to contain those annotations.
+***** Inject Zotero
+      After restarting Firefox, a function in the Zotero code gets altered
+      so that all BibtTeX entries (*not* collections) that are imported are
+      sent using org-protocol and are handled in Emacs according to the
+      variable =org-fireforg-received-bibtex-format= as described [[* Import BibTeX using Zotero][here]].  Due
+      to [[* Technical note][design choices in Zotero]] this is a bit fragile and can yield errors
+      and *might possibly even break Zotero's database*. It is not advisable
+      to use Zotero for production when enabling this option in Fireforg.
+***** Match sites by comparing their DOI with saved bibliography entries
+      :PROPERTIES:
+      :ID:       3ab02821-03c4-4fa7-9a3a-e9701245c5d8
+      :END:
+      Extract the Digital Object Identifier (DOI) from a page, prepend
+      "http://dx.doi.org/" to it and look up the resulting URL.
+
+      If using a bibliography format [[id:e6fc94c6-7fef-4348-b998-f6a6f58eded8][with properties]], a [[id:fbd09ba5-6632-40df-bcc0-8e5a7b9eb7a7][URL is generated in the same way from the value of the field "BIB_doi" if it exists]]. Thus
+      documents can be matched regardless of the possibly non-static URL.
+***** Prefetch links to extract DOI
+      :PROPERTIES:
+      :ID:       d73476f3-6c09-479c-abea-f33d3e0e074a
+      :END:
+      *Prefetch all links in a page* after it is loaded, extract the DOIs - if any -
+      and [[id:fbd09ba5-6632-40df-bcc0-8e5a7b9eb7a7][use it to find annotations]]. This requires the option [[id:3ab02821-03c4-4fa7-9a3a-e9701245c5d8][Match sites by comparing their DOI with saved bibliography entries]] to be set.
+
+      A site is only prefetched once in every Firefox session, because the
+      associated URL mapping is saved until Firefox is restarted.
+
+      *All links starting with "http" will be prefetched (except for
+      files with extensions: PDF, GIF, PNG or SWF).* This option can
+      also be toggled in the status bar menu.
+
+      *This option will generate additional network traffic and might
+      slow the browsing experience*
+***** List of characters specifying available remember templates
+      For every character in this list an entry in the [[*Triggering%20store%20link%20and%20remember][popup menu]] will be generated, that triggers remember with the template associated with the character.
+***** Enable workaround for Mac
+      see [[* Workaround for the inability to register a protocol in Firefox on the Mac][here]]
+***** Temporary file for Mac workaround
+      see [[* Workaround for the inability to register a protocol in Firefox on the Mac][here]]
+
+** Workaround for the inability to register a protocol in Firefox on the Mac
+
+   A long known bug in Firefox on the Mac is reported to stop protocol
+   registration from working. To work around this Fireforg is able to
+   write the org-protocol urls to a temporary file, that is read every
+   second and, if non empty, passed to emacsclient and emptied.
+
+   To enable this:
+   - check "Enable workaround for Mac" in Fireforg's preference dialogue [fn:ffprefdiag]
+   - get pull.sh from [[http://repo.or.cz/w/org-fireforg.git?a=blob_plain;f=ff_mac_workaround/pull.sh;hb=HEAD][the repository]] and run it.
+
+** Updating 
+
+   To avoid confusion, always update both org-fireforg.el and the plugin.
+
+   The plugin has to be uninstalled and then reinstalled as described
+   above. Automatic updating will be used when the testing phase is over.
+
+** Bugreporting and discussion
+
+   - Discussions go to the org-mode list.
+   - Bugreports are better not sent to the list, but rather directly to
+     the [[mailto:andreas%20AT%20burtzlaff%20DOT%20de][author]] (Please add "[Fireforg]" to the subject.).
+     
+*** A checklist for bug tracing
+
+    To create a test case put:
+    : * Greatest tool in the world [[http://orgmode.org/][Org mode]]    :Org:
+    into one of your agenda files and save it.
+
+    If problems arise please go through this checklist to locate the problem:
+
+    - Does the file "~/.org-fireforg-registry.xml" exist and does it contain "orgmode.org"?
+    - *No on either*: Send me the last content of the Messages buffer in Emacs
+    - *Yes*: In the Firefox menu: "Tools"->"Error console" look for errors containing: "chrome://fireforg/" and send them to me.
+
+** Technical note
+
+   Different instances of Zotero's Translator object seem to share state
+   in a non-obvious way. This makes coding very fragile and even lets
+   some imports fail (silently) after Fireforg has injected its code. The
+   failure when importing collections is somehow related to this.  While
+   I find it a strange design choice, it is not in my power to change it.
