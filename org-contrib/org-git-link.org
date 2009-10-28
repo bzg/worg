@@ -1,0 +1,165 @@
+# -*- mode: org; -*-
+#+TITLE: org-git-link.el -- link to specific git revisions
+#+OPTIONS: ^:{} author:nil toc:nil
+
+org-git-link allows linking to specific (git) versions of a file.
+
+* Use case
+
+  Often one wants to link to a specific version of a reference
+  document which may change in time. Thorsten Wagner described an
+  important use case in his mailing list entry
+  ([[http://permalink.gmane.org/gmane.emacs.orgmode/15774]]), namely
+  linking to results in a lab book. Quote:
+
+  #+BEGIN_QUOTE
+  [...] Please think about the following situation: I have
+  something like "... In the [graph] of the last results, a huge
+  peak is observable due to measurement problems for the
+  following set-up parameters ...." in my org-file and then
+  several month later in a stupid act I overwrite this file by
+  some very similar but different results, e.g. because I was not
+  longer aware of the link and thought there is no need to keep
+  this old graph with the ugly peak and replace it by something
+  "better". Now the link still depicts to a graph (lets say
+  without or smaller peak) and back in org-mode I might reread my
+  entries check what I did several months ago... and I will be
+  very confused since the graph and the written text have some
+  quirks (refer to a peak where no peak is depict in the graph
+  and refers to wrong measurement parameters) my boss ask me what
+  sort of mess I did, which I can not explain. He claims its the
+  fault of all this "linux-hacker-
+  emacs-org-mode-work-only-on-text-files"-stuff blaims me to dead
+  and force me switching back to use Outlook, MS Office and MS
+  Windows for the rest of my life..... wooohhh that would be a
+  sad story !!!!
+  #+END_QUOTE
+
+  What a sad story indeed. Collaborative editing is another case
+  where linking of (e.g.) todo items to specific versions or to
+  files in different branches comes in handy.
+
+* Specifying revisions
+
+  =org-git-link.el= defines two new link types. The =git= link
+  type is meant to be used in the typical scenario and mimics the
+  =file= link syntax as closely as possible. The =gitbare= link
+  type exists mostly for debugging reasons, but also allows e.g.
+  linking to files in a bare git repository for the experts. I
+  will first show an example usage for both kinds of links before
+  the syntax is defined more formally.
+
+** Example
+
+   In the lab book use case described above assume that the org
+   file in located in =/home/user/repo/planning/labbook.org= and
+   the measurement data is visualized in
+   =/home/user/repo/data/result.png=. The data is so exciting that
+   the relevant commit has been tagged =nobelprize=. Then the
+   links in a lab book entry could read any of the following:
+   #+BEGIN_EXAMPLE
+   - [[git:../data/result.png::master@{3.10.2009}]]
+   - [[git:/home/user/repo/data/results.png::nobelprize]]
+   - [[gitbare:../.git::nobelprize:data/results.png]]
+   #+END_EXAMPLE
+
+   For usage in collaborative editing, typical entries might be:
+   #+BEGIN_EXAMPLE
+   * TODO Merge [[git:paper.tex::theirstuff][Their version]] with [[git:paper.tex::ourstuff][Our version]]
+   * [[git:answer.txt::firstround][Answer]] to  [[git:report.txt::firstround][Referee report]] of our paper
+   * [[gitbare:/path/to/centralrepos.git::simulation.cpp][Simulation program]]
+   #+END_EXAMPLE
+
+   In all these examples, the linked files do not even have to exist
+   in the working repository, i.e. the links continue to work even
+   after the files have been deleted.
+
+** Formal specification
+
+*** User friendy form
+    #+BEGIN_EXAMPLE
+    [[git:/path/to/file::searchstring]]
+    #+END_EXAMPLE
+    This form is the familiar from normal org file links
+    including search options [[info:org:Search%20options][Search options]]. However, its use is
+    restricted to files in a working directory and does not
+    handle bare repositories on purpose (see the bare form for
+    that).
+
+    The search string references a commit (a tree-ish in Git
+    terminology). The two most useful types of search strings are
+
+    - A symbolic ref name, usually a branch or tag name (e.g.
+      master or nobelprize).
+    - A ref followed by the suffix @ with a date specification
+      enclosed in a brace pair (e.g. {yesterday}, {1 month 2
+      weeks 3 days 1 hour 1 second ago} or {1979-02-26 18:30:00})
+      to specify the value of the ref at a prior point in time
+
+    For other ways to specify commits see the git documentation
+    referenced in the [[*Bare%20git%20form][bare git section]].
+
+**** Technical note
+     From the (not necessarily existing) file path first the
+     corresponding git directory is extracted. This is done in the
+     following way: Starting with the directory of the linken
+     file, it is checked whether
+
+     - the directory exists and
+     - whether a .git subdirectory exists.
+
+     If not, the procedure is iterated with the parent directory.
+     The link path (which can be given as a local link) is thus
+     separated into an absolute path GIT_DIR to the git directory
+     (without .git) and a relative path RELPATH to the file. Git
+     is now called as
+     : git --no-pager --git-dir=GIT_DIR/.git show SEARCHSTRING:RELPATH
+
+*** Bare git form
+
+    #+BEGIN_EXAMPLE
+    [[gitbare:GIT_DIR::OBJECT]]
+    #+END_EXAMPLE
+    This is the more bare metal version, which gives the user most
+    control. It directly translates to the git command
+    : git --no-pager --git-dir=GIT_DIR show OBJECT
+    Using this version one can also view files from a bare git
+    repository. For detailed information on how to specify an
+    object, see the man page of =git-rev-parse= (section
+    SPECIFYING REVISIONS). A specific blob (file) can be
+    specified by a suffix clolon (:) followed by a path.
+
+** Following a git link
+
+   Following any of the git links creates a direcory named
+   =org-git-link-SHA= under =temporary-file-directory= (if it
+   does not exist), where SHA is the hash of the linked file
+   (blob). The file contents is saved within this directory under
+   the name used in the link. This ensures that each file is only
+   checked out once, even when they are referenced by different
+   search strings (e.g. once by branch name and once by tag). The
+   file is supsequently opened using =org-open-file=, which does
+   the right thing for non-text files as well.
+
+** Creating a git link
+
+   As an org mode is a simple text file, a git link can of course
+   be inserted directly as a string. For your convenience two functions creating links
+   automatically have been defined:
+
+   - org-git-store-link :: This function is automatically added
+        to =org-store-link-functions=. When =org-store-link=
+        (usually bound to =C-c l=) is called in a buffer whose
+        file is in a git repository, it creates a git link to the
+        file version corresponding to the current branchname and
+        date. The link is then added to =org-stored-links=, from
+        where it can be inserted with =org-insert-link(-global)=,
+        usually bound to =C-c C-l=.
+
+   - org-git-insert-link-interactively :: This function
+        interactively asks for a file name, a search string, and
+        a description. The corresponding link is then inserted at
+        point. Currently the only advantage over writing the link
+        directly is file completion. Completion of the search
+        string with the help of current tags and branch names
+        might be implemented at a later stage, if demand exists.
