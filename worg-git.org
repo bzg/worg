@@ -107,6 +107,24 @@ Now your changes will be filed under your name.
 
 # I'm not sure this is useful at all:
 
+* Dealing with line endings
+
+Unix, Windows and Mac all have different conventions for marking
+the end of a line. This might lead to problems when editing the
+same file across platforms. Github advises Linux users to
+automatically convert all external files to LF on committing (see
+[[http://help.github.com/dealing-with-lineendings]]) by setting:
+: $ git config --global core.autocrlf input
+For Worg, this is the wrong solution, since there are already
+files with both end of line conventions in the repository.
+Instead tell git locally not to convert files by setting:
+: $ git config core.autocrlf false
+Of course you have to be careful not to save Windows files as
+Unix files or vice versa, since this would lead to large and
+confusing diffs. This should not be a problem with Worg as
+  - one rarely edits other people's files anyway, and
+  - Emacs can deal with end of line conventions transparently.
+
 * How Worg publishes itself as HTML?
 
   The server behind http://orgmode.org website takes care of publishing
