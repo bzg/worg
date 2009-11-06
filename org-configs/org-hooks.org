@@ -18,6 +18,11 @@ documentation strings:
 
 * Hooks and Function variables
 
+** =org-mode-hook=
+Defined in: /org.el/
+#+begin_example
+    Mode hook for Org-mode, run after the mode was turned on.
+#+end_example
 ** =org-load-hook=
 Defined in: /org.el/
 #+begin_example
@@ -200,11 +205,6 @@ Defined in: /org.el/
 #+begin_example
     Function to be called when `C-c C-c' is used.
     This is for getting out of special buffers like remember.
-#+end_example
-** =org-mode-hook=
-Defined in: /org.el/
-#+begin_example
-    Mode hook for Org-mode, run after the mode was turned on.
 #+end_example
 ** =org-font-lock-hook=
 Defined in: /org.el/
@@ -419,6 +419,14 @@ Defined in: /org.el/
     not visibility should be done because of current context.  This is probably
     the place where a package like yasnippets can hook in.
 #+end_example
+** =org-tab-before-tab-emulation-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions to attach themselves to TAB.
+    See `org-ctrl-c-ctrl-c-hook' for more information.
+    This hook runs after every other options for TAB have been exhausted, but
+    before indentation and \t insertion takes place.
+#+end_example
 ** =org-metaleft-hook=
 Defined in: /org.el/
 #+begin_example
@@ -493,6 +501,15 @@ Defined in: /org-agenda.el/
     Some default stuff like drawers and scheduling/deadline dates will already
     have been removed when this is called, as will any matches for regular
     expressions listed in `org-agenda-entry-text-exclude-regexps'.
+#+end_example
+** =org-agenda-auto-exclude-function=
+Defined in: /org-agenda.el/
+#+begin_example
+    A function called with a tag to decide if it is filtered on '/ RET'.
+    The sole argument to the function, which is called once for each
+    possible tag, is a string giving the name of the tag.  The
+    function should return either nil if the tag should be included
+    as normal, or \"-<TAG>\" to exclude the tag.
 #+end_example
 ** =org-agenda-mode-hook=
 Defined in: /org-agenda.el/
@@ -624,6 +641,19 @@ Defined in: /org-html.el/
 #+begin_example
     Hook run during HTML export, after blockquote, verse, center are done.
 #+end_example
+** =org-icalendar-verify-function=
+Defined in: /org-icalendar.el/
+#+begin_example
+    Function to verify entries for iCalendar export.
+    This can be set to a function that will be called at each entry that
+    is considered for export to iCalendar.  When the function returns nil,
+    the entry will be skipped.  When it returns a non-nil value, the entry
+    will be considered for export.
+    This is used internally when an agenda buffer is exported to an ics file,
+    to make sure that only entries currently listed in the agenda will end
+    up in the ics file.  But for normal iCalendar export, you can use this
+    for whatevery you need.
+#+end_example
 ** =org-before-save-iCalendar-file-hook=
 Defined in: /org-icalendar.el/
 #+begin_example
@@ -690,6 +720,13 @@ Defined in: /org-mobile.el/
     by the mobile device, this hook should be used to copy the emptied
     capture file `mobileorg.org' back to the WebDAV directory, for example
     using `rsync' or `scp'.
+#+end_example
+** =org-mobile-before-process-capture-hook=
+Defined in: /org-mobile.el/
+#+begin_example
+    Hook that is run after content was moved to `org-mobile-inbox-for-pull'.
+    The inbox file is in the current buffer, and the buffer is arrowed to the
+    new captured data.
 #+end_example
 ** =org-mouse-context-menu-function=
 Defined in: /org-mouse.el/
