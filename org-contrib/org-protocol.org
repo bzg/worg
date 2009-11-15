@@ -78,6 +78,7 @@ actions. Just register your custom sub-protocol and handler with the variable
   8. Next time you try to open a location "=org-protocol://...=" FF will ask you for
      the program to use. Enter the path to emacsclient.
 
+# <<acrobat-setup>>
 *** Acrobat Reader
     :PROPERTIES:
     :CUSTOM_ID: acrobat-reader-setup
@@ -94,11 +95,13 @@ actions. Just register your custom sub-protocol and handler with the variable
     The examples given here will place new menu entries in the "Tools"
     menu, after restarting Adobe Reader.
 
+# <<acrobat-store-link-js>>
 ***** org-store-link.js
 : // from http://article.gmane.org/gmane.emacs.orgmode/6810
 : app.addMenuItem({cName:"org-store-link", cParent:"Tools",
 :    cExec:"app.launchURL('org-protocol://store-link://' + encodeURIComponent(this.URL) + '/' + encodeURIComponent(this.info.Title));"});
 
+# <<acrobat-remember-js>>
 ***** org-remember.js
 : // from http://article.gmane.org/gmane.emacs.orgmode/6810
 : app.addMenuItem({cName:"org-remember", cParent:"Tools",
@@ -226,6 +229,7 @@ REGEDIT4
   mix with more parameters to emacsclient. All parameters but the
   #'=org-protocol://org-remember://...=' one will be discarded.
 
+# <<which-remember-template>>
 *** Which remember template is used?
 
     You don't need to setup a remember template to use =org-protocol-remember=,
@@ -278,7 +282,7 @@ REGEDIT4
     [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][Org-mode manual]].
 
 
-# <<org-protocol-remember>>
+# <<open-source>>
 * Edit published content: =org-protocol-open-source=
 
   This one was designed to help with opening sources for editing when browsing
@@ -321,6 +325,62 @@ REGEDIT4
   project in =org-publish-project-alist=, try
 
   : M-x org-protocol-create-for-org RET
+
+# <<open-source-rewritten-urls>>
+*** Handle rewritten URLs
+
+    In some cases, replacing =:base-url= with =:working-directory= and
+    =:online-suffix= with =:working-suffix= will not yield the desired results.
+
+    Suppose you maintain an online store located at =http://example.com/=. The
+    local sources reside in =/home/user/example/=. While most of the URLs map
+    directly to local file names by stripping URL parameters from the end and
+    replacing the =:base-url= with =:working-diretory= and =:online-suffix= with
+    =working-suffix=, this might not work for rewritten URLs. It's common
+    practice, to serve all products in such a store through one file and rewrite
+    URLs, that do not match an existing file on the server.
+
+    That way, a request to =http://example.com/print/posters-A4.html= might be
+    rewritten on the server to something like
+    =http://example.com/shop/products.php/posters-A4.html.php=, where
+    =/posters-A4-digital.html.php= is the so called path info. Note, that the
+    browser will not notice the rewrite.
+
+    If you now click your =org-protocol://open-source://= bookmark, the handler
+    will probably not find a file named
+    =/home/user/example/print/posters-A4.html.php= and fail.
+
+    Or, even more simple, assume your browsing to =http://example.com/=. A file
+    named =/home/user/example/.php= is not likely to exist.
+
+    Since Org-mode commit =69b46e10aab3b2374ecbc1a963ba56e77102a9a4= from 15nth
+    Nov. 2009, such an entry in =org-protocol-project-alist= may hold an
+    additional property =:rewrites=. This property is a list of cons cells, each
+    of which maps a regular expression to a path, relative to the
+    =:working-directory=.
+
+    Now map the URL to the path =/home/user/example/products.php= by adding the
+    =:rewrites= property like this:
+
+#+begin_src emacs-lisp
+  (setq org-protocol-project-alist
+        '(("example.com"
+           :base-url "http://example.com/"
+           :working-directory "/home/user/example/"
+           :online-suffix ".php"
+           :working-suffix ".php"
+           :rewrites (("example.com/print/" . "products.php")
+                      ("example.com/$" . "index.php"))
+           )))
+#+end_src
+
+   Guess what the second =:rewrites= element does. Since =example.com/$= is used as
+   a regular expression, it maps =http://example.com/=, =https://example.com=,
+   =http://www.example.com/= and similar to =/home/user/example/index.php=.
+
+   The =:rewrites= are searched as a last resort if, and only if no existing file
+   name is matched.
+
 * Other browsers
 #<<conkeror-setup>>
 *** Conkeror setup
@@ -372,6 +432,8 @@ following to your .conkerorrc:
 org-remember from inside conkeror," November 14, 2008.
 http://tsdh.wordpress.com/2008/11/14/calling-org-remember-from-inside-conkeror/
 
+
+# <<firefox-keybindings>>
 * Keybindings for Firefox
 
   You can add key bindings for the =org-protocol= commands using the keyconfig
@@ -407,6 +469,7 @@ http://tsdh.wordpress.com/2008/11/14/calling-org-remember-from-inside-conkeror/
   Click Close, then OK, and then restart Firefox. You should then be able to
   access the org-protocol functions with your chosen keys.
 
+# <<screencast-intro>>
 * Screencast: small introduction to org-protocol.el
 
 #+begin_html
