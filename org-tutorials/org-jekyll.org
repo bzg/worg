@@ -373,6 +373,62 @@ the org html export and then runs Jekyll to generate your site.
 Bjørn Arild Mæland has created some modifications to Jekyll to
 provide some pre-processing to org files to allow for better
 integration with Jekyll. You can find his code on [[http://github.com/bmaland/happyblogger][github]].
+* Another example of Org-mode/Jekyll usage
+The on-line documentation for [[file:../org-contrib/babel/org-babel.org][Org-babel]] development is published on
+[[http://github.com][github]] which uses jekyll.  The following code is used to publish one
+blog post for every subheading of the first to top-level headings of a
+org file which tracks Org-babel development.  The results can be seen
+[[http://eschulte.github.com/babel-dev/][here]], and the code used to create this site is available [[http://github.com/eschulte/babel-dev/][here]].
+#+begin_src emacs-lisp
+  (save-excursion
+    ;; map over all tasks entries
+    (let ((dev-file (expand-file-name
+                     "development.org"
+                     (file-name-directory (buffer-file-name))))
+          (posts-dir (expand-file-name
+                      "_posts"
+                      (file-name-directory (buffer-file-name))))
+          (yaml-front-matter '(("layout" . "default"))))
+      ;; go through both the tasks and bugs
+      (mapc
+       (lambda (top-level)
+         (find-file dev-file)
+         (goto-char (point-min))
+         (outline-next-visible-heading 1)
+         (org-map-tree
+          (lambda ()
+            (let* ((props (org-entry-properties))
+                   (todo (cdr (assoc "TODO" props)))
+                   (time (cdr (assoc "TIMESTAMP_IA" props))))
+              ;; each task with a state and timestamp can be exported as a
+              ;; jekyll blog post
+              (when (and todo time)
+                (message "time=%s" time)
+                (let* ((heading (org-get-heading))
+                       (title (replace-regexp-in-string
+                               "[:=\(\)\?]" ""
+                               (replace-regexp-in-string
+                                "[ \t]" "-" heading)))
+                       (str-time (and (string-match "\\([[:digit:]\-]+\\) " time)
+                                      (match-string 1 time)))
+                       (to-file (format "%s-%s.html" str-time title))
+                       (org-buffer (current-buffer))
+                       (yaml-front-matter (cons (cons "title" heading) yaml-front-matter))
+                       html)
+                  (org-narrow-to-subtree)
+                  (setq html (org-export-as-html nil nil nil 'string t nil))
+                  (set-buffer org-buffer) (widen)
+                  (with-temp-file (expand-file-name to-file posts-dir)
+                    (when yaml-front-matter
+                      (insert "---\n")
+                      (mapc (lambda (pair) (insert (format "%s: %s\n" (car pair) (cdr pair))))
+                            yaml-front-matter)
+                      (insert "---\n\n"))
+                    (insert html))
+                  (get-buffer org-buffer)))))))
+       '(1 2))))  
+#+end_src
+
 * Other Blog Solutions for org.
 ** Blorgit
 [[http://orgmode.org/worg/blorgit.php][Blorgit]] uses org mode for markup and runs on the Sinatra mini
