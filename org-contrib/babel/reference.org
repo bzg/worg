@@ -1,4 +1,4 @@
-#+OPTIONS:    H:3 num:nil toc:3 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+OPTIONS:    H:4 num:nil toc:4 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
@@ -149,7 +149,11 @@ The values of header arguments can be set in three different ways,
 each more specific than the last.
 
 **** System-wide
-     System-wide values of header arguments can be specified by
+     :PROPERTIES:
+     :CUSTOM_ID: system-wide-header-argument
+     :END:
+
+  System-wide values of header arguments can be specified by
   customizing the =org-babel-default-header-args= variable:
   #+begin_example 
     org-babel-default-header-args is a variable defined in `org-babel.el'.
@@ -175,7 +179,8 @@ each more specific than the last.
   #+end_src
 
 **** Org-mode Properties
-     Header arguments are also read from [[http://orgmode.org/manual/Properties-and-Columns.html#Properties-and-Columns][Org-mode properties]], which
+
+  Header arguments are also read from [[http://orgmode.org/manual/Properties-and-Columns.html#Properties-and-Columns][Org-mode properties]], which
   means they can be set on the outline header level.  For example, the
   value of the =:cache= header argument will default to true in all
   source code blocks under the following example of an Org-mode outline header:
@@ -183,6 +188,7 @@ each more specific than the last.
     ,* outline header
       :PROPERTIES:
       :cache:    yes
+      :CUSTOM_ID: property-set-header-arguments
       :END:
   #+end_example
   Properties defined in this way override the properties set in
@@ -191,7 +197,10 @@ each more specific than the last.
   in Org-mode documents.
 
 **** Source Code Block
-     The most common way to assign values to header arguments is at the
+     :PROPERTIES:
+     :CUSTOM_ID: single-block-header-arguments
+     :END:
+  The most common way to assign values to header arguments is at the
   source code block level.  This can be done by listing a sequence of
   header arguments and their values as part of the =#+begin_src=
   line.  Properties set in this way override both the values of
@@ -210,12 +219,16 @@ each more specific than the last.
     ,#+end_src
   #+end_example
 
-*** Descriptions of Header Arguments
+*** Specific Header Arguments
      :PROPERTIES:
      :CUSTOM_ID: header-argument-specific-documentation
      :END:
 
 **** =:var=
+     :PROPERTIES:
+     :CUSTOM_ID: header-argument-var
+     :END:
+
      The =:var= header argument is used to pass arguments to
      source code blocks.  The specifics of how arguments are included
      in a source code block are language specific and are
@@ -357,6 +370,10 @@ each more specific than the last.
       functions, respectively.
 
 **** =:results=
+     :PROPERTIES:
+     :CUSTOM_ID: header-argument-results
+     :END:
+
      There are three types of results header argument:
      - *collection* header arguments specify how the results should be collected from
         the source code block;
@@ -428,6 +445,9 @@ each more specific than the last.
                    replace=.
 
 **** =:exports=
+     :PROPERTIES:
+     :CUSTOM_ID: header-argument-exports
+     :END:
 
      Specify what should be included in HTML or LaTeX exports of the
      Org-mode file.
@@ -459,6 +479,9 @@ each more specific than the last.
                  be exported.  E.g., =:tangle basename=.
 
 **** =:session=
+     :PROPERTIES:
+     :CUSTOM_ID: header-argument-session
+     :END:
 
      Start a session for an interpreted language where state is
      preserved.  This applies particularly to the supported languages
@@ -548,6 +571,9 @@ each more specific than the last.
        unnecessary here).
 
 **** =:noweb=
+     :PROPERTIES:
+     :CUSTOM_ID: header-argument-noweb
+     :END:
 
      Controls the expansion of [[noweb-reference-syntax][noweb syntax]] references in a
      source code block.  This header argument can have one of two
@@ -589,6 +615,9 @@ each more specific than the last.
       Thanks to Sébastien Vauban for this idea.
 
 **** =:cache=
+     :PROPERTIES:
+     :CUSTOM_ID: header-argument-cache
+     :END:
 
      Controls the use of in-buffer caching of source code block
      results to avoid re-running unchanged source code blocks.  This
