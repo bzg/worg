@@ -9,11 +9,25 @@
   This hack allows the user to easily copy and paste links to messages
   from the Entourage mail app into an org-mode file.
 * Installation & Setup
-** Dowload and Save Script In Entourage Scripts Menu Folder
+** Create and Save Script In Entourage Scripts Menu Folder
 
-   Installation is simple. Download the script here:
+   Installation is simple. Create a new Applescript application using the following code:
 
-   [[repofile:contrib/lisp/copy-org-link.scpt][Link to raw file]] 
+   : tell application "Microsoft Entourage"
+   :    set selectedMessages to current messages
+   :    if selectedMessages is {} then
+   :    	return
+   :    end if
+   :    repeat with theMessage in selectedMessages
+   :    	set theName to subject of theMessage
+   :    	set theSender to display name of sender of theMessage
+   :    	set theContent to content of theMessage
+   :    	set theID to ID of theMessage as string
+   :    	set theCommand to "mdfind com_microsoft_entourage_recordID==" & theID & " | sed 's/ /\\%20/'"
+   :    	set theMDfile to the first item of paragraphs of (do shell script theCommand)
+   :    	set the clipboard to "[[file:" & theMDfile & "][" & theName & "]]" as string
+   :    end repeat
+   : end tell
 
    and save it into your personal Entourage Scripts Menu Folder.  It's
    file path should be something like:
@@ -26,8 +40,11 @@
    click on the "Open Folder" dialog button it will open the
    "Entourage Script Menu Items" folder in Finder.
 
+   The exact file name will be used as the menu option so if you want it to look pretty be sure and
+   use something like "Copy Org Link" as the file name.
+
    Once you've completed this step you should be able to run the
-   script by selecting the "copy-org-link" option from the
+   script by selecting the "<file name>" option from the
    Applescript/Automator icon drop menu.
 ** Create Entourage Shortcut Key
 
@@ -76,7 +93,7 @@
    stores its messages (in a single monolithic database). When
    Spotlight indexes the messages it creates separate files that can
    be referenced and contain sufficient metadata to link back to the
-   original message in Entourage.
+   original message in Entoura
 * Usage
 
   Once the hack has been setup simply highlight a message line in the
