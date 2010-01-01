@@ -673,18 +673,175 @@ each more specific than the last.
   An example that uses the Noweb reference syntax is provided in the
   [[literate programming example]].
 
-* Useful Functions
-  Two org-babel functions might prove generally useful.  Both of
-  them evaluate one or more source code blocks within a frame of
-  reference. 
+* Key Bindings & Useful Functions
 
-  - =org-babel-execute-buffer= will evaluate all of the source code
-    blocks in the buffer.  You can call it within Emacs in the usual
-    way, =M-x org-babel-execute-buffer=.
+  Org-babel re-binds many common Org-mode key sequences depending on
+  the context.  When in a source-code block the following sequences
+  are rebound
+  | \C-c \C-c | [[function-org-babel-execute][org-babel-execute-src-block]]     |
+  | \C-c \C-o | [[function-org-babel-open-src-block-result][org-babel-open-src-block-result]] |
+  | \C-up     | [[function-org-babel-load-in-session][org-babel-load-in-session]]       |
+  | \M-down   | [[function-org-babel-pop-to-session][org-babel-pop-to-session]]        |
 
-  - =org-babel-execute-subtree= will evaluate all of the source code
-    blocks in the subtree that includes the point.  You can call it
-    within Emacs in the usual way, =M-x org-babel-execute-subtree=.
+  Org-babel also exposes a number of functions behind a the common
+  org-babel-key-prefix of "\C-c \M-b".  These functions are as follows
+  #+begin_src emacs-lisp :exports none
+     (lambda (binding
+       (list (format "\\C-c \\M-b %s"
+                     (car binding))
+             (format "[[function-%s][%s]]"
+                     (cdr binding) (cdr binding))))
+     org-babel-key-bindings)
+  #+end_src
+  | \C-c \M-b t | [[function-org-babel-tangle][org-babel-tangle]]                  |
+  | \C-c \M-b T | [[function-org-babel-tangle-file][org-babel-tangle-file]]             |
+  | \C-c \M-b e | [[function-org-babel-execute-src-block][org-babel-execute-src-block]]       |
+  | \C-c \M-b s | [[function-org-babel-execute-subtree][org-babel-execute-subtree]]         |
+  | \C-c \M-b b | [[function-org-babel-execute-buffer][org-babel-execute-buffer]]          |
+  | \C-c \M-b h | [[function-org-babel-sha1-hash][org-babel-sha1-hash]]               |
+  | \C-c \M-b g | [[function-org-babel-goto-named-source-block][org-babel-goto-named-source-block]] |
+  | \C-c \M-b l | [[function-org-babel-lob-ingest][org-babel-lob-ingest]]              |
+
+** Functions
+*** org-babel-execute-src-block
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-execute-src-block
+    :END:
+
+#+begin_example 
+  org-babel-execute-src-block is an interactive Lisp function in
+  `org-babel.el'.
+  
+  (org-babel-execute-src-block &optional ARG INFO PARAMS)
+  
+  Execute the current source code block, and insert the results
+  into the buffer.  Source code execution and the collection and
+  formatting of results can be controlled through a variety of
+  header arguments.
+  
+  Optionally supply a value for INFO in the form returned by
+  `org-babel-get-src-block-info'.
+  
+  Optionally supply a value for PARAMS which will be merged with
+  the header arguments specified at the front of the source code
+  block.
+#+end_example
+
+*** org-babel-open-src-block-result
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-open-src-block-result
+    :END:
+
+#+begin_example 
+  org-babel-open-src-block-result is an interactive Lisp function in
+  `org-babel.el'.
+  
+  (org-babel-open-src-block-result &optional RE-RUN)
+  
+  If `point' is on a src block then open the results of the
+  source code block, otherwise return nil.  With optional prefix
+  argument RE-RUN the source-code block is evaluated even if
+  results already exist.
+#+end_example
+
+*** org-babel-tangle
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-tangle
+    :END:
+
+#+begin_example 
+  org-babel-tangle is an interactive Lisp function in
+  `org-babel-tangle.el'.
+  
+  It is bound to C-c M-b t.
+  
+  (org-babel-tangle &optional TARGET-FILE LANG)
+  
+  Extract the bodies of all source code blocks from the current
+  file into their own source-specific files.  Optional argument
+  TARGET-FILE can be used to specify a default export file for all
+  source blocks.  Optional argument LANG can be used to limit the
+  exported source code blocks by language.
+#+end_example
+
+*** org-babel-execute-subtree
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-execute-subtree
+    :END:
+
+#+begin_example 
+  org-babel-execute-subtree is an interactive Lisp function in
+  `org-babel.el'.
+  
+  It is bound to C-c M-b s.
+  
+  (org-babel-execute-subtree &optional ARG)
+  
+  Replace EVAL snippets in the entire subtree.
+#+end_example
+
+*** org-babel-execute-buffer
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-execute-buffer
+    :END:
+
+#+begin_example 
+  org-babel-execute-buffer is an interactive Lisp function in
+  `org-babel.el'.
+  
+  It is bound to C-c M-b b.
+  
+  (org-babel-execute-buffer &optional ARG)
+  
+  Replace EVAL snippets in the entire buffer.
+#+end_example
+
+*** org-babel-sha1-hash
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-sha1-hash
+    :END:
+
+#+begin_example 
+  org-babel-sha1-hash is an interactive Lisp function in `org-babel.el'.
+  
+  It is bound to C-c M-b h.
+  
+  (org-babel-sha1-hash &optional INFO)
+  
+  Not documented.
+#+end_example
+
+*** org-babel-goto-named-source-block
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-goto-named-source-block
+    :END:
+
+#+begin_example 
+  org-babel-goto-named-source-block is an interactive Lisp function in
+  `org-babel.el'.
+  
+  It is bound to C-c M-b g.
+  
+  (org-babel-goto-named-source-block &optional NAME)
+  
+  Go to a named source-code block.
+#+end_example
+
+*** org-babel-lob-ingest
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-lob-ingest
+    :END:
+
+#+begin_example 
+  org-babel-lob-ingest is an interactive Lisp function in
+  `org-babel-lob.el'.
+  
+  It is bound to C-c M-b l.
+  
+  (org-babel-lob-ingest &optional FILE)
+  
+  Add all source-blocks defined in FILE to `org-babel-library-of-babel'.
+#+end_example
 
 * Footnotes
 
