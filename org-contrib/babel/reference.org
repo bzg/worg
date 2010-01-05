@@ -843,6 +843,37 @@ each more specific than the last.
   Add all source-blocks defined in FILE to `org-babel-library-of-babel'.
 #+end_example
 
+* Batch Execution
+It is possible to call Org-babel functions from the command line.
+This shell script calls `[[function-org-babel-tangle][org-babel-tangle]]' on every one of it's
+arguments.
+
+Be sure to adjust the paths to fit your system.
+#+begin_src sh
+  #!/bin/sh
+  # -*- mode: shell-script -*-
+  #
+  # tangle a file with org-babel
+  #
+  DIR=`pwd`
+  FILES=""
+  
+  # wrap each argument in the code required to call tangle on it
+  for i in $@; do
+  FILES="$FILES \"$i\""
+  done
+  
+  emacsclient \
+  --eval "(progn 
+  (add-to-list 'load-path (expand-file-name \"~/src/org/lisp/\"))
+  (add-to-list 'load-path (expand-file-name \"~/src/org/contrib/lisp/\"))
+  (require 'org)(require 'org-exp)(require 'org-babel)
+  (mapc (lambda (file)
+         (find-file (expand-file-name file \"$DIR\"))
+         (org-babel-tangle)
+         (kill-buffer)) '($FILES)))"
+#+end_src
+
 * Footnotes
 
 [fn:1] The former use of the =shell= identifier is now deprecated.
