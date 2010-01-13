@@ -1,0 +1,108 @@
+#+TITLE:     Org Link  -- create Org-mode hyperlinks to Entourage mail messages
+#+OPTIONS:   ^:{} author:nil
+#+STARTUP: odd
+
+[[file:org-mac.org][{Back to Worg's Org and Mac OS X page}]]
+
+* Purpose
+
+  This hack allows the user to easily copy and paste links to messages
+  from the Entourage mail app into an org-mode file.
+* Installation & Setup
+** Create and Save Script In Entourage Scripts Menu Folder
+
+   Installation is simple. Create a new Applescript application using the following code:
+
+   : tell application "Microsoft Entourage"
+   :    set selectedMessages to current messages
+   :    if selectedMessages is {} then
+   :    	return
+   :    end if
+   :    repeat with theMessage in selectedMessages
+   :    	set theName to subject of theMessage
+   :    	set theSender to display name of sender of theMessage
+   :    	set theContent to content of theMessage
+   :    	set theID to ID of theMessage as string
+   :    	set theCommand to "mdfind com_microsoft_entourage_recordID==" & theID & " | sed 's/ /\\%20/'"
+   :    	set theMDfile to the first item of paragraphs of (do shell script theCommand)
+   :    	set the clipboard to "[[file:" & theMDfile & "][" & theName & "]]" as string
+   :    end repeat
+   : end tell
+
+   and save it into your personal Entourage Scripts Menu Folder.  It's
+   file path should be something like:
+   
+   : ~/user/Documents/Microsoft User Data/Entourage Script Menu Items
+   
+   You can also locate this folder by opening Entourage and selecting
+   the Applescript/Automator icon from the main toolbar (looks like a
+   scroll / on the far right).  If you select "About This Menu..." and
+   click on the "Open Folder" dialog button it will open the
+   "Entourage Script Menu Items" folder in Finder.
+
+   The exact file name will be used as the menu option so if you want it to look pretty be sure and
+   use something like "Copy Org Link" as the file name.
+
+   Once you've completed this step you should be able to run the
+   script by selecting the "<file name>" option from the
+   Applescript/Automator icon drop menu.
+** Create Entourage Shortcut Key
+
+   After the first step you should already be able to use the script
+   (see usage below); however, it will probably be easier to use if
+   you assign it a hot key (like the cut and paste shortcut keys).
+
+   In order to assign it a hot key, open "System Preferences" and
+   navigate to the following location:
+
+   : Hardware/Keyboard & Mouse/Keyboard Shortcuts
+
+   Scroll to the bottom of the window, highlight "Application
+   Keyboard Shortcuts", and click the "+" sign just to the lower left
+   of the window.
+
+   This should open a dialog box.  Use the drop menu to select
+   "Entourage" as the application, then enter the exact name that
+   appears in the Entourage script menu.  The default is
+   "copy-org-link". Then enter the exact key combination that you
+   would like to use as a shortcut in the "Keyboard Shortcut" window.
+   My default is "<command> l".
+
+   When you go back to the scripts menu in Entourage you should now
+   see the shortcut next to the name of the script.
+** Enable Entourage Message Indexing In Spotlight
+
+   In order for the hack to work the user must have enabled the
+   Entourage application preference that allows OS X's built-in
+   Spotlight search engine to index the contents of the Entourage
+   database.
+
+   To enable this preference open Entourage and select the following
+   menu items:
+
+   : Preferences/General Preferences/Spotlight/
+
+   Then, simply check the box next to "Include Entourage items in Spotlight search
+   results" to instruct Spotlight to index your messages.
+
+   If you haven't previously had this feature enabled it may take it a
+   few minutes to index your messages, but once it has finished you
+   should be able to run the script successfully.
+
+   NOTE: This step is required because of the way that Entourage
+   stores its messages (in a single monolithic database). When
+   Spotlight indexes the messages it creates separate files that can
+   be referenced and contain sufficient metadata to link back to the
+   original message in Entoura
+* Usage
+
+  Once the hack has been setup simply highlight a message line in the
+  message list window, hold down the <command> key, and press the
+  assigned key.  This action will run the Applescript macro which will
+  copy a properly formatted link to the message onto the
+  clipboard. Simply paste the text from the clipboard into a .org
+  document to create the link.
+
+  Because of the way Spotlight indexes messages (it assigns each a
+  unique identifier that never changes) the link should still work no
+  matter where you move the original email within Entourage.

@@ -255,6 +255,25 @@ Defined in: /org.el/
     In addition to these, any additional properties can be specified
     and then used in remember templates.
 #+end_example
+** =org-open-link-functions=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions finding a plain text link.
+    These functions must take a single argument, the link content.
+    They will be called for links that look like [[link text][description]]
+    when LINK TEXT does not have a protocol like \"http:\" and does not look
+    like a filename (e.g. \"./blue.png\").
+    
+    These functions will be called *before* Org attempts to resolve the
+    link by doing text searches in the current buffer - so if you want a
+    link \"[[target]]\" to still find \"<<target>>\", your function should
+    handle this as a special case.
+    
+    When the function does handle the link, it must return a non-nil value.
+    If it decides that it is not responsible for this link, it must return
+    nil to indicate that that Org-mode can continue with other options
+    like exact and fuzzy text search.
+#+end_example
 ** =org-create-file-search-functions=
 Defined in: /org.el/
 #+begin_example
@@ -342,7 +361,7 @@ Defined in: /org.el/
     With C-u prefix arg, use completion to determine the new state.
     With numeric prefix arg, switch to that state.
     With a double C-u prefix, switch to the next set of TODO keywords (nextset).
-    With a tripple C-u prefix, circumvent any state blocking.
+    With a triple C-u prefix, circumvent any state blocking.
     
     For calling through lisp, arg is also interpreted in the following way:
     'none             -> empty state
@@ -374,8 +393,26 @@ Defined in: /org.el/
 Defined in: /org.el/
 #+begin_example
     Hook that is run whenever Org thinks TODO statistics should be updated.
-    This hook runs even if there is no statisics cookie present, in which case
+    This hook runs even if there is no statistics cookie present, in which case
     `org-after-todo-statistics-hook' would not run.
+#+end_example
+** =org-property-changed-functions=
+Defined in: /org.el/
+#+begin_example
+    Hook called when the value of a property has changed.
+    Each hook function should accept two arguments, the name of the property
+    and the new value.
+#+end_example
+** =org-property-allowed-value-functions=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions supplying allowed values for specific.
+    The functions must take a single argument, the name of the property, and
+    return a flat list of allowed values.  If \":ETC\" is one of
+    the values, this means that these values are intended as defaults for
+    completion, but that other values should be allowed too.
+    The functions must return nil if they are now responsible for this
+    prioerty.
 #+end_example
 ** =org-ctrl-c-ctrl-c-hook=
 Defined in: /org.el/
@@ -510,6 +547,9 @@ Defined in: /org-agenda.el/
     possible tag, is a string giving the name of the tag.  The
     function should return either nil if the tag should be included
     as normal, or \"-<TAG>\" to exclude the tag.
+    Note that for the purpose of tag filtering, only the lower-case version of
+    all tags will be considered, so that this function will only ever see
+    the lower-case version of all tags.
 #+end_example
 ** =org-agenda-mode-hook=
 Defined in: /org-agenda.el/
@@ -585,6 +625,12 @@ Defined in: /org-docbook.el/
 #+begin_example
     Hook run at the end of DocBook export, in the new buffer.
 #+end_example
+** =org-export-first-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook called as the first thing in each exporter.
+    Good for general initialization
+#+end_example
 ** =org-export-preprocess-hook=
 Defined in: /org-exp.el/
 #+begin_example
@@ -605,6 +651,12 @@ Defined in: /org-exp.el/
     This selection includes tags-based selection, as well as removal
     of commented and archived trees.
 #+end_example
+** =org-export-preprocess-before-selecting-backend-code-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook for preprocessing an export buffer.
+    This is run just before backend-specific blocks get selected.
+#+end_example
 ** =org-export-preprocess-after-blockquote-hook=
 Defined in: /org-exp.el/
 #+begin_example
@@ -624,6 +676,17 @@ Defined in: /org-exp.el/
     This is run as the last thing in the preprocessing buffer, just before
     returning the buffer string to the backend.
 #+end_example
+** =org-export-format-drawer-function=
+Defined in: /org-exp.el/
+#+begin_example
+    Function to be called to format the contents of a drawer.
+    The function must accept three parameters:
+      BACKEND  one of the symbols html, docbook, latex, ascii, xoxo
+      NAME     the drawer name, like \"PROPERTIES\"
+      CONTENT  the content of the drawer.
+    The function should return the text to be inserted into the buffer.
+    If this is nil, `org-export-format-drawer' is used as a default.
+#+end_example
 ** =org-feed-after-adding-hook=
 Defined in: /org-feed.el/
 #+begin_example
@@ -639,7 +702,7 @@ Defined in: /org-html.el/
 ** =org-export-html-final-hook=
 Defined in: /org-html.el/
 #+begin_example
-    Hook run during HTML export, after blockquote, verse, center are done.
+    Hook run at the end of HTML export, in the new buffer.
 #+end_example
 ** =org-icalendar-verify-function=
 Defined in: /org-icalendar.el/
@@ -652,7 +715,7 @@ Defined in: /org-icalendar.el/
     This is used internally when an agenda buffer is exported to an ics file,
     to make sure that only entries currently listed in the agenda will end
     up in the ics file.  But for normal iCalendar export, you can use this
-    for whatevery you need.
+    for whatever you need.
 #+end_example
 ** =org-before-save-iCalendar-file-hook=
 Defined in: /org-icalendar.el/
@@ -668,6 +731,13 @@ Defined in: /org-icalendar.el/
     A good way to use this is to tell a desktop calendar application to re-read
     the iCalendar file.
 #+end_example
+** =org-export-latex-after-initial-vars-hook=
+Defined in: /org-latex.el/
+#+begin_example
+    Hook run before LaTeX export.
+    The exact moment is after the initial variables like org-export-latex-class
+    have been determined from the environment.
+#+end_example
 ** =org-export-latex-after-blockquotes-hook=
 Defined in: /org-latex.el/
 #+begin_example
@@ -677,6 +747,12 @@ Defined in: /org-latex.el/
 Defined in: /org-latex.el/
 #+begin_example
     Hook run in the finalized LaTeX buffer.
+#+end_example
+** =org-export-latex-format-toc-function=
+Defined in: /org-latex.el/
+#+begin_example
+    The function formatting returning the string to createthe table of contents.
+    The function mus take one parameter, the depth of the table of contents.
 #+end_example
 ** =org-checkbox-statistics-hook=
 Defined in: /org-list.el/
@@ -740,7 +816,7 @@ Defined in: /org-publish.el/
 #+begin_example
     Hook run before export on the Org file.
     The hook may modify the file in arbitrary ways before publishing happens.
-    The orgiginal version of the buffer will be restored after publishing.
+    The original version of the buffer will be restored after publishing.
 #+end_example
 ** =org-publish-after-export-hook=
 Defined in: /org-publish.el/
@@ -777,7 +853,6 @@ Defined in: /org-xoxo.el/
 #+begin_example
     Hook run after XOXO export, in the new buffer.
 #+end_example
-
 
 * Examples for using hooks
 

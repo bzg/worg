@@ -789,3 +789,55 @@ If KWD is a number, get the corresponding match group."
 		(make-variable-buffer-local 'add-log-current-defun-function)
 		(setq add-log-current-defun-function 'org-log-current-defun)))
   #+END_SRC
+
+* Using ido-completing-read to find attachments
+  -- Matt Lundin
+
+Org-attach is great for quickly linking files to a project. But if you
+use org-attach extensively you might find yourself wanting to browse
+all the files you've attached to org headlines. This is not easy to do
+manually, since the directories containing the files are not human
+readable (i.e., they are based on automatically generated ids). Here's
+some code to browse those files using ido (obviously, you need to be
+using ido):
+
+#+begin_src emacs-lisp
+  (load-library "find-lisp")
+  
+  ;; Adapted from http://www.emacswiki.org/emacs/RecentFiles
+  
+  (defun my-ido-find-org-attach ()
+    "Find files in org-attachment directory"
+    (interactive)
+    (let* ((enable-recursive-minibuffers t)
+           (files (find-lisp-find-files org-attach-directory "."))
+           (file-assoc-list
+            (mapcar (lambda (x)
+                      (cons (file-name-nondirectory x)
+                            x))
+                    files))
+           (filename-list
+            (remove-duplicates (mapcar #'car file-assoc-list)
+                               :test #'string=))
+           (filename (ido-completing-read "Org attachments: " filename-list nil t))
+           (longname (cdr (assoc filename file-assoc-list))))
+      (ido-set-current-directory
+       (if (file-directory-p longname)
+           longname
+         (file-name-directory longname)))
+      (setq ido-exit 'refresh
+            ido-text-init ido-text
+            ido-rotate-temp t)
+      (exit-minibuffer)))
+  
+  (add-hook 'ido-setup-hook 'ido-my-keys)
+  
+  (defun ido-my-keys ()
+    "Add my keybindings for ido."
+    (define-key ido-completion-map (kbd "C-;") 'my-ido-find-org-attach)
+    )
+#+end_src
+
+To browse your org attachments using ido fuzzy matching and/or the
+completion buffer, invoke ido-find-file as usual (=C-x C-f=) and then
+press =C-;=.
