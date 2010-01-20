@@ -1,0 +1,371 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org-babel-clojure
+#+AUTHOR:     Joel Boehland
+#+EMAIL:      joel dot boehland at evocomputing dot com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org-babel support for
+  <a href="http://clojure.org/">Clojure</a>
+  </p>
+  <p>
+  <a href="http://clojure.org/">
+  <img src="http://clojure.org/space/showimage/clojure-icon.gif"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* Notes                                                            :noexport:
+** Template Design
+  - What the user wants to know:
+    - Required software
+    - How to install it
+    - How to configure it in Org-babel
+    - Org-babel conventions that might affect the language
+    - How it modifies Org-babel
+    - Common ways to use it
+
+* Requirements
+** A working Java install, version 1.5 or later
+   Installation instructions for java are beyond the scope of this
+   document, but instructions for all major platforms can easily be
+   found on [[http://java.sun.com][Sun's java website]].
+
+** A working Clojure install
+   You can set Clojure up separately as described in the
+   [[http://clojure.org/getting_started][official install document]] from the Clojure web site, but as you 
+   will see below, if you use ELPA to install the required packages, 
+   it can install Clojure for you.
+
+** Emacs ELPA package manager
+   Although it is possible to grab the different pieces and line all
+   the version numbers up so that it works, the process will most
+   likely bring you to bitter tears unless you are very experienced
+   and patient with setting up emacs, clojure, slime and swank. Save
+   yourself some trouble and use the [[http://tromey.com/elpa][Emacs Lisp Package Archive (ELPA)]].
+
+** Working (and recent) emacs ELPA clojure packages
+   You will need to install the following packages:
+   clojure-mode, swank-clojure, slime, slime-repl
+
+*** Installation
+    Once you have installed ELPA, you can do this easily in one step
+    within emacs by issuing the command:
+    
+#+begin_example
+   M-x package-list-packages
+#+end_example
+   
+   You will be presented with a buffer where you can select all of
+   these packages. Simply enter "i" on the lines of the packages you
+   wish to install, and when you are done selecting packages enter "x"
+   and ELPA will download and install these packages for you.
+   
+   Install these packages:
+
+#+begin_example
+   clojure-mode swank-clojure slime slime-repl
+#+end_example
+
+   At this point you should be able to start SLIME and have access to
+   a working Clojure REPL:
+
+#+begin_example
+   M-x slime
+#+end_example
+   
+   Note that if swank-clojure can't detect the Clojure jars, it will
+   prompt you for permission to download the required jars.
+
+** An up-to-date install of emacs-org-mode
+   You will probably need org-mode 6.34 or later
+
+* Advanced setup
+  There are quite a few usage modes for using emacs, clojure-mode,
+  swank-clojure, slime, and clojure. Following is a short description
+  in roughly easy to hard order. Note that the documentation for this
+  section comes mostly from Technomancy's writeup for the
+  [[http://github.com/technomancy/swank-clojure][swank-clojure project]].
+   
+** Use ELPA to install it for you (Easiest)
+   This is the shortest path to victory. Assuming you have a suitable
+   Java installed on your system, and the ELPA package manager
+   installed, you can simply install the required elisp packages, as
+   well as Clojure. 
+   
+** Project
+   Put your project's dependencies in the lib/ directory, either
+   manually or using [[http://github.com/technomancy/leiningen][Leiningen]] or Maven then launch:
+
+#+begin_example
+   M-x swank-clojure-project
+#+end_example
+
+   Note that you must have swank-clojure.jar in the lib/ directory, it
+   will not automatically add itself to the classpath as it did in
+   past versions that had to run from a checkout.
+
+** Server
+   Users of [[http://github.com/technomancy/leiningen][Leiningen]] or clojure-maven-plugin can launch a server from
+   a shell and connect to it from within Emacs.
+   
+*** Set up Leiningen project.clj file
+    You should set up your project's project.clj file to look
+    something like this
+
+#+begin_src clojure
+  (defproject my-project "0.1.0"
+    :description "My great Clojure project"
+    :dependencies [[org.clojure/clojure "1.1.0-alpha-SNAPSHOT"]
+                   [org.clojure/clojure-contrib "1.0-SNAPSHOT"]]
+    :dev-dependencies [[leiningen/lein-swank "1.0.0-SNAPSHOT"]])
+#+end_src
+    
+    Then from your project directory you can run the following:
+
+#+begin_example
+    $ lein swank
+#+end_example
+
+    A REPL should get started up on port 4005. Launch Emacs. Once Emacs is
+    up and running type:
+
+#+begin_example
+    M-x slime-connect
+#+end_example
+
+    Use the default settings. You’re now connected to a Clojure REPL with a properly
+    configured classpath for this particular project.
+    
+    Note that you could also connect to a remote server that you
+    started with the lein swank command as well using slime-connect.
+
+** Custom classpath (Hard)
+   If you know your way around setting up Java Classpaths and Emacs
+   load-paths, then you can set all of this up in your own custom
+   way. Set swank-clojure-classpath to a list of paths to the jars you
+   want to use and then use slime as before.
+
+*** Example
+     Let's say you have have the clojure.jar, clojure-contrib.jar and
+     swank-clojure.jar files in the directory ~/.my-clojure-jars.
+
+     You could properly set swank-clojure-classpath by entering the
+     following elisp code into your *scratch* buffer:
+
+#+begin_example
+     (setq swank-clojure-classpath (directory-files "~/.my-clojure-jars" t ".jar$"))
+#+end_example
+
+     Then, move the cursor to the end of that elisp code and enter the command:
+
+#+begin_example
+     M-j
+#+end_example
+    
+     You should now be able to start slime and have it be using the
+     jars entered above.
+
+#+begin_example
+     M-x slime
+#+end_example
+     
+* Usage
+  All the usage examples assume that you have a basic Clojure,
+  clojure-mode, swank-clojure and slime set up correctly. You should
+  be able to get a Clojure REPL when you issue the command:
+#+begin_example
+  M-x slime
+#+end_example
+  Make sure this is working for you before proceeding with the
+  org-babel-clojure examples.
+** Non session execution
+    By default, org-babel will execute each block by starting up a
+    Clojure process and having it execute each source block in
+    isolation from the other source blocks. Due to the relatively long
+    startup time of a Java JVM, this can make execution of many blocks
+    very *slow*. Unless you really need the execution isolation for
+    some reason, it is recommended that you use sessions in
+    org-babel-clojure.
+    
+*** Examples
+**** Basic Functionality
+     Let's start really simple. We will just test the execution of a
+     simple Clojure form. Create an org file and insert the following:
+#+begin_example
+     #+srcname: basic-clojure
+     #+begin_src clojure :results silent
+       (+ 1 4)
+     #+end_src
+#+end_example
+    
+     Now place the cursor anywhere between the begin_src..end_src lines
+     and enter the command:
+
+#+begin_example
+    C-c C-c
+#+end_example
+    
+    This should execute the Clojure form, and echo the results: "5".
+    
+    Now let's insert the results into the buffer immediately after the
+    Clojure src block. Insert the following into your org file:
+
+#+begin_example
+    #+srcname: basic-clojure-table-results
+    #+begin_src clojure :results value
+      [ 1 2 3 4]
+    #+end_src
+#+end_example
+
+    Execute as before:
+#+begin_example
+    C-c C-c
+#+end_example
+    
+    Now, immediately following this block, the following block should
+    have been inserted:
+
+#+begin_example
+    #+resname: basic-clojure-table-results
+    | 1 | 2 | 3 | 4 |
+#+end_example
+
+    Note that the Clojure vector has been automagically converted to
+    an org table.
+** Session execution
+   org-babel-clojure supports executing code blocks in the context of
+   one or more SLIME REPL sessions. This means that after the initial
+   startup time, the code blocks will execute much quicker. It also
+   means that you can easily go back and inspect the transcript
+   between Emacs and Clojure that will be stored in the
+   *inferior-lisp* and REPL buffers. You can also use the powerful
+   debugging and inspection facilities provided by SLIME.
+
+*** Examples
+**** Basic Functionality
+     Let's mirror the simple non-session examples we did above, but
+     execute them within a session.
+     
+     Create an org file and insert the following:
+#+begin_example
+     #+srcname: basic-session-clojure :session s1
+     #+begin_src clojure :results silent
+        (+ 1 4)
+     #+end_src
+#+end_example
+    
+     This will initialize a session named "s1". Now place the cursor
+     anywhere between the begin_src..end_src lines and enter the
+     command:
+
+#+begin_example
+     C-c C-c
+#+end_example
+    
+     This should create a SLIME REPL buffer named "s1", and execute the
+     Clojure form, and echo the results: "5". Note that the initial
+     creation of this SLIME REPL can take several seconds. Once this
+     session has been created, the execution will happen very quickly.
+
+     Now let's insert the results into the buffer immediately after the
+     Clojure src block. Insert the following into your org file:
+
+#+begin_example
+     #+srcname: basic-session-clojure-table-results
+     #+begin_src clojure :session s1 :results value
+        [ 1 2 3 4]
+     #+end_src
+#+end_example
+
+     Execute as before:
+#+begin_example
+     C-c C-c
+#+end_example
+    
+     As with the non-session code block, immediately following this block, the following block should
+     have been inserted:
+
+#+begin_example
+     #+resname: basic-session-clojure-table-results
+     | 1 | 2 | 3 | 4 |
+#+end_example
+
+**** Multiple sessions
+     org-babel-clojure also supports multiple sessions executing
+     concurrently. The following example will illustrate two different
+     sessions running in isolation from each other.
+     
+     Create an org file with the following content:
+#+begin_example
+     #+srcname: set-clojure-session-var-s1
+     #+begin_src clojure :session s1 :results value
+     (def *var* [1 2 3])
+     #+end_src
+     
+     #+srcname: set-clojure-session-var-s2
+     #+begin_src clojure :session s2 :results value
+     (def *var* [3 4 5 6 7 8 9])
+     #+end_src
+
+     #+srcname: get-clojure-session-var-s1
+     #+begin_src clojure :session s1 :results value
+     (count *var*)
+     #+end_src
+     
+     #+srcname: get-clojure-session-var-s2
+     #+begin_src clojure :session s2 :results value
+     (count *var*)
+     #+end_src
+#+end_example
+
+     Execute the entire buffer
+#+begin_example
+     C-c M-b b
+#+end_example
+    
+     You should have two separate SLIME REPL sessions being created,
+     and the results from executing each source block will be inserted
+     after the respective block. The resulting buffer should look
+     something like this:
+#+begin_example
+     #+srcname: set-clojure-session-var-s1
+     #+begin_src clojure :session s1 :results value
+     (def *var* [1 2 3])
+     #+end_src
+     
+     #+results: set-clojure-session-var-s1
+     : #'user/*var*
+
+     #+srcname: set-clojure-session-var-s2
+     #+begin_src clojure :session s2 :results value
+     (def *var* [3 4 5 6 7 8 9])
+     #+end_src
+
+     #+results: set-clojure-session-var-s2
+     : #'user/*var*
+
+     #+srcname: get-clojure-session-var-s1
+     #+begin_src clojure :session s1 :results value
+     (count *var*)
+     #+end_src
+     
+     #+results: get-clojure-session-var-s1
+     : 3
+
+     #+srcname: get-clojure-session-var-s2
+     #+begin_src clojure :session s2 :results value
+     (count *var*)
+     #+end_src
+   
+     #+results: get-clojure-session-var-s2
+     : 7
+#+end_example
+     

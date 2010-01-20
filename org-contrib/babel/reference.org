@@ -1,4 +1,5 @@
-#+OPTIONS:    H:3 num:nil toc:3 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+* Header                                                           :noexport:
+#+OPTIONS:    H:3 num:nil toc:3 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:nil skip:nil d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
@@ -19,7 +20,9 @@
   </style>
 #+end_html
 
-#+BEGIN_HTML
+[[file:index.org][{Back to Babel's index}]]
+
+#+begin_html
   <div id="logo2" style="float: left; text-align: center; max-width:
                          400px; font-size: 8pt; margin: 1em;">
     <p>
@@ -33,7 +36,7 @@
       </p>
     </p>
   </div>
-#+END_HTML
+#+end_html
 
 * Syntax
   :PROPERTIES:
@@ -67,10 +70,10 @@ This syntax can be expanded by naming the source code block.
 : #+end_src
 
 - name :: This name is associated with the source code block.  This is
-     similar to the =#+tblname= lines which can be used to name tables
-     in Org-mode files.  By referencing the name of a source code
-     block it is possible to evaluate the block from other places in
-     the file, from other files, or from inside Org-mode tables.  It
+     similar to the =#+tblname= lines that can be used to name tables
+     in Org-mode files.  Referencing the name of a source code
+     block makes it possible to evaluate the block from other places in
+     the file, other files, or inside Org-mode tables.  It
      is also possible to pass arguments to a source code block through
      this =#+source:= line (see [[alternate-argument-syntax][Alternate argument syntax]]).
 
@@ -80,9 +83,8 @@ This syntax can be expanded by naming the source code block.
 : #+lob: R-plot(data=R-plot-example-data)
 
 ** Aliases
-   A number of aliases for Org-babel keywords have emerged that may
-   be more natural than their predecessors.  The following aliases
-   could be used in the following example
+   Keyword aliases are intended to make Org-babel feel natural to
+   programmers fluent in a variety of languages.  For example,
    #+begin_example
      ,#+srcname: alias-example
      ,#+begin_src emacs-lisp 
@@ -96,8 +98,8 @@ This syntax can be expanded by naming the source code block.
      | source  | function | srcname |
      | results | resname  |         |
    #+end_example
-     - =#+srcname:= could be replaced with either of two aliases,  =#+source:= or =#+function:=.
-     - =#+results:= could be replaced with its alias, =#+resname:=.
+     - =#+srcname:= can be replaced with either of two aliases,  =#+source:= or =#+function:=.
+     - =#+results:= can be replaced with its alias, =#+resname:=.
 
    When calling Library of Babel functions, as in the following
    example, there are two acceptable keywords.  The =#+lob= call in
@@ -117,7 +119,7 @@ This syntax can be expanded by naming the source code block.
   |----------------+--------------------------+------------+---------------------------------------------|
   | Asymptote      | org-babel-doc-asymptote  | asymptote  | [[http://asymptote.sourceforge.net/][asymptote]], [[http://asymptote.sourceforge.net/doc/Editing-modes.html][asy-mode]]                         |
   | C              | [[file:languages/org-babel-doc-C.org][org-babel-doc-C]]          | C          | none                                        |
-  | Clojure        | org-babel-doc-clojure    | clojure    | [[http://clojure.org/][clojure]], [[http://www.emacswiki.org/emacs/clojure-mode.el][clojure-mode]], [[http://common-lisp.net/project/slime/][slime]], [[http://clojure.codestuffs.com/][swank-clojure]] |
+  | Clojure        | [[file:languages/org-babel-doc-clojure.org][org-babel-doc-clojure]]    | clojure    | [[http://clojure.org/][clojure]], [[http://www.emacswiki.org/emacs/clojure-mode.el][clojure-mode]], [[http://common-lisp.net/project/slime/][slime]], [[http://clojure.codestuffs.com/][swank-clojure]] |
   | css            | org-babel-doc-css        | css        | none                                        |
   | ditaa          | org-babel-doc-ditaa      | ditaa      | [[http://ditaa.org/ditaa/][ditaa]] (bundled with Org-mode)               |
   | Graphviz       | org-babel-doc-dot        | dot        | [[http://www.graphviz.org/][dot]]                                         |
@@ -676,15 +678,15 @@ each more specific than the last.
 * Key Bindings & Useful Functions
 
   Org-babel re-binds many common Org-mode key sequences depending on
-  the context.  When in a source-code block the following sequences
-  are rebound
-  | \C-c \C-c | [[function-org-babel-execute][org-babel-execute-src-block]]     |
-  | \C-c \C-o | [[function-org-babel-open-src-block-result][org-babel-open-src-block-result]] |
-  | \C-up     | [[function-org-babel-load-in-session][org-babel-load-in-session]]       |
-  | \M-down   | [[function-org-babel-pop-to-session][org-babel-pop-to-session]]        |
+  the context.  Within a source-code block the following sequences
+  are rebound:
+  | =C-c C-c= | [[function-org-babel-execute][org-babel-execute-src-block]]     |
+  | =C-c C-o= | [[function-org-babel-open-src-block-result][org-babel-open-src-block-result]] |
+  | =C-up=    | [[function-org-babel-load-in-session][org-babel-load-in-session]]       |
+  | =M-down=  | [[function-org-babel-pop-to-session][org-babel-pop-to-session]]        |
 
-  Org-babel also exposes a number of functions behind a the common
-  org-babel-key-prefix of "\C-c \M-b".  These functions are as follows
+  Org-babel also exposes a number of functions behind the common
+  =org-babel-key-prefix= of =C-c M-b=:
   #+begin_src emacs-lisp :exports none
      (lambda (binding
        (list (format "\\C-c \\M-b %s"
@@ -693,14 +695,15 @@ each more specific than the last.
                      (cdr binding) (cdr binding))))
      org-babel-key-bindings)
   #+end_src
-  | \C-c \M-b t | [[function-org-babel-tangle][org-babel-tangle]]                  |
-  | \C-c \M-b T | [[function-org-babel-tangle-file][org-babel-tangle-file]]             |
-  | \C-c \M-b e | [[function-org-babel-execute-src-block][org-babel-execute-src-block]]       |
-  | \C-c \M-b s | [[function-org-babel-execute-subtree][org-babel-execute-subtree]]         |
-  | \C-c \M-b b | [[function-org-babel-execute-buffer][org-babel-execute-buffer]]          |
-  | \C-c \M-b h | [[function-org-babel-sha1-hash][org-babel-sha1-hash]]               |
-  | \C-c \M-b g | [[function-org-babel-goto-named-source-block][org-babel-goto-named-source-block]] |
-  | \C-c \M-b l | [[function-org-babel-lob-ingest][org-babel-lob-ingest]]              |
+  | =C-c M-b t= | [[function-org-babel-tangle][org-babel-tangle]]                  |
+  | =C-c M-b T= | [[function-org-babel-tangle-file][org-babel-tangle-file]]             |
+  | =C-c M-b e= | [[function-org-babel-execute-src-block][org-babel-execute-src-block]]       |
+  | =C-c M-b s= | [[function-org-babel-execute-subtree][org-babel-execute-subtree]]         |
+  | =C-c M-b b= | [[function-org-babel-execute-buffer][org-babel-execute-buffer]]          |
+  | =C-c M-b h= | [[function-org-babel-sha1-hash][org-babel-sha1-hash]]               |
+  | =C-c M-b g= | [[function-org-babel-goto-named-source-block][org-babel-goto-named-source-block]] |
+  | =C-c M-b l= | [[function-org-babel-lob-ingest][org-babel-lob-ingest]]              |
+
 
 ** Functions
 *** org-babel-execute-src-block
@@ -742,6 +745,43 @@ each more specific than the last.
   source code block, otherwise return nil.  With optional prefix
   argument RE-RUN the source-code block is evaluated even if
   results already exist.
+#+end_example
+
+*** org-babel-load-in-session
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-load-in-session
+    :END:
+
+#+begin_example 
+  org-babel-load-in-session is an interactive Lisp function in
+  `org-babel.el'.
+  
+  (org-babel-load-in-session &optional ARG INFO)
+  
+  Load the body of the current source-code block.  Evaluate the
+  header arguments for the source block before entering the
+  session.  After loading the body this pops open the session.
+  
+  [back]
+#+end_example
+
+*** org-babel-pop-to-session
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-pop-to-session
+    :END:
+
+#+begin_example 
+  org-babel-pop-to-session is an interactive Lisp function in
+  `org-babel.el'.
+  
+  (org-babel-pop-to-session &optional ARG INFO)
+  
+  Pop to the session of the current source-code block.  If
+  called with a prefix argument then evaluate the header arguments
+  for the source block before entering the session.  Copy the body
+  of the source block to the kill ring.
+  
+  [back]
 #+end_example
 
 *** org-babel-tangle
@@ -842,6 +882,37 @@ each more specific than the last.
   
   Add all source-blocks defined in FILE to `org-babel-library-of-babel'.
 #+end_example
+
+* Batch Execution
+It is possible to call Org-babel functions from the command line.
+This shell script calls [[function-org-babel-tangle][org-babel-tangle]] on every one of its
+arguments.
+
+Be sure to adjust the paths to fit your system.
+#+begin_src sh
+  #!/bin/sh
+  # -*- mode: shell-script -*-
+  #
+  # tangle a file with org-babel
+  #
+  DIR=`pwd`
+  FILES=""
+  
+  # wrap each argument in the code required to call tangle on it
+  for i in $@; do
+  FILES="$FILES \"$i\""
+  done
+  
+  emacsclient \
+  --eval "(progn 
+  (add-to-list 'load-path (expand-file-name \"~/src/org/lisp/\"))
+  (add-to-list 'load-path (expand-file-name \"~/src/org/contrib/lisp/\"))
+  (require 'org)(require 'org-exp)(require 'org-babel)
+  (mapc (lambda (file)
+         (find-file (expand-file-name file \"$DIR\"))
+         (org-babel-tangle)
+         (kill-buffer)) '($FILES)))"
+#+end_src
 
 * Footnotes
 
