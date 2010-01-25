@@ -841,3 +841,31 @@ using ido):
 To browse your org attachments using ido fuzzy matching and/or the
 completion buffer, invoke ido-find-file as usual (=C-x C-f=) and then
 press =C-;=.
+
+* Remove redundant tags of headlines
+  -- David Maus
+
+A small function that processes all headlines in current buffer and
+removes tags that are local to a headline and inherited by a parent
+headline or the #+FILETAGS: statement.
+
+#+BEGIN_SRC emacs-lisp
+  (defun dmj/org-remove-redundant-tags ()
+    "Remove redundant tags of headlines in current buffer.
+  
+  A tag is considered redundant if it is local to a headline and
+  inherited by a parent headline."
+    (interactive)
+    (when (eq major-mode 'org-mode)
+      (save-excursion
+        (org-map-entries 
+         '(lambda ()
+            (let ((alltags (split-string (org-entry-get (point) "ALLTAGS") ":"))
+                  local inherited tag)
+              (dolist (tag alltags)
+                (if (get-text-property 0 'inherited tag)
+                    (push tag inherited) (push tag local)))
+              (dolist (tag local)
+                (if (member tag inherited) (org-toggle-tag tag 'off)))))
+         t nil))))
+#+END_SRC
