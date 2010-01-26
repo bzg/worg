@@ -8,27 +8,81 @@ waiting for input. If you can, please contribute. If you think that
 another section should be added, please add it and fill it out. Also,
 if you spot any mistakes, omissions or superfluities, please fix
 them. If you have an account, you can clone the Worg tree and make the
-additions/fixes [[linkTBD]], but a note to the mailing list
-[[linktomaillistTBD]] will also do the job. Thanks!
+additions/fixes (see [[http://orgmode.org/worg/worg-git.php]] for more
+information), but if you don't or don't want to do it yourself, that's
+fine too: a note to the [[mailto:emacs-orgmode@gnu.org][orgmode mailing list]] will also do
+the job. Thanks!
 
-Version: Org-mode version 6.33trans (release_6.33f.192.ge1a1)
+Version: Org-mode version 6.34c (release_6.34c.7.g566d)
 
 ** TODO Exporting in general.
 
-** TODO LaTeX export.
+** STARTED LaTeX export.
+The LaTeX class is selected using the
+
+:#+LaTeX_CLASS: <class>
+
+construct. org-latex predefines the treatment of the
+following LaTeX classeses (but you can of course customize
+this treatment to your heart's content): article, report, book
+and (in an experimental branch for now) beamer.
+
+*** STARTED article, book, report
+The LaTeX packages included by default are as follows:
+
+| LaTeX package | Ubuntu container package  | Options |
+|---------------+---------------------------+---------|
+| inputenc      | texlive-latex-base        | utf8    |
+| fontenc       | texlive-latex-base        | T1      |
+| graphicx      | texlive-latex-base        |         |
+| longtable     | texlive-latex-base        |         |
+| float         | texlive-latex-recommended |         |
+| wrapfig       | texlive-latex-extra       |         |
+| soul          | texlive-latex-extra       |         |
+| hyperref      | texlive-latex-base        |         |
+
+*** TODO beamer (experimental for now)
+*** STARTED Symbols
+
+LaTeX syntax can be used to introduce many special symbols into a
+document (e.g. mathematical symbols). Most of these symbols are defined
+by basic LaTeX, but some require the presence of extra packages.
+
+| Symbol | LaTeX package | Ubuntu container package  |
+|--------+---------------+---------------------------|
+| \EUR   | marvosym      | texlive-fonts-recommended |
+| \euro  | eurosym       | texlive-fonts-recommended |
+
 
 ** STARTED PDF export.
 
 PDF export goes through LaTeX export first, so all the LaTeX dependencies
-apply here as well. In addition, PDF export imposes the following dependencies:
-
-   - foo.
-
-   - bar.
+apply here as well. As far as I know, there are no additional dependencies.
 
 ** TODO DocBook export.
 
-** TODO HTML export.
+
+** STARTED HTML export.
+*** STARTED Exporting LaTeX fragments as images.
+LaTeX fragments can be exported as images for inclusion into HTML
+documents. For example, complicated mathematical expressions can be
+dealt with this way. This is done by creating a LaTeX file that
+contains the fragment, processing it through LaTeX to produce a DVI
+file and then processing it through dvipng. So, in addition to LaTeX,
+you will need dvipng: on Ubuntu, this is available in the "dvipng"
+package.
+
+The LaTeX file contains a somewhat different list of LaTeX packages.
+Note that this is the default list, determined by the value of the
+variable ``org-format-latex-header''.
+
+| LaTeX package | Ubuntu container package | Options  |
+|---------------+--------------------------+----------|
+| amssymb       | texlive-base             |          |
+| color         | texlive-latex-base       | usenames |
+| amsmath       | texlive-latex-base       |          |
+| latexsym      | texlive-latex-base       |          |
+| eucal         | texlive-base             | mathscr  |
 
 ** TODO org-plot.
 
