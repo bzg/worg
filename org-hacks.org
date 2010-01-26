@@ -860,7 +860,7 @@ headline or the #+FILETAGS: statement.
       (save-excursion
         (org-map-entries 
          '(lambda ()
-            (let ((alltags (split-string (org-entry-get (point) "ALLTAGS") ":"))
+            (let ((alltags (split-string (or (org-entry-get (point) "ALLTAGS") "") ":"))
                   local inherited tag)
               (dolist (tag alltags)
                 (if (get-text-property 0 'inherited tag)
