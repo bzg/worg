@@ -603,7 +603,7 @@ changed.
 #FIXME: gmane link?
 On emacs-orgmode, Ryan C. Thompson suggested this:
 
-#+begin_quote 
+#+begin_quote
 I am using org-remember set to open a new frame when used,
 and the default frame size is much too large. To fix this, I have
 designed some advice and a custom variable to implement custom
@@ -615,7 +615,7 @@ parameters for the remember frame:
     "Additional frame parameters for dedicated remember frame."
     :type 'alist
     :group 'remember)
-  
+
   (defadvice remember (around remember-frame-parameters activate)
     "Set some frame parameters for the remember frame."
     (let ((default-frame-alist (append remember-frame-alist
@@ -629,19 +629,19 @@ reasonable size for the frame.
 
 * Add an effort estimate on the fly when clocking in
 
-You can use =org-clock-in-prepare-hook= to add an effort estimate.  
+You can use =org-clock-in-prepare-hook= to add an effort estimate.
 This way you can easily have a "tea-timer" for your tasks when they
 don't already have an effort estimate.
 
 #+begin_src emacs-lisp
-(add-hook 'org-clock-in-prepare-hook 
+(add-hook 'org-clock-in-prepare-hook
 	  'my-org-mode-ask-effort)
 
 (defun my-org-mode-ask-effort ()
   "Ask for an effort estimate when clocking in."
   (unless (org-entry-get (point) "Effort")
-    (let ((effort 
-	   (completing-read 
+    (let ((effort
+	   (completing-read
 	    "Effort: "
 	    (org-entry-get-multivalued-property (point) "Effort"))))
       (unless (equal effort "")
@@ -651,7 +651,7 @@ don't already have an effort estimate.
 Or you can use a default effort for such a timer:
 
 #+begin_src emacs-lisp
-(add-hook 'org-clock-in-prepare-hook 
+(add-hook 'org-clock-in-prepare-hook
 	  'my-org-mode-add-default-effort)
 
 (defvar org-clock-default-effort "1:00")
@@ -702,7 +702,7 @@ and Chris Randle's original musings are at
     http://article.gmane.org/gmane.emacs.orgmode/6536/
 * Org-mode and saveplace.el
 
-Fix a problem with saveplace.el putting you back in a folded position: 
+Fix a problem with saveplace.el putting you back in a folded position:
 
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook
@@ -803,9 +803,9 @@ using ido):
 
 #+begin_src emacs-lisp
   (load-library "find-lisp")
-  
+
   ;; Adapted from http://www.emacswiki.org/emacs/RecentFiles
-  
+
   (defun my-ido-find-org-attach ()
     "Find files in org-attachment directory"
     (interactive)
@@ -829,9 +829,9 @@ using ido):
             ido-text-init ido-text
             ido-rotate-temp t)
       (exit-minibuffer)))
-  
+
   (add-hook 'ido-setup-hook 'ido-my-keys)
-  
+
   (defun ido-my-keys ()
     "Add my keybindings for ido."
     (define-key ido-completion-map (kbd "C-;") 'my-ido-find-org-attach)
@@ -852,13 +852,13 @@ headline or the #+FILETAGS: statement.
 #+BEGIN_SRC emacs-lisp
   (defun dmj/org-remove-redundant-tags ()
     "Remove redundant tags of headlines in current buffer.
-  
+
   A tag is considered redundant if it is local to a headline and
   inherited by a parent headline."
     (interactive)
     (when (eq major-mode 'org-mode)
       (save-excursion
-        (org-map-entries 
+        (org-map-entries
          '(lambda ()
             (let ((alltags (split-string (or (org-entry-get (point) "ALLTAGS") "") ":"))
                   local inherited tag)
@@ -869,3 +869,101 @@ headline or the #+FILETAGS: statement.
                 (if (member tag inherited) (org-toggle-tag tag 'off)))))
          t nil))))
 #+END_SRC
+
+* Different org-cycle-level behavior
+  -- Ryan Thompson
+In recent org versions, when your point (cursor) is at the end of an
+empty header line (like after you first created the header), the TAB
+key (=org-cycle=) has a special behavior: it cycles the headline through
+all possible levels. However, I did not like the way it determined
+"all possible levels," so I rewrote the whole function, along with a
+couple of supporting functions.
+
+The original function's definition of "all possible levels" was "every
+level from 1 to one more than the initial level of the current
+headline before you started cycling." My new definition is "every
+level from 1 to one more than the previous headline's level." So, if
+you have a headline at level 4 and you use ALT+RET to make a new
+headline below it, it will cycle between levels 1 and 5, inclusive.
+
+The main advantage of my custom =org-cycle-level= function is that it
+is stateless: the next level in the cycle is determined entirely by
+the contents of the buffer, and not what command you executed last.
+This makes it more predictable, I hope.
+
+#+BEGIN_SRC emacs-lisp
+(require 'cl)
+
+(defun org-point-at-end-of-empty-headline ()
+  "If point is at the end of an empty headline, return t, else nil."
+  (and (looking-at "[ \t]*$")
+       (save-excursion
+         (beginning-of-line 1)
+         (looking-at (concat "^\\(\\*+\\)[ \t]+\\(" org-todo-regexp "\\)?[ \t]*")))))
+
+(defun org-level-increment ()
+  "Return the number of stars that will be added or removed at a
+time to headlines when structure editing, based on the value of
+`org-odd-levels-only'."
+  (if org-odd-levels-only 2 1))
+
+(defvar org-previous-line-level-cached nil)
+
+(defun org-recalculate-previous-line-level ()
+  "Same as `org-get-previous-line-level', but does not use cached
+value. It does *set* the cached value, though."
+  (set 'org-previous-line-level-cached
+       (let ((current-level (org-current-level))
+             (prev-level (when (> (line-number-at-pos) 1)
+                           (save-excursion
+                             (previous-line)
+                             (org-current-level)))))
+         (cond ((null current-level) nil) ; Before first headline
+               ((null prev-level) 0)      ; At first headline
+               (prev-level)))))
+
+(defun org-get-previous-line-level ()
+  "Return the outline depth of the last headline before the
+current line. Returns 0 for the first headline in the buffer, and
+nil if before the first headline."
+  ;; This calculation is quite expensive, with all the regex searching
+  ;; and stuff. Since org-cycle-level won't change lines, we can reuse
+  ;; the last value of this command.
+  (or (and (eq last-command 'org-cycle-level)
+           org-previous-line-level-cached)
+      (org-recalculate-previous-line-level)))
+
+(defun org-cycle-level ()
+  (interactive)
+  (let ((org-adapt-indentation nil))
+    (when (org-point-at-end-of-empty-headline)
+      (setq this-command 'org-cycle-level) ;Only needed for caching
+      (let ((cur-level (org-current-level))
+            (prev-level (org-get-previous-line-level)))
+        (cond
+         ;; If first headline in file, promote to top-level.
+         ((= prev-level 0)
+          (loop repeat (/ (- cur-level 1) (org-level-increment))
+                do (org-do-promote)))
+         ;; If same level as prev, demote one.
+         ((= prev-level cur-level)
+          (org-do-demote))
+         ;; If parent is top-level, promote to top level if not already.
+         ((= prev-level 1)
+          (loop repeat (/ (- cur-level 1) (org-level-increment))
+                do (org-do-promote)))
+         ;; If top-level, return to prev-level.
+         ((= cur-level 1)
+          (loop repeat (/ (- prev-level 1) (org-level-increment))
+                do (org-do-demote)))
+         ;; If less than prev-level, promote one.
+         ((< cur-level prev-level)
+          (org-do-promote))
+         ;; If deeper than prev-level, promote until higher than
+         ;; prev-level.
+         ((> cur-level prev-level)
+          (loop repeat (+ 1 (/ (- cur-level prev-level) (org-level-increment)))
+                do (org-do-promote))))
+        t))))
+#+END_SRC
+
