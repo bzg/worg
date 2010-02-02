@@ -271,9 +271,9 @@ web browser.
 If you don't have ruby installed on your system, then you can run this
 shell script alternative from the Org-mode version of the file:
 
-#+begin_src sh
-echo "This file was last evaluated on `date`"
-#+end_src
+: #+begin_src sh
+: echo "This file was last evaluated on `date`"
+: #+end_src
 
 *** Source Code Execution
     :PROPERTIES:
@@ -428,7 +428,8 @@ the last statement and nothing else.
      apart from the output of the commands it contains. (This mode
      will be familiar to Sweave users).
 
-     Consider the result of evaluating this source code block with scripting mode.
+     Consider the result of evaluating this source code block with
+     scripting mode.
 
 #+srcname: name
 #+begin_src python :results output
@@ -571,10 +572,10 @@ For example, let's take some system diagnostics in the shell and graph them with
    sizes. Org-babel automatically converts the output into an Org-mode
    table.
    
-#+srcname: directories
-   #+begin_src sh :results replace
-   cd ~ && du -sc * |grep -v total
-   #+end_src
+: #+srcname: directories
+: #+begin_src sh :results replace
+:   cd ~ && du -sc * |grep -v total
+: #+end_src
    
 #+resname: directories
 |       72 | "Desktop"   |
@@ -597,10 +598,18 @@ For example, let's take some system diagnostics in the shell and graph them with
    in the Org-mode table as a
    pie-chart. Note how this source code block uses the =srcname=
    of the previous source code block to obtain the data.
+
+In the Org-mode file: 
+: #+srcname: directory-pie-chart(dirs = directories)
+: #+begin_src R :session R-pie-example :file ../../images/babel/dirs.png
+:   pie(dirs[,1], labels = dirs[,2])
+: #+end_src
+
+HTML export of code:
 #+srcname: directory-pie-chart(dirs = directories)
-   #+begin_src R :session R-pie-example :file ../../images/babel/dirs.png
-   pie(dirs[,1], labels = dirs[,2])
-   #+end_src
+#+begin_src R :session R-pie-example :file ../../images/babel/dirs.png
+  pie(dirs[,1], labels = dirs[,2])
+#+end_src
  [[file:../../images/babel/dirs.png]]
 
 * Multilingual Spreadsheet Plugins for Org-mode
@@ -619,10 +628,10 @@ average value of a few numbers. First, let's make some data. The
 following source block creates an Org-mode table filled with five random
 numbers between 0 and 1.
 
-#+srcname: tbl-example-data()
-#+begin_src R 
-runif(n=5, min=0, max=1)
-#+end_src
+: #+srcname: tbl-example-data()
+: #+begin_src R 
+: runif(n=5, min=0, max=1)
+: #+end_src
 
 #+resname: tbl-example-data
 | 0.836685163900256 |
@@ -632,6 +641,14 @@ runif(n=5, min=0, max=1)
 | 0.994794291909784 |
 
 Now we define a source block to calculate the mean.
+
+In the Org-mode file:
+: #+srcname: R-mean(x)
+: #+begin_src R 
+: mean(x)
+: #+end_src
+
+HTML export of code:
 #+srcname: R-mean(x)
 #+begin_src R 
 mean(x)
@@ -640,6 +657,15 @@ mean(x)
 Finally, we create the table which is going to make use of the R
 code. This is done using the =sbe= ('source block evaluate') macro in
 the table formula line.
+
+In the Org-mode file:
+: #+tblname: summaries
+: |              mean |
+: |-------------------|
+: | 0.779619386699051 |
+: #+TBLFM: @2$1='(sbe "R-mean" (x "tbl-example-data()"))
+
+HTML export of code:
 #+tblname: summaries
 |              mean |
 |-------------------|
@@ -664,6 +690,22 @@ with results and pass/fail statistics.
 
 Here's a sample of our test suite.
 
+In the Org-mode file:
+
+: #+TBLNAME: org-babel-tests
+: | functionality    | block        | arg |    expected |     results | pass |
+: |------------------+--------------+-----+-------------+-------------+------|
+: | basic evaluation |              |     |             |             | pass |
+: |------------------+--------------+-----+-------------+-------------+------|
+: | emacs lisp       | basic-elisp  |   2 |           4 |           4 | pass |
+: | shell            | basic-shell  |     |           6 |           6 | pass |
+: | ruby             | basic-ruby   |     |   org-babel |   org-babel | pass |
+: | python           | basic-python |     | hello world | hello world | pass |
+: | R                | basic-R      |     |          13 |          13 | pass |
+: #+TBLFM: $5='(if (= (length $3) 1) (sbe $2 (n $3)) (sbe $2)) :: $6='(if (string= $4 $5) "pass" (format "expected %S but was %S" $4 $5))
+
+HTML export of code:
+
 #+TBLNAME: org-babel-tests
 | functionality    | block        | arg |    expected |     results | pass |
 |------------------+--------------+-----+-------------+-------------+------|
@@ -678,31 +720,76 @@ Here's a sample of our test suite.
 
 **** code blocks for tests
 
+In the Org-mode file:
+
+: #+srcname: basic-elisp(n)
+: #+begin_src emacs-lisp
+: (* 2 n)
+: #+end_src
+
+HTML export of code:
+
 #+srcname: basic-elisp(n)
 #+begin_src emacs-lisp
 (* 2 n)
 #+end_src
 
+In the Org-mode file:
+: #+srcname: basic-shell
+: #+begin_src sh :results silent
+: expr 1 + 5
+: #+end_src
+
+HTML export of code:
 #+srcname: basic-shell
 #+begin_src sh :results silent
 expr 1 + 5
 #+end_src
 
+In the Org-mode file:
+: #+srcname: date-simple
+: #+begin_src sh :results silent
+: date
+: #+end_src
+
+HTML export of code:
 #+srcname: date-simple
 #+begin_src sh :results silent
 date
 #+end_src
 
+In the Org-mode file:
+: #+srcname: basic-ruby
+: #+begin_src ruby :results silent
+: "org-babel"
+: #+end_src
+
+HTML export of code:
 #+srcname: basic-ruby
 #+begin_src ruby :results silent
 "org-babel"
 #+end_src
 
+In the Org-mode file
+: #+srcname: basic-python
+: #+begin_src python :results silent
+: 'hello world'
+: #+end_src
+
+HTML export of code:
 #+srcname: basic-python
 #+begin_src python :results silent
 'hello world'
 #+end_src
 
+In the Org-mode file:
+: #+srcname: basic-R
+: #+begin_src R :results silent
+: b <- 9
+: b + 4
+: #+end_src
+
+HTML export of code:
 #+srcname: basic-R
 #+begin_src R :results silent
 b <- 9
@@ -844,25 +931,29 @@ and so will not, by themselves, create source code files.  They are
 included in the source code file by the third source code block, which
 does have a =tangle= header argument.
 
-#+srcname: hello-world-prefix
-#+begin_src sh :exports none
-  echo "/-----------------------------------------------------------\\"
-#+end_src
-
+In the Org-mode file:
 : #+srcname: hello-world-prefix
 : #+begin_src sh :exports none
 :   echo "/-----------------------------------------------------------\\"
 : #+end_src
 
-#+srcname: hello-world-postfix
+HTML export of code:
+#+srcname: hello-world-prefix
 #+begin_src sh :exports none
-  echo "\-----------------------------------------------------------/"
+  echo "/-----------------------------------------------------------\\"
 #+end_src
 
+In the Org-mode file
 : #+srcname: hello-world-postfix
 : #+begin_src sh :exports none
 :   echo "\-----------------------------------------------------------/"
 : #+end_src
+
+HTML export of code:
+#+srcname: hello-world-postfix
+#+begin_src sh :exports none
+  echo "\-----------------------------------------------------------/"
+#+end_src
 
 
 The third source code block does have a =tangle= header argument
@@ -871,6 +962,15 @@ be written.  It also has [[http://www.cs.tufts.edu/~nr/noweb/][Noweb]] style ref
 source code blocks.  These references will be expanded during tangling
 to include them in the output file as well.
 
+In the Org-mode file:
+: #+srcname: hello-world
+: #+begin_src sh :tangle hello :exports none
+:   # <<hello-world-prefix>>
+:   echo "|                       hello world                         |"
+:   # <<hello-world-postfix>>
+: #+end_src
+
+HTML export of code:
 #+srcname: hello-world
 #+begin_src sh :tangle hello :exports none
   # <<hello-world-prefix>>
@@ -878,12 +978,6 @@ to include them in the output file as well.
   # <<hello-world-postfix>>
 #+end_src
 
-: #+srcname: hello-world
-: #+begin_src sh :tangle hello :exports none
-:   # <<hello-world-prefix>>
-:   echo "|                       hello world                         |"
-:   # <<hello-world-postfix>>
-: #+end_src
 
 Calling =org-babel-tangle= will result in the following shell source
 code being written to the hello.sh file:
@@ -917,7 +1011,7 @@ calling source block functions (see the [[library-of-babel][Library of babel]]).
 sets the value of argument \"a\" equal to \"9\".  Note that
 these arguments are not evaluated in the current source-code
 block but are passed literally to =example-block()=.
-#+end_src
+
 
 *** Emacs Initialization with Org-babel
     :PROPERTIES:
