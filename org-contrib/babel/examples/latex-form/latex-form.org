@@ -1,0 +1,75 @@
+#+OPTIONS:    H:3 num:nil toc:1 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:nil skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE:      Org-babel: Uses
+#+AUTHOR:     Thomas S. Dye
+#+EMAIL:      tsd at tsdye dot com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+
+[[file:index.org][{Back to Babel's index}]]
+
+* A LaTeX Form
+  This example uses Org-babel as a user interface for a LaTeX form
+  that might be used by the members of an organization.  It uses the
+  literate programming facility of Org-babel to isolate the user from
+  the sometimes arcane LaTeX constructs needed to create a
+  highly-structured form.  Org-babel can tangle multiple documents in
+  a single Org-mode file, and this ability is used to create a
+  distribution version of the form separate from one designed for the
+  file cabinet.
+
+** Requirement
+   - A working LaTeX installation.
+
+** Advantages
+   - User is isolated from the LaTeX code and thus less likely to
+     alter it inadvertently.
+   - Multiple versions of the document are created automatically.
+   - Org-mode keywords can help track data entry progress.
+
+** Disadvantages
+   - This approach is somewhat dated.  A modern organization might
+     accomplish this more cleanly with a web-based interface to a database.
+
+** Example
+
+*** TODO Your name
+    - Enter your full name on the open line below.
+#+srcname: your-name
+#+begin_src latex
+Tom Dye
+#+end_src
+
+*** TODO Your email address
+    - Enter your email address on the open line below.
+#+srcname: your-email
+#+begin_src latex
+tsd at tsdye dot com
+#+end_src
+
+*** No data entry below this line
+    - The two source blocks here each produce a LaTeX document after
+      they are tangled with a call to =org-babel-tangle=.
+
+#+begin_src latex :noweb :tangle dist-form.tex 
+  \documentclass[12pt]{article}
+  \begin{document}
+  \section{Distribution Form}
+  \begin{description}
+  \item[Name] <<your-name>>
+  \item[Email] <<your-email>>
+  \end{description}
+  \end{document}
+#+end_src
+
+#+begin_src latex :noweb :tangle file-form.tex 
+  \documentclass[10pt]{article}
+  \begin{document}
+  \section{File Form}
+  <<your-name>> can be reached at <<your-email>>.
+  \end{document}
+#+end_src
+
+
