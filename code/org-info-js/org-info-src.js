@@ -2,7 +2,7 @@
  * @file
  * org-info.js
  *
- * Version: 0.1.2.1
+ * Version: 0.1.2.2
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -364,7 +364,7 @@ var org_html_manager = {
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
   ORGTAG_REGEX: /^(.*)<span\s+class=[\'\"]tag[\'\"]>(<span[^>]>[^<]<\/span>)+<\/span>/i, // Remove Org tags
   TRIMMER: /^(\s*)([^\s].*)(\s*)$/, // Trim
-  FNREF_REGEX: /(fnr\.*)/,     // Footnote ref
+  // FNREF_REGEX: /(fnr\.*)/,     // Footnote ref FIXME: not in use!?!
   TOC: null,                   // toc.
   RUNS: 0,                     // Count the scan runs.
   HISTORY: new Array(50),      // Save navigation history.
@@ -571,13 +571,13 @@ var org_html_manager = {
     document.onkeypress=OrgHtmlManagerKeyEvent;
 
     if(t.VIEW == t.INFO_VIEW)
-      t.infoView(start_section);
+      t.infoView(start_section, 1);
     else if(t.VIEW == t.SLIDE_VIEW) {
-      t.slideView(start_section);
+      t.slideView(start_section, 1);
     }
     else {
       var v = t.VIEW; // will be changed in t.plainView()!
-      t.plainView(start_section);
+      t.plainView(start_section, 1);
       t.ROOT.DIRTY = true;
       t.ROOT_STATE = OrgNode.STATE_UNFOLDED;
       t.toggleGlobaly();
@@ -586,7 +586,8 @@ var org_html_manager = {
       if (v == t.ALL_VIEW)
         t.toggleGlobaly();
     }
-    t.showSection(start_section);
+
+    t.showSection(start_section, 1);
     // Hm - this helps...
     if(0 == start_section || t.INFO_VIEW == t.VIEW) window.scrollTo(0, 0);
 
@@ -995,8 +996,16 @@ var org_html_manager = {
 
 
 
-
-  showSection: function (sec)
+  /**
+   * Show a certain section.
+   * @param sec   The section to show. This is the index
+   *              in @c SECS.
+   * @param norep If `1', @c window.location.replace() will never be
+   *              called. This is needed on startup to prevent reloading of the
+   *              page with `?VIEW=overview#sec-1'. Should we add an option to
+   *              specify the view mode when replacing @c window.location?
+   */
+  showSection: function (sec, norep)
   {
     var t = this;
     var section = parseInt(sec);
@@ -1039,7 +1048,7 @@ var org_html_manager = {
             // because the fixed TOC will jump then, causing links towards the
             // bottom to disapear again.
             if(! t.FIXED_TOC) OrgNode.hideElement(document.body);
-            if ('?/toc/?' != sec) window.location.replace(t.BASE_URL + t.getDefaultTarget());
+            if(1 != norep && '?/toc/?' != sec) window.location.replace(t.BASE_URL + t.getDefaultTarget());
             if(! t.FIXED_TOC) OrgNode.showElement(document.body);
           }
           else {
@@ -1048,13 +1057,13 @@ var org_html_manager = {
             t.NODE.setState(OrgNode.UNFOLDED);
             t.NODE.show();
             t.NODE.DIV.scrollIntoView(true);
-            window.location.replace(t.BASE_URL + t.getDefaultTarget());
+            if(1 != norep) window.location.replace(t.BASE_URL + t.getDefaultTarget());
           }
         }
     }
   },
 
-  plainView: function (sec)
+  plainView: function (sec, skip_show_section)
   {
     var t = this;
     document.onclick = null;
@@ -1072,7 +1081,8 @@ var org_html_manager = {
       t.ROOT.CHILDREN[i].STATE = OrgNode.STATE_UNFOLDED;
       t.ROOT.CHILDREN[i].fold();
     }
-    t.showSection(sec);
+    if(!skip_show_section)
+      t.showSection(sec);
     if(t.POSTAMBLE) OrgNode.showElement(t.POSTAMBLE);
     if(t.NODE.IDX == 0) window.scrollTo(0, 0);
     else t.NODE.DIV.scrollIntoView(true);
