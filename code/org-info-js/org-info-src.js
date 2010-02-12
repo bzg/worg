@@ -2,7 +2,7 @@
  * @file
  * org-info.js
  *
- * Version: 0.1.2.2
+ * Version: 0.1.2.4
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -352,6 +352,7 @@ var org_html_manager = {
   POSTAMBLE: null,             // cache the 'postamble' element.
   // Private
   BASE_URL: document.URL,      // URL without '#sec-x.y.z'
+  Q_PARAM: "",                 // A query param like `?VIEW=content'
   ROOT: null,                  // Root element or our OrgNode tree
   NODE: null,                  // The current node
   TITLE: null,                 // Save the title for hide/show
@@ -362,7 +363,7 @@ var org_html_manager = {
   REGEX: /(#)(.*$)/,           // identify a section link in toc
   SID_REGEX: /(^#)(sec-\d[.\d]*$)/, // identify a plain section ID
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
-  ORGTAG_REGEX: /^(.*)<span\s+class=[\'\"]tag[\'\"]>(<span[^>]>[^<]<\/span>)+<\/span>/i, // Remove Org tags
+  ORGTAG_REGEX: /^(.*)<span\s+class=[\'\"]tag[\'\"]>(<span[^>]+>[^<]+<\/span>)+<\/span>/i, // Remove Org tags
   TRIMMER: /^(\s*)([^\s].*)(\s*)$/, // Trim
   // FNREF_REGEX: /(fnr\.*)/,     // Footnote ref FIXME: not in use!?!
   TOC: null,                   // toc.
@@ -474,10 +475,15 @@ var org_html_manager = {
     return s;
   },
 
+  /**
+   * Remove tags from headlin's inner HTML.
+   * @param s The headline's inner HTML.
+   * @return @c s with all tags stripped.
+   */
   removeOrgTags: function (s)
   {
     if(s.match(this.ORGTAG_REGEX)) {
-      var matches = this.REGEX.exec(s);
+      var matches = this.ORGTAG_REGEX.exec(s);
       return matches[1];
     }
     return s;
@@ -511,6 +517,7 @@ var org_html_manager = {
     }
 
     var start_section = 0;
+    var start_section_explicit = false;
 
     if("" != location.hash) {
       t.BASE_URL = t.BASE_URL.substring(0, t.BASE_URL.indexOf('#'));
@@ -518,12 +525,15 @@ var org_html_manager = {
       for(var i=0;i<t.SECS.length;++i) {
         if(t.SECS[i].isTargetFor[location.hash]) {
           start_section = i;
+          start_section_explicit = 1;
           break;
         }
       }
     }
-    if("" != location.search)
+    if("" != location.search) {
+      t.Q_PARAM =  t.BASE_URL.substring(t.BASE_URL.indexOf('?'));
       t.BASE_URL = t.BASE_URL.substring(0, t.BASE_URL.indexOf('?'));
+    }
 
     t.convertLinks(); // adjust internal links. BASE_URL has to be stripped.
 
@@ -570,10 +580,13 @@ var org_html_manager = {
     t.CONSOLE_INPUT = document.getElementById("org-info-js_console-input");
     document.onkeypress=OrgHtmlManagerKeyEvent;
 
-    if(t.VIEW == t.INFO_VIEW)
-      t.infoView(start_section, 1);
+    if(t.VIEW == t.INFO_VIEW) {
+      t.infoView(start_section);
+      t.showSection(start_section);
+    }
     else if(t.VIEW == t.SLIDE_VIEW) {
-      t.slideView(start_section, 1);
+      t.slideView(start_section);
+      t.showSection(start_section);
     }
     else {
       var v = t.VIEW; // will be changed in t.plainView()!
@@ -585,9 +598,11 @@ var org_html_manager = {
         t.toggleGlobaly();
       if (v == t.ALL_VIEW)
         t.toggleGlobaly();
+      if(start_section_explicit) // Unfold the requested section
+        t.showSection(start_section);
     }
 
-    t.showSection(start_section, 1);
+
     // Hm - this helps...
     if(0 == start_section || t.INFO_VIEW == t.VIEW) window.scrollTo(0, 0);
 
@@ -998,14 +1013,17 @@ var org_html_manager = {
 
   /**
    * Show a certain section.
+   *
+   * NOTE: Replacing window.location might change the view mode, if the mode was
+   * requested using an URL like "?VIEW=...&param=value" and the mode was
+   * different from the one specified in the <head> section. The solution is, to
+   * track the query parameter until the user changes the view mode for the
+   * first time.
+   *
    * @param sec   The section to show. This is the index
    *              in @c SECS.
-   * @param norep If `1', @c window.location.replace() will never be
-   *              called. This is needed on startup to prevent reloading of the
-   *              page with `?VIEW=overview#sec-1'. Should we add an option to
-   *              specify the view mode when replacing @c window.location?
    */
-  showSection: function (sec, norep)
+  showSection: function (sec)
   {
     var t = this;
     var section = parseInt(sec);
@@ -1048,7 +1066,7 @@ var org_html_manager = {
             // because the fixed TOC will jump then, causing links towards the
             // bottom to disapear again.
             if(! t.FIXED_TOC) OrgNode.hideElement(document.body);
-            if(1 != norep && '?/toc/?' != sec) window.location.replace(t.BASE_URL + t.getDefaultTarget());
+            if('?/toc/?' != sec) window.location.replace(t.BASE_URL + t.Q_PARAM + t.getDefaultTarget());
             if(! t.FIXED_TOC) OrgNode.showElement(document.body);
           }
           else {
@@ -1057,7 +1075,7 @@ var org_html_manager = {
             t.NODE.setState(OrgNode.UNFOLDED);
             t.NODE.show();
             t.NODE.DIV.scrollIntoView(true);
-            if(1 != norep) window.location.replace(t.BASE_URL + t.getDefaultTarget());
+            window.location.replace(t.BASE_URL + t.Q_PARAM + t.getDefaultTarget());
           }
         }
     }
@@ -1181,9 +1199,15 @@ var org_html_manager = {
       document.ondblclick = function(){org_html_manager.scheduleClick("org_html_manager.adjustSlide("+this.NODE.IDX+", -1)");};
   },
 
+  /**
+   * Toggle the view mode.
+   * This also resets the <code>Q_PARAM</code> to an empty string.
+   * @param sec The section index to show.
+   */
   toggleView: function (sec)
   {
     var t = this;
+    t.Q_PARAM="";
     t.removeWarning();
     if(t.VIEW == t.INFO_VIEW)
       t.plainView(sec);
