@@ -583,6 +583,8 @@ var org_html_manager = {
     if(t.VIEW == t.INFO_VIEW) {
       t.infoView(start_section);
       t.showSection(start_section);
+      // For Opera 10 - want to see the title and buttons on (re-)load.
+      window.setTimeout(function(){window.scrollTo(0, 0);}, 100);
     }
     else if(t.VIEW == t.SLIDE_VIEW) {
       t.slideView(start_section);
@@ -601,10 +603,6 @@ var org_html_manager = {
       if(start_section_explicit) // Unfold the requested section
         t.showSection(start_section);
     }
-
-
-    // Hm - this helps...
-    if(0 == start_section || t.INFO_VIEW == t.VIEW) window.scrollTo(0, 0);
 
     if("" != t.OCCUR) {
       t.CONSOLE_INPUT.value = t.OCCUR;
@@ -625,10 +623,11 @@ var org_html_manager = {
     // so we do what is customized for orgmode (depth of sections in toc).
     if(t.RUNS == 1 || ! t.ROOT) {
       var toc = document.getElementById("table-of-contents");
+
       if(null != toc) {
         var heading = null;
         var i = 0;
-        for(i;heading == null && i < 7;++i) // TODO: What is this?
+        for(i;heading == null && i < 7;++i)
           heading = toc.getElementsByTagName("h"+i)[0];
         heading.onclick = function() {org_html_manager.fold(0);};
         heading.style.cursor = "pointer";
@@ -640,38 +639,38 @@ var org_html_manager = {
         if(t.FIXED_TOC) {
           heading.setAttribute('onclick', 'org_html_manager.toggleGlobaly();');
           t.ROOT = new OrgNode( null,
-                                   t.BODY.getElementsByTagName("h1")[0],
-                                   'javascript:org_html_manager.navigateTo(0);',
-                                   0,
-                                   null ); // the root node
+                                t.BODY.getElementsByTagName("h1")[0],
+                                'javascript:org_html_manager.navigateTo(0);',
+                                0,
+                                null ); // the root node
           t.TOC = new OrgNode( toc,
-                                  heading,
-                                  'javascript:org_html_manager.navigateTo(0);',
-                                  i,
-                                  null ); // the root node
+                               heading,
+                               'javascript:org_html_manager.navigateTo(0);',
+                               i,
+                               null ); // the root node
           t.NODE = t.ROOT;
         }
         else {
           t.ROOT = new OrgNode( null,
-                                   t.BODY.getElementsByTagName("h1")[0],
-                                   'javascript:org_html_manager.navigateTo(0);',
-                                   0,
-                                   null ); // the root node
+                                t.BODY.getElementsByTagName("h1")[0],
+                                'javascript:org_html_manager.navigateTo(0);',
+                                0,
+                                null ); // the root node
           if(t.HIDE_TOC) {
             t.TOC = new OrgNode( toc,
-                                    "",
-                                    'javascript:org_html_manager.navigateTo(0);',
-                                    i,
-                                    null );
+                                 "",
+                                 'javascript:org_html_manager.navigateTo(0);',
+                                 i,
+                                 null );
             t.NODE = t.ROOT;
             OrgNode.hideElement(toc);
           }
           else {
             t.TOC = new OrgNode( toc,
-                                    heading,
-                                    'javascript:org_html_manager.navigateTo(0);',
-                                    i,
-                                    t.ROOT ); // the root node
+                                 heading,
+                                 'javascript:org_html_manager.navigateTo(0);',
+                                 i,
+                                 t.ROOT ); // the root node
             t.TOC.IDX = 0;
             t.NODE = t.TOC;
             t.SECS.push(t.TOC);
@@ -683,7 +682,7 @@ var org_html_manager = {
         return false;
     }
 
-    var theIndex = document.getElementsByTagName("ul")[0]; // toc
+    var theIndex = t.TOC.FOLDER.getElementsByTagName("ul")[0]; // toc
 
     // Could we scan the document all the way down?
     // Return false if not.
@@ -829,7 +828,6 @@ var org_html_manager = {
         h.onmouseout = function() {org_html_manager.unhighlightHeadline("" + sec);};
       }
       var link = 'javascript:org_html_manager.navigateTo(' + sec + ')';
-      // Is this wrong (??):
       if(depth > this.NODE.DEPTH) {
         this.NODE = new OrgNode ( div, h, link, depth, this.NODE, id);
       }
@@ -1020,6 +1018,10 @@ var org_html_manager = {
    * track the query parameter until the user changes the view mode for the
    * first time.
    *
+   * You can avoid the URL-replacing by setting @c org_html_manager.NODE to the
+   * same node you want to display before calling this function. This
+   * <u>should</u> be the case on startup.
+   *
    * @param sec   The section to show. This is the index
    *              in @c SECS.
    */
@@ -1066,7 +1068,8 @@ var org_html_manager = {
             // because the fixed TOC will jump then, causing links towards the
             // bottom to disapear again.
             if(! t.FIXED_TOC) OrgNode.hideElement(document.body);
-            if('?/toc/?' != sec) window.location.replace(t.BASE_URL + t.Q_PARAM + t.getDefaultTarget());
+            if(last_node.IDX != t.NODE.IDX)
+              if('?/toc/?' != sec) window.location.replace(t.BASE_URL + t.Q_PARAM + t.getDefaultTarget());
             if(! t.FIXED_TOC) OrgNode.showElement(document.body);
           }
           else {
@@ -1074,8 +1077,10 @@ var org_html_manager = {
             OrgNode.showElement(t.NODE.BUTTONS);
             t.NODE.setState(OrgNode.UNFOLDED);
             t.NODE.show();
-            t.NODE.DIV.scrollIntoView(true);
-            window.location.replace(t.BASE_URL + t.Q_PARAM + t.getDefaultTarget());
+            if(last_node.IDX != t.NODE.IDX)
+              window.location.replace(t.BASE_URL + t.Q_PARAM + t.getDefaultTarget());
+            if(t.NODE.IDX == 0) window.scrollTo(0, 0);
+            else t.NODE.DIV.scrollIntoView(true);
           }
         }
     }
@@ -1123,6 +1128,7 @@ var org_html_manager = {
     if(t.POSTAMBLE) OrgNode.showElement(t.POSTAMBLE);
     if(!skip_show_section)
       t.showSection(sec);
+    window.scrollTo(0, 0);
   },
 
   slideView: function (sec, skip_show_section)
