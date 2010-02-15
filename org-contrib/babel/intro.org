@@ -321,22 +321,22 @@ HTML export of the resulting string:
 : This file takes up  36K
 
 **** [[http://www.r-project.org/][R]] 
-
+     What are the most common words in this file?
 In the Org-mode file:
 : #+begin_src R :colnames t
-:   t(sort(table(tolower(scan("org-babel.org", what="", na.strings="|"))), decreasing=TRUE)[1:10])
+:   words <- tolower(scan("intro.org", what="", na.strings=c("|",":")))
+:   t(sort(table(words[nchar(words) > 3]), decreasing=TRUE)[1:10])
 : #+end_src
 
 HTML export of code:
 #+begin_src R :colnames t
-  t(sort(table(tolower(scan("org-babel.org", what="", na.strings="|"))), decreasing=TRUE)[1:10])
+  words <- tolower(scan("intro.org", what="", na.strings=c("|",":")))
+  t(rev(sort(table(words[nchar(words) > 3])))[1:10])
 #+end_src
-
-HTML export of the resulting table:
-#+resname:
-| "the" | "of" | "to" | "in" | "a" | "is" | "and" | "code" | ":" | "be" |
-|-------+------+------+------+-----+------+-------+--------+-----+------|
-|   303 |  130 |  100 |   94 |  90 |   84 |    75 |     69 |  60 |   51 |
+#+results:
+| code | source | org-mode | #+end_src | #+begin_src | this | block | that | org-babel | with |
+|------+--------+----------+-----------+-------------+------+-------+------+-----------+------|
+|   64 |     62 |       44 |        42 |          41 |   36 |    34 |   28 |        28 |   27 |
 
 **** [[http://ditaa.sourceforge.net/][ditaa]]
 
