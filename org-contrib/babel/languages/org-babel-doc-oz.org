@@ -1,0 +1,437 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org-babel-OZ
+#+AUTHOR:     Torsten Anders, Eric Schulte
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org-babel support for
+  <a href="http://www.mozart-oz.org/">OZ</a>
+  </p>
+  <p>
+  <a href="http://www.mozart-oz.org/">
+  <img src="http://www.mozart-oz.org/logos/mozart-259x112.gif"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* TODO Notes                                                       :noexport:
+
+  - Make =:results output= the default, so =:results value= must be
+    specified explicitly. Currently this is the other way round.
+
+* Introduction
+
+org-babel-oz extends org-babel by support for executing Oz source
+code. Oz code is executed by sending it to the Oz Programming
+Environment (OPI), the Emacs mode and compiler interface for Oz
+programs.
+
+Oz distinguishes between statements and expressions. org-babel-oz
+supports both of them, but the org-babel header argument =:results=
+must be set accordingly. =:results output= requires the respective
+code block to be an Oz statement and =:results value= requires an Oz
+expression. org-babel inserts the result of expressions automatically
+into an org buffer, as usual. A statement has no result (i.e. the
+result of :results output is always nil), but it can produce output as
+a side effect (e.g., use the Oz browser or output a file).
+
+The OPI keeps running in the background between executing multiple
+code blocks (e.g., it remembers variable values). Therefore,
+org-babel-oz always runs in session mode (the org-babel =:session=
+header argument is ignored). In practice, non-session code blocks are
+handled equally well by the session mode. However, only a single
+session is supported.
+
+Expression evaluation happens synchronously. Therefore there is an
+additional header argument =:wait-time= <number>, which specifies the
+maximum time to wait for the result of a given expression. =nil= means
+to wait as long as it takes to get a result (potentially wait
+forever).
+
+* Requirements
+
+org-babel-oz requires the Mozart Programming System. Mozart is the
+implementation of the Oz programming language
+(http://www.mozart-oz.org/), which includes the major mode mozart for
+editing Oz programs.
+
+* Enabling org-babel-oz
+
+Add the following to your =~/.emacs= file.
+
+: (require 'org-babel-oz)
+
+* Feeding statements with =:results output=
+
+  The top-level expression of a typical Oz program is a statement (not
+  an expression). The following code block calls the Oz browser for
+  printing the Oz atom 'Hello org-babel!' (as usual, execute the block
+  with =C-c C-c=).
+
+#+begin_src oz :results output
+  {Browse 'Hello org-babel!'}
+#+end_src
+
+  This code does not return anything (no result is shown in the org
+  buffer) -- it only feeds a statement to the OPI compiler. Note that
+  =:results output= is a required header argument (the default is
+  =:results value=).
+
+* Feeding expressions and getting back results with =:results value=
+
+Oz expressions are executed with the org-babel header argument
+=:results value=. org-babel inserts the the result of an expression
+into an org buffer, as usual.
+
+#+begin_src oz :results value
+  39 + 3
+#+end_src
+
+#+results:
+: 42
+
+Oz does not distinguish between lists of integers and strings. The
+interface is currently set to output virtual strings "as is". This
+approach works fine for plain strings, on the one hand. ...
+
+#+begin_src oz :results value
+  "Bla"
+#+end_src
+
+#+results:
+: Bla
+
+..., and for concatenated virtual strings, on the other hand.
+
+#+begin_src oz :results value
+  foo#bar
+#+end_src
+
+#+results:
+: foobar
+
+However, list of integers are translated into the corresponding string
+by org-babel.
+
+#+begin_src oz :results value
+  [60 61 62 63]
+#+end_src
+
+#+results:
+: <=>?
+
+As a workaround, a list of integers can explicitly be translated into
+a string.
+
+#+begin_src oz :results value
+  {Value.toVirtualString [60 61 62 63]
+   100 100}
+#+end_src
+
+#+results:
+: [60 61 62 63]
+
+Nested data structures are supported as well. However, they are not
+pretty printed.
+
+#+begin_src oz :results value
+  seq([note(duration:2
+            pitch:60
+            amplitude:80)
+       note(duration:2
+            pitch:64
+            amplitude:60)
+       note(duration:2
+            pitch:67
+            amplitude:50)
+       note(duration:6
+            pitch:72
+            amplitude:100)]
+      startTime: 0
+      timeUnits: beats(4))
+#+end_src
+
+#+results:
+: seq([note(amplitude:80 duration:2 pitch:60) note(amplitude:60 duration:2 pitch:64) note(amplitude:50 duration:2 pitch:67) note(amplitude:100 duration:6 pitch:72)] startTime:0 timeUnits:beats(4))
+
+Oz objects without a literal representation are returned as they would
+be shown, e.g., in the Oz emulator. This example creates a Strasheela
+score object (so Strasheela must be installed).
+
+#+begin_src oz :results value
+  {Score.make seq
+   unit}
+#+end_src
+
+#+results:
+: <O: Sequential>
+
+* Org-babel variables
+
+Code blocks can contain variables in org-babel that are bound with the
+code block header argument =:var=. The variable syntax must comply
+with the syntax of variables for the programming language in
+question. Oz variables always start with a capital letter.
+
+Variables can also be bound with the result of Emacs lisp code. In the
+following example, the path of the directory of the present file is
+browsed.
+
+#+begin_src oz :results output :var Path=(format "'%s%s'" (file-name-directory (buffer-file-name)) "")
+{Browse Path}
+#+end_src
+
+Any Oz code can be expressed by wrapping it into an (Emacs lisp)
+string. In the following example, the variable =Foo= is bound to the
+(result of the) Oz expression 2+3.
+
+#+begin_src oz :results output :var Foo="2+3"
+{Browse Foo}
+#+end_src
+
+Another use for variables is for the Library of Babel. When the
+following code block is executed (=C-c C-c=), it calls the code block
+=browse= defined below. Arguments must be valid binding statements for
+Oz variables (e.g., X=3).
+
+#+lob: browse(X=3)
+
+#+lob: browse(X="This is a test")
+
+You can see in the Oz Compiler buffer the actual Oz code generated
+from such calls (org-babel-oz automatically surrounds the code block
+by a =local= statement, i.e. declares these variables).
+
+#+srcname: browse(X)
+#+begin_src oz
+  {Browse X}
+#+end_src
+
+Multiple variables are separated by commas (which is org-babel and not
+Oz syntax).
+
+#+lob: browse2(X=3, Y=7)
+
+#+srcname: browse2(X, Y)
+#+begin_src oz :results output
+  {Browse X#Y}
+#+end_src
+
+* Literate example
+
+Org-babel supports literate programming, and org-babel-oz inherits
+this functionality. An example is shown below. The following code
+block contains the code =<<declaration>>=, which expands to the code
+block named =declaration= shown below. Code blocks with such noweb
+syntax require the header argument =:noweb yes=. Interactive execution
+of literate programs that are split into multiple chunks works like
+the interactive execution plain code blocks (i.e. using =C-c C-c=)
+
+#+begin_src oz :results output :tangle LP-test :noweb yes
+  <<declaration>>
+  {Browse X+Y}
+#+end_src
+
+A complete Oz source file combining code chucks is created when
+calling =org-babel-tangle=. The a resulting file name (without
+extension) is given to the header argument =:tangle=.
+
+Following is the named code block =declaration=, which is used as a
+chunk in this literate programming example. Note that the order of
+code block definitions is not the order in which these code blocks
+(chunks) appear in the resulting program!
+
+#+srcname: declaration
+#+begin_src oz :results output
+  declare
+  X = 7
+  Y = 3
+#+end_src
+
+** TODO Ideas for Improving Literate Programming Support of Org-Babel
+
+   - Important: the names of literate programming code blocks must
+     appear in the exported files (e.g., HTML), otherwise the
+     resulting literate program is incomprehensible (e.g., using a
+     notation like <<code block name>> = <code>). These code names
+     should likely be created automatically, but there seems to be
+     also no strait-forward manual way to name code blocks (e.g.,
+     =#+CAPTION:= does not work for code blocks).
+
+   - Important: every "call" to a code block (e.g., <<my code block>>)
+     should somehow directly link to its definition (e.g., HTML link,
+     or ref to section number)
+
+   - Less important: Noweb syntax of chord block insertion is also
+     valid Oz syntax (macro call) -- the different should be somehow
+     made clear to avoid confusion
+
+* Session-based evaluation
+
+As mentioned above, org-babel-oz always runs in session mode. Sessions
+can consist of statements and expressions. In the following statement,
+the variable =X= is declared.
+
+#+begin_src oz :results output
+  declare
+  X = 7
+#+end_src
+
+In a later code block, the variable =X= is browsed (also a statement).
+
+#+begin_src oz :results output
+  {Browse X}
+#+end_src
+
+The value of this variable can also be returned (expression).
+
+#+begin_src oz :results value
+  X
+#+end_src
+
+#+resname:
+: 7
+
+* Inline source blocks
+
+  The following code example is only shown in the source, while the
+  export contains the result: src_oz{2+1}. Nevertheless, the code can
+  also be evaluated interactively.
+
+* Getting different result types                                   :noexport:
+
+** file
+
+Create a Strasheela score and output it as MIDI file (requires
+installation of Strasheela and midicsv).
+
+#+begin_src oz :results output
+   declare
+   MyTestScore = {Score.makeScore
+                  seq(items:[note(duration:2
+                                  pitch:60
+                                  amplitude:80)
+                             note(duration:2
+                                  pitch:64
+                                  amplitude:60)
+                             note(duration:2
+                                  pitch:67
+                                  amplitude:50)
+                             note(duration:6
+                                  pitch:72
+                                  amplitude:100)
+                            ]
+                      startTime:0
+                      timeUnit:beats(4))
+                  unit}
+   File = test
+  {Out.midi.renderAndPlayMidiFile MyTestScore
+   unit(file: File)}
+#+end_src
+
+#+begin_src oz :results value file :exports none
+   {Init.getStrasheelaEnv defaultMidiDir}#File#".mid"
+#+end_src
+
+*** TODO =:exports none= and =:exports results= are swapped
+
+    Meaning of these two args is swapped.
+
+*** TODO File output problems
+
+    - Are file names always absolute? I assume this depends on the
+      file name returned by the code block...
+
+* Handling Oz Exceptions
+
+In case an Oz statement results in an exception, then this exception
+is shown in the Oz Compiler buffer, as usual (it does not block the Oz
+compiler).
+
+#+begin_src oz :results output
+  {Bla} % undefined procedure
+#+end_src
+
+For Oz expressions that result in an exception, the exception is shown
+and additionally the result =error= returned.
+
+#+begin_src oz :results value
+   1 div 0 % division by 0 error
+#+end_src
+
+#+resname:
+: error
+
+Note that some exceptions are not caught by the Oz interface and thus
+block Emacs. In the following example, the variable Bla is not
+declared and Emacs is blocked for the default value of the header
+argument =:wait-time= (1 sec).
+
+#+begin_src oz :results value
+   Bla
+#+end_src
+
+* Bugs
+
+  While evaluating Oz statements with =:results output= is stable,
+  evaluating Oz expressions with =:results value= is not. In
+  particular, when Oz is halted and restarted, then [sometimes?] the
+  connection between org-babel-oz and Oz is broken.  Workaround:
+  execute the Emacs Lisp code =(org-babel-oz-create-socket)= (problem:
+  "Address already in use").
+
+  The first time an Oz expression is executed, the result is posted in
+  a separate temporary buffer. For later expression executions, the
+  result is inserted in the org buffer as expected
+
+* Convenience extensions                                           :noexport:
+
+** Using yasnippet with org-mode
+
+   YASnippet is a template system for Emacs.
+   http://code.google.com/p/yasnippet/
+
+   - Start typing =begin=
+   - Press =C-§= (the yas/trigger-key)
+   - Type rest of block keyword (e.g., =src= to get a =begin_src= block)
+   - Press =TAB=
+   - Type header args
+   - Press =TAB=
+   - Fill in body of block (e.g., press =C-'= and edit code)
+
+* TMP Tests                                                        :noexport:
+
+#+begin_src oz :results output :var Path=(buffer-file-name)
+  {Browse Path}
+#+end_src
+
+
+#+begin_src sh :file blue.png
+  echo "test"
+#+end_src
+
+#+results:
+[[file:test]]
+
+
+
+
+#+begin_src python :results output
+import time
+#+end_src
+
+
+#+begin_src python :results value
+2 + 2
+#+end_src
+
+#+results:
+: None
+
