@@ -30,8 +30,8 @@
       <p>
         The Babel Fish is small, yellow, and simultaneously translates
         from one spoken language to another.
-      </p> 
-      <p> 
+      </p>
+      <p>
         &ndash; The Hitchhiker's Guide to the Galaxy, Douglas Adams
       </p>
     </p>
@@ -66,7 +66,7 @@ This syntax can be expanded by naming the source code block.
 
 : #+source: name
 : #+begin_src language header-arguments
-:   
+:
 : #+end_src
 
 - name :: This name is associated with the source code block.  This is
@@ -87,12 +87,12 @@ This syntax can be expanded by naming the source code block.
    programmers fluent in a variety of languages.  For example,
    #+begin_example
      ,#+srcname: alias-example
-     ,#+begin_src emacs-lisp 
+     ,#+begin_src emacs-lisp
        '((call lob)
          (source function srcname)
-         (results resname))  
+         (results resname))
      ,#+end_src
-     
+
      ,#+results: alias-example
      | call    | lob      |         |
      | source  | function | srcname |
@@ -112,9 +112,9 @@ This syntax can be expanded by naming the source code block.
   :PROPERTIES:
   :CUSTOM_ID: languages
   :END:
-  
+
   Org-babel has support for the following languages.
-  
+
   | Language       | Documentation            | Identifier | Requirements                                |
   |----------------+--------------------------+------------+---------------------------------------------|
   | Asymptote      | org-babel-doc-asymptote  | asymptote  | [[http://asymptote.sourceforge.net/][asymptote]], [[http://asymptote.sourceforge.net/doc/Editing-modes.html][asy-mode]]                         |
@@ -136,13 +136,13 @@ This syntax can be expanded by naming the source code block.
   | GNU Screen     | [[file:languages/org-babel-doc-screen.org][org-babel-doc-screen]]     | screen     | [[http://www.gnu.org/software/screen/][screen]], a terminal                          |
   | shell          | org-babel-doc-sh         | sh[fn:1]   | a shell                                     |
   | SQL            | org-babel-doc-sql        | sql        | none                                        |
-  
+
   To add support for a particular language to your Org-babel
   installation first make sure that the requirements of the language
   are met, then add a line like the following to your Emacs
   configuration, (replace "identifier" with one of the
   entries in the Identifier column of the table).
-  #+begin_src emacs-lisp 
+  #+begin_src emacs-lisp
     (require 'org-babel-identifier)
   #+end_src
 
@@ -168,22 +168,22 @@ each more specific than the last.
 
  System-wide values of header arguments can be specified by
  customizing the =org-babel-default-header-args= variable:
- #+begin_example 
+ #+begin_example
    org-babel-default-header-args is a variable defined in `org-babel.el'.
-   Its value is 
+   Its value is
    ((:session . "none")
     (:results . "replace")
     (:exports . "code")
     (:cache . "no")
     (:noweb . "no"))
-   
-   
+
+
    Documentation:
    Default arguments to use when evaluating a source block.
  #+end_example
- [[#default-noweb]]  
+ [[#default-noweb]]
  For example, the following example could be used to set the default value
- of =:noweb= header arguments to =yes=.  This would have the effect of 
+ of =:noweb= header arguments to =yes=.  This would have the effect of
  expanding =:noweb= references by default when evaluating source code blocks.
  #+begin_src emacs-lisp :results silent :exports code
    (setq org-babel-default-header-args
@@ -197,7 +197,7 @@ each more specific than the last.
  means they can be set on the outline header level.  For example, the
  value of the =:cache= header argument will default to true in all
  source code blocks under the following example of an Org-mode outline header:
- #+begin_example 
+ #+begin_example
    ,* outline header
      :PROPERTIES:
      :cache:    yes
@@ -224,11 +224,11 @@ each more specific than the last.
  header argument is set to =code=, meaning only the body of the
  source code block
  will be preserved on export to HTML or LaTeX.
- #+begin_example 
+ #+begin_example
    ,#+source: factorial
    ,#+begin_src haskell :results silent :exports code
      fac 0 = 1
-     fac n = n * fac (n-1)  
+     fac n = n * fac (n-1)
    ,#+end_src
  #+end_example
 
@@ -266,53 +266,53 @@ each more specific than the last.
 
     - literal value :: either a string ="string"= or a number =9=.
     - reference :: a table name:
-         
+
          #+begin_example
            ,#+tblname: example-table
            | 1 |
            | 2 |
            | 3 |
            | 4 |
-           
+
            ,#+source: table-length
            ,#+begin_src emacs-lisp :var table=example-table
              (length table)
            ,#+end_src
-           
+
            ,#+results: table-length
            : 4
          #+end_example
-         
+
          a source code block name, as assigned by =#+srcname:=,
          followed by parentheses:
-         
+
          #+begin_example
            ,#+begin_src emacs-lisp :var length=table-length()
              (* 2 length)
            ,#+end_src
-           
+
            ,#+results:
            : 8
          #+end_example
-         
+
          In addition, an argument can be passed to the source code
          block referenced by =:var=.  The argument is passed within
          the parentheses following the source code block name:
-         
-         #+begin_example 
+
+         #+begin_example
            ,#+source: double
            ,#+begin_src emacs-lisp :var input=8
              (* 2 input)
            ,#+end_src
-           
+
            ,#+results: double
            : 16
-           
+
            ,#+source: squared
            ,#+begin_src emacs-lisp :var input=double(input=1)
              (* input input)
            ,#+end_src
-           
+
            ,#+results: squared
            : 4
          #+end_example
@@ -321,55 +321,55 @@ each more specific than the last.
      :PROPERTIES:
      :CUSTOM_ID: alternate-argument-syntax
      :END:
-     
+
      It is also possible to specify arguments in a potentially more
      natural way using the =#+source:= line of a source code block.
      As in the following example arguments can be packed inside of
      parenthesis following the source name.
-     #+begin_example 
+     #+begin_example
        ,#+source: double(input=0)
        ,#+begin_src emacs-lisp
          (* 2 input)
        ,#+end_src
      #+end_example
-     
+
 **** indexable variable values
      :PROPERTIES:
      :CUSTOM_ID: var-argument-indexing
      :END:
-     
+
      It is possible to assign a portion of a value to a
      variable in a source block.  The following example
      assigns the second and third rows of the table
      =example-table= to the variable =data=:
-   
+
      #+begin_example
        :var data=example-table[1:2]
      #+end_example
 
      *Note:* ranges are indexed using the =:= operator.
-     
+
      *Note:* indices are 0 based.
 
      The following example assigns the second column of the
      first row of =example-table= to =data=:
-   
+
      #+begin_example
        :var data=example-table[0,1]
      #+end_example
-   
+
      It is possible to index into the results of source code blocks
      as well as tables.  Any number of dimensions can be indexed.
-     Dimensions are separated from one another by commas.  
+     Dimensions are separated from one another by commas.
 
      For more information on indexing behavior see the documentation
      for the =org-babel-ref-index-list= function -- provided below.
-     
-     #+begin_example 
+
+     #+begin_example
        org-babel-ref-index-list is a Lisp function in `org-babel-ref.el'.
-       
+
        (org-babel-ref-index-list INDEX LIS)
-       
+
        Return the subset of LIS indexed by INDEX.  If INDEX is
        separated by ,s then each PORTION is assumed to index into the
        next deepest nesting or dimension.  A valid PORTION can consist
@@ -400,6 +400,9 @@ each more specific than the last.
        block.
 
 **** collection
+    :PROPERTIES:
+    :CUSTOM_ID: header-argument-results-collection
+    :END:
      The following options are mutually exclusive, and specify how the
      results should be collected from the source code block.
 
@@ -477,7 +480,7 @@ each more specific than the last.
 *** =:tangle=
     :PROPERTIES:
     :CUSTOM_ID: tangle-header-arguments
-    :END: 
+    :END:
 
     Specify whether or not the source code block should be included
     in tangled extraction of source code files.
@@ -506,15 +509,83 @@ each more specific than the last.
     session a name.  This makes it possible to run concurrent
     sessions for each interpreted language.
 
-    Results are handled somewhat differently if a session is invoked.
+*** =:noweb=
+    :PROPERTIES:
+    :CUSTOM_ID: header-argument-noweb
+    :END:
 
+    Controls the expansion of [[noweb-reference-syntax][noweb syntax]] references in a
+    source code block.  This header argument can have one of two
+    values: =yes= or =no=.
+    - =no= :: the default.  No [[noweb-reference-syntax][noweb syntax]] specific action is taken
+         on evaluating source code blocks/  However, noweb references
+         will still be expanded during tangling.
+    - =yes= :: all [[noweb-reference-syntax][noweb syntax]] references in the body of the source
+               code block will be expanded before the block is evaluated.
+
+**** Noweb Prefix Lines
+
+     Noweb insertions are now placed behind the line prefix of the
+     =<<reference>>=.
+
+     This behavior is illustrated in the following example.  Because
+     the =<<example>>= noweb reference appears behind the SQL
+     comment syntax, each line of the expanded noweb reference will
+     be commented.
+
+     This source code block:
+
+     #+begin_example
+       -- <<example>>
+     #+end_example
+
+
+     expands to:
+
+     #+begin_example
+       -- this is the
+       -- multi-line body of example
+     #+end_example
+
+     Note that noweb replacement text that does *not* contain any
+     newlines will not be affected by this change, so it is still
+     possible to use inline noweb references.
+
+     Thanks to Sébastien Vauban for this idea.
+
+*** =:cache=
+    :PROPERTIES:
+    :CUSTOM_ID: header-argument-cache
+    :END:
+
+    Controls the use of in-buffer caching of source code block
+    results to avoid re-running unchanged source code blocks.  This
+    header argument can have one of two values: =yes= or =no=.
+    - =no= :: The default.  No caching takes place and the source
+         code block will be run every time it is executed.
+    - =yes= :: every time the source code block is run a sha1 hash of
+         the code and arguments passed to the block will be
+         generated.  This hash is packed into the =#+results:= line
+         of the results and will be checked on subsequent executions
+         of the source code block.  If the source code block has not
+         changed since the last time it was evaluated, it will not be
+         re-evaluated.
+
+* Results
+    :PROPERTIES:
+    :CUSTOM_ID: results-specification
+    :END:
+
+    The way in which results are handled depends on whether a [[header-argument-session][session]]
+    is invoked, as well as on whether
+    [[header-argument-results-collection][=:results value=] or
+    [[header-argument-results-collection][=:results output=]] is used. The following table shows the
+    possibilities:
 
     |                   | non-session (default)    | =:session=                          |
     |-------------------+--------------------------+-------------------------------------|
     | =:results value=  | value of last expression | value of last expression            |
     | =:results output= | contents of stdout       | concatenation of interpreter output |
-    
-
 
     *Note:*  With =:results value=, the result in both =:session= and
     non-session is returned to Org-mode as a table (a one- or
@@ -547,7 +618,7 @@ each more specific than the last.
       a language-specific manner: the value of the variable =_= in
       python and ruby, and the value of =.Last.value= in R).
 
-***** =:results output= 
+***** =:results output=
        The code is passed to the interpreter running as an interactive
        Emacs inferior process. The result returned is the concatenation
        of the sequence of (text) output from the interactive
@@ -583,68 +654,6 @@ each more specific than the last.
        and prints out its value, '2'. (Indeed, the other print statements are
        unnecessary here).
 
-*** =:noweb=
-    :PROPERTIES:
-    :CUSTOM_ID: header-argument-noweb
-    :END:
-
-    Controls the expansion of [[noweb-reference-syntax][noweb syntax]] references in a
-    source code block.  This header argument can have one of two
-    values: =yes= or =no=. 
-    - =no= :: the default.  No [[noweb-reference-syntax][noweb syntax]] specific action is taken
-         on evaluating source code blocks/  However, noweb references
-         will still be expanded during tangling.
-    - =yes= :: all [[noweb-reference-syntax][noweb syntax]] references in the body of the source
-               code block will be expanded before the block is evaluated.
-
-**** Noweb Prefix Lines
-
-     Noweb insertions are now placed behind the line prefix of the
-     =<<reference>>=.
-     
-     This behavior is illustrated in the following example.  Because
-     the =<<example>>= noweb reference appears behind the SQL
-     comment syntax, each line of the expanded noweb reference will
-     be commented.  
-
-     This source code block:
-   
-     #+begin_example 
-       -- <<example>>
-     #+end_example
-     
-   
-     expands to:
-
-     #+begin_example 
-       -- this is the
-       -- multi-line body of example
-     #+end_example
-   
-     Note that noweb replacement text that does *not* contain any
-     newlines will not be affected by this change, so it is still
-     possible to use inline noweb references.
-   
-     Thanks to Sébastien Vauban for this idea.
-
-*** =:cache=
-    :PROPERTIES:
-    :CUSTOM_ID: header-argument-cache
-    :END:
-
-    Controls the use of in-buffer caching of source code block
-    results to avoid re-running unchanged source code blocks.  This
-    header argument can have one of two values: =yes= or =no=.
-    - =no= :: The default.  No caching takes place and the source
-         code block will be run every time it is executed.
-    - =yes= :: every time the source code block is run a sha1 hash of
-         the code and arguments passed to the block will be
-         generated.  This hash is packed into the =#+results:= line
-         of the results and will be checked on subsequent executions
-         of the source code block.  If the source code block has not
-         changed since the last time it was evaluated, it will not be
-         re-evaluated. 
-
 * Noweb Reference Syntax
   :PROPERTIES:
   :CUSTOM_ID: noweb-reference-syntax
@@ -655,23 +664,23 @@ each more specific than the last.
   : <<code-block-name>>
 
   Noweb references are handled differently during evaluation and
-  tangling. 
+  tangling.
 
   When a document is tangled, Noweb references are replaced with the
-  named source code block.  
+  named source code block.
 
   When a source code block is evaluated, the action depends upon the
   value of the =:noweb= header argument.  If =:noweb yes=, then a
   Noweb reference is expanded before evaluation.  If =:noweb no=,
   the default, then the reference is not expanded before
-  evaluation.  
+  evaluation.
 
   *Note:* the default value, =:noweb no=, was chosen to ensure that
   Org-babel does not break correct code in a language, such as Ruby,
   where =<<arg>>= is a syntactically valid construct.  If =<<arg>>= is
   not syntactically valid in languages that you use, then please
   consider [[*System%20wide][setting the default value]].
-  
+
   An example that uses the Noweb reference syntax is provided in the
   [[literate programming example]].
 
@@ -711,20 +720,20 @@ each more specific than the last.
     :CUSTOM_ID: function-org-babel-execute-src-block
     :END:
 
-#+begin_example 
+#+begin_example
   org-babel-execute-src-block is an interactive Lisp function in
   `org-babel.el'.
-  
+
   (org-babel-execute-src-block &optional ARG INFO PARAMS)
-  
+
   Execute the current source code block, and insert the results
   into the buffer.  Source code execution and the collection and
   formatting of results can be controlled through a variety of
   header arguments.
-  
+
   Optionally supply a value for INFO in the form returned by
   `org-babel-get-src-block-info'.
-  
+
   Optionally supply a value for PARAMS which will be merged with
   the header arguments specified at the front of the source code
   block.
@@ -735,12 +744,12 @@ each more specific than the last.
     :CUSTOM_ID: function-org-babel-open-src-block-result
     :END:
 
-#+begin_example 
+#+begin_example
   org-babel-open-src-block-result is an interactive Lisp function in
   `org-babel.el'.
-  
+
   (org-babel-open-src-block-result &optional RE-RUN)
-  
+
   If `point' is on a src block then open the results of the
   source code block, otherwise return nil.  With optional prefix
   argument RE-RUN the source-code block is evaluated even if
@@ -752,16 +761,16 @@ each more specific than the last.
     :CUSTOM_ID: function-org-babel-load-in-session
     :END:
 
-#+begin_example 
+#+begin_example
   org-babel-load-in-session is an interactive Lisp function in
   `org-babel.el'.
-  
+
   (org-babel-load-in-session &optional ARG INFO)
-  
+
   Load the body of the current source-code block.  Evaluate the
   header arguments for the source block before entering the
   session.  After loading the body this pops open the session.
-  
+
   [back]
 #+end_example
 
@@ -770,17 +779,17 @@ each more specific than the last.
     :CUSTOM_ID: function-org-babel-pop-to-session
     :END:
 
-#+begin_example 
+#+begin_example
   org-babel-pop-to-session is an interactive Lisp function in
   `org-babel.el'.
-  
+
   (org-babel-pop-to-session &optional ARG INFO)
-  
+
   Pop to the session of the current source-code block.  If
   called with a prefix argument then evaluate the header arguments
   for the source block before entering the session.  Copy the body
   of the source block to the kill ring.
-  
+
   [back]
 #+end_example
 
@@ -789,14 +798,14 @@ each more specific than the last.
     :CUSTOM_ID: function-org-babel-tangle
     :END:
 
-#+begin_example 
+#+begin_example
   org-babel-tangle is an interactive Lisp function in
   `org-babel-tangle.el'.
-  
+
   It is bound to C-c M-b t.
-  
+
   (org-babel-tangle &optional TARGET-FILE LANG)
-  
+
   Extract the bodies of all source code blocks from the current
   file into their own source-specific files.  Optional argument
   TARGET-FILE can be used to specify a default export file for all
@@ -809,14 +818,14 @@ each more specific than the last.
     :CUSTOM_ID: function-org-babel-execute-subtree
     :END:
 
-#+begin_example 
+#+begin_example
   org-babel-execute-subtree is an interactive Lisp function in
   `org-babel.el'.
-  
+
   It is bound to C-c M-b s.
-  
+
   (org-babel-execute-subtree &optional ARG)
-  
+
   Replace EVAL snippets in the entire subtree.
 #+end_example
 
@@ -825,14 +834,14 @@ each more specific than the last.
     :CUSTOM_ID: function-org-babel-execute-buffer
     :END:
 
-#+begin_example 
+#+begin_example
   org-babel-execute-buffer is an interactive Lisp function in
   `org-babel.el'.
-  
+
   It is bound to C-c M-b b.
-  
+
   (org-babel-execute-buffer &optional ARG)
-  
+
   Replace EVAL snippets in the entire buffer.
 #+end_example
 
@@ -841,13 +850,13 @@ each more specific than the last.
     :CUSTOM_ID: function-org-babel-sha1-hash
     :END:
 
-#+begin_example 
+#+begin_example
   org-babel-sha1-hash is an interactive Lisp function in `org-babel.el'.
-  
+
   It is bound to C-c M-b h.
-  
+
   (org-babel-sha1-hash &optional INFO)
-  
+
   Not documented.
 #+end_example
 
@@ -856,14 +865,14 @@ each more specific than the last.
     :CUSTOM_ID: function-org-babel-goto-named-source-block
     :END:
 
-#+begin_example 
+#+begin_example
   org-babel-goto-named-source-block is an interactive Lisp function in
   `org-babel.el'.
-  
+
   It is bound to C-c M-b g.
-  
+
   (org-babel-goto-named-source-block &optional NAME)
-  
+
   Go to a named source-code block.
 #+end_example
 
@@ -872,14 +881,14 @@ each more specific than the last.
     :CUSTOM_ID: function-org-babel-lob-ingest
     :END:
 
-#+begin_example 
+#+begin_example
   org-babel-lob-ingest is an interactive Lisp function in
   `org-babel-lob.el'.
-  
+
   It is bound to C-c M-b l.
-  
+
   (org-babel-lob-ingest &optional FILE)
-  
+
   Add all source-blocks defined in FILE to `org-babel-library-of-babel'.
 #+end_example
 
@@ -897,14 +906,14 @@ Be sure to adjust the paths to fit your system.
   #
   DIR=`pwd`
   FILES=""
-  
+
   # wrap each argument in the code required to call tangle on it
   for i in $@; do
   FILES="$FILES \"$i\""
   done
-  
+
   emacsclient \
-  --eval "(progn 
+  --eval "(progn
   (add-to-list 'load-path (expand-file-name \"~/src/org/lisp/\"))
   (add-to-list 'load-path (expand-file-name \"~/src/org/contrib/lisp/\"))
   (require 'org)(require 'org-exp)(require 'org-babel)
