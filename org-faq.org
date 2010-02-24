@@ -1770,23 +1770,74 @@ or recurring appointments, such as:
 
 or
 
+: * Vacation
+:   <2009-03-20 Fri>--<2009-04-01 Wed>
+
+or
+
 : * Weekly meeting with boss
 :   <2009-01-20 Tue 14:00 +1w>
 
 Sometimes, however, you need to set up more complicated recurring
-appointments. Org-mode has built-in support for many of [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Sexp-Diary-Entries.html][the powerful
-sexp entries]] that work in [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Diary.html#Diary][Emacs diary]]. Let's say, for instance, that
-you teach a class that meets every Monday evening between February 16
-and April 20, 2009. The way to enter this an org-mode file is:
+appointments. Org-mode has built-in support for many of
+[[http://www.gnu.org/software/emacs/manual/html_node/emacs/Sexp-Diary-Entries.html][the
+powerful sexp entries]] that work in [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Diary.html#Diary][Emacs diary]]. Let's say, for
+instance, that you teach a class that meets every Monday evening
+between February 16 and April 20, 2009. The way to enter this an
+org-mode file is:
 
 : ** Class 7:00pm-9:00pm
 : <%%(and (= 1 (calendar-day-of-week date)) (diary-block 2 16 2009 4 20 2009))>
 
-The expression above designates all Mondays (1) that fall between
-February 16 and April 20.
+The expression above designates all Mondays that fall between February
+16 and April 20. How exactly does it work?
 
-For more ideas on how to create such expressions, see [[http://www.emacswiki.org/cgi-bin/wiki/DiaryMode][this page on the
-Emacs wiki]].
+ - (and... :: Indicates that *both* of the conditions that follow have
+          to be true.
+
+   - (= 1 (calendar-day-of-week date)) :: Is the day of the week a
+        Monday.
+
+       - Note: the function calendar-day-of-week converts the date to the day of week
+	 expressed in numeric form, where 0 = Sunday, 1 = Monday, and so on.
+
+   - (diary-block 2 16 2009 4 20 2009) :: Does the date fall between
+        these two dates.
+
+You can make a sexp as complex as you like. If you wanted to omit a
+week because of holidays, you could add another condition to the sexp:
+
+: ** Class 7:00pm-9:00pm
+: <%%(unless (diary-block 3 9 2009 3 13 2009) 
+: (and (= 1 (calendar-day-of-week date)) (diary-block 2 16 2009 4 20 2009)))>
+
+The sexp above would omit Monday during the week of March 9, 2009.
+
+Org-mode now offers a more convenient way to set up a recurring
+appointment that lasts for a certain period of time, such as a class.
+The function to use is org-diary-class:
+
+: (org-diary-class M1 D1 Y1 M2 D2 Y2 DAYNAME &rest SKIP-WEEKS)
+
+M1/2, D1/2, and Y1/2 indicate the beginning and ending dates. Dayname
+takes the form of a number indicating the day of the week (0 = Sunday,
+1 = Monday, and so on...). In addition, one can add an optional
+argument SKIP-WEEKS to indicate weeks on the calendar that should be
+skipped. This argument should be expressed as an ISO week number. You
+can find the number by invoking emacs' built-in calendar (=M-x
+calendar=), navigating to the appropriate week, and typing =p c=
+(calendar-iso-print-date).
+
+You can use it in an org-diary-class in a file as follows:
+
+: ** Class 7:00pm-9:00pm
+: %%(org-diary-class 2 16 2009 4 20 2009 1 10)
+
+This would give us the same result as the more complex sexp example
+above.
+
+For more ideas on how to create diary special expressions, see [[http://www.emacswiki.org/cgi-bin/wiki/DiaryMode][this
+page on the Emacs wiki]].
 
 ** How can I set an event to occur every day except saturday and sunday?
 
