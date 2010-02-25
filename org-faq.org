@@ -1758,7 +1758,7 @@ org-mode >= 6.24).
 
   : M-x org-agenda-to-appt RET
 
-** How can I shedule an weekly appointment that lasts only until a certain date?
+** How can I create more complex appointments in my org-files?
    :PROPERTIES:
    :CUSTOM_ID: diary-sexp-in-org-files
    :END:
@@ -1766,17 +1766,22 @@ org-mode >= 6.24).
 Org-mode's active timestamps work very well for scheduling individual
 or recurring appointments, such as:
 
-: * 8:00am Dentist appointment <2009-01-16 Fri>
+#+begin_src org
+  ,* 8:00am Dentist appointment <2009-01-16 Fri>
+#+end_src
+
+or
+#+begin_src org
+  ,* Vacation
+  ,  <2009-03-20 Fri>--<2009-04-01 Wed>
+#+end_src
 
 or
 
-: * Vacation
-:   <2009-03-20 Fri>--<2009-04-01 Wed>
-
-or
-
-: * Weekly meeting with boss
-:   <2009-01-20 Tue 14:00 +1w>
+#+begin_src org
+  ,* Weekly meeting with boss
+  ,  <2009-01-20 Tue 14:00 +1w>
+#+end_src
 
 Sometimes, however, you need to set up more complicated recurring
 appointments. Org-mode has built-in support for many of
@@ -1786,8 +1791,10 @@ instance, that you teach a class that meets every Monday evening
 between February 16 and April 20, 2009. The way to enter this an
 org-mode file is:
 
-: ** Class 7:00pm-9:00pm
-: <%%(and (= 1 (calendar-day-of-week date)) (diary-block 2 16 2009 4 20 2009))>
+#+begin_src org
+  ,** Class 7:00pm-9:00pm
+  ,   <%%(and (= 1 (calendar-day-of-week date)) (diary-block 2 16 2009 4 20 2009))>
+#+end_src
 
 The expression above designates all Mondays that fall between February
 16 and April 20. How exactly does it work?
@@ -1796,26 +1803,57 @@ The expression above designates all Mondays that fall between February
           to be true.
 
    - (= 1 (calendar-day-of-week date)) :: Is the day of the week a
-        Monday.
+        Monday?
 
        - Note: the function calendar-day-of-week converts the date to the day of week
 	 expressed in numeric form, where 0 = Sunday, 1 = Monday, and so on.
 
    - (diary-block 2 16 2009 4 20 2009) :: Does the date fall between
-        these two dates.
+        these two dates?
 
 You can make a sexp as complex as you like. If you wanted to omit a
-week because of holidays, you could add another condition to the sexp:
+week because of holidays, for instance, you could add another
+condition to the sexp:
+
+#+begin_src org
+  ,** Class 7:00pm-9:00pm
+  , <%%(unless (diary-block 3 9 2009 3 13 2009) (and (= 1 (calendar-day-of-week date)) (diary-block 2 16 2009 4 20 2009)))>
+#+end_src
+
+The sexp above would omit Monday during the week of March 9, 2009. For
+another way to accomplish the same thing, see [[org-diary-class][this FAQ]].
+
+Another diary function commonly used for more complex scheduling is
+diary-float. For instance,
+
+#+begin_src org
+  ,* Monthly meeting
+  ,  %%(diary-float t 3 3) 
+#+end_src
+
+...would appear on the third Wednesday of every month.
+
+For more ideas on how to create diary special expressions, see [[http://www.emacswiki.org/cgi-bin/wiki/DiaryMode][this
+page on the Emacs wiki]].
+
+** How can I schedule a weekly class that lasts for a limited period of time?
+   :PROPERTIES:
+   :CUSTOM_ID: org-diary-class
+   :END:
+
+Org-mode offers a convenient diary sexp function for setting up a
+recurring appointment that lasts for a certain period of time, such as
+a class. It is called org-diary-class and it can be entered as
+follows:
 
 : ** Class 7:00pm-9:00pm
-: <%%(unless (diary-block 3 9 2009 3 13 2009) 
-: (and (= 1 (calendar-day-of-week date)) (diary-block 2 16 2009 4 20 2009)))>
+: %%(org-diary-class 2 16 2009 4 20 2009 1 10)
 
-The sexp above would omit Monday during the week of March 9, 2009.
+The function above schedules an appointment for every Monday (1)
+between February 16 and April 20, 2009, except for ISO week 10 (March
+1 to March 7).
 
-Org-mode now offers a more convenient way to set up a recurring
-appointment that lasts for a certain period of time, such as a class.
-The function to use is org-diary-class:
+The function org-diary-class has the following format:
 
 : (org-diary-class M1 D1 Y1 M2 D2 Y2 DAYNAME &rest SKIP-WEEKS)
 
@@ -1828,24 +1866,11 @@ can find the number by invoking emacs' built-in calendar (=M-x
 calendar=), navigating to the appropriate week, and typing =p c=
 (calendar-iso-print-date).
 
-You can use it in an org-diary-class in a file as follows:
-
-: ** Class 7:00pm-9:00pm
-: %%(org-diary-class 2 16 2009 4 20 2009 1 10)
-
-This would give us the same result as the more complex sexp example
-above.
-
-For more ideas on how to create diary special expressions, see [[http://www.emacswiki.org/cgi-bin/wiki/DiaryMode][this
-page on the Emacs wiki]].
-
-** How can I set an event to occur every day except saturday and sunday?
-
-
+** How can I set an event to occur every day except Saturday and Sunday?
 
    #+begin_example
    ** Daily meeting
-      SCHEDULED: <%%(memq (calendar-day-of-week date) '(1 2 3 4 5))>
+      <%%(memq (calendar-day-of-week date) '(1 2 3 4 5))>
    #+end_example
 
 * Export
