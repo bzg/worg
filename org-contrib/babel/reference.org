@@ -461,6 +461,88 @@ each more specific than the last.
                   into the Org-mode buffer.  E.g., =:results output
                   replace=.
 
+*** =:file=
+    :PROPERTIES:
+    :CUSTOM_ID: header-argument-file
+    :END:
+
+    =:file= is used to specify a path for file output in which case an
+    [[http://orgmode.org/manual/Link-format.html#Link-format][org style]] =file:= link is inserted into the buffer as the
+    result. Common examples are graphical output from [[file:languages/org-babel-doc-R.org][R]], gnuplot,
+    ditaa and [[file:languages/org-babel-doc-LaTeX.org][latex]] blocks.
+
+    See the [[#header-argument-dir][=:dir= and remote execution]] section for examples.
+
+    The variable =org-babel-file-links-use-filename-as-description=
+    can be used to control whether the link features a description
+    part or not.
+
+    Note that for R and gnuplot (as well as latex and ditaa) graphical
+    output is automatically sent to the specified file (there is no
+    need to do so explicitly in the code). In contrast, in general
+    purpose languages such as python and ruby, while the =:file=
+    header argument can be used, the code will need to explicitly
+    create output corresponding to the filepath supplied.
+
+*** =:dir= and remote execution
+    :PROPERTIES:
+    :CUSTOM_ID: header-argument-dir
+    :END:
+    =:dir= specifies the /default directory/ during code block
+    execution. If it is absent, then the directory associated with the
+    current buffer is used. In other words, supplying =:dir path= has
+    the same effect as changing the current directory with =M-x cd
+    path=, and then not supplying =:dir=. Under the surface, =:dir=
+    simply sets the value of the emacs variable =default-directory=.
+
+    When using =:dir=, you should supply a relative path for [[#header-argument-file][file
+    output]] (e.g. =:file myfile.jpg= or =:file results/myfile.jpg=) in
+    which case that path will be interpreted relative to the default
+    directory.
+
+    In other words, if you want your plot to go into a folder called
+    Work in your home directory, you could use
+
+#+begin_example 
+  ,#+begin_src R :file myplot.png :dir ~/Work
+  matplot(matrix(rnorm(100), 10), type="l")
+  ,#+end_src
+#+end_example
+
+**** Remote execution
+     A directory on a remote machine can be specified using [[http://www.gnu.org/software/tramp/#Filename-Syntax][tramp
+     filename syntax]], in which case the code will be executed on the
+     remote machine[fn:2]. An example is
+
+#+begin_example 
+,#+begin_src R :file plot.png :dir /dand@yakuba.princeton.edu:
+  plot(1:10, main=system("hostname", intern=TRUE))
+,#+end_src
+#+end_example
+
+Text results will be returned to the local org buffer as normal, and
+file output will be created on the remote machine with relative paths
+interpreted relative to the remote directory. An org link to the
+remote file will be created.
+
+So in the above example a plot will be created on the remote machine,
+and a link of the following form will be inserted in the org buffer:
+
+#+begin_example 
+[[file:/scp:dand@yakuba.princeton.edu:/home/dand/plot.png][plot.png]]
+#+end_example
+
+Most of this functionality follows immediately from the fact that
+     =:dir= sets the value of the emacs variable =default-directory=,
+     thanks to [[http://www.gnu.org/software/tramp/][tramp]]. Those using XEmacs, or GNU Emacs prior to
+     version 23 may need to install tramp separately in order for the
+     above features to work correctly.
+
+**** Further points
+     - If =:dir= is used in conjunction with =:session=, although it
+       will determine the starting directory for a new session as
+       expected, no attempt is currently made to alter the directory
+       associated with an existing session.
 *** =:exports=
     :PROPERTIES:
     :CUSTOM_ID: header-argument-exports
@@ -502,7 +584,7 @@ each more specific than the last.
 
     Start a session for an interpreted language where state is
     preserved.  This applies particularly to the supported languages
-    perl, python, R and ruby.
+    python, R and ruby.
 
     By default, a session is not started.
 
@@ -927,3 +1009,6 @@ Be sure to adjust the paths to fit your system.
 * Footnotes
 
 [fn:1] The former use of the =shell= identifier is now deprecated.
+
+[fn:2] As long as the interpreter executable is found on the remote
+machine: see the variable =tramp-remote-path=
