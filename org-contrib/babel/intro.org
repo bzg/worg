@@ -608,10 +608,16 @@ For example, let's take some system diagnostics in the shell and graph them with
   :CUSTOM_ID: spreadsheet
   :END:
 
-Not only can Org-babel pass entire tables of data as [[arguments-to-source-code-blocks][arguments to
-source code blocks]], Org-babel can also be used to call source code
-blocks from *within* Org-mode tables using Org-mode's [[http://orgmode.org/manual/The-spreadsheet.html#The-spreadsheet][existing spreadsheet
-functionality]].
+In addition to passing data from tables as [[arguments-to-source-code-blocks][arguments]] to source code
+blocks, and [[#results-value][storing]] results as tables, Org-babel can be used in a
+third way with Org-mode tables. First note that Org-mode's [[http://orgmode.org/manual/The-spreadsheet.html#The-spreadsheet][existing
+spreadsheet functionality]] allows values in cells to be computed
+automatically from the values of other cells, using a =#+TBLFM=
+formula line. In this way, table computations can be carried out using
+[[http://orgmode.org/manual/Formula-syntax-for-Calc.html#Formula-syntax-for-Calc][calc]] and [[http://orgmode.org/manual/Formula-syntax-for-Lisp.html#Formula-syntax-for-Lisp][emacs lisp]].
+
+What Org-babel adds is the ability to use source blocks (in whatever
+language) in the =#+TBLFM= line to perform the necessary computation.
 
 *** Example 1: Data Summaries Using R
 As a simple example, we'll fill in a cell in an Org-mode table with the
@@ -619,9 +625,9 @@ average value of a few numbers. First, let's make some data. The
 following source block creates an Org-mode table filled with five random
 numbers between 0 and 1.
 
-#+srcname: tbl-example-data()
+#+srcname: tbl-example-data
 #+begin_src R 
-runif(n=5, min=0, max=1)
+  runif(n=5, min=0, max=1)
 #+end_src
 
 #+resname: tbl-example-data
@@ -641,10 +647,10 @@ Finally, we create the table which is going to make use of the R
 code. This is done using the =sbe= ('source block evaluate') macro in
 the table formula line.
 #+tblname: summaries
-|              mean |
-|-------------------|
-| 0.779619386699051 |
-#+TBLFM: @2$1='(sbe "R-mean" (x "tbl-example-data()"))
+| mean |
+|------|
+| 0.78 |
+#+TBLFM: @2$1='(sbe R-mean (x tbl-example-data));%.2f
 
 To recalculate the table formula, use C-u C-c C-c in the
 table. Notice that as things stand the calculated value doesn't
