@@ -152,11 +152,11 @@ may have further ideas / views here.
   :PROPERTIES:
   :CUSTOM_ID: introduction
   :END:
-  Org-babel extends the very excellent [[http://orgmode.org/][Org-mode]] with the ability to
-  execute source code within Org-mode documents.  Org-mode is an [[http://www.gnu.org/software/emacs/][Emacs]]
-  major mode for doing almost anything with plain text.  If you are
-  not familiar with Org-mode please take a moment to read [[http://orgmode.org/][the Org-mode
-  homepage]] before continuing.
+  Org-babel extends the very excellent [[http://orgmode.org/][Org-mode]] with several new
+  features for working with source code, including code
+  execution. Org-mode is an [[http://www.gnu.org/software/emacs/][Emacs]] major mode for doing almost anything
+  with plain text. If you are not familiar with Org-mode please take a
+  moment to read the [[http://orgmode.org/][Org-mode]] homepage before continuing.
 
   As its name implies, Org-babel will execute code in many different
   languages. The results of code execution --- text, tables and
@@ -168,10 +168,32 @@ may have further ideas / views here.
 
   - interactive and on-export execution of source code;
   - code blocks as functions that can be parameterised, refer to
-     other code blocks, and be called remotely; and
+    other code blocks, and be called remotely; and
   - export to files for literate programming.
 
-* Getting Started
+* Overview
+  Org-babel provides new features on a few different fronts, and
+  different people may want to start in different places.
+
+  - Using source code in Org mode ::
+    If you are not familiar with creating code blocks in an org
+    buffer, and moving between that buffer and the language major-mode
+    edit buffer, then you should have a look at the relevant section
+    in the [[http://orgmode.org/manual/Literal-examples.html][Org manual]] and [[#source-code-blocks][below]], try it out, and come back.
+  - Executing code ::
+    The core of Org-babel is its ability to execute code in Org-mode
+    source blocks, taking input from other blocks and tables, with
+    output to further blocks and tables. This is described starting
+    [[#source-code-execution][here]].
+  - Literate Programming ::
+    If you are a programmer writing code that you would normally
+    execute in some other way (e.g. from the command line, or sourcing
+    it into an interactive session), then a simple introduction to
+    Org-babel is to place your code in blocks in an Org file, and to
+    use Org-babel's [[#literate-programming][Literate Programming]] support to extract pure code
+    from your Org files.
+    
+* Initial Configuration
   :PROPERTIES:
   :CUSTOM_ID: getting-started
   :results:  silent
@@ -212,13 +234,14 @@ may have further ideas / views here.
 
   5) Evaluate your modified .emacs.
 
-* Basic Org-babel Functionality
-  :PROPERTIES:
-  :CUSTOM_ID: basic-functionality
-  :END:
-*** Source Code Blocks
+* Source Code Blocks
     :PROPERTIES:
     :CUSTOM_ID: source-code-blocks
+    :END:
+
+** Source Code Blocks in Org
+    :PROPERTIES:
+    :CUSTOM_ID: source-code-blocks-org
     :END:
 
     Org-babel is all about [[http://orgmode.org/manual/Literal-examples.html][source code blocks]] in Org-mode. If you are
@@ -232,50 +255,82 @@ may have further ideas / views here.
     shortcut, C-c '.  This places the source code block in a new
     buffer with the appropriate mode activated.
 
-
+#+begin_src org
+  ,#+begin_src language org-switches
+  ,body
+  ,#+end_src
+#+end_src
 
     For example, a source code block of [[http://www.ruby-lang.org/][ruby]] code looks like this in
     an Org-mode file:
 
-: #+begin_src ruby
-: require 'date'
-: "This file was last evaluated on #{Date.today}"
-: #+end_src
-
-
-    We had to take [[http://orgmode.org/manual/Literal-examples.html#Literal-examples][special steps]] to make it look that way in the HTML
-    output. Normally, when exported to HTML, source blocks are
-    fontified according to their language, and the =begin_src=
-    ... =end_src= mark-up is omitted, like this:
-
-#+begin_src ruby
-require 'date'
-"This file was last evaluated on #{Date.today}"
+#+begin_src org
+  ,#+begin_src ruby
+  ,require 'date'
+  ,"This file was last evaluated on #{Date.today}"
+  ,#+end_src
 #+end_src
 
-#+resname:
-: This file was last evaluated on 2009-10-03
+#     We had to take [[http://orgmode.org/manual/Literal-examples.html#Literal-examples][special steps]] to make it look that way in the HTML
+#     output. Normally, when exported to HTML, source blocks are
+#     fontified according to their language, and the =begin_src=
+#     ... =end_src= mark-up is omitted, like this:
 
-In general, if you are viewing the HTML version, you will see the
-HTML output only. However, much of this document consists of
-interactive examples, and therefore in order to get a feeling for the
-mechanics of Org-babel it might make most sense to grab the Org-mode
-version of this file
-#+html: <a href="http://eschulte.github.com/org-babel/org-babel.org">org-babel.org</a>
-and work through it in Emacs. Alternatively the HTMLized version of
-the plain text of this file at
-#+html: <a href="http://eschulte.github.com/org-babel/org-babel.org.html">org-babel.org.html</a>
-allows the plain text version to be viewed (non-interactively) in a
-web browser.
+# #+begin_src ruby
+# require 'date'
+# "This file was last evaluated on #{Date.today}"
+# #+end_src
 
-If you don't have ruby installed on your system, then you can run this
-shell script alternative from the Org-mode version of the file:
+# #+resname:
+# : This file was last evaluated on 2009-10-03
 
-#+begin_src sh
-echo "This file was last evaluated on `date`"
+# In general, if you are viewing the HTML version, you will see the
+# HTML output only. However, much of this document consists of
+# interactive examples, and therefore in order to get a feeling for the
+# mechanics of Org-babel it might make most sense to grab the Org-mode
+# version of this file
+# #+html: <a href="http://eschulte.github.com/org-babel/org-babel.org">org-babel.org</a>
+# and work through it in Emacs. Alternatively the HTMLized version of
+# the plain text of this file at
+# #+html: <a href="http://eschulte.github.com/org-babel/org-babel.org.html">org-babel.org.html</a>
+# allows the plain text version to be viewed (non-interactively) in a
+# web browser.
+
+# If you don't have ruby installed on your system, then you can run this
+# shell script alternative from the Org-mode version of the file:
+
+# #+begin_src sh
+# echo "This file was last evaluated on `date`"
+# #+end_src
+
+** Source Code Blocks in Org-babel
+    :PROPERTIES:
+    :CUSTOM_ID: source-code-blocks-babel
+    :END:
+
+Org-babel adds some new elements to source code blocks. The basic
+structure becomes:
+
+#+begin_src org
+  ,#+begin_src language babel-header-arguments org-switches
+  ,body
+  ,#+end_src
 #+end_src
 
-*** Source Code Execution
+
+- language :: The language of the code in the source-code block. Valid
+     values must be members of =org-babel-interpreters=.
+- header-arguments :: Header arguments control many facets of the
+     evaluation and output of source-code blocks.  See the [[file:reference.org::#header-arguments][Header
+     Arguments]] section for a complete review of available header
+     arguments.
+- body :: The source code to be evaluated.  An important key-binding
+     is C-c '.  This calls =org-edit-src-code=, a function that brings
+     up an edit buffer containing the code using the Emacs major mode
+     appropriate to the language.  You can edit your source code block
+     as you regularly would in Emacs.
+
+* Source Code Execution
     :PROPERTIES:
     :CUSTOM_ID: source-code-execution
     :END:
@@ -289,8 +344,7 @@ Here are examples of code blocks in three different languages,
 followed by their output. If you are viewing the Org-mode version of
 this document in Emacs, place point anywhere inside a block and press
 C-c C-c to run the code[fn:1] (and feel free to alter it!).
-
-**** Ruby
+*** Ruby
 In the Org-mode file:
 : #+begin_src ruby
 : "This file was last evaluated on #{Date.today}"
@@ -305,7 +359,7 @@ HTML export of the resulting string:
 #+resname:
 : This file was last evaluated on 2009-08-09
 
-**** Shell
+*** Shell
 In the Org-mode file:
 : #+begin_src sh
 :   echo "This file takes up `du -h org-babel.org |sed 's/\([0-9k]*\)[ ]*org-babel.org/\1/'`"
@@ -320,7 +374,7 @@ HTML export of the resulting string:
 #+resname:
 : This file takes up  36K
 
-**** [[http://www.r-project.org/][R]] 
+*** [[http://www.r-project.org/][R]] 
      What are the most common words in this file?
 In the Org-mode file:
 : #+begin_src R :colnames t
@@ -338,7 +392,7 @@ HTML export of code:
 |------+--------+----------+-----------+-------------+------+-------+------+-----------+------|
 |   64 |     62 |       44 |        42 |          41 |   36 |    34 |   28 |        28 |   27 |
 
-**** [[http://ditaa.sourceforge.net/][ditaa]]
+*** [[http://ditaa.sourceforge.net/][ditaa]]
 
 In the Org-mode file:
 : #+begin_src ditaa :file blue.png :cmdline -r
@@ -366,42 +420,27 @@ HTML export of the resulting image:
 #+resname:
 [[file:../../images/babel/blue.png]]
 
-*** Source Code Block Syntax
-
-The basic syntax of source code blocks in Org-babel is as follows:
-
-: #+begin_src language header-arguments
-: body
-: #+end_src
-
-- language :: The language of the code in the source-code block. Valid
-     values must be members of =org-babel-interpreters=.
-- header-arguments :: Header arguments control many facets of the
-     evaluation and output of source-code blocks.  See the [[file:reference.org::#header-arguments][Header
-     Arguments]] section for a complete review of available header
-     arguments.
-- body :: The source code to be evaluated.  An important key-binding
-     is C-c '.  This calls =org-edit-src-code=, a function that brings
-     up an edit buffer containing the code using the Emacs major mode
-     appropriate to the language.  You can edit your source code block
-     as you regularly would in Emacs.
-
-*** Capturing the Results of Code Evaluation
-    :PROPERTIES:
-    :CUSTOM_ID: results
-    :END:
-    Org-babel provides two fundamentally different modes for capturing
-    the results of code evaluation: functional mode and scripting
-    mode.  The choice of mode is specified by the =:results= header
-    argument.
-**** =:results value= (functional mode)
+** Capturing the Results of Code Evaluation
+   :PROPERTIES:
+   :CUSTOM_ID: results
+   :END:
+   Org-babel provides two fundamentally different modes for capturing
+   the results of code evaluation: functional mode and scripting
+   mode.  The choice of mode is specified by the =:results= header
+   argument.
+*** =:results value= (functional mode)
+   :PROPERTIES:
+   :CUSTOM_ID: results-value
+   :END:
      The 'result' of code evaluation is the *value* of the last
      statement in the source code block. In functional mode, the
      source code block is a function with a return value. The return
      value of one source code block can be used as input for another
      source code block, even one in a different language.  In this
-     way, Org-babel becomes a [[meta-programming-language]]. This setting
-     is the default.
+     way, Org-babel becomes a [[meta-programming-language]]. If the block
+     returns tabular data (a vector, array or table of some sort) then
+     this will be held as an Org-mode table in the buffer. This
+     setting is the default.
      
      For example, consider the following block of python code and its
      output.
@@ -419,7 +458,11 @@ return 2 + 2
 Notice that, in functional mode, the output consists of the value of
 the last statement and nothing else.
 
-**** =:results output= (scripting mode)
+*** =:results output= (scripting mode)
+   :PROPERTIES:
+   :CUSTOM_ID: results-output
+   :END:
+
      In scripting mode, Org-babel captures the text output of the
      source code block and places it in the Org-mode buffer. It is
      called scripting mode because the code block contains a series of
@@ -446,32 +489,32 @@ Here, scripting mode returned the text that python sent to stdout.  Because
 the source code block doesn't include a =print()= statement for the last
 value (2 + 2), 4 does not appear in the results.
 
-*** Session-based Evaluation
-    For some languages, such as python, R, ruby and shell, it is
-    possible to run an interactive session as an "inferior process"
-    within Emacs. This means that an environment is created containing
-    data objects that persist between different source code
-    blocks. Org-babel supports evaluation of code within such sessions
-    with the =:session= header argument. If the header argument is
-    given a value then that will be used as the name of the session.
-    Thus, it is possible to run separate simultaneous sessions in the
-    same language.
+** Session-based Evaluation
+   For some languages, such as python, R, ruby and shell, it is
+   possible to run an interactive session as an "inferior process"
+   within Emacs. This means that an environment is created containing
+   data objects that persist between different source code
+   blocks. Org-babel supports evaluation of code within such sessions
+   with the =:session= header argument. If the header argument is
+   given a value then that will be used as the name of the session.
+   Thus, it is possible to run separate simultaneous sessions in the
+   same language.
 
-    With R, the session will be under the control of [[http://ess.r-project.org/][Emacs Speaks
-    Statistics]] as usual, and the full power of ESS is thus still
-    available, both in the R session, and when switching to the R code
-    edit buffer with C-c '.
+   With R, the session will be under the control of [[http://ess.r-project.org/][Emacs Speaks
+   Statistics]] as usual, and the full power of ESS is thus still
+   available, both in the R session, and when switching to the R code
+   edit buffer with C-c '.
 
-*** Arguments to Source Code Blocks
-    :PROPERTIES:
-    :CUSTOM_ID: arguments-to-source-code-blocks
-    :END:
-    Org-babel supports parameterisation of source code blocks, i.e.,
-    arguments can be passed to source code blocks, which gives them
-    the status of *functions*. Arguments can be passed to source code blocks in
-    both functional and scripting modes.
+** Arguments to Source Code Blocks
+   :PROPERTIES:
+   :CUSTOM_ID: arguments-to-source-code-blocks
+   :END:
+   Org-babel supports parameterisation of source code blocks, i.e.,
+   arguments can be passed to source code blocks, which gives them
+   the status of *functions*. Arguments can be passed to source code blocks in
+   both functional and scripting modes.
 
-**** Simple example of using a source block as a function
+*** Simple example of using a source block as a function
 
      First let's look at a very simple example. The following source
      code block defines a function, using python, that squares its argument.
@@ -498,7 +541,7 @@ Now we use the source block:
 #+results: square(x=6)
 : 36
 
-**** A more complex example using an Org-mode table as input
+*** A more complex example using an Org-mode table as input
 
      In this example we define a function called =fibonacci-seq=, using
      Emacs Lisp.  The function =fibonacci-seq= computes a Fibonacci
@@ -545,14 +588,14 @@ The return value of =fibonacci-seq= is a table:
 | 1 | 1 | 2 |  3 |  5 |   8 |  13 |  21 |   34 |   55 |
 | 1 | 3 | 8 | 21 | 55 | 144 | 377 | 987 | 2584 | 6765 |
 
-*** In-line Source Blocks
+** In-line Source Blocks
     Code can be evaluated in-line using the following syntax:
 
 : Without header args: src_lang{code} or with header args: src_lang[args]{code},
 : for example src_python[:session]{10*x}, where x is a variable existing in the 
 : python session.
 
-* A Meta-programming Language for Org-mode
+** A Meta-programming Language for Org-mode
   :PROPERTIES:
   :CUSTOM_ID: meta-programming-language
   :END:
@@ -603,12 +646,12 @@ For example, let's take some system diagnostics in the shell and graph them with
    #+end_src
  [[file:../../images/babel/dirs.png]]
 
-* Multilingual Spreadsheet Plugins for Org-mode
+* Using Source Code Blocks in Org Tables
   :PROPERTIES:
   :CUSTOM_ID: spreadsheet
   :END:
 
-In addition to passing data from tables as [[arguments-to-source-code-blocks][arguments]] to source code
+In addition to passing data from tables as [[arguments-to-source-code-blocks][arguments]] to code
 blocks, and [[#results-value][storing]] results as tables, Org-babel can be used in a
 third way with Org-mode tables. First note that Org-mode's [[http://orgmode.org/manual/The-spreadsheet.html#The-spreadsheet][existing
 spreadsheet functionality]] allows values in cells to be computed
@@ -616,7 +659,7 @@ automatically from the values of other cells, using a =#+TBLFM=
 formula line. In this way, table computations can be carried out using
 [[http://orgmode.org/manual/Formula-syntax-for-Calc.html#Formula-syntax-for-Calc][calc]] and [[http://orgmode.org/manual/Formula-syntax-for-Lisp.html#Formula-syntax-for-Lisp][emacs lisp]].
 
-What Org-babel adds is the ability to use source blocks (in whatever
+What Org-babel adds is the ability to use code blocks (in whatever
 language) in the =#+TBLFM= line to perform the necessary computation.
 
 *** Example 1: Data Summaries Using R
@@ -686,33 +729,33 @@ Here's a sample of our test suite.
 
 #+srcname: basic-elisp(n)
 #+begin_src emacs-lisp
-(* 2 n)
+  (* 2 n)
 #+end_src
 
 #+srcname: basic-shell
 #+begin_src sh :results silent
-expr 1 + 5
+  expr 1 + 5
 #+end_src
 
 #+srcname: date-simple
 #+begin_src sh :results silent
-date
+  date
 #+end_src
 
 #+srcname: basic-ruby
 #+begin_src ruby :results silent
-"org-babel"
+  "org-babel"
 #+end_src
 
 #+srcname: basic-python
 #+begin_src python :results silent
-'hello world'
+  'hello world'
 #+end_src
 
 #+srcname: basic-R
 #+begin_src R :results silent
-b <- 9
-b + 4
+  b <- 9
+  b + 4
 #+end_src
 
 * The Library of Babel
@@ -755,44 +798,6 @@ b + 4
   Note that it is possible to pass table values or the output of
   a source-code block to Library of Babel functions. It is also possible to
   reference Library of Babel functions in arguments to source code blocks.
-
-* Reproducible Research
-  :PROPERTIES:
-  :CUSTOM_ID: reproducable-research
-  :END:
-#+begin_quote 
-An article about computational science in a scientific publication is
-not the scholarship itself, it is merely advertising of the
-scholarship. The actual scholarship is the complete software
-development environment and the complete set of instructions which
-generated the figures.
-
--- D. Donoho
-#+end_quote
-
-[[http://reproducibleresearch.net/index.php/Main_Page][Reproducible Research]] (RR) is the practice of distributing, along with
-a research publication, all data, software source code, and tools
-required to reproduce the results discussed in the publication.  As
-such the RR package not only describes the research and its results,
-but becomes a complete laboratory in which the research can be
-reproduced and extended.
-
-Org-mode already has exceptional support for [[http://orgmode.org/manual/Exporting.html#Exporting][exporting to HTML and
-LaTeX]].  Org-babel makes Org-mode a tool for RR by *activating* the
-data and source code embedded in Org-mode documents; the
-entire document becomes executable.  This makes it possible, and natural, to
-distribute research in a format that encourages readers to recreate
-results and perform their own analyses.
-
-One notable existing RR tool is [[http://en.wikipedia.org/wiki/Sweave][Sweave]], which provides a mechanism for
-embedding [[http://www.r-project.org/][R]] code into LaTeX documents.  Sweave is a mature
-and very useful tool, but we believe that Org-babel has several
-advantages:
- - it supports multiple languages (we're not aware of other RR tools that do this);
- - the [[http://orgmode.org/manual/Exporting.html#Exporting][export process]] is flexible and powerful, including HTML as a
-   target in addition to LaTeX; and
- - the document can make use of Org-mode features that support [[http://orgmode.org/manual/Agenda-Views.html#Agenda-Views][project
-   planning]] and [[http://orgmode.org/manual/TODO-Items.html#TODO-Items][task management]].
 
 * Literate Programming
   :PROPERTIES:
@@ -1006,6 +1011,44 @@ For a simple example of usage, follow these 5 steps:
    source code blocks embedded in Org-mode files in this directory;
    and
 5)  re-start Emacs to load the customizations.
+
+* Reproducible Research
+  :PROPERTIES:
+  :CUSTOM_ID: reproducable-research
+  :END:
+#+begin_quote 
+An article about computational science in a scientific publication is
+not the scholarship itself, it is merely advertising of the
+scholarship. The actual scholarship is the complete software
+development environment and the complete set of instructions which
+generated the figures.
+
+-- D. Donoho
+#+end_quote
+
+[[http://reproducibleresearch.net/index.php/Main_Page][Reproducible Research]] (RR) is the practice of distributing, along with
+a research publication, all data, software source code, and tools
+required to reproduce the results discussed in the publication.  As
+such the RR package not only describes the research and its results,
+but becomes a complete laboratory in which the research can be
+reproduced and extended.
+
+Org-mode already has exceptional support for [[http://orgmode.org/manual/Exporting.html#Exporting][exporting to HTML and
+LaTeX]].  Org-babel makes Org-mode a tool for RR by *activating* the
+data and source code embedded in Org-mode documents; the
+entire document becomes executable.  This makes it possible, and natural, to
+distribute research in a format that encourages readers to recreate
+results and perform their own analyses.
+
+One notable existing RR tool is [[http://en.wikipedia.org/wiki/Sweave][Sweave]], which provides a mechanism for
+embedding [[http://www.r-project.org/][R]] code into LaTeX documents.  Sweave is a mature
+and very useful tool, but we believe that Org-babel has several
+advantages:
+ - it supports multiple languages (we're not aware of other RR tools that do this);
+ - the [[http://orgmode.org/manual/Exporting.html#Exporting][export process]] is flexible and powerful, including HTML as a
+   target in addition to LaTeX; and
+ - the document can make use of Org-mode features that support [[http://orgmode.org/manual/Agenda-Views.html#Agenda-Views][project
+   planning]] and [[http://orgmode.org/manual/TODO-Items.html#TODO-Items][task management]].
 
 * Footnotes
 [fn:1] Calling =C-c C-o= on a source code block will open the
