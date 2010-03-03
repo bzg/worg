@@ -279,21 +279,50 @@ cd ~/Documents/org
 bzr push sftp://myserver.com/bzr/myrepo/org-files  
 #+END_SRC
 
-Git is a bit more complicated. See http://www.netsplit.com/?p=192 for
-a laconic view of the problems. The first time you want to push your
-changes to a remote server you need to create the bare repository on
-the remote server:
+Git is a bit more complicated. The goal is to create a bare repository
+on the remote server. If you have ssh access to the server you can do
+it like this:
 
 #+BEGIN_SRC emacs-shell
-  git clone --bare . ssh://myserver.com/git-repo/org.git
+  ssh me@myserver.com
+  mkdir myrepo.git
+  cd myrepo.git
+  git init --bare
 #+END_SRC
 
-Once you have created the remote repo, you should be able to push
-subsequent changes using:
+Alternatively create the directory on your local computer and move it
+to your server via ftp or some other method.
+
+Now you need to push your local repository to the server:
+
+#+BEGIN_SRC emacs-shell
+  cd ~/my_local_git_repo/.git
+  
+#+END_SRC
+
+Edit the config file in the .git directory and add something like:
+
+#+BEGIN_SRC emacs-shell
+  [remote "origin"]
+   url = me@myserver.com:~/repositories/myrepo.git
+   fetch = +refs/heads/*:refs/remotes/origin/*
+#+END_SRC
+
+If you don't want to edit the config file directly you can add the
+required information like this:
+
+#+BEGIN_SRC emacs-shell
+  git remote add origin me@myserver.com:~/repositories/myrepo.git
+#+END_SRC
+
+Note that you can call "origin" anything you like. Assuming that you
+have ssh access to your server you should now be able to push your
+changes to the server:
 
 #+BEGIN_SRC emacs-shell
   git-push push origin master
 #+END_SRC
+
 ** Using a USB Stick as a Central Repository.
 You can create a central repository on a USB stick. You might want to
 do this if you take files between your home and work computers and
@@ -326,11 +355,32 @@ Now populate the repository with your org files:
   bzr push file:///media/disk/bzr-repo
 #+END_SRC
 
-Using git the comand is:
+Using git the command you need to create the directory and a bare repo
+on your usb stick:
 
 #+BEGIN_SRC emacs-shell
-  git clone --bare ~/Documents/org /media/disk/org.git
+  cd /media/usbstick
+  mkdir myrepo.git
+  cd myrepo.git
+  git init --bare
 #+END_SRC
+
+Now edit the config file in the .git directory of your local repo and
+add the following:
+
+#+BEGIN_SRC emacs-shell
+    [remote "usbstick"]
+      url = /media/53141017-f3e3-407f-a08f-20b91064b7f3/repos/org.git/
+      fetch = +refs/heads/*:refs/remotes/usbstick/*  
+#+END_SRC
+
+You can now push to the usb stick:
+#+BEGIN_SRC emacs-shell
+  git push usbstick master
+#+END_SRC
+
+You may wish to mount your usb stick in /etc/fstab using the disk's
+UUID to ensure that the mount point is always the same.
 
 Once you have made the initial push you can sync your changes to the
 usb stick like this:
@@ -344,7 +394,7 @@ usb stick like this:
 #+END_SRC
 
 #+BEGIN_SRC emacs-shell
-  git push origin master
+  git push usbstick master
 #+END_SRC
 
 The git example assumes that the remote on the usb stick is named
@@ -407,6 +457,7 @@ Work.
 - Commit the changes you made - bzr commit -m "Commit before push to usb stick."
 - Push your changes to the usb stick - =bzr push=
 - Unplug the usb stick and go home.
+
 ** Update the Local Branch on Your Notebook from the Central Repository.
 Sometimes you might want to update your local branch from your central
 repository, rather than from your local server. One reason for wanting
