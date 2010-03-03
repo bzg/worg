@@ -490,10 +490,11 @@ each more specific than the last.
     :END:
     =:dir= specifies the /default directory/ during code block
     execution. If it is absent, then the directory associated with the
-    current buffer is used. In other words, supplying =:dir path= has
-    the same effect as changing the current directory with =M-x cd
-    path=, and then not supplying =:dir=. Under the surface, =:dir=
-    simply sets the value of the emacs variable =default-directory=.
+    current buffer is used. In other words, supplying =:dir path=
+    temporarily has the same effect as changing the current directory
+    with =M-x cd path=, and then not supplying =:dir=. Under the
+    surface, =:dir= simply sets the value of the emacs variable
+    =default-directory=.
 
     When using =:dir=, you should supply a relative path for [[#header-argument-file][file
     output]] (e.g. =:file myfile.jpg= or =:file results/myfile.jpg=) in
@@ -543,6 +544,14 @@ Most of this functionality follows immediately from the fact that
        will determine the starting directory for a new session as
        expected, no attempt is currently made to alter the directory
        associated with an existing session.
+     - =:dir= should typically not be used to create files during
+       export with =:exports results= or =:exports both=. The reason
+       is that, in order to retain portability of exported material
+       between machines, during export, links inserted into the buffer
+       will *not* be expanded against default directory. Therefore, if
+       default-directory is altered using =:dir=, it it probable that
+       the file will be created in a location to which the link does
+       not point.
 *** =:exports=
     :PROPERTIES:
     :CUSTOM_ID: header-argument-exports
