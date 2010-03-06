@@ -82,20 +82,43 @@
 #+end_src
 
 * Configuration in Org-babel
-  - Activate LaTeX evaluation by adding the following line to .emacs
+** Activate LaTeX Evaluation
+  - Add the following line to .emacs
 #+begin_src emacs-lisp
     (require 'org-babel-latex)
 #+end_src
 
-
-   - Add LaTeX to a list of languages that raise noweb-type errors.
-   - The following is an example from a system also using R and python
-     source code blocks in Org-babel.  You will need to edit the last
-     argument to reflect the languages you use in Org-babel.
+** Raise Noweb-type Errors
+   - Add LaTeX to a list of languages that raise noweb-type errors
+   - Edit the following example to include the languages you use in Org-babel
 
 #+begin_src emacs-lisp 
   (setq org-babel-noweb-error-langs '("R" "python" "latex"))
 #+end_src
+
+** RefTeX Support
+  - This is a two-step process
+  - Add the following lines to .emacs (adapted from  Kevin Brubeck Unhammer's [[http://www.mfasold.net/blog/2009/02/using-emacs-org-mode-to-draft-papers/][Reftex Setup]])
+#+begin_src emacs-lisp
+  (defun org-mode-article-modes ()
+    (reftex-mode t)
+    (and (buffer-file-name)
+         (file-exists-p (buffer-file-name))
+         (reftex-parse-all)))
+  
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (if (member "REFTEX" org-todo-keywords-1)
+                  (org-mode-article-modes))))
+#+end_src
+
+  - Add the following line to the top of your org-mode file
+#+begin_src latex
+    #+TODO: REFTEX
+#+end_src
+
+  - When you open an org-mode file with this line, RefTeX will prompt
+    for the master .tex file
 
 * Language-specific Conventions
   - Org-babel returns raw LaTeX code on evaluation, unless a =:file=
@@ -154,8 +177,8 @@
 
 * Common Idioms
   - Note that Org-mode can export its outline structure to LaTeX,
-    yielding a serviceable document.
-  - LaTeX source code blocks in Org-babel are useful if: 
+    yielding a serviceable document
+  - LaTeX source code blocks in Org-babel are useful if:
     - you want to use the Org-mode file as a meta-document about the
       writing of a LaTeX document;
 
