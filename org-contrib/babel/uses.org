@@ -63,7 +63,132 @@
   makes it possible to present writing tasks to the authors in an order
   different from which they appear in the report.
 
-* [[file:examples/research-project.org][A Research Project]]
+** Requirement
+   - A working LaTeX installation.
+
+** Advantages
+   - The integration of training material with in-file instruction can
+     be quite effective.
+   - Many authors find it easy to work from the bottom up, or from the
+     particular to the general, rather than the usual sequence of
+     general-particular-general found in reports.
+
+** Disadvantages
+   - None?
+
+** Example
+   - This report must satisfy the requirements set out in [[http://hawaii.gov/dlnr/hpd/pdfs/revproc_har/275_284/pdfs/278.pdf][the Historic
+     Preservation Division rule]].
+   - Complete each of the TODO items.
+   - Mark each item DONE when you have completed it.
+   - =C-c a t= will make an agenda of items left to do in this
+     document.
+   - =C-c a m= YOURNAME will make an agenda of writing tasks assigned
+     to you.
+   
+*** TODO Field Methods
+**** TODO Include the following information: [1/7]
+      - [X] When the fieldwork was carried out.
+      - [ ] Who directed the fieldwork.
+      - [ ] The names and qualifications of crew members.
+      - [ ] Establishment of site datum and grid.
+      - [ ] Excavation tools.
+      - [ ] Assignment of contexts.
+      - [ ] Bag list.
+**** DONE Include a citation to the project plan.
+     :LOGBOOK:
+     - State "DONE"       from "TODO"       [2009-11-25 Wed 09:53]
+     :END:
+
+#+srcname: field-methods
+#+begin_src latex
+  \section{Field Methods}
+  \label{sec:field-methods}
+  
+  % Enter text below this line.
+
+  Fieldwork for the project was carried out between December 26, 2008
+  and February 3, 2009 following an approved plan \cite{plan}.
+#+end_src   
+
+*** TODO Results
+    - Note the use of Org-mode tags to assign sections to authors Veronica and Eric.
+    - Discuss the artifacts and midden recovered during excavation.
+
+
+**** TODO Artifacts						   :Veronica:
+     :LOGBOOK:
+     - State "TODO"       from "DONE"       [2009-11-25 Wed 09:44]
+     - State "DONE"       from "TODO"       [2009-11-25 Wed 09:44]
+     :END:
+     - Use Sinoto's classification of one-piece fishhooks.
+     - Cite Anell when describing two-piece fishhooks.
+     - Use Emory's classification of adzes when describing
+       cross-section.
+#+srcname: artifacts
+#+begin_src latex
+  \subsection{Description of Artifacts}
+  \label{sec:artifact-description}
+  
+  % Enter text below this line
+#+end_src
+
+**** TODO Midden						       :Eric:
+     - Use Kay for identifying and naming marine shells
+     - Cite Ziegler for information on fish habitats
+#+srcname: midden
+#+begin_src latex
+  \subsection{Midden}
+  \label{sec:midden}
+  
+  % Enter text below this line
+#+end_src
+
+**** No data entry beyond this line
+
+#+srcname: results
+#+begin_src latex :noweb
+  \section{Results}
+  \label{sec:results}
+  
+  This section presents the results of excavation.
+  
+  <<artifacts>>
+  
+  <<midden>>
+#+end_src
+
+
+*** TODO Introduction
+    - Give the reader a brief overview of the project and its results.
+
+#+srcname: intro
+#+begin_src latex
+  \section{Introduction}
+  \label{sec:introduction}
+  
+  % Text below this line
+#+end_src
+*** No data entry beyond this line
+    - The LaTeX code here sets up the environment and inserts the
+      defined source code blocks in their report order.
+    - A call to =org-babel-tangle= produces the LaTeX report document.
+
+#+begin_src latex :noweb :tangle report.tex
+  \documentclass{article}
+  \begin{document}
+  <<intro>>
+  <<field-methods>>
+  <<results>>
+  \bibliographystyle{apa} 
+  \bibliography{mybib}
+  \end{document}
+#+end_src
+
+
+
+
+* A Research Project
   It is outrageous to think that an entire research project might fit
   in a single computer file.  Practically speaking, it probably isn't
   possible.  But the combination of Org-mode and Org-babel does make
@@ -101,4 +226,231 @@
   the researcher spends time thinking about the research, rather than
   its organization across multiple directories, files, and
   applications.  What fun!
+
+** Requirements
+   - A working LaTeX installation.
+   - A working R installation.
+   - Note that this example is an illustration only.  It is not fully
+     functional as it stands.
+
+** Advantages
+   - Easier and more efficient error checking and correction.
+   - On-the-fly production of reproducible research document.
+   - Comprehensive log of data analysis.
+
+** Disadvantages
+   - None?
+
+** Example
+   This example shows snippets from an on-going project.  It
+   represents a first attempt to integrate Org-babel with a research
+   project. 
+
+   The schedule and daily log use Org-mode functionality in a fairly
+   simple way.  More sophisticated setups are certainly possible and
+   probably useful.
+
+   Org-babel is used to monitor data acquisition and in particular to
+   catch data entry errors as they happen.  It is also used
+   extensively in the data analysis, which provides a simple example
+   of how it might be used.
+
+*** Schedule
+   
+
+**** DONE Meet Jenny to measure adzes
+     DEADLINE: <2009-11-25 Wed 14:00>
+     :LOGBOOK:
+     - State "DONE"       from "TODO"       [2009-11-25 Wed 20:18]
+     :END:
+
+
+**** TODO Regress edge width on weight 
+     DEADLINE: <2009-11-27 Fri>
+
+*** Daily Log
+**** 09/11/25
+     - Measured adzes in trays 2 and 3.  
+     - Reworked measurement protocol for shoulder thickness on untanged adzes.
+
+**** 09/11/26
+     - Checked shoulder thickness measures on untanged adzes.  All OK now.
+
+*** Data Acquisition
+
+    - This section illustrates the use of Org-babel to track data
+      acquisition.  Queries are designed to expose unlikely data
+      values likely to be the result of data entry errors.  These
+      queries are collected in a source code block that establishes an
+      R session, reads data from the database, and creates R data
+      objects and graphics that can be used diagnostically.
+
+**** Queries
+    - Source code block r-bad-interior-landmarks checks for data entry
+      errors in the presence/absence of landmarks.  Note that if the
+      edge is present and the poll is present that the shoulder and
+      chin must be present, as well.  This query assumes that the
+      observations on chin and poll have been entered correctly.
+
+#+srcname: r-bad-interior-landmarks
+#+begin_src R
+      bad.landmarks <- dbGetQuery(con, "select * from adze where
+      edge_present = 'true' AND poll_present = 'true' AND (shoulder_present
+      = 'false' OR chin_present = 'false')")
+#+end_src
+      
+      - Plot weight to look for unusual weights.  In practice any
+        diagnostic plot that isolates outliers can be used to check
+        for possible data entry errors.
+
+#+srcname: r-complete-weight-histogram
+#+begin_src R 
+  adze.wt <- ggplot(whole.adze, aes(weight))
+  adze.wt + geom_histogram(fill="white",color="black") +
+  scale_x_log10()
+  ggsave(file = "adze_wt_log.pdf", width = 5, height = 3)
+#+end_src
+
+#+resname: r-complete-weight-histogram
+[[http://www.tsdye2.com/org-babel/adze_wt_log.pdf][file:adze_wt_log.pdf]]
+
+ 
+**** Set-up Session
+
+     - Run r-data-acquisition to refresh the output of the data
+       acquisition queries.  This is the highest-level source code
+       block.  It establishes an R session named acquire, loads
+       various R libraries, and populates the session with data
+       objects based on database queries.  The source code block
+       =<<r-complete-2>>= is defined in the following section to
+       create an R data frame of all the complete adzes in the database.
+       Then, the two source code blocks defined above are run on that
+       data frame to produce (hopefully) useful diagnostics.
+
+#+src_name r-data-acquisition
+#+begin_src R :session acquire :noweb
+  library(ggplot2)
+  library(xtable)
+  <<r-connect>>
+  <<r-complete-2>>
+  <<r-bad-interior-landmarks>>
+  <<r-complete-weight-histogram>>
+#+end_src
+
+  - The r-connect source code block can be used by other source code
+    blocks.  It is used in r-data-acquisition (above) and in
+    r-data-analysis (below).  The fictitious code shown here
+    illustrates an R connection to a database server.
+#+srcname: r-connect
+#+begin_src R
+  library(RMySQL)
+  con <- dbConnect(MySQL(), user="me", password="mine", dbname="adze", host="localhost")
+#+end_src
+
+*** Data Analysis
+    - This section illustrates how queries can be documented and
+      revised.  A simple table is developed for use in the print
+      publication and the Beamer slide show.
+
+**** Querying for Complete Adzes
+   - The first try was r-complete, which relies on a single field, *complete*, in
+     the data table.  In practice, an adze blade that is substantially
+     complete, but whose edge has been chipped away, would be
+     classified as complete because all of the attributes typically
+     recorded are present.  For certain measures, such as length, this
+     might introduce a bit of bias.
+
+#+srcname: r-complete
+#+begin_src R
+ complete.adze <- dbGetQuery(con, "select * from adze where complete = 'complete'")
+#+end_src
+
+ - A second try is somewhat more satisfying because it relies on
+   direct observation that the edge is present along with the poll.
+   For length measurements, for instance, it is a direct statement to
+   the effect that the full length of the blade was measured.
+
+#+srcname: r-complete-2
+#+begin_src R
+ whole.adze <- dbGetQuery(con, "select * from adze where edge_present = 'true' AND poll_present = 'true'")
+#+end_src
+
+**** Making a Table
+
+     - Here, the xtable package is used to return a LaTeX table of
+       values corresponding to the range, median, and 0.25 quantiles
+       of the adze blade weights.  This can be inserted directly into
+       a LaTeX source block, or it can be saved to a file with the
+       xtable print() function.  The file solution is attractive
+       because the table can be tweaked after it is written and
+       subsequent tangles, if necessary, will not overwrite it.  On
+       the other hand, it might be best to tweak the table after the
+       document is completely stable and doesn't need re-tangling.
+       The output of xtable is certainly useful in draft documents.
+       The R source block r-weight-quantile is designed to insert its
+       results directly in the LaTeX file.  The source block can be
+       debugged by checking that its :results output latex is a valid
+       LaTeX construct.
+
+#+srcname: r-weight-quantile
+#+begin_src R :session adze :results output
+   weight <- quantile(whole.adze$weight)
+   weight.xtable <- xtable(as.data.frame(weight))
+   caption(weight.xtable) <- 'Weights of complete adzes in the Bishop
+   Museum collection.'
+   label(weight.xtable) <- 'tab:weight_xtable'
+   print(weight.xtable, file="weight_xtable.tex", table.placement =
+   "htb!", caption.placement = "top")
+#+end_src
+
+#+resname: r-weight-quantile
+% latex table generated in R 2.9.2 by xtable 1.5-5 package
+% Wed Nov  4 08:21:58 2009
+\begin{table}[htb!]
+\begin{center}
+\caption{Weights of complete adzes in the Bishop
+Museum collection.}
+\label{tab:weight_xtable}
+\begin{tabular}{rr}
+  \hline
+ & weight \\ 
+  \hline
+0\% &   0 \\ 
+  25\% &  22 \\ 
+  50\% &  34 \\ 
+  75\% &  83 \\ 
+  100\% & 2580 \\ 
+   \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+*** Presentation of Results
+
+    - Org-babel and Org-mode make it convenient to develop a slide
+      show and a print publication side-by-side.  The literate
+      programming facility of Org-babel makes it easy to divide each
+      of the presentations up into small chunks.  Sometimes, writing
+      the slide helps the mind focus on what should appear in the
+      print publication.  Other times, writing out the print
+      publication helps define what should appear in the slide.
+
+**** Introduction
+
+ The introduction needs to set up the problem: adzes have been
+  classified according to putatively culture-historical
+  characteristics, the goal of which is to create classes of artifact
+  that have distinctive space-time distributions. In Dunnell's terms,
+  these must be stylistic classes. But, Turner's work in NZ has
+  shown that the classes thus formed are actually functional.  Thus,
+  they aren't appropriate for culture history.  The problem is that
+  they are poorly specified for functional studies.  We want to
+  develop a specifically functional classification.
+
+  - The LaTeX introduction.  Compare this with the introductory Beamer
+    slide below.
+#+srcname: latex-introduction
+#+begin_src latex :exports code
+  \section{Introduction}
+  \label{sec:introduction}
   
