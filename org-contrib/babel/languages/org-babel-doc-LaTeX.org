@@ -176,13 +176,18 @@
 
 
 * Common Idioms
-  - Note that Org-mode can export its outline structure to LaTeX,
-    yielding a serviceable document
-  - LaTeX source code blocks in Org-babel are useful if:
-    - you want to use the Org-mode file as a meta-document about the
-      writing of a LaTeX document;
 
-: Don't end the optional argument to \caption{} with a period.
+
+  - Org-mode can export its outline structure to LaTeX, yielding a
+    serviceable document
+
+** Meta-document 
+
+   - This example uses the Org-mode file as a meta-document about the
+      writing of a LaTeX document
+
+: ** Captions
+:   - Don't end the optional argument to \caption{} with a period.
 : #+begin_src latex :exports code
 :   \begin{figure}[htb!]
 :     \includegraphics{my_fig}
@@ -191,8 +196,11 @@
 :   \end{figure}
 : #+end_src
 
-    - you want to create multiple LaTeX documents from a single
-      Org-mode file.
+** Multiple Documents
+    - This example creates two LaTeX documents from a single
+      Org-mode file
+
+: ** First document
 : #+srcname: first-document :tangle first-document.tex
 : #+begin_src latex 
 :   \documentclass{article}
@@ -200,6 +208,8 @@
 :   The first document.
 :   \end{document}
 : #+end_src
+
+: ** Second document
 : #+srcname: second-document :tangle second-document.tex
 : #+begin_src latex 
 :   \documentclass{book}
@@ -207,4 +217,28 @@
 :   The second document.
 :   \end{document}
 : #+end_src
+
+** Creating and Including Graphics
+   - This example creates a graph in R, then inserts it with a noweb
+     reference to the results of the R code block
+   - Note that this example is for illustration; it is not a complete
+     working example
+
+: #+srcname: r-complete-weight-histogram
+: #+begin_src R :session adze :file r/adze_wt_log.pdf
+:     adze.wt <- ggplot(whole.adze, aes(x = weight))
+:     adze.wt + geom_histogram() + scale_x_log10()
+:     ggsave(file = "adze_wt_log.pdf", width = 5, height = 3)
+: #+end_src
+
+: #+begin_src latex :tangle graphics-document.tex
+:   \begin{figure}[htb!]
+:     \centering
+:     \includegraphics[width=5in]{<<r-complete-weight-histogram()>>}
+:     \caption[Weight of complete adzes]{Weight of complete adzes on a
+:       logarithmic scale.}
+:     \label{fig:complete-weight}
+:   \end{figure}
+: #+end_src
+
 
