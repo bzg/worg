@@ -287,6 +287,84 @@ to a column view:
 	  (org-agenda-view-columns-initially t)))))
 #+END_SRC
 
+* Speeding up custom agenda commands
+
+The most recent versions of org-mode (the git repo or versions greater
+than 6.35) have a new variable that helps to speed up certain types of
+agenda commands. The variable is =org-agenda-entry-types= and it can
+be set *locally* within custom agenda commands via the customize
+interface.
+
+As always, you can learn more about the variable by typing =M-x
+describe-variable [RET] org-agenda-entry-types=. According to the
+[[file:~/Worg/org-glossary.org::#docstring][docstring]], the value =org-agenda-entry-types= is a list that consists
+of any or all of the following items:
+
+  - :timestamp :: List items containing a date stamp or date range
+                  matching the selected date. This includes sexp
+                  entries in angular brackets.
+
+  - :sexp :: List entries resulting from plain diary-like sexps.
+
+  - :deadline :: List deadline due on that date. When the date is
+                 today, also list any deadlines past due, or due
+                 within `org-deadline-warning-days'. `:deadline' must
+                 appear before `:scheduled' if the setting of
+                 `org-agenda-skip-scheduled-if-deadline-is-shown' is
+                 to have any effect.
+
+  - :scheduled :: List all items which are scheduled for the given
+                  date. The diary for *today* also contains items
+                  which were scheduled earlier and are not yet marked
+                  DONE.
+
+By default, the daily/weekly agenda includes all of these items in its
+results. Sometimes, however, you might want to construct agenda views
+that consist only of certain types of entries, such as a list of
+upcoming deadlines or a weekly or monthly calendar view that includes
+only timestamps and diary sexps. The variable =org-agenda-entry-types=
+allows you to search for such a subset of items quite efficiently
+(without bothering with the other items).
+
+Here is an example of a weekly calendar using
+=org-agenda-entry-types=.
+
+#+begin_src emacs-lisp
+  (setq org-agenda-custom-commands
+        '(("c" "Calendar" agenda ""
+           ((org-agenda-ndays 7)                          ;; [1]
+            (org-agenda-start-on-weekday 0)               ;; [2]
+            (org-agenda-time-grid nil)                    
+            (org-agenda-repeating-timestamp-show-all t)   ;; [3]
+            (org-agenda-entry-types '(:timestamp :sexp))))  ;; [4]
+        ;; other commands go here
+          ))
+#+end_src
+
+The options above create (1) a weekly calendar that (2) starts on
+Sunday and (3) includes all instances of repeating timestamps.
+Moreover, the calendar is generated quite quickly because the agenda
+command (4) only searches for timestamps and diary sexps and does not
+bother with deadlines and scheduling timestamps.
+
+Another example might arise if one wants an overview of all deadlines
+due within the next 365 days:
+
+#+begin_src emacs-lisp
+  (setq org-agenda-custom-commands
+        '(("d" "Upcoming deadlines" agenda "" 
+                  ((org-agenda-time-grid nil)
+                   (org-deadline-warning-days 365)        ;; [1]
+                   (org-agenda-entry-types '(:deadline))  ;; [2]
+                   ))
+        ;; other commands go here
+         ))
+#+end_src
+
+This custom command shows all deadlines that (1) fall due within the
+upcoming year. It does so quite efficiently by (2) looking for
+deadlines and nothing else. 
+
 * Other configuration ideas
 
 This section is for additional ideas for configuring
@@ -351,14 +429,16 @@ Another example: you could use the following custom command to see
 deadlines due within the next 60 days:
 
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-custom-commands
-      '(("d" "Upcoming deadlines" agenda ""
-	 ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
-	  (org-agenda-ndays 1)
-	  (org-deadline-warning-days 60)
-	  (org-agenda-time-grid nil)))
-	;; ...other commands here
-	))
+  (setq org-agenda-custom-commands
+        '(("d" "Upcoming deadlines" agenda ""
+           ((org-agenda-entry-types '(:deadline))
+            ;; a slower way to do the same thing
+            ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'notdeadline))
+            (org-agenda-ndays 1)
+            (org-deadline-warning-days 60)
+            (org-agenda-time-grid nil)))
+          ;; ...other commands here
+          ))
 #+END_SRC
 	
 ** Printed agenda
@@ -384,28 +464,28 @@ postscript file when you type =C-c a e=.
 Here's the code:
  
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-custom-commands
-      '(("P" "Printed agenda"
-	 ((agenda "" ((org-agenda-ndays 7)			;; overview of appointments
-		      (org-agenda-start-on-weekday nil)		;; calendar begins today
-		      (org-agenda-repeating-timestamp-show-all t)
-		      (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))))
-	  (agenda "" ((org-agenda-ndays 1)			;; daily agenda
-		      (org-deadline-warning-days 7)		;; 7 day advanced warning for deadlines
-		      (org-agenda-todo-keyword-format "[ ]")
-		      (org-agenda-scheduled-leaders '("" ""))
-		      (org-agenda-prefix-format "%t%s")))
-	  (todo "TODO"						;; todos sorted by context
-		((org-agenda-prefix-format "[ ] %T: ")
-		 (org-agenda-sorting-strategy '(tag-up priority-down))
-		 (org-agenda-todo-keyword-format "")
-		 (org-agenda-overriding-header "\nTasks by Context\n------------------\n"))))
-	 ((org-agenda-with-colors nil)
-	  (org-agenda-compact-blocks t)
-	  (org-agenda-remove-tags t)
-	  (ps-number-of-columns 2)
-	   (ps-landscape-mode t))
-	 ("~/agenda.ps"))
-	;; other commands go here
-	))
+  (setq org-agenda-custom-commands
+        '(("P" "Printed agenda"
+           ((agenda "" ((org-agenda-ndays 7)                      ;; overview of appointments
+                        (org-agenda-start-on-weekday nil)         ;; calendar begins today
+                        (org-agenda-repeating-timestamp-show-all t)
+                        (org-agenda-entry-types '(:timestamp :sexp))))
+            (agenda "" ((org-agenda-ndays 1)                      ;; daily agenda
+                        (org-deadline-warning-days 7)             ;; 7 day advanced warning for deadlines
+                        (org-agenda-todo-keyword-format "[ ]")
+                        (org-agenda-scheduled-leaders '("" ""))
+                        (org-agenda-prefix-format "%t%s")))
+            (todo "TODO"                                          ;; todos sorted by context
+                  ((org-agenda-prefix-format "[ ] %T: ")
+                   (org-agenda-sorting-strategy '(tag-up priority-down))
+                   (org-agenda-todo-keyword-format "")
+                   (org-agenda-overriding-header "\nTasks by Context\n------------------\n"))))
+           ((org-agenda-with-colors nil)
+            (org-agenda-compact-blocks t)
+            (org-agenda-remove-tags t)
+            (ps-number-of-columns 2)
+             (ps-landscape-mode t))
+           ("~/agenda.ps"))
+          ;; other commands go here
+          ))
 #+END_SRC
