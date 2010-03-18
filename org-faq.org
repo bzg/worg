@@ -106,7 +106,9 @@ Suckling]] posted a link showing how to make a simple foldable unicorn
 [[http://article.gmane.org/gmane.emacs.orgmode/11735][Tim Burt]] made a very complicated one which is now a treasured
 possession of the Org-mode author.
 
-- Official logo: [[http://orgmode.org/img/nrocinu2.jpg]]
+- Official logo: [[http://orgmode.org/img/org-mode-unicorn.png]]
+  This logo is available in a number of different formats including
+  Photoshop /.psd/ and scaleable vector graphics /.svg/ [[http://orgmode.org/img/][here]].
 
 - An [[http://orgmode.org/img/nrocinu4.jpg][alternative version]] from Christophe Bataillon (c):
 
@@ -2127,6 +2129,121 @@ lower level headlines will be mapped to itemize objects.
 This above is adapted from an [[http://article.gmane.org/gmane.emacs.orgmode/15077/match=beamer+dokos][email by Nick Dokos]], and an [[http://article.gmane.org/gmane.emacs.orgmode/17767/match=beamer+dokos][email by
 Thomas Dye]].  For a much more complex Beamer setup see the [[http://article.gmane.org/gmane.emacs.orgmode/17767/match=beamer+dokos][email by
 Thomas Dye]].
+
+** How can I use RefTeX in Org-mode files for LaTeX export and in Org-babel LaTeX code blocks?
+
+[[http://www.gnu.org/software/auctex/reftex.html][RefTeX]] is an indispensable tool for the author of LaTeX documents.  It
+aids in creation of bibliographies, cross-references, indexes, and
+glossaries.  RefTeX understands the structure of multi-file LaTeX
+documents and is able to collect from them information about the
+location(s) of external data stores used in creation of the final
+document.  RefTeX was written by Carsten Dominik and is currently
+being maintained by the [[http://www.gnu.org/software/auctex/index.html][AucTeX]] project.
+
+*** Using RefTeX In Org-mode Files for LaTeX Export
+In Org-mode files for LaTeX export, the trick is to find a way to tell
+RefTeX the locations of external data stores.  One way is to set the
+variable, =reftex-default-bibliography=.  Add lines like these to
+.emacs:
+
+#+begin_src emacs-lisp 
+  (setq reftex-default-bibliography
+        (quote
+         ("default.bib" "other-default.bib")))       
+#+end_src
+
+In practice, this is a limited solution and the
+typical user will want to pass this information on a per-file basis.
+Two solutions to this problem were posted on a blog, [[http://www.mfasold.net/blog/2009/02/using-emacs-org-mode-to-draft-papers/][Mario's
+Braindump]].  
+
+The first solution, proposed by Mario, enables the RefTeX citation
+function in Org-mode.  Add these lines to .emacs:
+
+#+begin_src emacs-lisp
+(defun org-mode-reftex-setup ()
+(load-library "reftex")
+(and (buffer-file-name)
+(file-exists-p (buffer-file-name))
+(reftex-parse-all))
+(define-key org-mode-map (kbd "C-c )") 'reftex-citation)
+)
+(add-hook 'org-mode-hook 'org-mode-reftex-setup)
+#+end_src
+
+Then add the following lines to the Org-mode file:
+
+#+begin_src org
+\bibliographystyle{plain}
+\bibliography{BIB-NAME}
+#+end_src
+
+A second solution, to activate the RefTeX minor mode on a per-file
+basis, was posted by Kevin Brubeck Unhammer in response to this idea.
+Add the following lines to .emacs:
+
+#+begin_src emacs-lisp
+  (add-hook ‘org-mode-hook
+             (lambda ()
+               (if (member “WRITE” org-todo-keywords-1)
+                   (org-mode-article-modes))))
+#+end_src
+
+where =org-mode-article-modes= is defined as follows:
+
+#+begin_src emacs-lisp
+  (defun org-mode-article-modes ()
+    (reftex-mode t)
+    (bib-cite-minor-mode t)
+    (and (buffer-file-name)
+         (file-exists-p (buffer-file-name))
+         (reftex-parse-all)))
+#+end_src
+
+Add the =\bibliographystyle{}= and =\bibliography{}= lines to the
+Org-mode file as before and define a TODO keyword, =WRITE=, perhaps
+like this:
+
+#+begin_src org
+  ,#+TODO: TODO(t) STARTED(s) | DONE(d) DEFERRED(f) WRITE
+#+end_src
+
+*** Using RefTeX in Org-babel LaTeX Code Blocks
+
+In Org-babel LaTeX code blocks, the trick is to give RefTeX access to
+information in other Org-babel LaTeX code blocks.  If you use an Emacs
+starter kit where configuration information is held in Org-mode files,
+then the second solution is preferable because you won't be asked for
+a master file when Emacs is started.  For this reason, the second
+solution is modified for use with Org-babel latex code blocks.  No
+key-binding is needed here because Org-babel code blocks are edited
+within the usual AucTeX environment.
+
+Add the following lines to .emacs (adapted from  Kevin Brubeck Unhammer's [[http://www.mfasold.net/blog/2009/02/using-emacs-org-mode-to-draft-papers/][Reftex Setup]])
+#+begin_src emacs-lisp
+  (defun org-mode-article-modes ()
+    (reftex-mode t)
+    (and (buffer-file-name)
+         (file-exists-p (buffer-file-name))
+         (reftex-parse-all)))
+  
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (if (member "REFTEX" org-todo-keywords-1)
+                  (org-mode-article-modes))))
+#+end_src
+
+Then add a line like the following line to the top of your org-mode file:
+
+#+begin_src org
+  ,#+TODO: TODO(t) STARTED(s) | DONE(d) DEFERRED(f) REFTEX
+#+end_src
+
+When you open an org-mode file with a line like this, RefTeX will
+prompt for the master .tex file, which will be parsed in the usual
+way.  This means that the .tex file should already exist, perhaps by
+tangling the LaTeX preamble and postamble, before
+=org-mode-article-modes= is activated for the Org-mode file.
 
 * COMMENT HTML style specifications
 

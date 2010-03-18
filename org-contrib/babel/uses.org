@@ -7,8 +7,8 @@
 #+EMAIL:      tsd at tsdye dot com
 #+LANGUAGE:   en
 #+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
-
-[[file:index.org][{Back to Babel's index}]]
+#+LINK_UP:  index.php
+#+LINK_HOME: http://orgmode.org/worg/
 
 * Introduction
   This page collects examples of using Org-babel in a variety of
@@ -63,42 +63,152 @@
   makes it possible to present writing tasks to the authors in an order
   different from which they appear in the report.
 
+** Requirement
+   - A working LaTeX installation.
+
+** Advantages
+   - The integration of training material with in-file instruction can
+     be quite effective.
+   - Many authors find it easy to work from the bottom up, or from the
+     particular to the general, rather than the usual sequence of
+     general-particular-general found in reports.
+
+** Disadvantages
+   - None?
+
+** Example
+   - This report must satisfy the requirements set out in [[http://hawaii.gov/dlnr/hpd/pdfs/revproc_har/275_284/pdfs/278.pdf][the Historic
+     Preservation Division rule]].
+   - Complete each of the TODO items.
+   - Mark each item DONE when you have completed it.
+   - =C-c a t= will make an agenda of items left to do in this
+     document.
+   - =C-c a m= YOURNAME will make an agenda of writing tasks assigned
+     to you.
+   
+*** TODO Field Methods
+**** TODO Include the following information: [1/7]
+      - [X] When the fieldwork was carried out.
+      - [ ] Who directed the fieldwork.
+      - [ ] The names and qualifications of crew members.
+      - [ ] Establishment of site datum and grid.
+      - [ ] Excavation tools.
+      - [ ] Assignment of contexts.
+      - [ ] Bag list.
+**** DONE Include a citation to the project plan.
+     :LOGBOOK:
+     - State "DONE"       from "TODO"       [2009-11-25 Wed 09:53]
+     :END:
+
+#+srcname: field-methods
+#+begin_src latex
+  \section{Field Methods}
+  \label{sec:field-methods}
+  
+  % Enter text below this line.
+
+  Fieldwork for the project was carried out between December 26, 2008
+  and February 3, 2009 following an approved plan \cite{plan}.
+#+end_src   
+
+*** TODO Results
+    - Note the use of Org-mode tags to assign sections to authors Veronica and Eric.
+    - Discuss the artifacts and midden recovered during excavation.
+
+
+**** TODO Artifacts						   :Veronica:
+     :LOGBOOK:
+     - State "TODO"       from "DONE"       [2009-11-25 Wed 09:44]
+     - State "DONE"       from "TODO"       [2009-11-25 Wed 09:44]
+     :END:
+     - Use Sinoto's classification of one-piece fishhooks.
+     - Cite Anell when describing two-piece fishhooks.
+     - Use Emory's classification of adzes when describing
+       cross-section.
+#+srcname: artifacts
+#+begin_src latex
+  \subsection{Description of Artifacts}
+  \label{sec:artifact-description}
+  
+  % Enter text below this line
+#+end_src
+
+**** TODO Midden						       :Eric:
+     - Use Kay for identifying and naming marine shells
+     - Cite Ziegler for information on fish habitats
+#+srcname: midden
+#+begin_src latex
+  \subsection{Midden}
+  \label{sec:midden}
+  
+  % Enter text below this line
+#+end_src
+
+**** No data entry beyond this line
+
+#+srcname: results
+#+begin_src latex :noweb
+  \section{Results}
+  \label{sec:results}
+  
+  This section presents the results of excavation.
+  
+  <<artifacts>>
+  
+  <<midden>>
+#+end_src
+
+
+*** TODO Introduction
+    - Give the reader a brief overview of the project and its results.
+
+#+srcname: intro
+#+begin_src latex
+  \section{Introduction}
+  \label{sec:introduction}
+  
+  % Text below this line
+#+end_src
+*** No data entry beyond this line
+    - The LaTeX code here sets up the environment and inserts the
+      defined source code blocks in their report order.
+    - A call to =org-babel-tangle= produces the LaTeX report document.
+
+#+begin_src latex :noweb :tangle report.tex
+  \documentclass{article}
+  \begin{document}
+  <<intro>>
+  <<field-methods>>
+  <<results>>
+  \bibliographystyle{apa} 
+  \bibliography{mybib}
+  \end{document}
+#+end_src
+
+
+
 * [[file:examples/research-project.org][A Research Project]]
-  It is outrageous to think that an entire research project might fit
-  in a single computer file.  Practically speaking, it probably isn't
-  possible.  But the combination of Org-mode and Org-babel does make
-  it possible for one file to hold many, many things useful to the researcher:
-     - the project schedule; 
-     - a daily log; 
-     - notes; 
-     - a facility to track data acquisition graphically; 
-     - a complete specification of the steps taken in data analysis; 
-     - the two presentation products typically produced by researchers---an article
-       for print publication and a digital slide show; 
-     - comments; 
-     - metadata;
-     - etc.
   
-  When the project is finished and the Org-mode file is complete, one
-  call to =org-babel-tangle= produces the LaTeX source files for the
-  print publication and the Beamer slide show.  Exporting the Org-mode
-  file, say with =C-c, C-e h=, produces an HTML file that meets most,
-  if not all, the requirements for a piece of reproducible research.
+  A research project typically produces one or more documents that
+  describe or rely upon:
+  - a data collection
+  - computations and code used in data analysis or simulation
+  - methodological conventions and assumptions
+  - decisions among alternate analytic paths
 
-  Equally outrageous---the one Org-mode file is easy to
-  set-up, use, and maintain.  A modicum of organization, along with some
-  judicious use of keywords and tags, and perhaps a custom agenda item
-  or two, makes it easy to keep track of progress and to get where you
-  want to be with no hassle.
+  The documents produced by a research project typically stand apart
+  from the things they describe and rely upon, which makes it
+  difficult for other researchers to understand fully or to reproduce
+  the results of the research project.
+ 
+  A software solution to this problem was proposed by Gentleman and
+Temple Lang, who "introduce the concept of a /compendium/ as both a
+container for the different elements that make up the document and its
+computations (i.e. text, code, data, ...), and as a means for
+distributing, managing and updating the collection."
 
-  More outrageous---the project data can be augmented or
-  corrected at any point and these changes will be reflected
-  everywhere---in the graphics, the slides, the text of the article,
-  the metadata, etc.  One can work with great confidence, knowing that
-  mistakes of logic, analysis, and execution are very likely to be
-  recorded in the Org-mode file.  Fixing an error where it occurs, and
-  only there, propagates the fix throughout the project.  As a result,
-  the researcher spends time thinking about the research, rather than
-  its organization across multiple directories, files, and
-  applications.  What fun!
-  
+Org-babel and Org-mode provide the tools needed to create a compendium
+in one Org-mode file.  This example is taken from a work in progress,
+one that has seen many changes in structure and organization.  No
+claim is made that it is the best way to do things.  But it works and
+is proving extremely useful in the conduct of the research project.
