@@ -968,3 +968,97 @@ nil if before the first headline."
         t))))
 #+END_SRC
 
+* Keep yearly archive files
+  - Matt Lundin
+
+One way to keep one's agenda files lean is archive subtrees to
+separate files with C-c C-x C-s (org-archive-subtree). The default
+archive location is simply the name of the current file with an
+"_archive" extension, so items in "computer.org" would be archived to
+"computer.org_archive." The problem here is that if one frequently
+creates and deletes org files (say "job-xyz.org"), then one can end up
+with all sorts of orphaned archive files which are no longer
+accessible via the agenda's archive mode, since they are no longer
+connected to an agenda file.
+
+My solution to this problem is to use yearly archive files, organized
+in trees that correspond to the original file. 
+
+#+begin_src emacs-lisp
+(setq org-archive-location (concat (format-time-string "%Y") ".org_archive::* %s"))
+#+end_src
+
+The setting above archives subtrees to files names "2009.org_archive",
+"2010.org_archive", and so on. Each file is organized by file name:
+
+#+begin_src org
+  ,* computer.org...
+  ,* org-mode.org...
+  ,* client-xyz.org..
+  ,* job.xyz.org...
+#+end_src
+
+This approach helps to keep one's archive files nice and organized,
+regardless of how much the original collection of agenda files grows
+or shrinks. Perhaps the chief disadvantage is that data related to a
+particular subject is scattered across multiple files. The following
+code will "reconstitute" an original file in a temporary buffer, with
+data organized by the year in which it was archived:
+
+#+begin_src emacs-lisp
+  (defun my-org-reconstitute-file-from-archives ()
+    "Recreate single archive file from yearly archives.
+  The function prompts the user for a name of a file (with
+  completions gathered from 1st level headings in the archive
+  files). The data from those subtrees is gathered in a temporary
+  buffer named *archive-[name-of-original-file].org*."
+    (interactive)
+    (let* ((arch-files (file-expand-wildcards "~/org/20*.org_archive"))
+           (org-refile-targets '((arch-files :level . 1)))
+           (location-table (cdr (org-get-refile-targets)))
+           (comp-list (mapcar 
+                       (lambda (x)
+                         (nth 1 (split-string (car x) "/")))
+                       location-table))
+           (name (completing-read "File name: " (delq nil comp-list) nil nil))
+           (buf (concat "*archive-" name "*"))
+           p temp-file)
+      (save-window-excursion
+        (when (get-buffer buf)
+          (kill-buffer buf))
+        (get-buffer-create buf)
+        (mapc 
+         (lambda (x)
+           (string-match "^\\([0-9]+\\)\\.org_archive" (file-name-nondirectory x))
+           (let ((date (match-string 1 (file-name-nondirectory x))))
+             (with-current-buffer (or (find-buffer-visiting x)
+                                      (find-file-noselect x))
+               (goto-char (point-min))
+               (while (re-search-forward (concat "^* " name) nil t)
+                 (outline-mark-subtree)
+                 (push 
+                  (concat 
+                   "\n"
+                   (replace-regexp-in-string
+                    (concat "^* " name)
+                    (concat "* " date)
+                    (buffer-substring (point) (mark))))
+                  temp-file)
+                 (forward-line 1)))))
+         arch-files))
+      (switch-to-buffer buf)
+      ;; use this one if you want descending date order
+      ;;  (apply 'insert (nreverse temp-file))
+      (apply 'insert temp-file)
+      (setq buffer-read-only t)
+      (goto-char (point-min))
+      (forward-line 1)
+      (org-mode))
+    ;; need to get rid of nil in refile targets since this buffer is not
+    ;; associated with a file
+    (let* ((local-refile-targets (copy-alist org-refile-targets)))
+      (set
+       (make-local-variable 'org-refile-targets)
+       (assq-delete-all nil local-refile-targets))))
+#+end_src
+
