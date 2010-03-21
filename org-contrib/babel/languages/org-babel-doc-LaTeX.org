@@ -20,31 +20,26 @@
 * Notes                                                            :noexport:
 ** Queries
 ** Comments
-* Requirements
+* Requirements and Enhancements
 **  [[http://www.gnu.org/software/auctex/][AucTeX]]
-   Strongly recommended for editing .tex files.
+   Strongly recommended for editing .tex files.  Add the following
+   line to .emacs:
        
 #+begin_src emacs-lisp 
 (load "auctex.el" nil t t)
 #+end_src
 
-*** Preview LaTeX
-    Partial WYSIWYG in a .tex file buffer
+** [[http://www.gnu.org/software/auctex/reftex.html][RefTeX]]
+    This cross-reference, bibliography, glossary, and index manager is
+    indispensable.  Add the following line to .emacs:
 #+begin_src emacs-lisp 
-(load "preview-latex.el" nil t t)
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex) 
 #+end_src
 
-*** RefTeX
-    Cross-reference, bibliography, glossary, and index manager
-#+begin_src emacs-lisp 
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)   ; with AUCTeX LaTeX mode
-#+end_src
-
-**** Recommended RefTeX Setting
-     - It is helpful to name a default bibliography when editing
-       source code in Org-babel, since the LaTeX source code block
-       being edited probably doesn't include the \bibliography{}
-       command that RefTeX uses to find bibliographic database(s).
+*** Recommended RefTeX Setting
+     - It can be helpful to name a default bibliography when editing
+       source code in Org-babel.  Add the following lines, edited to
+       conform to your setup, to .emacs:
 
 
 #+begin_src emacs-lisp 
@@ -52,6 +47,33 @@
         (quote
          ("default.bib" "other-default.bib")))       
 #+end_src
+
+*** Enhanced RefTeX Support
+  - You can give RefTeX access to information in other LaTeX code
+    blocks with the following code
+
+  - Add the following lines to your .emacs (adapted from  Kevin Brubeck Unhammer's [[http://www.mfasold.net/blog/2009/02/using-emacs-org-mode-to-draft-papers/][Reftex Setup]])
+#+begin_src emacs-lisp
+  (defun org-mode-article-modes ()
+    (reftex-mode t)
+    (and (buffer-file-name)
+         (file-exists-p (buffer-file-name))
+         (reftex-parse-all)))
+  
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (if (member "REFTEX" org-todo-keywords-1)
+                  (org-mode-article-modes))))
+#+end_src
+
+  - Add the following line to the top of an org-mode file that
+    contains LaTeX code blocks
+#+begin_src latex
+    #+TODO: REFTEX
+#+end_src
+
+  - When you open an org-mode file with this line, RefTeX will prompt
+    for the master .tex file
 
 * Configuration in Org-babel
 ** Activate LaTeX Evaluation
@@ -68,30 +90,6 @@
   (setq org-babel-noweb-error-langs '("R" "python" "latex"))
 #+end_src
 
-** RefTeX Support
-  - This is a two-step process
-  - Add the following lines to .emacs (adapted from  Kevin Brubeck Unhammer's [[http://www.mfasold.net/blog/2009/02/using-emacs-org-mode-to-draft-papers/][Reftex Setup]])
-#+begin_src emacs-lisp
-  (defun org-mode-article-modes ()
-    (reftex-mode t)
-    (and (buffer-file-name)
-         (file-exists-p (buffer-file-name))
-         (reftex-parse-all)))
-  
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (if (member "REFTEX" org-todo-keywords-1)
-                  (org-mode-article-modes))))
-#+end_src
-
-  - Add the following line to the top of your org-mode file
-#+begin_src latex
-    #+TODO: REFTEX
-#+end_src
-
-  - When you open an org-mode file with this line, RefTeX will prompt
-    for the master .tex file
-
 * Language-specific Conventions
   - Org-babel returns raw LaTeX code on evaluation, unless a =:file=
     header argument is present.
@@ -107,17 +105,15 @@
     arguments: =:pdfheight=,  =:pdfwidth=, and =:packages=.
 ** Header Arguments
   - The =:file= header argument accepts a file name ending in =.png=
-    or =.pdf=.
+    or =.pdf=
   - When =:file FILENAME.png= is set, =:buffer no= specifies that
-    buffer colors won't be used in the =.png= file.
+    buffer colors won't be used in the =.png= file
   - When =:file FILENAME.pdf= is set, =:pdfheight= and =:pdfwidth=
     header arguments can be used to specify the size of the pdf
     image.  These arguments take LaTeX lengths, e.g., =1in=, =6em=, =48pt=, etc.
-  - The =:packages= header argument temporarily adds one or more
-    packages to =org-export-latex-packages-alist=.  It accepts an
-    assoc-list that can be appended to
-    =org-export-latex-packages-alist=.  An example is given below. 
-  - LaTeX source code blocks do not support the =:session= header argument.
+  - The =:packages= header argument can be passed an assoc-list that temporarily adds one or more
+    packages to =org-export-latex-packages-alist=
+  - LaTeX source code blocks do not support the =:session= header argument
 ** Examples of Use
 *** Display the LaTeX logo in the Emacs buffer
 
@@ -160,8 +156,6 @@
 ** Creating and Including Graphics
    - This example creates a graph in R, then inserts it with a noweb
      reference to the results of the R code block
-   - Note that this example is for illustration; it is not a complete
-     working example
 
 : #+srcname: r-complete-weight-histogram
 : #+begin_src R :session adze :file r/adze_wt_log.pdf
