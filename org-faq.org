@@ -2161,14 +2161,13 @@ The first solution, proposed by Mario, enables the RefTeX citation
 function in Org-mode.  Add these lines to .emacs:
 
 #+begin_src emacs-lisp
-(defun org-mode-reftex-setup ()
-(load-library "reftex")
-(and (buffer-file-name)
-(file-exists-p (buffer-file-name))
-(reftex-parse-all))
-(define-key org-mode-map (kbd "C-c )") 'reftex-citation)
-)
-(add-hook 'org-mode-hook 'org-mode-reftex-setup)
+  (defun org-mode-reftex-setup ()
+    (load-library "reftex")
+    (and (buffer-file-name)
+         (file-exists-p (buffer-file-name))
+         (reftex-parse-all))
+    (define-key org-mode-map (kbd "C-c )") 'reftex-citation))
+  (add-hook 'org-mode-hook 'org-mode-reftex-setup)
 #+end_src
 
 Then add the following lines to the Org-mode file:
@@ -2248,17 +2247,17 @@ tangling the LaTeX preamble and postamble, before
 * COMMENT HTML style specifications
 
 #+begin_src emacs-lisp
-(defun org-faq-make-target ()
-  "Make hard target for current headline."
-  (interactive)
-  (if (not (org-on-heading-p))
-      (error "Not on a headline"))
-  (let ((h (org-trim (org-get-heading 'no-tags))))
-    (if (string-match "[ \t]*\\?\\'" h)
-	(setq h (replace-match "" t t h)))
-    (while (string-match "[ \t]+" h)
-      (setq h (replace-match "-" t t h)))
-    (org-entry-put nil "CUSTOM_ID" h)))
+  (defun org-faq-make-target ()
+    "Make hard target for current headline."
+    (interactive)
+    (if (not (org-on-heading-p))
+        (error "Not on a headline"))
+    (let ((h (org-trim (org-get-heading 'no-tags))))
+      (if (string-match "[ \t]*\\?\\'" h)
+          (setq h (replace-match "" t t h)))
+      (while (string-match "[ \t]+" h)
+        (setq h (replace-match "-" t t h)))
+      (org-entry-put nil "CUSTOM_ID" h)))
 #+end_src
 
 
