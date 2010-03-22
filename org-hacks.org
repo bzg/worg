@@ -1007,60 +1007,105 @@ code will "reconstitute" an original file in a temporary buffer, with
 data organized by the year in which it was archived:
 
 #+begin_src emacs-lisp
-  (defun my-org-reconstitute-file-from-archives ()
-    "Recreate single archive file from yearly archives.
-  The function prompts the user for a name of a file (with
-  completions gathered from 1st level headings in the archive
-  files). The data from those subtrees is gathered in a temporary
-  buffer named *archive-[name-of-original-file].org*."
-    (interactive)
-    (let* ((arch-files (file-expand-wildcards "~/org/20*.org_archive"))
-           (org-refile-targets '((arch-files :level . 1)))
-           (location-table (cdr (org-get-refile-targets)))
-           (comp-list (mapcar 
-                       (lambda (x)
-                         (nth 1 (split-string (car x) "/")))
-                       location-table))
-           (name (completing-read "File name: " (delq nil comp-list) nil nil))
-           (buf (concat "*archive-" name "*"))
-           p temp-file)
-      (save-window-excursion
-        (when (get-buffer buf)
-          (kill-buffer buf))
-        (get-buffer-create buf)
-        (mapc 
-         (lambda (x)
-           (string-match "^\\([0-9]+\\)\\.org_archive" (file-name-nondirectory x))
-           (let ((date (match-string 1 (file-name-nondirectory x))))
-             (with-current-buffer (or (find-buffer-visiting x)
-                                      (find-file-noselect x))
-               (goto-char (point-min))
-               (while (re-search-forward (concat "^* " name) nil t)
-                 (outline-mark-subtree)
-                 (push 
-                  (concat 
-                   "\n"
-                   (replace-regexp-in-string
-                    (concat "^* " name)
-                    (concat "* " date)
-                    (buffer-substring (point) (mark))))
-                  temp-file)
-                 (forward-line 1)))))
-         arch-files))
-      (switch-to-buffer buf)
-      ;; use this one if you want descending date order
-      ;;  (apply 'insert (nreverse temp-file))
-      (apply 'insert temp-file)
-      (setq buffer-read-only t)
-      (goto-char (point-min))
-      (forward-line 1)
-      (org-mode))
+(defun my-org-reconstitute-file-from-archives (&optional name temp)
+  "Recreate single archive file from yearly archives.
+The function prompts the user for a name of a file (with
+completions gathered from 1st level headings in the archive
+files). The data from those subtrees is gathered in a temporary
+buffer named *archive-[name-of-original-file].org*. 
+
+With the argument temp, write the buffer to a subdirectory of
+`temporary-file-directory'."
+  (interactive)
+  (let* ((arch-files (file-expand-wildcards "~/org/20*.org_archive"))
+	 (org-refile-targets '((arch-files :level . 1)))
+	 (location-table (unless name 
+			   (cdr (org-get-refile-targets))))
+	 (comp-list (unless name
+		      (mapcar 
+		       (lambda (x)
+			 (nth 1 (split-string (car x) "/")))
+		       location-table)))
+	 (name (or name
+		   (completing-read 
+		    "File name: " 
+		    (delq nil comp-list) nil nil)))
+	 (buf (concat (file-name-sans-extension name) ".archive"))
+	 p temp-file)
+	 (save-window-excursion
+	   (when (get-buffer buf)
+	     (kill-buffer buf))
+	   (get-buffer-create buf)
+	   (mapc 
+	    (lambda (x)
+	      (string-match "^\\([0-9]+\\)\\.org_archive" 
+			    (file-name-nondirectory x))
+	      (let ((date (match-string 1 (file-name-nondirectory x))))
+		(with-current-buffer (or (find-buffer-visiting x)
+					 (find-file-noselect x))
+		  (save-excursion
+		    (goto-char (point-min))
+		    (while (re-search-forward (concat "^* " name) nil t)
+		      (outline-mark-subtree)
+		      (setq temp-file 
+			    (cons 
+			     (concat 
+			      "\n"
+			      (replace-regexp-in-string
+			       (concat "^* " name)
+			       (concat "* " date "\t\t\t\t\t\t\t:" date ":")
+;;			       (concat "* " date)
+			       (buffer-substring (point) (mark))))
+			     temp-file))
+		      (forward-line 1))))))
+	    arch-files))
+	 (switch-to-buffer buf)
+	 ;; use this one if you want descending date order
+	 ;; (apply 'insert (nreverse temp-file))
+	 (insert "#    -*- mode: org -*-\n")
+	 (insert (concat "#+title: Archive of " name "\n"))
+	 (apply 'insert temp-file)
+	 (goto-char (point-min))
+	 (outline-next-visible-heading 1)
+	 (org-mode)
+	 (when temp
+	   (let ((temp-dir 
+		  (concat temporary-file-directory "org-archive-files/")))
+	     (unless (file-exists-p temp-dir)
+	       (make-directory temp-dir))
+	     (write-file (concat temp-dir buf))))
+	 (setq buffer-read-only t))
     ;; need to get rid of nil in refile targets since this buffer is not
     ;; associated with a file
     (let* ((local-refile-targets (copy-alist org-refile-targets)))
       (set
        (make-local-variable 'org-refile-targets)
-       (assq-delete-all nil local-refile-targets))))
+       (assq-delete-all nil local-refile-targets)))
+    (set (make-local-variable 'org-speed-commands-user)
+	 '(("g" . my-org-archive-jump-to-original-from-temp-archive))))
+
+(defun my-org-archive-jump-to-original-from-temp-archive ()
+  (interactive)
+  (if (looking-at "^*\\s-")
+      (error "Can't link from here"))
+  (let* ((cbuf (buffer-name))
+	 (ext (file-name-extension cbuf))
+	 (trunk (file-name-sans-extension cbuf))
+	 (link-text (concat "*" trunk ".org"))
+	 (search-text (nth 4 (org-heading-components)))
+	 year afile)
+    (unless (string= ext "archive")
+      (error "Not in reconstituted archive file"))
+    (save-excursion
+      (while (org-up-heading-safe))
+      (setq year (nth 4 (org-heading-components))))
+    (setq afile (concat "~/org/" year ".org_archive"))
+    (org-open-file afile t nil link-text)
+    (beginning-of-line) (org-narrow-to-subtree)
+    (re-search-forward (concat "^*+\\s-" search-text) nil t)
+    (org-reveal t)
+    (beginning-of-line)))
+
 #+end_src
 
 * Speed Commands
