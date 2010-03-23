@@ -2170,12 +2170,59 @@ function in Org-mode.  Add these lines to .emacs:
   (add-hook 'org-mode-hook 'org-mode-reftex-setup)
 #+end_src
 
-Then add the following lines to the Org-mode file:
+Then add the following lines anywhere in the Org-mode file (Org-mode
+will recognize them as LaTeX commands):
 
 #+begin_src org
 \bibliographystyle{plain}
 \bibliography{BIB-NAME}
 #+end_src
+
+With this setup, =C-c )= will invoke =reftex-citation= which will
+insert a reference in the usual way:
+
+#+begin_src org
+* test reftex
+
+This is a citation \cite{tierney90}.
+
+\bibliographystyle{plain}
+\bibliography{tsd}
+#+end_src
+
+This Org-mode file will export the following LaTeX output:
+
+#+begin_src latex :exports code
+  % Created 2010-03-22 Mon 14:34
+  \documentclass[11pt,letter]{article}
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{hyperref}
+  
+  \title{test.org}
+  \author{Tom Dye}
+  \date{2010-03-22 Mon}
+  
+  \begin{document}
+  
+  \maketitle
+  
+  \setcounter{tocdepth}{3}
+  \tableofcontents
+  \vspace*{1cm}
+  
+  \section{test reftex}
+  \label{sec-1}
+  
+  
+  This is a citation \cite{tierney90}.
+  
+  \bibliographystyle{plain}
+  \bibliography{tsd}
+  
+  \end{document}
+#+end_src
+
 
 A second solution, to activate the RefTeX minor mode on a per-file
 basis, was posted by Kevin Brubeck Unhammer in response to this idea.
@@ -2206,6 +2253,8 @@ like this:
 #+begin_src org
   ,#+TODO: TODO(t) STARTED(s) WRITE | DONE(d) DEFERRED(f)
 #+end_src
+
+With this setup, you insert a citation with =M-x reftex-citation RET=.
 
 *** Using RefTeX in Org-babel LaTeX Code Blocks
 
