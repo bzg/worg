@@ -48,11 +48,12 @@ summarize the uses and implications of a compendium:
     manipulated programmatically in ways perhaps not envisioned by
     the author.
 
-Org-babel and Org-mode provide the tools needed to create a compendium
-in one Org-mode file.  This example is taken from a work in progress,
-one that has seen many changes in structure and organization.  No
-claim is made that it is the best way to do things.  But it works and
-is proving extremely useful in the conduct of the research project.
+Org-babel and Org-mode provide the tools needed to create a
+multi-language compendium in a single Org-mode file.  This example is
+taken from a work in progress, one that has seen many changes in
+structure and organization.  No claim is made that it is the best way
+to do things.  But it works and is proving extremely useful in the
+conduct of the research project.
 
 * Products of the Org-babel Compendium
 
@@ -82,7 +83,7 @@ The Org-mode file is divided into eight sections:
   ,* Instructions for Use
   ,* Documents
   ,* Project Tracking
-  ,* Software Versions
+  ,* Quality Control
   ,* Notes
 #+end_src
 
@@ -401,31 +402,75 @@ code block above.
   ,[[file:r/adze_wt_log.png]]
 #+end_src
 
-** Software Versions
-    This section documents the software versions used by the author to
-    produce the derived documents.
+** Quality Control
+    - Quality control is achieved by: 
+      - assigning a version to the compendium
+      - documenting the software versions used by the author to
+        produce the derived documents
+      - including a test suite for Org-babel
+      - marking result blocks as original products of the compendium
+        so readers can execute code blocks and compare results with
+        the original
 
-    The basic idea is that the Org-mode document ought to work with
-    the software versions documented here.
+*** Original Compendium Results
+
+The reader can exercise quality control by comparing results against
+the author's.  The function, =compendium-results= adds a stamp,
+COMPENDIUM, to the names of results blocks.  When the reader executes
+code blocks, the results can be compared to the COMPENDIUM blocks.
+
+To use this function, execute the code block with =C-c C-c= then run
+it with =M-x compendium-results RETURN=.  
+
+#+srcname: compendium-results-function
+#+begin_src emacs-lisp
+  (defun compendium-results ()
+    "Adds COMPENDIUM to #+results: block names."
+    (interactive)
+    (query-replace-regexp "\\(#\\+results:.*\\)$" "\\1 COMPENDIUM")
+    )
+#+end_src
+
+
 
 #+begin_src org
-  ,* Software Versions                                                :noexport:
-  ,** Org-mode
+  ,* Quality Control
+  
+  ,** Digital Signature
+  ,   - This file is distributed with an MD5 digital signature
+  ,   - You should check that the file you received matches the digital signature
+  ,   - Run the following command with =C-c C-c= before your make changes
+  ,     to the file and compare with the distributed value
+  ,     
+  ,#+begin_src shell
+  ,     md5 research-project.org
+  ,#+end_src
+  
+  ,** Software Version Information                                    :noexport:
+  ,*** Compendium Version
+  ,    - Version 1
+  
+  ,*** Org-mode
+  ,    - The org-version function yields sufficient information to
+  ,      identify the Org-mode and Org-babel code used by the author
   ,#+srcname: org-version
   ,#+begin_src emacs-lisp 
   ,   (org-version nil)
   ,#+end_src
   
-  ,#+results: org-version
+  ,#+results: org-version 
   ,: Org-mode version 6.34trans (release_6.34c.221.gadb2)
   
-  ,** R
+  ,*** R
+  ,    - The version of R used by the author  
+  ,    - Ideally, package versions would also be displayed
+  
   ,#+srcname: r-version
   ,#+begin_src R :session adzes :results output
   ,  version
   ,#+end_src
   
-  ,#+results: r-version
+  ,#+results: r-version 
   ,#+begin_example
   ,               _                           
   ,platform       i386-apple-darwin8.11.1     
@@ -451,7 +496,7 @@ code block above.
 [fn:1] [[http://www.bepress.com/bioconductor/paper2/][Statistical Analyses and Reproducible Research]]
 
 * Summary of the Org-babel Compendium
-  The Org-babel compendium fulfills all of the characteristics
+  The Org-babel compendium fulfills the characteristics
   specified by Gentleman and Temple Lang.
 
   - It encapsulates fully the actual work of the author, potentially
@@ -483,3 +528,53 @@ code block above.
     or inputs to software, which either runs or can be made to run
     under Org-babel, thus allowing programmatic manipulation in ways
     different from those carried out by the author.
+
+Gentleman and Temple Lang describe five kinds of software needed to
+create, manage, and distribute a compendium.  Emacs with Org-mode and
+Org-babel carries out the tasks of all five kinds of software.
+
+** Authoring Software
+   Emacs with Org-mode and Org-babel leverages familiar tools to
+   create a compendium in a single file.  It provides easy integration
+   and editing of code together with text.  All the usual editing
+   tools are available when editing both text chunks and code chunks;
+   R code, for example, is edited using the facilities provided by
+   [[http://ess.r-project.org/][Emacs Speaks Statistics]]. There is a simple mechanism for evaluating
+   code chunks in the growing list of supported languages, i.e., place
+   point in the code block and press =C-c C-c=.
+** Auxiliary Software
+   Because the components of the compendium all reside in the same
+   Org-mode file, no auxiliary software, other than the external
+   software applications needed to evaluate code chunks, such as R, is
+   required.
+** Transformation Software
+   Org-mode and Org-babel provide the necessary "collection of
+   filters" to generate the various outputs.
+** Quality Control Software
+   The issue of quality control is meant to insure that the reader of
+   a compendium achieves the same results as the author of the
+   compendium.  The compendium described here encourages the user to
+   check the distribution file's digital signature using md5, thus
+   providing a mechanism to ensure that the reader's file is identical
+   to the author's.  The compendium also contains information on the
+   version numbers of the software used by the author.  In the case of
+   this example these include the output of =(org-version nil)=, which
+   yields a reference to an abbreviated description of the git HEAD,
+   and the detailed output of the R =version= command.  Ideally, the
+   versions of R packages used in the computations would also be
+   included.  Finally, the compendium contains a small function that
+   the author uses to tag =#+results:= blocks so they are not
+   overwritten by subsequent executions of their source blocks.  In
+   this way, the reader can execute the source blocks and directly
+   compare results with those obtained by the author.
+
+** Distribution Software
+   The problems of distribution are largely solved by the fact that
+   the Org-babel multi-language compendium can be distributed as a
+   single ASCII text file.  Because Emacs is ported to many operating
+   environments, the compendium can be used by readers with a wide
+   variety of hardware.  In practice, the md5 digital signature should
+   provide adequate protection against file corruption.
+
+   
+
