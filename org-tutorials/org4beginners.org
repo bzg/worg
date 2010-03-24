@@ -71,7 +71,6 @@ sudo apt-get install emacs
      ([[http://www.claremontmckenna.edu/math/alee/emacs/emacs.html][according to this example installation]])
 * Starting org-mode
   New shortcuts in this chapter:
-  - *C-x b* -- switch to document (buffer)
   - *C-x s* -- save document
   - *C-x f* -- open document
 ** Our first org-mode document
@@ -81,9 +80,9 @@ sudo apt-get install emacs
    to the Emacs tutorial and some other documents, but for now, we
    don't need those.
 
-   To start a new document, use the following short-cut: *C-x b*,
-   which will offer you to open another document (or buffer as it is
-   called in Emacs), type *1.org*. This will give you a brand-new,
+   To start a new document, use the following short-cut: *C-x f*,
+   which will offer you to open a document (or buffer as it is
+   called in Emacs), call it *1.org*. This will give you a brand-new,
    empty document.
   
    To save the document, either press the save icon, or press *C-x s*,
@@ -94,12 +93,13 @@ sudo apt-get install emacs
    : M-x org-mode
    Which will enable the org-mode on the current document.
 
-   To make Emacs understand that this is an org-mode document, when it
-   opens up the document, add the following to the top of your document:
+   To make Emacs understand that this is an org-mode document, add the
+   following to the *top* of your document:
 #+BEGIN_SRC org
-# -*- mode: org -*- 
+MY PROJECT -*- mode: org -*- 
 #+END_SRC
-   Those are minuses, /not/ underscores.
+   Those are minuses, /not/ underscores. MY PROJECT is the title of
+   the document, this can be anything.
 
    This will enable org-mode for this document, no matter what the
    file-ending is.
@@ -119,6 +119,7 @@ sudo apt-get install emacs
 
 ;;enable syntax highlighting
 (global-font-lock-mode t)
+(transient-mark-mode 1)
 
 ;;;;org-mode configuration
 ;;enable org-mode
@@ -129,9 +130,10 @@ sudo apt-get install emacs
 
   Restart Emacs.
 
-  *Note:* The mode-line, mentioned in the previous paragraph is only needed if
-  you 1) have files with a different file-ending then configured in your
-  Emacs config (for example myfile.txt). 2) Don't have the auto-mode-alist line in your configuration.
+  *Note:* The mode-line, mentioned in the previous paragraph is only
+  needed if you 1) have files with a different file-ending then
+  configured in your Emacs config (for example myfile.txt). 2) Don't
+  have the auto-mode-alist line in your configuration.
 * Keep track of lists and notes
   New shortcuts in this chapter:
   - *TAB* / *S-TAB* -- (un)fold
@@ -438,3 +440,69 @@ Current:
   For quick reminders there are the [[http://orgmode.org/index.html#sec-4.2][org-mode cheat-sheet]] and the
   emacs cheat-sheet, both will help you to remember those pesky
   short-cuts. 
+* Beyond the basics
+  
+  As is often said in geek humor: "here be dragons!" From here on you
+  are going into the die-hard section of using org-mode. Most of the
+  following material is not really hard, but make sure to have backups
+  of your important data. If you have questions about the following,
+  look it up in the manual and the faq. Also irc (#orgmode on
+  freenode) is a good place to ask questions.
+
+** TODO Quickly adding tasks with remember
+** Running the latest version of org-mode
+
+   New commands in this section:
+   - *M-x reload* -- reload org-mode after an update
+   - *M-x org-version* -- show org-mode version
+
+   Pretty soon you will notice that the development of org-mode goes a
+   lot faster the speed Emacs get's updated with. It is quite possible
+   to run the development version of org-mode daily.
+
+   How do you go about that?
+   
+   1. Install git
+      Not really part of an org-mode tutorial, but here are some
+      places to start:
+      - [[http://code.google.com/p/git-osx-installer/][Git OS X installer]]
+      - [[http://code.google.com/p/msysgit/][Myssysgit]] git on Windows
+      - On Linux, use your package manager:
+      #+BEGIN_SRC bash
+	sudo apt-get install git
+      #+END_SRC
+
+   2. Decide where you will keep the org-mode code, I use
+      *~/Build/Emacs/org-mode*, but for Emacs it is really all the
+      same, just choose something convenient, and stick with it.
+
+   3. Download the latest version of org-mode:
+      #+BEGIN_SRC bash
+       mkdir ~/Build/Emacs
+       cd ~/Build/Emacs
+       git clone git://repo.or.cz/org-mode.git
+       cd org-mode && make && make doc
+      #+END_SRC
+
+   4. Add to your Emacs-init file:
+     #+BEGIN_SRC Emacs-lisp
+       (setq load-path (cons "~/Build/Emacs/org-mode/lisp" load-path))
+       (setq load-path (cons "~/Build/Emacs/org-mode/contrib/lisp"
+       load-path))
+
+       (require 'org-install)
+    #+END_SRC
+    *Important!* If you run the regular version of org-mode, you have
+    :(require 'org) 
+    in your config-file. This line *must* be removed, if you use
+    :(require 'org-install)
+
+   5. To keep up-to-date with org-mode in the future do:
+      #+BEGIN_SRC bash
+       cd ~/Build/Emacs/org-mode
+       git pull && make clean && make && make doc
+      #+END_SRC
+
+   6. Reload org mode, using: *M-x org-reload*, or restart Emacs.
+   
+   To see what version of org-mode you are running: *M-x org-version*
