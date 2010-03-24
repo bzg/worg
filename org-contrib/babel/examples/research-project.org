@@ -405,51 +405,17 @@ code block above.
 ** Quality Control
     - Quality control is achieved by: 
       - assigning a version to the compendium
-      - documenting the software versions used by the author to
-        produce the derived documents
-      - including a test suite for Org-babel
-      - marking result blocks as original products of the compendium
-        so readers can execute code blocks and compare results with
-        the original
-
-*** Original Compendium Results
-
-The reader can exercise quality control by comparing results against
-the author's.  The function, =compendium-results= adds a stamp,
-COMPENDIUM, to the names of results blocks.  When the reader executes
-code blocks, the results can be compared to the COMPENDIUM blocks.
-
-To use this function, execute the code block with =C-c C-c= then run
-it with =M-x compendium-results RETURN=.  
-
-#+srcname: compendium-results-function
-#+begin_src emacs-lisp
-  (defun compendium-results ()
-    "Adds COMPENDIUM to #+results: block names."
-    (interactive)
-    (query-replace-regexp "\\(#\\+results:.*\\)$" "\\1 COMPENDIUM")
-    )
-#+end_src
-
-
 
 #+begin_src org
-  ,* Quality Control
-  
-  ,** Digital Signature
-  ,   - This file is distributed with an MD5 digital signature
-  ,   - You should check that the file you received matches the digital signature
-  ,   - Run the following command with =C-c C-c= before your make changes
-  ,     to the file and compare with the distributed value
-  ,     
-  ,#+begin_src shell
-  ,     md5 research-project.org
-  ,#+end_src
-  
-  ,** Software Version Information                                    :noexport:
   ,*** Compendium Version
   ,    - Version 1
-  
+#+end_src
+
+      - documenting the software versions used by the author to
+        produce the derived documents
+
+#+begin_src org
+  ,** Software Version Information                                    :noexport:
   ,*** Org-mode
   ,    - The org-version function yields sufficient information to
   ,      identify the Org-mode and Org-babel code used by the author
@@ -489,6 +455,28 @@ it with =M-x compendium-results RETURN=.
   ,#+end_example
 #+end_src
 
+      - marking result blocks as original products of the compendium
+        so readers can execute code blocks and compare results with
+        the original.  The reader can exercise quality control by
+        comparing results against the author's.  The function,
+        =compendium-results= adds a stamp, COMPENDIUM, to the names of
+        results blocks.  When the reader executes code blocks, the
+        results can be compared to the COMPENDIUM blocks.  To use this
+        function, execute the code block with =C-c C-c= then run it
+        with =M-x compendium-results RETURN=.
+
+
+
+#+srcname: compendium-results-function
+#+begin_src emacs-lisp
+  (defun compendium-results ()
+    "Adds COMPENDIUM to #+results: block names."
+    (interactive)
+    (query-replace-regexp "\\(#\\+results:.*\\)$" "\\1 COMPENDIUM")
+    )
+#+end_src
+
+
 ** Notes
     This section holds notes, TODO items, etc.  It provides a high
     level receptacle for items saved by remember or refiled.
@@ -497,7 +485,7 @@ it with =M-x compendium-results RETURN=.
 
 * Summary of the Org-babel Compendium
   The Org-babel compendium fulfills the characteristics
-  specified by Gentleman and Temple Lang.
+  specified by Gentleman and Temple Lang:
 
   - It encapsulates fully the actual work of the author, potentially
     down to the level of task scheduling and clock time
