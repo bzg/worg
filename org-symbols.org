@@ -1,4 +1,4 @@
-#+OPTIONS:    H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+OPTIONS:    H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:nil skip:nil d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
@@ -19,687 +19,344 @@
 
 #+ATTR_LaTeX: longtable
 
-|   | Name           | LaTeX code        | LaTeX look            | HTML code     | HTML look   | ASCII |
-|---+----------------+-------------------+-----------------------+---------------+-------------+-------|
-| / | <>             | <                 | >                     | <             | >           | <>    |
-|   | nbsp           |                   | $\mbox{\hspace{1em}}$ | =&nbsp;=      | &nbsp;      |       |
-|   | iexcl          |                   | $\mbox{\hspace{1em}}$ | =&iexcl;=     | &iexcl;     |       |
-|   | cent           |                   | $\mbox{\hspace{1em}}$ | =&cent;=      | &cent;      |       |
-|   | pound          |                   | $\mbox{\hspace{1em}}$ | =&pound;=     | &pound;     |       |
-|   | curren         |                   | $\mbox{\hspace{1em}}$ | =&curren;=    | &curren;    |       |
-|   | yen            |                   | $\mbox{\hspace{1em}}$ | =&yen;=       | &yen;       |       |
-|   | brvbar         |                   | $\mbox{\hspace{1em}}$ | =&brvbar;=    | &brvbar;    |       |
-|   | vert           | =\vert=           | $\vert$               | =&#124;=      | &#124;      |       |
-|   | sect           |                   | $\mbox{\hspace{1em}}$ | =&sect;=      | &sect;      |       |
-|   | uml            |                   | $\mbox{\hspace{1em}}$ | =&uml;=       | &uml;       |       |
-|   | copy           |                   | $\mbox{\hspace{1em}}$ | =&copy;=      | &copy;      |       |
-|   | ordf           |                   | $\mbox{\hspace{1em}}$ | =&ordf;=      | &ordf;      |       |
-|   | laquo          |                   | $\mbox{\hspace{1em}}$ | =&laquo;=     | &laquo;     |       |
-|   | not            | =\not=            | $\not$                | =&not;=       | &not;       |       |
-|   | shy            |                   | $\mbox{\hspace{1em}}$ | =&shy;=       | &shy;       |       |
-|   | reg            |                   | $\mbox{\hspace{1em}}$ | =&reg;=       | &reg;       |       |
-|   | macr           |                   | $\mbox{\hspace{1em}}$ | =&macr;=      | &macr;      |       |
-|   | deg            | =\deg=            | $\deg$                | =deg=         | deg         |       |
-|   | pm             | =\pm=             | $\pm$                 | =&plusmn;=    | &plusmn;    |       |
-|   | plusmn         |                   | $\mbox{\hspace{1em}}$ | =&plusmn;=    | &plusmn;    |       |
-|   | sup2           |                   | $\mbox{\hspace{1em}}$ | =&sup2;=      | &sup2;      |       |
-|   | sup3           |                   | $\mbox{\hspace{1em}}$ | =&sup3;=      | &sup3;      |       |
-|   | acute x        | =\acute x=        | $\acute x$            | =&acute x;=   | &acute x;   |       |
-|   | micro          | =\mu=             | $\mu$                 | =&micro;=     | &micro;     |       |
-|   | para           |                   | $\mbox{\hspace{1em}}$ | =&para;=      | &para;      |       |
-|   | middot         |                   | $\mbox{\hspace{1em}}$ | =&middot;=    | &middot;    |       |
-|   | odot           | =\odot=           | $\odot$               | =o=           | o           |       |
-|   | star           | =\star=           | $\star$               | =*=           | *           |       |
-|   | cedil          |                   | $\mbox{\hspace{1em}}$ | =&cedil;=     | &cedil;     |       |
-|   | sup1           | =\sup1=           | $\sup1$               | =&sup1;=      | &sup1;      |       |
-|   | ordm           |                   | $\mbox{\hspace{1em}}$ | =&ordm;=      | &ordm;      |       |
-|   | raquo          |                   | $\mbox{\hspace{1em}}$ | =&raquo;=     | &raquo;     |       |
-|   | iquest         |                   | $\mbox{\hspace{1em}}$ | =&iquest;=    | &iquest;    |       |
-|   | Agrave         |                   | $\mbox{\hspace{1em}}$ | =&Agrave;=    | &Agrave;    |       |
-|   | Aacute         |                   | $\mbox{\hspace{1em}}$ | =&Aacute;=    | &Aacute;    |       |
-|   | Acirc          |                   | $\mbox{\hspace{1em}}$ | =&Acirc;=     | &Acirc;     |       |
-|   | Atilde         |                   | $\mbox{\hspace{1em}}$ | =&Atilde;=    | &Atilde;    |       |
-|   | Auml           |                   | $\mbox{\hspace{1em}}$ | =&Auml;=      | &Auml;      |       |
-|   | Aring          |                   | $\mbox{\hspace{1em}}$ | =&Aring;=     | &Aring;     |       |
-|   | AA             | =\AA=             | $\mbox{\AA}$          | =&Aring;=     | &Aring;     |       |
-|   | AElig          |                   | $\mbox{\hspace{1em}}$ | =&AElig;=     | &AElig;     |       |
-|   | Ccedil         |                   | $\mbox{\hspace{1em}}$ | =&Ccedil;=    | &Ccedil;    |       |
-|   | Egrave         |                   | $\mbox{\hspace{1em}}$ | =&Egrave;=    | &Egrave;    |       |
-|   | Eacute         |                   | $\mbox{\hspace{1em}}$ | =&Eacute;=    | &Eacute;    |       |
-|   | Ecirc          |                   | $\mbox{\hspace{1em}}$ | =&Ecirc;=     | &Ecirc;     |       |
-|   | Euml           |                   | $\mbox{\hspace{1em}}$ | =&Euml;=      | &Euml;      |       |
-|   | Igrave         |                   | $\mbox{\hspace{1em}}$ | =&Igrave;=    | &Igrave;    |       |
-|   | Iacute         |                   | $\mbox{\hspace{1em}}$ | =&Iacute;=    | &Iacute;    |       |
-|   | Icirc          |                   | $\mbox{\hspace{1em}}$ | =&Icirc;=     | &Icirc;     |       |
-|   | Iuml           |                   | $\mbox{\hspace{1em}}$ | =&Iuml;=      | &Iuml;      |       |
-|   | ETH            |                   | $\mbox{\hspace{1em}}$ | =&ETH;=       | &ETH;       |       |
-|   | Ntilde         |                   | $\mbox{\hspace{1em}}$ | =&Ntilde;=    | &Ntilde;    |       |
-|   | Ograve         |                   | $\mbox{\hspace{1em}}$ | =&Ograve;=    | &Ograve;    |       |
-|   | Oacute         |                   | $\mbox{\hspace{1em}}$ | =&Oacute;=    | &Oacute;    |       |
-|   | Ocirc          |                   | $\mbox{\hspace{1em}}$ | =&Ocirc;=     | &Ocirc;     |       |
-|   | Otilde         |                   | $\mbox{\hspace{1em}}$ | =&Otilde;=    | &Otilde;    |       |
-|   | Ouml           |                   | $\mbox{\hspace{1em}}$ | =&Ouml;=      | &Ouml;      |       |
-|   | times          | =\times=          | $\times$              | =&times;=     | &times;     |       |
-|   | Oslash         |                   | $\mbox{\hspace{1em}}$ | =&Oslash;=    | &Oslash;    |       |
-|   | Ugrave         |                   | $\mbox{\hspace{1em}}$ | =&Ugrave;=    | &Ugrave;    |       |
-|   | Uacute         |                   | $\mbox{\hspace{1em}}$ | =&Uacute;=    | &Uacute;    |       |
-|   | Ucirc          |                   | $\mbox{\hspace{1em}}$ | =&Ucirc;=     | &Ucirc;     |       |
-|   | Uuml           |                   | $\mbox{\hspace{1em}}$ | =&Uuml;=      | &Uuml;      |       |
-|   | Yacute         |                   | $\mbox{\hspace{1em}}$ | =&Yacute;=    | &Yacute;    |       |
-|   | THORN          |                   | $\mbox{\hspace{1em}}$ | =&THORN;=     | &THORN;     |       |
-|   | szlig          |                   | $\mbox{\hspace{1em}}$ | =&szlig;=     | &szlig;     |       |
-|   | agrave         |                   | $\mbox{\hspace{1em}}$ | =&agrave;=    | &agrave;    |       |
-|   | aacute         |                   | $\mbox{\hspace{1em}}$ | =&aacute;=    | &aacute;    |       |
-|   | acirc          |                   | $\mbox{\hspace{1em}}$ | =&acirc;=     | &acirc;     |       |
-|   | atilde         |                   | $\mbox{\hspace{1em}}$ | =&atilde;=    | &atilde;    |       |
-|   | auml           |                   | $\mbox{\hspace{1em}}$ | =&auml;=      | &auml;      |       |
-|   | aring          |                   | $\mbox{\hspace{1em}}$ | =&aring;=     | &aring;     |       |
-|   | aelig          |                   | $\mbox{\hspace{1em}}$ | =&aelig;=     | &aelig;     |       |
-|   | ccedil         |                   | $\mbox{\hspace{1em}}$ | =&ccedil;=    | &ccedil;    |       |
-|   | checkmark      |                   | $\mbox{\hspace{1em}}$ | =&#10003;=    | &#10003;    |       |
-|   | egrave         |                   | $\mbox{\hspace{1em}}$ | =&egrave;=    | &egrave;    |       |
-|   | eacute         |                   | $\mbox{\hspace{1em}}$ | =&eacute;=    | &eacute;    |       |
-|   | ecirc          |                   | $\mbox{\hspace{1em}}$ | =&ecirc;=     | &ecirc;     |       |
-|   | euml           |                   | $\mbox{\hspace{1em}}$ | =&euml;=      | &euml;      |       |
-|   | igrave         |                   | $\mbox{\hspace{1em}}$ | =&igrave;=    | &igrave;    |       |
-|   | iacute         |                   | $\mbox{\hspace{1em}}$ | =&iacute;=    | &iacute;    |       |
-|   | icirc          |                   | $\mbox{\hspace{1em}}$ | =&icirc;=     | &icirc;     |       |
-|   | iuml           |                   | $\mbox{\hspace{1em}}$ | =&iuml;=      | &iuml;      |       |
-|   | eth            |                   | $\mbox{\hspace{1em}}$ | =&eth;=       | &eth;       |       |
-|   | ntilde         |                   | $\mbox{\hspace{1em}}$ | =&ntilde;=    | &ntilde;    |       |
-|   | ograve         |                   | $\mbox{\hspace{1em}}$ | =&ograve;=    | &ograve;    |       |
-|   | oacute         |                   | $\mbox{\hspace{1em}}$ | =&oacute;=    | &oacute;    |       |
-|   | ocirc          |                   | $\mbox{\hspace{1em}}$ | =&ocirc;=     | &ocirc;     |       |
-|   | otilde         |                   | $\mbox{\hspace{1em}}$ | =&otilde;=    | &otilde;    |       |
-|   | ouml           |                   | $\mbox{\hspace{1em}}$ | =&ouml;=      | &ouml;      |       |
-|   | oslash         |                   | $\mbox{\hspace{1em}}$ | =&oslash;=    | &oslash;    |       |
-|   | ugrave         |                   | $\mbox{\hspace{1em}}$ | =&ugrave;=    | &ugrave;    |       |
-|   | uacute         |                   | $\mbox{\hspace{1em}}$ | =&uacute;=    | &uacute;    |       |
-|   | ucirc          |                   | $\mbox{\hspace{1em}}$ | =&ucirc;=     | &ucirc;     |       |
-|   | uuml           |                   | $\mbox{\hspace{1em}}$ | =&uuml;=      | &uuml;      |       |
-|   | yacute         |                   | $\mbox{\hspace{1em}}$ | =&yacute;=    | &yacute;    |       |
-|   | thorn          |                   | $\mbox{\hspace{1em}}$ | =&thorn;=     | &thorn;     |       |
-|   | yuml           |                   | $\mbox{\hspace{1em}}$ | =&yuml;=      | &yuml;      |       |
-|   | fnof           |                   | $\mbox{\hspace{1em}}$ | =&fnof;=      | &fnof;      |       |
-|   | Alpha          |                   | $\mbox{\hspace{1em}}$ | =&Alpha;=     | &Alpha;     |       |
-|   | Beta           |                   | $\mbox{\hspace{1em}}$ | =&Beta;=      | &Beta;      |       |
-|   | Gamma          | =\Gamma=          | $\Gamma$              | =&Gamma;=     | &Gamma;     |       |
-|   | Delta          | =\Delta=          | $\Delta$              | =&Delta;=     | &Delta;     |       |
-|   | Epsilon        |                   | $\mbox{\hspace{1em}}$ | =&Epsilon;=   | &Epsilon;   |       |
-|   | Zeta           |                   | $\mbox{\hspace{1em}}$ | =&Zeta;=      | &Zeta;      |       |
-|   | Eta            |                   | $\mbox{\hspace{1em}}$ | =&Eta;=       | &Eta;       |       |
-|   | Theta          | =\Theta=          | $\Theta$              | =&Theta;=     | &Theta;     |       |
-|   | Iota           |                   | $\mbox{\hspace{1em}}$ | =&Iota;=      | &Iota;      |       |
-|   | Kappa          |                   | $\mbox{\hspace{1em}}$ | =&Kappa;=     | &Kappa;     |       |
-|   | Lambda         | =\Lambda=         | $\Lambda$             | =&Lambda;=    | &Lambda;    |       |
-|   | Mu             |                   | $\mbox{\hspace{1em}}$ | =&Mu;=        | &Mu;        |       |
-|   | Nu             |                   | $\mbox{\hspace{1em}}$ | =&Nu;=        | &Nu;        |       |
-|   | Xi             | =\Xi=             | $\Xi$                 | =&Xi;=        | &Xi;        |       |
-|   | Omicron        |                   | $\mbox{\hspace{1em}}$ | =&Omicron;=   | &Omicron;   |       |
-|   | Pi             | =\Pi=             | $\Pi$                 | =&Pi;=        | &Pi;        |       |
-|   | Rho            |                   | $\mbox{\hspace{1em}}$ | =&Rho;=       | &Rho;       |       |
-|   | Sigma          | =\Sigma=          | $\Sigma$              | =&Sigma;=     | &Sigma;     |       |
-|   | Tau            |                   | $\mbox{\hspace{1em}}$ | =&Tau;=       | &Tau;       |       |
-|   | Upsilon        | =\Upsilon=        | $\Upsilon$            | =&Upsilon;=   | &Upsilon;   |       |
-|   | Phi            | =\Phi=            | $\Phi$                | =&Phi;=       | &Phi;       |       |
-|   | Chi            |                   | $\mbox{\hspace{1em}}$ | =&Chi;=       | &Chi;       |       |
-|   | Psi            | =\Psi=            | $\Psi$                | =&Psi;=       | &Psi;       |       |
-|   | Omega          | =\Omega=          | $\Omega$              | =&Omega;=     | &Omega;     |       |
-|   | alpha          | =\alpha=          | $\alpha$              | =&alpha;=     | &alpha;     |       |
-|   | beta           | =\beta=           | $\beta$               | =&beta;=      | &beta;      |       |
-|   | gamma          | =\gamma=          | $\gamma$              | =&gamma;=     | &gamma;     |       |
-|   | delta          | =\delta=          | $\delta$              | =&delta;=     | &delta;     |       |
-|   | epsilon        | =\epsilon=        | $\epsilon$            | =&epsilon;=   | &epsilon;   |       |
-|   | varepsilon     | =\varepsilon=     | $\varepsilon$         | =&epsilon;=   | &epsilon;   |       |
-|   | zeta           | =\zeta=           | $\zeta$               | =&zeta;=      | &zeta;      |       |
-|   | eta            | =\eta=            | $\eta$                | =&eta;=       | &eta;       |       |
-|   | theta          | =\theta=          | $\theta$              | =&theta;=     | &theta;     |       |
-|   | iota           | =\iota=           | $\iota$               | =&iota;=      | &iota;      |       |
-|   | kappa          | =\kappa=          | $\kappa$              | =&kappa;=     | &kappa;     |       |
-|   | lambda         | =\lambda=         | $\lambda$             | =&lambda;=    | &lambda;    |       |
-|   | mu             | =\mu=             | $\mu$                 | =&mu;=        | &mu;        |       |
-|   | nu             | =\nu=             | $\nu$                 | =&nu;=        | &nu;        |       |
-|   | xi             | =\xi=             | $\xi$                 | =&xi;=        | &xi;        |       |
-|   | omicron        |                   | $\mbox{\hspace{1em}}$ | =&omicron;=   | &omicron;   |       |
-|   | pi             | =\pi=             | $\pi$                 | =&pi;=        | &pi;        |       |
-|   | rho            | =\rho=            | $\rho$                | =&rho;=       | &rho;       |       |
-|   | sigmaf         |                   | $\mbox{\hspace{1em}}$ | =&sigmaf;=    | &sigmaf;    |       |
-|   | varsigma       | =\varsigma=       | $\varsigma$           | =&sigmaf;=    | &sigmaf;    |       |
-|   | sigma          | =\sigma=          | $\sigma$              | =&sigma;=     | &sigma;     |       |
-|   | tau            | =\tau=            | $\tau$                | =&tau;=       | &tau;       |       |
-|   | upsilon        | =\upsilon=        | $\upsilon$            | =&upsilon;=   | &upsilon;   |       |
-|   | phi            | =\phi=            | $\phi$                | =&phi;=       | &phi;       |       |
-|   | chi            | =\chi=            | $\chi$                | =&chi;=       | &chi;       |       |
-|   | psi            | =\psi=            | $\psi$                | =&psi;=       | &psi;       |       |
-|   | omega          | =\omega=          | $\omega$              | =&omega;=     | &omega;     |       |
-|   | thetasym       |                   | $\mbox{\hspace{1em}}$ | =&thetasym;=  | &thetasym;  |       |
-|   | vartheta       | =\vartheta=       | $\vartheta$           | =&thetasym;=  | &thetasym;  |       |
-|   | upsih          |                   | $\mbox{\hspace{1em}}$ | =&upsih;=     | &upsih;     |       |
-|   | piv            |                   | $\mbox{\hspace{1em}}$ | =&piv;=       | &piv;       |       |
-|   | bull           |                   | $\mbox{\hspace{1em}}$ | =&bull;=      | &bull;      |       |
-|   | bullet         | =\bullet=         | $\bullet$             | =&bull;=      | &bull;      |       |
-|   | hellip         |                   | $\mbox{\hspace{1em}}$ | =&hellip;=    | &hellip;    |       |
-|   | dots           | =\dots=           | $\mbox{\dots}$        | =&hellip;=    | &hellip;    |       |
-|   | prime          | =\prime=          | $\prime$              | =&prime;=     | &prime;     |       |
-|   | Prime          |                   | $\mbox{\hspace{1em}}$ | =&Prime;=     | &Prime;     |       |
-|   | oline          |                   | $\mbox{\hspace{1em}}$ | =&oline;=     | &oline;     |       |
-|   | frasl          |                   | $\mbox{\hspace{1em}}$ | =&frasl;=     | &frasl;     |       |
-|   | weierp         |                   | $\mbox{\hspace{1em}}$ | =&weierp;=    | &weierp;    |       |
-|   | image          |                   | $\mbox{\hspace{1em}}$ | =&image;=     | &image;     |       |
-|   | real           |                   | $\mbox{\hspace{1em}}$ | =&real;=      | &real;      |       |
-|   | trade          |                   | $\mbox{\hspace{1em}}$ | =&trade;=     | &trade;     |       |
-|   | alefsym        |                   | $\mbox{\hspace{1em}}$ | =&alefsym;=   | &alefsym;   |       |
-|   | larr           |                   | $\mbox{\hspace{1em}}$ | =&larr;=      | &larr;      |       |
-|   | leftarrow      | =\leftarrow=      | $\leftarrow$          | =&larr;=      | &larr;      |       |
-|   | gets           | =\gets=           | $\gets$               | =&larr;=      | &larr;      |       |
-|   | uarr           |                   | $\mbox{\hspace{1em}}$ | =&uarr;=      | &uarr;      |       |
-|   | uparrow        | =\uparrow=        | $\uparrow$            | =&uarr;=      | &uarr;      |       |
-|   | rarr           |                   | $\mbox{\hspace{1em}}$ | =&rarr;=      | &rarr;      |       |
-|   | to             | =\to=             | $\to$                 | =&rarr;=      | &rarr;      |       |
-|   | rightarrow     | =\rightarrow=     | $\rightarrow$         | =&rarr;=      | &rarr;      |       |
-|   | darr           |                   | $\mbox{\hspace{1em}}$ | =&darr;=      | &darr;      |       |
-|   | downarrow      | =\downarrow=      | $\downarrow$          | =&darr;=      | &darr;      |       |
-|   | harr           |                   | $\mbox{\hspace{1em}}$ | =&harr;=      | &harr;      |       |
-|   | leftrightarrow | =\leftrightarrow= | $\leftrightarrow$     | =&harr;=      | &harr;      |       |
-|   | crarr          |                   | $\mbox{\hspace{1em}}$ | =&crarr;=     | &crarr;     |       |
-|   | hookleftarrow  | =\hookleftarrow=  | $\hookleftarrow$      | =&crarr;=     | &crarr;     |       |
-|   | lArr           |                   | $\mbox{\hspace{1em}}$ | =&lArr;=      | &lArr;      |       |
-|   | Leftarrow      | =\Leftarrow=      | $\Leftarrow$          | =&lArr;=      | &lArr;      |       |
-|   | uArr           |                   | $\mbox{\hspace{1em}}$ | =&uArr;=      | &uArr;      |       |
-|   | Uparrow        | =\Uparrow=        | $\Uparrow$            | =&uArr;=      | &uArr;      |       |
-|   | rArr           |                   | $\mbox{\hspace{1em}}$ | =&rArr;=      | &rArr;      |       |
-|   | Rightarrow     | =\Rightarrow=     | $\Rightarrow$         | =&rArr;=      | &rArr;      |       |
-|   | dArr           |                   | $\mbox{\hspace{1em}}$ | =&dArr;=      | &dArr;      |       |
-|   | Downarrow      | =\Downarrow=      | $\Downarrow$          | =&dArr;=      | &dArr;      |       |
-|   | hArr           |                   | $\mbox{\hspace{1em}}$ | =&hArr;=      | &hArr;      |       |
-|   | Leftrightarrow | =\Leftrightarrow= | $\Leftrightarrow$     | =&hArr;=      | &hArr;      |       |
-|   | forall         | =\forall=         | $\forall$             | =&forall;=    | &forall;    |       |
-|   | partial        | =\partial=        | $\partial$            | =&part;=      | &part;      |       |
-|   | exist          |                   | $\mbox{\hspace{1em}}$ | =&exist;=     | &exist;     |       |
-|   | exists         | =\exists=         | $\exists$             | =&exist;=     | &exist;     |       |
-|   | empty          | =\empty=          | $\mbox{\empty}$       | =&empty;=     | &empty;     |       |
-|   | emptyset       | =\emptyset=       | $\emptyset$           | =&empty;=     | &empty;     |       |
-|   | nabla          | =\nabla=          | $\nabla$              | =&nabla;=     | &nabla;     |       |
-|   | isin           |                   | $\mbox{\hspace{1em}}$ | =&isin;=      | &isin;      |       |
-|   | in             | =\in=             | $\in$                 | =&isin;=      | &isin;      |       |
-|   | notin          | =\notin=          | $\notin$              | =&notin;=     | &notin;     |       |
-|   | ni             | =\ni=             | $\ni$                 | =&ni;=        | &ni;        |       |
-|   | prod           | =\prod=           | $\prod$               | =&prod;=      | &prod;      |       |
-|   | sum            | =\sum=            | $\sum$                | =&sum;=       | &sum;       |       |
-|   | minus          |                   | $\mbox{\hspace{1em}}$ | =&minus;=     | &minus;     |       |
-|   | lowast         |                   | $\mbox{\hspace{1em}}$ | =&lowast;=    | &lowast;    |       |
-|   | ast            | =\ast=            | $\ast$                | =&lowast;=    | &lowast;    |       |
-|   | radic          |                   | $\mbox{\hspace{1em}}$ | =&radic;=     | &radic;     |       |
-|   | prop           |                   | $\mbox{\hspace{1em}}$ | =&prop;=      | &prop;      |       |
-|   | proptp         |                   | $\mbox{\hspace{1em}}$ | =&prop;=      | &prop;      |       |
-|   | infin          |                   | $\mbox{\hspace{1em}}$ | =&infin;=     | &infin;     |       |
-|   | infty          | =\infty=          | $\infty$              | =&infin;=     | &infin;     |       |
-|   | ang            |                   | $\mbox{\hspace{1em}}$ | =&ang;=       | &ang;       |       |
-|   | angle          | =\angle=          | $\angle$              | =&ang;=       | &ang;       |       |
-|   | and            |                   | $\mbox{\hspace{1em}}$ | =&and;=       | &and;       |       |
-|   | wedge          | =\wedge=          | $\wedge$              | =&and;=       | &and;       |       |
-|   | or             |                   | $\mbox{\hspace{1em}}$ | =&or;=        | &or;        |       |
-|   | vee            | =\vee=            | $\vee$                | =&or;=        | &or;        |       |
-|   | cap            | =\cap=            | $\cap$                | =&cap;=       | &cap;       |       |
-|   | cup            | =\cup=            | $\cup$                | =&cup;=       | &cup;       |       |
-|   | int            | =\int=            | $\int$                | =&int;=       | &int;       |       |
-|   | there4         |                   | $\mbox{\hspace{1em}}$ | =&there4;=    | &there4;    |       |
-|   | sim            | =\sim=            | $\sim$                | =&sim;=       | &sim;       |       |
-|   | cong           | =\cong=           | $\cong$               | =&cong;=      | &cong;      |       |
-|   | simeq          | =\simeq=          | $\simeq$              | =&cong;=      | &cong;      |       |
-|   | asymp          | =\asymp=          | $\asymp$              | =&asymp;=     | &asymp;     |       |
-|   | approx         | =\approx=         | $\approx$             | =&asymp;=     | &asymp;     |       |
-|   | ne             | =\ne=             | $\ne$                 | =&ne;=        | &ne;        |       |
-|   | neq            | =\neq=            | $\neq$                | =&ne;=        | &ne;        |       |
-|   | equiv          | =\equiv=          | $\equiv$              | =&equiv;=     | &equiv;     |       |
-|   | le             | =\le=             | $\le$                 | =&le;=        | &le;        |       |
-|   | ge             | =\ge=             | $\ge$                 | =&ge;=        | &ge;        |       |
-|   | sub            |                   | $\mbox{\hspace{1em}}$ | =&sub;=       | &sub;       |       |
-|   | subset         | =\subset=         | $\subset$             | =&sub;=       | &sub;       |       |
-|   | sup            | =\sup=            | $\sup$                | =sup=         | sup         |       |
-|   | supset         | =\supset=         | $\supset$             | =&sup;=       | &sup;       |       |
-|   | nsub           |                   | $\mbox{\hspace{1em}}$ | =&nsub;=      | &nsub;      |       |
-|   | sube           |                   | $\mbox{\hspace{1em}}$ | =&sube;=      | &sube;      |       |
-|   | supe           |                   | $\mbox{\hspace{1em}}$ | =&supe;=      | &supe;      |       |
-|   | oplus          | =\oplus=          | $\oplus$              | =&oplus;=     | &oplus;     |       |
-|   | otimes         | =\otimes=         | $\otimes$             | =&otimes;=    | &otimes;    |       |
-|   | perp           | =\perp=           | $\perp$               | =&perp;=      | &perp;      |       |
-|   | sdot           |                   | $\mbox{\hspace{1em}}$ | =&sdot;=      | &sdot;      |       |
-|   | cdot           | =\cdot=           | $\cdot$               | =&sdot;=      | &sdot;      |       |
-|   | lceil          | =\lceil=          | $\lceil$              | =&lceil;=     | &lceil;     |       |
-|   | rceil          | =\rceil=          | $\rceil$              | =&rceil;=     | &rceil;     |       |
-|   | lfloor         | =\lfloor=         | $\lfloor$             | =&lfloor;=    | &lfloor;    |       |
-|   | rfloor         | =\rfloor=         | $\rfloor$             | =&rfloor;=    | &rfloor;    |       |
-|   | lang           |                   | $\mbox{\hspace{1em}}$ | =&lang;=      | &lang;      |       |
-|   | rang           |                   | $\mbox{\hspace{1em}}$ | =&rang;=      | &rang;      |       |
-|   | loz            |                   | $\mbox{\hspace{1em}}$ | =&loz;=       | &loz;       |       |
-|   | Diamond        |                   | $\mbox{\hspace{1em}}$ | =&loz;=       | &loz;       |       |
-|   | spades         |                   | $\mbox{\hspace{1em}}$ | =&spades;=    | &spades;    |       |
-|   | spadesuit      | =\spadesuit=      | $\spadesuit$          | =&spades;=    | &spades;    |       |
-|   | clubs          |                   | $\mbox{\hspace{1em}}$ | =&clubs;=     | &clubs;     |       |
-|   | clubsuit       | =\clubsuit=       | $\clubsuit$           | =&clubs;=     | &clubs;     |       |
-|   | hearts         |                   | $\mbox{\hspace{1em}}$ | =&hearts;=    | &hearts;    |       |
-|   | heartsuit      | =\heartsuit=      | $\heartsuit$          | =&heartsuit;= | &heartsuit; |       |
-|   | diamondsuit    | =\diamondsuit=    | $\diamondsuit$        | =&diams;=     | &diams;     |       |
-|   | diams          |                   | $\mbox{\hspace{1em}}$ | =&diams;=     | &diams;     |       |
-|   | smile          | =\smile=          | $\smile$              | =&#9786;=     | &#9786;     |       |
-|   | blacksmile     |                   | $\mbox{\hspace{1em}}$ | =&#9787;=     | &#9787;     |       |
-|   | sad            |                   | $\mbox{\hspace{1em}}$ | =&#9785;=     | &#9785;     |       |
-|   | quot           |                   | $\mbox{\hspace{1em}}$ | =&quot;=      | &quot;      |       |
-|   | amp            |                   | $\mbox{\hspace{1em}}$ | =&amp;=       | &amp;       |       |
-|   | lt             |                   | $\mbox{\hspace{1em}}$ | =&lt;=        | &lt;        |       |
-|   | gt             |                   | $\mbox{\hspace{1em}}$ | =&gt;=        | &gt;        |       |
-|   | OElig          |                   | $\mbox{\hspace{1em}}$ | =&OElig;=     | &OElig;     |       |
-|   | oelig          |                   | $\mbox{\hspace{1em}}$ | =&oelig;=     | &oelig;     |       |
-|   | Scaron         |                   | $\mbox{\hspace{1em}}$ | =&Scaron;=    | &Scaron;    |       |
-|   | scaron         |                   | $\mbox{\hspace{1em}}$ | =&scaron;=    | &scaron;    |       |
-|   | Yuml           |                   | $\mbox{\hspace{1em}}$ | =&Yuml;=      | &Yuml;      |       |
-|   | circ           | =\circ=           | $\circ$               | =&circ;=      | &circ;      |       |
-|   | tilde          | =???=             | $???$                 | =&tilde;=     | &tilde;     |       |
-|   | ensp           |                   | $\mbox{\hspace{1em}}$ | =&ensp;=      | &ensp;      |       |
-|   | emsp           |                   | $\mbox{\hspace{1em}}$ | =&emsp;=      | &emsp;      |       |
-|   | thinsp         |                   | $\mbox{\hspace{1em}}$ | =&thinsp;=    | &thinsp;    |       |
-|   | zwnj           |                   | $\mbox{\hspace{1em}}$ | =&zwnj;=      | &zwnj;      |       |
-|   | zwj            |                   | $\mbox{\hspace{1em}}$ | =&zwj;=       | &zwj;       |       |
-|   | lrm            |                   | $\mbox{\hspace{1em}}$ | =&lrm;=       | &lrm;       |       |
-|   | rlm            |                   | $\mbox{\hspace{1em}}$ | =&rlm;=       | &rlm;       |       |
-|   | ndash          |                   | $\mbox{\hspace{1em}}$ | =&ndash;=     | &ndash;     |       |
-|   | mdash          |                   | $\mbox{\hspace{1em}}$ | =&mdash;=     | &mdash;     |       |
-|   | lsquo          |                   | $\mbox{\hspace{1em}}$ | =&lsquo;=     | &lsquo;     |       |
-|   | rsquo          |                   | $\mbox{\hspace{1em}}$ | =&rsquo;=     | &rsquo;     |       |
-|   | sbquo          |                   | $\mbox{\hspace{1em}}$ | =&sbquo;=     | &sbquo;     |       |
-|   | ldquo          |                   | $\mbox{\hspace{1em}}$ | =&ldquo;=     | &ldquo;     |       |
-|   | rdquo          |                   | $\mbox{\hspace{1em}}$ | =&rdquo;=     | &rdquo;     |       |
-|   | bdquo          |                   | $\mbox{\hspace{1em}}$ | =&bdquo;=     | &bdquo;     |       |
-|   | dagger         | =\dagger=         | $\dagger$             | =&dagger;=    | &dagger;    |       |
-|   | Dagger         |                   | $\mbox{\hspace{1em}}$ | =&Dagger;=    | &Dagger;    |       |
-|   | permil         |                   | $\mbox{\hspace{1em}}$ | =&permil;=    | &permil;    |       |
-|   | lsaquo         |                   | $\mbox{\hspace{1em}}$ | =&lsaquo;=    | &lsaquo;    |       |
-|   | rsaquo         |                   | $\mbox{\hspace{1em}}$ | =&rsaquo;=    | &rsaquo;    |       |
-|   | euro           |                   | $\mbox{\hspace{1em}}$ | =&euro;=      | &euro;      |       |
-|   | EUR            |                   | $\mbox{\hspace{1em}}$ | =&euro;=      | &euro;      |       |
-|   | EURdig         |                   | $\mbox{\hspace{1em}}$ | =&euro;=      | &euro;      |       |
-|   | EURhv          |                   | $\mbox{\hspace{1em}}$ | =&euro;=      | &euro;      |       |
-|   | EURcr          |                   | $\mbox{\hspace{1em}}$ | =&euro;=      | &euro;      |       |
-|   | EURtm          |                   | $\mbox{\hspace{1em}}$ | =&euro;=      | &euro;      |       |
-|   | arccos         | =\arccos=         | $\arccos$             | =arccos=      | arccos      |       |
-|   | arcsin         | =\arcsin=         | $\arcsin$             | =arcsin=      | arcsin      |       |
-|   | arctan         | =\arctan=         | $\arctan$             | =arctan=      | arctan      |       |
-|   | arg            | =\arg=            | $\arg$                | =arg=         | arg         |       |
-|   | cos            | =\cos=            | $\cos$                | =cos=         | cos         |       |
-|   | cosh           | =\cosh=           | $\cosh$               | =cosh=        | cosh        |       |
-|   | cot            | =\cot=            | $\cot$                | =cot=         | cot         |       |
-|   | coth           | =\coth=           | $\coth$               | =coth=        | coth        |       |
-|   | csc            | =\csc=            | $\csc$                | =csc=         | csc         |       |
-|   | deg            | =\deg=            | $\deg$                | =&deg;=       | &deg;       |       |
-|   | det            | =\det=            | $\det$                | =det=         | det         |       |
-|   | dim            | =\dim=            | $\dim$                | =dim=         | dim         |       |
-|   | exp            | =\exp=            | $\exp$                | =exp=         | exp         |       |
-|   | gcd            | =\gcd=            | $\gcd$                | =gcd=         | gcd         |       |
-|   | hom            | =\hom=            | $\hom$                | =hom=         | hom         |       |
-|   | inf            | =\inf=            | $\inf$                | =inf=         | inf         |       |
-|   | ker            | =\ker=            | $\ker$                | =ker=         | ker         |       |
-|   | lg             | =\lg=             | $\lg$                 | =lg=          | lg          |       |
-|   | lim            | =\lim=            | $\lim$                | =lim=         | lim         |       |
-|   | liminf         | =\liminf=         | $\liminf$             | =liminf=      | liminf      |       |
-|   | limsup         | =\limsup=         | $\limsup$             | =limsup=      | limsup      |       |
-|   | ln             | =\ln=             | $\ln$                 | =ln=          | ln          |       |
-|   | log            | =\log=            | $\log$                | =log=         | log         |       |
-|   | max            | =\max=            | $\max$                | =max=         | max         |       |
-|   | min            | =\min=            | $\min$                | =min=         | min         |       |
-|   | Pr             | =\Pr=             | $\Pr$                 | =Pr=          | Pr          |       |
-|   | sec            | =\sec=            | $\sec$                | =sec=         | sec         |       |
-|   | sin            | =\sin=            | $\sin$                | =sin=         | sin         |       |
-|   | sinh           | =\sinh=           | $\sinh$               | =sinh=        | sinh        |       |
-|   | sup            | =\sup=            | $\sup$                | =&sup;=       | &sup;       |       |
-|   | tan            | =\tan=            | $\tan$                | =tan=         | tan         |       |
-|   | tanh           | =\tanh=           | $\tanh$               | =tanh=        | tanh        |       |
-|   | frac12         | =\frac{1}{2}=     | $\frac{1}{2}$         | =&frac12;=    | &frac12;    |       |
-|   | frac14         | =\frac{1}{4}=     | $\frac{1}{4}$         | =&frac14;=    | &frac14;    |       |
-|   | frac34         | =\frac{3}{4}=     | $\frac{3}{4}$         | =&frac34;=    | &frac34;    |       |
-|   | partial        | =\partial=        | $\partial$            | =&part;=      | &part;      |       |
-|   | oslash         |                   | $$                    | =&oslash;=    | &oslash;    |       |
-|   | div            | =\div=            | $\div$                | =&divide;=    | &divide;    |       |
-=======
-|   | Name           | LaTeX             | LaTeX             | HTML          | HTML        | ASCII |
-|---+----------------+-------------------+-------------------+---------------+-------------+-------|
-| / | <>             | <                 | >                 | <             | >           | <>    |
-|   | nbsp           | the               | $\mbox{----}$     | =&nbsp;=      | &nbsp;      |       |
-|   | iexcl          |                   | $\mbox{----}$     | =&iexcl;=     | &iexcl;     |       |
-|   | cent           |                   | $\mbox{----}$     | =&cent;=      | &cent;      |       |
-|   | pound          |                   | $\mbox{----}$     | =&pound;=     | &pound;     |       |
-|   | curren         |                   | $\mbox{----}$     | =&curren;=    | &curren;    |       |
-|   | yen            |                   | $\mbox{----}$     | =&yen;=       | &yen;       |       |
-|   | brvbar         |                   | $\mbox{----}$     | =&brvbar;=    | &brvbar;    |       |
-|   | vert           | =\vert=           | $\vert$           | =&#124;=      | &#124;      |       |
-|   | sect           |                   | $\mbox{----}$     | =&sect;=      | &sect;      |       |
-|   | uml            |                   | $\mbox{----}$     | =&uml;=       | &uml;       |       |
-|   | copy           |                   | $\mbox{----}$     | =&copy;=      | &copy;      |       |
-|   | ordf           |                   | $\mbox{----}$     | =&ordf;=      | &ordf;      |       |
-|   | laquo          |                   | $\mbox{----}$     | =&laquo;=     | &laquo;     |       |
-|   | not            | =\not=            | $\not$            | =&not;=       | &not;       |       |
-|   | shy            |                   | $\mbox{----}$     | =&shy;=       | &shy;       |       |
-|   | reg            |                   | $\mbox{----}$     | =&reg;=       | &reg;       |       |
-|   | macr           |                   | $\mbox{----}$     | =&macr;=      | &macr;      |       |
-|   | deg            | =\deg=            | $\deg$            | =deg=         | deg         |       |
-|   | pm             | =\pm=             | $\pm$             | =&plusmn;=    | &plusmn;    |       |
-|   | plusmn         |                   | $\mbox{----}$     | =&plusmn;=    | &plusmn;    |       |
-|   | sup2           |                   | $\mbox{----}$     | =&sup2;=      | &sup2;      |       |
-|   | sup3           |                   | $\mbox{----}$     | =&sup3;=      | &sup3;      |       |
-|   | acute x        | =\acute x=        | $\acute x$        | =&acute x;=   | &acute x;   |       |
-|   | micro          | =\mu=             | $\mu$             | =&micro;=     | &micro;     |       |
-|   | para           |                   | $\mbox{----}$     | =&para;=      | &para;      |       |
-|   | middot         |                   | $\mbox{----}$     | =&middot;=    | &middot;    |       |
-|   | odot           | =\odot=           | $\odot$           | =o=           | o           |       |
-|   | star           | =\star=           | $\star$           | =*=           | *           |       |
-|   | cedil          |                   | $\mbox{----}$     | =&cedil;=     | &cedil;     |       |
-|   | sup1           | =\sup1=           | $\sup1$           | =&sup1;=      | &sup1;      |       |
-|   | ordm           |                   | $\mbox{----}$     | =&ordm;=      | &ordm;      |       |
-|   | raquo          |                   | $\mbox{----}$     | =&raquo;=     | &raquo;     |       |
-|   | iquest         |                   | $\mbox{----}$     | =&iquest;=    | &iquest;    |       |
-|   | Agrave         |                   | $\mbox{----}$     | =&Agrave;=    | &Agrave;    |       |
-|   | Aacute         |                   | $\mbox{----}$     | =&Aacute;=    | &Aacute;    |       |
-|   | Acirc          |                   | $\mbox{----}$     | =&Acirc;=     | &Acirc;     |       |
-|   | Atilde         |                   | $\mbox{----}$     | =&Atilde;=    | &Atilde;    |       |
-|   | Auml           |                   | $\mbox{----}$     | =&Auml;=      | &Auml;      |       |
-|   | Aring          |                   | $\mbox{----}$     | =&Aring;=     | &Aring;     |       |
-|   | AA             | =\AA=             | $\mbox{\AA}$      | =&Aring;=     | &Aring;     |       |
-|   | AElig          |                   | $\mbox{----}$     | =&AElig;=     | &AElig;     |       |
-|   | Ccedil         |                   | $\mbox{----}$     | =&Ccedil;=    | &Ccedil;    |       |
-|   | Egrave         |                   | $\mbox{----}$     | =&Egrave;=    | &Egrave;    |       |
-|   | Eacute         |                   | $\mbox{----}$     | =&Eacute;=    | &Eacute;    |       |
-|   | Ecirc          |                   | $\mbox{----}$     | =&Ecirc;=     | &Ecirc;     |       |
-|   | Euml           |                   | $\mbox{----}$     | =&Euml;=      | &Euml;      |       |
-|   | Igrave         |                   | $\mbox{----}$     | =&Igrave;=    | &Igrave;    |       |
-|   | Iacute         |                   | $\mbox{----}$     | =&Iacute;=    | &Iacute;    |       |
-|   | Icirc          |                   | $\mbox{----}$     | =&Icirc;=     | &Icirc;     |       |
-|   | Iuml           |                   | $\mbox{----}$     | =&Iuml;=      | &Iuml;      |       |
-|   | ETH            |                   | $\mbox{----}$     | =&ETH;=       | &ETH;       |       |
-|   | Ntilde         |                   | $\mbox{----}$     | =&Ntilde;=    | &Ntilde;    |       |
-|   | Ograve         |                   | $\mbox{----}$     | =&Ograve;=    | &Ograve;    |       |
-|   | Oacute         |                   | $\mbox{----}$     | =&Oacute;=    | &Oacute;    |       |
-|   | Ocirc          |                   | $\mbox{----}$     | =&Ocirc;=     | &Ocirc;     |       |
-|   | Otilde         |                   | $\mbox{----}$     | =&Otilde;=    | &Otilde;    |       |
-|   | Ouml           |                   | $\mbox{----}$     | =&Ouml;=      | &Ouml;      |       |
-|   | times          | =\times=          | $\times$          | =&times;=     | &times;     |       |
-|   | Oslash         |                   | $\mbox{----}$     | =&Oslash;=    | &Oslash;    |       |
-|   | Ugrave         |                   | $\mbox{----}$     | =&Ugrave;=    | &Ugrave;    |       |
-|   | Uacute         |                   | $\mbox{----}$     | =&Uacute;=    | &Uacute;    |       |
-|   | Ucirc          |                   | $\mbox{----}$     | =&Ucirc;=     | &Ucirc;     |       |
-|   | Uuml           |                   | $\mbox{----}$     | =&Uuml;=      | &Uuml;      |       |
-|   | Yacute         |                   | $\mbox{----}$     | =&Yacute;=    | &Yacute;    |       |
-|   | THORN          |                   | $\mbox{----}$     | =&THORN;=     | &THORN;     |       |
-|   | szlig          |                   | $\mbox{----}$     | =&szlig;=     | &szlig;     |       |
-|   | agrave         |                   | $\mbox{----}$     | =&agrave;=    | &agrave;    |       |
-|   | aacute         |                   | $\mbox{----}$     | =&aacute;=    | &aacute;    |       |
-|   | acirc          |                   | $\mbox{----}$     | =&acirc;=     | &acirc;     |       |
-|   | atilde         |                   | $\mbox{----}$     | =&atilde;=    | &atilde;    |       |
-|   | auml           |                   | $\mbox{----}$     | =&auml;=      | &auml;      |       |
-|   | aring          |                   | $\mbox{----}$     | =&aring;=     | &aring;     |       |
-|   | aelig          |                   | $\mbox{----}$     | =&aelig;=     | &aelig;     |       |
-|   | ccedil         |                   | $\mbox{----}$     | =&ccedil;=    | &ccedil;    |       |
-|   | checkmark      |                   | $\mbox{----}$     | =&#10003;=    | &#10003;    |       |
-|   | egrave         |                   | $\mbox{----}$     | =&egrave;=    | &egrave;    |       |
-|   | eacute         |                   | $\mbox{----}$     | =&eacute;=    | &eacute;    |       |
-|   | ecirc          |                   | $\mbox{----}$     | =&ecirc;=     | &ecirc;     |       |
-|   | euml           |                   | $\mbox{----}$     | =&euml;=      | &euml;      |       |
-|   | igrave         |                   | $\mbox{----}$     | =&igrave;=    | &igrave;    |       |
-|   | iacute         |                   | $\mbox{----}$     | =&iacute;=    | &iacute;    |       |
-|   | icirc          |                   | $\mbox{----}$     | =&icirc;=     | &icirc;     |       |
-|   | iuml           |                   | $\mbox{----}$     | =&iuml;=      | &iuml;      |       |
-|   | eth            |                   | $\mbox{----}$     | =&eth;=       | &eth;       |       |
-|   | ntilde         |                   | $\mbox{----}$     | =&ntilde;=    | &ntilde;    |       |
-|   | ograve         |                   | $\mbox{----}$     | =&ograve;=    | &ograve;    |       |
-|   | oacute         |                   | $\mbox{----}$     | =&oacute;=    | &oacute;    |       |
-|   | ocirc          |                   | $\mbox{----}$     | =&ocirc;=     | &ocirc;     |       |
-|   | otilde         |                   | $\mbox{----}$     | =&otilde;=    | &otilde;    |       |
-|   | ouml           |                   | $\mbox{----}$     | =&ouml;=      | &ouml;      |       |
-|   | oslash         |                   | $\mbox{----}$     | =&oslash;=    | &oslash;    |       |
-|   | ugrave         |                   | $\mbox{----}$     | =&ugrave;=    | &ugrave;    |       |
-|   | uacute         |                   | $\mbox{----}$     | =&uacute;=    | &uacute;    |       |
-|   | ucirc          |                   | $\mbox{----}$     | =&ucirc;=     | &ucirc;     |       |
-|   | uuml           |                   | $\mbox{----}$     | =&uuml;=      | &uuml;      |       |
-|   | yacute         |                   | $\mbox{----}$     | =&yacute;=    | &yacute;    |       |
-|   | thorn          |                   | $\mbox{----}$     | =&thorn;=     | &thorn;     |       |
-|   | yuml           |                   | $\mbox{----}$     | =&yuml;=      | &yuml;      |       |
-|   | fnof           |                   | $\mbox{----}$     | =&fnof;=      | &fnof;      |       |
-|   | Alpha          |                   | $\mbox{----}$     | =&Alpha;=     | &Alpha;     |       |
-|   | Beta           |                   | $\mbox{----}$     | =&Beta;=      | &Beta;      |       |
-|   | Gamma          | =\Gamma=          | $\Gamma$          | =&Gamma;=     | &Gamma;     |       |
-|   | Delta          | =\Delta=          | $\Delta$          | =&Delta;=     | &Delta;     |       |
-|   | Epsilon        |                   | $\mbox{----}$     | =&Epsilon;=   | &Epsilon;   |       |
-|   | Zeta           |                   | $\mbox{----}$     | =&Zeta;=      | &Zeta;      |       |
-|   | Eta            |                   | $\mbox{----}$     | =&Eta;=       | &Eta;       |       |
-|   | Theta          | =\Theta=          | $\Theta$          | =&Theta;=     | &Theta;     |       |
-|   | Iota           |                   | $\mbox{----}$     | =&Iota;=      | &Iota;      |       |
-|   | Kappa          |                   | $\mbox{----}$     | =&Kappa;=     | &Kappa;     |       |
-|   | Lambda         | =\Lambda=         | $\Lambda$         | =&Lambda;=    | &Lambda;    |       |
-|   | Mu             |                   | $\mbox{----}$     | =&Mu;=        | &Mu;        |       |
-|   | Nu             |                   | $\mbox{----}$     | =&Nu;=        | &Nu;        |       |
-|   | Xi             | =\Xi=             | $\Xi$             | =&Xi;=        | &Xi;        |       |
-|   | Omicron        |                   | $\mbox{----}$     | =&Omicron;=   | &Omicron;   |       |
-|   | Pi             | =\Pi=             | $\Pi$             | =&Pi;=        | &Pi;        |       |
-|   | Rho            |                   | $\mbox{----}$     | =&Rho;=       | &Rho;       |       |
-|   | Sigma          | =\Sigma=          | $\Sigma$          | =&Sigma;=     | &Sigma;     |       |
-|   | Tau            |                   | $\mbox{----}$     | =&Tau;=       | &Tau;       |       |
-|   | Upsilon        | =\Upsilon=        | $\Upsilon$        | =&Upsilon;=   | &Upsilon;   |       |
-|   | Phi            | =\Phi=            | $\Phi$            | =&Phi;=       | &Phi;       |       |
-|   | Chi            |                   | $\mbox{----}$     | =&Chi;=       | &Chi;       |       |
-|   | Psi            | =\Psi=            | $\Psi$            | =&Psi;=       | &Psi;       |       |
-|   | Omega          | =\Omega=          | $\Omega$          | =&Omega;=     | &Omega;     |       |
-|   | alpha          | =\alpha=          | $\alpha$          | =&alpha;=     | &alpha;     |       |
-|   | beta           | =\beta=           | $\beta$           | =&beta;=      | &beta;      |       |
-|   | gamma          | =\gamma=          | $\gamma$          | =&gamma;=     | &gamma;     |       |
-|   | delta          | =\delta=          | $\delta$          | =&delta;=     | &delta;     |       |
-|   | epsilon        | =\epsilon=        | $\epsilon$        | =&epsilon;=   | &epsilon;   |       |
-|   | varepsilon     | =\varepsilon=     | $\varepsilon$     | =&epsilon;=   | &epsilon;   |       |
-|   | zeta           | =\zeta=           | $\zeta$           | =&zeta;=      | &zeta;      |       |
-|   | eta            | =\eta=            | $\eta$            | =&eta;=       | &eta;       |       |
-|   | theta          | =\theta=          | $\theta$          | =&theta;=     | &theta;     |       |
-|   | iota           | =\iota=           | $\iota$           | =&iota;=      | &iota;      |       |
-|   | kappa          | =\kappa=          | $\kappa$          | =&kappa;=     | &kappa;     |       |
-|   | lambda         | =\lambda=         | $\lambda$         | =&lambda;=    | &lambda;    |       |
-|   | mu             | =\mu=             | $\mu$             | =&mu;=        | &mu;        |       |
-|   | nu             | =\nu=             | $\nu$             | =&nu;=        | &nu;        |       |
-|   | xi             | =\xi=             | $\xi$             | =&xi;=        | &xi;        |       |
-|   | omicron        |                   | $\mbox{----}$     | =&omicron;=   | &omicron;   |       |
-|   | pi             | =\pi=             | $\pi$             | =&pi;=        | &pi;        |       |
-|   | rho            | =\rho=            | $\rho$            | =&rho;=       | &rho;       |       |
-|   | sigmaf         |                   | $\mbox{----}$     | =&sigmaf;=    | &sigmaf;    |       |
-|   | varsigma       | =\varsigma=       | $\varsigma$       | =&sigmaf;=    | &sigmaf;    |       |
-|   | sigma          | =\sigma=          | $\sigma$          | =&sigma;=     | &sigma;     |       |
-|   | tau            | =\tau=            | $\tau$            | =&tau;=       | &tau;       |       |
-|   | upsilon        | =\upsilon=        | $\upsilon$        | =&upsilon;=   | &upsilon;   |       |
-|   | phi            | =\phi=            | $\phi$            | =&phi;=       | &phi;       |       |
-|   | chi            | =\chi=            | $\chi$            | =&chi;=       | &chi;       |       |
-|   | psi            | =\psi=            | $\psi$            | =&psi;=       | &psi;       |       |
-|   | omega          | =\omega=          | $\omega$          | =&omega;=     | &omega;     |       |
-|   | thetasym       |                   | $\mbox{----}$     | =&thetasym;=  | &thetasym;  |       |
-|   | vartheta       | =\vartheta=       | $\vartheta$       | =&thetasym;=  | &thetasym;  |       |
-|   | upsih          |                   | $\mbox{----}$     | =&upsih;=     | &upsih;     |       |
-|   | piv            |                   | $\mbox{----}$     | =&piv;=       | &piv;       |       |
-|   | bull           |                   | $\mbox{----}$     | =&bull;=      | &bull;      |       |
-|   | bullet         | =\bullet=         | $\bullet$         | =&bull;=      | &bull;      |       |
-|   | hellip         |                   | $\mbox{----}$     | =&hellip;=    | &hellip;    |       |
-|   | dots           | =\dots=           | $\mbox{\dots}$    | =&hellip;=    | &hellip;    |       |
-|   | prime          | =\prime=          | $\prime$          | =&prime;=     | &prime;     |       |
-|   | Prime          |                   | $\mbox{----}$     | =&Prime;=     | &Prime;     |       |
-|   | oline          |                   | $\mbox{----}$     | =&oline;=     | &oline;     |       |
-|   | frasl          |                   | $\mbox{----}$     | =&frasl;=     | &frasl;     |       |
-|   | weierp         |                   | $\mbox{----}$     | =&weierp;=    | &weierp;    |       |
-|   | image          |                   | $\mbox{----}$     | =&image;=     | &image;     |       |
-|   | real           |                   | $\mbox{----}$     | =&real;=      | &real;      |       |
-|   | trade          |                   | $\mbox{----}$     | =&trade;=     | &trade;     |       |
-|   | alefsym        |                   | $\mbox{----}$     | =&alefsym;=   | &alefsym;   |       |
-|   | larr           |                   | $\mbox{----}$     | =&larr;=      | &larr;      |       |
-|   | leftarrow      | =\leftarrow=      | $\leftarrow$      | =&larr;=      | &larr;      |       |
-|   | gets           | =\gets=           | $\gets$           | =&larr;=      | &larr;      |       |
-|   | uarr           |                   | $\mbox{----}$     | =&uarr;=      | &uarr;      |       |
-|   | uparrow        | =\uparrow=        | $\uparrow$        | =&uarr;=      | &uarr;      |       |
-|   | rarr           |                   | $\mbox{----}$     | =&rarr;=      | &rarr;      |       |
-|   | to             | =\to=             | $\to$             | =&rarr;=      | &rarr;      |       |
-|   | rightarrow     | =\rightarrow=     | $\rightarrow$     | =&rarr;=      | &rarr;      |       |
-|   | darr           |                   | $\mbox{----}$     | =&darr;=      | &darr;      |       |
-|   | downarrow      | =\downarrow=      | $\downarrow$      | =&darr;=      | &darr;      |       |
-|   | harr           |                   | $\mbox{----}$     | =&harr;=      | &harr;      |       |
-|   | leftrightarrow | =\leftrightarrow= | $\leftrightarrow$ | =&harr;=      | &harr;      |       |
-|   | crarr          |                   | $\mbox{----}$     | =&crarr;=     | &crarr;     |       |
-|   | hookleftarrow  | =\hookleftarrow=  | $\hookleftarrow$  | =&crarr;=     | &crarr;     |       |
-|   | lArr           |                   | $\mbox{----}$     | =&lArr;=      | &lArr;      |       |
-|   | Leftarrow      | =\Leftarrow=      | $\Leftarrow$      | =&lArr;=      | &lArr;      |       |
-|   | uArr           |                   | $\mbox{----}$     | =&uArr;=      | &uArr;      |       |
-|   | Uparrow        | =\Uparrow=        | $\Uparrow$        | =&uArr;=      | &uArr;      |       |
-|   | rArr           |                   | $\mbox{----}$     | =&rArr;=      | &rArr;      |       |
-|   | Rightarrow     | =\Rightarrow=     | $\Rightarrow$     | =&rArr;=      | &rArr;      |       |
-|   | dArr           |                   | $\mbox{----}$     | =&dArr;=      | &dArr;      |       |
-|   | Downarrow      | =\Downarrow=      | $\Downarrow$      | =&dArr;=      | &dArr;      |       |
-|   | hArr           |                   | $\mbox{----}$     | =&hArr;=      | &hArr;      |       |
-|   | Leftrightarrow | =\Leftrightarrow= | $\Leftrightarrow$ | =&hArr;=      | &hArr;      |       |
-|   | forall         | =\forall=         | $\forall$         | =&forall;=    | &forall;    |       |
-|   | partial        | =\partial=        | $\partial$        | =&part;=      | &part;      |       |
-|   | exist          |                   | $\mbox{----}$     | =&exist;=     | &exist;     |       |
-|   | exists         | =\exists=         | $\exists$         | =&exist;=     | &exist;     |       |
-|   | empty          | =\empty=          | $\mbox{\empty}$   | =&empty;=     | &empty;     |       |
-|   | emptyset       | =\emptyset=       | $\emptyset$       | =&empty;=     | &empty;     |       |
-|   | nabla          | =\nabla=          | $\nabla$          | =&nabla;=     | &nabla;     |       |
-|   | isin           |                   | $\mbox{----}$     | =&isin;=      | &isin;      |       |
-|   | in             | =\in=             | $\in$             | =&isin;=      | &isin;      |       |
-|   | notin          | =\notin=          | $\notin$          | =&notin;=     | &notin;     |       |
-|   | ni             | =\ni=             | $\ni$             | =&ni;=        | &ni;        |       |
-|   | prod           | =\prod=           | $\prod$           | =&prod;=      | &prod;      |       |
-|   | sum            | =\sum=            | $\sum$            | =&sum;=       | &sum;       |       |
-|   | minus          |                   | $\mbox{----}$     | =&minus;=     | &minus;     |       |
-|   | lowast         |                   | $\mbox{----}$     | =&lowast;=    | &lowast;    |       |
-|   | ast            | =\ast=            | $\ast$            | =&lowast;=    | &lowast;    |       |
-|   | radic          |                   | $\mbox{----}$     | =&radic;=     | &radic;     |       |
-|   | prop           |                   | $\mbox{----}$     | =&prop;=      | &prop;      |       |
-|   | proptp         |                   | $\mbox{----}$     | =&prop;=      | &prop;      |       |
-|   | infin          |                   | $\mbox{----}$     | =&infin;=     | &infin;     |       |
-|   | infty          | =\infty=          | $\infty$          | =&infin;=     | &infin;     |       |
-|   | ang            |                   | $\mbox{----}$     | =&ang;=       | &ang;       |       |
-|   | angle          | =\angle=          | $\angle$          | =&ang;=       | &ang;       |       |
-|   | and            |                   | $\mbox{----}$     | =&and;=       | &and;       |       |
-|   | wedge          | =\wedge=          | $\wedge$          | =&and;=       | &and;       |       |
-|   | or             |                   | $\mbox{----}$     | =&or;=        | &or;        |       |
-|   | vee            | =\vee=            | $\vee$            | =&or;=        | &or;        |       |
-|   | cap            | =\cap=            | $\cap$            | =&cap;=       | &cap;       |       |
-|   | cup            | =\cup=            | $\cup$            | =&cup;=       | &cup;       |       |
-|   | int            | =\int=            | $\int$            | =&int;=       | &int;       |       |
-|   | there4         |                   | $\mbox{----}$     | =&there4;=    | &there4;    |       |
-|   | sim            | =\sim=            | $\sim$            | =&sim;=       | &sim;       |       |
-|   | cong           | =\cong=           | $\cong$           | =&cong;=      | &cong;      |       |
-|   | simeq          | =\simeq=          | $\simeq$          | =&cong;=      | &cong;      |       |
-|   | asymp          | =\asymp=          | $\asymp$          | =&asymp;=     | &asymp;     |       |
-|   | approx         | =\approx=         | $\approx$         | =&asymp;=     | &asymp;     |       |
-|   | ne             | =\ne=             | $\ne$             | =&ne;=        | &ne;        |       |
-|   | neq            | =\neq=            | $\neq$            | =&ne;=        | &ne;        |       |
-|   | equiv          | =\equiv=          | $\equiv$          | =&equiv;=     | &equiv;     |       |
-|   | le             | =\le=             | $\le$             | =&le;=        | &le;        |       |
-|   | ge             | =\ge=             | $\ge$             | =&ge;=        | &ge;        |       |
-|   | sub            |                   | $\mbox{----}$     | =&sub;=       | &sub;       |       |
-|   | subset         | =\subset=         | $\subset$         | =&sub;=       | &sub;       |       |
-|   | sup            | =\sup=            | $\sup$            | =sup=         | sup         |       |
-|   | supset         | =\supset=         | $\supset$         | =&sup;=       | &sup;       |       |
-|   | nsub           |                   | $\mbox{----}$     | =&nsub;=      | &nsub;      |       |
-|   | sube           |                   | $\mbox{----}$     | =&sube;=      | &sube;      |       |
-|   | supe           |                   | $\mbox{----}$     | =&supe;=      | &supe;      |       |
-|   | oplus          | =\oplus=          | $\oplus$          | =&oplus;=     | &oplus;     |       |
-|   | otimes         | =\otimes=         | $\otimes$         | =&otimes;=    | &otimes;    |       |
-|   | perp           | =\perp=           | $\perp$           | =&perp;=      | &perp;      |       |
-|   | sdot           |                   | $\mbox{----}$     | =&sdot;=      | &sdot;      |       |
-|   | cdot           | =\cdot=           | $\cdot$           | =&sdot;=      | &sdot;      |       |
-|   | lceil          | =\lceil=          | $\lceil$          | =&lceil;=     | &lceil;     |       |
-|   | rceil          | =\rceil=          | $\rceil$          | =&rceil;=     | &rceil;     |       |
-|   | lfloor         | =\lfloor=         | $\lfloor$         | =&lfloor;=    | &lfloor;    |       |
-|   | rfloor         | =\rfloor=         | $\rfloor$         | =&rfloor;=    | &rfloor;    |       |
-|   | lang           |                   | $\mbox{----}$     | =&lang;=      | &lang;      |       |
-|   | rang           |                   | $\mbox{----}$     | =&rang;=      | &rang;      |       |
-|   | loz            |                   | $\mbox{----}$     | =&loz;=       | &loz;       |       |
-|   | Diamond        |                   | $\mbox{----}$     | =&loz;=       | &loz;       |       |
-|   | spades         |                   | $\mbox{----}$     | =&spades;=    | &spades;    |       |
-|   | spadesuit      | =\spadesuit=      | $\spadesuit$      | =&spades;=    | &spades;    |       |
-|   | clubs          |                   | $\mbox{----}$     | =&clubs;=     | &clubs;     |       |
-|   | clubsuit       | =\clubsuit=       | $\clubsuit$       | =&clubs;=     | &clubs;     |       |
-|   | hearts         |                   | $\mbox{----}$     | =&hearts;=    | &hearts;    |       |
-|   | heartsuit      | =\heartsuit=      | $\heartsuit$      | =&heartsuit;= | &heartsuit; |       |
-|   | diamondsuit    | =\diamondsuit=    | $\diamondsuit$    | =&diams;=     | &diams;     |       |
-|   | diams          |                   | $\mbox{----}$     | =&diams;=     | &diams;     |       |
-|   | smile          | =\smile=          | $\smile$          | =&#9786;=     | &#9786;     |       |
-|   | blacksmile     |                   | $\mbox{----}$     | =&#9787;=     | &#9787;     |       |
-|   | sad            |                   | $\mbox{----}$     | =&#9785;=     | &#9785;     |       |
-|   | quot           |                   | $\mbox{----}$     | =&quot;=      | &quot;      |       |
-|   | amp            |                   | $\mbox{----}$     | =&amp;=       | &amp;       |       |
-|   | lt             |                   | $\mbox{----}$     | =&lt;=        | &lt;        |       |
-|   | gt             |                   | $\mbox{----}$     | =&gt;=        | &gt;        |       |
-|   | OElig          |                   | $\mbox{----}$     | =&OElig;=     | &OElig;     |       |
-|   | oelig          |                   | $\mbox{----}$     | =&oelig;=     | &oelig;     |       |
-|   | Scaron         |                   | $\mbox{----}$     | =&Scaron;=    | &Scaron;    |       |
-|   | scaron         |                   | $\mbox{----}$     | =&scaron;=    | &scaron;    |       |
-|   | Yuml           |                   | $\mbox{----}$     | =&Yuml;=      | &Yuml;      |       |
-|   | circ           | =\circ=           | $\circ$           | =&circ;=      | &circ;      |       |
-|   | tilde          | =???=             | $???$             | =&tilde;=     | &tilde;     |       |
-|   | ensp           |                   | $\mbox{----}$     | =&ensp;=      | &ensp;      |       |
-|   | emsp           |                   | $\mbox{----}$     | =&emsp;=      | &emsp;      |       |
-|   | thinsp         |                   | $\mbox{----}$     | =&thinsp;=    | &thinsp;    |       |
-|   | zwnj           |                   | $\mbox{----}$     | =&zwnj;=      | &zwnj;      |       |
-|   | zwj            |                   | $\mbox{----}$     | =&zwj;=       | &zwj;       |       |
-|   | lrm            |                   | $\mbox{----}$     | =&lrm;=       | &lrm;       |       |
-|   | rlm            |                   | $\mbox{----}$     | =&rlm;=       | &rlm;       |       |
-|   | ndash          |                   | $\mbox{----}$     | =&ndash;=     | &ndash;     |       |
-|   | mdash          |                   | $\mbox{----}$     | =&mdash;=     | &mdash;     |       |
-|   | lsquo          |                   | $\mbox{----}$     | =&lsquo;=     | &lsquo;     |       |
-|   | rsquo          |                   | $\mbox{----}$     | =&rsquo;=     | &rsquo;     |       |
-|   | sbquo          |                   | $\mbox{----}$     | =&sbquo;=     | &sbquo;     |       |
-|   | ldquo          |                   | $\mbox{----}$     | =&ldquo;=     | &ldquo;     |       |
-|   | rdquo          |                   | $\mbox{----}$     | =&rdquo;=     | &rdquo;     |       |
-|   | bdquo          |                   | $\mbox{----}$     | =&bdquo;=     | &bdquo;     |       |
-|   | dagger         | =\dagger=         | $\dagger$         | =&dagger;=    | &dagger;    |       |
-|   | Dagger         |                   | $\mbox{----}$     | =&Dagger;=    | &Dagger;    |       |
-|   | permil         |                   | $\mbox{----}$     | =&permil;=    | &permil;    |       |
-|   | lsaquo         |                   | $\mbox{----}$     | =&lsaquo;=    | &lsaquo;    |       |
-|   | rsaquo         |                   | $\mbox{----}$     | =&rsaquo;=    | &rsaquo;    |       |
-|   | euro           |                   | $\mbox{----}$     | =&euro;=      | &euro;      |       |
-|   | EUR            |                   | $\mbox{----}$     | =&euro;=      | &euro;      |       |
-|   | EURdig         |                   | $\mbox{----}$     | =&euro;=      | &euro;      |       |
-|   | EURhv          |                   | $\mbox{----}$     | =&euro;=      | &euro;      |       |
-|   | EURcr          |                   | $\mbox{----}$     | =&euro;=      | &euro;      |       |
-|   | EURtm          |                   | $\mbox{----}$     | =&euro;=      | &euro;      |       |
-|   | arccos         | =\arccos=         | $\arccos$         | =arccos=      | arccos      |       |
-|   | arcsin         | =\arcsin=         | $\arcsin$         | =arcsin=      | arcsin      |       |
-|   | arctan         | =\arctan=         | $\arctan$         | =arctan=      | arctan      |       |
-|   | arg            | =\arg=            | $\arg$            | =arg=         | arg         |       |
-|   | cos            | =\cos=            | $\cos$            | =cos=         | cos         |       |
-|   | cosh           | =\cosh=           | $\cosh$           | =cosh=        | cosh        |       |
-|   | cot            | =\cot=            | $\cot$            | =cot=         | cot         |       |
-|   | coth           | =\coth=           | $\coth$           | =coth=        | coth        |       |
-|   | csc            | =\csc=            | $\csc$            | =csc=         | csc         |       |
-|   | deg            | =\deg=            | $\deg$            | =&deg;=       | &deg;       |       |
-|   | det            | =\det=            | $\det$            | =det=         | det         |       |
-|   | dim            | =\dim=            | $\dim$            | =dim=         | dim         |       |
-|   | exp            | =\exp=            | $\exp$            | =exp=         | exp         |       |
-|   | gcd            | =\gcd=            | $\gcd$            | =gcd=         | gcd         |       |
-|   | hom            | =\hom=            | $\hom$            | =hom=         | hom         |       |
-|   | inf            | =\inf=            | $\inf$            | =inf=         | inf         |       |
-|   | ker            | =\ker=            | $\ker$            | =ker=         | ker         |       |
-|   | lg             | =\lg=             | $\lg$             | =lg=          | lg          |       |
-|   | lim            | =\lim=            | $\lim$            | =lim=         | lim         |       |
-|   | liminf         | =\liminf=         | $\liminf$         | =liminf=      | liminf      |       |
-|   | limsup         | =\limsup=         | $\limsup$         | =limsup=      | limsup      |       |
-|   | ln             | =\ln=             | $\ln$             | =ln=          | ln          |       |
-|   | log            | =\log=            | $\log$            | =log=         | log         |       |
-|   | max            | =\max=            | $\max$            | =max=         | max         |       |
-|   | min            | =\min=            | $\min$            | =min=         | min         |       |
-|   | Pr             | =\Pr=             | $\Pr$             | =Pr=          | Pr          |       |
-|   | sec            | =\sec=            | $\sec$            | =sec=         | sec         |       |
-|   | sin            | =\sin=            | $\sin$            | =sin=         | sin         |       |
-|   | sinh           | =\sinh=           | $\sinh$           | =sinh=        | sinh        |       |
-|   | sup            | =\sup=            | $\sup$            | =&sup;=       | &sup;       |       |
-|   | tan            | =\tan=            | $\tan$            | =tan=         | tan         |       |
-|   | tanh           | =\tanh=           | $\tanh$           | =tanh=        | tanh        |       |
-|   | frac12         | =\frac{1}{2}=     | $\frac{1}{2}$     | =&frac12;=    | &frac12;    |       |
-|   | frac14         | =\frac{1}{4}=     | $\frac{1}{4}$     | =&frac14;=    | &frac14;    |       |
-|   | frac34         | =\frac{3}{4}=     | $\frac{3}{4}$     | =&frac34;=    | &frac34;    |       |
-|   | partial        | =\partial=        | $\partial$        | =&part;=      | &part;      |       |
-|   | oslash         |                   | $$                | =&oslash;=    | &oslash;    |       |
-|   | div            | =\div=            | $\div$            | =&divide;=    | &divide;    |       |
-
+| Name           | LaTeX code              | LaTeX                          | HTML code     | HTML        | ASCII                     | Latin1                    | UTF-8  |
+|----------------+-------------------------+--------------------------------+---------------+-------------+---------------------------+---------------------------+--------|
+| nbsp           | =~=                     | $\mbox{~}$                     | =&nbsp;=      | &nbsp;      |                           |                           |        |
+| iexcl          | =!`=                    | $\mbox{!`}$                    | =&iexcl;=     | &iexcl;     | !                         | ¡                         | ¡      |
+| cent           | =\textcent{}=           | $\mbox{\textcent{}}$           | =&cent;=      | &cent;      | cent                      | ¢                         | ¢      |
+| pound          | =\pounds{}=             | $\mbox{\pounds{}}$             | =&pound;=     | &pound;     | pound                     | £                         | £      |
+| curren         | =\textcurrency{}=       | $\mbox{\textcurrency{}}$       | =&curren;=    | &curren;    | curr.                     | ¤                         | ¤      |
+| yen            | =\textyen{}=            | $\mbox{\textyen{}}$            | =&yen;=       | &yen;       | yen                       | ¥                         | ¥      |
+| brvbar         | =\textbrokenbar{}=      | $\mbox{\textbrokenbar{}}$      | =&brvbar;=    | &brvbar;    | \vert                     | ¦                         | ¦      |
+| vert           | =\vert{}=               | $\vert{}$                      | =&#124;=      | &#124;      | \vert                     | \vert                     | \vert  |
+| sect           | =\S=                    | $\mbox{\S}$                    | =&sect;=      | &sect;      | paragraph                 | §                         | §      |
+| uml            | =\textasciidieresis{}=  | $\mbox{\textasciidieresis{}}$  | =&uml;=       | &uml;       | [diaeresis]               | ¨                         | ¨      |
+| copy           | =\textcopyright{}=      | $\mbox{\textcopyright{}}$      | =&copy;=      | &copy;      | (c)                       | ©                         | ©      |
+| ordf           | =\textordfeminine{}=    | $\mbox{\textordfeminine{}}$    | =&ordf;=      | &ordf;      | _a_                       | ª                         | ª      |
+| laquo          | =\guillemotleft{}=      | $\mbox{\guillemotleft{}}$      | =&laquo;=     | &laquo;     | <<                        | «                         | «      |
+| not            | =\textlnot{}=           | $\mbox{\textlnot{}}$           | =&not;=       | &not;       | [angled dash]             | ¬                         | ¬      |
+| shy            | =\-=                    | $\mbox{\-}$                    | =&shy;=       | &shy;       |                           |                           |        |
+| reg            | =\textregistered{}=     | $\mbox{\textregistered{}}$     | =&reg;=       | &reg;       | (r)                       | ®                         | ®      |
+| macr           | =\textasciimacron{}=    | $\mbox{\textasciimacron{}}$    | =&macr;=      | &macr;      | [macron]                  | ¯                         | ¯      |
+| deg            | =\textdegree{}=         | $\mbox{\textdegree{}}$         | =deg=         | deg         | degree                    | °                         | °      |
+| pm             | =\textpm{}=             | $\mbox{\textpm{}}$             | =&plusmn;=    | &plusmn;    | +-                        | ±                         | ±      |
+| plusmn         | =\textpm{}=             | $\mbox{\textpm{}}$             | =&plusmn;=    | &plusmn;    | +-                        | ±                         | ±      |
+| sup2           | =\texttwosuperior{}=    | $\mbox{\texttwosuperior{}}$    | =&sup2;=      | &sup2;      | ^2                        | ²                         | ²      |
+| sup3           | =\textthreesuperior{}=  | $\mbox{\textthreesuperior{}}$  | =&sup3;=      | &sup3;      | ^3                        | ³                         | ³      |
+| acutex         | =\acute x=              | $\acute x$                     | =&acute x;=   | &acute x;   | 'x                        | 'x                        | 𝑥́      |
+| micro          | =\textmu{}=             | $\mbox{\textmu{}}$             | =&micro;=     | &micro;     | micro                     | µ                         | µ      |
+| para           | =\P{}=                  | $\mbox{\P{}}$                  | =&para;=      | &para;      | [pilcrow]                 | ¶                         | ¶      |
+| middot         | =\textperiodcentered{}= | $\mbox{\textperiodcentered{}}$ | =&middot;=    | &middot;    | .                         | ·                         | ·      |
+| odot           | =\odot=                 | $\odot$                        | =o=           | o           | [circled dot]             | [circled dot]             | ʘ      |
+| star           | =\star=                 | $\star$                        | =*=           | *           | *                         | *                         | ⋆      |
+| cedil          | =\c{}=                  | $\mbox{\c{}}$                  | =&cedil;=     | &cedil;     | [cedilla]                 | ¸                         | ¸      |
+| sup1           | =\textonesuperior{}=    | $\mbox{\textonesuperior{}}$    | =&sup1;=      | &sup1;      | ^1                        | ¹                         | ¹      |
+| ordm           | =\textordmasculine{}=   | $\mbox{\textordmasculine{}}$   | =&ordm;=      | &ordm;      | _o_                       | º                         | º      |
+| raquo          | =\guillemotright{}=     | $\mbox{\guillemotright{}}$     | =&raquo;=     | &raquo;     | >>                        | »                         | »      |
+| iquest         | =?`=                    | $\mbox{?`}$                    | =&iquest;=    | &iquest;    | ?                         | ¿                         | ¿      |
+| Agrave         | =\`{A}=                 | $\mbox{\`{A}}$                 | =&Agrave;=    | &Agrave;    | A                         | À                         | À      |
+| Aacute         | =\'{A}=                 | $\mbox{\'{A}}$                 | =&Aacute;=    | &Aacute;    | A                         | Á                         | Á      |
+| Acirc          | =\^{A}=                 | $\mbox{\^{A}}$                 | =&Acirc;=     | &Acirc;     | A                         | Â                         | Â      |
+| Atilde         | =\~{A}=                 | $\mbox{\~{A}}$                 | =&Atilde;=    | &Atilde;    | A                         | Ã                         | Ã      |
+| Auml           | =\"{A}=                 | $\mbox{\"{A}}$                 | =&Auml;=      | &Auml;      | Ae                        | Ä                         | Ä      |
+| Aring          | =\AA{}=                 | $\mbox{\AA{}}$                 | =&Aring;=     | &Aring;     | A                         | Å                         | Å      |
+| AA             | =\AA{}=                 | $\mbox{\AA{}}$                 | =&Aring;=     | &Aring;     | A                         | Å                         | Å      |
+| AElig          | =\AE{}=                 | $\mbox{\AE{}}$                 | =&AElig;=     | &AElig;     | AE                        | Æ                         | Æ      |
+| Ccedil         | =\c{C}=                 | $\mbox{\c{C}}$                 | =&Ccedil;=    | &Ccedil;    | C                         | Ç                         | Ç      |
+| Egrave         | =\`{E}=                 | $\mbox{\`{E}}$                 | =&Egrave;=    | &Egrave;    | E                         | È                         | È      |
+| Eacute         | =\'{E}=                 | $\mbox{\'{E}}$                 | =&Eacute;=    | &Eacute;    | E                         | É                         | É      |
+| Ecirc          | =\^{E}=                 | $\mbox{\^{E}}$                 | =&Ecirc;=     | &Ecirc;     | E                         | Ê                         | Ê      |
+| Euml           | =\"{E}=                 | $\mbox{\"{E}}$                 | =&Euml;=      | &Euml;      | E                         | Ë                         | Ë      |
+| Igrave         | =\`{I}=                 | $\mbox{\`{I}}$                 | =&Igrave;=    | &Igrave;    | I                         | Ì                         | Ì      |
+| Iacute         | =\'{I}=                 | $\mbox{\'{I}}$                 | =&Iacute;=    | &Iacute;    | I                         | Í                         | Í      |
+| Icirc          | =\^{I}=                 | $\mbox{\^{I}}$                 | =&Icirc;=     | &Icirc;     | I                         | Î                         | Î      |
+| Iuml           | =\"{I}=                 | $\mbox{\"{I}}$                 | =&Iuml;=      | &Iuml;      | I                         | Ï                         | Ï      |
+| ETH            | =\DH{}=                 | $\mbox{\DH{}}$                 | =&ETH;=       | &ETH;       | D                         | Ð                         | Ð      |
+| Ntilde         | =\~{N}=                 | $\mbox{\~{N}}$                 | =&Ntilde;=    | &Ntilde;    | N                         | Ñ                         | Ñ      |
+| Ograve         | =\`{O}=                 | $\mbox{\`{O}}$                 | =&Ograve;=    | &Ograve;    | O                         | Ò                         | Ò      |
+| Oacute         | =\'{O}=                 | $\mbox{\'{O}}$                 | =&Oacute;=    | &Oacute;    | O                         | Ó                         | Ó      |
+| Ocirc          | =\^{O}=                 | $\mbox{\^{O}}$                 | =&Ocirc;=     | &Ocirc;     | O                         | Ô                         | Ô      |
+| Otilde         | =\~{O}=                 | $\mbox{\~{O}}$                 | =&Otilde;=    | &Otilde;    | O                         | Õ                         | Õ      |
+| Ouml           | =\"{O}=                 | $\mbox{\"{O}}$                 | =&Ouml;=      | &Ouml;      | Oe                        | Ö                         | Ö      |
+| times          | =\texttimes{}=          | $\mbox{\texttimes{}}$          | =&times;=     | &times;     | *                         | ×                         | ×      |
+| Oslash         | =\O=                    | $\mbox{\O}$                    | =&Oslash;=    | &Oslash;    | O                         | Ø                         | Ø      |
+| Ugrave         | =\`{U}=                 | $\mbox{\`{U}}$                 | =&Ugrave;=    | &Ugrave;    | U                         | Ù                         | Ù      |
+| Uacute         | =\'{U}=                 | $\mbox{\'{U}}$                 | =&Uacute;=    | &Uacute;    | U                         | Ú                         | Ú      |
+| Ucirc          | =\^{U}=                 | $\mbox{\^{U}}$                 | =&Ucirc;=     | &Ucirc;     | U                         | Û                         | Û      |
+| Uuml           | =\"{U}=                 | $\mbox{\"{U}}$                 | =&Uuml;=      | &Uuml;      | Ue                        | Ü                         | Ü      |
+| Yacute         | =\'{Y}=                 | $\mbox{\'{Y}}$                 | =&Yacute;=    | &Yacute;    | Y                         | Ý                         | Ý      |
+| THORN          | =\TH{}=                 | $\mbox{\TH{}}$                 | =&THORN;=     | &THORN;     | TH                        | Þ                         | Þ      |
+| szlig          | =\ss{}=                 | $\mbox{\ss{}}$                 | =&szlig;=     | &szlig;     | ss                        | ß                         | ß      |
+| agrave         | =\`{a}=                 | $\mbox{\`{a}}$                 | =&agrave;=    | &agrave;    | a                         | à                         | à      |
+| aacute         | =\'{a}=                 | $\mbox{\'{a}}$                 | =&aacute;=    | &aacute;    | a                         | á                         | á      |
+| acirc          | =\^{a}=                 | $\mbox{\^{a}}$                 | =&acirc;=     | &acirc;     | a                         | â                         | â      |
+| atilde         | =\~{a}=                 | $\mbox{\~{a}}$                 | =&atilde;=    | &atilde;    | a                         | ã                         | ã      |
+| auml           | =\"{a}=                 | $\mbox{\"{a}}$                 | =&auml;=      | &auml;      | ae                        | ä                         | ä      |
+| aring          | =\aa{}=                 | $\mbox{\aa{}}$                 | =&aring;=     | &aring;     | a                         | å                         | å      |
+| aelig          | =\ae{}=                 | $\mbox{\ae{}}$                 | =&aelig;=     | &aelig;     | ae                        | æ                         | æ      |
+| ccedil         | =\c{c}=                 | $\mbox{\c{c}}$                 | =&ccedil;=    | &ccedil;    | c                         | ç                         | ç      |
+| checkmark      | =\checkmark=            | $\checkmark$                   | =&#10003;=    | &#10003;    | [checkmark]               | [checkmark]               | ✓      |
+| egrave         | =\`{e}=                 | $\mbox{\`{e}}$                 | =&egrave;=    | &egrave;    | e                         | è                         | è      |
+| eacute         | =\'{e}=                 | $\mbox{\'{e}}$                 | =&eacute;=    | &eacute;    | e                         | é                         | é      |
+| ecirc          | =\^{e}=                 | $\mbox{\^{e}}$                 | =&ecirc;=     | &ecirc;     | e                         | ê                         | ê      |
+| euml           | =\"{e}=                 | $\mbox{\"{e}}$                 | =&euml;=      | &euml;      | e                         | ë                         | ë      |
+| igrave         | =\`{i}=                 | $\mbox{\`{i}}$                 | =&igrave;=    | &igrave;    | i                         | ì                         | ì      |
+| iacute         | =\'{i}=                 | $\mbox{\'{i}}$                 | =&iacute;=    | &iacute;    | i                         | í                         | í      |
+| icirc          | =\^{i}=                 | $\mbox{\^{i}}$                 | =&icirc;=     | &icirc;     | i                         | î                         | î      |
+| iuml           | =\"{i}=                 | $\mbox{\"{i}}$                 | =&iuml;=      | &iuml;      | i                         | ï                         | ï      |
+| eth            | =\dh{}=                 | $\mbox{\dh{}}$                 | =&eth;=       | &eth;       | dh                        | ð                         | ð      |
+| ntilde         | =\~{n}=                 | $\mbox{\~{n}}$                 | =&ntilde;=    | &ntilde;    | n                         | ñ                         | ñ      |
+| ograve         | =\`{o}=                 | $\mbox{\`{o}}$                 | =&ograve;=    | &ograve;    | o                         | ò                         | ò      |
+| oacute         | =\'{o}=                 | $\mbox{\'{o}}$                 | =&oacute;=    | &oacute;    | o                         | ó                         | ó      |
+| ocirc          | =\^{o}=                 | $\mbox{\^{o}}$                 | =&ocirc;=     | &ocirc;     | o                         | ô                         | ô      |
+| otilde         | =\~{o}=                 | $\mbox{\~{o}}$                 | =&otilde;=    | &otilde;    | o                         | õ                         | õ      |
+| ouml           | =\"{o}=                 | $\mbox{\"{o}}$                 | =&ouml;=      | &ouml;      | oe                        | ö                         | ö      |
+| oslash         | =\o{}=                  | $\mbox{\o{}}$                  | =&oslash;=    | &oslash;    | o                         | ø                         | ø      |
+| ugrave         | =\`{u}=                 | $\mbox{\`{u}}$                 | =&ugrave;=    | &ugrave;    | u                         | ù                         | ù      |
+| uacute         | =\'{u}=                 | $\mbox{\'{u}}$                 | =&uacute;=    | &uacute;    | u                         | ú                         | ú      |
+| ucirc          | =\^{u}=                 | $\mbox{\^{u}}$                 | =&ucirc;=     | &ucirc;     | u                         | û                         | û      |
+| uuml           | =\"{u}=                 | $\mbox{\"{u}}$                 | =&uuml;=      | &uuml;      | ue                        | ü                         | ü      |
+| yacute         | =\'{y}=                 | $\mbox{\'{y}}$                 | =&yacute;=    | &yacute;    | y                         | ý                         | ý      |
+| thorn          | =\th{}=                 | $\mbox{\th{}}$                 | =&thorn;=     | &thorn;     | th                        | þ                         | þ      |
+| yuml           | =\"{y}=                 | $\mbox{\"{y}}$                 | =&yuml;=      | &yuml;      | y                         | ÿ                         | ÿ      |
+| fnof           | =\textit{f}=            | $\mbox{\textit{f}}$            | =&fnof;=      | &fnof;      | f                         | f                         | ƒ      |
+| Alpha          | =A=                     | $\mbox{A}$                     | =&Alpha;=     | &Alpha;     | Alpha                     | Alpha                     | Α      |
+| Beta           | =B=                     | $\mbox{B}$                     | =&Beta;=      | &Beta;      | Beta                      | Beta                      | Β      |
+| Gamma          | =\Gamma=                | $\Gamma$                       | =&Gamma;=     | &Gamma;     | Gamma                     | Gamma                     | Γ      |
+| Delta          | =\Delta=                | $\Delta$                       | =&Delta;=     | &Delta;     | Delta                     | Gamma                     | Δ      |
+| Epsilon        | =E=                     | $\mbox{E}$                     | =&Epsilon;=   | &Epsilon;   | Epsilon                   | Epsilon                   | Ε      |
+| Zeta           | =Z=                     | $\mbox{Z}$                     | =&Zeta;=      | &Zeta;      | Zeta                      | Zeta                      | Ζ      |
+| Eta            | =H=                     | $\mbox{H}$                     | =&Eta;=       | &Eta;       | Eta                       | Eta                       | Η      |
+| Theta          | =\Theta=                | $\Theta$                       | =&Theta;=     | &Theta;     | Theta                     | Theta                     | Θ      |
+| Iota           | =I=                     | $\mbox{I}$                     | =&Iota;=      | &Iota;      | Iota                      | Iota                      | Ι      |
+| Kappa          | =K=                     | $\mbox{K}$                     | =&Kappa;=     | &Kappa;     | Kappa                     | Kappa                     | Κ      |
+| Lambda         | =\Lambda=               | $\Lambda$                      | =&Lambda;=    | &Lambda;    | Lambda                    | Lambda                    | Λ      |
+| Mu             | =M=                     | $\mbox{M}$                     | =&Mu;=        | &Mu;        | Mu                        | Mu                        | Μ      |
+| Nu             | =N=                     | $\mbox{N}$                     | =&Nu;=        | &Nu;        | Nu                        | Nu                        | Ν      |
+| Xi             | =\Xi=                   | $\Xi$                          | =&Xi;=        | &Xi;        | Xi                        | Xi                        | Ξ      |
+| Omicron        | =O=                     | $\mbox{O}$                     | =&Omicron;=   | &Omicron;   | Omicron                   | Omicron                   | Ο      |
+| Pi             | =\Pi=                   | $\Pi$                          | =&Pi;=        | &Pi;        | Pi                        | Pi                        | Π      |
+| Rho            | =P=                     | $\mbox{P}$                     | =&Rho;=       | &Rho;       | Rho                       | Rho                       | Ρ      |
+| Sigma          | =\Sigma=                | $\Sigma$                       | =&Sigma;=     | &Sigma;     | Sigma                     | Sigma                     | Σ      |
+| Tau            | =T=                     | $\mbox{T}$                     | =&Tau;=       | &Tau;       | Tau                       | Tau                       | Τ      |
+| Upsilon        | =\Upsilon=              | $\Upsilon$                     | =&Upsilon;=   | &Upsilon;   | Upsilon                   | Upsilon                   | Υ      |
+| Phi            | =\Phi=                  | $\Phi$                         | =&Phi;=       | &Phi;       | Phi                       | Phi                       | Φ      |
+| Chi            | =X=                     | $\mbox{X}$                     | =&Chi;=       | &Chi;       | Chi                       | Chi                       | Χ      |
+| Psi            | =\Psi=                  | $\Psi$                         | =&Psi;=       | &Psi;       | Psi                       | Psi                       | Ψ      |
+| Omega          | =\Omega=                | $\Omega$                       | =&Omega;=     | &Omega;     | Omega                     | Omega                     | Ω      |
+| alpha          | =\alpha=                | $\alpha$                       | =&alpha;=     | &alpha;     | alpha                     | alpha                     | α      |
+| beta           | =\beta=                 | $\beta$                        | =&beta;=      | &beta;      | beta                      | beta                      | β      |
+| gamma          | =\gamma=                | $\gamma$                       | =&gamma;=     | &gamma;     | gamma                     | gamma                     | γ      |
+| delta          | =\delta=                | $\delta$                       | =&delta;=     | &delta;     | delta                     | delta                     | δ      |
+| epsilon        | =\epsilon=              | $\epsilon$                     | =&epsilon;=   | &epsilon;   | epsilon                   | epsilon                   | ε      |
+| varepsilon     | =\varepsilon=           | $\varepsilon$                  | =&epsilon;=   | &epsilon;   | varepsilon                | varepsilon                | ε      |
+| zeta           | =\zeta=                 | $\zeta$                        | =&zeta;=      | &zeta;      | zeta                      | zeta                      | ζ      |
+| eta            | =\eta=                  | $\eta$                         | =&eta;=       | &eta;       | eta                       | eta                       | η      |
+| theta          | =\theta=                | $\theta$                       | =&theta;=     | &theta;     | theta                     | theta                     | θ      |
+| iota           | =\iota=                 | $\iota$                        | =&iota;=      | &iota;      | iota                      | iota                      | ι      |
+| kappa          | =\kappa=                | $\kappa$                       | =&kappa;=     | &kappa;     | kappa                     | kappa                     | κ      |
+| lambda         | =\lambda=               | $\lambda$                      | =&lambda;=    | &lambda;    | lambda                    | lambda                    | λ      |
+| mu             | =\mu=                   | $\mu$                          | =&mu;=        | &mu;        | mu                        | mu                        | μ      |
+| nu             | =\nu=                   | $\nu$                          | =&nu;=        | &nu;        | nu                        | nu                        | ν      |
+| xi             | =\xi=                   | $\xi$                          | =&xi;=        | &xi;        | xi                        | xi                        | ξ      |
+| omicron        | =\textit{o}=            | $\mbox{\textit{o}}$            | =&omicron;=   | &omicron;   | omicron                   | omicron                   | ο      |
+| pi             | =\pi=                   | $\pi$                          | =&pi;=        | &pi;        | pi                        | pi                        | π      |
+| rho            | =\rho=                  | $\rho$                         | =&rho;=       | &rho;       | rho                       | rho                       | ρ      |
+| sigmaf         | =\varsigma=             | $\varsigma$                    | =&sigmaf;=    | &sigmaf;    | sigmaf                    | sigmaf                    | ς      |
+| varsigma       | =\varsigma=             | $\varsigma$                    | =&sigmaf;=    | &sigmaf;    | varsigma                  | varsigma                  | ς      |
+| sigma          | =\sigma=                | $\sigma$                       | =&sigma;=     | &sigma;     | sigma                     | sigma                     | σ      |
+| tau            | =\tau=                  | $\tau$                         | =&tau;=       | &tau;       | tau                       | tau                       | τ      |
+| upsilon        | =\upsilon=              | $\upsilon$                     | =&upsilon;=   | &upsilon;   | upsilon                   | upsilon                   | υ      |
+| phi            | =\phi=                  | $\phi$                         | =&phi;=       | &phi;       | phi                       | phi                       | φ      |
+| chi            | =\chi=                  | $\chi$                         | =&chi;=       | &chi;       | chi                       | chi                       | χ      |
+| psi            | =\psi=                  | $\psi$                         | =&psi;=       | &psi;       | psi                       | psi                       | ψ      |
+| omega          | =\omega=                | $\omega$                       | =&omega;=     | &omega;     | omega                     | omega                     | ω      |
+| thetasym       | =\vartheta=             | $\vartheta$                    | =&thetasym;=  | &thetasym;  | theta                     | theta                     | ϑ      |
+| vartheta       | =\vartheta=             | $\vartheta$                    | =&thetasym;=  | &thetasym;  | theta                     | theta                     | ϑ      |
+| upsih          | =\Upsilon=              | $\Upsilon$                     | =&upsih;=     | &upsih;     | upsilon                   | upsilon                   | ϒ      |
+| piv            | =\varpi=                | $\varpi$                       | =&piv;=       | &piv;       | omega-pi                  | omega-pi                  | ϖ      |
+| bull           | =\textbullet{}=         | $\mbox{\textbullet{}}$         | =&bull;=      | &bull;      | *                         | *                         | •      |
+| bullet         | =\textbullet{}=         | $\mbox{\textbullet{}}$         | =&bull;=      | &bull;      | *                         | *                         | •      |
+| hellip         | =\dots{}=               | $\mbox{\dots{}}$               | =&hellip;=    | &hellip;    | ...                       | ...                       | …      |
+| dots           | =\dots{}=               | $\mbox{\dots{}}$               | =&hellip;=    | &hellip;    | ...                       | ...                       | …      |
+| prime          | =\prime=                | $\prime$                       | =&prime;=     | &prime;     | '                         | '                         | ′      |
+| Prime          | =\prime{}\prime=        | $\prime{}\prime$               | =&Prime;=     | &Prime;     | ''                        | ''                        | ″      |
+| oline          | =\overline{~}=          | $\overline{~}$                 | =&oline;=     | &oline;     | [overline]                | ¯                         | ‾      |
+| frasl          | =/=                     | $\mbox{/}$                     | =&frasl;=     | &frasl;     | /                         | /                         | ⁄      |
+| weierp         | =\wp=                   | $\wp$                          | =&weierp;=    | &weierp;    | P                         | P                         | ℘      |
+| image          | =\Im=                   | $\Im$                          | =&image;=     | &image;     | I                         | I                         | ℑ      |
+| real           | =\Re=                   | $\Re$                          | =&real;=      | &real;      | R                         | R                         | ℜ      |
+| trade          | =\texttrademark{}=      | $\mbox{\texttrademark{}}$      | =&trade;=     | &trade;     | TM                        | TM                        | ™      |
+| alefsym        | =\aleph=                | $\aleph$                       | =&alefsym;=   | &alefsym;   | aleph                     | aleph                     | ℵ      |
+| larr           | =\leftarrow=            | $\leftarrow$                   | =&larr;=      | &larr;      | <-                        | <-                        | ←      |
+| leftarrow      | =\leftarrow=            | $\leftarrow$                   | =&larr;=      | &larr;      | <-                        | <-                        | ←      |
+| gets           | =\gets=                 | $\gets$                        | =&larr;=      | &larr;      | <-                        | <-                        | ←      |
+| uarr           | =\uparrow=              | $\uparrow$                     | =&uarr;=      | &uarr;      | [uparrow]                 | [uparrow]                 | ↑      |
+| uparrow        | =\uparrow=              | $\uparrow$                     | =&uarr;=      | &uarr;      | [uparrow]                 | [uparrow]                 | ↑      |
+| rarr           | =\rightarrow=           | $\rightarrow$                  | =&rarr;=      | &rarr;      | ->                        | ->                        | →      |
+| to             | =\to=                   | $\to$                          | =&rarr;=      | &rarr;      | ->                        | ->                        | →      |
+| rightarrow     | =\rightarrow=           | $\rightarrow$                  | =&rarr;=      | &rarr;      | ->                        | ->                        | →      |
+| darr           | =\downarrow=            | $\downarrow$                   | =&darr;=      | &darr;      | [downarrow]               | [downarrow]               | ↓      |
+| downarrow      | =\downarrow=            | $\downarrow$                   | =&darr;=      | &darr;      | [downarrow]               | [downarrow]               | ↓      |
+| harr           | =\leftrightarrow=       | $\leftrightarrow$              | =&harr;=      | &harr;      | <->                       | <->                       | ↔      |
+| leftrightarrow | =\leftrightarrow=       | $\leftrightarrow$              | =&harr;=      | &harr;      | <->                       | <->                       | ↔      |
+| crarr          | =\hookleftarrow=        | $\hookleftarrow$               | =&crarr;=     | &crarr;     | <-'                       | <-'                       | ↵      |
+| hookleftarrow  | =\hookleftarrow=        | $\hookleftarrow$               | =&crarr;=     | &crarr;     | <-'                       | <-'                       | ↵      |
+| lArr           | =\Leftarrow=            | $\Leftarrow$                   | =&lArr;=      | &lArr;      | <=                        | <=                        | ⇐      |
+| Leftarrow      | =\Leftarrow=            | $\Leftarrow$                   | =&lArr;=      | &lArr;      | <=                        | <=                        | ⇐      |
+| uArr           | =\Uparrow=              | $\Uparrow$                     | =&uArr;=      | &uArr;      | [dbluparrow]              | [dbluparrow]              | ⇑      |
+| Uparrow        | =\Uparrow=              | $\Uparrow$                     | =&uArr;=      | &uArr;      | [dbluparrow]              | [dbluparrow]              | ⇑      |
+| rArr           | =\Rightarrow=           | $\Rightarrow$                  | =&rArr;=      | &rArr;      | = >                       | = >                       | ⇒      |
+| Rightarrow     | =\Rightarrow=           | $\Rightarrow$                  | =&rArr;=      | &rArr;      | = >                       | = >                       | ⇒      |
+| dArr           | =\Downarrow=            | $\Downarrow$                   | =&dArr;=      | &dArr;      | [dbldownarrow]            | [dbldownarrow]            | ⇓      |
+| Downarrow      | =\Downarrow=            | $\Downarrow$                   | =&dArr;=      | &dArr;      | [dbldownarrow]            | [dbldownarrow]            | ⇓      |
+| hArr           | =\Leftrightarrow=       | $\Leftrightarrow$              | =&hArr;=      | &hArr;      | <=>                       | <=>                       | ⇔      |
+| Leftrightarrow | =\Leftrightarrow=       | $\Leftrightarrow$              | =&hArr;=      | &hArr;      | <=>                       | <=>                       | ⇔      |
+| forall         | =\forall=               | $\forall$                      | =&forall;=    | &forall;    | [for all]                 | [for all]                 | ∀      |
+| partial        | =\partial=              | $\partial$                     | =&part;=      | &part;      | [partial differential]    | [partial differential]    | ∂      |
+| exist          | =\exists=               | $\exists$                      | =&exist;=     | &exist;     | [there exists]            | [there exists]            | ∃      |
+| exists         | =\exists=               | $\exists$                      | =&exist;=     | &exist;     | [there exists]            | [there exists]            | ∃      |
+| empty          | =\empty=                | $\empty$                       | =&empty;=     | &empty;     | [empty set]               | [empty set]               | ∅      |
+| emptyset       | =\emptyset=             | $\emptyset$                    | =&empty;=     | &empty;     | [empty set]               | [empty set]               | ∅      |
+| nabla          | =\nabla=                | $\nabla$                       | =&nabla;=     | &nabla;     | [nabla]                   | [nabla]                   | ∇      |
+| isin           | =\in=                   | $\in$                          | =&isin;=      | &isin;      | [element of]              | [element of]              | ∈      |
+| in             | =\in=                   | $\in$                          | =&isin;=      | &isin;      | [element of]              | [element of]              | ∈      |
+| notin          | =\notin=                | $\notin$                       | =&notin;=     | &notin;     | [not an element of]       | [not an element of]       | ∉      |
+| ni             | =\ni=                   | $\ni$                          | =&ni;=        | &ni;        | [contains as member]      | [contains as member]      | ∋      |
+| prod           | =\prod=                 | $\prod$                        | =&prod;=      | &prod;      | [product]                 | [n-ary product]           | ∏      |
+| sum            | =\sum=                  | $\sum$                         | =&sum;=       | &sum;       | [sum]                     | [sum]                     | ∑      |
+| minus          | =-=                     | $-$                            | =&minus;=     | &minus;     | -                         | -                         | −      |
+| lowast         | =\ast=                  | $\ast$                         | =&lowast;=    | &lowast;    | *                         | *                         | ∗      |
+| ast            | =\ast=                  | $\ast$                         | =&lowast;=    | &lowast;    | *                         | *                         | *      |
+| radic          | =\sqrt{,}=              | $\sqrt{,}$                     | =&radic;=     | &radic;     | [square root]             | [square root]             | √      |
+| prop           | =\propto=               | $\propto$                      | =&prop;=      | &prop;      | [proportional to]         | [proportional to]         | ∝      |
+| proptp         | =\propto=               | $\propto$                      | =&prop;=      | &prop;      | [proportional to]         | [proportional to]         | ∝      |
+| infin          | =\propto=               | $\propto$                      | =&infin;=     | &infin;     | [infinity]                | [infinity]                | ∞      |
+| infty          | =\infty=                | $\infty$                       | =&infin;=     | &infin;     | [infinity]                | [infinity]                | ∞      |
+| ang            | =\angle=                | $\angle$                       | =&ang;=       | &ang;       | [angle]                   | [angle]                   | ∠      |
+| angle          | =\angle=                | $\angle$                       | =&ang;=       | &ang;       | [angle]                   | [angle]                   | ∠      |
+| and            | =\wedge=                | $\wedge$                       | =&and;=       | &and;       | [logical and]             | [logical and]             | ∧      |
+| wedge          | =\wedge=                | $\wedge$                       | =&and;=       | &and;       | [logical and]             | [logical and]             | ∧      |
+| or             | =\vee=                  | $\vee$                         | =&or;=        | &or;        | [logical or]              | [logical or]              | ∨      |
+| vee            | =\vee=                  | $\vee$                         | =&or;=        | &or;        | [logical or]              | [logical or]              | ∨      |
+| cap            | =\cap=                  | $\cap$                         | =&cap;=       | &cap;       | [intersection]            | [intersection]            | ∩      |
+| cup            | =\cup=                  | $\cup$                         | =&cup;=       | &cup;       | [union]                   | [union]                   | ∪      |
+| int            | =\int=                  | $\int$                         | =&int;=       | &int;       | [integral]                | [integral]                | ∫      |
+| there4         | =\therefore=            | $\therefore$                   | =&there4;=    | &there4;    | [therefore]               | [therefore]               | ∴      |
+| sim            | =\sim=                  | $\sim$                         | =&sim;=       | &sim;       | ~                         | ~                         | ∼      |
+| cong           | =\cong=                 | $\cong$                        | =&cong;=      | &cong;      | [approx. equal to]        | [approx. equal to]        | ≅      |
+| simeq          | =\simeq=                | $\simeq$                       | =&cong;=      | &cong;      | [approx. equal to]        | [approx. equal to]        | ≅      |
+| asymp          | =\asymp=                | $\asymp$                       | =&asymp;=     | &asymp;     | [almost equal to]         | [almost equal to]         | ≈      |
+| approx         | =\approx=               | $\approx$                      | =&asymp;=     | &asymp;     | [almost equal to]         | [almost equal to]         | ≈      |
+| ne             | =\ne=                   | $\ne$                          | =&ne;=        | &ne;        | [not equal to]            | [not equal to]            | ≠      |
+| neq            | =\neq=                  | $\neq$                         | =&ne;=        | &ne;        | [not equal to]            | [not equal to]            | ≠      |
+| equiv          | =\equiv=                | $\equiv$                       | =&equiv;=     | &equiv;     | [identical to]            | [identical to]            | ≡      |
+| le             | =\le=                   | $\le$                          | =&le;=        | &le;        | <=                        | <=                        | ≤      |
+| ge             | =\ge=                   | $\ge$                          | =&ge;=        | &ge;        | >=                        | >=                        | ≥      |
+| sub            | =\subset=               | $\subset$                      | =&sub;=       | &sub;       | [subset of]               | [subset of]               | ⊂      |
+| subset         | =\subset=               | $\subset$                      | =&sub;=       | &sub;       | [subset of]               | [subset of]               | ⊂      |
+| sup            | =\supset=               | $\supset$                      | =&sup;=       | &sup;       | [superset of]             | [superset of]             | ⊃      |
+| supset         | =\supset=               | $\supset$                      | =&sup;=       | &sup;       | [superset of]             | [superset of]             | ⊃      |
+| nsub           | =\not\subset=           | $\not\subset$                  | =&nsub;=      | &nsub;      | [not a subset of]         | [not a subset of          | ⊄      |
+| sube           | =\subseteq=             | $\subseteq$                    | =&sube;=      | &sube;      | [subset of or equal to]   | [subset of or equal to]   | ⊆      |
+| supe           | =\supseteq=             | $\supseteq$                    | =&supe;=      | &supe;      | [superset of or equal to] | [superset of or equal to] | ⊇      |
+| oplus          | =\oplus=                | $\oplus$                       | =&oplus;=     | &oplus;     | [circled plus]            | [circled plus]            | ⊕      |
+| otimes         | =\otimes=               | $\otimes$                      | =&otimes;=    | &otimes;    | [circled times]           | [circled times]           | ⊗      |
+| perp           | =\perp=                 | $\perp$                        | =&perp;=      | &perp;      | [up tack]                 | [up tack]                 | ⊥      |
+| sdot           | =\cdot=                 | $\cdot$                        | =&sdot;=      | &sdot;      | [dot]                     | [dot]                     | ⋅      |
+| cdot           | =\cdot=                 | $\cdot$                        | =&sdot;=      | &sdot;      | [dot]                     | [dot]                     | ⋅      |
+| lceil          | =\lceil=                | $\lceil$                       | =&lceil;=     | &lceil;     | [left ceiling]            | [left ceiling]            | ⌈      |
+| rceil          | =\rceil=                | $\rceil$                       | =&rceil;=     | &rceil;     | [right ceiling]           | [right ceiling]           | ⌉      |
+| lfloor         | =\lfloor=               | $\lfloor$                      | =&lfloor;=    | &lfloor;    | [left floor]              | [left floor]              | ⌊      |
+| rfloor         | =\rfloor=               | $\rfloor$                      | =&rfloor;=    | &rfloor;    | [right floor]             | [right floor]             | ⌋      |
+| lang           | =\langle=               | $\langle$                      | =&lang;=      | &lang;      | <                         | <                         | ⟨      |
+| rang           | =\rangle=               | $\rangle$                      | =&rang;=      | &rang;      | >                         | >                         | ⟩      |
+| loz            | =\diamond=              | $\diamond$                     | =&loz;=       | &loz;       | [lozenge]                 | [lozenge]                 | ◊      |
+| Diamond        | =\diamond=              | $\diamond$                     | =&diamond;=   | &diamond;   | [diamond]                 | [diamond]                 | ⋄      |
+| spades         | =\spadesuit=            | $\spadesuit$                   | =&spades;=    | &spades;    | [spades]                  | [spades]                  | ♠      |
+| spadesuit      | =\spadesuit=            | $\spadesuit$                   | =&spades;=    | &spades;    | [spades]                  | [spades]                  | ♠      |
+| clubs          | =\clubsuit=             | $\clubsuit$                    | =&clubs;=     | &clubs;     | [clubs]                   | [clubs]                   | ♣      |
+| clubsuit       | =\clubsuit=             | $\clubsuit$                    | =&clubs;=     | &clubs;     | [clubs]                   | [clubs]                   | ♣      |
+| hearts         | =\heartsuit=            | $\heartsuit$                   | =&hearts;=    | &hearts;    | [hearts]                  | [hearts]                  | ♥      |
+| heartsuit      | =\heartsuit=            | $\heartsuit$                   | =&heartsuit;= | &heartsuit; | [hearts]                  | [hearts]                  | ♥      |
+| diamondsuit    | =\diamondsuit=          | $\diamondsuit$                 | =&diams;=     | &diams;     | [diamonds]                | [diamonds]                | ♦      |
+| diams          | =\diamondsuit=          | $\diamondsuit$                 | =&diams;=     | &diams;     | [diamonds]                | [diamonds]                | ♦      |
+| smile          | =\smile=                | $\smile$                       | =&#9786;=     | &#9786;     | :-)                       | :-)                       | ⌣      |
+| blacksmile     | =\blacksmiley{}=        | $\mbox{\blacksmiley{}}$        | =&#9787;=     | &#9787;     | :-)                       | :-)                       | ☻      |
+| sad            | =\frownie{}=            | $\mbox{\frownie{}}$            | =&#9785;=     | &#9785;     | :-(                       | :-(                       | ☹      |
+| quot           | =\textquotedbl{}=       | $\mbox{\textquotedbl{}}$       | =&quot;=      | &quot;      | "                         | "                         | "      |
+| amp            | =\&=                    | $\mbox{\&}$                    | =&amp;=       | &amp;       | &                         | &                         | &      |
+| lt             | =\textless{}=           | $\mbox{\textless{}}$           | =&lt;=        | &lt;        | <                         | <                         | <      |
+| gt             | =\textgreater{}=        | $\mbox{\textgreater{}}$        | =&gt;=        | &gt;        | >                         | >                         | >      |
+| OElig          | =\OE{}=                 | $\mbox{\OE{}}$                 | =&OElig;=     | &OElig;     | OE                        | OE                        | Œ      |
+| oelig          | =\oe{}=                 | $\mbox{\oe{}}$                 | =&oelig;=     | &oelig;     | oe                        | oe                        | œ      |
+| Scaron         | =\v{S}=                 | $\mbox{\v{S}}$                 | =&Scaron;=    | &Scaron;    | S                         | S                         | Š      |
+| scaron         | =\v{s}=                 | $\mbox{\v{s}}$                 | =&scaron;=    | &scaron;    | s                         | s                         | š      |
+| Yuml           | =\"{Y}=                 | $\mbox{\"{Y}}$                 | =&Yuml;=      | &Yuml;      | Y                         | Y                         | Ÿ      |
+| circ           | =\circ=                 | $\circ$                        | =&circ;=      | &circ;      | ^                         | ^                         | ˆ      |
+| tilde          | =~{}=                   | $\mbox{~{}}$                   | =&tilde;=     | &tilde;     | ~                         | ~                         | ~      |
+| ensp           | =\hspace*{.5em}=        | $\mbox{\hspace*{.5em}}$        | =&ensp;=      | &ensp;      |                           |                           |        |
+| emsp           | =\hspace*{1em}=         | $\mbox{\hspace*{1em}}$         | =&emsp;=      | &emsp;      |                           |                           |        |
+| thinsp         | =\hspace*{.2em}=        | $\mbox{\hspace*{.2em}}$        | =&thinsp;=    | &thinsp;    |                           |                           |        |
+| zwnj           | =\/{}=                  | $\mbox{\/{}}$                  | =&zwnj;=      | &zwnj;      |                           |                           | ‌       |
+| zwj            | ==                      | $\mbox{}$                      | =&zwj;=       | &zwj;       |                           |                           | ‍       |
+| lrm            | ==                      | $\mbox{}$                      | =&lrm;=       | &lrm;       |                           |                           | ‎       |
+| rlm            | ==                      | $\mbox{}$                      | =&rlm;=       | &rlm;       |                           |                           | ‏       |
+| ndash          | =--=                    | $\mbox{--}$                    | =&ndash;=     | &ndash;     | -                         | -                         | –      |
+| mdash          | =---=                   | $\mbox{---}$                   | =&mdash;=     | &mdash;     | --                        | --                        | —      |
+| lsquo          | =\textquoteleft{}=      | $\mbox{\textquoteleft{}}$      | =&lsquo;=     | &lsquo;     | `                         | `                         | ‘      |
+| rsquo          | =\textquoteright{}=     | $\mbox{\textquoteright{}}$     | =&rsquo;=     | &rsquo;     | '                         | '                         | ’      |
+| sbquo          | =\quotesinglbase{}=     | $\mbox{\quotesinglbase{}}$     | =&sbquo;=     | &sbquo;     | ,                         | ,                         | ‚      |
+| ldquo          | =\textquotedblleft{}=   | $\mbox{\textquotedblleft{}}$   | =&ldquo;=     | &ldquo;     | "                         | "                         | “      |
+| rdquo          | =\textquotedblright{}=  | $\mbox{\textquotedblright{}}$  | =&rdquo;=     | &rdquo;     | "                         | "                         | ”      |
+| bdquo          | =\quotedblbase{}=       | $\mbox{\quotedblbase{}}$       | =&bdquo;=     | &bdquo;     | "                         | "                         | „      |
+| dagger         | =\textdagger{}=         | $\mbox{\textdagger{}}$         | =&dagger;=    | &dagger;    | [dagger]                  | [dagger]                  | †      |
+| Dagger         | =\textdaggerdbl{}=      | $\mbox{\textdaggerdbl{}}$      | =&Dagger;=    | &Dagger;    | [doubledagger]            | [doubledagger]            | ‡      |
+| permil         | =\textperthousand{}=    | $\mbox{\textperthousand{}}$    | =&permil;=    | &permil;    | per thousand              | per thousand              | ‰      |
+| lsaquo         | =\guilsinglleft{}=      | $\mbox{\guilsinglleft{}}$      | =&lsaquo;=    | &lsaquo;    | <                         | <                         | ‹      |
+| rsaquo         | =\guilsinglright{}=     | $\mbox{\guilsinglright{}}$     | =&rsaquo;=    | &rsaquo;    | >                         | >                         | ›      |
+| euro           | =\texteuro{}=           | $\mbox{\texteuro{}}$           | =&euro;=      | &euro;      | EUR                       | EUR                       | €      |
+| EUR            | =\EUR{}=                | $\mbox{\EUR{}}$                | =&euro;=      | &euro;      | EUR                       | EUR                       | €      |
+| EURdig         | =\EURdig{}=             | $\mbox{\EURdig{}}$             | =&euro;=      | &euro;      | EUR                       | EUR                       | €      |
+| EURhv          | =\EURhv{}=              | $\mbox{\EURhv{}}$              | =&euro;=      | &euro;      | EUR                       | EUR                       | €      |
+| EURcr          | =\EURcr{}=              | $\mbox{\EURcr{}}$              | =&euro;=      | &euro;      | EUR                       | EUR                       | €      |
+| EURtm          | =\EURtm{}=              | $\mbox{\EURtm{}}$              | =&euro;=      | &euro;      | EUR                       | EUR                       | €      |
+| arccos         | =\arccos=               | $\arccos$                      | =arccos=      | arccos      | arccos                    | arccos                    | arccos |
+| arcsin         | =\arcsin=               | $\arcsin$                      | =arcsin=      | arcsin      | arcsin                    | arcsin                    | arcsin |
+| arctan         | =\arctan=               | $\arctan$                      | =arctan=      | arctan      | arctan                    | arctan                    | arctan |
+| arg            | =\arg=                  | $\arg$                         | =arg=         | arg         | arg                       | arg                       | arg    |
+| cos            | =\cos=                  | $\cos$                         | =cos=         | cos         | cos                       | cos                       | cos    |
+| cosh           | =\cosh=                 | $\cosh$                        | =cosh=        | cosh        | cosh                      | cosh                      | cosh   |
+| cot            | =\cot=                  | $\cot$                         | =cot=         | cot         | cot                       | cot                       | cot    |
+| coth           | =\coth=                 | $\coth$                        | =coth=        | coth        | coth                      | coth                      | coth   |
+| csc            | =\csc=                  | $\csc$                         | =csc=         | csc         | csc                       | csc                       | csc    |
+| deg            | =\deg=                  | $\deg$                         | =&deg;=       | &deg;       | deg                       | deg                       | deg    |
+| det            | =\det=                  | $\det$                         | =det=         | det         | det                       | det                       | det    |
+| dim            | =\dim=                  | $\dim$                         | =dim=         | dim         | dim                       | dim                       | dim    |
+| exp            | =\exp=                  | $\exp$                         | =exp=         | exp         | exp                       | exp                       | exp    |
+| gcd            | =\gcd=                  | $\gcd$                         | =gcd=         | gcd         | gcd                       | gcd                       | gcd    |
+| hom            | =\hom=                  | $\hom$                         | =hom=         | hom         | hom                       | hom                       | hom    |
+| inf            | =\inf=                  | $\inf$                         | =inf=         | inf         | inf                       | inf                       | inf    |
+| ker            | =\ker=                  | $\ker$                         | =ker=         | ker         | ker                       | ker                       | ker    |
+| lg             | =\lg=                   | $\lg$                          | =lg=          | lg          | lg                        | lg                        | lg     |
+| lim            | =\lim=                  | $\lim$                         | =lim=         | lim         | lim                       | lim                       | lim    |
+| liminf         | =\liminf=               | $\liminf$                      | =liminf=      | liminf      | liminf                    | liminf                    | liminf |
+| limsup         | =\limsup=               | $\limsup$                      | =limsup=      | limsup      | limsup                    | limsup                    | limsup |
+| ln             | =\ln=                   | $\ln$                          | =ln=          | ln          | ln                        | ln                        | ln     |
+| log            | =\log=                  | $\log$                         | =log=         | log         | log                       | log                       | log    |
+| max            | =\max=                  | $\max$                         | =max=         | max         | max                       | max                       | max    |
+| min            | =\min=                  | $\min$                         | =min=         | min         | min                       | min                       | min    |
+| Pr             | =\Pr=                   | $\Pr$                          | =Pr=          | Pr          | Pr                        | Pr                        | Pr     |
+| sec            | =\sec=                  | $\sec$                         | =sec=         | sec         | sec                       | sec                       | sec    |
+| sin            | =\sin=                  | $\sin$                         | =sin=         | sin         | sin                       | sin                       | sin    |
+| sinh           | =\sinh=                 | $\sinh$                        | =sinh=        | sinh        | sinh                      | sinh                      | sinh   |
+| sup            | =\sup=                  | $\sup$                         | =&sup;=       | &sup;       | sup                       | sup                       | sup    |
+| tan            | =\tan=                  | $\tan$                         | =tan=         | tan         | tan                       | tan                       | tan    |
+| tanh           | =\tanh=                 | $\tanh$                        | =tanh=        | tanh        | tanh                      | tanh                      | tanh   |
+| frac12         | =\textonehalf{}=        | $\mbox{\textonehalf{}}$        | =&frac12;=    | &frac12;    | 1/2                       | ½                         | ½      |
+| frac14         | =\textonequarter{}=     | $\mbox{\textonequarter{}}$     | =&frac14;=    | &frac14;    | 1/4                       | ¼                         | ¼      |
+| frac34         | =\textthreequarters{}=  | $\mbox{\textthreequarters{}}$  | =&frac34;=    | &frac34;    | 3/4                       | ¾                         | ¾      |
+| div            | =\textdiv{}=            | $\mbox{\textdiv{}}$            | =&divide;=    | &divide;    | /                         | ÷                         | ÷      |
+| acute          | =\textasciiacute{}=     | $\mbox{\textasciiacute{}}$     | =&acute;=     | &acute;     | '                         | ´                         | ´      |
+| nsup           | =\not\supset=           | $\not\supset$                  | =&nsup;=      | &nsup;      | [not a superset of]       | [not a superset of]       | ⊅      |
+| smiley         | =\smiley{}=             | $\mbox{\smiley{}}$             | =&#9786;=     | &#9786;     | :-)                       | :-)                       | ☺      |
