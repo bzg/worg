@@ -62,6 +62,27 @@ plot(data)
 ** Gnuplot
 
 * Table/Matrix manipulation
+*** Filtering a table by rows
+#+function: filter-table(table, field, value)
+#+begin_src emacs-lisp
+  (defun org-lob-filter-table (table field value)
+    (if (and (> (length table) 1)
+             (eq (second table) 'hline))
+        (append
+         (list
+          (first table)
+          'hline)
+         (org-lob-filter-table (cddr table) field value))
+      (delq nil
+            (mapcar (lambda (row)
+                      (cond
+                       ((eq row 'hline) 'hline)
+                       ((equal (nth field row) value) row)))
+                    table))))
+  
+  (org-lob-filter-table table field value)
+#+end_src
+
 *** Transposing a matrix
 ***** Emacs lisp
 #+srcname: transpose-elisp(table)
