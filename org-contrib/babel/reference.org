@@ -508,22 +508,24 @@ each more specific than the last.
 #+end_example
 
 **** Remote execution
-     A directory on a remote machine can be specified using [[http://www.gnu.org/software/tramp/#Filename-Syntax][tramp
-     filename syntax]], in which case the code will be executed on the
-     remote machine[fn:2]. An example is
+     A directory on a remote machine can be specified passing an
+     argument in [[http://www.gnu.org/software/tramp/#Filename-Syntax][tramp filename syntax]] to =:dir=.  In this case, the
+     code block will be executed on the remote machine.[fn:2] For
+     example, the following code block will execute the machine at
+     yakuba.princeton.edu:
 
+#<<remote-example>>
 #+begin_example 
 ,#+begin_src R :file plot.png :dir /dand@yakuba.princeton.edu:
   plot(1:10, main=system("hostname", intern=TRUE))
 ,#+end_src
 #+end_example
 
-Text results will be returned to the local org buffer as normal, and
-file output will be created on the remote machine with relative paths
-interpreted relative to the remote directory. An org link to the
-remote file will be created.
-
-So in the above example a plot will be created on the remote machine,
+Results of the remote execution will be returned to the local org
+buffer.  File output will be created on the remote machine with a path
+interpreted relative to the remote directory specified by =:dir=. In
+addition, a link to the remote file will be created in the Org-mode
+buffer.  Following on the [[remote-example][example]], a plot will be created on the remote machine,
 and a link of the following form will be inserted in the org buffer:
 
 #+begin_example 
@@ -532,21 +534,19 @@ and a link of the following form will be inserted in the org buffer:
 
 Most of this functionality follows immediately from the fact that
 =:dir= sets the value of the emacs variable =default-directory=,
-thanks to [[http://www.gnu.org/software/tramp/][tramp]]. Those using XEmacs, or GNU Emacs prior to
-version 23 may need to install tramp separately in order for the
-above features to work correctly.
+thanks to [[http://www.gnu.org/software/tramp/][tramp]].[fn:3]
 
 **** Further points
-     - If =:dir= is used in conjunction with =:session=, although it
+     - When =:dir= is used in conjunction with =:session= it
        will determine the starting directory for a new session as
-       expected, no attempt is currently made to alter the directory
+       expected, but no attempt is made to alter the directory
        associated with an existing session.
      - =:dir= should typically not be used to create files during
        export with =:exports results= or =:exports both=. The reason
        is that, in order to retain portability of exported material
        between machines, during export, links inserted into the buffer
        will *not* be expanded against default directory. Therefore, if
-       default-directory is altered using =:dir=, it it probable that
+       default-directory is altered using =:dir=, it is probable that
        the file will be created in a location to which the link does
        not point.
 *** =:exports=
@@ -1018,6 +1018,10 @@ Be sure to adjust the paths to fit your system.
 
 [fn:2] As long as the interpreter executable is found on the remote
 machine: see the variable =tramp-remote-path=
+
+[fn:3] Those using XEmacs, or GNU Emacs prior to version 23 may need
+to install [[http://www.gnu.org/software/tramp/][tramp]] separately in order for the remote execution features
+to work correctly.
 
 
 * HTML 1                                                           :noexport:
