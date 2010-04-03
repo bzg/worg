@@ -57,33 +57,39 @@
 * Language-specific Features 					      :Write:
 ** Graphical output 							:Fix:
     If a =:file filename.ext= header arg is provided to an R block,
-    then all graphical output from the source block is captured on
+    then graphical output from the source block is captured on
     disk, and the output of the source block is a link to the
     resulting file (as is also the case with the graphics-only
-    languages such as gnuplot, ditaa, dot, asymptote.)
+    languages such as gnuplot, ditaa, dot, and asymptote.)
 
     An attempt is made to find an R graphics device corresponding to
-    the file extension (currently .png, .jpg, .jpeg, .tiff, .bmp,
-    .pdf, .ps, .postscript are recognised); if that fails, png format
-    output is created.
+    the file extension.  Currently, the following extensions are
+    recognized: .png, .jpg, .jpeg, .tiff, .bmp, .pdf, .ps,
+    .postscript, and .svg.  If the extension of the file name passed
+    to =:file= is not recognized, png format output is created by
+    default.
     
+# <<r-dev-header-args>>
     Additionally, values for several arguments to the R graphics
     device can be passed using header args:
     
 #+begin_example 
-    :width :height :bg :units :pointsize :antialias :quality :compression :res :type :family
+    :width :height :bg :fg :units :pointsize :antialias :quality :compression :res :type :family
     :title :fonts :version :paper :encoding :pagecentre :colormodel :useDingbats :horizontal
 #+end_example
     
     See the R help page for the graphics devices (e.g. using =?png=,
     =?pdf=) for explanations of these arguments.
 
-    Arguments to the R graphics device that are not supported as header
-    args can be passed as a string in R argument syntax, using the header
-    arg =:R-dev-args=
+    Arguments to the R graphics device can also be passed as a string
+    in R argument syntax, using the header arg =:R-dev-args=.  This is
+    useful for graphics device arguments that don't have an Org-babel
+    header argument counterpart.
     
-    An example block is (although both bg and fg can be passed directly as
-    header args)
+    The following example source block illustrates use of
+    =:R-dev-args= to pass background and foreground colors.  Note that
+    both of these arguments can also be passed directly as
+    header args, using =:fg= and =:bg=.
     
 #+begin_example 
     #+begin_src R :file z.pdf :width 8 :height 8 :R-dev-args bg="olivedrab", fg="hotpink"
@@ -93,9 +99,16 @@
 ** Missing Values					     :Write:noexport:
 * Additions to Org-babel                                              :Write:
 ** Header Arguments
+R support introduces a large number of header arguments to Org-babel.
+Most of these set parameters of R graphic devices, as described [[r-dev-header-args][above]].
+
+It is also possible to include column names during export of data
+frames.
+
 | Header arg    | Meaning                        |
 |---------------+--------------------------------|
 | :colnames yes | Include column names in output |
+
 * Common Idioms						     :Write:noexport:
 * Tips for usage
 ** Debugging
@@ -120,7 +133,7 @@ functions with names beginning ess-eval-*. They evaluate lines and
 regions in different ways; it's worth looking at their descriptions
 (C-h f).
     
-** Outputting latex code from R
+** LaTeX code from R
 This example summarises a linear regression fit. Usually the org-babel
 user should not have to be involved in latex code generation, as this
 is the responsibility of org-mode's latex export engine. But in this
