@@ -91,7 +91,7 @@ Defined in: /org.el/
 ** =org-confirm-shell-link-function=
 Defined in: /org.el/
 #+begin_example
-    Non-nil means, ask for confirmation before executing shell links.
+    Non-nil means ask for confirmation before executing shell links.
     Shell links can be dangerous: just think about a link
     
          [[shell:rm -rf ~/*][Google Search]]
@@ -105,7 +105,7 @@ Defined in: /org.el/
 ** =org-confirm-elisp-link-function=
 Defined in: /org.el/
 #+begin_example
-    Non-nil means, ask for confirmation before executing Emacs Lisp links.
+    Non-nil means ask for confirmation before executing Emacs Lisp links.
     Elisp links can be dangerous: just think about a link
     
          [[elisp:(shell-command \"rm -rf ~/*\")][Google Search]]
@@ -396,6 +396,11 @@ Defined in: /org.el/
     This hook runs even if there is no statistics cookie present, in which case
     `org-after-todo-statistics-hook' would not run.
 #+end_example
+** =org-reveal-start-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook run before revealing a location.
+#+end_example
 ** =org-property-changed-functions=
 Defined in: /org.el/
 #+begin_example
@@ -406,13 +411,13 @@ Defined in: /org.el/
 ** =org-property-allowed-value-functions=
 Defined in: /org.el/
 #+begin_example
-    Hook for functions supplying allowed values for specific.
+    Hook for functions supplying allowed values for a specific property.
     The functions must take a single argument, the name of the property, and
     return a flat list of allowed values.  If \":ETC\" is one of
     the values, this means that these values are intended as defaults for
     completion, but that other values should be allowed too.
-    The functions must return nil if they are now responsible for this
-    prioerty.
+    The functions must return nil if they are not responsible for this
+    property.
 #+end_example
 ** =org-ctrl-c-ctrl-c-hook=
 Defined in: /org.el/
@@ -620,6 +625,12 @@ Defined in: /org-clock.el/
 #+begin_example
     Hook run when selecting the currently clocked-in entry.
 #+end_example
+** =org-ctags-open-link-functions=
+Defined in: /org-ctags.el/
+#+begin_example
+    List of functions to be prepended to ORG-OPEN-LINK-FUNCTIONS when
+    ORG-CTAGS is active.
+#+end_example
 ** =org-export-docbook-final-hook=
 Defined in: /org-docbook.el/
 #+begin_example
@@ -629,6 +640,7 @@ Defined in: /org-docbook.el/
 Defined in: /org-exp.el/
 #+begin_example
     Hook called as the first thing in each exporter.
+    Point will be still in the original buffer.
     Good for general initialization
 #+end_example
 ** =org-export-preprocess-hook=
@@ -636,6 +648,11 @@ Defined in: /org-exp.el/
 #+begin_example
     Hook for preprocessing an export buffer.
     Pretty much the first thing when exporting is running this hook.
+    Point will be in a temporary buffer that contains a copy of
+    the original buffer, or of the section that is being export.
+    All the other hooks in the org-export-preprocess... category
+    also work in that temporary buffer, already modified by various
+    stages of the processing.
 #+end_example
 ** =org-export-preprocess-after-include-files-hook=
 Defined in: /org-exp.el/
@@ -651,6 +668,13 @@ Defined in: /org-exp.el/
     This selection includes tags-based selection, as well as removal
     of commented and archived trees.
 #+end_example
+** =org-export-preprocess-after-headline-targets-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook for preprocessing export buffer.
+    This is run just after the headline targets have been defined and
+    the target-alist has been set up.
+#+end_example
 ** =org-export-preprocess-before-selecting-backend-code-hook=
 Defined in: /org-exp.el/
 #+begin_example
@@ -663,6 +687,12 @@ Defined in: /org-exp.el/
     Hook for preprocessing an export buffer.
     This is run after blockquote/quote/verse/center have been marked
     with cookies.
+#+end_example
+** =org-export-preprocess-before-normalizing-links-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook for preprocessing an export buffer.
+    This hook is run before links are normalized.
 #+end_example
 ** =org-export-preprocess-before-backend-specifics-hook=
 Defined in: /org-exp.el/
@@ -748,6 +778,11 @@ Defined in: /org-latex.el/
 #+begin_example
     Hook run in the finalized LaTeX buffer.
 #+end_example
+** =org-export-latex-after-save-hook=
+Defined in: /org-latex.el/
+#+begin_example
+    Hook run in the finalized LaTeX buffer, after it has been saved.
+#+end_example
 ** =org-export-latex-format-toc-function=
 Defined in: /org-latex.el/
 #+begin_example
@@ -801,8 +836,8 @@ Defined in: /org-mobile.el/
 Defined in: /org-mobile.el/
 #+begin_example
     Hook that is run after content was moved to `org-mobile-inbox-for-pull'.
-    The inbox file is in the current buffer, and the buffer is arrowed to the
-    new captured data.
+    The inbox file is visited by the current buffer, and the buffer is
+    narrowed to the newly captured data.
 #+end_example
 ** =org-mouse-context-menu-function=
 Defined in: /org-mouse.el/
@@ -847,6 +882,36 @@ Defined in: /org-src.el/
     You may want to use this hook for example to turn off `outline-minor-mode'
     or similar things which you want to have when editing a source code file,
     but which mess up the display of a snippet in Org exported files.
+#+end_example
+** =org-timer-start-hook=
+Defined in: /org-timer.el/
+#+begin_example
+    Hook run after relative timer is started.
+#+end_example
+** =org-timer-stop-hook=
+Defined in: /org-timer.el/
+#+begin_example
+    Hook run before relative timer is stopped.
+#+end_example
+** =org-timer-pause-hook=
+Defined in: /org-timer.el/
+#+begin_example
+    Hook run before relative timer is paused.
+#+end_example
+** =org-timer-set-hook=
+Defined in: /org-timer.el/
+#+begin_example
+    Hook run after countdown timer is set.
+#+end_example
+** =org-timer-done-hook=
+Defined in: /org-timer.el/
+#+begin_example
+    Hook run after countdown timer reaches zero.
+#+end_example
+** =org-timer-cancel-hook=
+Defined in: /org-timer.el/
+#+begin_example
+    Hook run before countdown timer is canceled.
 #+end_example
 ** =org-export-xoxo-final-hook=
 Defined in: /org-xoxo.el/
