@@ -968,145 +968,131 @@ nil if before the first headline."
         t))))
 #+END_SRC
 
-* Keep yearly archive files
+* Set org-agenda-files by filetag
   - Matt Lundin
 
-One way to keep one's agenda files lean is archive subtrees to
-separate files with C-c C-x C-s (org-archive-subtree). The default
-archive location is simply the name of the current file with an
-"_archive" extension, so items in "computer.org" would be archived to
-"computer.org_archive." The problem here is that if one frequently
-creates and deletes org files (say "job-xyz.org"), then one can end up
-with all sorts of orphaned archive files which are no longer
-accessible via the agenda's archive mode, since they are no longer
-connected to an agenda file.
+It is often helpful to limit yourself to a subset of your agenda
+files. For instance, at work, you might want to see only files related
+to work (e.g., bugs, clientA, projectxyz, etc.). The FAQ has helpful
+information on filtering tasks using [[file:org-faq.org::#limit-agenda-with-tag-filtering][filetags]] and [[file:org-faq.org::#limit-agenda-with-category-match][custom agenda
+commands]]. These solutions, however, require reapplying a filter each
+time you call the agenda or writing several new custom agenda commands
+for each context. Another solution is to use directories for different
+types of tasks and to change your agenda files with a function that
+sets org-agenda-files to the appropriate directory. But this relies on
+hard and static boundaries between files.
 
-My solution to this problem is to use yearly archive files, organized
-in trees that correspond to the original file. 
-
-#+begin_src emacs-lisp
-(setq org-archive-location (concat (format-time-string "%Y") ".org_archive::* %s"))
-#+end_src
-
-The setting above archives subtrees to files named "2009.org_archive",
-"2010.org_archive", and so on. The archived trees are placed beneath
-the name of the file from which they came:
-
-#+begin_src org
-  ,* computer.org...
-  ,* org-mode.org...
-  ,* client-xyz.org..
-  ,* job.xyz.org...
-#+end_src
-
-This approach helps to keep one's archive files nice and organized,
-regardless of how much the original collection of agenda files grows
-or shrinks. Perhaps the chief disadvantage is that data related to a
-particular subject is scattered across multiple files. The following
-code will "reconstitute" an original file in a temporary buffer, with
-data organized by the year in which it was archived:
+The following functions allow for a more dynamic approach to selecting
+a subset of files based on filetags:
 
 #+begin_src emacs-lisp
-(defun my-org-reconstitute-file-from-archives (&optional name temp)
-  "Recreate single archive file from yearly archives.
-The function prompts the user for a name of a file (with
-completions gathered from 1st level headings in the archive
-files). The data from those subtrees is gathered in a temporary
-buffer named *archive-[name-of-original-file].org*. 
-
-With the argument temp, write the buffer to a subdirectory of
-`temporary-file-directory'."
+(defun my-org-agenda-files-by-filetag (&optional tag)
+  "Limit org agenda files only to those containing filetag."
   (interactive)
-  (let* ((arch-files (file-expand-wildcards "~/org/20*.org_archive"))
-	 (org-refile-targets '((arch-files :level . 1)))
-	 (location-table (unless name 
-			   (cdr (org-get-refile-targets))))
-	 (comp-list (unless name
-		      (mapcar 
-		       (lambda (x)
-			 (nth 1 (split-string (car x) "/")))
-		       location-table)))
-	 (name (or name
-		   (completing-read 
-		    "File name: " 
-		    (delq nil comp-list) nil nil)))
-	 (buf (concat (file-name-sans-extension name) ".archive"))
-	 p temp-file)
-	 (save-window-excursion
-	   (when (get-buffer buf)
-	     (kill-buffer buf))
-	   (get-buffer-create buf)
-	   (mapc 
-	    (lambda (x)
-	      (string-match "^\\([0-9]+\\)\\.org_archive" 
-			    (file-name-nondirectory x))
-	      (let ((date (match-string 1 (file-name-nondirectory x))))
-		(with-current-buffer (or (find-buffer-visiting x)
-					 (find-file-noselect x))
-		  (save-excursion
-		    (goto-char (point-min))
-		    (while (re-search-forward (concat "^* " name) nil t)
-		      (outline-mark-subtree)
-		      (setq temp-file 
-			    (cons 
-			     (concat 
-			      "\n"
-			      (replace-regexp-in-string
-			       (concat "^* " name)
-			       (concat "* " date "\t\t\t\t\t\t\t:" date ":")
-;;			       (concat "* " date)
-			       (buffer-substring (point) (mark))))
-			     temp-file))
-		      (forward-line 1))))))
-	    arch-files))
-	 (switch-to-buffer buf)
-	 ;; use this one if you want descending date order
-	 ;; (apply 'insert (nreverse temp-file))
-	 (insert "#    -*- mode: org -*-\n")
-	 (insert (concat "#+title: Archive of " name "\n"))
-	 (apply 'insert temp-file)
-	 (goto-char (point-min))
-	 (outline-next-visible-heading 1)
-	 (org-mode)
-	 (when temp
-	   (let ((temp-dir 
-		  (concat temporary-file-directory "org-archive-files/")))
-	     (unless (file-exists-p temp-dir)
-	       (make-directory temp-dir))
-	     (write-file (concat temp-dir buf))))
-	 (setq buffer-read-only t))
-    ;; need to get rid of nil in refile targets since this buffer is not
-    ;; associated with a file
-    (let* ((local-refile-targets (copy-alist org-refile-targets)))
-      (set
-       (make-local-variable 'org-refile-targets)
-       (assq-delete-all nil local-refile-targets)))
-    (set (make-local-variable 'org-speed-commands-user)
-	 '(("g" . my-org-archive-jump-to-original-from-temp-archive))))
+  (let* ((tagslist (my-org-get-all-filetags))
+	 (ftag (or tag 
+		   (completing-read "Tag: " 
+				    (mapcar 'car tagslist)))))
+    (setq org-agenda-files (cdr (assoc ftag tagslist)))))
 
-(defun my-org-archive-jump-to-original-from-temp-archive ()
-  (interactive)
-  (if (looking-at "^*\\s-")
-      (error "Can't link from here"))
-  (let* ((cbuf (buffer-name))
-	 (ext (file-name-extension cbuf))
-	 (trunk (file-name-sans-extension cbuf))
-	 (link-text (concat "*" trunk ".org"))
-	 (search-text (nth 4 (org-heading-components)))
-	 year afile)
-    (unless (string= ext "archive")
-      (error "Not in reconstituted archive file"))
-    (save-excursion
-      (while (org-up-heading-safe))
-      (setq year (nth 4 (org-heading-components))))
-    (setq afile (concat "~/org/" year ".org_archive"))
-    (org-open-file afile t nil link-text)
-    (beginning-of-line) (org-narrow-to-subtree)
-    (re-search-forward (concat "^*+\\s-" search-text) nil t)
-    (org-reveal t)
-    (beginning-of-line)))
+(defun my-org-get-all-filetags ()
+  "Get list of filetags from all default org-files."
+  (let ((files 
+	 (my-org-list-files 
+	  my-org-agenda-directories my-org-agenda-extensions))
+	(tagslist nil)
+	x)
+    (save-window-excursion
+      (while (setq x (pop files))
+	(set-buffer (find-file-noselect x))
+	(mapc
+	 (lambda (y)
+	   (let ((tagfiles (assoc y tagslist)))
+	     (if tagfiles
+		 (setcdr tagfiles (cons x (cdr tagfiles)))
+	       (add-to-list 'tagslist (list y x)))))
+	 (my-org-get-filetags)))
+      tagslist)))
 
+(defun my-org-get-filetags ()
+  "Get list of filetags for current buffer"
+  (let ((ftags org-file-tags)
+	x)
+    (mapcar 
+     (lambda (x)
+       (org-substring-no-properties x))
+     ftags)))
 #+end_src
+
+Calling my-org-agenda-files-by-filetag results in a prompt with all
+filetags in your "normal" agenda files. When you select a tag,
+org-agenda-files will be set only to those files containing that
+filetag.
+
+This functionality relies on a few other functions that abstract the
+process of setting org-agenda-files:
+
+#+begin_src emacs-lisp
+  (defun my-org-list-files (dirs ext)
+    "Function to create list of org files in multiple subdirectories.
+  This can be called to generate a list of files for
+  org-agenda-files or org-refile-targets.
+  
+  DIRS is a list of directories.
+  
+  EXT is a list of the extensions of files to be included."
+    (let ((dirs (if (listp dirs)
+                    dirs
+                  (list dirs)))
+          (ext (if (listp ext)
+                   ext
+                 (list ext)))
+          files)
+      (mapc 
+       (lambda (x)
+         (mapc 
+          (lambda (y)
+            (setq files 
+                  (append files 
+                          (file-expand-wildcards 
+                           (concat (file-name-as-directory x) "*" y)))))
+          ext))
+       dirs)
+      (mapc
+       (lambda (x)
+         (when (or (string-match "/.#" x)
+                   (string-match "#$" x))
+           (delq x files)))
+       files)
+      files))
+  
+  (defvar my-org-agenda-directories '("~/org/")
+    "List of directories containing org files.")
+  (defvar my-org-agenda-extensions '(".org")
+    "List of extensions of agenda files")
+  
+  (setq my-org-agenda-directories '("~/org/"))
+  (setq my-org-agenda-extensions '(".org"))
+  
+  (defun my-org-set-agenda-files ()
+    (interactive)
+    (setq org-agenda-files (my-org-list-files 
+                            my-org-agenda-directories
+                            my-org-agenda-extensions)))
+  
+  (my-org-set-agenda-files)
+#+end_src
+
+The code above will set your "default" agenda files to all files
+ending in ".org" in the directory "~/org/". You can change these values
+by setting the variables my-org-agenda-extensions and
+my-org-agenda-directories. The function my-org-agenda-files-by-filetag
+uses these two variables to determine which files to search for
+filetags (i.e., the larger set from which the subset will be drawn).
+
+You can also easily use my-org-list-files to "mix and match"
+directories and extensions to generate different lists of agenda
+files.
 
 * Speed Commands
   Speed commands are described [[http://orgmode.org/manual/Speed-keys.html#Speed-keys][here]] in the manual. Add your own speed
