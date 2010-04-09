@@ -18,7 +18,6 @@ can be useful for sending tables, notified source code, and inline
 images in email.
 
 * How to use it
-
 ** Setup
 =org-mime= exposes two functions
 
@@ -33,6 +32,13 @@ images in email.
      : Export a portion of an email body composed using `mml-mode' to
      : html using `org-mode'.  If called with an active region only
      : export that region, otherwise export the entire body.
+     *warning*: There has been some concern voiced over the potential
+     complexity of email resulting from calling this function on an
+     active region resulting in multiple =multipart/alternative=
+     sections in the same email.  Please see [[http://thread.gmane.org/gmane.emacs.orgmode/23617][this email thread]] for a
+     discussion of the potential pitfalls of this approach.  Speaking
+     from personal experience this has not been a problem for the
+     author.
 
 - `org-mime-org-buffer-htmlize' :: can be called from within an
      Org-mode buffer to export either the whole buffer or the narrowed
@@ -46,6 +52,7 @@ images in email.
      : Export the current org-mode buffer to HTML using
      : `org-export-as-html' and package the results into an email
      : handling with appropriate MIME encoding.
+
 
 The following key bindings are suggested, which bind the =C-c M-o= key
 sequence to the appropriate =org-mime= function in both email and
