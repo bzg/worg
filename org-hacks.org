@@ -724,7 +724,12 @@ current column =$1= = transposed remote row =@1=:
 
 -- Michael Brand
 
-To [[http://en.wikipedia.org/wiki/Transpose][transpose]] this 4x7 table
+This is more like a demonstration of using _field coordinates in formulas_
+to [[http://en.wikipedia.org/wiki/Transpose][transpose]] a table or to do it without using org-babel.  The efficient
+and simple solution for this with the help of org-babel and Emacs Lisp has
+been provided by Thomas S. Dye on the [[http://thread.gmane.org/gmane.emacs.orgmode/23809/focus=23815][mailing list]].
+
+To transpose this 4x7 table
 
 : #+TBLNAME: FOO
 : | year | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 |
@@ -769,7 +774,7 @@ column formulas to row formulas or vice versa.
 -- Michael Brand
 
 In this example all columns next to =quote= are calculated from the column
-=quote= and show the average change of the time series =(year, quote)=
+=quote= and show the average change of the time series =quote[year]=
 during the period of the preceding =1=, =2=, =3= or =4= years:
 
 : | year | quote |   1 a |   2 a |   3 a |   4 a |
@@ -783,9 +788,15 @@ during the period of the preceding =1=, =2=, =3= or =4= years:
 
 The formula is the same for each column =$3= through =$6=.  This can easily
 be seen with the great formula editor invoked by C-c ' on the
-table. The complicated part of the formula without the field blanking is:
+table. The important part of the formula without the field blanking is:
 
 : ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1
+
+which is the Emacs Calc implementation of the equation
+
+/AvgChange(i, a) = (quote[i] / quote[i - a]) ^ 1 / n - 1/
+
+where /i/ is the current time and /a/ is the length of the preceding period.
 
 * Org-mode and saveplace.el
 
