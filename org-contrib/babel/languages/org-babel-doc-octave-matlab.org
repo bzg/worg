@@ -1,12 +1,6 @@
-#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
-#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
-#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
-#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
-#+TITLE:      Org-babel-octave-matlab
-#+AUTHOR:     Dan Davison
-#+EMAIL:      davison at stats dot ox dot ac dot uk
-#+LANGUAGE:   en
-#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+TITLE:Org-babel-octave-matlab
+#+AUTHOR: Dan Davison
+#+EMAIL:  davison at stats dot ox dot ac dot uk
 
 This file contains notes on the support for matlab and octave in
 org-babel. As these get sorted out, hopefully this document will turn
@@ -27,17 +21,28 @@ As noted below, this needs to be made more sophisticated, in
 particular to detect whether 'ans' is an object for which save -ascii
 is appropriate (e.g. an array) or not (e.g. a string).
 
-* TODO How to detect if result is numeric or string?
+* DONE How to detect if result is numeric or string?
      - State "TODO"       from ""           [2010-03-18 Thu 12:37]
 
-       Currently strings are being returned as their ascii codes:
+       Strings were being returned as their ascii codes.
+
+       We have adopted Darlan's suggestion of using save -text %s ans
+       (and delting the comment lines), which seems to provide a
+       solution.
 
 #+begin_src octave
-  'ab'
+  'octave string'
 #+end_src
 
 #+results:
-: 9.70000000e+01 9.80000000e+01
+: octave string
+
+#+begin_src matlab :dir /ddavison@tombstone.princeton.edu:
+  'string from matlab'
+#+end_src
+
+#+results:
+: 1.1500000e+02   1.1600000e+02   1.1400000e+02   1.0500000e+02   1.1000000e+02   1.0300000e+02   3.2000000e+01   1.0200000e+02   1.1400000e+02   1.1100000e+02   1.0900000e+02   3.2000000e+01   1.0900000e+02   9.7000000e+01   1.1600000e+02   1.0800000e+02   9.7000000e+01   9.8000000e+01
 
 * TODO How to divert graphical output to file?
   - State "TODO"       from ""           [2010-03-17 Wed 23:3
@@ -128,3 +133,10 @@ Of course, this works
  around line 4253 in matlab.el so that my matlab sessions run on a
  machine with matlab installed.
 
+* Org config							   :noexport:
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
