@@ -724,7 +724,12 @@ current column =$1= = transposed remote row =@1=:
 
 -- Michael Brand
 
-To [[http://en.wikipedia.org/wiki/Transpose][transpose]] this 4x7 table
+This is more like a demonstration of using _field coordinates in formulas_
+to [[http://en.wikipedia.org/wiki/Transpose][transpose]] a table or to do it without using org-babel.  The efficient
+and simple solution for this with the help of org-babel and Emacs Lisp has
+been provided by Thomas S. Dye on the [[http://thread.gmane.org/gmane.emacs.orgmode/23809/focus=23815][mailing list]].
+
+To transpose this 4x7 table
 
 : #+TBLNAME: FOO
 : | year | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 |
@@ -769,7 +774,7 @@ column formulas to row formulas or vice versa.
 -- Michael Brand
 
 In this example all columns next to =quote= are calculated from the column
-=quote= and show the average change of the time series =(year, quote)=
+=quote= and show the average change of the time series =quote[year]=
 during the period of the preceding =1=, =2=, =3= or =4= years:
 
 : | year | quote |   1 a |   2 a |   3 a |   4 a |
@@ -783,9 +788,15 @@ during the period of the preceding =1=, =2=, =3= or =4= years:
 
 The formula is the same for each column =$3= through =$6=.  This can easily
 be seen with the great formula editor invoked by C-c ' on the
-table. The complicated part of the formula without the field blanking is:
+table. The important part of the formula without the field blanking is:
 
 : ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1
+
+which is the Emacs Calc implementation of the equation
+
+/AvgChange(i, a) = (quote[i] / quote[i - a]) ^ 1 / n - 1/
+
+where /i/ is the current time and /a/ is the length of the preceding period.
 
 * Org-mode and saveplace.el
 
@@ -1056,6 +1067,9 @@ nil if before the first headline."
 #+END_SRC
 
 * Set org-agenda-files by filetag
+  :PROPERTIES:
+  :CUSTOM_ID: set-agenda-files-by-filetag
+  :END:
   - Matt Lundin
 
 It is often helpful to limit yourself to a subset of your agenda
@@ -1263,13 +1277,17 @@ whereas before I had a tendency to forget that it was there.
 #+end_src
 
 * Send html messages and attachments with Wanderlust
-  -- David Maus
+** Org-mime
+*note*: [[file:org-contrib/org-mime.org][Org-mime]] has recently been added to the contrib directory of
+ Org-mode implementing this functionality for both Wanderlust and
+ Gnus.
 
+** non Org-mime approach
 These two hacks below add the capability of using Org to send out html
 via email.  Both focus on Wanderlust but could be easily adopted for
-Gnus, I think.
+Gnus, I think. -- David Maus
 
-** Send HTML message
+*** Send HTML message
 
 Putting the code below in your .emacs adds following four functions:
 
@@ -1393,8 +1411,7 @@ you send HTML that looks quite good.
   (add-hook 'wl-draft-send-hook 'dmj/wl-send-html-message-maybe)
 #+end_src
 
-
-** Attach HTML of region or subtree
+*** Attach HTML of region or subtree
 
 Instead of sending a complete HTML message you might only send parts
 of an Org file as HTML for the poor souls who are plagued with
@@ -1434,7 +1451,7 @@ complete subtree otherwise.
         (message "html export done, pushed to kill ring and clipboard"))))
 #+end_src
 
-** Adopting for Gnus
+*** Adopting for Gnus
 
 The whole magic lies in the special strings that mark a HTML
 attachment.  So you might just have to find out what these special

@@ -1,0 +1,127 @@
+#+TITLE:     org-mime.el --- org html export for text/html MIME emails
+#+OPTIONS:    H:3 num:nil toc:3 \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+AUTHOR:     Eric Schulte
+#+EMAIL:      schulte.eric at gmail dot com
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+* General
+
+=org-mime= can be used to send HTML email using Org-mode HTML export.
+
+This approximates a WYSiWYG HTML mail editor from within Emacs, and
+can be useful for sending tables, fontified source code, and inline
+images in email.
+
+* How to use it
+** Setup
+If the org-mode =contrib/= directory is in your load path, then
+#+begin_src emacs-lisp
+  (require 'org-mime)
+#+end_src
+is sufficient to load =org-mime=.
+
+Next you need to tell =org-mime= which Emacs mail agent you use.
+- for gnus -- this is set by default
+  #+begin_src emacs-lisp
+    (setq org-mime-library 'mml)
+  #+end_src
+- for Wanderlust (WL)
+  #+begin_src emacs-lisp
+    (setq org-mime-library 'semi)
+  #+end_src
+- for VM -- not yet supported
+  #+begin_src emacs-lisp
+    (setq org-mime-library 'vm)
+  #+end_src
+
+=org-mime= exposes two functions
+
+- `org-mime-htmlize' :: can be called from within a mail composition
+     buffer to export either the entire buffer or just the active
+     region to html, and embed the results into the buffer as a
+     text/html mime section.
+     : org-mime-htmlize is an interactive Lisp function in `org-mime.el'.
+     : 
+     : (org-mime-htmlize ARG)
+     : 
+     : Export a portion of an email body composed using `mml-mode' to
+     : html using `org-mode'.  If called with an active region only
+     : export that region, otherwise export the entire body.
+     *warning*: There has been some concern voiced over the potential
+     complexity of email resulting from calling this function on an
+     active region resulting in multiple =multipart/alternative=
+     sections in the same email.  Please see [[http://thread.gmane.org/gmane.emacs.orgmode/23617][this email thread]] for a
+     discussion of the potential pitfalls of this approach.  Speaking
+     from personal experience this has not been a problem for the
+     author.
+
+- `org-mime-org-buffer-htmlize' :: can be called from within an
+     Org-mode buffer to export either the whole buffer or the narrowed
+     subtree or active region to HTML, and open a new email buffer
+     including the resulting HTML content as an embedded mime section.
+     : org-mime-org-buffer-htmlize is an interactive Lisp function in
+     : `org-mime.el'.
+     : 
+     : (org-mime-org-buffer-htmlize)
+     : 
+     : Export the current org-mode buffer to HTML using
+     : `org-export-as-html' and package the results into an email
+     : handling with appropriate MIME encoding.
+
+
+The following key bindings are suggested, which bind the =C-c M-o= key
+sequence to the appropriate =org-mime= function in both email and
+Org-mode buffers.
+#+begin_src emacs-lisp
+  (add-hook 'message-mode-hook
+            (lambda ()
+              (local-set-key "\C-c\M-o" 'org-mime-htmlize)))
+  
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (local-set-key "\C-c\M-o" 'org-mime-org-buffer-htmlize)))
+#+end_src
+
+** CSS style customization
+Email clients will often strip all global CSS from email messages.  In
+the case of web-based email readers this is essential in order to
+protect the CSS of the containing web site.  To ensure that your CSS
+styles are rendered correctly they must be included in the actual body
+of the elements to which they apply.
+
+The `org-mime-html-hook' allows for the insertion of these important
+CSS elements into the resulting HTML before mime encoding.  The
+following are some possible uses of this hook.
+
+- for those who use color themes with Dark backgrounds it is useful to
+  set a dark background for all exported code blocks and example
+  regions.  This can be accomplished with the following
+  #+begin_src emacs-lisp
+    (add-hook 'org-mime-html-hook
+              (lambda ()
+                (org-mime-change-element-style
+                 "pre" (format "color: %s; background-color: %s; padding: 0.5em;"
+                               "#E6E1DC" "#232323"))))
+  #+end_src
+- the following can be used to nicely offset block quotes in email
+  bodies
+  #+begin_src emacs-lisp
+    (add-hook 'org-mime-html-hook
+              (lambda ()
+                (org-mime-change-element-style
+                 "blockquote" "border-left: 2px solid gray; padding-left: 4px;")))    
+  #+end_src
+
+For other customization options see the =org-mime= customization
+group.
+
+* Credits
+
+=org-mime= was developed by Eric Schulte with much-appreciated help
+and discussion from everyone on the "[[http://thread.gmane.org/gmane.emacs.orgmode/23153][using orgmode to send html mail]]"
+thread especially Eric S. Fraga for adding WL support.
