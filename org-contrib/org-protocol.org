@@ -432,6 +432,28 @@ following to your .conkerorrc:
 org-remember from inside conkeror," November 14, 2008.
 http://tsdh.wordpress.com/2008/11/14/calling-org-remember-from-inside-conkeror/
 
+*** Uzbl
+    :PROPERTIES:
+    :CUSTOM_ID: uzbl
+    :END:
+
+Uzbl is a minimalistic webkit browser for Unix/Linux.
+
+- [[http://www.uzbl.org/]]
+
+You can pass encoded url data from uzbl to org-protocol by adding the
+following lines to =.config/uzbl/config=.
+
+#+begin_src 
+
+# Org-protocol
+
+@cbind 	\\r = sh 'emacsclient "org-protocol://remember://\@<encodeURIComponent(window.location.href)>\@/\@<encodeURIComponent(document.title)>\@/\@<document.getSelection()>\@"'
+@cbind 	\\l = sh 'emacsclient "org-protocol://remember://\@<encodeURIComponent(window.location.href)>\@/\@<encodeURIComponent(document.title)>\@"'
+
+#+end_src
+
+These bind org-protocol-remember and org-store-line to "\r" and "\l" respectively.
 
 # <<firefox-keybindings>>
 * Keybindings for Firefox

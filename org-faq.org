@@ -1392,6 +1392,83 @@ Some entered text.
 
 Make sure that the variable comment-start is nil.
 
+** Are there any shortcuts for entering source blocks and comment lines?
+   :PROPERTIES:
+   :CUSTOM_ID: shortcuts-for-entering-source-blocks
+   :END:
+
+Org mode has some [[http://orgmode.org/manual/Literal-examples.html#Literal-examples][very convenient markup]] for including literal blocks
+and lines of code in a file. (This is especially useful when exporting
+documents or using the contributed package [[file:org-contrib/babel/index.org][org-babel]] for executing
+blocks of code.)
+
+#+begin_src org
+  ,#+begin_src perl
+  ,  print "Hello, world!\n";
+  ,#+end_src
+#+end_src
+
+It can be tiresome to enter the block comment lines manually. There
+are several possible shortcuts you can use to enter them:
+
+1) Built-in expansion
+
+   - Org mode has a "secret" method of expanding source code blocks
+     and comment lines.
+
+   - If you type "<s" followed by =TAB= or =M-TAB=, a source block will
+     magically appear.
+
+   - For a full list of expansions, type =M-x describe-variable
+     [RET] org-structure-template-alist=.
+
+2) [[http://orgmode.org/manual/Literal-examples.html#Literal-examples][Registers]]
+
+   - Add the following line to your emacs file:
+
+     =(set-register ?p "#+begin_src\n\n#+end_src perl")=
+
+   - Then type =C-x r i p= to insert the source block. Please note: if
+     you save another value to the register "p" with =C-x r s p=, it
+     will overwrite the setting above for the current emacs session.
+
+3) [[http://orgmode.org/manual/Literal-examples.html#Literal-examples][Abbrevs]]
+
+ - Activate the abbrev minor-mode in org-mode:
+
+   + M-x abbrev-mode
+
+   + /Permanently/:
+
+       + =(add-hook 'org-mode-hook (lambda () (abbrev-mode 1)))=
+
+ - In org-mode, type "sbp" (a sample abbreviation for a perl source
+   block).
+
+ - Immediately after "sbp" type =C-x a i l=.
+
+ - Enter the expansion: 
+
+   - =#+begin_src perl[C-q C-j][C-q C-j]#+end_src=
+
+   - Note: =C-q C-j= creates a new line in the minibuffer
+
+ - Now, whenever, you type sbp followed by =SPACE= or =RET= in an
+   org-mode buffer, the src block will magically appear.
+
+ - To review your list of abbrevs, type =M-x edit-abbrevs=.
+
+ - If you want more complex completion (like yasnippet) you can combine
+   abbrev mode with [[http://www.emacswiki.org/emacs/SkeletonMode][skeletons]].
+
+4) [[http://code.google.com/p/yasnippet/][Yasnippet]]
+
+ - Several org-mode users install yasnippet for convenient, complex
+   expansion.
+
+ - See Bernt Hansen's [[http://doc.norang.ca/org-mode.html#Yasnippets][org-mode setup]] for a good introduction to
+   yasnippet.
+
 * Remember
   :PROPERTIES:
   :CUSTOM_ID: Remember
