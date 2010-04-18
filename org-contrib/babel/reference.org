@@ -154,8 +154,8 @@ language-specific header arguments.
 
 ** Using Header Arguments
 
-The values of header arguments can be set in three different ways,
-each more specific than the last.
+The values of header arguments can be set in four different ways, each
+more specific (and having higher priority) than the last.
 
 *** System-wide
     :PROPERTIES:
@@ -187,23 +187,32 @@ each more specific than the last.
                (assq-delete-all :noweb org-babel-default-header-args)))
  #+end_src
 
-*** Org-mode Properties
+*** Buffer-wide Properties
+    Header arguments are also read from [[http://orgmode.org/manual/Properties-and-Columns.html#Properties-and-Columns][Org-mode properties]]. An
+    example of setting a header argument for all code blocks in a
+    buffer is
 
- Header arguments are also read from [[http://orgmode.org/manual/Properties-and-Columns.html#Properties-and-Columns][Org-mode properties]], which
- means they can be set on the outline header level.  For example, the
- value of the =:cache= header argument will default to true in all
- source code blocks under the following example of an Org-mode outline header:
+#+begin_example 
+#+property: tangle yes
+#+end_example
+
+*** Subtree Properties
+
+     Properties can also be set at the outline heading level. For
+     example, the value of the =:cache= header argument will default
+     to true in all source code blocks under the following example of
+     an Org-mode outline heading:
  #+begin_example
-   ,* outline header
+   ,* outline heading
      :PROPERTIES:
      :cache:    yes
      :CUSTOM_ID: property-set-header-arguments
      :END:
  #+end_example
- Properties defined in this way override the properties set in
- =org-babel-default-header-args=.  It is convenient to use the
- =org-set-property= function bound to =C-c C-x p= to set properties
- in Org-mode documents.
+ Properties defined in this way override buffer-wide properties, and
+ override the properties set in =org-babel-default-header-args=.  It
+ is convenient to use the =org-set-property= function bound to =C-c
+ C-x p= to set properties in Org-mode documents.
 
 *** Source Code Block
     :PROPERTIES:
