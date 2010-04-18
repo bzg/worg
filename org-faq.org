@@ -1324,6 +1324,169 @@ table:
 
 See [[http://orgmode.org/manual/Tables-in-HTML-export.html#Tables-in-HTML-export][the manual]] for more details.
 
+** Why does the Calc high precision (e. g. =p20=) not work like expected?
+   :PROPERTIES:
+   :CUSTOM_ID: table-high-precision
+   :END:
+
+- *Short answer*
+
+  Avoid
+  : | 0.16666667000000 |
+  : #+TBLFM: $1 = 1 / 2 * 3; p20 %.14f
+  and use
+  : | 0.16666666666667 |
+  : #+TBLFM: $1 = 1 / 2 * 3; p20 f14
+
+- *Longer answer*
+
+  It is important to distinguish between the precision of
+  1) =p20=: Calc internal calculation (=calc-internal-prec=)
+  2) =f14=: Calc float formatting, unlimited in precision (=calc-float-format=)
+  3) =%.14f=: the =printf= reformatting, limited in precision
+
+  See [[http://orgmode.org/manual/Formula-syntax-for-Calc.html#Formula-syntax-for-Calc][the Org manual]] (org-version 6.35 or newer) for more details.
+
+  Use =C-h v org-calc-default-modes RET= to check the Org default settings
+  which are used if no format specifiers are added to a table formula.
+  The examples below have been made with the out_of_the_box Org defaults
+  =calc-internal-prec = 12= and =calc-float-format = 8=.
+
+  Remember the formula debugger, toggled with =C-c {=,
+  to view the processing stages like:
+  |   | formula debugger label | processing stage           |
+  | / | <                      | <>                         |
+  |---+------------------------+----------------------------|
+  |   | Result:                | output of Calc             |
+  |   | Format:                | reformatting with =printf= |
+
+  Following are some examples to demonstrate
+  the interaction of the three precisions.
+
+  - *display precision limitations for Calc formulas*
+    - limited by Calc internal calculation precision from Org default
+      (here =p12=)
+      : | 0.16666666666700 |
+      : #+TBLFM: $1 = 1 / 2 * 3;     f14
+
+      : | 0.1666666666670000000 |
+      : #+TBLFM: $1 = 1 / 2 * 3;     f19
+
+    - limited by Calc float format from Org default (here =f8=)
+      : | 0.16666667 |
+      : #+TBLFM: $1 = 1 / 2 * 3
+
+      : | 0.16666667 |
+      : #+TBLFM: $1 = 1 / 2 * 3; p20
+
+      : | 0.16666667000000 |
+      : #+TBLFM: $1 = 1 / 2 * 3;         %.14f
+
+      : | 0.16666667000000 |
+      : #+TBLFM: $1 = 1 / 2 * 3; p20     %.14f
+
+    - limited by Calc float format specified
+      : | 0.166667 |
+      : #+TBLFM: $1 = 1 / 2 * 3;     f6
+
+      : | 0.16666666666667 |
+      : #+TBLFM: $1 = 1 / 2 * 3; p20 f14
+
+      : | 0.1666666666666666667 |
+      : #+TBLFM: $1 = 1 / 2 * 3; p20 f19
+
+    - limited by =printf= conversion to Emacs Lisp float
+      : | 0.1666666699999999900 | the inaccuracy is platform dependent |
+      : #+TBLFM: $1 = 1 / 2 * 3;         %.19f
+
+      : | 0.1666666699999999900 | the inaccuracy is platform dependent |
+      : #+TBLFM: $1 = 1 / 2 * 3; p20     %.19f
+
+      : | 0.1666666666666666600 | the inaccuracy is platform dependent |
+      : #+TBLFM: $1 = 1 / 2 * 3; p20 f20 %.19f
+
+    - limited by =printf= format specified
+      : | 0.166667 |
+      : #+TBLFM: $1 = 1 / 2 * 3;         %.6f
+
+  - *display precision limitations for Emacs Lisp formulas*
+    - limited by Emacs Lisp float
+      : | 0.16666666666666666 |
+      : #+TBLFM: $1 = '(/ 1.0 (* 2 3))
+
+      : | 0.1666666666666666574 | the inaccuracy is platform dependent |
+      : #+TBLFM: $1 = '(/ 1.0 (* 2 3)); %.19f
+
+    - limited by =printf= format specified
+      : | 0.16666666666667 |
+      : #+TBLFM: $1 = '(/ 1.0 (* 2 3)); %.14f
+
+This FAQ entry is based on this [[http://thread.gmane.org/gmane.emacs.orgmode/22642][mailing list thread]]
+and is continued in the [[#table-float-fraction][next FAQ entry]].
+
+** Which float format shows the fraction part also when the latter is zero?
+   :PROPERTIES:
+   :CUSTOM_ID: table-float-fraction
+   :END:
+
+- *Short answer*
+
+  Avoid
+  : | 1 |
+  : #+TBLFM: $1 = 1 + 0; f3
+  and use
+  : | 1.000 |
+  : #+TBLFM: $1 = 1 + 0; %.3f
+
+- *Longer answer*
+
+  For =f3= and =f-3= see =`d f' (`calc-fix-notation')= in [[http://www.delorie.com/gnu/docs/calc/calc.html#SEC_Top][the Calc manual]]
+  in the section Mode Settings -> Display Modes -> Float Formats
+  [[http://www.delorie.com/gnu/docs/calc/calc_163.html][found here as long as the section numbering is kept]].
+
+  Remember the formula debugger, toggled with =C-c {=,
+  to view the processing stages like:
+  |   | formula debugger label | processing stage           |
+  | / | <                      | <>                         |
+  |---+------------------------+----------------------------|
+  |   | Result:                | output of Calc             |
+  |   | Format:                | reformatting with =printf= |
+
+  Following are some examples to demonstrate different float formats.
+
+  - normal precision
+    : |----------------------+---------+-------+-------|
+    : | number               |      f3 |   f-3 |  %.3f |
+    : |----------------------+---------+-------+-------|
+    : | 1 + 0                |       1 |     1 | 1.000 |
+    : | 0 + 0                |       0 |     0 | 0.000 |
+    : |----------------------+---------+-------+-------|
+    : | 1 + 1 / 2 * 3 * 1000 |   1.000 | 1.000 | 1.000 |
+    : | 0 + 1 / 2 * 3 * 1000 | 1.67e-4 | 0.000 | 0.000 |
+    : |----------------------+---------+-------+-------|
+    : | 1 + 1 / 2 * 3 *  100 |   1.002 | 1.002 | 1.002 |
+    : | 0 + 1 / 2 * 3 *  100 |   0.002 | 0.002 | 0.002 |
+    : |----------------------+---------+-------+-------|
+    : #+TBLFM: $2 = $1; f3 :: $3 = $1; f-3 :: $4 = $1; %.3f
+
+  - high precision
+    : |----------------------+--------------------------+-----------------------|
+    : | number               |                      f19 |                  f-19 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1 + 0                |                        1 |                     1 |
+    : | 0 + 0                |                        0 |                     0 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1 + 1 / 2 * 3 * 1e19 |    1.0000000000000000000 | 1.0000000000000000000 |
+    : | 0 + 1 / 2 * 3 * 1e19 | 1.666666666666666667e-20 | 0.0000000000000000000 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1 + 1 / 2 * 3 * 1e18 |    1.0000000000000000002 | 1.0000000000000000002 |
+    : | 0 + 1 / 2 * 3 * 1e18 |    0.0000000000000000002 | 0.0000000000000000002 |
+    : |----------------------+--------------------------+-----------------------|
+    : #+TBLFM: $2 = $1; p20 f19 :: $3 = $1; p20 f-19
+
+    The =printf= reformatting (=%.19f=) cannot be used with high precision,
+    see the [[#table-high-precision][previous FAQ entry]].
+
 * Markup
   :PROPERTIES:
   :CUSTOM_ID: Footnotes
