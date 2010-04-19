@@ -6,8 +6,8 @@
 #+AUTHOR:     Sebastian Rose
 #+EMAIL:      sebastian_rose gmx de
 #+LANGUAGE:   en
-#+PRIORITIES: A C B
 #+CATEGORY:   worg-tutorial
+#+SETUPFILE:  ../macros.setupfile
 
 
 [[file:../index.org][{Back to Worg's index}]]
@@ -15,9 +15,9 @@
 * Introduction
 
   You should be comfortable with publishing Org-mode fiels to HTML already when
-  you read this. Make sure, to create the tree-style index-file on export.
+  you read this. Make sure, to create the tree-style sitemap-file on export.
 
-  This Tutorial describes a simple technique to inlude published content into
+  This Tutorial describes a simple technique to include published content into
   other web applications. I use an external JavaScript treemenu library publish
   by Marco Pratesi. This treemenu is fast and runs in all Browsers I'm aware
   of. The techniqe could as well be adopted to other menu libs.
@@ -32,6 +32,13 @@
 #+CAPTION: Example phplayersmenu treemenu
 #+ATTR_HTML: style="margin-left:auto;margin-right:auto;text-align:center;"
   [[file:../images/sr/phplayermenu-example-tree.png]]
+
+  {{{BeginInfoBox}}} *Note:* Prior to Org-mode commit
+  [[http://repo.or.cz/w/org-mode.git/commit/4892c8899e5b99d041836749fb2d1458971be55d][4892c8899e5b99d041836749fb2d1458971be55d]] (version 6.34trans), =sitemap-file=
+  =auto-sitemap= a.s.o. where called =index-file=, =auto-index= and similar. I you
+  have to work with a version released before 25th of February 2010, just
+  replace =sitemap= with =index= throughout this file.
+  {{{EndInfoBox}}}
 
 
 * How the menus work
@@ -83,12 +90,12 @@
 * Creating the menu structure when publishing
 
   To create the menu structure, I use a modified version of the elisp function
-  =org-publish-org-index=, defined in =Org-mode/lisp/org-publish.el=, that generates
+  =org-publish-org-sitemap=, defined in =Org-mode/lisp/org-publish.el=, that generates
   the sitemap for HTML export. The function is called
-  =sr-org-notes-index-complete= and defined in one of my emacs setup files.
+  =sr-org-notes-sitemap-complete= and defined in one of my emacs setup files.
 
   Fortunately, Org-mode makes it possible to call a function after the
-  publishing process has fineshed. To make use of =sr-org-notes-index-complete=,
+  publishing process has fineshed. To make use of =sr-org-notes-sitemap-complete=,
   add this to your publishing project's definition:
 
 #+begin_src emacs-lisp
@@ -99,8 +106,13 @@
 
          ;; ...
 
+         ;; Important:
+         :auto-sitemap t ; generate sitemap.org automagically
+         :sitemap-filename "sitemap.org" ; this is the default
+         :sitemap-style "tree"
+
          ;; Layersmenu:
-         :completion-function sr-org-notes-index-complete
+         :completion-function sr-org-notes-sitemap-complete
          :menu/structure-file "~/path/to/menu-structure-file.txt"
          :menu/link-target "mitte" ;; optional
 
@@ -111,14 +123,14 @@
 
   Once you re-publish your project, the menu-structure file will be created.
 
-* =my-org-notes-index-complete=
+* =my-org-notes-sitemap-complete=
 
 #+begin_src emacs-lisp
-(defun sr-org-notes-index-complete ()
-  "Take the index-file and turn it into the menu-structure
+(defun sr-org-notes-sitemap-complete ()
+  "Take the sitemap-file and turn it into the menu-structure
 file for Marco Pratesi's phplayersmenu."
   (let* ((base-dir (file-name-as-directory (plist-get project-plist :base-directory)))
-         (orig (expand-file-name (concat base-dir (plist-get project-plist :index-filename))))
+         (orig (expand-file-name (concat base-dir (plist-get project-plist :sitemap-filename))))
          (strip-suffix (or (plist-get project-plist :base-extension) "org"))
          (add-suffix (or (plist-get project-plist :html-extension) "html"))
          (link-target (or (plist-get project-plist :menu/link-target) "_blank"))
