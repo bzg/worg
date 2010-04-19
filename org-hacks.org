@@ -1066,7 +1066,7 @@ nil if before the first headline."
         t))))
 #+END_SRC
 
-* Set org-agenda-files by filetag
+* Restrict org-agenda-files by filetag
   :PROPERTIES:
   :CUSTOM_ID: set-agenda-files-by-filetag
   :END:
@@ -1087,51 +1087,51 @@ The following functions allow for a more dynamic approach to selecting
 a subset of files based on filetags:
 
 #+begin_src emacs-lisp
-(defun my-org-agenda-files-by-filetag (&optional tag)
-  "Limit org agenda files only to those containing filetag."
-  (interactive)
-  (let* ((tagslist (my-org-get-all-filetags))
-	 (ftag (or tag 
-		   (completing-read "Tag: " 
-				    (mapcar 'car tagslist)))))
-    (setq org-agenda-files (cdr (assoc ftag tagslist)))))
-
-(defun my-org-get-all-filetags ()
-  "Get list of filetags from all default org-files."
-  (let ((files 
-	 (my-org-list-files 
-	  my-org-agenda-directories my-org-agenda-extensions))
-	(tagslist nil)
-	x)
-    (save-window-excursion
-      (while (setq x (pop files))
-	(set-buffer (find-file-noselect x))
-	(mapc
-	 (lambda (y)
-	   (let ((tagfiles (assoc y tagslist)))
-	     (if tagfiles
-		 (setcdr tagfiles (cons x (cdr tagfiles)))
-	       (add-to-list 'tagslist (list y x)))))
-	 (my-org-get-filetags)))
-      tagslist)))
-
-(defun my-org-get-filetags ()
-  "Get list of filetags for current buffer"
-  (let ((ftags org-file-tags)
-	x)
-    (mapcar 
-     (lambda (x)
-       (org-substring-no-properties x))
-     ftags)))
+  (defun my-org-agenda-files-by-filetag (&optional tag)
+    "Restrict org agenda files only to those containing filetag."
+    (interactive)
+    (let* ((tagslist (my-org-get-all-filetags))
+           (ftag (or tag 
+                     (completing-read "Tag: " 
+                                      (mapcar 'car tagslist)))))
+      (setq org-agenda-restrict nil)
+      (put 'org-agenda-files 'org-restrict (cdr (assoc ftag tagslist)))
+      (setq org-agenda-overriding-restriction 'files)))
+  
+  (defun my-org-get-all-filetags ()
+    "Get list of filetags from all default org-files."
+    (let ((files org-agenda-files)
+          tagslist x)
+      (save-window-excursion
+        (while (setq x (pop files))
+          (set-buffer (find-file-noselect x))
+          (mapc
+           (lambda (y)
+             (let ((tagfiles (assoc y tagslist)))
+               (if tagfiles
+                   (setcdr tagfiles (cons x (cdr tagfiles)))
+                 (add-to-list 'tagslist (list y x)))))
+           (my-org-get-filetags)))
+        tagslist)))
+  
+  (defun my-org-get-filetags ()
+    "Get list of filetags for current buffer"
+    (let ((ftags org-file-tags)
+          x)
+      (mapcar 
+       (lambda (x)
+         (org-substring-no-properties x))
+       ftags)))
 #+end_src
 
 Calling my-org-agenda-files-by-filetag results in a prompt with all
 filetags in your "normal" agenda files. When you select a tag,
-org-agenda-files will be set only to those files containing that
-filetag.
+org-agenda-files will be restricted to only those files containing the
+filetag. To release the restriction, type C-c C-x >
+(org-agenda-remove-restriction-lock).
 
-This functionality relies on a few other functions that abstract the
-process of setting org-agenda-files:
+* Make it easier to set org-agenda-files from multiple directories
+  - Matt Lundin
 
 #+begin_src emacs-lisp
   (defun my-org-list-files (dirs ext)
@@ -1172,8 +1172,8 @@ process of setting org-agenda-files:
   (defvar my-org-agenda-extensions '(".org")
     "List of extensions of agenda files")
   
-  (setq my-org-agenda-directories '("~/org/"))
-  (setq my-org-agenda-extensions '(".org"))
+  (setq my-org-agenda-directories '("~/org/" "~/work/"))
+  (setq my-org-agenda-extensions '(".org" ".ref"))
   
   (defun my-org-set-agenda-files ()
     (interactive)
@@ -1185,11 +1185,12 @@ process of setting org-agenda-files:
 #+end_src
 
 The code above will set your "default" agenda files to all files
-ending in ".org" in the directory "~/org/". You can change these values
-by setting the variables my-org-agenda-extensions and
-my-org-agenda-directories. The function my-org-agenda-files-by-filetag
-uses these two variables to determine which files to search for
-filetags (i.e., the larger set from which the subset will be drawn).
+ending in ".org" and ".ref" in the directories "~/org/" and "~/work/".
+You can change these values by setting the variables
+my-org-agenda-extensions and my-org-agenda-directories. The function
+my-org-agenda-files-by-filetag uses these two variables to determine
+which files to search for filetags (i.e., the larger set from which
+the subset will be drawn).
 
 You can also easily use my-org-list-files to "mix and match"
 directories and extensions to generate different lists of agenda
