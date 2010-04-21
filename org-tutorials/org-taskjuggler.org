@@ -29,7 +29,7 @@ You start out as you normally would by breaking down the project into
 tasks. Let's take the following example where you have a project to
 create an accounting software:
 
-#+BEGIN_EXAMPLE
+#+BEGIN_SRC org
 * Accounting Software
 
 ** Specification
@@ -50,15 +50,15 @@ create an accounting software:
 *** Technology Preview
 *** Beta version
 *** Ship Product to Customer
-#+END_EXAMPLE
+#+END_SRC
 
 * Estimate the effort
 Now that you've figured out the tasks it's time to estimate the
 efforts for each task. By using column view this can be done very
-efficiently. It also helps to define the COLUMNS and default values
+efficiently. It also helps to define the =COLUMNS= and default values
 for the Effort property as shown in the following example
 
-#+BEGIN_EXAMPLE
+#+BEGIN_SRC org
 #+PROPERTY: Effort_ALL 2.0 5.0 10.0 20.0 30.0 35.0 50.0 
 #+COLUMNS: %70ITEM(Task) %Effort %allocate 
 
@@ -107,12 +107,12 @@ for the Effort property as shown in the following example
 *** Technology Preview
 *** Beta version
 *** Ship Product to Customer
-#+END_EXAMPLE
+#+END_SRC
 
 * Generate a Gantt chart
 Before you now export the project to TaskJuggler you need to tell the
 exporter in which tree it can find the tasks. You do this by adding
-the tag taskjuggler_project[fn:1] to the node "Accounting Software".
+the tag ~taskjuggler_project~ to the node "Accounting Software"[fn:1].
 Do this by moving to the "Accounting Software" headline and typing the
 following:
 
@@ -141,10 +141,10 @@ leveled.
 The next step is to list all the resources working on the project and
 assign the tasks to them. Create a node for the resources. You can
 group the resources by creating hierarchies. Tag the resource tree
-with the tag taskjuggler_resource so that the exporter knows where to
-look for resource definitions
+with the tag ~taskjuggler_resource~ so that the exporter knows where to
+look for resource definitions[fn:2].
 
-#+BEGIN_SRC
+#+BEGIN_SRC org
 * Resources					       :taskjuggler_resource:
 ** Developers
    :PROPERTIES:
@@ -174,7 +174,7 @@ look for resource definitions
 As you'll note I also added some ID properties to some of the
 resources (or resource groups). I will use these IDs to allocate the
 resources to the tasks. The exporter will create unique ids for the
-resources automatically[fn:2], but if you want to use short forms it's
+resources automatically[fn:3], but if you want to use short forms it's
 better to define IDs for your resources. This will also allow you to
 define default values for the allocation as follows:
 
@@ -182,7 +182,7 @@ define default values for the allocation as follows:
 
 The easiest way to assign resources is again the column view mode.
 There is no need to allocate a resource to every task, as allocations
-are inherited in TaskJuggler[fn:3]. You'll note in the screenshot
+are inherited in TaskJuggler[fn:4]. You'll note in the screenshot
 below that some tasks have more than one resource assigned to them.
 TaskJuggler will calculate the duration of the task based on the
 effort and the resources working on this task.
@@ -206,26 +206,26 @@ There are several ways to define dependencies between tasks. When
 coming from an org mode background you probably want to define them
 using the facilities provided by org mode, which are either 
 
-  - The ORDERED property which allows you to state that the child
+  - The =ORDERED= property which allows you to state that the child
     tasks have to be completed in the order they appear (top most
     first).
 
-  - The BLOCKER property which allows you to state that a task depends
-    on either 
+  - The =BLOCKER= property which allows you to state that a task
+    depends on either
     - a previous sibling ("previous-sibling") or 
     - any other task by stating the ID of the predecessor
 
-Lastly there is also the 'depends' property which corresponds to the
-TaskJuggler terminology. It can be used the same way as the BLOCKER
+Lastly there is also the ~depends~ property which corresponds to the
+TaskJuggler terminology. It can be used the same way as the =BLOCKER=
 property. This is illustrated below where the "Software Development"
 for example is blocked by the task "Specification", i.e. it has to
 wait until the specification is done. The task "Software Development"
-is defined as ORDERED, i.e. all the subtasks of it have to be
+is defined as =ORDERED=, i.e. all the subtasks of it have to be
 completed in sequence. Another example is the milestone "Ship Product
 to Customer" which is waiting until the Beta test and the Manual are
 done.
 
-#+BEGIN_SRC
+#+BEGIN_SRC org
 #+PROPERTY: Effort_ALL 2.0 5.0 10.0 20.0 30.0 35.0 50.0 
 #+PROPERTY: allocate_ALL dev doc test
 #+COLUMNS: %70ITEM(Task) %Effort %allocate 
@@ -341,7 +341,6 @@ done.
     :PROPERTIES:
     :ID:       test
     :END:
-
 #+END_SRC
 
 If you export the example above you'll TaskJuggler will schedule the
@@ -365,25 +364,27 @@ TaskJuggler. An example is linked below:
 
 * Export of other properties
 Generally the exporter writes a node property that is known to
-TaskJuggler (such as shift, booking, efficiency, journalentry, rate
-for resources or account, start, note, duration, end, journalentry,
-milestone, reference, responsible, scheduling, etc for tasks) as is to
-the TaskJuggler file.
+TaskJuggler (such as ~shift~, ~booking~, ~efficiency~, ~journalentry~,
+~rate~ for resources or ~account~, ~start~, ~note~, ~duration~, ~end~,
+~journalentry~, ~milestone~, ~reference~, ~responsible~, ~scheduling~,
+etc for tasks) as is to the TaskJuggler file.
 
 Other properties such as completeness or priority are derived from
 implizit information in the org mode file. The TODO state for example
 determines the completeness. A task will be exported with 100%
-complete ("complete 100") if it is marked as done. The priority of a
+complete (~complete 100~) if it is marked as done. The priority of a
 task will be determined through its priority cookie.
 
 
 * Footnotes
 [fn:1] You can customize this tag
 
-[fn:2] by downcasing the headline, replacing non-ascii characters with
+[fn:2] Again, of course this tag can be customized
+
+[fn:3] by downcasing the headline, replacing non-ascii characters with
 '_' and picking the the first word if it is unique
 
-[fn:3] In TaskJuggler the allocations are cumilative, the exporter
+[fn:4] In TaskJuggler the allocations are cumilative, the exporter
 however adds some code so that inherited allocation are ignored when
 explicitly assigning a resource.
 
