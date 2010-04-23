@@ -1277,17 +1277,15 @@ whereas before I had a tendency to forget that it was there.
 #+end_src
 
 * Send html messages and attachments with Wanderlust
-** Org-mime
-*note*: [[file:org-contrib/org-mime.org][Org-mime]] has recently been added to the contrib directory of
- Org-mode implementing this functionality for both Wanderlust and
- Gnus.
+  -- David Maus
 
-** non Org-mime approach
-These two hacks below add the capability of using Org to send out html
-via email.  Both focus on Wanderlust but could be easily adopted for
-Gnus, I think. -- David Maus
+/Note/: The module [[file:org-contrib/org-mime.org][Org-mime]] in Org's contrib directory provides
+similar functionality for both Wanderlust and Gnus.  The hack below is
+still somewhat different: It allows you to toggle sending of html
+messages within Wanderlust transparently.  I.e. html markup of the
+message body is created right before sending starts.
 
-*** Send HTML message
+** Send HTML message
 
 Putting the code below in your .emacs adds following four functions:
 
@@ -1411,7 +1409,7 @@ you send HTML that looks quite good.
   (add-hook 'wl-draft-send-hook 'dmj/wl-send-html-message-maybe)
 #+end_src
 
-*** Attach HTML of region or subtree
+** Attach HTML of region or subtree
 
 Instead of sending a complete HTML message you might only send parts
 of an Org file as HTML for the poor souls who are plagued with
@@ -1451,7 +1449,7 @@ complete subtree otherwise.
         (message "html export done, pushed to kill ring and clipboard"))))
 #+end_src
 
-*** Adopting for Gnus
+** Adopting for Gnus
 
 The whole magic lies in the special strings that mark a HTML
 attachment.  So you might just have to find out what these special
