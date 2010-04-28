@@ -626,7 +626,6 @@ parameters for the remember frame:
 Setting remember-frame-alist to =((width . 80) (height . 15)))= give a
 reasonable size for the frame.
 
-
 * Add an effort estimate on the fly when clocking in
 
 You can use =org-clock-in-prepare-hook= to add an effort estimate.
@@ -1278,17 +1277,15 @@ whereas before I had a tendency to forget that it was there.
 #+end_src
 
 * Send html messages and attachments with Wanderlust
-** Org-mime
-*note*: [[file:org-contrib/org-mime.org][Org-mime]] has recently been added to the contrib directory of
- Org-mode implementing this functionality for both Wanderlust and
- Gnus.
+  -- David Maus
 
-** non Org-mime approach
-These two hacks below add the capability of using Org to send out html
-via email.  Both focus on Wanderlust but could be easily adopted for
-Gnus, I think. -- David Maus
+/Note/: The module [[file:org-contrib/org-mime.org][Org-mime]] in Org's contrib directory provides
+similar functionality for both Wanderlust and Gnus.  The hack below is
+still somewhat different: It allows you to toggle sending of html
+messages within Wanderlust transparently.  I.e. html markup of the
+message body is created right before sending starts.
 
-*** Send HTML message
+** Send HTML message
 
 Putting the code below in your .emacs adds following four functions:
 
@@ -1412,7 +1409,7 @@ you send HTML that looks quite good.
   (add-hook 'wl-draft-send-hook 'dmj/wl-send-html-message-maybe)
 #+end_src
 
-*** Attach HTML of region or subtree
+** Attach HTML of region or subtree
 
 Instead of sending a complete HTML message you might only send parts
 of an Org file as HTML for the poor souls who are plagued with
@@ -1452,8 +1449,44 @@ complete subtree otherwise.
         (message "html export done, pushed to kill ring and clipboard"))))
 #+end_src
 
-*** Adopting for Gnus
+** Adopting for Gnus
 
 The whole magic lies in the special strings that mark a HTML
 attachment.  So you might just have to find out what these special
 strings are in message-mode and modify the functions accordingly.
+* Archive in a date tree
+Posted to Org-mode mailing list by Osamu Okano
+[2010-04-21 Wed]
+#+begin_src emacs-lisp
+  ;; (setq org-archive-location "%s_archive::date-tree")
+  (defadvice org-archive-subtree
+    (around org-archive-subtree-to-data-tree activate)
+    "org-archive-subtree to date-tree"
+    (if
+        (string= "date-tree"
+                 (org-extract-archive-heading
+                  (org-get-local-archive-location)))
+        (let* ((dct (decode-time (org-current-time)))
+               (y (nth 5 dct))
+               (m (nth 4 dct))
+               (d (nth 3 dct))
+               (this-buffer (current-buffer))
+               (location (org-get-local-archive-location))
+               (afile (org-extract-archive-file location))
+               (org-archive-location
+                (format "%s::*** %04d-%02d-%02d %s" afile y m d
+                        (format-time-string "%A" (encode-time 0 0 0 d m y)))))
+          (message "afile=%s" afile)
+          (unless afile
+            (error "Invalid `org-archive-location'"))
+          (save-excursion
+            (switch-to-buffer (find-file-noselect afile))
+            (org-datetree-find-year-create y)
+            (org-datetree-find-month-create y m)
+            (org-datetree-find-day-create y m d)
+            (widen)
+            (switch-to-buffer this-buffer))
+          ad-do-it)
+      ad-do-it))
+#+end_src
+
