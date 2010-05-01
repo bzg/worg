@@ -19,33 +19,67 @@ Check an Org-mode environment.
  buffer both safe and useful.
 
 * Instructions
-  - Download [[http://orgmode.org/worg/sources/org-contrib/babel/examples/org-check.org][org-check.org]] from the git repository, or just grab the [[http://orgmode.org/worg/sources/org-contrib/babel/examples/org-check.org][file]]
-  - Calculate test results by putting point in the table and pressing =C-u C-c *=
+  - Download the file [[http://org-babel.tsdye2.com/org-check.org][org-check.org]]
+  - Calculate the table by putting point in the table and pressing =C-u C-c *=
   - Check the =results= column
     - if you see all "pass" results, then your environment passes
     - if you see "fail" or other results, then follow the link in the
       =task= column for an explanation 
 
-| task          | topic            | command                    | results |
-|---------------+------------------+----------------------------+---------|
-| [[*Preview%20LaTeX][preview latex]] |                  |                            |         |
-|               | [[* latex][latex]]            | check-latex-command        | pass    |
-|               | [[* check-latex-system][latex-system]]     | check-latex-system         | pass    |
-|               | [[* dvipng][dvipng]]           | check-dvipng-command       | pass    |
-|               | [[*check-dvipng-system][dvipng-system]]    | check-dvipng-system        | pass    |
-|               | [[*check-latex-scale][latex-scale]]      | check-latex-scale          | 1.0     |
-| [[*Make%20pdf%20files][make pdfs]]     |                  |                            |         |
-|               | [[* latex][latex]]            | check-latex-command        | pass    |
-| [[*Agenda][agenda]]        |                  |                            |         |
-|               | [[* org-agenda-files][org-agenda-files]] | check-org-agenda-files-set | pass    |
+| task          | topic            | command                    | results  |
+|---------------+------------------+----------------------------+----------|
+| [[*Export%20LaTeX][LaTeX export]]  |                  |                            |          |
+|               | [[*Export%20LaTeX%20classes][LaTeX classes]]    | check-latex-classes        | pass     |
+| [[*Preview%20LaTeX][preview latex]] |                  |                            |          |
+|               | [[* latex][latex]]            | check-latex-command        | pass     |
+|               | [[* check-latex-system][latex-system]]     | check-latex-system         | pass     |
+|               | [[* dvipng][dvipng]]           | check-dvipng-command       | pass     |
+|               | [[*check-dvipng-system][dvipng-system]]    | check-dvipng-system        | pass     |
+|               | [[*check-latex-scale][latex-scale]]      | check-latex-scale          | 1.0      |
+| [[*Make%20pdf%20files][make pdfs]]     |                  |                            |          |
+|               | [[* latex][latex]]            | check-latex-command        | pass     |
+|               | [[*LaTeX%20engine][latex-engine]]     | check-latex-engine         | pdflatex |
+|               | [[*LaTeX%20engine%20present][engine-present]]   | check-engine-present       | pass     |
+| [[*Agenda][agenda]]        |                  |                            |          |
+|               | [[* org-agenda-files][org-agenda-files]] | check-org-agenda-files-set | pass     |
 #+TBLFM: $4='(sbe $3)
 
 * Commands
 
+** Export LaTeX classes
+#+srcname: check-latex-classes
+#+begin_src emacs-lisp :results silent
+  (if (null org-export-latex-classes)
+      "fail: set =org-export-latex-classes="
+    "pass")
+  
+#+end_src
+
+** LaTeX engine specified
+   - Returns the first argument of the first entry in org-latex-to-pdf-process
+   - This is typically a call to the LaTeX engine
+   - If fail is returned, then the variable =org-latex-to-pdf-process=
+     needs to be set
+#+srcname: check-latex-engine
+#+begin_src emacs-lisp :results silent
+  (require 'org-latex)
+  (if  (null org-latex-to-pdf-process) "fail" (substring (first org-latex-to-pdf-process) 0 (string-match "\\ " (first org-latex-to-pdf-process))) )
+#+end_src
+
+** LaTeX engine present
+   - Checks if the LaTeX engine specified by
+     =org-latex-to-pdf-process= can be found by Org-mode
+   - Return fail if  =check-latex-engine= returns fail
+#+srcname: check-engine-present
+#+begin_src emacs-lisp :var x=check-latex-engine :results silent
+  (if (string-equal x "fail") x (if (org-check-external-command x "" t)
+  "pass" "fail"))
+#+end_src
+
 ** =latex= command
-The =latex= command must be findable by Emacs in order to generate
-pdfs or preview latex fragments in buffer.  This command checks to see
-if latex is found anywhere on =exec-path=.
+   - The =latex= command must be findable by Emacs in order to generate
+     pdfs or preview latex fragments in-buffer 
+   - This command checks to see if latex is found anywhere on =exec-path=
 
 #+srcname: check-latex-command
 #+begin_src emacs-lisp :results silent
@@ -109,6 +143,8 @@ Report the scale setting for inline images.  Default is 1.0.
 #+end_src
 
 * Tasks
+** Export LaTeX
+   - [[http://orgmode.org/worg/org-tutorials/org-latex-export.php][LaTeX Export Tutorial]]
 ** Preview LaTeX
    - Previewing LaTeX in the Org-mode buffer requires: 
      - a working LaTeX installation, including the =latex= executable
@@ -125,8 +161,10 @@ Report the scale setting for inline images.  Default is 1.0.
    - Image size can be scaled using the =:scale= property of the
      variable =org-format-latex-options=
 ** Make pdf files
+   - Pdf files are created for in-buffer preview and as the
+     end-product of LaTeX export
 ** Agenda
-
+   - The agenda is key to using Org-mode effectively
 * Notes                                                            :noexport:
 ** TODO Provide a link to the org-check.org file in Instructions
 ** TODO Check, does Windows have something like which?
