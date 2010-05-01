@@ -13,7 +13,7 @@
 
 
 * Introduction
-Org mode is an excellent tool for project planning as Peter Jones has
+[[http://orgmode.org/][Org mode]] is an excellent tool for project planning as Peter Jones has
 shown in his article on [[http://www.contextualdevelopment.com/articles/2008/project-planning][project planning]]. He first breaks the project
 into features and tasks, then estimates the effort and from that
 presents a project plan. In this tutorial we will take this one step
@@ -21,7 +21,7 @@ further, assign resources to the tasks, schedule the tasks and create
 the corresponding gantt chart for this project.
 
 We will be using [[http://www.taskjuggler.org/][TaskJuggler]] to handle the task scheduling, resource
-leveling and creation of a miriad of charts (such as [[http://en.wikipedia.org/wiki/Gantt_chart][Gantt chart]]) for
+leveling and creation of a myriad of charts (such as [[http://en.wikipedia.org/wiki/Gantt_chart][Gantt chart]]) for
 your customer or your [[http://en.wikipedia.org/wiki/Pointy-haired_Boss][Pointy-haired Boss]].
 
 * Plan your project
@@ -155,41 +155,42 @@ look for resource definitions[fn:2].
 * Resources					       :taskjuggler_resource:
 ** Developers
    :PROPERTIES:
-   :ID:       dev
+   :resource_id: dev
    :END:
 *** Paul Smith
     :PROPERTIES:
-    :ID:       paul
+    :resource_id: paul
     :END:
 *** Sébastien Bono
     :PROPERTIES:
-    :ID:       seb
+    :resource_id: seb
     :END:
 *** Klaus Müller
 
 ** Others
 *** Peter Murphy
     :PROPERTIES:
-    :ID:       doc
+    :resource_id: doc
     :END:
 *** Dim Sung
     :PROPERTIES:
-    :ID:       test
+    :resource_id: test
     :END:
 #+END_SRC
 
-As you'll note I also added some ID properties to some of the
-resources (or resource groups). I will use these IDs to allocate the
-resources to the tasks. The exporter will create unique ids for the
-resources automatically[fn:3], but if you want to use short forms it's
-better to define IDs for your resources. This will also allow you to
-define default values for the allocation as follows:
+As you'll note I also added some ~resource_id~ properties to some of
+the resources (or resource groups). I will use these identifiers to
+allocate the resources to the tasks. The exporter will create unique
+ids for the resources automatically[fn:3], but if you want to use
+short forms it's better to define ~resource_id~ properties for your
+resources. This will also allow you to define default values for the
+allocation as follows:
 
 : #+PROPERTY: allocate_ALL dev doc test
 
 The easiest way to assign resources is again the column view mode.
 There is no need to allocate a resource to every task, as allocations
-are inherited in TaskJuggler[fn:4]. You'll note in the screenshot
+are inherited in TaskJuggler[fn:4]. You'll note in the screen shot
 below that some tasks have more than one resource assigned to them.
 TaskJuggler will calculate the duration of the task based on the
 effort and the resources working on this task.
@@ -200,7 +201,7 @@ effort and the resources working on this task.
 
 If we now export the project you'll see that TaskJuggler scheduled
 some tasks in parallel (as there are several resources now which can
-work in parallel). See the screenshot below:
+work in parallel). See the screen shot below:
 
 #+CAPTION: Gantt Chart with multiple resources
 #+ATTR_HTML: alt="Gantt Chart with multiple resources"
@@ -220,7 +221,8 @@ using the facilities provided by org mode, which are either
   - The =BLOCKER= property which allows you to state that a task
     depends on either
     - a previous sibling ("previous-sibling") or 
-    - any other task by stating the ID of the predecessor
+    - any other task by stating the ~task_id~ property of the
+      predecessor
 
 Again, it is probably easiest to define the dependencies using the
 column view as shown below in the screen shot:
@@ -272,7 +274,7 @@ done.
 *** Back-End Functions
     :PROPERTIES:
     :Effort:   30.0
-    :ID:       back_end
+    :task_id:  back_end
     :END:
 
 *** Graphical User Interface
@@ -290,20 +292,20 @@ done.
 *** Alpha Test
     :PROPERTIES:
     :Effort:   5.0
-    :ID:       alpha
+    :task_id:  alpha
     :END:
 
 *** Beta Test
     :PROPERTIES:
     :Effort:   20.0
-    :ID:       beta
+    :task_id:  beta
     :allocate: test, paul
     :END:
 
 ** Manual
    :PROPERTIES:
    :Effort:   50.0
-   :ID:       manual
+   :task_id:  manual
    :BLOCKER:  start
    :allocate: doc
    :END:
@@ -311,7 +313,7 @@ done.
 ** Milestones
 *** Project start
     :PROPERTIES:
-    :ID:       start
+    :task_id:  start
     :END:
 
 *** Technology Preview
@@ -333,27 +335,27 @@ done.
 * Resources					       :taskjuggler_resource:
 ** Developers
    :PROPERTIES:
-   :ID:       dev
+   :resource_id: dev
    :END:
 *** Paul Smith
     :PROPERTIES:
-    :ID:       paul
+    :resource_id: paul
     :END:
 *** Sébastien Bono
     :PROPERTIES:
-    :ID:       seb
+    :resource_id: seb
     :END:
 *** Klaus Müller
 
 ** Others
 *** Peter Murphy
     :PROPERTIES:
-    :ID:       doc
+    :resource_id: doc
     :limits:   { dailymax 6.4h }
     :END:
 *** Dim Sung
     :PROPERTIES:
-    :ID:       test
+    :resource_id: test
     :END:
 #+END_SRC
 
@@ -371,10 +373,8 @@ will be and what they are working on. See below for a screen shot:
 #+ATTR_HTML: alt="Resource usage chart"
 [[file:../images/taskjuggler/resource-graph.png]]
 
-Finally you can generate good-looking project plans by printing from
-TaskJuggler. An example is linked below:
-
-[[file:../images/taskjuggler/project-plan.pdf]]
+Finally you can generate [[file:../images/taskjuggler/project-plan.pdf][good-looking project plans]] in PDF by printing
+from TaskJuggler. This will make any [[http://en.wikipedia.org/wiki/Pointy-haired_Boss][Pointy-haired Boss]] happy.
 
 * Export of other properties
 Generally the exporter writes a node property that is known to
@@ -384,7 +384,7 @@ TaskJuggler (such as ~shift~, ~booking~, ~efficiency~, ~journalentry~,
 etc for tasks) as is to the TaskJuggler file.
 
 Other properties such as completeness or priority are derived from
-implizit information in the org mode file. The TODO state for example
+implicit information in the org mode file. The TODO state for example
 determines the completeness. A task will be exported with 100%
 complete (~complete 100~) if it is marked as done. The priority of a
 task will be determined through its priority cookie.
@@ -398,7 +398,7 @@ task will be determined through its priority cookie.
 [fn:3] by downcasing the headline, replacing non-ascii characters with
 '_' and picking the the first word if it is unique
 
-[fn:4] In TaskJuggler the allocations are cumilative, the exporter
+[fn:4] In TaskJuggler the allocations are cumulative, the exporter
 however adds some code so that inherited allocation are ignored when
 explicitly assigning a resource.
 
