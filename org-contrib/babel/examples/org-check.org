@@ -26,28 +26,88 @@ Check an Org-mode environment.
     - if you see "fail" or other results, then follow the link in the
       =task= column for an explanation 
 
-| task          | topic            | command                    | results  |
-|---------------+------------------+----------------------------+----------|
-| [[*Export%20LaTeX][LaTeX export]]  |                  |                            |          |
-|               | [[*Export%20LaTeX%20classes][LaTeX classes]]    | check-latex-classes        | pass     |
-| [[*Preview%20LaTeX][preview latex]] |                  |                            |          |
-|               | [[* latex][latex]]            | check-latex-command        | pass     |
-|               | [[* check-latex-system][latex-system]]     | check-latex-system         | pass     |
-|               | [[* dvipng][dvipng]]           | check-dvipng-command       | pass     |
-|               | [[*check-dvipng-system][dvipng-system]]    | check-dvipng-system        | pass     |
-|               | [[*check-latex-scale][latex-scale]]      | check-latex-scale          | 1.0      |
-| [[*Make%20pdf%20files][make pdfs]]     |                  |                            |          |
-|               | [[* latex][latex]]            | check-latex-command        | pass     |
-|               | [[*LaTeX%20engine][latex-engine]]     | check-latex-engine         | pdflatex |
-|               | [[*LaTeX%20engine%20present][engine-present]]   | check-engine-present       | pass     |
-| [[*Agenda][agenda]]        |                  |                            |          |
-|               | [[* org-agenda-files][org-agenda-files]] | check-org-agenda-files-set | pass     |
-#+TBLFM: $4='(sbe $3)
+| task          | topic          | command            | arg       | results  |
+|---------------+----------------+--------------------+-----------+----------|
+| [[*Agenda][agenda]]        |                |                    |           |          |
+|               |                | chk-agenda-files   |           | pass     |
+| [[*Export%20LaTeX][LaTeX export]]  |                |                    |           |          |
+|               | [[*Export%20LaTeX%20classes][LaTeX classes]]  | chk-latex-classes  |           | pass     |
+| [[*Preview%20LaTeX][preview latex]] |                |                    |           |          |
+|               | [[* latex][latex]]          | chk-ext-cmd        | "latex"   | pass     |
+|               | [[* chk-latex-system][latex-system]]   | chk-sys-cmd        | "latex"   | pass     |
+|               | [[* dvipng][dvipng]]         | chk-dvipng-command |           | pass     |
+|               | [[*chk-dvipng-system][dvipng-system]]  | chk-dvipng-system  |           | pass     |
+|               | [[*chk-latex-scale][latex-scale]]    | chk-latex-scale    |           | 1.0      |
+| [[*Make%20pdf%20files][make pdfs]]     |                |                    |           |          |
+|               | [[* latex][latex]]          | chk-ext-cmd        | "latex"   | pass     |
+|               | [[* chk-latex-system][latex-system]]   | chk-sys-cmd        | "latex"   | pass     |
+|               | [[*LaTeX%20engine][latex-engine]]   | chk-latex-engine   |           | pdflatex |
+|               | [[*LaTeX%20engine%20present][engine-present]] | chk-engine-present |           | pass     |
+| [[*Babel][Org-babel]]     |                |                    |           |          |
+|               |                | chk-babel-lang     | "R"       | pass     |
+|               |                | chk-ext-cmd        | "R"       | pass     |
+|               |                | chk-sys-cmd        | "R"       | pass     |
+|---------------+----------------+--------------------+-----------+----------|
+|               |                | chk-babel-lang     | "C"       | fail     |
+|               |                | chk-ext-cmd        | "cc"      | pass     |
+|               |                | chk-sys-cmd        | "cc"      | pass     |
+|---------------+----------------+--------------------+-----------+----------|
+|               |                | chk-babel-lang     | "clojure" | fail     |
+|               |                | chk-ext-cmd        | "clojure" | fail     |
+|               |                | chk-sys-cmd        | "clojure" | fail     |
+|---------------+----------------+--------------------+-----------+----------|
+|               |                | chk-babel-lang     | "ditaa"   | pass     |
+|---------------+----------------+--------------------+-----------+----------|
+|               |                | chk-babel-lang     | "css"     | fail     |
+|---------------+----------------+--------------------+-----------+----------|
+|               |                | chk-babel-lang     | "gnuplot" | fail     |
+|               |                | chk-ext-cmd        | "gnuplot" | fail     |
+|               |                | chk-sys-cmd        | "gnuplot" | fail     |
+|---------------+----------------+--------------------+-----------+----------|
+|               |                | chk-babel-lang     | "haskell" | fail     |
+|               |                | chk-ext-cmd        | "haskell" | fail     |
+|               |                | chk-sys-cmd        | "haskell" | fail     |
+|---------------+----------------+--------------------+-----------+----------|
+|               |                | chk-babel-lang     | "latex"   | pass     |
+|               |                | chk-ext-cmd        | "latex"   | pass     |
+|               |                | chk-sys-cmd        | "latex"   | pass     |
+|---------------+----------------+--------------------+-----------+----------|
+|               |                | chk-babel-lang     | "matlab"  | fail     |
+|               |                | chk-ext-cmd        | "matlab"  | fail     |
+|               |                | chk-sys-cmd        | "matlab"  | fail     |
+|---------------+----------------+--------------------+-----------+----------|
+|               |                | chk-babel-lang     | "perl"    | fail     |
+|               |                | chk-ext-cmd        | "perl"    | pass     |
+|               |                | chk-sys-cmd        | "perl"    | pass     |
+|---------------+----------------+--------------------+-----------+----------|
+|               |                | chk-babel-lang     | "python"  | pass     |
+|               |                | chk-ext-cmd        | "python"  | pass     |
+|               |                | chk-sys-cmd        | "python"  | pass     |
+|---------------+----------------+--------------------+-----------+----------|
+|               |                | chk-babel-lang     | "ruby"    | fail     |
+|               |                | chk-ext-cmd        | "ruby"    | pass     |
+|               |                | chk-sys-cmd        | "ruby"    | pass     |
+|---------------+----------------+--------------------+-----------+----------|
+#+TBLFM: $5='(if (> (length $4) 0) (sbe $3 (x $4)) (sbe $3))
 
 * Commands
+** Babel languages
+   - Checks if a language can be tangled by Org-babel
+#+srcname: chk-babel-lang(x)
+#+begin_src emacs-lisp :results silent
+  (let ((z  (mapcar #'(lambda (y)
+                (first y)) org-babel-tangle-langs )
+  )) (if (member x z) "pass" "fail") )
+#+end_src
+
+** Check external commands
+#+srcname: chk-ext-cmd(x)
+#+begin_src emacs-lisp :results silent
+    (if (org-check-external-command x "" t) "pass" "fail") 
+#+end_src
 
 ** Export LaTeX classes
-#+srcname: check-latex-classes
+#+srcname: chk-latex-classes
 #+begin_src emacs-lisp :results silent
   (if (null org-export-latex-classes)
       "fail: set =org-export-latex-classes="
@@ -56,11 +116,11 @@ Check an Org-mode environment.
 #+end_src
 
 ** LaTeX engine specified
-   - Returns the first argument of the first entry in org-latex-to-pdf-process
+   - Returns the first argument of the first entry in =org-latex-to-pdf-process=
    - This is typically a call to the LaTeX engine
-   - If fail is returned, then the variable =org-latex-to-pdf-process=
+   - If =fail= is returned, then the variable =org-latex-to-pdf-process=
      needs to be set
-#+srcname: check-latex-engine
+#+srcname: chk-latex-engine
 #+begin_src emacs-lisp :results silent
   (require 'org-latex)
   (if  (null org-latex-to-pdf-process) "fail" (substring (first org-latex-to-pdf-process) 0 (string-match "\\ " (first org-latex-to-pdf-process))) )
@@ -69,9 +129,9 @@ Check an Org-mode environment.
 ** LaTeX engine present
    - Checks if the LaTeX engine specified by
      =org-latex-to-pdf-process= can be found by Org-mode
-   - Return fail if  =check-latex-engine= returns fail
-#+srcname: check-engine-present
-#+begin_src emacs-lisp :var x=check-latex-engine :results silent
+   - Returns =fail= if  =chk-latex-engine= returns =fail=
+#+srcname: chk-engine-present
+#+begin_src emacs-lisp :var x=chk-latex-engine :results silent
   (if (string-equal x "fail") x (if (org-check-external-command x "" t)
   "pass" "fail"))
 #+end_src
@@ -81,7 +141,7 @@ Check an Org-mode environment.
      pdfs or preview latex fragments in-buffer 
    - This command checks to see if latex is found anywhere on =exec-path=
 
-#+srcname: check-latex-command
+#+srcname: chk-latex-command
 #+begin_src emacs-lisp :results silent
    (if (org-check-external-command "latex" "" t) "pass" "fail")
 #+end_src
@@ -90,20 +150,18 @@ Check an Org-mode environment.
 The =dvipng= command must be findable by Emacs in order to preview
 latex fragments in buffer.  This command checks for dvipng on =exec-path=.
 
-#+srcname: check-dvipng-command
+#+srcname: chk-dvipng-command
 #+begin_src emacs-lisp :results silent
    (if (org-check-external-command "dvipng" "" t) "pass" "fail")
 #+end_src
    
-** =org-agenda-files= is very useful
-Although not explicitly required for normal use the `[[elisp:(progn (describe-variable 'org-agenda-files) (other-window 1))][org-agenda-files]]'
-variable is required for a number of useful org-mode commands
-including the following.
-- `[[elisp:(progn (describe-function 'org-agenda) (other-window 1))][org-agenda]]'
-- `[[elisp:(progn (describe-variable 'org-export-icalendar-combine-agenda-files) (other-window 1))][org-export-icalendar-combine-agenda-files]]'
-- others?
-
-#+srcname: check-org-agenda-files-set
+** =org-agenda-files= 
+   - The [[elisp:(progn (describe-variable 'org-agenda-files) (other-window 1))][org-agenda-files]] variable is required for a number of optional, but useful, Org-mode commands
+        - [[elisp:(progn (describe-function 'org-agenda) (other-window 1))][org-agenda]]
+        - [[elisp:(progn (describe-variable 'org-export-icalendar-combine-agenda-files) (other-window 1))][org-export-icalendar-combine-agenda-files]]
+        - others?
+   - It is [[http://orgmode.org/manual/Agenda-files.html#Agenda-files][easy to set]]
+#+srcname: chk-agenda-files
 #+begin_src emacs-lisp :results silent
   (if (null org-agenda-files)
       "consider setting [[* org-agenda-files][org-agenda-files]]"
@@ -111,22 +169,22 @@ including the following.
 #+end_src
 
 ** =check-latex-system=
-See if LaTeX is present on the *nix system, regardless of whether it
-is found on the Emacs =exec-path=.
-
-#+srcname: check-latex-system
-#+begin_src sh :results silent
-    if which latex > /dev/null;
+   - Check if x is present on the system path
+#+srcname: chk-sys-cmd(x)
+#+begin_src sh 
+    if which $x > /dev/null;
     then echo pass;
     else echo fail;
     fi
 #+end_src
 
+#+results: chk-latex-system
+: pass
 ** =check-dvipng-system=
 See if dvipng is present on the *nix system, regardless of whether it
 is found on the Emacs =exec-path=.
 
-#+srcname: check-dvipng-system
+#+srcname: chk-dvipng-system
 #+begin_src sh :results silent
     if which dvipng > /dev/null;
     then echo pass;
@@ -137,7 +195,7 @@ is found on the Emacs =exec-path=.
 ** =check-latex-scale=
 Report the scale setting for inline images.  Default is 1.0.
 
-#+srcname: check-latex-scale
+#+srcname: chk-latex-scale
 #+begin_src emacs-lisp :results silent
   (plist-get org-format-latex-options :scale)
 #+end_src
@@ -162,9 +220,14 @@ Report the scale setting for inline images.  Default is 1.0.
      variable =org-format-latex-options=
 ** Make pdf files
    - Pdf files are created for in-buffer preview and as the
-     end-product of LaTeX export
+     end-product of [[http://orgmode.org/worg/org-tutorials/org-latex-export.php#sec-7][LaTeX export]]
 ** Agenda
-   - The agenda is key to using Org-mode effectively
+   - The [[http://orgmode.org/manual/Agenda-Views.html#Agenda-Views][agenda]] is key to using Org-mode effectively
+** Babel
+   - [[http://orgmode.org/worg/org-contrib/babel/index.php][Org-babel]] extends the very excellent Org-mode with the ability to
+     execute code blocks
+   - [[http://orgmode.org/worg/org-contrib/babel/intro.php#getting-started][Org-babel configuration]] is a 5-step process that requires entries
+     in .emacs
 * Notes                                                            :noexport:
 ** TODO Provide a link to the org-check.org file in Instructions
 ** TODO Check, does Windows have something like which?
