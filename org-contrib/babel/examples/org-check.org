@@ -23,71 +23,69 @@ Check an Org-mode environment.
   - Calculate the table by putting point in the table and pressing =C-u C-c *=
   - Check the =results= column
     - if you see all "pass" results, then your environment passes
-    - if you see "fail" or other results, then follow the link in the
-      =task= column for an explanation 
+    - if you see "fail" or other unexpected results, then follow the
+      link in the =topic= column for an explanation
 
-| task          | topic          | command            | arg       | results  |
-|---------------+----------------+--------------------+-----------+----------|
-| [[*Agenda][agenda]]        |                |                    |           |          |
-|               |                | chk-agenda-files   |           | pass     |
-| [[*Export%20LaTeX][LaTeX export]]  |                |                    |           |          |
-|               | [[*Export%20LaTeX%20classes][LaTeX classes]]  | chk-latex-classes  |           | pass     |
-| [[*Preview%20LaTeX][preview latex]] |                |                    |           |          |
-|               | [[* latex][latex]]          | chk-ext-cmd        | "latex"   | pass     |
-|               | [[* chk-latex-system][latex-system]]   | chk-sys-cmd        | "latex"   | pass     |
-|               | [[* dvipng][dvipng]]         | chk-dvipng-command |           | pass     |
-|               | [[*chk-dvipng-system][dvipng-system]]  | chk-dvipng-system  |           | pass     |
-|               | [[*chk-latex-scale][latex-scale]]    | chk-latex-scale    |           | 1.0      |
-| [[*Make%20pdf%20files][make pdfs]]     |                |                    |           |          |
-|               | [[* latex][latex]]          | chk-ext-cmd        | "latex"   | pass     |
-|               | [[* chk-latex-system][latex-system]]   | chk-sys-cmd        | "latex"   | pass     |
-|               | [[*LaTeX%20engine][latex-engine]]   | chk-latex-engine   |           | pdflatex |
-|               | [[*LaTeX%20engine%20present][engine-present]] | chk-engine-present |           | pass     |
-| [[*Babel][Org-babel]]     |                |                    |           |          |
-|               |                | chk-babel-lang     | "R"       | pass     |
-|               |                | chk-ext-cmd        | "R"       | pass     |
-|               |                | chk-sys-cmd        | "R"       | pass     |
-|---------------+----------------+--------------------+-----------+----------|
-|               |                | chk-babel-lang     | "C"       | fail     |
-|               |                | chk-ext-cmd        | "cc"      | pass     |
-|               |                | chk-sys-cmd        | "cc"      | pass     |
-|---------------+----------------+--------------------+-----------+----------|
-|               |                | chk-babel-lang     | "clojure" | fail     |
-|               |                | chk-ext-cmd        | "clojure" | fail     |
-|               |                | chk-sys-cmd        | "clojure" | fail     |
-|---------------+----------------+--------------------+-----------+----------|
-|               |                | chk-babel-lang     | "ditaa"   | pass     |
-|---------------+----------------+--------------------+-----------+----------|
-|               |                | chk-babel-lang     | "css"     | fail     |
-|---------------+----------------+--------------------+-----------+----------|
-|               |                | chk-babel-lang     | "gnuplot" | fail     |
-|               |                | chk-ext-cmd        | "gnuplot" | fail     |
-|               |                | chk-sys-cmd        | "gnuplot" | fail     |
-|---------------+----------------+--------------------+-----------+----------|
-|               |                | chk-babel-lang     | "haskell" | fail     |
-|               |                | chk-ext-cmd        | "haskell" | fail     |
-|               |                | chk-sys-cmd        | "haskell" | fail     |
-|---------------+----------------+--------------------+-----------+----------|
-|               |                | chk-babel-lang     | "latex"   | pass     |
-|               |                | chk-ext-cmd        | "latex"   | pass     |
-|               |                | chk-sys-cmd        | "latex"   | pass     |
-|---------------+----------------+--------------------+-----------+----------|
-|               |                | chk-babel-lang     | "matlab"  | fail     |
-|               |                | chk-ext-cmd        | "matlab"  | fail     |
-|               |                | chk-sys-cmd        | "matlab"  | fail     |
-|---------------+----------------+--------------------+-----------+----------|
-|               |                | chk-babel-lang     | "perl"    | fail     |
-|               |                | chk-ext-cmd        | "perl"    | pass     |
-|               |                | chk-sys-cmd        | "perl"    | pass     |
-|---------------+----------------+--------------------+-----------+----------|
-|               |                | chk-babel-lang     | "python"  | pass     |
-|               |                | chk-ext-cmd        | "python"  | pass     |
-|               |                | chk-sys-cmd        | "python"  | pass     |
-|---------------+----------------+--------------------+-----------+----------|
-|               |                | chk-babel-lang     | "ruby"    | fail     |
-|               |                | chk-ext-cmd        | "ruby"    | pass     |
-|               |                | chk-sys-cmd        | "ruby"    | pass     |
-|---------------+----------------+--------------------+-----------+----------|
+| task          | topic          | command           | arg       | results  |
+|---------------+----------------+-------------------+-----------+----------|
+| [[*Agenda][Agenda]]        |                |                   |           |          |
+|               |                | chk-agenda-files  |           | pass     |
+|---------------+----------------+-------------------+-----------+----------|
+| [[*Export%20LaTeX][LaTeX Export]]  |                |                   |           |          |
+|               | [[*%20org-export-latex-classes][LaTeX classes]]  | chk-latex-classes |           | pass     |
+|---------------+----------------+-------------------+-----------+----------|
+| [[*Preview%20LaTeX][Preview Latex]] |                |                   |           |          |
+|               | [[* latex][latex]]          | chk-ext-cmd       | "latex"   | pass     |
+|               | [[* check-latex-system][latex-system]]   | chk-sys-cmd       | "latex"   | pass     |
+|               | [[* dvipng][dvipng]]         | chk-ext-cmd       | "dvipng"  | pass     |
+|               | [[*chk-dvipng-system][dvipng-system]]  | chk-sys-cmd       | "dvipng"  | pass     |
+|               | [[*chk-latex-scale][latex-scale]]    | chk-latex-scale   |           | 1.0      |
+|---------------+----------------+-------------------+-----------+----------|
+| [[*Make%20pdf%20files][Make Pdfs]]     |                |                   |           |          |
+|               | [[* latex][latex]]          | chk-ext-cmd       | "latex"   | pass     |
+|               | [[* chk-latex-system][latex-system]]   | chk-sys-cmd       | "latex"   | pass     |
+|               | [[*LaTeX%20engine][latex-engine]]   | chk-latex-engine  |           | pdflatex |
+|               | [[*LaTeX%20engine%20present][engine-present]] | chk-engine-cmd    |           | pass     |
+|---------------+----------------+-------------------+-----------+----------|
+| [[*Babel][Org-babel]]     |                |                   |           |          |
+|               | [[*R%20language%20configuration][R language]]     | chk-babel-lang    | "R"       | pass     |
+|               |                | chk-ext-cmd       | "R"       | pass     |
+|               |                | chk-sys-cmd       | "R"       | pass     |
+|---------------+----------------+-------------------+-----------+----------|
+|               | [[*C%20language%20configuration][C language]]     | chk-babel-lang    | "C"       | fail     |
+|               |                | chk-ext-cmd       | "cc"      | pass     |
+|               |                | chk-sys-cmd       | "cc"      | pass     |
+|---------------+----------------+-------------------+-----------+----------|
+|               | [[*Clojure%20language%20configuration][Clojure]]        | chk-babel-lang    | "clojure" | fail     |
+|---------------+----------------+-------------------+-----------+----------|
+|               | [[*Ditaa%20language%20configuration][Ditaa]]          | chk-babel-lang    | "ditaa"   | pass     |
+|---------------+----------------+-------------------+-----------+----------|
+|               | [[*CSS%20configuration][CSS]]            | chk-babel-lang    | "css"     | fail     |
+|---------------+----------------+-------------------+-----------+----------|
+|               | [[*Gnuplot%20language%20configuration][Gnuplot]]        | chk-babel-lang    | "gnuplot" | fail     |
+|               |                | chk-ext-cmd       | "gnuplot" | fail     |
+|               |                | chk-sys-cmd       | "gnuplot" | fail     |
+|---------------+----------------+-------------------+-----------+----------|
+|               | [[*LaTeX%20language%20configuration][LaTeX]]          | chk-babel-lang    | "latex"   | pass     |
+|               |                | chk-ext-cmd       | "latex"   | pass     |
+|               |                | chk-sys-cmd       | "latex"   | pass     |
+|---------------+----------------+-------------------+-----------+----------|
+|               | [[*MATLAB%20language%20configuration][MATLAB®]]        | chk-babel-lang    | "matlab"  | fail     |
+|               |                | chk-ext-cmd       | "matlab"  | fail     |
+|               |                | chk-sys-cmd       | "matlab"  | fail     |
+|---------------+----------------+-------------------+-----------+----------|
+|               | [[*Perl%20language%20configuration][Perl]]           | chk-babel-lang    | "perl"    | fail     |
+|               |                | chk-ext-cmd       | "perl"    | pass     |
+|               |                | chk-sys-cmd       | "perl"    | pass     |
+|---------------+----------------+-------------------+-----------+----------|
+|               | [[*Python%20language%20configuration][Python]]         | chk-babel-lang    | "python"  | pass     |
+|               |                | chk-ext-cmd       | "python"  | pass     |
+|               |                | chk-sys-cmd       | "python"  | pass     |
+|---------------+----------------+-------------------+-----------+----------|
+|               | [[*Ruby%20language%20configuration][Ruby]]           | chk-babel-lang    | "ruby"    | fail     |
+|               |                | chk-ext-cmd       | "ruby"    | pass     |
+|               |                | chk-sys-cmd       | "ruby"    | pass     |
+|---------------+----------------+-------------------+-----------+----------|
 #+TBLFM: $5='(if (> (length $4) 0) (sbe $3 (x $4)) (sbe $3))
 
 * Commands
@@ -109,10 +107,7 @@ Check an Org-mode environment.
 ** Export LaTeX classes
 #+srcname: chk-latex-classes
 #+begin_src emacs-lisp :results silent
-  (if (null org-export-latex-classes)
-      "fail: set =org-export-latex-classes="
-    "pass")
-  
+  (if (null org-export-latex-classes) "fail" "pass")
 #+end_src
 
 ** LaTeX engine specified
@@ -130,7 +125,8 @@ Check an Org-mode environment.
    - Checks if the LaTeX engine specified by
      =org-latex-to-pdf-process= can be found by Org-mode
    - Returns =fail= if  =chk-latex-engine= returns =fail=
-#+srcname: chk-engine-present
+   - If =fail= is returned, then the variable =exec-path=
+#+srcname: chk-engine-cmd
 #+begin_src emacs-lisp :var x=chk-latex-engine :results silent
   (if (string-equal x "fail") x (if (org-check-external-command x "" t)
   "pass" "fail"))
@@ -139,20 +135,11 @@ Check an Org-mode environment.
 ** =latex= command
    - The =latex= command must be findable by Emacs in order to generate
      pdfs or preview latex fragments in-buffer 
-   - This command checks to see if latex is found anywhere on =exec-path=
+   - If =fail= is returned then latex is not found on [[elisp:(progn (describe-variable 'exec-path) (other-window 1))][exec-path]]
 
 #+srcname: chk-latex-command
 #+begin_src emacs-lisp :results silent
    (if (org-check-external-command "latex" "" t) "pass" "fail")
-#+end_src
-
-** =dvipng= command
-The =dvipng= command must be findable by Emacs in order to preview
-latex fragments in buffer.  This command checks for dvipng on =exec-path=.
-
-#+srcname: chk-dvipng-command
-#+begin_src emacs-lisp :results silent
-   (if (org-check-external-command "dvipng" "" t) "pass" "fail")
 #+end_src
    
 ** =org-agenda-files= 
@@ -168,25 +155,16 @@ latex fragments in buffer.  This command checks for dvipng on =exec-path=.
     "pass")
 #+end_src
 
-** =check-latex-system=
+** Check System Command   
    - Check if x is present on the system path
+   - If =fail= is returned, ensure that the executable is found on
+     your system, then check that =$PATH= holds a path to the
+     executable
+   - [[shell:$PATH][Check $PATH]]
+
 #+srcname: chk-sys-cmd(x)
-#+begin_src sh 
-    if which $x > /dev/null;
-    then echo pass;
-    else echo fail;
-    fi
-#+end_src
-
-#+results: chk-latex-system
-: pass
-** =check-dvipng-system=
-See if dvipng is present on the *nix system, regardless of whether it
-is found on the Emacs =exec-path=.
-
-#+srcname: chk-dvipng-system
 #+begin_src sh :results silent
-    if which dvipng > /dev/null;
+    if which $x > /dev/null;
     then echo pass;
     else echo fail;
     fi
@@ -203,6 +181,8 @@ Report the scale setting for inline images.  Default is 1.0.
 * Tasks
 ** Export LaTeX
    - [[http://orgmode.org/worg/org-tutorials/org-latex-export.php][LaTeX Export Tutorial]]
+*** Check =org-export-latex-classes=
+    - Check that the variable [[elisp:(progn (describe-variable 'org-export-latex-classes) (other-window 1))][org-export-latex-classes]] has been set
 ** Preview LaTeX
    - Previewing LaTeX in the Org-mode buffer requires: 
      - a working LaTeX installation, including the =latex= executable
@@ -227,7 +207,166 @@ Report the scale setting for inline images.  Default is 1.0.
    - [[http://orgmode.org/worg/org-contrib/babel/index.php][Org-babel]] extends the very excellent Org-mode with the ability to
      execute code blocks
    - [[http://orgmode.org/worg/org-contrib/babel/intro.php#getting-started][Org-babel configuration]] is a 5-step process that requires entries
-     in .emacs
+     in =.emacs=
+*** R language configuration
+    - [[http://www.r-project.org/][R]] is a free software environment for statistical computing and graphics
+    - if =chk-babel-lang= returns =fail= then you should add this line
+      to =.emacs=
+#+begin_src emacs-lisp
+  (require 'org-babel-R)
+#+end_src
+    - if =chk-ext-cmd= returns =fail= then you should check if there
+      is a path to the R executable in [[elisp:(progn%20(describe-variable%20'exec-path)%20(other-window%201))][exec-path]] and possibly add a
+      line to =.emacs=
+#+begin_src emacs-lisp
+   (setq exec-path (append exec-path '("/path/to/R/executable")))
+#+end_src
+    - if =chk-sys-cmd= returns =fail= then you should check to see if
+      R is installed on your system
+*** C language configuration
+    - [[http://en.wikipedia.org/wiki/C_%28programming_language%29][C]] is a general-purpose computer programming language
+    - if =chk-babel-lang= returns =fail= then you should add this line
+      to =.emacs=
+#+begin_src emacs-lisp
+  (require 'org-babel-C)
+#+end_src
+    - if =chk-ext-cmd= returns =fail= then you should check if there
+      is a path to the cc executable in [[elisp:(progn%20(describe-variable%20'exec-path)%20(other-window%201))][exec-path]] and possibly add a
+      line to =.emacs=
+#+begin_src emacs-lisp
+   (setq exec-path (append exec-path '("/path/to/cc/executable")))
+#+end_src
+    - if =chk-sys-cmd= returns =fail= then you should check to see if
+      a C compiler is installed on your system and, if it is, what it
+      is called other than =cc=
+*** Clojure language configuration
+    - [[http://clojure.org/][Clojure]] is a dynamic programming language that targets the Java Virtual Machine
+    - if =chk-babel-lang= returns =fail= then you should add this line
+      to =.emacs=
+#+begin_src emacs-lisp
+  (require 'org-babel-clojure)
+#+end_src
+
+*** Ditaa language configuration
+    - [[http://ditaa.sourceforge.net/][Ditaa]] is a small command-line utility written in Java, that can convert diagrams drawn using ascii art into proper bitmap graphics
+    - if =chk-babel-lang= returns =fail= then you should add this line
+      to =.emacs=
+#+begin_src emacs-lisp
+  (require 'org-babel-ditaa)
+#+end_src
+
+*** CSS configuration
+    - [[http://www.w3.org/Style/CSS/][Cascading Style Sheets (CSS)]] is a simple mechanism for adding style to Web documents
+    - if =chk-babel-lang= returns =fail= then you should add this line
+      to =.emacs=
+#+begin_src emacs-lisp
+  (require 'org-babel-css)
+#+end_src
+
+*** Gnuplot language configuration
+    - [[http://www.gnuplot.info/][Gnuplot]] is a command-line driven graphing utility
+    - if =chk-babel-lang= returns =fail= then you should add this line
+      to .emacs
+#+begin_src emacs-lisp
+  (require 'org-babel-gnuplot)
+#+end_src
+    - if =chk-ext-cmd= returns =fail= then you should check if there
+      is a path to the gnuplot executable in [[elisp:(progn%20(describe-variable%20'exec-path)%20(other-window%201))][exec-path]] and possibly add a
+      line to .emacs
+#+begin_src emacs-lisp
+   (setq exec-path (append exec-path '("/path/to/gnuplot/executable")))
+#+end_src
+    - if =chk-sys-cmd= returns =fail= then you should check to see if
+      gnuplot is installed on your system
+
+*** LaTeX language configuration
+    - [[http://www.tug.org/][LaTeX]] is a TeX macro package that provides a document processing system
+    - if =chk-babel-lang= returns =fail= then you should add this line
+      to .emacs
+#+begin_src emacs-lisp
+  (require 'org-babel-latex)
+#+end_src
+    - if =chk-ext-cmd= returns =fail= then you should check if there
+      is a path to the latex executable in [[elisp:(progn%20(describe-variable%20'exec-path)%20(other-window%201))][exec-path]] and possibly add a
+      line to .emacs
+#+begin_src emacs-lisp
+   (setq exec-path (append exec-path '("/path/to/latex/executable")))
+#+end_src
+    - if =chk-sys-cmd= returns =fail= then you should check to see if
+      latex is installed on your system
+
+*** MATLAB® language configuration
+    - MATLAB® is a high-level language and interactive environment
+      that enables you to perform computationally intensive tasks
+      faster than with traditional programming languages such as C,
+      C++, and Fortran
+    - if =chk-babel-lang= returns =fail= then you should add this line
+      to .emacs
+#+begin_src emacs-lisp
+  (require 'org-babel-matlab)
+#+end_src
+    - if =chk-ext-cmd= returns =fail= then you should check if there
+      is a path to the MATLAB® executable in [[elisp:(progn%20(describe-variable%20'exec-path)%20(other-window%201))][exec-path]] and possibly add a
+      line to .emacs
+#+begin_src emacs-lisp
+   (setq exec-path (append exec-path '("/path/to/matlab/executable")))
+#+end_src
+    - if =chk-sys-cmd= returns =fail= then you should check to see if
+      MATLAB® is installed on your system
+
+*** Perl language configuration
+    - [[http://www.perl.org/][Perl]] is a highly capable, feature-rich programming language with
+      over 22 years of development
+    - if =chk-babel-lang= returns =fail= then you should add this line
+      to =.emacs=
+#+begin_src emacs-lisp
+  (require 'org-babel-perl)
+#+end_src
+    - if =chk-ext-cmd= returns =fail= then you should check if there
+      is a path to the Perl executable in [[elisp:(progn%20(describe-variable%20'exec-path)%20(other-window%201))][exec-path]] and possibly add a
+      line to =.emacs=
+#+begin_src emacs-lisp
+   (setq exec-path (append exec-path '("/path/to/perl/executable")))
+#+end_src
+    - if =chk-sys-cmd= returns =fail= then you should check to see if
+      Perl is installed on your system
+
+*** Python language configuration
+    - [[http://www.python.org/][Python]] is a programming language that lets you work more quickly
+      and integrate your systems more effectively
+    - if =chk-babel-lang= returns =fail= then you should add this line
+      to =.emacs=
+#+begin_src emacs-lisp
+  (require 'org-babel-python)
+#+end_src
+    - if =chk-ext-cmd= returns =fail= then you should check if there
+      is a path to the Python executable in [[elisp:(progn%20(describe-variable%20'exec-path)%20(other-window%201))][exec-path]] and possibly add a
+      line to =.emacs=
+#+begin_src emacs-lisp
+   (setq exec-path (append exec-path '("/path/to/python/executable")))
+#+end_src
+    - if =chk-sys-cmd= returns =fail= then you should check to see if
+      Python is installed on your system
+
+*** Ruby language configuration
+    - [[http://www.ruby-lang.org/en/][Ruby]] is a dynamic, open source programming language with a focus
+      on simplicity and productivity
+    - if =chk-babel-lang= returns =fail= then you should add this line
+      to =.emacs=
+#+begin_src emacs-lisp
+  (require 'org-babel-ruby)
+#+end_src
+    - if =chk-ext-cmd= returns =fail= then you should check if there
+      is a path to the Ruby executable in [[elisp:(progn%20(describe-variable%20'exec-path)%20(other-window%201))][exec-path]] and possibly add a
+      line to =.emacs=
+#+begin_src emacs-lisp
+   (setq exec-path (append exec-path '("/path/to/ruby/executable")))
+#+end_src
+    - if =chk-sys-cmd= returns =fail= then you should check to see if
+      Ruby is installed on your system
+
+
+
 * Notes                                                            :noexport:
 ** TODO Provide a link to the org-check.org file in Instructions
 ** TODO Check, does Windows have something like which?
