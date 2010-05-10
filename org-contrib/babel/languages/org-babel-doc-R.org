@@ -169,6 +169,25 @@ xtable(summary(lm(y ~ x)))
 \end{center}
 \end{table}
 #+END_LaTeX
+** Org output from R
+David Hajage's [[http://cran.r-project.org/web/packages/ascii/index.html][ascii]] R package can be used to (amongst other things)
+output Org format textual representations of R objects. This can be
+particularly useful for retrieving non-tabular R data structures in
+Org:
+#+begin_src R :results output org
+  library(ascii)
+  options(asciiType="org")
+  ascii(summary(table(1:4, 1:4)))
+#+end_src
+
+#+results:
+Loading required package: proto
+- Number of cases in table: 4 
+- Number of factors: 2 
+- Test for independence of all factors:
+  - Chisq = 12, df = 9, p-value = 0.2133
+  - Chi-squared approximation may be incorrect
+
 ** ess-switch-to-end-of-ESS
    When in an org mode R code edit buffer with an associated R
    session, ess-switch-to-end-of-ESS will bring the R session buffer
