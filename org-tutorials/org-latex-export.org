@@ -1,0 +1,187 @@
+* Settings                                                         :noexport:
+#+TITLE:   LaTeX Export
+#+AUTHOR:    Tom Dye
+#+EMAIL:     tsd@tsdye2.com
+#+DATE:      2010-04-24 Sat
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+
+* Start up
+Org-mode LaTeX export is easy.  Place the following code in your
+.emacs and you're ready to go.
+
+#+begin_src emacs-lisp
+  (add-to-list 'org-export-latex-classes
+               '("article"
+                 "\\documentclass{article}"
+                 ("\\section{%s}" . "\\section*{%s}")))  
+#+end_src
+
+This tells the Org-mode LaTeX exporter to use the standard LaTeX
+=article= document class by default and to map Org-mode headlines and
+lists to LaTeX sectioning and list commands, as follows:
+
+#+begin_src org
+  ,* section
+  ,** itemize
+  ,*** itemize, etc.
+  ,    - itemize
+#+end_src
+
+Now you can pick a LaTeX export command from the export menu, =C-c
+C-e=, and expect to find a well-formed LaTeX document with the same
+base name as your org-mode buffer.
+
+It could hardly be easier!
+
+* Why LaTeX Export?
+
+As the manual says, "Org is a mode for keeping notes, maintaining TODO
+lists, and doing project planning with a fast and effective plain-text
+system."  LaTeX is a convenient interface to TeX, a typesetting system
+that its author "intended for the creation of beautiful books — and
+especially for books that contain a lot of mathematics."  Where do
+these two activities--keeping notes and making beautiful books--overlap?
+
+Org-mode is well supplied with a variety of other exporters.  The Org
+ASCII exporter produces a readable and simple version of an Org file
+for printing and sharing of notes.  The HTML exporter does such a good
+job of preparing notes for the web that many people use it to create
+entire web sites.  The XOXO exporter makes notes accessible to other
+software applications and the DocBook exporter starts the journey to
+many other formats, including LaTeX, using DocBook tools.
+
+The niche for the LaTeX exporter is producing a version of an Org file
+for printing and sharing notes that looks better than an ASCII
+printout but that can be produced without the overhead required to
+support DocBook.  All that is needed is a working LaTeX installation.
+LaTeX distributions for all major platforms are today well-developed
+and easy to use and maintain.
+
+* More Highly-Structured Documents
+
+You can prepare more highly structured LaTeX documents by adding a few
+lines to =org-export-latex-classes= in the .emacs.
+
+#+begin_src emacs-lisp
+  (add-to-list 'org-export-latex-classes
+               '("article"
+                 "\\documentclass{article}"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+
+This setup produces the following document structure:
+
+#+begin_src org
+  ,* section
+  ,** subsection
+  ,*** subsubsection
+  ,**** paragraph
+  ,***** subparagraph
+  ,****** itemize, etc.
+  ,       - itemize
+#+end_src
+
+* Exporting Other LaTeX Document Classes
+
+The LaTeX exporter can be configured to produce LaTeX output for
+books, reports, letters or any other document class, including custom
+classes.  These can be useful if notes need to be formatted to a
+certain specification, such as a company technical manual, or if the
+notes are quite long, as might be the case when Org-mode is used as a
+laboratory or project notebook.
+
+Here is a standard setup for export to a LaTeX book class:
+
+#+begin_src emacs-lisp
+  (add-to-list 'org-export-latex-classes
+               `("book"
+                 "\\documentclass[11pt,letter]{book}"
+                 ("\\part{%s}" . "\\part*{%s}")
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+               )
+#+end_src
+
+Then, in the Org file with a book-full of notes, add this line:
+
+#+begin_src org
+  #+LaTeX_CLASS: book 
+#+end_src
+
+* Specifying LaTeX Packages
+According to its author, the LaTeX macro package "represents a balance
+between functionality and ease of use."  The LaTeX user who adds
+functionality through the addition of packages necessarily makes the
+software more difficult to use.  Like LaTeX itself, the Org-mode LaTeX
+exporter has struck its own balance between functionality and ease of
+use with the addition of several LaTeX packages.  These are written
+out in the LaTeX header as LaTeX \usepackage{} commands.
+
+The names of the LaTeX packages are kept in a data structure designed
+for ease of maintenance as additional features are added to the LaTeX
+exporter.  Packages in the default packages list,
+=org-export-latex-default-packages-alist=, are required to support all
+features of the LaTeX exporter.  This list is typically specified in
+the Org-mode source code and its documentation contains a warning not
+to modify it.  Packages not included on the default packages list that
+the user needs consistently can be added to
+=org-export-latex-packages-alist=.  Packages needed for a particular
+file can be specified by inserting a line like this in the Org-mode
+buffer:
+#+begin_src org
+  ,#+LATEX_HEADER: \usepackage{xyz}
+#+end_src
+* Using Custom Classes
+If the user has custom LaTeX document classes that conflict with the
+default packages or that only require a few of the default packages to
+support all features of the LaTeX exporter, then this can be handled
+in the .emacs using [DEFAULT-PACKAGES], [NO-DEFAULT-PACKAGES],
+[PACKAGES], [NO-PACKAGES], [EXTRA], [NO-EXTRA].    
+
+Here is a simple example that uses a LaTeX class that supports the
+Org-mode requirements and leaves open the possibility of adding file
+specific packages:
+  
+#+begin_src emacs-lisp
+    (add-to-list 'org-export-latex-classes
+          '("article"
+             "\\documentclass{org-ready}
+             [NO-DEFAULT-PACKAGES]
+             [EXTRA]"
+             ("\\section{%s}" . "\\section*{%s}")
+             ("\\subsection{%s}" . "\\subsection*{%s}")
+             ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+             ("\\paragraph{%s}" . "\\paragraph*{%s}")
+             ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+* Creating PDF Output
+The LaTeX exporter by default produces code ready for processing by
+pdflatex.  pdflatex calls the pdfTeX program, a modern extension of
+TeX that produces PDF output directly, using the standard LaTeX
+macros.  pdfTeX is tightly integrated with PDF features such as
+hypertext links and tables of contents, using LaTeX packages such as
+hyperref, which is included in the default packages list.
+
+Org-mode offers a command to produce a PDF file from the LaTeX export.
+This is bound to =C-c C-e p=.  The command =C-c C-e d= does all this
+*and* opens the PDF file in the default reader.
+
+If you use a different TeX typesetting engine, then you will want to
+modify the variable =org-latex-to-pdf-process=.  This is a list of
+strings, each of which contains a call to one of the TeX typesetting
+engines or to an auxiliary program, such as BibTeX, makeindex, etc.

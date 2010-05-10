@@ -2,7 +2,7 @@
  * @file
  * org-info.js
  *
- * Version: 0.1.2.4
+ * Version: 0.1.3
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -361,7 +361,7 @@ var org_html_manager = {
   WINDOW: null,                // A div to display info view mode
   SECS: new Array(),           // The OrgNode tree
   REGEX: /(#)(.*$)/,           // identify a section link in toc
-  SID_REGEX: /(^#)(sec-\d[.\d]*$)/, // identify a plain section ID
+  SID_REGEX: /(^#)(sec-\d+([._]\d+)*$)/, // identify a plain section ID
   UNTAG_REGEX: /<[^>]+>/i,     // Remove HTML tags
   ORGTAG_REGEX: /^(.*)<span\s+class=[\'\"]tag[\'\"]>(<span[^>]+>[^<]+<\/span>)+<\/span>/i, // Remove Org tags
   TRIMMER: /^(\s*)([^\s].*)(\s*)$/, // Trim
@@ -402,7 +402,6 @@ var org_html_manager = {
   TAGS_INDEX: null,            // Caches the tags-index screen
   CLICK_TIMEOUT: null,         // Mousehandling
   SECNUM_MAP: {},              // Map section numbers to OrgNodes
-  SECNUM_REGEX: /^section-number-(\d)+/, // class of the span containing section numbers.
   TOC_LINK: null,              // Last link used in TOC
 
   /**
@@ -613,6 +612,7 @@ var org_html_manager = {
     if(t.STARTUP_MESSAGE) {
       t.warn("This page uses org-info.js. Press '?' for more information.", true);
     }
+
   },
 
 
@@ -1536,9 +1536,6 @@ var org_html_manager = {
         }
         else if ('i' == s) {
           if(! t.FIXED_TOC) {
-            // here we should handle the TOC_LINK differently because of
-            // cloning. Or, better, avoid cloning? The tabIndex is no good
-            // solution...
             if (t.HIDE_TOC) t.navigateTo('?/toc/?');
             // No cloning here:
             else if(0 != t.NODE.IDX) t.navigateTo(0);

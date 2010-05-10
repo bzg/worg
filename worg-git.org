@@ -33,7 +33,9 @@ If you want to contribute to Worg, keep reading.
 
 1. If you don't have a SSH-key, [[file:worg-git-ssh-key.org][create one]].
 
-2. Register a [[http://repo.or.cz/reguser.cgi][new account]] on the git public repository.
+2. Register a [[http://repo.or.cz/reguser.cgi][new account]] on the git public repository (don't forget to
+   copy paste your public SSH key from =~/.ssh/id_rsa.pub= to the
+   registration form.)
 
 3. Drop an email to [[mailto:bzg%20AT%20altern%20DOT%20org][Bastien]] mentioning your username on repo.or.cz
 
@@ -41,7 +43,14 @@ If you want to contribute to Worg, keep reading.
 
 5. Clone the project somewhere in a working directory:
 
-   : ~$ git clone git+ssh://repo.or.cz/srv/git/Worg.git
+   - If your user name in the shell is the same as the
+     =Login= [[http://repo.or.cz/reguser.cgi][registered at repo.or.cz]]:
+
+     : ~$ git clone git+ssh://repo.or.cz/srv/git/Worg.git
+
+   - else add the =Login= [[http://repo.or.cz/reguser.cgi][registered at repo.or.cz]] to <UserName>:
+
+     : ~$ git clone git+ssh://<UserName>@repo.or.cz/srv/git/Worg.git
 
 6. Go to the newly created =Worg/= directory and edit some files.
 
@@ -49,23 +58,24 @@ If you want to contribute to Worg, keep reading.
 
    : ~$ git add *.org
 
-8. Commit changes with the appropriate ChangeLog:
+8. Commit changes with the appropriate comment:
 
-  : ~$ git commit -a -m "My changelog"
+   : ~$ git commit -a -m "summary comment about all changes"
 
 9. Push your change to Worg:
 
-  : ~$ git push
+   - If your user name in the shell is the same as the
+     =Login= [[http://repo.or.cz/reguser.cgi][registered at repo.or.cz]]:
 
-  This stage didn't work for me, instead I had to add a remote like
-  so:
+     : ~$ git push
 
-  : ~$ git remote add public git+ssh://<UserName>@repo.or.cz/srv/git/Worg.git
+   - else add the =Login= [[http://repo.or.cz/reguser.cgi][registered at repo.or.cz]] to <UserName>:
 
-  Where <UserName> is the username you supplied repo.or.cz.  Then do
-  a:
+     : ~$ git remote add public git+ssh://<UserName>@repo.or.cz/srv/git/Worg.git
 
-  : ~$ git push public
+     Then do a:
+
+     : ~$ git push public
 
 * The second time you contribute to Worg
 
@@ -77,7 +87,7 @@ If you want to contribute to Worg, keep reading.
 
 4. Commit your changes on your local repository:
 
-   : ~$ git commit -a -m "My ChangeLog"
+   : ~$ git commit -a -m "summary comment about all changes"
 
 5. Push your change on the remote repository
 
@@ -105,7 +115,7 @@ Information regarding your name can be stored in your ~/.gitconfig file.
 Edit it like this:
 
 : [user]
-:        name = Your Name Goes Here
+:        name = FirstName LastName
 :        email = you@yourdomain.example.com
 
 Now your changes will be filed under your name.
