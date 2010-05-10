@@ -170,10 +170,66 @@ xtable(summary(lm(y ~ x)))
 \end{table}
 #+END_LaTeX
 ** Org output from R
-David Hajage's [[http://cran.r-project.org/web/packages/ascii/index.html][ascii]] R package can be used to (amongst other things)
-output Org format textual representations of R objects. This can be
-particularly useful for retrieving non-tabular R data structures in
-Org:
+David Hajage's [[http://cran.r-project.org/web/packages/ascii/index.html][ascii]] R package creates appropriate plain text
+representations of many R objects, and features an option to specify
+that the plain text representations should be in Org format. This can
+be particularly useful for retrieving non-tabular R data structures in
+Org.
+
+In R:
+#+begin_example 
+> library(ascii)
+> options(asciiType = "org")
+> x <- rnorm(100)
+> y <- x + rnorm(100)
+> ascii(summary(lm(y ~ x)))
+|             | Estimate | Std. Error | t value | Pr(>\|t\|)   |
+|-------------+----------+------------+---------+--------------|
+| (Intercept) | -0.0679  | 0.1038     | -0.6543 | 0.5144       |
+| x           | 0.9899   | 0.1056     | 9.3744  | 0.0000       |
+> library(Hmisc)
+> ascii(describe(esoph))
+#+CAPTION: esoph
+- 5 Variable
+- 88 Observations
+
+*agegp*
+| n  | missing | unique |
+| 88 | 0       | 6      |
+
+|           | 25-34 | 35-44 | 45-54 | 55-64 | 65-74 | 75+ |
+| Frequency | 15    | 15    | 16    | 16    | 15    | 11  |
+| %         | 17    | 17    | 18    | 18    | 17    | 12  |
+
+*alcgp*
+| n  | missing | unique |
+| 88 | 0       | 4      |
+
+ 0-39g/day (23, 26%), 40-79 (23, 26%), 80-119 (21, 24%), 120+ (21, 24%)
+
+*tobgp*
+| n  | missing | unique |
+| 88 | 0       | 4      |
+
+ 0-9g/day (24, 27%), 10-19 (24, 27%), 20-29 (20, 23%), 30+ (20, 23%)
+
+*ncases*
+| n  | missing | unique | Mean  | .05 | .10 | .25 | .50 | .75 | .90 | .95 |
+| 88 | 0       | 10     | 2.273 | 0.0 | 0.0 | 0.0 | 1.0 | 4.0 | 5.3 | 6.0 |
+
+|           | 0  | 1  | 2  | 3  | 4 | 5 | 6 | 8 | 9 | 17 |
+| Frequency | 29 | 16 | 11 | 9  | 8 | 6 | 5 | 1 | 2 | 1  |
+| %         | 33 | 18 | 12 | 10 | 9 | 7 | 6 | 1 | 2 | 1  |
+
+*ncontrols*
+| n  | missing | unique | Mean  | .05 | .10 | .25 | .50 | .75  | .90  | .95  |
+| 88 | 0       | 30     | 11.08 | 1.0 | 1.0 | 3.0 | 6.0 | 14.0 | 29.1 | 40.0 |
+
+ lowest:  1  2  3  4  5, highest: 40 46 48 49 60
+#+end_example
+
+
+ From Org-babel:
 #+begin_src R :results output org
   library(ascii)
   options(asciiType="org")
