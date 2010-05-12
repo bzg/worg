@@ -185,3 +185,55 @@ If you use a different TeX typesetting engine, then you will want to
 modify the variable =org-latex-to-pdf-process=.  This is a list of
 strings, each of which contains a call to one of the TeX typesetting
 engines or to an auxiliary program, such as BibTeX, makeindex, etc.
+
+* Exporting Parts of a Buffer
+Tags can be used to select which parts of an Org-mode buffer are sent
+to the LaTeX exporter.  The tags used for this purpose are held in
+variables: =org-export-select-tags= is a list of tags, initially set
+to =export=, that select a tree or sub-tree for export;
+=org-export-exclude-tags= is a list of tags, initially set to
+=noexport=, that exclude a tree or subtree for export.  The effect
+they have on export is logical, but the logic isn't necessarily what
+one might expect.  In particular, if both select tags and exclude tags
+are to be used in the same buffer, then their use must follow certain
+rules.  Also, the handling of unmarked trees and subtrees changes
+depending on which tags are used and how they are used.
+
+If neither select tags nor exclude tags are used, then all of the trees
+and their subtrees are sent to the LaTeX exporter.  If, however, a
+select tag is added to a tree as in the example below, then unmarked
+trees will *not* be sent to the exporter.  Thus, the effect of a
+select tag is not restricted to its tree; its effect extends to the
+entire buffer.
+
+#+begin_src org
+  ,* Tree 1                                                             :export:
+  ,   This is exported
+  ,** Subtree 1
+  ,   This is also exported
+  ,* Tree 2
+  ,  This is not exported
+  ,** Subtree 2
+  ,  This is not exported, either
+#+end_src
+
+Once the scope of the tag's effect is grasped, the primary rule of using
+select and exclude tags is obvious: only one type of tag may be used
+for the trees of a buffer.  If both types of tags are used for trees,
+how can Org-mode decide what to do with the unmarked trees?  
+
+A corollary of this rule is that the other type of tag can only be
+used in a subtree of the tagged tree in order to reverse the effect of
+the tree-level tag, as in the following example.
+
+#+begin_src org
+  ,* Tree 1                                                             :export:
+  ,   This is exported
+  ,** Subtree 1                                                       :noexport:
+  ,   This is not exported
+  ,* Tree 2
+  ,  This is not exported
+  ,** Subtree 2
+  ,  This is not exported, either
+#+end_src
+
