@@ -891,6 +891,8 @@ of translating Org-mode tables to and from supported languages.
   Org-babel re-binds many common Org-mode key sequences depending on
   the context.  Within a source-code block the following sequences
   are rebound:
+  | Key       | Binding                         |
+  |-----------+---------------------------------|
   | =C-c C-c= | [[function-org-babel-execute][org-babel-execute-src-block]]     |
   | =C-c C-o= | [[function-org-babel-open-src-block-result][org-babel-open-src-block-result]] |
   | =C-up=    | [[function-org-babel-load-in-session][org-babel-load-in-session]]       |
@@ -906,6 +908,9 @@ of translating Org-mode tables to and from supported languages.
                      (cdr binding) (cdr binding))))
      org-babel-key-bindings)
   #+end_src
+
+  | Key         | Binding                           |
+  |-------------+-----------------------------------|
   | =C-c M-b t= | [[function-org-babel-tangle][org-babel-tangle]]                  |
   | =C-c M-b T= | [[function-org-babel-tangle-file][org-babel-tangle-file]]             |
   | =C-c M-b e= | [[function-org-babel-execute-src-block][org-babel-execute-src-block]]       |
@@ -916,7 +921,47 @@ of translating Org-mode tables to and from supported languages.
   | =C-c M-b l= | [[function-org-babel-lob-ingest][org-babel-lob-ingest]]              |
 
 
+Functions exposed behind =C-c C-v= include: 
+| Key           | Binding                           |
+|---------------+-----------------------------------|
+| =C-c C-v C-a= | [[function-org-babel-sha1-hash][org-babel-sha1-hash]]               |
+| =C-c C-v C-b= | [[function-org-babel-execute-buffer][org-babel-execute-buffer]]          |
+| =C-c C-v C-f= | [[function-org-babel-tangle-file][org-babel-tangle-file]]             |
+| =C-c C-v C-g= | [[function-org-babel-goto-named-source-block][org-babel-goto-named-source-block]] |
+| =C-c C-v C-l= | [[function-org-babel-lob-ingest][org-babel-lob-ingest]]              |
+| =C-c C-v C-p= | [[function-org-babel-expand-src-block][org-babel-expand-src-block]]        |
+| =C-c C-v C-s= | [[function-org-babel-execute-subtree][org-babel-execute-subtree]]         |
+| =C-c C-v C-t= | [[function-org-babel-tangle][org-babel-tangle]]                  |
+| =C-c C-v C-z= | [[function-orb-babel-switch-to-session][org-babel-switch-to-session]]       |
+| =C-c C-v a=   | [[function-org-babel-sha1-hash][org-babel-sha1-hash]]               |
+| =C-c C-v b=   | [[function-org-babel-execute-buffer][org-babel-execute-buffer]]          |
+| =C-c C-v f=   | [[function-org-babel-tangle-file][org-babel-tangle-file]]             |
+| =C-c C-v g=   | [[function-org-babel-goto-named-source-block][org-babel-goto-named-source-block]] |
+| =C-c C-v h=   | org-babel-describe-bindings       |
+| =C-c C-v l=   | [[function-org-babel-lob-ingest][org-babel-lob-ingest]]              |
+| =C-c C-v p=   | [[function-org-babel-expand-src-block][org-babel-expand-src-block]]        |
+| =C-c C-v s=   | [[function-org-babel-execute-subtree][org-babel-execute-subtree]]         |
+| =C-c C-v t=   | [[function-org-babel-tangle][org-babel-tangle]]                  |
+| =C-c C-v z=   | [[function-orb-babel-switch-to-session][org-babel-switch-to-session]]       |
+
+
 ** Functions
+*** org-babel-execute-buffer
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-execute-buffer
+    :END:
+
+#+begin_example
+  org-babel-execute-buffer is an interactive Lisp function in
+  `org-babel.el'.
+
+  It is bound to C-c M-b b.
+
+  (org-babel-execute-buffer &optional ARG)
+
+  Replace EVAL snippets in the entire buffer.
+#+end_example
+
 *** org-babel-execute-src-block
     :PROPERTIES:
     :CUSTOM_ID: function-org-babel-execute-src-block
@@ -941,21 +986,53 @@ of translating Org-mode tables to and from supported languages.
   block.
 #+end_example
 
-*** org-babel-open-src-block-result
+*** org-babel-execute-subtree
     :PROPERTIES:
-    :CUSTOM_ID: function-org-babel-open-src-block-result
+    :CUSTOM_ID: function-org-babel-execute-subtree
     :END:
 
 #+begin_example
-  org-babel-open-src-block-result is an interactive Lisp function in
+  org-babel-execute-subtree is an interactive Lisp function in
   `org-babel.el'.
 
-  (org-babel-open-src-block-result &optional RE-RUN)
+  It is bound to C-c M-b s.
 
-  If `point' is on a src block then open the results of the
-  source code block, otherwise return nil.  With optional prefix
-  argument RE-RUN the source-code block is evaluated even if
-  results already exist.
+  (org-babel-execute-subtree &optional ARG)
+
+  Replace EVAL snippets in the entire subtree.
+#+end_example
+
+*** org-babel-expand-src-block
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-expand-src-block
+    :END:
+
+#+begin_example
+org-babel-expand-src-block is an interactive Lisp function in
+`org-babel.el'.
+
+It is bound to C-c C-v C-p.
+
+(org-babel-expand-src-block &optional ARG INFO PARAMS)
+
+Expand the current source code block according to it's header
+arguments, and pop open the results in a preview buffer.
+#+end_example
+
+*** org-babel-goto-named-source-block
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-goto-named-source-block
+    :END:
+
+#+begin_example
+  org-babel-goto-named-source-block is an interactive Lisp function in
+  `org-babel.el'.
+
+  It is bound to C-c M-b g.
+
+  (org-babel-goto-named-source-block &optional NAME)
+
+  Go to a named source-code block.
 #+end_example
 
 *** org-babel-load-in-session
@@ -976,6 +1053,38 @@ of translating Org-mode tables to and from supported languages.
   [back]
 #+end_example
 
+*** org-babel-lob-ingest
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-lob-ingest
+    :END:
+
+#+begin_example
+  org-babel-lob-ingest is an interactive Lisp function in
+  `org-babel-lob.el'.
+
+  It is bound to C-c M-b l.
+
+  (org-babel-lob-ingest &optional FILE)
+
+  Add all source-blocks defined in FILE to `org-babel-library-of-babel'.
+#+end_example
+*** org-babel-open-src-block-result
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-open-src-block-result
+    :END:
+
+#+begin_example
+  org-babel-open-src-block-result is an interactive Lisp function in
+  `org-babel.el'.
+
+  (org-babel-open-src-block-result &optional RE-RUN)
+
+  If `point' is on a src block then open the results of the
+  source code block, otherwise return nil.  With optional prefix
+  argument RE-RUN the source-code block is evaluated even if
+  results already exist.
+#+end_example
+
 *** org-babel-pop-to-session
     :PROPERTIES:
     :CUSTOM_ID: function-org-babel-pop-to-session
@@ -993,6 +1102,40 @@ of translating Org-mode tables to and from supported languages.
   of the source block to the kill ring.
 
   [back]
+#+end_example
+
+*** org-babel-sha1-hash
+    :PROPERTIES:
+    :CUSTOM_ID: function-org-babel-sha1-hash
+    :END:
+
+#+begin_example
+  org-babel-sha1-hash is an interactive Lisp function in `org-babel.el'.
+
+  It is bound to C-c M-b h.
+
+  (org-babel-sha1-hash &optional INFO)
+
+  Not documented.
+#+end_example
+
+*** org-babel-switch-to-session
+    :PROPERTIES:
+    :CUSTOM_ID: function-orb-babel-switch-to-session
+    :END:
+#+begin_example 
+    org-babel-switch-to-session is an interactive Lisp function in
+`org-babel.el'.
+
+It is bound to C-c C-v C-z.
+
+(org-babel-switch-to-session &optional ARG INFO)
+
+Switch to the session of the current source-code block.
+If called with a prefix argument then evaluate the header arguments
+for the source block before entering the session. Copy the body
+of the source block to the kill ring.
+
 #+end_example
 
 *** org-babel-tangle
@@ -1015,84 +1158,6 @@ of translating Org-mode tables to and from supported languages.
   exported source code blocks by language.
 #+end_example
 
-*** org-babel-execute-subtree
-    :PROPERTIES:
-    :CUSTOM_ID: function-org-babel-execute-subtree
-    :END:
-
-#+begin_example
-  org-babel-execute-subtree is an interactive Lisp function in
-  `org-babel.el'.
-
-  It is bound to C-c M-b s.
-
-  (org-babel-execute-subtree &optional ARG)
-
-  Replace EVAL snippets in the entire subtree.
-#+end_example
-
-*** org-babel-execute-buffer
-    :PROPERTIES:
-    :CUSTOM_ID: function-org-babel-execute-buffer
-    :END:
-
-#+begin_example
-  org-babel-execute-buffer is an interactive Lisp function in
-  `org-babel.el'.
-
-  It is bound to C-c M-b b.
-
-  (org-babel-execute-buffer &optional ARG)
-
-  Replace EVAL snippets in the entire buffer.
-#+end_example
-
-*** org-babel-sha1-hash
-    :PROPERTIES:
-    :CUSTOM_ID: function-org-babel-sha1-hash
-    :END:
-
-#+begin_example
-  org-babel-sha1-hash is an interactive Lisp function in `org-babel.el'.
-
-  It is bound to C-c M-b h.
-
-  (org-babel-sha1-hash &optional INFO)
-
-  Not documented.
-#+end_example
-
-*** org-babel-goto-named-source-block
-    :PROPERTIES:
-    :CUSTOM_ID: function-org-babel-goto-named-source-block
-    :END:
-
-#+begin_example
-  org-babel-goto-named-source-block is an interactive Lisp function in
-  `org-babel.el'.
-
-  It is bound to C-c M-b g.
-
-  (org-babel-goto-named-source-block &optional NAME)
-
-  Go to a named source-code block.
-#+end_example
-
-*** org-babel-lob-ingest
-    :PROPERTIES:
-    :CUSTOM_ID: function-org-babel-lob-ingest
-    :END:
-
-#+begin_example
-  org-babel-lob-ingest is an interactive Lisp function in
-  `org-babel-lob.el'.
-
-  It is bound to C-c M-b l.
-
-  (org-babel-lob-ingest &optional FILE)
-
-  Add all source-blocks defined in FILE to `org-babel-library-of-babel'.
-#+end_example
 
 * Batch Execution
 It is possible to call Org-babel functions from the command line.
