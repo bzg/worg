@@ -898,28 +898,6 @@ of translating Org-mode tables to and from supported languages.
   | =C-up=    | [[function-org-babel-load-in-session][org-babel-load-in-session]]       |
   | =M-down=  | [[function-org-babel-pop-to-session][org-babel-pop-to-session]]        |
 
-  Org-babel also exposes a number of functions behind the common
-  =org-babel-key-prefix= of =C-c M-b=:
-  #+begin_src emacs-lisp :exports none
-     (lambda (binding
-       (list (format "\\C-c \\M-b %s"
-                     (car binding))
-             (format "[[function-%s][%s]]"
-                     (cdr binding) (cdr binding))))
-     org-babel-key-bindings)
-  #+end_src
-
-  | Key         | Binding                           |
-  |-------------+-----------------------------------|
-  | =C-c M-b t= | [[function-org-babel-tangle][org-babel-tangle]]                  |
-  | =C-c M-b T= | [[function-org-babel-tangle-file][org-babel-tangle-file]]             |
-  | =C-c M-b e= | [[function-org-babel-execute-src-block][org-babel-execute-src-block]]       |
-  | =C-c M-b s= | [[function-org-babel-execute-subtree][org-babel-execute-subtree]]         |
-  | =C-c M-b b= | [[function-org-babel-execute-buffer][org-babel-execute-buffer]]          |
-  | =C-c M-b h= | [[function-org-babel-sha1-hash][org-babel-sha1-hash]]               |
-  | =C-c M-b g= | [[function-org-babel-goto-named-source-block][org-babel-goto-named-source-block]] |
-  | =C-c M-b l= | [[function-org-babel-lob-ingest][org-babel-lob-ingest]]              |
-
 
 Functions exposed behind =C-c C-v= include: 
 | Key           | Binding                           |
@@ -1158,7 +1136,6 @@ of the source block to the kill ring.
   exported source code blocks by language.
 #+end_example
 
-
 * Batch Execution
 It is possible to call Org-babel functions from the command line.
 This shell script calls [[function-org-babel-tangle][org-babel-tangle]] on every one of its
@@ -1227,3 +1204,26 @@ to work correctly.
    - HTML 1 was keeping the babelfish code from exporting.  Not sure
      why or if the code itself is necessary, but moving it here gets
      the fish on the page.
+* Old stuff                                                        :noexport:
+  Org-babel also exposes a number of functions behind the common
+  =org-babel-key-prefix= of =C-c M-b=:
+  #+begin_src emacs-lisp :exports none
+     (lambda (binding
+       (list (format "\\C-c \\M-b %s"
+                     (car binding))
+             (format "[[function-%s][%s]]"
+                     (cdr binding) (cdr binding))))
+     org-babel-key-bindings)
+  #+end_src
+
+  | Key         | Binding                           |
+  |-------------+-----------------------------------|
+  | =C-c M-b t= | [[function-org-babel-tangle][org-babel-tangle]]                  |
+  | =C-c M-b T= | [[function-org-babel-tangle-file][org-babel-tangle-file]]             |
+  | =C-c M-b e= | [[function-org-babel-execute-src-block][org-babel-execute-src-block]]       |
+  | =C-c M-b s= | [[function-org-babel-execute-subtree][org-babel-execute-subtree]]         |
+  | =C-c M-b b= | [[function-org-babel-execute-buffer][org-babel-execute-buffer]]          |
+  | =C-c M-b h= | [[function-org-babel-sha1-hash][org-babel-sha1-hash]]               |
+  | =C-c M-b g= | [[function-org-babel-goto-named-source-block][org-babel-goto-named-source-block]] |
+  | =C-c M-b l= | [[function-org-babel-lob-ingest][org-babel-lob-ingest]]              |
+
