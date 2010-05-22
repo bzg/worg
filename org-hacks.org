@@ -542,6 +542,15 @@ changed.
 (add-hook 'after-save-hook 'ba/org-adjust-tags-column-after-save)
 (add-hook 'org-agenda-mode-hook '(lambda ()
                                   (setq org-agenda-tags-column (- (window-width)))))
+
+; between invoking org-refile and displaying the prompt (which
+; triggers window-configuration-change-hook) tags might adjust, 
+; which invalidates the org-refile cache
+(defadvice org-refile (around org-refile-disable-adjust-tags)
+  "Disable dynamically adjusting tags"
+  (let ((ba/org-adjust-tags-column nil))
+    ad-do-it))
+(ad-activate 'org-refile)
 #+end_src
 * Compiling Org without make
   :PROPERTIES:
