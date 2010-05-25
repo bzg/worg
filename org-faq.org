@@ -631,6 +631,36 @@ the following variable:
   (setq system-time-locale "C")
 #+end_src
 
+** What does a minimal .emacs look like?
+Using a stripped down minimal .emacs files removes broken custom
+settings as the cause of an issue and makes it easy to reproduce for
+other people.  The example below has system-specific paths that you'll
+need to change for your own use.
+#+begin_src emacs-lisp
+  (add-to-list 'load-path (expand-file-name "~/git/org-mode/lisp"))
+  (add-to-list 'auto-mode-alist '("\\.\\(org\\  |org_archive\\|txt\\)$" . org-mode))
+  (setq org-agenda-files '("/tmp/test.org"))
+  (require 'org-install)
+  (require 'org-habit)
+  
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cb" 'org-iswitchb)
+#+end_src
+
+You can save the minimal .emacs file to ~/minimal.emacs, add suspect
+configuration code to it, then start emacs something like this:
+#+begin_src sh
+  emacs -Q -l ~/minimal.emacs
+#+end_src
+
+On OS X, starting emacs with minimal configuration might look
+something like this:
+#+begin_src sh 
+  /Applications/emacs.app/Contents/MacOS/Emacs -Q -l ~/minimal.emacs
+#+end_src sh
+
+
 * Errors and general problems
   :PROPERTIES:
   :CUSTOM_ID: Errors
