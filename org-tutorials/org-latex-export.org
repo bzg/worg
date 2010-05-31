@@ -200,10 +200,19 @@ modify the variable =org-latex-to-pdf-process=.  This is a list of
 strings, each of which contains a call to one of the TeX typesetting
 engines or to an auxiliary program, such as BibTeX, makeindex, etc.
 
-* Exporting Parts of a Buffer
+* Exporting Parts of an Org-mode Buffer
 Tags can be used to select which parts of an Org-mode buffer are sent
-to the LaTeX exporter.  The tags used for this purpose are held in
-variables: =org-export-select-tags= is a list of tags, initially set
+to the LaTeX exporter.  In the typical case, the
+Org-mode buffer contains material for a single export file along with
+material that shouldn't appear in the export; tags distinguish the
+export parts from the non-export parts.  This is the single
+export case.  It is also possible to use tags to specify multiple
+export targets in a single Org-mode buffer.  In the multiple export
+case, tags are resolved by a [[http://orgmode.org/org.html#Publishing][publishing management system]].  
+
+** The Single Export Case
+The tags used for the single export case are held in
+two variables: =org-export-select-tags= is a list of tags, initially set
 to =export=, that select a tree or sub-tree for export;
 =org-export-exclude-tags= is a list of tags, initially set to
 =noexport=, that exclude a tree or subtree for export.  The effect
@@ -251,3 +260,63 @@ the tree-level tag, as in the following example.
   ,  This is not exported, either
 #+end_src
 
+
+** The Multiple Export Case
+In the multiple export case, tags used to select a tree or subtree for
+export are defined in =.emacs= as part of the configuration needed to
+specify the many properties of a publication project.  A tutorial
+illustrates [[http://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.php][the flexibility of the publishing mechanism]] using an HTML
+example.  The intricacies of the publishing mechanism are beyond the
+scope of of this LaTeX export tutorial.  Here, a working example[fn:1]
+is described.
+
+In the example, the file =index.org= holds material for two export
+targets, one related to work items and the other related to home.  The
+variable =org-publish-project-alist= has two entries, one for a
+project named =work= and the other for a project named =home=.  Both
+projects are based on the file =index.org= located in =~/notes/org=.
+
+Both projects will create output files named =index.tex=, based on the
+name of the Org-mode file used for import.  The two =index.tex= files
+are kept separate by writing them to different directories, as
+indicated by the keyword argument =:publishing-directory=.
+#+begin_src emacs-lisp
+  (setq org-publish-project-alist
+        '(
+          ("work"
+           :base-directory "~/notes/org/"
+           :base-extension "org"
+           :publishing-directory "~/notes/export/work/"
+           :publishing-function org-publish-org-to-latex
+           :select-tags     ("@WORK")
+           :title "Work Notes"
+           :include ("index.org")
+           :exclude "\\.org$"
+           )
+          ("home"
+           :base-directory "~/notes/org/"
+           :base-extension "org"
+           :publishing-directory "~/notes/export/home/"
+           :publishing-function org-publish-org-to-latex
+           :select-tags     ("@HOME")
+           :title "Home Phone"
+           :include ("index.org")
+           :exclude "\\.org$"
+           )
+          ))
+#+end_src
+
+The parts of =index.org= tagged =@WORK= can now be exported to
+=~/notes/export/work/index.tex= with =C-c C-e X= and selecting the
+=work= project.
+
+Similarly, the parts of =index.org= tagged =@HOME= can now be exported to
+=~/notes/export/home/index.tex= with =C-c C-e X= and selecting the
+=home= project.
+
+
+* Footnotes
+
+[fn:1] Based on posts to the mailing list by Karl Marino and Carsten
+Dominick.  Thanks to Bernt Hansen and Nick Dokos for help debugging a
+problem implementing the publishing project.
