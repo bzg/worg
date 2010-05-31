@@ -2619,6 +2619,57 @@ way.  This means that the .tex file should already exist, perhaps by
 tangling the LaTeX preamble and postamble, before
 =org-mode-article-modes= is activated for the Org-mode file.
 
+* MobileOrg
+
+** Which versions of MobileOrg do exist
+   :PROPERTIES:
+   :CUSTOM_ID: mobileorg_versions
+   :END:
+
+- MobileOrg for the iPhone/iPod Touch/iPad series of devices, by
+  Richard Moreland.  Check out
+  [[http://mobileorg.ncogni.to/][Richard's page]]
+- Matt Jones is developing a feature-equivalent application for
+  Android, see
+  [[http://wiki.github.com/matburt/mobileorg-android/][his project page]].
+
+** What can I do if I don't want to use Dropbox.com
+   :PROPERTIES:
+   :CUSTOM_ID: mobileorg_webdav
+   :END:
+
+Dropbox.com is the easiest way to connect between Emacs and MobileOrg,
+you can get a free account there.  If for some reason you cannot or do
+not want to use this path, you can use any webdav server.  On this
+webdav server you need to create a dedicated directory for the
+communication between Emacs and MobileOrg.  If you can mount that
+directory locally so that Emacs can directly write to it, just point
+to that directory using the variable =org-mobile-directory=.  Using
+the /tramp/ method, =org-mobile-directory= may point to a remote
+directory accessible through, for example, /ssh/ and /scp/:
+
+#+begin_src emacs-lisp
+(setq org-mobile-directory "/scpc:user@@remote.host:org/webdav/")
+#+end_src
+
+If Emacs cannot access the WebDAV directory directly using a /tramp/
+method, or you prefer to maintain a local copy, you can use a local
+directory for staging.  Other means must then be used to keep this
+directory in sync with the WebDAV directory.  In the following
+example, files are staged in =~/stage/=, and Org-mode hooks take
+care of moving files to and from the WebDAV directory using
+/scp/.
+
+#+begin_src emacs-lisp
+(setq org-mobile-directory "~/stage/")
+(add-hook 'org-mobile-post-push-hook
+  (lambda () (shell-command "scp -r ~/stage/* user@@wdhost:mobile/")))
+(add-hook 'org-mobile-pre-pull-hook
+  (lambda () (shell-command "scp user@@wdhost:mobile/mobileorg.org ~/stage/ ")))
+(add-hook 'org-mobile-post-pull-hook
+  (lambda () (shell-command "scp ~/stage/mobileorg.org user@@wdhost:mobile/")))
+#+end_src
+
 * COMMENT HTML style specifications
 
 #+begin_src emacs-lisp
