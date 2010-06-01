@@ -54,23 +54,27 @@ of GNU Emacs.  These files are called the /Org core/, and they are all
 copyrighted by the [[http://www.fsf.org][Free Software Foundation, Inc]].  If you consider
 contributing to these files, your first need to grant the right to
 include your works in GNU Emacs to the FSF.  For this you need to
-complete [[http://orgmode.org/request-assign-future.txt][this form]] and send it to [[mailto:assign@gnu.org][assign@gnu.org]].  Some people
-consider this a hassle.  I don't want to discuss this in detail here -
-but by playing according to the Emacs rules, we gain the fantastic
-advantage that every version of Emacs ships with Org-mode already
-fully built in.  So please consider doing this - it makes our work as
-maintainers so much easier, because we can then take your patches
-without any additional work.
+complete [[http://orgmode.org/request-assign-future.txt][this form]], send it to [[mailto:assign@gnu.org][assign@gnu.org]], and tell the Org-mode
+maintainer when this process is complete.  Some people consider this a
+hassle.  I don't want to discuss this in detail here - there are some
+good reasons for getting the copyright registered, an example is
+discussed in this [[http://twit.tv/floss117][FLOSS weekly podcast]].  Furthermore, by playing
+according to the Emacs rules, we gain the fantastic advantage that
+every version of Emacs ships with Org-mode already fully built in.  So
+please consider doing this - it makes our work as maintainers so much
+easier, because we can then take your patches without any additional
+work.
 
-If you want to understand /why/ copyright assignments are collected,
-read this: [[http://www.gnu.org/licenses/why-assign.html][Why the FSF gets copyright assignments from contributors?]]
+If you want to learn more about /why/ copyright assignments are
+collected, read this: [[http://www.gnu.org/licenses/why-assign.html][Why the FSF gets copyright assignments from
+contributors?]]
 
 * Preferred way of submitting patches
 
 Org-mode is developed using /git/ as the version control system.  Git
 provides an amazing framework to collaborate on a project.  Git can be
-used to make patches and send them via email - this is fine for minor
-changes.  These patches will be automatically registered at
+used to make patches and send them via email - this is perfectly fine
+for minor changes.  These patches will be automatically registered at
 [[http://patchwork.newartisans.com/project/org-mode][John Wiegley's patchwork server]] and will then be accepted, rejected,
 or sent back to the author with a request for modification.
 
@@ -118,7 +122,40 @@ through public branches of your repository clone.
    : git branch -d NEWTOPIC
    : git push REMOTE :NEWTOPIC
 
-* Current contributors
+* ChangeLog entries and commit messages
+
+We have decided to no longer keep a ChangeLog file to record changes
+to individual functions.  In a modern version control system like git,
+ChangeLog is duplicating information that should be in the commit
+message, and it is the main cause of merge conflicts.
+
+Instead, the change log entry should be part of the commit message.
+Line 1 of the commit message should always be a short description of
+the overall change.  In line 3, the ChangeLog entry should start, in a
+similar format as in the old ChangeLog files, but without the author
+information (which is part of the commit anyway).  After the
+changelog, another empty line should come before any additional
+information that the committer wishes to provide in order to expain
+the patch.
+
+An example for such a commit message is [[http://article.gmane.org/gmane.emacs.orgmode/25574][here]].
+
+If you are using /magit.el/ in Emacs, such entries are easily made by
+pressing =C= in the diff listing.  Another option to make the entries
+is to use `C-x 4 a' in the changed function.  This will create entries
+in the ChangeLog file, and you can then cut and paste these to the
+commit message and remove the indentation.
+
+
+* Copyrighted contributors to Org-mode
+
+Here is the list of people who have contributed actual code to the
+Org-mode core.  Note that the manual contains a more extensive list
+with acknowledgments, including contributed ideas!  The lists below
+are mostly for house keeping, to help the maintainers keep track of
+copyright issues.
+
+** Current contributors
   :PROPERTIES:
   :CUSTOM_ID: contributors_with_fsf_papers
   :END:
@@ -173,6 +210,39 @@ within GNU Emacs:
 44. John Wiegley
 45. Piotr Zielinski
 
+** Processing
+
+These people have been asked to sign the papers, and they are
+currently considering it or a request is being processed by the FSF.
+
+1. Russel Adams
+2. Chris Gray
+3. Christian Egli
+4. Stephen Eglen
+5. Andreas Burtzlaff
+
+** Tiny Changes
+
+These people have submitted tiny change patches that made it into Org
+without FSF papers.  When they submit more, we need to get papers
+eventually.  The limit is a cumulative change of 20 non-repetitive
+change lines.  Details are given in [[http://www.gnu.org/prep/maintain/maintain.html#Legally-Significant ][this document]].
+
+1. Robert P. Goldman
+2. Michael Sperber
+3. Julien Barnier
+4. Andy Lutomirski
+5. Joel Boehland
+
+(this list may be incomplete - please help to complete it)
+
+** No FSF assignment
+
+These people cannot or prefer to not sign the FSF copyright papers,
+and we can only accept patches that do not change the core files (the
+ones that are also in Emacs).
+
+Luckily, this list is still empty.
 
 #+BEGIN: timestamp :string "Last update: " :format "%Y-%m-%d @ %H:%M"
 Last update: 06-04-2010 16:29
