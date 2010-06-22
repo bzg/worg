@@ -20,6 +20,14 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-06-22  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-change-todo): New function.  Change
+;;   TODO keyword of issue.
+;;   (org-issue-display): New function.  Display issue in other
+;;   window.
+;;   (org-issue-jump): New function.  Jump to issue.
+;; 
 ;; 2010-06-15  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-tag): Save buffer before kill.
@@ -206,6 +214,41 @@ If optional argument REMOVE is non-nil, remove the flag."
 	(org-set-tags-command))
       (save-buffer)
       (unless visiting (kill-buffer)))))
+
+(defun org-issue-keyword ()
+  "Change TODO keyword of current message."
+  (interactive)
+  (let ((msginfo (org-issue-get-msginfo))
+	(visiting (find-buffer-visiting org-issue-issue-file)))
+    (unless (org-issue-exists-p (car msginfo))
+      (error "No such issue: %s" (cdr msginfo)))
+    (with-current-buffer (or visiting
+			     (find-file-noselect org-issue-issue-file))
+      (goto-char (org-find-entry-with-id (format "mid:%s" (car msginfo))))
+      (call-interactively 'org-todo))))
+
+(defun org-issue-display ()
+  "Display issue in other-window."
+  (interactive)
+  (let ((msginfo (org-issue-get-msginfo))
+	(buf (or (find-buffer-visiting org-issue-issue-file)
+		 (find-file-noselect org-issue-issue-file))))
+    (unless (org-issue-exists-p (car msginfo))
+      (error "No such issue: %s" (cdr msginfo)))
+    (display-buffer buf 'other-window)
+    (with-current-buffer buf
+      (goto-char (org-find-entry-with-id (format "mid:%s" (car msginfo))))
+      (org-reveal))))
+
+(defun org-issue-jump ()
+  "Jump to issue of current message."
+  (interactive)
+  (let ((msginfo (org-issue-get-msginfo))
+	(buf (or (find-buffer-visiting org-issue-issue-file)
+		 (find-file-noselect org-issue-issue-file))))
+    (switch-to-buffer buf)
+    (goto-char (org-find-entry-with-id (format "mid:%s" (car msginfo))))
+    (org-reveal)))
 
 (defun org-issue-close ()
   "Close issue of current message."
