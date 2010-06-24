@@ -20,6 +20,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-06-24  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-display): Move point in other window.
+;; 
 ;; 2010-06-22  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-change-todo): New function.  Change
@@ -232,13 +236,16 @@ If optional argument REMOVE is non-nil, remove the flag."
   (interactive)
   (let ((msginfo (org-issue-get-msginfo))
 	(buf (or (find-buffer-visiting org-issue-issue-file)
-		 (find-file-noselect org-issue-issue-file))))
+		 (find-file-noselect org-issue-issue-file)))
+	wn pt)
     (unless (org-issue-exists-p (car msginfo))
       (error "No such issue: %s" (cdr msginfo)))
-    (display-buffer buf 'other-window)
+    (setq wn (display-buffer buf 'other-window))
     (with-current-buffer buf
-      (goto-char (org-find-entry-with-id (format "mid:%s" (car msginfo))))
-      (org-reveal))))
+      (setq pt (org-find-entry-with-id (format "mid:%s" (car msginfo))))
+      (goto-char pt)
+      (org-reveal))
+    (set-window-point wn tp)))
 
 (defun org-issue-jump ()
   "Jump to issue of current message."
