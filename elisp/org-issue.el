@@ -23,6 +23,9 @@
 ;; 2010-06-24  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-display): Move point in other window.
+;;   (org-issue-remove-ml-prefix): New function.
+;;   (org-issue-get-msginfo:gnus, org-issue-get-msginfo:wl): Remove
+;;   Org mode mailing list prefix.
 ;; 
 ;; 2010-06-22  David Maus  <dmaus@ictsoc.de>
 ;; 
@@ -96,6 +99,12 @@ flag is added in removed by the functions `org-issue-new',
     (setq s (replace-match ")" nil nil s)))
   s)
 
+(defun org-issue-remove-ml-prefix (s)
+  "Return S without Org mode mailing list prefix."
+  (if (string-match "^\\[Orgmode\\] " s)
+      (replace-match "" nil nil s))
+  s)
+
 (defun org-issue-get-msginfo ()
   "Return cons with message id in car and subject in cdr."
   (cond
@@ -116,7 +125,8 @@ Operates on Gnus messages."
       (org-remove-angle-brackets
        (mail-header-id header)))
      (org-issue-replace-brackets
-      (mail-header-subject header)))))
+      (org-issue-remove-ml-prefix
+       (mail-header-subject header))))))
 
 (defun org-issue-get-msginfo:wl ()
   "Return cons with message id in car and subject in cdr.
@@ -131,7 +141,8 @@ Operates on Wanderlust messages."
 	   (org-remove-angle-brackets
 	    (org-wl-message-field 'message-id ent)))
 	  (org-issue-replace-brackets
-	   (org-wl-message-field 'subject ent)))))
+	   (org-issue-remove-ml-prefix
+	    (org-wl-message-field 'subject ent))))))
 
 (defun org-issue-exists-p (id)
   "Return non-nil, if an issue identified by ID exists."
