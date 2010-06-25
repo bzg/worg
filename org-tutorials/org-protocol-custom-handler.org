@@ -81,15 +81,18 @@ nil)
   by typing '=C-g=', consider to supply the '=:kill-client=' property when you
   define the protocol.
 
-  This is what we did for the remember handler:
+  This is what we did for the capture handler:
 
-  : (defconst org-protocol-protocol-alist-default
-  :   '(("org-remember" :protocol "remember"
-  :                     :function org-protocol-remember
-  :                     :kill-client t)
-  :     ... ))
+  #+begin_src emacs-lisp
+    (defconst org-protocol-protocol-alist-default
+      '(("org-capture" :protocol "capture"
+         :function org-protocol-capture
+         :kill-client t)
+        ;; ...
+        ))
+  #+end_src
 
-  Otherwise, if the user has an interactive property defined in her remember
+  Otherwise, if the user has an interactive property defined in her capture
   template, discarding it through '=C-g=' would leed to emacsclient waiting for
   ever, thus to the appropriate questions when exiting emacs.
 
