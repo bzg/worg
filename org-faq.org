@@ -660,7 +660,6 @@ something like this:
   /Applications/emacs.app/Contents/MacOS/Emacs -Q -l ~/minimal.emacs
 #+end_src sh
 
-
 * Errors and general problems
   :PROPERTIES:
   :CUSTOM_ID: Errors
@@ -2027,6 +2026,22 @@ time-of-day indicator and the entry would appear in your agenda at
 If you would like to turn off the time-of-day search, you can
 configure the variable =org-agenda-search-headline-for-time= (requires
 org-mode >= 6.24).
+
+** How can I change the visibility of an item from the agenda?
+   :PROPERTIES:
+   :CUSTOM_ID: cycling-visibility-from-agenda
+   :END:
+
+You can add a keybinding as follows:
+
+#+begin_src emacs-lisp
+(add-hook 'org-agenda-mode-hook
+   (lambda ()
+     (define-key org-agenda-mode-map " " 'org-agenda-cycle-show)))
+#+end_src
+
+Then, as you press SPACE on an item on the agenda, it will cycle the
+visibility of its original location.
 
 * Appointments/Diary
   :PROPERTIES:
