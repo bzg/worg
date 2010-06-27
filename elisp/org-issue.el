@@ -20,6 +20,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-06-27  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-display): Fix typo.
+;; 
 ;; 2010-06-24  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-display): Move point in other window.
@@ -256,7 +260,7 @@ If optional argument REMOVE is non-nil, remove the flag."
       (setq pt (org-find-entry-with-id (format "mid:%s" (car msginfo))))
       (goto-char pt)
       (org-reveal))
-    (set-window-point wn tp)))
+    (set-window-point wn pt)))
 
 (defun org-issue-jump ()
   "Jump to issue of current message."
