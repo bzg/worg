@@ -23,6 +23,7 @@
 ;; 2010-06-27  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-display): Fix typo.
+;;   (org-issue-remove-ml-prefix): Set return value.
 ;; 
 ;; 2010-06-24  David Maus  <dmaus@ictsoc.de>
 ;; 
@@ -106,7 +107,7 @@ flag is added in removed by the functions `org-issue-new',
 (defun org-issue-remove-ml-prefix (s)
   "Return S without Org mode mailing list prefix."
   (if (string-match "^\\[Orgmode\\] " s)
-      (replace-match "" nil nil s))
+      (setq s (replace-match "" nil nil s)))
   s)
 
 (defun org-issue-get-msginfo ()
