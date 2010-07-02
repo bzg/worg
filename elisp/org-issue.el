@@ -20,6 +20,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-07-02  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-bulk-update-message-flag): New function.
+;; 
 ;; 2010-06-27  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-display): Fix typo.
@@ -304,6 +308,15 @@ If optional argument REMOVE is non-nil, remove the flag."
 	(setq state (org-entry-is-todo-p)))
       (unless visiting (kill-buffer)))
     (org-issue-flag-message org-issue-message-flag (not state))))
+
+(defun org-issue-bulk-update-message-flag ()
+  "Update message flag of all messages in summary."
+  (interactive)
+  (when (eq major-mode 'wl-summary-mode)
+    (goto-char (point-min))
+    (while (not (eobp))
+      (ignore-errors (org-issue-update-message-flag))
+      (beginning-of-line 2))))
 
 (provide 'org-issue)
 
