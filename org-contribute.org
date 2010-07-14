@@ -138,7 +138,29 @@ changelog, another empty line should come before any additional
 information that the committer wishes to provide in order to expain
 the patch.
 
-An example for such a commit message is [[http://article.gmane.org/gmane.emacs.orgmode/25574][here]].
+If the change is a minor change made by a committer without copyright
+assignment to the FSF, the commit message should also contain the
+cookie =TINYCHANGE= (anywhere in the message).  When we later produce
+the ChangeLog file for Emacs, this will indicate that it is OK to take
+this change.
+
+Here is an example for such a message
+
+#+begin_example
+Capture: Fix the case of using a template file
+    
+* lisp/org-capture.el (org-capture-set-plist): Make sure txt is a string
+before calling `string-match'.
+(org-capture-templates): Fix customization type.
+* doc/org.texi (Capture): Document using a file for a template
+    
+The problem here was that a wrong keyword was given in the
+customization type.  This let to a string-match against a list value.
+
+Modified from a patch proposal by Johan Friis.
+
+TINYCHANGE
+#+end_example
 
 If you are using /magit.el/ in Emacs, such entries are easily made by
 pressing =C= in the diff listing.  Another option to make the entries
