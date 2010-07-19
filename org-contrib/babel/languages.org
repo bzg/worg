@@ -1,0 +1,115 @@
+#+OPTIONS:    H:3 num:nil toc:3 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:nil skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org-babel: Languages
+#+AUTHOR:     Eric Schulte, Dan Davison, Tom Dye
+#+EMAIL:      schulte.eric at gmail dot com, davison at stats dot ox dot ac dot uk, tsd at tsdye dot com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-syntax{ clear:both; }</style>
+#+STYLE:      <style type="text/css">#table-of-contents{ max-width:100%; }</style>
+#+LINK_UP:    index.php
+#+LINK_HOME:  http://orgmode.org/worg/
+
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+    <p>executable source code blocks in org-mode</p>
+  </div>
+  <div id="logo2" style="float: left; text-align: center; max-width:
+                         420px; font-size: 8pt; margin: 1em;">
+    <p>
+      <img src="../../images/babel/babelfish.png"  alt="Babel Fish"/>
+      <p>
+        The Babel Fish is small, yellow, and simultaneously translates
+        from one spoken language to another.
+      </p>
+      <p>
+        &ndash; The Hitchhiker's Guide to the Galaxy, Douglas Adams
+      </p>
+    </p>
+  </div>
+#+end_html
+
+Org-babel has support for the following languages.
+
+| Language       | Documentation        | Identifier   | Requirements                                |
+|----------------+----------------------+--------------+---------------------------------------------|
+| Asymptote      | ob-doc-asymptote     | asymptote    | [[http://asymptote.sourceforge.net/][asymptote]], [[http://asymptote.sourceforge.net/doc/Editing-modes.html][asy-mode]]                         |
+| C              | [[file:languages/ob-doc-C.org][ob-doc-C]]             | C            | none                                        |
+| Clojure        | [[file:languages/ob-doc-clojure.org][ob-doc-clojure]]       | clojure      | [[http://clojure.org/][clojure]], [[http://www.emacswiki.org/emacs/clojure-mode.el][clojure-mode]], [[http://common-lisp.net/project/slime/][slime]], [[http://clojure.codestuffs.com/][swank-clojure]] |
+| css            | ob-doc-css           | css          | none                                        |
+| ditaa          | ob-doc-ditaa         | ditaa        | [[http://ditaa.org/ditaa/][ditaa]] (bundled with Org-mode)               |
+| Graphviz       | ob-doc-dot           | dot          | [[http://www.graphviz.org/][dot]]                                         |
+| Emacs Lisp     | ob-doc-emacs-lisp    | emacs-lisp   | none                                        |
+| gnuplot        | ob-doc-gnuplot       | gnuplot      | [[http://www.gnuplot.info/][gnuplot]], [[http://cars9.uchicago.edu/~ravel/software/gnuplot-mode.html][gnuplot-mode]]                       |
+| Haskell        | ob-doc-haskell       | haskell      | [[http://www.haskell.org/][haskell]], [[http://projects.haskell.org/haskellmode-emacs/][haskell-mode]], [[http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs#inf-haskell.el:_the_best_thing_since_the_breadknife][inf-haskell]], [[http://people.cs.uu.nl/andres/lhs2tex/][lhs2tex]] |
+| LaTeX          | [[file:languages/ob-doc-LaTeX.org][ob-doc-latex]]         | latex        | [[http://www.latex-project.org/][latex]], [[http://www.gnu.org/software/auctex/][auctex]], [[http://www.gnu.org/software/auctex/reftex.html][reftex]]                       |
+| Matlab         | [[file:languages/ob-doc-octave-matlab.org][ob-doc-octave-matlab]] | matlab       | matlab, [[http://sourceforge.net/projects/matlab-emacs/][matlab.el]]                           |
+| Objective Caml | ob-doc-ocaml         | ocaml        | [[http://caml.inria.fr/][ocaml]], [[http://www-rocq.inria.fr/~acohen/tuareg/][tuareg-mode]]                          |
+| Octave         | [[file:languages/ob-doc-octave-matlab.org][ob-doc-octave-matlab]] | octave       | octave                                      |
+| OZ             | [[file:languages/ob-doc-oz.org][ob-doc-oz]]            | oz (contrib) | [[http://www.mozart-oz.org/][Mozart]] which includes a major mode          |
+| Perl           | ob-doc-perl          | perl         | [[http://www.perl.org/][perl]], [[http://www.emacswiki.org/emacs/CPerlMode][cperl-mode]] (optional)                 |
+| Python         | ob-doc-python        | python       | [[http://www.python.org/][python]], [[https://launchpad.net/python-mode][python-mode]] (optional)              |
+| R              | [[file:languages/ob-doc-R.org][ob-doc-R]]             | R            | [[http://www.r-project.org/][R]], [[http://ess.r-project.org/][ess-mode]]                                 |
+| Ruby           | ob-doc-ruby          | ruby         | [[http://www.ruby-lang.org/][ruby]], [[http://www.ruby-lang.org/][irb]], [[http://github.com/eschulte/rinari/raw/master/util/ruby-mode.el][ruby-mode]], [[http://github.com/eschulte/rinari/raw/master/util/inf-ruby.el][inf-ruby mode]]         |
+| Sass           | ob-doc-sass          | sass         | [[http://sass-lang.com/][sass]], [[http://github.com/nex3/haml/blob/master/extra/sass-mode.el][sass-mode]]                             |
+| GNU Screen     | [[file:languages/ob-doc-screen.org][ob-doc-screen]]        | screen       | [[http://www.gnu.org/software/screen/][screen]], a terminal                          |
+| shell          | ob-doc-sh            | sh           | a shell                                     |
+| SQL            | ob-doc-sql           | sql          | none                                        |
+| Sqlite         | ob-sqlite            | sqlite       | the =sqlite3= executable                    |
+
+* Configure active languages
+  :PROPERTIES:
+  :CUSTOM_ID: configure
+  :END:
+To add support for a particular language to your Babel installation
+first make sure that the requirements of the language are met, then
+you may customize the =org-babel-load-languages= variable, update the
+variable's value manually by adding[fn:1]
+: (lang . t)
+to it's definition.  A line like the following to explicitly /remove/
+support for a language.
+: (lang . nil)
+
+Here is an example manual configuration of this variable, which
+enables support for =R=, and disables support for =emacs-lisp=.
+#+begin_src emacs-lisp :exports code
+  ;; active Babel languages
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)
+     (emacs-lisp . nil)
+     ))
+#+end_src
+
+* Develop support for new languages
+  :PROPERTIES:
+  :CUSTOM_ID: develop
+  :END:
+The core Babel functions (viewing, export, tangling, etc...) are
+language agnostic and will work even for languages which are not
+explicitly support.  Explicit language-specific support is required
+only for evaluation of code blocks in a language.
+
+Babel is designed to be easily extended to support new languages.
+Language support is added by defining language-specific functions
+using a simple naming convention.  The full suite of possible language
+specific functions need not be implemented all at once, but rather it
+is possible (and encouraged) to develop language-specific
+functionality in an incremental fashion -- Babel will make use of
+those functions which are available, and will fail gracefully when
+functionality has not yet been implemented.
+
+There is a short Emacs Lisp template ([[http://repo.or.cz/w/Worg.git/blob/HEAD:/org-contrib/babel/ob-template.el][ob-template.el]]) which can be
+used as a starting point for implementing support for new languages.
+Developers are encouraged to read the [[file:~/src/worg/org-contribute.org][Org-mode contribution
+instructions]] in the hopes that the language support can be included
+into the Org-mode core.
+
+* Footnotes
+
+[fn:1] languages in the contrib directory are marked with "(contrib)"
+       in the "Identifier" section above are not loadable through the
+       =org-babel-do-load-languages= variable, but rather must be
+       explicitly required (e.g. =(require 'ob-oz)=) after the contrib
+       directory has been added to you load path.
