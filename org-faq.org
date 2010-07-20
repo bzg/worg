@@ -371,7 +371,6 @@ The result of that discussion is the file/function found in
   :PROPERTIES:
   :CUSTOM_ID: Setup
   :END:
-
 ** How can I quickly browse all Org options?
 
 =M-x org-customize RET=
@@ -590,34 +589,6 @@ files in your =.emacs= file before you have set your org variables,
 since these will also cause org.el to be loaded. To be safe, load org
 files *after* you have set your variables.
 
-** Org-mode has a lot of colors?  How can I change them?
-   :PROPERTIES:
-   :CUSTOM_ID: customizing-org-faces
-   :END:
-
-This is a question that applies to Emacs as a whole, but it comes up
-quite frequently on the org-mode mailing list, so it is appropriate to
-discuss it here.
-
-If you would like to change the style of a face in org-mode (or any
-other Emacs mode), simply type =M-x customize-face [RET]= while the
-cursor is on the color/style you are interested in modifying. You will
-be given the opportunity to customize all the faces located at that
-point.
-
-If you would like an overview of all the faces in org-mode, you can
-type =C-u M-x list-faces-display [RET] org= and you will be shown all
-the faces defined by org-mode along with an illustration of their
-current settings.
-
-If you would like to customize org-faces and other aspects of
-org-appearance, type =M-x customize-group org-font-lock [RET]=.
-
-Finally, if you would like verbose information about the properties of
-the text under the cursor, you can type =C-u C-x ==.
-
-See the Worg page on [[file:org-tutorials/org-appearance.org][customizing Org appearance]] for further information.
-
 ** How can I make sure that timestamps appear in English?
    :PROPERTIES:
    :CUSTOM_ID: timestamps-and-system-time-locale
@@ -659,7 +630,6 @@ something like this:
 #+begin_src sh 
   /Applications/emacs.app/Contents/MacOS/Emacs -Q -l ~/minimal.emacs
 #+end_src sh
-
 * Errors and general problems
   :PROPERTIES:
   :CUSTOM_ID: Errors
@@ -880,6 +850,75 @@ If you are using an older version of org mode, you can:
     (define-key org-mode-map "\C-a" 'move-beginning-of-line)
     (define-key org-mode-map "\C-e" 'move-end-of-line)))
 
+#+end_src
+* Faces and highlighting
+  :PROPERTIES:
+  :CUSTOM_ID: Faces
+  :END:
+** Org-mode has a lot of colors?  How can I change them?
+   :PROPERTIES:
+   :CUSTOM_ID: customizing-org-faces
+   :END:
+
+This is a question that applies to Emacs as a whole, but it comes up
+quite frequently on the org-mode mailing list, so it is appropriate to
+discuss it here.
+
+If you would like to change the style of a face in org-mode (or any
+other Emacs mode), simply type =M-x customize-face [RET]= while the
+cursor is on the color/style you are interested in modifying. You will
+be given the opportunity to customize all the faces located at that
+point.
+
+If you would like an overview of all the faces in org-mode, you can
+type =C-u M-x list-faces-display [RET] org= and you will be shown all
+the faces defined by org-mode along with an illustration of their
+current settings.
+
+If you would like to customize org-faces and other aspects of
+org-appearance, type =M-x customize-group org-font-lock [RET]=.
+
+Finally, if you would like verbose information about the properties of
+the text under the cursor, you can type =C-u C-x ==.
+
+See the Worg page on [[file:org-tutorials/org-appearance.org][customizing Org appearance]] for further information.
+** Why do I get a tiny font in column view when using emacs daemon?
+   :PROPERTIES:
+   :CUSTOM_ID: column-view-tiny-font
+   :END:
+
+When using emacs in daemon mode (=emacs --daemon=), client frames
+sometimes override the column view face settings, resulting in very
+small fonts. Here is a fix:
+
+#+begin_src emacs-lisp
+  (defun org-column-view-uses-fixed-width-face ()
+  ;; copy from org-faces.el
+  (when (fboundp 'set-face-attribute)
+      ;; Make sure that a fixed-width face is used when we have a column
+      ;; table.
+      (set-face-attribute 'org-column nil
+                          :height (face-attribute 'default :height)
+                          :family (face-attribute 'default :family))))
+  
+   (when (and (fboundp 'daemonp) (daemonp))
+    (add-hook 'org-mode-hook 'org-column-view-uses-fixed-width-face))
+#+end_src
+
+This fix was provided in the following mailing list post:
+
+http://article.gmane.org/gmane.emacs.orgmode/27560
+** How can I stop the mouse cursor from highlighting lines in the agenda?
+   :PROPERTIES:
+   :CUSTOM_ID: ratpoison-for-agenda-highlighting
+   :END:
+
+You can add the following to your =.emacs=:
+
+#+begin_src emacs-lisp
+(add-hook 'org-finalize-agenda-hook
+    (lambda () (remove-text-properties
+	       (point-min) (point-max) '(mouse-face t))))
 #+end_src
 
 * Outline

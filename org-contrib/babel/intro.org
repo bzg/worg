@@ -2,7 +2,7 @@
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
-#+TITLE:      Org-babel: Introduction
+#+TITLE:      Babel: Introduction
 #+AUTHOR:     Eric Schulte, Dan Davison, Tom Dye
 #+EMAIL:      schulte.eric at gmail dot com, davison at stats dot ox dot ac dot uk, tsd at tsdye dot com
 #+LANGUAGE:   en
@@ -153,19 +153,18 @@ may have further ideas / views here.
   :PROPERTIES:
   :CUSTOM_ID: introduction
   :END:
-  Org-babel extends the very excellent [[http://orgmode.org/][Org-mode]] with several new
-  features for working with source code, including code
-  execution. Org-mode is an [[http://www.gnu.org/software/emacs/][Emacs]] major mode for doing almost anything
-  with plain text. If you are not familiar with Org-mode please take a
-  moment to read the [[http://orgmode.org/][Org-mode]] homepage before continuing.
+  Babel extends the very excellent [[http://orgmode.org/][Org-mode]] with several features for
+  working with source code, including code execution. Org-mode is an
+  [[http://www.gnu.org/software/emacs/][Emacs]] major mode for doing almost anything with plain text. If you
+  are not familiar with Org-mode please take a moment to read the
+  [[http://orgmode.org/][Org-mode]] homepage before continuing.
 
-  As its name implies, Org-babel will execute code in many different
+  As its name implies, Babel will execute code in many different
   languages. The results of code execution --- text, tables and
-  graphics --- can be used as input to other code blocks or
-  integrated into the powerful publishing facilities of Org-mode.
+  graphics --- can be used as input to other code blocks or integrated
+  into the powerful publishing facilities of Org-mode.
 
-  Org-babel augments [[http://orgmode.org/manual/Literal-examples.html][Org-mode support for code blocks]]
-  by providing:
+  Babel augments [[http://orgmode.org/manual/Literal-examples.html][Org-mode support for code blocks]] by providing:
 
   - interactive and on-export execution of code blocks;
   - code blocks as functions that can be parameterised, refer to
@@ -173,7 +172,7 @@ may have further ideas / views here.
   - export to files for literate programming.
 
 * Overview
-  Org-babel provides new features on a few different fronts, and
+  Babel provides new features on a few different fronts, and
   different people may want to start in different places.
 
   - Using 'src' blocks in Org mode ::
@@ -182,7 +181,7 @@ may have further ideas / views here.
     edit buffer, then you should have a look at the relevant section
     in the [[http://orgmode.org/manual/Literal-examples.html][Org manual]] and [[#source-code-blocks][below]], try it out, and come back.
   - Executing code ::
-    The core of Org-babel is its ability to execute code in Org-mode
+    The core of Babel is its ability to execute code in Org-mode
     'src' blocks, taking input from other blocks and tables, with
     output to further blocks and tables. This is described starting
     [[#source-code-execution][here]].
@@ -190,10 +189,14 @@ may have further ideas / views here.
     If you are a programmer writing code that you would normally
     execute in some other way (e.g. from the command line, or sourcing
     it into an interactive session), then a simple introduction to
-    Org-babel is to place your code in blocks in an Org-mode file, and to
-    use Org-babel's [[#literate-programming][Literate Programming]] support to extract pure code
+    Babel is to place your code in blocks in an Org-mode file, and to
+    use Babel's [[#literate-programming][Literate Programming]] support to extract pure code
     from your Org files.
     
+  All of these use cases, as well as exhaustive documentation of the
+  features of Babel are covered in the [[http://orgmode.org/manual/Working-With-Source-Code.html#Working-With-Source-Code][Working with Source Code]]
+  section of the Org manual.
+
 * Initial Configuration
   :PROPERTIES:
   :CUSTOM_ID: getting-started
@@ -201,39 +204,19 @@ may have further ideas / views here.
   :END:
 
   If you have a working Emacs installation, then getting started with
-  Org-babel is a simple five-step process.
+  Babel is a simple five-step process.
 
   1) It is strongly recommended that you update to the latest version
-     of Org-mode by [[file:../../org-faq.org::keeping-current-with-Org-mode-development][keeping current with Org-mode development]].
-     Org-babel is included in the =contrib= directory of Org-mode.
+     of Org-mode by [[file:../../org-faq.org::keeping-current-with-Org-mode-development][keeping current with Org-mode development]].  As of
+     version 7.0 of Org-mode Babel is included as part of Org-mode.
 
-  2) Make sure that the path to Org-mode's =contrib/lisp= directory is in
-     your load-path and add the following Emacs Lisp expression to your .emacs.
-     #+begin_src emacs-lisp
-       (require 'org-babel-init)     
-     #+end_src
+  2) Optionally activate the subset of languages which you will want
+     to be able to execute with Babel.  See [[file:languages.org::#configure][Configure active languages]]
+     instructions.  Emacs Lisp is activated by default so this step
+     can be skipped for now and all =emacs-lisp= examples will still
+     work as expected.
 
-  3) Activate the subset of [[#reference-and-documentation][supported Org-babel languages]] that you
-     will be using by adding Emacs Lisp expressions to your
-     .emacs.  As an example, the following three Emacs Lisp
-     expressions activate R, Ruby, Python and Clojure.  Shell script and
-     Emacs-lisp are enabled by default.
-     #+begin_src emacs-lisp
-       (require 'org-babel-R)         ;; requires R and ess-mode
-       (require 'org-babel-ruby)      ;; requires ruby, irb, ruby-mode, and inf-ruby
-       (require 'org-babel-python)    ;; requires python, and python-mode
-       (require 'org-babel-clojure)   ;; requires clojure, clojure-mode, swank-clojure and slime
-     #+end_src
-
-  4) Load the Library of Babel by adding the following Emacs Lisp
-     expression to your .emacs.  The Library of Babel will make
-     pre-built helper functions available in the languages you will be
-     using.
-     #+begin_src emacs-lisp
-       (org-babel-load-library-of-babel)
-     #+end_src
-
-  5) Evaluate your modified .emacs.
+  3) Evaluate your modified .emacs.
 
 * Code Blocks
     :PROPERTIES:
@@ -245,7 +228,7 @@ may have further ideas / views here.
     :CUSTOM_ID: source-code-blocks-org
     :END:
 
-    Org-babel is all about [[http://orgmode.org/manual/Literal-examples.html][code blocks]] in Org-mode. If you are
+    Babel is all about [[http://orgmode.org/manual/Literal-examples.html][code blocks]] in Org-mode. If you are
     unfamiliar with the notion of a code block in Org-mode, where they
     are called 'src' blocks, please have a look at the [[http://orgmode.org/manual/Literal-examples.html][Org-mode manual]]
     before proceeding.
@@ -273,48 +256,16 @@ may have further ideas / views here.
   ,#+end_src
 #+end_src
 
-#     We had to take [[http://orgmode.org/manual/Literal-examples.html#Literal-examples][special steps]] to make it look that way in the HTML
-#     output. Normally, when exported to HTML, source blocks are
-#     fontified according to their language, and the =begin_src=
-#     ... =end_src= mark-up is omitted, like this:
-
-# #+begin_src ruby
-# require 'date'
-# "This file was last evaluated on #{Date.today}"
-# #+end_src
-
-# #+resname:
-# : This file was last evaluated on 2009-10-03
-
-# In general, if you are viewing the HTML version, you will see the
-# HTML output only. However, much of this document consists of
-# interactive examples, and therefore in order to get a feeling for the
-# mechanics of Org-babel it might make most sense to grab the Org-mode
-# version of this file
-# #+html: <a href="http://eschulte.github.com/org-babel/org-babel.org">org-babel.org</a>
-# and work through it in Emacs. Alternatively the HTMLized version of
-# the plain text of this file at
-# #+html: <a href="http://eschulte.github.com/org-babel/org-babel.org.html">org-babel.org.html</a>
-# allows the plain text version to be viewed (non-interactively) in a
-# web browser.
-
-# If you don't have ruby installed on your system, then you can run this
-# shell script alternative from the Org-mode version of the file:
-
-# #+begin_src sh
-# echo "This file was last evaluated on `date`"
-# #+end_src
-
-** Code Blocks in Org-babel
+** Code Blocks in Babel
     :PROPERTIES:
     :CUSTOM_ID: source-code-blocks-babel
     :END:
 
-Org-babel adds some new elements to code blocks. The basic
+Babel adds some new elements to code blocks. The basic
 structure becomes:
 
 #+begin_src org
-  ,#+begin_src language babel-header-arguments org-switches
+  ,#+begin_src language  org-switches header-arguments
   ,body
   ,#+end_src
 #+end_src
@@ -337,7 +288,7 @@ structure becomes:
     :CUSTOM_ID: source-code-execution
     :END:
 
-Org-babel executes code blocks for *interpreted* languages such
+Babel executes code blocks for *interpreted* languages such
 as shell, python, R, etc. by passing code to the interpreter, which
 must be installed on your system.  You control what is done with the
 results of execution. 
@@ -426,7 +377,7 @@ HTML export of the resulting image:
    :PROPERTIES:
    :CUSTOM_ID: results
    :END:
-   Org-babel provides two fundamentally different modes for capturing
+   Babel provides two fundamentally different modes for capturing
    the results of code evaluation: functional mode and scripting
    mode.  The choice of mode is specified by the =:results= header
    argument.
@@ -439,7 +390,7 @@ HTML export of the resulting image:
      code block is a function with a return value. The return
      value of one code block can be used as input for another
      code block, even one in a different language.  In this
-     way, Org-babel becomes a [[meta-programming-language]]. If the block
+     way, Babel becomes a [[meta-programming-language]]. If the block
      returns tabular data (a vector, array or table of some sort) then
      this will be held as an Org-mode table in the buffer. This
      setting is the default.
@@ -465,7 +416,7 @@ the last statement and nothing else.
    :CUSTOM_ID: results-output
    :END:
 
-     In scripting mode, Org-babel captures the text output of the
+     In scripting mode, Babel captures the text output of the
      code block and places it in the Org-mode buffer. It is
      called scripting mode because the code block contains a series of
      commands, and the output of each command is returned. Unlike
@@ -496,7 +447,7 @@ value, =(2 + 2)=, 4 does not appear in the results.
    possible to run an interactive session as an "inferior process"
    within Emacs. This means that an environment is created containing
    data objects that persist between different source code
-   blocks. Org-babel supports evaluation of code within such sessions
+   blocks. Babel supports evaluation of code within such sessions
    with the =:session= header argument. If the header argument is
    given a value then that will be used as the name of the session.
    Thus, it is possible to run separate simultaneous sessions in the
@@ -519,7 +470,7 @@ value, =(2 + 2)=, 4 does not appear in the results.
    :PROPERTIES:
    :CUSTOM_ID: arguments-to-source-code-blocks
    :END:
-   Org-babel supports parameterisation of code blocks, i.e.,
+   Babel supports parameterisation of code blocks, i.e.,
    arguments can be passed to code blocks, which gives them
    the status of *functions*. Arguments can be passed to code blocks in
    both functional and scripting modes.
@@ -606,7 +557,7 @@ The return value of =fibonacci-seq= is a table:
 : python session.
 
 ** Code Block Body Expansion
-     Org-babel "expands" code blocks prior to evaluation, i.e., the
+     Babel "expands" code blocks prior to evaluation, i.e., the
      evaluated code comprises the code block contents augmented with
      code that assigns referenced data to variables. It is possible to
      preview expanded contents, and also to expand code during
@@ -659,8 +610,8 @@ With point inside the code block,  =C-c M-b p= expands the contents:
 
 Because the return value of a function written in one language can be
 passed to a function written in another language, or to an Org-mode
-table, which is itself programmable, Org-babel can be used as a
-meta-functional programming language.  With Org-babel, functions from
+table, which is itself programmable, Babel can be used as a
+meta-functional programming language.  With Babel, functions from
 many languages can work together.  You can mix and match languages,
 using each language for the tasks to which it is best suited.
 
@@ -668,7 +619,7 @@ For example, let's take some system diagnostics in the shell and graph them with
 
 1. Create a code block, using shell code, to list
    directories in our home directory, together with their
-   sizes. Org-babel automatically converts the output into an Org-mode
+   sizes. Babel automatically converts the output into an Org-mode
    table.
    
 : #+srcname: directories
@@ -717,14 +668,14 @@ HTML export of code:
   :END:
 
 In addition to passing data from tables as [[arguments-to-source-code-blocks][arguments]] to code
-blocks, and [[#results-value][storing]] results as tables, Org-babel can be used in a
+blocks, and [[#results-value][storing]] results as tables, Babel can be used in a
 third way with Org-mode tables. First note that Org-mode's [[http://orgmode.org/manual/The-spreadsheet.html#The-spreadsheet][existing
 spreadsheet functionality]] allows values in cells to be computed
 automatically from the values of other cells, using a =#+TBLFM=
 formula line. In this way, table computations can be carried out using
 [[http://orgmode.org/manual/Formula-syntax-for-Calc.html#Formula-syntax-for-Calc][calc]] and [[http://orgmode.org/manual/Formula-syntax-for-Lisp.html#Formula-syntax-for-Lisp][emacs lisp]].
 
-What Org-babel adds is the ability to use code blocks (in whatever
+What Babel adds is the ability to use code blocks (in whatever
 language) in the =#+TBLFM= line to perform the necessary computation.
 
 *** Example 1: Data Summaries Using R
@@ -786,8 +737,8 @@ block responsible for generating the data; each time the table formula
 is recalculated the source block will be evaluated again, and
 therefore the calculated average value will change.
 
-*** Example 2: Org-babel Test Suite
-While developing Org-babel, we used a suite of tests implemented
+*** Example 2: Babel Test Suite
+While developing Babel, we used a suite of tests implemented
 as a large Org-mode table.  To run the entire test suite we simply
 evaluate the table with C-u C-c C-c: all of the tests are run,
 the results are compared with expectations, and the table is updated
@@ -906,6 +857,8 @@ HTML export of code:
   :CUSTOM_ID: library-of-babel
   :END:
 
+  (see also [[http://orgmode.org/manual/Library-of-Babel.html#Library-of-Babel][Org manual:Library-of-Babel]])
+
   As we saw above with the [[*Simple%20example%20of%20using%20a%20source%20block%20as%20a%20function][=square=]] example, once a source block
   function has been defined it can be called using the =lob= notation:
 
@@ -914,7 +867,7 @@ HTML export of code:
   But what about code blocks that you want to make available to
   every Org-mode buffer?
 
-  In addition to the current buffer, Org-babel searches for
+  In addition to the current buffer, Babel searches for
   pre-defined code block functions in the Library of
   Babel. This is a user-extensible collection of ready-made source
   code blocks for handling common tasks.  One use for the Library of
@@ -923,31 +876,32 @@ HTML export of code:
   R, gnuplot, asymptote, etc. If you implement something that might be
   of use to other Org-mode users, please consider adding it to the
   Library of Babel; similarly, feel free to request help solving a
-  problem using external code via Org-babel -- there's always a chance
-  that other Org-babel users will be able to contribute some helpful
+  problem using external code via Babel -- there's always a chance
+  that other Babel users will be able to contribute some helpful
   code.
 
-  Org-babel comes pre-populated with the code blocks located in
+  Babel comes pre-populated with the code blocks located in
   the [[file:library-of-babel.org][Library of Babel]] file -- raw file at
-#+html: <a href="http://eschulte.github.com/org-babel/library-of-babel.org">library-of-babel.org</a>
-  --. It is possible to add a code block to the library
-  from any Org-mode file by naming it =add-file-to-lob=:
+#+html: <a href="http://repo.or.cz/w/org-mode.git/blob/HEAD:/contrib/babel/library-of-babel.org">library-of-babel.org</a>
+  --. It is possible to add code blocks to the library from any
+  Org-mode file using the =org-babel-lob-ingest= (bound to =C-c C-v
+  l=).
 
   #+srcname: add-file-to-lob
   #+begin_src emacs-lisp 
   (org-babel-lob-ingest "path/to/file.org")
   #+end_src
 
-  Note that it is possible to pass table values or the output of
-  a source-code block to Library of Babel functions. It is also possible to
-  reference Library of Babel functions in arguments to code blocks.
+  Note that it is possible to pass table values or the output of a
+  source-code block to Library of Babel functions. It is also possible
+  to reference Library of Babel functions in arguments to code blocks.
 
 * Literate Programming
   :PROPERTIES:
   :CUSTOM_ID: literate-programming
   :END:
 
-#+begin_quote 
+#+begin_quote
 Let us change our traditional attitude to the construction of
 programs: Instead of imagining that our main task is to instruct a
 /computer/ what to do, let us concentrate rather on explaining to
@@ -965,20 +919,20 @@ other.
  -- Donald Knuth
 #+end_quote
 
-Org-babel supports [[http://en.wikipedia.org/wiki/Literate_programming][Literate Programming]] (LP) by allowing the act of
+Babel supports [[http://en.wikipedia.org/wiki/Literate_programming][Literate Programming]] (LP) by allowing the act of
 programming to take place inside of Org-mode documents.  The Org-mode
 file can then be exported (*woven* in LP speak) to HTML or LaTeX for
 consumption by a human, and the embedded source code can be extracted
 (*tangled* in LP speak) into structured source code files for
 consumption by a computer.
 
-To support these operations Org-babel relies on Org-mode's [[http://orgmode.org/manual/Exporting.html#Exporting][existing
+To support these operations Babel relies on Org-mode's [[http://orgmode.org/manual/Exporting.html#Exporting][existing
 exporting functionality]] for *weaving* of documentation, and on the
 =org-babel-tangle= function which makes use of [[http://www.cs.tufts.edu/~nr/noweb/][Noweb]] [[noweb-reference-syntax][reference syntax]]
 for *tangling* of code files.
 
 The [[literate-programming-example][following example]] demonstrates the process of *tangling* in
-Org-babel.
+Babel.
 
 *** Simple Literate Programming Example (Noweb syntax)
     :PROPERTIES:
@@ -1076,8 +1030,7 @@ sets the value of argument \"a\" equal to \"9\".  Note that
 these arguments are not evaluated in the current source-code
 block but are passed literally to =example-block()=.
 
-
-*** Emacs Initialization with Org-babel
+*** Emacs Initialization with Babel
     :PROPERTIES:
     :CUSTOM_ID: emacs-initialization
     :END:
@@ -1085,7 +1038,7 @@ block but are passed literally to =example-block()=.
 #+attr_html: style="float:left;"
 [[file:../../images/babel/dot-emacs.png]]
 
-Org-babel has special support for embedding your Emacs initialization
+Babel has special support for embedding your Emacs initialization
 into Org-mode files.  The =org-babel-load-file= function can be used
 to load the Emacs Lisp code blocks embedded in a literate
 Org-mode file in the same way that you might load a regular Emacs Lisp
@@ -1095,7 +1048,7 @@ This allows you to make use of the nice features of Org-mode, such as folding, t
 notes, HTML export, etc., to organize and maintain your Emacs initialization.
 
 To try this out, either see the simple [[literate-emacs-init][Literate Emacs Initialization]]
-example, or check out the Org-babel Literate Programming version of
+example, or check out the Babel Literate Programming version of
 Phil Hagelberg's excellent [[http://github.com/technomancy/emacs-starter-kit/tree/master][emacs-starter-kit]] available at
 [[http://github.com/eschulte/emacs-starter-kit/tree/master][Org-babel-emacs-starter-kit]].
 
@@ -1181,7 +1134,7 @@ but becomes a complete laboratory in which the research can be
 reproduced and extended.
 
 Org-mode already has exceptional support for [[http://orgmode.org/manual/Exporting.html#Exporting][exporting to HTML and
-LaTeX]].  Org-babel makes Org-mode a tool for RR by *activating* the
+LaTeX]].  Babel makes Org-mode a tool for RR by *activating* the
 data and code blocks embedded in Org-mode documents; the
 entire document becomes executable.  This makes it possible, and natural, to
 distribute research in a format that encourages readers to recreate
@@ -1189,7 +1142,7 @@ results and perform their own analyses.
 
 One notable existing RR tool is [[http://en.wikipedia.org/wiki/Sweave][Sweave]], which provides a mechanism for
 embedding [[http://www.r-project.org/][R]] code into LaTeX documents.  Sweave is a mature
-and very useful tool, but we believe that Org-babel has several
+and very useful tool, but we believe that Babel has several
 advantages:
  - it supports multiple languages (we're not aware of other RR tools that do this);
  - the [[http://orgmode.org/manual/Exporting.html#Exporting][export process]] is flexible and powerful, including HTML as a
