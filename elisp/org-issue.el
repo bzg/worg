@@ -20,6 +20,11 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-07-21  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-template-body): Add blank line after
+;;   Gmane link.
+;; 
 ;; 2010-07-02  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-bulk-update-message-flag): New function.
@@ -189,7 +194,7 @@ cdr."
    "  :PROPERTIES:\n"
    "  :ID: mid:" (car msginfo) "\n"
    "  :END:\n\n"
-   "    - Gmane :: " (org-issue-link-gmane msginfo)))
+   "    - Gmane :: " (org-issue-link-gmane msginfo) "\n\n"))
 
 (defun org-issue-new ()
   "File new issue for current message."
