@@ -381,6 +381,7 @@ still use the git repository to do so.
 
 In the repository, do
 
+: $ git fetch --tags
 : $ git tag
 
 To see which release tags are available.  Let's say you decide to use
@@ -395,8 +396,19 @@ master branch.
 
 Later, when we release 7.02, you can switch to that using
 
-: $ git fetch origin                   # to get all the new stuff
+: $ git fetch --tags                   # to get all the new stuff
+: $ git tag
 : $ git checkout release_7.02
+
+
+Alternatively, if you just want to always run whatever the latest
+stable release is, you can do
+
+: $ git checkout -b stable origin/maint
+
+and then regularly update this branch by doing
+
+: $ git pull
 
 ** How can I install an up-to-date version of org-mode without "make" tools?
    :PROPERTIES:
