@@ -351,6 +351,55 @@ At anytime during the rebase conflict resolution you can say "oops this is all w
 using
 : $ git rebase --abort
 
+
+** How can I use a stable release version instead of the bleeding edge
+   :PROPERTIES:
+   :CUSTOM_ID: using-stable-releases-only
+   :END:
+
+The master branch of the git repository always contains the bleeding
+edge development code.  This is important for Org's fast development,
+because code on master gets checked out by many people daily and we
+quickly receive bug reports if something is wrong.  On rare occasions,
+this code may not function perfectly for a limited time while we are
+trying to fix things.
+
+Not everyone like to use this bleeding-edge code and face the danger
+to hit a surprising bug.
+
+Therefore, from time to time, we make a release.  This typically
+happens when the maintainers feel that 
+
+1. they have reached a good point in the development
+2. the code has a feature set that should stay and be supported in the
+   future
+
+Stable releases are used as the basis for [[http://orgmode.org/index.html#sec-3_3][alternative distributions]] of
+Org, and they are also the code that gets merged into the Emacs
+distribution.  If you want to work only with stable releases, you can
+still use the git repository to do so.
+
+In the repository, do
+
+: git tag
+
+To see which release tags are available.  Let's say you decide to use
+=release_7.01f=.
+
+: git checkout -b stable release_7.01f
+
+This creates a new branch "stable" with the state of Org at the moment
+of release 7.01f.  You can then run Org from this branch and be sure
+to use the stable release while development continues on the master
+branch.
+
+Later, when we release 7.02, you can switch to that using
+
+: git checkout master
+: git pull
+: git branch -D stable
+: git checkout -b stable release_7.02
+
 ** How can I install an up-to-date version of org-mode without "make" tools?
    :PROPERTIES:
    :CUSTOM_ID: installing-org-without-make-tools
