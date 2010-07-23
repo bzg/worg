@@ -20,6 +20,11 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-07-23  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-template-body): Don't indent PROPERTIES
+;;   drawer.
+;; 
 ;; 2010-07-21  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-template-body): Add blank line after
@@ -191,9 +196,9 @@ cdr."
   (concat
    "* NEW " (cdr msginfo) "%!\n"
    "  %u\n"
-   "  :PROPERTIES:\n"
-   "  :ID: mid:" (car msginfo) "\n"
-   "  :END:\n\n"
+   ":PROPERTIES:\n"
+   ":ID: mid:" (car msginfo) "\n"
+   ":END:\n\n"
    "    - Gmane :: " (org-issue-link-gmane msginfo) "\n\n"))
 
 (defun org-issue-new ()
