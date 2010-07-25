@@ -20,6 +20,11 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-07-25  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-update-message-flag): Keep flag for NEW
+;;   issues only.
+;; 
 ;; 2010-07-23  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-template-body): Don't indent PROPERTIES
@@ -315,9 +320,11 @@ If optional argument REMOVE is non-nil, remove the flag."
 			     (find-file-noselect org-issue-issue-file))
       (save-excursion
 	(goto-char (org-find-entry-with-id (format "mid:%s" (car msginfo))))
-	(setq state (org-entry-is-todo-p)))
+	(setq state (org-get-todo-state)))
       (unless visiting (kill-buffer)))
-    (org-issue-flag-message org-issue-message-flag (not state))))
+    (org-issue-flag-message
+     org-issue-message-flag
+     (or (null state) (not (string= state "NEW"))))))
 
 (defun org-issue-bulk-update-message-flag ()
   "Update message flag of all messages in summary."
