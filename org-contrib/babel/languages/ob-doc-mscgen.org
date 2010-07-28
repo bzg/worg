@@ -1,0 +1,93 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      ob-mscgen
+#+AUTHOR:     Juan Pechiar
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org-babel support for
+  <a href="http://www.mcternan.me.uk/mscgen/">Mscgen</a>: Message sequence charts
+  </p>
+  </div>
+#+end_html
+
+* Introduction
+
+org-babel-oz extends org-babel by support for executing Oz source
+code. Oz code is executed by sending it to the Oz Programming
+Environment (OPI), the Emacs mode and compiler interface for Oz
+programs.
+
+Oz distinguishes between statements and expressions. org-babel-oz
+supports both of them, but the org-babel header argument =:results=
+must be set accordingly. =:results output= requires the respective
+code block to be an Oz statement and =:results value= requires an Oz
+expression. org-babel inserts the result of expressions automatically
+into an org buffer, as usual. A statement has no result (i.e. the
+result of :results output is always nil), but it can produce output as
+a side effect (e.g., use the Oz browser or output a file).
+
+The OPI keeps running in the background between executing multiple
+code blocks (e.g., it remembers variable values). Therefore,
+org-babel-oz always runs in session mode (the org-babel =:session=
+header argument is ignored). In practice, non-session code blocks are
+handled equally well by the session mode. However, only a single
+session is supported.
+
+Expression evaluation happens synchronously. Therefore there is an
+additional header argument =:wait-time= <number>, which specifies the
+maximum time to wait for the result of a given expression. =nil= means
+to wait as long as it takes to get a result (potentially wait
+forever).
+
+* Requirements
+
+ob-mscgen requires mscgen installed on your system and accessible on
+emacs path setting (exec-path).
+
+* Enabling ob-mscgen
+
+You need to add mscgen to the org-babel-load-languages setting.
+
+Customize thus:
+
+: M-x customize-variable RET org-babel-load-languages RET
+
+* Example usage
+
+The following is a trivial example of 2 messages between nodes A and B:
+
+: #+begin_src mscgen :file chart.png
+: msc {
+:   A,B;
+:   A -> B [ label = "send message" ];
+:   A <- B [ label = "receive answer" ];
+: }
+: #+end_src
+
+Which produces the following result:
+
+[[file:chart.png]]
+
+* Header arguments
+
+The following header arguments are relevant for ob-mscgen:
+   - file :: the file argument is needed since mscgen's output is always to a file.
+   - filetype :: optional file type, defaults to PNG.
+
+Supported file types (as of 2010W30) are:
+   - PNG (Portable Network Graphics) - default
+   - SVG (Scalable Vector Graphics)
+   - EPS (encapsulated PostScript)
+   - ismap (server-side image map)
+
+PNG results in a bitmap image, but it is supported in all export formats (i.e. by web browsers and by pdflatex).
+
+Other formats may result in a link to the actual file.
+
+In order to get higher resoultion on PNG output, include a =width= or =hscale= statement.
