@@ -18,32 +18,14 @@
 
 * Introduction
 
-org-babel-oz extends org-babel by support for executing Oz source
-code. Oz code is executed by sending it to the Oz Programming
-Environment (OPI), the Emacs mode and compiler interface for Oz
-programs.
+Mscgen is a utility for rendering message sequence charts.
 
-Oz distinguishes between statements and expressions. org-babel-oz
-supports both of them, but the org-babel header argument =:results=
-must be set accordingly. =:results output= requires the respective
-code block to be an Oz statement and =:results value= requires an Oz
-expression. org-babel inserts the result of expressions automatically
-into an org buffer, as usual. A statement has no result (i.e. the
-result of :results output is always nil), but it can produce output as
-a side effect (e.g., use the Oz browser or output a file).
+The charts are defined in text format as specified on the [[http://www.mcternan.me.uk/mscgen/][project homepage]].
 
-The OPI keeps running in the background between executing multiple
-code blocks (e.g., it remembers variable values). Therefore,
-org-babel-oz always runs in session mode (the org-babel =:session=
-header argument is ignored). In practice, non-session code blocks are
-handled equally well by the session mode. However, only a single
-session is supported.
-
-Expression evaluation happens synchronously. Therefore there is an
-additional header argument =:wait-time= <number>, which specifies the
-maximum time to wait for the result of a given expression. =nil= means
-to wait as long as it takes to get a result (potentially wait
-forever).
+This org-babel module is similar to ob-dot and ob-ditaa in that they
+just render an image from a text-based definition. Therefore many of
+the org-babel concetps do not apply (things like sessions, variables,
+vector output).
 
 * Requirements
 
