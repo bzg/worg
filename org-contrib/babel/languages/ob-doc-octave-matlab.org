@@ -11,7 +11,7 @@ the extremely simple code being used to write results to file. Here
 the first %s is replaced with the body of the block, and the second %s
 with a temp file name.
 
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
 (defvar org-babel-octave-wrapper-method
   "%s
 save -ascii %s ans")
@@ -55,7 +55,24 @@ is appropriate (e.g. an array) or not (e.g. a string).
     However, would it be appropriate to move to the org-babel-R model,
     whereby if :results file is supplied, any graphical is
     automatically diverted to that file?
-    
+
+** Related: getting graphical output from octave
+
+In order to get graphical output without leaving open graph windows
+during evaluation, the following can be used:
+
+#+begin_example
+#+begin_src octave :output file :file chart.png
+figure( 1, "visible" , "off" );
+sombrero;
+print -dpng chart.png
+#+end_src
+#+end_example
+
+The =figure= command opens an invisible graph window where the next plot commands should act.
+
+Then, the =print= command exports the graph to a file.
+
 * TODO How to get rid of the matlab splash message
   - State "TODO"       from ""           [2010-03-18 Thu 01:09]
 
@@ -68,7 +85,7 @@ is appropriate (e.g. an array) or not (e.g. a string).
        'ans' has at the end of the block. However, there are some
        problems with this as can be seen from the following session:
 
-#+begin_example 
+#+begin_example
 octave> 'hello'
 ans = hello
 octave> ans
@@ -125,7 +142,7 @@ Of course, this works
 
 * TODO submit patch to matlab.el so that matlab session can be remote
     - State "TODO"       from ""           [2010-03-18 Thu 01:29]
-      
+
       At the moment I'm using a massive hack: insert
 
  (cd "/ddavison@tombstone.princeton.edu:") ;; DED
