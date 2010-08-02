@@ -20,6 +20,11 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-08-02  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-new): Use org-capture instead of
+;;   org-remember.
+;; 
 ;; 2010-07-25  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-update-message-flag): Keep flag for NEW
@@ -210,14 +215,15 @@ cdr."
   "File new issue for current message."
   (interactive)
   (let* ((msginfo (org-issue-get-msginfo))
-	 (org-remember-templates
-	  `(("Issue" ?i ,(org-issue-template-body msginfo)
-	     ,org-issue-issue-file "New Issues" nil))))
+	 (org-capture-templates
+	  `(("i" "Issue"
+	     entry (file+headline ,org-issue-issue-file "New issues")
+	     ,(org-issue-template-body msginfo)))))
     (if (org-issue-exists-p (car msginfo))
 	(error "Already filed: %s" (cdr msginfo))
       (if org-issue-message-flag
 	  (org-issue-flag-message org-issue-message-flag))
-      (org-remember))))
+      (org-capture))))
 
 (defun org-issue-flag-message (flag &optional remove)
   "Flag current message.
