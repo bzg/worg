@@ -20,6 +20,11 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-08-04  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-new): Immediate finish capture
+;;   template.
+;; 
 ;; 2010-08-02  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-new): Use org-capture instead of
@@ -218,7 +223,8 @@ cdr."
 	 (org-capture-templates
 	  `(("i" "Issue"
 	     entry (file+headline ,org-issue-issue-file "New issues")
-	     ,(org-issue-template-body msginfo)))))
+	     ,(org-issue-template-body msginfo)
+	     :immediate-finish t))))
     (if (org-issue-exists-p (car msginfo))
 	(error "Already filed: %s" (cdr msginfo))
       (if org-issue-message-flag
