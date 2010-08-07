@@ -20,6 +20,11 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-08-07  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-new): Insert newline after new capture
+;;   entry.
+;; 
 ;; 2010-08-04  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-new): Immediate finish capture
@@ -224,7 +229,7 @@ cdr."
 	  `(("i" "Issue"
 	     entry (file+headline ,org-issue-issue-file "New issues")
 	     ,(org-issue-template-body msginfo)
-	     :immediate-finish t))))
+	     :immediate-finish t :empty-lines 1))))
     (if (org-issue-exists-p (car msginfo))
 	(error "Already filed: %s" (cdr msginfo))
       (if org-issue-message-flag
