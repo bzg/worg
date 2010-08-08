@@ -20,6 +20,11 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-08-08  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-template-body): Fix capture template
+;;   body.
+;; 
 ;; 2010-08-07  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-new): Insert newline after new capture
@@ -214,7 +219,7 @@ killring."
 MSGINFO is a cons with message id in car and message subject in
 cdr."
   (concat
-   "* NEW " (cdr msginfo) "%!\n"
+   "* NEW " (cdr msginfo) "\n"
    "  %u\n"
    ":PROPERTIES:\n"
    ":ID: mid:" (car msginfo) "\n"
