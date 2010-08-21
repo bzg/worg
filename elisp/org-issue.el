@@ -20,6 +20,12 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;; 2010-08-21  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-url-escape): New function.
+;;   (org-issue-get-msginfo:gnus, org-issue-get-msginfo:wl): Use
+;;   function.
+;; 
 ;; 2010-08-08  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-template-body): Fix capture template
@@ -159,13 +165,22 @@ flag is added in removed by the functions `org-issue-new',
    (t
     (error "Unsupported mailer mode: %s" major-mode))))
 
+(defun org-issue-url-escape (s)
+  "Escape chars in S for gmane's id resolver."
+  (mapconcat (lambda (chr)
+	       (if (or (and (> chr 64) (< chr 91))
+		       (and (> chr 96) (< chr 123))
+		       (and (> chr 47) (< chr 58)))
+		   (char-to-string chr)
+		 (format "%%%X" chr))) s ""))
+
 (defun org-issue-get-msginfo:gnus ()
   "Return cons with message id in car and subject in cdr.
 Operates on Gnus messages."
   (let ((header (with-current-buffer gnus-summary-buffer
 		  (gnus-summary-article-header))))
     (cons
-     (url-hexify-string
+     (org-issue-url-escape
       (org-remove-angle-brackets
        (mail-header-id header)))
      (org-issue-replace-brackets
@@ -181,7 +196,7 @@ Operates on Wanderlust messages."
 		   wl-summary-buffer-elmo-folder num)
 		(elmo-msgdb-overview-get-entity
 		 num (wl-summary-buffer-msgdb)))))
-    (cons (url-hexify-string
+    (cons (org-issue-url-escape
 	   (org-remove-angle-brackets
 	    (org-wl-message-field 'message-id ent)))
 	  (org-issue-replace-brackets
