@@ -368,7 +368,7 @@ Not everyone like to use this bleeding-edge code and face the danger
 to hit a surprising bug.
 
 Therefore, from time to time, we make a release.  This typically
-happens when the maintainers feel that 
+happens when the maintainers feel that
 
 1. they have reached a good point in the development
 2. the code has a feature set that should stay and be supported in the
@@ -679,7 +679,7 @@ need to change for your own use.
   (setq org-agenda-files '("/tmp/test.org"))
   (require 'org-install)
   (require 'org-habit)
-  
+
   (global-set-key "\C-cl" 'org-store-link)
   (global-set-key "\C-ca" 'org-agenda)
   (global-set-key "\C-cb" 'org-iswitchb)
@@ -693,7 +693,7 @@ configuration code to it, then start emacs something like this:
 
 On OS X, starting emacs with minimal configuration might look
 something like this:
-#+begin_src sh 
+#+begin_src sh
   /Applications/emacs.app/Contents/MacOS/Emacs -Q -l ~/minimal.emacs
 #+end_src sh
 * Errors and general problems
@@ -717,7 +717,7 @@ something like this:
    This is a conflict with an outdated version of the /allout.el/, see
    the [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] section in the manual
 
-** How can I control the application launched by Org-mode to open a certain file type like pdf, html.... 
+** How can I control the application launched by Org-mode to open a certain file type like pdf, html....
    :PROPERTIES:
    :CUSTOM_ID: external-application-launched-to-open-file-link
    :END:
@@ -733,14 +733,14 @@ operating-system provides:
     You you have to check your mailcap settings, find the files:
 
     : /etc/mailcap
-    : 
-    : or  
-    : 
+    :
+    : or
+    :
     : $HOME/.mailcap
 
 and modify them accordingly. Please read their manual entry.
 
-*** Windows systems 
+*** Windows systems
     + for html pages you may configure the =browse-url-= variables through
       the Customize interface,
     + the pdf files are automatically opened with Acrobat Reader (if it is
@@ -784,7 +784,7 @@ of yasnippet).  Then try the following
 #+begin_src emacs-lisp
   (defun yas/org-very-safe-expand ()
     (let ((yas/fallback-behavior 'return-nil)) (yas/expand)))
-  
+
   (add-hook 'org-mode-hook
             (lambda ()
               ;; yasnippet (using the new org-cycle hooks)
@@ -876,7 +876,7 @@ Here are some other ideas for speeding up the agenda:
    =(setq org-agenda-ndays 1)=
 
 2. Archive inactive items to separate files.
-   
+
    =C-c C-x C-s= (org-archive-subtree)
 
 3. Do not include the global todo list in your agenda view.
@@ -895,7 +895,7 @@ Here are some other ideas for speeding up the agenda:
 
 Visual-line-mode "soft wraps" lines so that the visual edge of the
 buffer is considered a line break for purposes of navigation, even
-though there is no line break in reality. 
+though there is no line break in reality.
 
 In older versions of org-mode, org-beginning-of-line and
 org-end-of-line do not work well with visual line mode. (The two
@@ -966,7 +966,7 @@ small fonts. Here is a fix:
       (set-face-attribute 'org-column nil
                           :height (face-attribute 'default :height)
                           :family (face-attribute 'default :family))))
-  
+
    (when (and (fboundp 'daemonp) (daemonp))
     (add-hook 'org-mode-hook 'org-column-view-uses-fixed-width-face))
 #+end_src
@@ -1807,7 +1807,7 @@ are several possible shortcuts you can use to enter them:
 
  - Immediately after "sbp" type =C-x a i l=.
 
- - Enter the expansion: 
+ - Enter the expansion:
 
    - =#+begin_src perl[C-q C-j][C-q C-j]#+end_src=
 
@@ -2301,6 +2301,7 @@ page on the Emacs wiki]].
    :CUSTOM_ID: org-diary-class
    :END:
 
+1. Method 1
 Org-mode offers a convenient diary sexp function for setting up a
 recurring appointment that lasts for a certain period of time, such as
 a class. It is called org-diary-class and it can be entered as
@@ -2328,12 +2329,136 @@ can find the number by invoking emacs' built-in calendar (=M-x
 calendar=), navigating to the appropriate week, and typing =p c=
 (calendar-iso-print-date).
 
+2. Method 2
+
+For example, say you are taking night classes in Spanish. The class is every
+Wednesday evening at 7pm, starting on 18 August, and runs for 8 weeks. AFAIK
+Org's timestamps do not support limited occurrences of recurrent items -- you
+have to schedule the item with infinite recurrences, then delete it when it
+finishes.
+
+To schedule the Spanish classes, put the following in your =.emacs=:
+
+#+begin_src emacs-lisp
+  (defun diary-limited-cyclic (recurrences interval m d y)
+    "For use in emacs diary. Cyclic item with limited number of recurrences.
+  Occurs every INTERVAL days, starting on YYYY-MM-DD, for a total of
+  RECURRENCES occasions."
+    (let ((startdate (calendar-absolute-from-gregorian (list m d y)))
+          (today (calendar-absolute-from-gregorian date)))
+      (and (not (minusp (- today startdate)))
+           (zerop (% (- today startdate) interval))
+           (< (floor (- today startdate) interval) recurrences))))
+#+end_src
+The item in the org file looks like this:
+
+#+begin_src org
+  ,** 19:00-21:00 Spanish lessons
+  ,   <%%(diary-limited-cyclic 8 7 8 18 2010)>
+#+end_src
+[Source: Paul Sexton's post on Org-mode mailing list.]
+
 ** How can I set an event to occur every day except Saturday and Sunday?
 
    #+begin_example
    ** Daily meeting
       <%%(memq (calendar-day-of-week date) '(1 2 3 4 5))>
    #+end_example
+
+** How do I schedule events relative to Easter Sunday?
+
+   Easter's date moves around from year to year according to a
+   complicated set of criteria which I do not claim to understand.
+   However the following code will allow you to schedule recurring
+   events relative to Easter Sunday.
+
+   Note: the function da-easter is from:
+   http://github.com/soren/elisp/blob/master/da-kalender.el
+
+   Put the following in your .emacs:
+
+#+begin_src emacs-lisp
+  (defun da-easter (year)
+    "Calculate the date for Easter Sunday in YEAR. Returns the date in the
+  Gregorian calendar, ie (MM DD YY) format."
+    (let* ((century (1+ (/ year 100)))
+           (shifted-epact (% (+ 14 (* 11 (% year 19))
+                                (- (/ (* 3 century) 4))
+                                (/ (+ 5 (* 8 century)) 25)
+                                (* 30 century))
+                             30))
+           (adjusted-epact (if (or (= shifted-epact 0)
+                                   (and (= shifted-epact 1)
+                                        (< 10 (% year 19))))
+                               (1+ shifted-epact)
+                             shifted-epact))
+           (paschal-moon (- (calendar-absolute-from-gregorian
+                             (list 4 19 year))
+                            adjusted-epact)))
+      (calendar-dayname-on-or-before 0 (+ paschal-moon 7))))
+
+
+  (defun da-easter-gregorian (year)
+    (calendar-gregorian-from-absolute (da-easter year)))
+
+  (defun calendar-days-from-easter ()
+    "When used in a diary sexp, this function will calculate how many days
+  are between the current date (DATE) and Easter Sunday."
+    (- (calendar-absolute-from-gregorian date)
+       (da-easter (calendar-extract-year date))))
+#+end_src
+
+    Now we can schedule the public holidays associated with Easter as
+    recurring events. Good Friday is 2 days before "Easter", Easter
+    Monday is one day after.
+
+#+begin_src org
+  ,* Good Friday
+  ,  <%%(= -2 (calendar-days-from-easter))>
+
+  ,* Easter Sunday
+  ,  <%%(= 0 (calendar-days-from-easter))>
+
+  ,* Easter Monday
+  ,  <%%(= 1 (calendar-days-from-easter))>
+#+end_src
+   [Source: Posted by Paul Sexton on Org-mode mailing list.]
+
+** How to schedule public holiday that is "the nearest Monday to DATE"?
+
+   In New Zealand each regional capital has an "Anniversary Day". The
+   date of Auckland's anniversary day is "the nearest Monday to 29
+   January".
+
+   Put this in your =.emacs=:
+
+#+begin_src emacs-lisp
+  (defun calendar-nearest-to (target-dayname target-day target-month)
+    "Recurring event that occurs in the nearest TARGET-DAYNAME to
+  the date TARGET-DAY, TARGET-MONTH each year."
+    (interactive)
+    (let* ((dayname (calendar-day-of-week date))
+           (target-date (list target-month target-day (calendar-extract-year date)))
+           (days-diff (abs (- (calendar-day-number date)
+                              (calendar-day-number target-date)))))
+      (and (= dayname target-dayname)
+           (< days-diff 4))))
+#+end_src
+
+   Now we can schedule Auckland Anniversary Day. The first argument,
+   1, means Monday (days of the week are numbered starting with
+   Sunday=0).
+
+   [Source: Originally posted by Paul Sexton on Org-mode mailing list.]
+
+** How to schedule public holiday on "the 4th Monday in October"?
+
+   This does not require any additions to =.emacs=:
+
+#+begin_src org
+  ,* Labour Day (NZ)
+  ,  <%%(diary-float 10 1 4)>
+#+end_src
 
 * Export
   :PROPERTIES:
@@ -2516,13 +2641,13 @@ customization.
 #+begin_src emacs-lisp
   ;; requite org-latex so that the following variables are defined
   (require 'org-latex)
-  
+
   ;; tell org to use listings
   (setq org-export-latex-listings t)
-  
+
   ;; you must include the listings package
   (add-to-list 'org-export-latex-packages-alist '("" "listings"))
-  
+
   ;; if you want colored source code then you need to include the color package
   (add-to-list 'org-export-latex-packages-alist '("" "color"))
 #+end_src
@@ -2548,7 +2673,7 @@ something like the following
 \definecolor{back}{RGB}{51,51,51}
 \lstset{
   basicstyle=\color{fore},
-  keywordstyle=\color{keywords},  
+  keywordstyle=\color{keywords},
   commentstyle=\color{comments},
   backgroundcolor=\color{back}
 }
@@ -2604,16 +2729,16 @@ RefTeX the locations of external data stores.  One way is to set the
 variable, =reftex-default-bibliography=.  Add lines like these to
 .emacs:
 
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
   (setq reftex-default-bibliography
         (quote
-         ("default.bib" "other-default.bib")))       
+         ("default.bib" "other-default.bib")))
 #+end_src
 
 In practice, this is a limited solution and the
 typical user will want to pass this information on a per-file basis.
 Two solutions to this problem were posted on a blog, [[http://www.mfasold.net/blog/2009/02/using-emacs-org-mode-to-draft-papers/][Mario's
-Braindump]].  
+Braindump]].
 
 The first solution, proposed by Mario, enables the RefTeX citation
 function in Org-mode.  Add these lines to .emacs:
@@ -2641,9 +2766,9 @@ insert a reference in the usual way:
 
 #+begin_src org
   ,* test reftex
-  
+
   ,This is a citation \cite{tierney90}.
-  
+
   ,\bibliographystyle{plain}
   ,\bibliography{tsd}
 #+end_src
@@ -2656,28 +2781,28 @@ This Org-mode file will export the following LaTeX output:
   \usepackage[utf8]{inputenc}
   \usepackage[T1]{fontenc}
   \usepackage{hyperref}
-  
+
   \title{test.org}
   \author{Tom Dye}
   \date{2010-03-22 Mon}
-  
+
   \begin{document}
-  
+
   \maketitle
-  
+
   \setcounter{tocdepth}{3}
   \tableofcontents
   \vspace*{1cm}
-  
+
   \section{test reftex}
   \label{sec-1}
-  
-  
+
+
   This is a citation \cite{tierney90}.
-  
+
   \bibliographystyle{plain}
   \bibliography{tsd}
-  
+
   \end{document}
 #+end_src
 
@@ -2732,7 +2857,7 @@ Add the following lines to .emacs (adapted from  Kevin Brubeck Unhammer's [[http
     (and (buffer-file-name)
          (file-exists-p (buffer-file-name))
          (reftex-parse-all)))
-  
+
   (add-hook 'org-mode-hook
             (lambda ()
               (if (member "REFTEX" org-todo-keywords-1)
