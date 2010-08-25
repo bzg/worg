@@ -21,7 +21,7 @@
 ** Queries
 ** Comments
 * Requirements and Enhancements
-**  [[http://www.gnu.org/software/auctex/][AucTeX]]
+** [[http://www.gnu.org/software/auctex/][AucTeX]]
    Strongly recommended for editing .tex files.  Add the following
    line to .emacs:
        
@@ -96,22 +96,37 @@
   - The default value for the =:exports= header argument is
     =results=[fn:1] 
   - The default value for the =:results= header argument is =latex=
-* Additions to Org-babel
+* Header Arguments
   - Org-babel's LaTeX support uses the =:file= and =:buffer= header
     arguments in language-specific ways  
   - It adds three header arguments: =:pdfheight=, =:pdfwidth=, and
     =:packages=
-** Header Arguments
-  - The =:file= header argument accepts a file name ending in =.png=
-    or =.pdf=
-  - When =:file FILENAME.png= is set, =:buffer no= specifies that
-    buffer colors won't be used in the =.png= file
-  - When =:file FILENAME.pdf= is set, =:pdfheight= and =:pdfwidth=
-    header arguments can be used to specify the size of the pdf
-    image in LaTeX lengths, e.g., =1in=, =6em=, =48pt=, etc.
-  - The =:packages= header argument can be passed an assoc-list that temporarily adds one or more
-    packages to =org-export-latex-packages-alist=
-  - LaTeX source code blocks do not support the =:session= header argument
+
+** Language Specific Header Arguments
+- The =:file= header argument accepts a file name ending in =.png= or
+  =.pdf=
+- When =:file FILENAME.png= is set, =:buffer no= specifies that buffer
+  colors won't be used in the =.png= file
+- When =:file FILENAME.pdf= is set, =:pdfheight= and =:pdfwidth=
+  header arguments can be used to specify the size of the pdf image in
+  LaTeX lengths, e.g., =1in=, =6em=, =48pt=, etc.
+- The =:packages= header argument can be passed an assoc-list that
+  temporarily adds one or more packages to
+  =org-export-latex-packages-alist=
+- =:fit= will use the LaTeX [[http://www.ctan.org/tex-archive/macros/latex/contrib/preview/][preview]] package for neatly fitting the
+  size of the generated pdf file to the size of the figure or text
+  resulting from the code block.  This is only useful when a =.pdf=
+  file type is in use.
+- the results of the =:fit= header argument mentioned above may seem
+  too tight.  The =:border= header argument is exactly like =:fit=
+  only it takes an argument specifying the size of border to place
+  around the image (e.g. =:border 1em=)
+- the height and width of the generated =.pdf= file can also be
+  specified manually using the =:pdfheight= and =:pdfwidth= header
+  arguments, which take LaTeX length arguments (e.g. =:pdfwidth 3in=)
+- LaTeX source code blocks do not support the =:session= header
+  argument
+
 ** Examples of Use
 *** Display the LaTeX logo in the Emacs buffer
 
@@ -124,10 +139,8 @@
 #+end_src
 
 *** Generate a complex figure
-
-    - This example uses the excellent [[http://sourceforge.net/projects/pgf/][pgf/tikz]] package
-
-: #+begin_src latex :file fsa.pdf :packages '(("" "tikz")) :pdfwidth 3in :pdfheight 3in
+This example uses the excellent [[http://sourceforge.net/projects/pgf/][pgf/tikz]] package
+: #+begin_src latex :file fsa.pdf :packages '(("" "tikz")) :border 1em
 :   % Define block styles
 :   \usetikzlibrary{shapes,arrows}
 :   \tikzstyle{astate} = [circle, draw, text centered, font=\footnotesize, fill=blue!25]
@@ -143,7 +156,6 @@
 :           (3) edge [loop above] node {(a, b)} (3);
 :   \end{tikzpicture}
 : #+end_src
-
 
 * Common Idioms
 
@@ -171,7 +183,6 @@
 :     \label{fig:complete-weight}
 :   \end{figure}
 : #+end_src
-
 
 
 
