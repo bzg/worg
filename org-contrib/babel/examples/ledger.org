@@ -1,0 +1,231 @@
+#+TITLE:     Using ledger for accounting in org with babel
+#+AUTHOR:    Eric S Fraga
+#+EMAIL:     e.fraga@ucl.ac.uk
+#+DATE:      2010.08.25 20:41:52
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:   
+#+LINK_HOME: 
+#+XSLT: 
+
+#+STARTUP: oddonly
+
+* Introduction
+
+/Ledger/ is a double entry accounting system which uses simple text
+files for recording all transactions.  As such, it is fundamentally
+compatible with org mode in Emacs.  Using orb-babel, it is possible to
+record financial transactions conveniently in an org file and
+subsequently generate the financial reports required.
+
+*** Getting started
+    :PROPERTIES:
+    :ID:       a14c087b-c675-4b6f-b7d4-5974a140acb3
+    :END:
+
+With a recent version of org (7.01+), ledger support is provided.  To
+use it, enable ledger support.  Check the [[http://orgmode.org/worg/org-contrib/babel/index.php][orb-babel documentation on
+Worg]] for instructions on how to achieve this but I currently do this
+directly as follows:
+
+#+srcname: babel-language-setup
+#+begin_src emacs-lisp 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((R . t)
+   (ditaa . t)
+   (dot . t)
+   (emacs-lisp . t)
+   (gnuplot . t)
+   (haskell . nil)
+   (latex . t)
+   (ledger . t)  	;this is the important one for this tutorial
+   (ocaml . nil)
+   (octave . t)
+   (python . t)
+   (ruby . t)
+   (screen . nil)
+   (sh . t)
+   (sql . nil)
+   (sqlite . t)))
+#+end_src
+
+Once ledger support in org-babel has been enabled, we can use the
+tangling support in org-babel to introduce ledger entries throughout
+an org file.
+
+The rest of this document presents an example of how to do this but
+only scratches the surface of what is possible in /ledger/.  For further
+information on /ledger/, check out [[http://wiki.github.com/jwiegley/ledger/][the project website]].
+
+* Embedded ledger example
+
+In this example, we will separate the recording of financial
+transactions from the reporting of financial summaries.  The first
+subsection will present some simple expenses and income entries; the
+second subsection will show some example financial summaries you may
+wish to generate.
+
+*** Income and expenses records
+    :PROPERTIES:
+    :tangle:   /tmp/account.ledger
+    :END:
+
+    The property for this heading specifies where the tangled output
+    of the ledger code blocks in what follows should end up.  I have
+    specified the file =/tmp/account.ledger=. By default, the file will
+    appear in the same directory where the org file resides but ledger
+    will be invoked in =/tmp=, at least on a linux system so specifying
+    the =/tmp= directory makes life easier.  However, please be aware of
+    confidentiality problems with this approach!
+
+***** Income entries
+      :PROPERTIES:
+      :ID:       74fd73c2-41f9-41eb-97dd-1f8cb515d837
+      :END:
+
+      The first set of entries relates to income, either monthly pay or
+      interest, all typically going into one of my bank account.  Here
+      I have placed several entries but we could have had each entry
+      in a separate =src= block.
+
+#+begin_src ledger
+2010/01/01 * Starting balance
+  assets:bank:savings  £1300.00
+  income:starting balances
+2010/07/22 * Got paid
+  assets:bank:chequing  £1000.00
+  income:salary
+2010/07/31 * Interest on bank savings
+  assets:bank:savings  £3.53
+  income:interest
+2010/07/31 * Transfer savings
+  assets:bank:savings  £250.00
+  assets:bank:chequing
+2010/08/01 got paid again
+  assets:bank:chequing  £1000.00
+  income:salary
+#+end_src
+
+***** expenses
+      :PROPERTIES:
+      :ID:       07d84b1d-892b-4367-86da-95a0380b8a45
+      :END:
+
+      The following entries relate to personal expenses, such as rent
+      and food.  Again, these have all been placed in a single =src=
+      block but could have been done individually.
+
+#+begin_src ledger
+2010/07/23 Rent
+  expenses:rent  £500.00
+  assets:bank:chequing
+2010/07/24 Food
+  expenses:food  £150.00
+  assets:bank:chequing
+#+end_src
+
+*** Financial summaries
+
+    Assuming you have tangled the ledger entries (=C-c C-v t=), you can now
+    perform all kinds of calculations.  However, please *note* that
+    despite tangling to the current directory (where this org file
+    resides), on Linux systems at least, the direct execution of babel
+    =src= blocks takes place in =/tmp= so any references to the tangled
+    file generated must have the full path.
+
+***** An overall balance summary
+      :PROPERTIES:
+      :ID:       b9747939-6380-495d-9520-aad8e4bf80ad
+      :END:
+
+      The overall balance of your account and expenditure with a breakdown
+      according to category is specified by passing the =bal= argument
+      to /ledger/.
+
+#+begin_src ledger :cmdline bal :results value 
+!include /tmp/account.ledger
+#+end_src
+
+#+results:
+:            £2653.53  assets
+:             £650.00  expenses
+:           £-3303.53  income
+
+If you want a more detailed breakdown of where your money is and where
+it has been spent, you can specify the =-s= flag to tell /ledger/ to
+include sub-accounts in the report.
+
+#+begin_src ledger :cmdline -s bal :results value 
+!include /tmp/account.ledger
+#+end_src
+
+#+results:
+#+begin_example
+           £2653.53  assets:bank
+           £1100.00    chequing
+           £1553.53    savings
+            £650.00  expenses
+            £150.00    food
+            £500.00    rent
+          £-3303.53  income
+             £-3.53    interest
+          £-2000.00    salary
+          £-1300.00    starting balances
+#+end_example
+
+
+***** Generating a monthly register
+      :PROPERTIES:
+      :ID:       d9a89c50-33fd-42cc-a6ed-adcf263422d8
+      :END:
+
+      You can also generate a monthly register by executing the
+      following =src= block.  This presents a summary of transactions
+      for each monthly period with a running total in the final column
+      (which should be 0 at the end if all the entries are correct).
+
+#+begin_src ledger :cmdline -M reg
+!include /tmp/account.ledger
+#+end_src
+
+#+results:
+#+begin_example
+2010/01/01 - 2010/01/31         assets:bank:savings       £1300.00    £1300.00
+                                in:starting balances     £-1300.00            0
+2010/07/01 - 2010/07/31         assets:bank:chequing       £100.00     £100.00
+                                assets:bank:savings        £253.53     £353.53
+                                expenses:food              £150.00     £503.53
+                                expenses:rent              £500.00    £1003.53
+                                income:interest             £-3.53    £1000.00
+                                income:salary            £-1000.00            0
+2010/08/01 - 2010/08/01         assets:bank:chequing      £1000.00    £1000.00
+                                income:salary            £-1000.00            0
+#+end_example
+
+We could also generate a monthly report on our =assets= showing how
+these are increasing (or decreasing!).  In this case, the final column
+will be the running total of the =assets= in our ledger.
+
+#+begin_src ledger :cmdline -M reg assets
+!include /tmp/account.ledger
+#+end_src
+
+#+results:
+: 2010/01/01 - 2010/01/31         assets:bank:savings       £1300.00    £1300.00
+: 2010/07/01 - 2010/07/31         assets:bank:chequing       £100.00    £1400.00
+:                                 assets:bank:savings        £253.53    £1653.53
+: 2010/08/01 - 2010/08/01         assets:bank:chequing      £1000.00    £2653.53
+
+* Summary
+
+This short tutorial shows how /ledger/ entries can be embedded in a org
+file and manipulated using [[http://orgmode.org/worg/org-contrib/babel/index.php][org-babel]].  However, only simple /ledger/
+features have been illustrated; please refer to the /ledger/
+[[http://wiki.github.com/jwiegley/ledger/][documentation]] for examples of more complex interations with a ledger.
