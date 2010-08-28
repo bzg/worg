@@ -314,6 +314,30 @@ Similarly, the parts of =index.org= tagged =@HOME= can now be exported to
 =~/notes/export/home/index.tex= with =C-c C-e X= and selecting the
 =home= project.
 
+* Exporting Pseudo-Code
+  The LaTeX exporter will fontify exported code blocks written in any
+  language that has an associated Emacs mode for editing.  If you want
+  to export pseudo-code, for which there is no corresponding Emacs
+  mode, then one approach is to use =#+begin_latex ... #+end_latex=
+  and write the pseudo-code directly in LaTeX.  This depends on the
+  LaTeX [[http://www.ctan.org/tex-archive/macros/latex/contrib/listings/][listings package]], which is one of the default packages used by
+  Org-mode. 
+
+  Dan Davison provided this example on the Org-mode list:
+
+: #+begin_latex
+: \begin{algorithm}
+:  \caption{An algorithm}
+:  \label{alg:myalg}
+:  \begin{lstlisting}[mathescape,escapeinside='']
+:    '\foreach individual $i$'
+:        '\foreach group $k$'
+:            $\gamma_{ik} \getsp Q_{k}\prod_{l}\prod_{a=1}^{2}P_{lkX_{ila}}$
+:  \end{lstlisting}
+: \end{algorithm}
+: #+end_latex
+
+
 
 * Footnotes
 
