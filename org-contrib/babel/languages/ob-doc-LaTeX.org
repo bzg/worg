@@ -2,16 +2,17 @@
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
-#+TITLE:      Org-babel-doc-LaTeX
+#+TITLE:      LaTeX Code Blocks in Babel
 #+AUTHOR:     Tom Dye
 #+EMAIL:      tsd at tsdye dot com
 #+LANGUAGE:   en
 #+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+BABEL: :exports code
 
 #+begin_html
   <div id="subtitle" style="float: center; text-align: center;">
   <p>
-  Org-babel support for LaTeX
+  Babel support for LaTeX
   </p>
   <p>
   </div>
@@ -38,7 +39,7 @@
 
 *** Recommended RefTeX Setting
      - It can be helpful to name a default bibliography when editing
-       source code in Org-babel.  Add the following lines, edited to
+       source code in Babel.  Add the following lines, edited to
        conform to your setup, to .emacs:
 
 
@@ -75,32 +76,40 @@
   - When you open an org-mode file with this line, RefTeX will prompt
     for the master .tex file
 
-* Configuration in Org-babel
+* Configuration in Babel
 ** Activate LaTeX Evaluation
-  - Add the following line to .emacs
-#+begin_src emacs-lisp
-    (require 'org-babel-latex)
-#+end_src
-
-** Raise Noweb-type Errors
-   - Add LaTeX to a list of languages that raise noweb-type errors
-   - Edit the following example to include the languages you use in Org-babel
-
-#+begin_src emacs-lisp 
-  (setq org-babel-noweb-error-langs '("R" "python" "latex"))
+  - Add the commented line to .emacs
+#+begin_src emacs-lisp :tangle yes
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)
+     (ditaa . t)
+     (dot . t)
+     (emacs-lisp . t)
+     (gnuplot . nil)
+     (haskell . nil)
+     (latex . t) ; this is the entry to activate LaTeX
+     (ocaml . nil)
+     (perl . t)
+     (python . t)
+     (ruby . t)
+     (screen . nil)
+     (sh . t)
+     (sql . nil)
+     (sqlite . nil)))
 #+end_src
 
 * Language-specific Conventions
-  - Org-babel returns raw LaTeX code on evaluation, unless a =:file=
+  - Babel returns raw LaTeX code on evaluation, unless a =:file=
     header argument is present
   - The default value for the =:exports= header argument is
     =results=[fn:1] 
   - The default value for the =:results= header argument is =latex=
 * Header Arguments
-  - Org-babel's LaTeX support uses the =:file= and =:buffer= header
+  - Babel's LaTeX support uses the =:file= and =:buffer= header
     arguments in language-specific ways  
-  - It adds three header arguments: =:pdfheight=, =:pdfwidth=, and
-    =:packages=
+  - It adds these header arguments: =:pdfheight=, =:pdfwidth=,
+    =:packages=, =:fit=, and =:border=
 
 ** Language Specific Header Arguments
 - The =:file= header argument accepts a file name ending in =.png= or
@@ -159,13 +168,12 @@ This example uses the excellent [[http://sourceforge.net/projects/pgf/][pgf/tikz
 
 * Common Idioms
 
-
   - Org-mode can export its outline structure to LaTeX, yielding a
-    serviceable document
+    serviceable document independent of Babel, see the [[http://orgmode.org/worg/org-tutorials/org-latex-export.php][LaTeX Export Tutorial]]
 
 ** Creating and Including Graphics
-   - This example creates a graph in R, then inserts it with a noweb
-     reference to the results of the R code block
+   - This example creates a graph in R, then inserts it into a LaTeX
+     clode block with a noweb reference
 
 : #+srcname: r-complete-weight-histogram
 : #+begin_src R :session adze :file r/adze_wt_log.pdf
