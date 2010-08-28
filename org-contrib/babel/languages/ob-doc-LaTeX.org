@@ -169,7 +169,7 @@ This example uses the excellent [[http://sourceforge.net/projects/pgf/][pgf/tikz
 * Common Idioms
 
   - Org-mode can export its outline structure to LaTeX, yielding a
-    serviceable document independent of Babel, see the [[http://orgmode.org/worg/org-tutorials/org-latex-export.php][LaTeX Export Tutorial]]
+    serviceable document independent of Babel, see the [[http://orgmode.org/worg/org-tutorials/org-latex-export.php][LaTeX export tutorial]]
 
 ** Creating and Including Graphics
    - This example creates a graph in R, then inserts it into a LaTeX
@@ -192,6 +192,61 @@ This example uses the excellent [[http://sourceforge.net/projects/pgf/][pgf/tikz
 :   \end{figure}
 : #+end_src
 
+
+
+** Passing an Org-mode table to a LaTeX code block
+
+Tables are difficult to set in type.  This was true when lead type was
+set manually and it is still true with a sophisticated type-setting
+engine like LaTeX.  One way to make a LaTeX table is to write it out
+using an Org-mode table and then "export" the table into the LaTeX
+code block using the function =orgtbl-to-generic=.
+
+This Emacs lisp function, slightly modified from one written by Eric
+Schulte, inserts an Org-mode table into a LaTeX code block.  It
+depends on the [[http://www.ctan.org/tex-archive/macros/latex/contrib/booktabs/][LaTeX booktabs package]], which draws horizontal rules of
+appropriate widths at the top and bottom of a table, as well as within
+the table.
+
+: #+srcname: booktabs-2
+: #+begin_src emacs-lisp :var table='((:head) hline (:body))
+: (flet ((to-tab (tab)
+:                (orgtbl-to-generic
+:                 (mapcar (lambda (lis)
+:                           (if (listp lis)
+:                               (mapcar (lambda (el)
+:                                         (if (stringp el)
+:                                             el
+:                                           (format "%S" el))) lis)
+:                             lis)) tab)
+:                 (list :lend " \\\\" :sep " & " :hline "\\hline"))))
+:   (org-fill-template
+:    "
+: \\toprule
+: %table
+: \\bottomrule\n"
+:    (list
+:     (cons "table"
+:           ;; only use \midrule if it looks like there are column headers
+:           (if (equal 'hline (second table))
+:               (concat (to-tab (list (first table)))
+:                       "\n\\midrule\n"
+:                       (to-tab (cddr table)))
+:             (to-tab table))))))
+: #+end_src
+
+The function can be called using noweb syntax, like this:
+
+: #+begin_src latex :noweb yes
+:  \begin{table}[htb!]
+:    \centering
+:    \caption{A test table}
+:    \label{tab:test}
+:    \begin{tabular}{rl}
+:      <<booktabs-2(table=months)>>
+:    \end{tabular}
+:  \end{table}
+: #+end_src
 
 
 * Footnotes
