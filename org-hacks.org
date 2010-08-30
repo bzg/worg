@@ -17,214 +17,64 @@
 This page is for ad hoc bits of code.  Feel free to add quick hacks and
 workaround.  Go crazy.
 
-* Automatically add an appointment when clocking in a task
 
-#+BEGIN_SRC emacs-lisp
-;; Make sure you have a sensible value for `appt-message-warning-time'
-(defvar bzg-org-clock-in-appt-delay 100
-  "Number of minutes for setting an appointment by clocking-in")
-#+END_SRC
+* Hacking Org: Modifying orgmode itself.
+** Compiling Org without make
+   :PROPERTIES:
+   :CUSTOM_ID: compiling-org-without-make
+   :END:
 
-This function let's you add an appointment for the current entry.
-This can be useful when you need a reminder.
+   This file is the result of  [[http://article.gmane.org/gmane.emacs.orgmode/15264][one of our discussions]] on the mailing list.
+   Enhancements wellcome.
 
-#+BEGIN_SRC emacs-lisp
-(defun bzg-org-clock-in-add-appt (&optional n)
-  "Add an appointment for the Org entry at point in N minutes."
-  (interactive)
-  (save-excursion
-    (org-back-to-heading t)
-    (looking-at org-complex-heading-regexp)
-    (let* ((msg (match-string-no-properties 4))
-	   (ct-time (decode-time))
-	   (appt-min (+ (cadr ct-time)
-			(or n bzg-org-clock-in-appt-delay)))
-	   (appt-time ; define the time for the appointment
-	    (progn (setf (cadr ct-time) appt-min) ct-time)))
-      (appt-add (format-time-string
-		 "%H:%M" (apply 'encode-time appt-time)) msg)
-      (if (interactive-p) (message "New appointment for %s" msg)))))
-#+END_SRC
+   To use this function, adjust the variables =my/org-lisp-directory= and
+   =my/org-compile-sources= to suite your needs.
 
-You can advise =org-clock-in= so that =C-c C-x C-i= will automatically
-add an appointment:
+   #+BEGIN_SRC emacs-lisp
+     (defvar my/org-lisp-directory "~/.emacs.d/org/lisp"
+       "Directory where your org-mode files live.")
 
-#+BEGIN_SRC emacs-lisp
-(defadvice org-clock-in (after org-clock-in-add-appt activate)
-  "Add an appointment when clocking a task in."
-  (bzg-org-clock-in-add-appt))
-#+END_SRC
+     (defvar my/org-compile-sources t
+       "If `nil', never compile org-sources. `my/compile-org' will only create
+     the autoloads file `org-install.el' then. If `t', compile the sources, too.")
 
-You may also want to delete the associated appointment when clocking
-out.  This function does this:
+     ;; Customize:
+     (setq my/org-lisp-directory "~/.emacs.d/org/lisp")
 
-#+BEGIN_SRC emacs-lisp
-(defun bzg-org-clock-out-delete-appt nil
-  "When clocking out, delete any associated appointment."
-  (interactive)
-  (save-excursion
-    (org-back-to-heading t)
-    (looking-at org-complex-heading-regexp)
-    (let* ((msg (match-string-no-properties 4)))
-      (setq appt-time-msg-list
-	    (delete nil
-		    (mapcar
-		     (lambda (appt)
-		       (if (not (string-match (regexp-quote msg)
-					      (cadr appt))) appt))
-		     appt-time-msg-list)))
-      (appt-check))))
-#+END_SRC
+     ;; Customize:
+     (setq  my/org-compile-sources t)
 
-And here is the advice for =org-clock-out= (=C-c C-x C-o=)
+     (defun my/compile-org(&optional directory)
+       "Compile all *.el files that come with org-mode."
+       (interactive)
+       (setq directory (concat
+                       	(file-truename
+                         (or directory my/org-lisp-directory)) "/"))
 
-#+BEGIN_SRC emacs-lisp
-(defadvice org-clock-out (before org-clock-out-delete-appt activate)
-  "Delete an appointment when clocking a task out."
-  (bzg-org-clock-out-delete-appt))
-#+END_SRC
+       (add-to-list 'load-path directory)
 
-*IMPORTANT*: You can add appointment by clocking in in both an
-=org-mode= and an =org-agenda-mode= buffer.  But clocking out from
-agenda buffer with the advice above will bring an error.
+       (let ((list-of-org-files (file-expand-wildcards (concat directory "*.el"))))
 
-* Use Org-mode with Screen [Andrew Hyatt]
+         ;; create the org-install file
+         (require 'autoload)
+         (setq esf/org-install-file (concat directory "org-install.el"))
+         (find-file esf/org-install-file)
+         (erase-buffer)
+         (mapc (lambda (x)
+                 (generate-file-autoloads x))
+               list-of-org-files)
+         (insert "\n(provide (quote org-install))\n")
+         (save-buffer)
+         (kill-buffer)
+         (byte-compile-file esf/org-install-file t)
 
-"The general idea is that you start a task in which all the work will
-take place in a shell.  This usually is not a leaf-task for me, but
-usually the parent of a leaf task.  From a task in your org-file, M-x
-ash-org-screen will prompt for the name of a session.  Give it a name,
-and it will insert a link.  Open the link at any time to go the screen
-session containing your work!"
-
-http://article.gmane.org/gmane.emacs.orgmode/5276
-
-#+BEGIN_SRC emacs-lisp
-(require 'term)
-
-(defun ash-org-goto-screen (name)
-  "Open the screen with the specified name in the window"
-  (interactive "MScreen name: ")
-  (let ((screen-buffer-name (ash-org-screen-buffer-name name)))
-    (if (member screen-buffer-name
-                (mapcar 'buffer-name (buffer-list)))
-        (switch-to-buffer screen-buffer-name)
-      (switch-to-buffer (ash-org-screen-helper name "-dr")))))
-
-(defun ash-org-screen-buffer-name (name)
-  "Returns the buffer name corresponding to the screen name given."
-  (concat "*screen " name "*"))
-
-(defun ash-org-screen-helper (name arg)
-  ;; Pick the name of the new buffer.
-  (let ((term-ansi-buffer-name
-	 (generate-new-buffer-name
-	  (ash-org-screen-buffer-name name))))
-    (setq term-ansi-buffer-name
-          (term-ansi-make-term
-	   term-ansi-buffer-name "/usr/bin/screen" nil arg name))
-    (set-buffer term-ansi-buffer-name)
-    (term-mode)
-    (term-char-mode)
-    (term-set-escape-char ?\C-x)
-    term-ansi-buffer-name))
-
-(defun ash-org-screen (name)
-  "Start a screen session with name"
-  (interactive "MScreen name: ")
-  (save-excursion
-    (ash-org-screen-helper name "-S"))
-  (insert-string (concat "[[screen:" name "]]")))
-
-;; And don't forget to add ("screen" . "elisp:(ash-org-goto-screen
-;; \"%s\")") to org-link-abbrev-alist.
-#+END_SRC
-
-* Org Agenda + Appt + Zenity
-
-Russell Adams posted this setup [[http://article.gmane.org/gmane.emacs.orgmode/5806][on the list]].  It make sure your agenda
-appointments are known by Emacs, and it displays warnings in a [[http://live.gnome.org/Zenity][zenity]]
-popup window.
-
-#+BEGIN_SRC emacs-lisp
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; For org appointment reminders
-
-;; Get appointments for today
-(defun my-org-agenda-to-appt ()
-  (interactive)
-  (setq appt-time-msg-list nil)
-  (let ((org-deadline-warning-days 0))    ;; will be automatic in org 5.23
-        (org-agenda-to-appt)))
-
-;; Run once, activate and schedule refresh
-(my-org-agenda-to-appt)
-(appt-activate t)
-(run-at-time "24:01" nil 'my-org-agenda-to-appt)
-
-; 5 minute warnings
-(setq appt-message-warning-time 15)
-(setq appt-display-interval 5)
-
-; Update appt each time agenda opened.
-(add-hook 'org-finalize-agenda-hook 'my-org-agenda-to-appt)
-
-; Setup zenify, we tell appt to use window, and replace default function
-(setq appt-display-format 'window)
-(setq appt-disp-window-function (function my-appt-disp-window))
-
-(defun my-appt-disp-window (min-to-app new-time msg)
-  (save-window-excursion (shell-command (concat
-    "/usr/bin/zenity --info --title='Appointment' --text='"
-    msg "' &") nil nil)))
-#+END_SRC
-
-* Org-Mode + gnome-osd
-
-Richard Riley uses gnome-osd in interaction with Org-Mode to display
-appointments.  You can look at the code on the [[http://www.emacswiki.org/emacs-en/OrgMode-OSD][emacswiki]].
-
-* remind2org
-
-  From Detlef Steuer
-
-http://article.gmane.org/gmane.emacs.orgmode/5073
-
-#+BEGIN_QUOTE
-Remind (http://www.roaringpenguin.com/products/remind) is a very powerful
-command line calendaring program. Its features superseed the possibilities
-of orgmode in the area of date specifying, so that I want to use it
-combined with orgmode.
-
-Using the script below I'm able use remind and incorporate its output in my
-agenda views.  The default of using 13 months look ahead is easily
-changed. It just happens I sometimes like to look a year into the
-future. :-)
-#+END_QUOTE
-
-* org-remember-anything
-
-[[http://www.emacswiki.org/cgi-bin/wiki/Anything][Anything]] users may find the snippet below interesting:
-
-#+BEGIN_SRC emacs-lisp
-(defvar org-remember-anything
-  '((name . "Org Remember")
-    (candidates . (lambda () (mapcar 'car org-remember-templates)))
-    (action . (lambda (name)
-                (let* ((orig-template org-remember-templates)
-                       (org-remember-templates
-                        (list (assoc name orig-template))))
-                  (call-interactively 'org-remember))))))
-#+END_SRC
-
-You can add it to your 'anything-sources' variable and open remember directly
-from anything. I imagine this would be more interesting for people with many
-remember templatesm, so that you are out of keys to assign those to. You should
-get something like this:
-
-[[file:images/thumbs/org-remember-anything.png]]
-
-* Reload Org
+         (dolist (f list-of-org-files)
+           (if (file-exists-p (concat f "c")) ; delete compiled files
+               (delete-file (concat f "c")))
+           (if my/org-compile-sources     ; Compile, if `my/org-compile-sources' is t
+               (byte-compile-file f)))))
+   #+END_SRC
+** Reload Org
 
 As of Org version 6.23b (released Sunday Feb 22, 2009) there is a new
 function to reload org files.
@@ -245,580 +95,47 @@ To switch back to the compiled version just reload again with
 
 : M-x org-reload
 
-* Split horizontally for agenda
-
-If you would like to split the frame into two side-by-side windows when
-displaying the agenda, try this hack from Jan Rehders, which uses the
-`toggle-window-split' from
-
-http://www.emacswiki.org/cgi-bin/wiki/ToggleWindowSplit
-
-#+BEGIN_SRC emacs-lisp
-;; Patch org-mode to use vertical splitting
-(defadvice org-prepare-agenda (after org-fix-split)
-  (toggle-window-split))
-(ad-activate 'org-prepare-agenda)
-#+END_SRC
-* Highlight the agenda line under cursor
-
-This is useful to make sure what task you are operating on.
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
-#+END_SRC emacs-lisp
-
-Under XEmacs:
-
-#+BEGIN_SRC emacs-lisp
-;; hl-line seems to be only for emacs
-(require 'highline)
-(add-hook 'org-agenda-mode-hook '(lambda () (highline-mode 1)))
-
-;; highline-mode does not work straightaway in tty mode.
-;; I use a black background
-(custom-set-faces
-  '(highline-face ((((type tty) (class color))
-                    (:background "white" :foreground "black")))))
-#+END_SRC emacs-lisp
-
-* Remove time grid lines that are in an appointment
-
-The agenda shows lines for the time grid.  Some people think that
-these lines are a distraction when there are appointments at those
-times.  You can get rid of the lines which coincide exactly with the
-beginning of an appointment.  Michael Ekstrand has written a piece of
-advice that also removes lines that are somewhere inside an
-appointment:
-
+** Speed Commands
+   Speed commands are described [[http://orgmode.org/manual/Speed-keys.html#Speed-keys][here]] in the manual. Add your own speed
+   commands here.
+*** Show next/prev heading tidily
+   - Dan Davison
+     These close the current heading and open the next/previous heading.
 #+begin_src emacs-lisp
-(defun org-time-to-minutes (time)
-  "Convert an HHMM time to minutes"
-  (+ (* (/ time 100) 60) (% time 100)))
+(defun ded/org-show-next-heading-tidily ()
+  "Show next entry, keeping other entries closed."
+  (if (save-excursion (end-of-line) (outline-invisible-p))
+      (progn (org-show-entry) (show-children))
+    (outline-next-heading)
+    (unless (and (bolp) (org-on-heading-p))
+      (org-up-heading-safe)
+      (hide-subtree)
+      (error "Boundary reached"))
+    (org-overview)
+    (org-reveal t)
+    (org-show-entry)
+    (show-children)))
 
-(defun org-time-from-minutes (minutes)
-  "Convert a number of minutes to an HHMM time"
-  (+ (* (/ minutes 60) 100) (% minutes 60)))
+(defun ded/org-show-previous-heading-tidily ()
+  "Show previous entry, keeping other entries closed."
+  (let ((pos (point)))
+    (outline-previous-heading)
+    (unless (and (< (point) pos) (bolp) (org-on-heading-p))
+      (goto-char pos)
+      (hide-subtree)
+      (error "Boundary reached"))
+    (org-overview)
+    (org-reveal t)
+    (org-show-entry)
+    (show-children)))
 
-(defadvice org-agenda-add-time-grid-maybe (around mde-org-agenda-grid-tweakify
-                                                  (list ndays todayp))
-  (if (member 'remove-match (car org-agenda-time-grid))
-      (flet ((extract-window
-              (line)
-              (let ((start (get-text-property 1 'time-of-day line))
-                    (dur (get-text-property 1 'duration line)))
-                (cond
-                 ((and start dur)
-                  (cons start
-                        (org-time-from-minutes
-                         (+ dur (org-time-to-minutes start)))))
-                 (start start)
-                 (t nil)))))
-        (let* ((windows (delq nil (mapcar 'extract-window list)))
-               (org-agenda-time-grid
-                (list (car org-agenda-time-grid)
-                      (cadr org-agenda-time-grid)
-                      (remove-if
-                       (lambda (time)
-                         (find-if (lambda (w)
-                                    (if (numberp w)
-                                        (equal w time)
-                                      (and (>= time (car w))
-                                           (< time (cdr w)))))
-                                  windows))
-                       (caddr org-agenda-time-grid)))))
-          ad-do-it))
-    ad-do-it))
-(ad-activate 'org-agenda-add-time-grid-maybe)
+(setq org-use-speed-commands t)
+(add-to-list 'org-speed-commands-user
+             '("n" ded/org-show-next-heading-tidily))
+(add-to-list 'org-speed-commands-user 
+             '("p" ded/org-show-previous-heading-tidily))
 #+end_src
-
-* Group task list by a property
-
-This advice allows you to group a task list in Org-Mode.  To use it,
-set the variable =org-agenda-group-by-property= to the name of a
-property in the option list for a TODO or TAGS search.  The resulting
-agenda view will group tasks by that property prior to searching.
-
-#+begin_src emacs-lisp
-(defvar org-agenda-group-by-property nil
-  "Set this in org-mode agenda views to group tasks by property")
-
-(defun org-group-bucket-items (prop items)
-  (let ((buckets ()))
-    (dolist (item items)
-      (let* ((marker (get-text-property 0 'org-marker item))
-             (pvalue (org-entry-get marker prop t))
-             (cell (assoc pvalue buckets)))
-        (if cell
-            (setcdr cell (cons item (cdr cell)))
-          (setq buckets (cons (cons pvalue (list item))
-                              buckets)))))
-    (setq buckets (mapcar (lambda (bucket)
-                            (cons (car bucket)
-                                  (reverse (cdr bucket))))
-                          buckets))
-    (sort buckets (lambda (i1 i2)
-                    (string< (car i1) (car i2))))))
-
-(defadvice org-finalize-agenda-entries (around org-group-agenda-finalize
-                                               (list &optional nosort))
-  "Prepare bucketed agenda entry lists"
-  (if org-agenda-group-by-property
-      ;; bucketed, handle appropriately
-      (let ((text ""))
-        (dolist (bucket (org-group-bucket-items
-                         org-agenda-group-by-property
-                         list))
-          (let ((header (concat "Property "
-                                org-agenda-group-by-property
-                                " is "
-                                (or (car bucket) "<nil>") ":\n")))
-            (add-text-properties 0 (1- (length header))
-                                 (list 'face 'org-agenda-structure)
-                                 header)
-            (setq text
-                  (concat text header
-                          ;; recursively process
-                          (let ((org-agenda-group-by-property nil))
-                            (org-finalize-agenda-entries
-                             (cdr bucket) nosort))
-                          "\n\n"))))
-        (setq ad-return-value text))
-    ad-do-it))
-(ad-activate 'org-finalize-agenda-entries)
-#+end_src
-* Link to Gnus messages by Message-Id
-
-In a [[http://thread.gmane.org/gmane.emacs.orgmode/8860][recent thread]] on the Org-Mode mailing list, there was some
-discussion about linking to Gnus messages without encoding the folder
-name in the link.  The following code hooks in to the store-link
-function in Gnus to capture links by Message-Id when in nnml folders,
-and then provides a link type "mid" which can open this link.  The
-=mde-org-gnus-open-message-link= function uses the
-=mde-mid-resolve-methods= variable to determine what Gnus backends to
-scan.  It will go through them, in order, asking each to locate the
-message and opening it from the first one that reports success.
-
-It has only been tested with a single nnml backend, so there may be
-bugs lurking here and there.
-
-The logic for finding the message was adapted from [[http://www.emacswiki.org/cgi-bin/wiki/FindMailByMessageId][an Emacs Wiki
-article]].
-
-#+begin_src emacs-lisp
-;; Support for saving Gnus messages by Message-ID
-(defun mde-org-gnus-save-by-mid ()
-  (when (memq major-mode '(gnus-summary-mode gnus-article-mode))
-    (when (eq major-mode 'gnus-article-mode)
-      (gnus-article-show-summary))
-    (let* ((group gnus-newsgroup-name)
-           (method (gnus-find-method-for-group group)))
-      (when (eq 'nnml (car method))
-        (let* ((article (gnus-summary-article-number))
-               (header (gnus-summary-article-header article))
-               (from (mail-header-from header))
-               (message-id
-                (save-match-data
-                  (let ((mid (mail-header-id header)))
-                    (if (string-match "<\\(.*\\)>" mid)
-                        (match-string 1 mid)
-                      (error "Malformed message ID header %s" mid)))))
-               (date (mail-header-date header))
-               (subject (gnus-summary-subject-string)))
-          (org-store-link-props :type "mid" :from from :subject subject
-                                :message-id message-id :group group
-                                :link (org-make-link "mid:" message-id))
-          (apply 'org-store-link-props
-                 :description (org-email-link-description)
-                 org-store-link-plist)
-          t)))))
-
-(defvar mde-mid-resolve-methods '()
-  "List of methods to try when resolving message ID's.  For Gnus,
-it is a cons of 'gnus and the select (type and name).")
-(setq mde-mid-resolve-methods
-      '((gnus nnml "")))
-
-(defvar mde-org-gnus-open-level 1
-  "Level at which Gnus is started when opening a link")
-(defun mde-org-gnus-open-message-link (msgid)
-  "Open a message link with Gnus"
-  (require 'gnus)
-  (require 'org-table)
-  (catch 'method-found
-    (message "[MID linker] Resolving %s" msgid)
-    (dolist (method mde-mid-resolve-methods)
-      (cond
-       ((and (eq (car method) 'gnus)
-             (eq (cadr method) 'nnml))
-        (funcall (cdr (assq 'gnus org-link-frame-setup))
-                 mde-org-gnus-open-level)
-        (when gnus-other-frame-object
-          (select-frame gnus-other-frame-object))
-        (let* ((msg-info (nnml-find-group-number
-                          (concat "<" msgid ">")
-                          (cdr method)))
-               (group (and msg-info (car msg-info)))
-               (message (and msg-info (cdr msg-info)))
-               (qname (and group
-                           (if (gnus-methods-equal-p
-                                (cdr method)
-                                gnus-select-method)
-                               group
-                             (gnus-group-full-name group (cdr method))))))
-          (when msg-info
-            (gnus-summary-read-group qname nil t)
-            (gnus-summary-goto-article message nil t))
-          (throw 'method-found t)))
-       (t (error "Unknown link type"))))))
-
-(eval-after-load 'org-gnus
-  '(progn
-     (add-to-list 'org-store-link-functions 'mde-org-gnus-save-by-mid)
-     (org-add-link-type "mid" 'mde-org-gnus-open-message-link)))
-#+end_src
-* Dynamically adjust tag position
-Here is a bit of code that allows you to have the tags always
-right-adjusted in the buffer.
-
-This is useful when you have bigger window than default window-size
-and you dislike the aesthetics of having the tag in the middle of the
-line.
-
-This hack solves the problem of adjusting it whenever you change the
-window size.
-Before saving it will revert the file to having the tag position be
-left-adjusted so that if you track your files with version control,
-you won't run into artificial diffs just because the window-size
-changed.
-
-*IMPORTANT*: This is probably slow on very big files.
-
-#+begin_src emacs-lisp
-(setq ba/org-adjust-tags-column t)
-
-(defun ba/org-adjust-tags-column-reset-tags ()
-  "In org-mode buffers it will reset tag position according to
-`org-tags-column'."
-  (when (and
-         (not (string= (buffer-name) "*Remember*"))
-         (eql major-mode 'org-mode))
-    (let ((b-m-p (buffer-modified-p)))
-      (condition-case nil
-          (save-excursion
-            (goto-char (point-min))
-            (command-execute 'outline-next-visible-heading)
-            ;; disable (message) that org-set-tags generates
-            (flet ((message (&rest ignored) nil))
-              (org-set-tags 1 t))
-            (set-buffer-modified-p b-m-p))
-        (error nil)))))
-
-(defun ba/org-adjust-tags-column-now ()
-  "Right-adjust `org-tags-column' value, then reset tag position."
-  (set (make-local-variable 'org-tags-column)
-       (- (- (window-width) (length org-ellipsis))))
-  (ba/org-adjust-tags-column-reset-tags))
-
-(defun ba/org-adjust-tags-column-maybe ()
-  "If `ba/org-adjust-tags-column' is set to non-nil, adjust tags."
-  (when ba/org-adjust-tags-column
-    (ba/org-adjust-tags-column-now)))
-
-(defun ba/org-adjust-tags-column-before-save ()
-  "Tags need to be left-adjusted when saving."
-  (when ba/org-adjust-tags-column
-     (setq org-tags-column 1)
-     (ba/org-adjust-tags-column-reset-tags)))
-
-(defun ba/org-adjust-tags-column-after-save ()
-  "Revert left-adjusted tag position done by before-save hook."
-  (ba/org-adjust-tags-column-maybe)
-  (set-buffer-modified-p nil))
-
-; automatically align tags on right-hand side
-(add-hook 'window-configuration-change-hook
-          'ba/org-adjust-tags-column-maybe)
-(add-hook 'before-save-hook 'ba/org-adjust-tags-column-before-save)
-(add-hook 'after-save-hook 'ba/org-adjust-tags-column-after-save)
-(add-hook 'org-agenda-mode-hook '(lambda ()
-                                  (setq org-agenda-tags-column (- (window-width)))))
-
-; between invoking org-refile and displaying the prompt (which
-; triggers window-configuration-change-hook) tags might adjust, 
-; which invalidates the org-refile cache
-(defadvice org-refile (around org-refile-disable-adjust-tags)
-  "Disable dynamically adjusting tags"
-  (let ((ba/org-adjust-tags-column nil))
-    ad-do-it))
-(ad-activate 'org-refile)
-#+end_src
-* Compiling Org without make
-  :PROPERTIES:
-  :CUSTOM_ID: compiling-org-without-make
-  :END:
-
-  This file is the result of  [[http://article.gmane.org/gmane.emacs.orgmode/15264][one of our discussions]] on the mailing list.
-  Enhancements wellcome.
-
-  To use this function, adjust the variables =my/org-lisp-directory= and
-  =my/org-compile-sources= to suite your needs.
-
-  #+BEGIN_SRC emacs-lisp
-    (defvar my/org-lisp-directory "~/.emacs.d/org/lisp"
-      "Directory where your org-mode files live.")
-
-    (defvar my/org-compile-sources t
-      "If `nil', never compile org-sources. `my/compile-org' will only create
-    the autoloads file `org-install.el' then. If `t', compile the sources, too.")
-
-    ;; Customize:
-    (setq my/org-lisp-directory "~/.emacs.d/org/lisp")
-
-    ;; Customize:
-    (setq  my/org-compile-sources t)
-
-    (defun my/compile-org(&optional directory)
-      "Compile all *.el files that come with org-mode."
-      (interactive)
-      (setq directory (concat
-                       (file-truename
-                        (or directory my/org-lisp-directory)) "/"))
-
-      (add-to-list 'load-path directory)
-
-      (let ((list-of-org-files (file-expand-wildcards (concat directory "*.el"))))
-
-        ;; create the org-install file
-        (require 'autoload)
-        (setq esf/org-install-file (concat directory "org-install.el"))
-        (find-file esf/org-install-file)
-        (erase-buffer)
-        (mapc (lambda (x)
-                (generate-file-autoloads x))
-              list-of-org-files)
-        (insert "\n(provide (quote org-install))\n")
-        (save-buffer)
-        (kill-buffer)
-        (byte-compile-file esf/org-install-file t)
-
-        (dolist (f list-of-org-files)
-          (if (file-exists-p (concat f "c")) ; delete compiled files
-              (delete-file (concat f "c")))
-          (if my/org-compile-sources     ; Compile, if `my/org-compile-sources' is t
-              (byte-compile-file f)))))
-  #+END_SRC
-* Customize the size of the frame for remember
-
-#FIXME: gmane link?
-On emacs-orgmode, Ryan C. Thompson suggested this:
-
-#+begin_quote
-I am using org-remember set to open a new frame when used,
-and the default frame size is much too large. To fix this, I have
-designed some advice and a custom variable to implement custom
-parameters for the remember frame:
-#+end_quote
-
-#+begin_src emacs-lisp
-  (defcustom remember-frame-alist nil
-    "Additional frame parameters for dedicated remember frame."
-    :type 'alist
-    :group 'remember)
-
-  (defadvice remember (around remember-frame-parameters activate)
-    "Set some frame parameters for the remember frame."
-    (let ((default-frame-alist (append remember-frame-alist
-                                       default-frame-alist)))
-      ad-do-it))
-#+end_src
-
-Setting remember-frame-alist to =((width . 80) (height . 15)))= give a
-reasonable size for the frame.
-
-* Add an effort estimate on the fly when clocking in
-
-You can use =org-clock-in-prepare-hook= to add an effort estimate.
-This way you can easily have a "tea-timer" for your tasks when they
-don't already have an effort estimate.
-
-#+begin_src emacs-lisp
-(add-hook 'org-clock-in-prepare-hook
-	  'my-org-mode-ask-effort)
-
-(defun my-org-mode-ask-effort ()
-  "Ask for an effort estimate when clocking in."
-  (unless (org-entry-get (point) "Effort")
-    (let ((effort
-	   (completing-read
-	    "Effort: "
-	    (org-entry-get-multivalued-property (point) "Effort"))))
-      (unless (equal effort "")
-	(org-set-property "Effort" effort)))))
-#+end_src
-
-Or you can use a default effort for such a timer:
-
-#+begin_src emacs-lisp
-(add-hook 'org-clock-in-prepare-hook
-	  'my-org-mode-add-default-effort)
-
-(defvar org-clock-default-effort "1:00")
-
-(defun my-org-mode-add-default-effort ()
-  "Add a default effort estimation."
-  (unless (org-entry-get (point) "Effort")
-    (org-set-property "Effort" org-clock-default-effort)))
-#+end_src
-* Org table
-** Dates computation
-
-*** Question ([[http://article.gmane.org/gmane.emacs.orgmode/15692][Xin Shi]])
-
-I have a table in org which stores the date, I'm wondering if there is
-any function to calculate the duration? For example:
-
-| Start Date |   End Date | Duration |
-|------------+------------+----------|
-| 2004.08.07 | 2005.07.08 |          |
-
-I tried to use B&-C&, but failed ...
-
-*** Answer ([[http://article.gmane.org/gmane.emacs.orgmode/15694][Nick Dokos]])
-
-Try the following:
-
-| Start Date |   End Date | Duration |
-|------------+------------+----------|
-| 2004.08.07 | 2005.07.08 |      335 |
-:#+TBLFM: $3=(date(<$2>)-date(<$1>))
-
-See this thread:
-
-    http://thread.gmane.org/gmane.emacs.orgmode/7741
-
-as well as this post (which is really a followup on the
-above):
-
-    http://article.gmane.org/gmane.emacs.orgmode/7753
-
-The problem that this last article pointed out was solved
-in
-
-    http://article.gmane.org/gmane.emacs.orgmode/8001
-
-and Chris Randle's original musings are at
-
-    http://article.gmane.org/gmane.emacs.orgmode/6536/
-
-** Field coordinates in formulas (=@#= and =$#=)
-
--- Michael Brand
-
-Following are some use cases that can be implemented with the
-_field coordinates in formulas_ described in the corresponding
-chapter in the [[http://orgmode.org/manual/References.html#References][Org manual]], available since =org-version= 6.35.
-
-*** Copy a column from a remote table into a column
-
-current column =$3= = remote column =$2=:
-: #+TBLFM: $3 = remote(FOO, @@#$2)
-
-*** Copy a row from a remote table transposed into a column
-
-current column =$1= = transposed remote row =@1=:
-: #+TBLFM: $1 = remote(FOO, @$#$@#)
-
-*** Transpose a table
-
--- Michael Brand
-
-This is more like a demonstration of using _field coordinates in formulas_
-to [[http://en.wikipedia.org/wiki/Transpose][transpose]] a table or to do it without using org-babel.  The efficient
-and simple solution for this with the help of org-babel and Emacs Lisp has
-been provided by Thomas S. Dye on the [[http://thread.gmane.org/gmane.emacs.orgmode/23809/focus=23815][mailing list]].
-
-To transpose this 4x7 table
-
-: #+TBLNAME: FOO
-: | year | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 |
-: |------+------+------+------+------+------+------|
-: | min  |  401 |  501 |  601 |  701 |  801 |  901 |
-: | avg  |  402 |  502 |  602 |  702 |  802 |  902 |
-: | max  |  403 |  503 |  603 |  703 |  803 |  903 |
-
-start with a 7x4 table without any horizontal line (to have filled
-also the column header) and yet empty:
-
-: |   |   |   |   |
-: |   |   |   |   |
-: |   |   |   |   |
-: |   |   |   |   |
-: |   |   |   |   |
-: |   |   |   |   |
-: |   |   |   |   |
-
-Then add the =TBLFM= below with the same formula repeated for each column.
-After recalculation this will end up with the transposed copy:
-
-: | year | min | avg | max |
-: | 2004 | 401 | 402 | 403 |
-: | 2005 | 501 | 502 | 503 |
-: | 2006 | 601 | 602 | 603 |
-: | 2007 | 701 | 702 | 703 |
-: | 2008 | 801 | 802 | 803 |
-: | 2009 | 901 | 902 | 903 |
-: #+TBLFM: $1 = remote(FOO, @$#$@#) :: $2 = remote(FOO, @$#$@#) :: $3 = remote(FOO, @$#$@#) :: $4 = remote(FOO, @$#$@#)
-
-The formulas simply exchange row and column numbers by taking
-- the absolute remote row number =@$#= from the current column number =$#=
-- the absolute remote column number =$@#= from the current row number =@#=
-
-Possible field formulas from the remote table will have to be transferred
-manually.  Since there are no row formulas yet there is no need to transfer
-column formulas to row formulas or vice versa.
-
-*** Dynamic variation of ranges
-
--- Michael Brand
-
-In this example all columns next to =quote= are calculated from the column
-=quote= and show the average change of the time series =quote[year]=
-during the period of the preceding =1=, =2=, =3= or =4= years:
-
-: | year | quote |   1 a |   2 a |   3 a |   4 a |
-: |------+-------+-------+-------+-------+-------|
-: | 2005 |    10 |       |       |       |       |
-: | 2006 |    12 | 0.200 |       |       |       |
-: | 2007 |    14 | 0.167 | 0.183 |       |       |
-: | 2008 |    16 | 0.143 | 0.155 | 0.170 |       |
-: | 2009 |    18 | 0.125 | 0.134 | 0.145 | 0.158 |
-: #+TBLFM: $3=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3::$4=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3::$5=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3::$6=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3
-
-The formula is the same for each column =$3= through =$6=.  This can easily
-be seen with the great formula editor invoked by C-c ' on the
-table. The important part of the formula without the field blanking is:
-
-: ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1
-
-which is the Emacs Calc implementation of the equation
-
-/AvgChange(i, a) = (quote[i] / quote[i - a]) ^ 1 / n - 1/
-
-where /i/ is the current time and /a/ is the length of the preceding period.
-
-* Org-mode and saveplace.el
-
-Fix a problem with saveplace.el putting you back in a folded position:
-
-#+begin_src emacs-lisp
-(add-hook 'org-mode-hook
-          (lambda ()
-	    (when (outline-invisible-p)
-	      (save-excursion
-		(outline-previous-visible-heading 1)
-		(org-show-subtree)))))
-#+end_src
-* Easy customization of TODO colors
+** Easy customization of TODO colors
   -- Ryan C. Thompson
 
   Here is some code I came up with some code to make it easier to
@@ -875,80 +192,29 @@ If KWD is a number, get the corresponding match group."
           (and (member kwd org-done-keywords) 'org-done)
           'org-todo))))
 #+END_SRC emacs-lisp
-* Changelog support for org headers
-  -- James TD Smith
 
-  Put the following in your =.emacs=, and =C-x 4 a= and other functions which
-  use =add-log-current-defun= like =magit-add-log= will pick up the nearest org
-  headline as the "current function" if you add a changelog entry from an org
-  buffer.
+** Changelog support for org headers
+   -- James TD Smith
 
-  #+BEGIN_SRC emacs-lisp
-    (defun org-log-current-defun ()
-      (save-excursion
-	(org-back-to-heading)
-	(if (looking-at org-complex-heading-regexp)
-	    (match-string 4))))
+   Put the following in your =.emacs=, and =C-x 4 a= and other functions which
+   use =add-log-current-defun= like =magit-add-log= will pick up the nearest org
+   headline as the "current function" if you add a changelog entry from an org
+   buffer.
 
-    (add-hook 'org-mode-hook
-	      (lambda ()
-		(make-variable-buffer-local 'add-log-current-defun-function)
-		(setq add-log-current-defun-function 'org-log-current-defun)))
-  #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (defun org-log-current-defun ()
+       (save-excursion
+	 (org-back-to-heading)
+	 (if (looking-at org-complex-heading-regexp)
+	     (match-string 4))))
 
-* Using ido-completing-read to find attachments
-  -- Matt Lundin
+     (add-hook 'org-mode-hook
+	       (lambda ()
+		 (make-variable-buffer-local 'add-log-current-defun-function)
+		 (setq add-log-current-defun-function 'org-log-current-defun)))
+   #+END_SRC
 
-Org-attach is great for quickly linking files to a project. But if you
-use org-attach extensively you might find yourself wanting to browse
-all the files you've attached to org headlines. This is not easy to do
-manually, since the directories containing the files are not human
-readable (i.e., they are based on automatically generated ids). Here's
-some code to browse those files using ido (obviously, you need to be
-using ido):
-
-#+begin_src emacs-lisp
-  (load-library "find-lisp")
-
-  ;; Adapted from http://www.emacswiki.org/emacs/RecentFiles
-
-  (defun my-ido-find-org-attach ()
-    "Find files in org-attachment directory"
-    (interactive)
-    (let* ((enable-recursive-minibuffers t)
-           (files (find-lisp-find-files org-attach-directory "."))
-           (file-assoc-list
-            (mapcar (lambda (x)
-                      (cons (file-name-nondirectory x)
-                            x))
-                    files))
-           (filename-list
-            (remove-duplicates (mapcar #'car file-assoc-list)
-                               :test #'string=))
-           (filename (ido-completing-read "Org attachments: " filename-list nil t))
-           (longname (cdr (assoc filename file-assoc-list))))
-      (ido-set-current-directory
-       (if (file-directory-p longname)
-           longname
-         (file-name-directory longname)))
-      (setq ido-exit 'refresh
-            ido-text-init ido-text
-            ido-rotate-temp t)
-      (exit-minibuffer)))
-
-  (add-hook 'ido-setup-hook 'ido-my-keys)
-
-  (defun ido-my-keys ()
-    "Add my keybindings for ido."
-    (define-key ido-completion-map (kbd "C-;") 'my-ido-find-org-attach)
-    )
-#+end_src
-
-To browse your org attachments using ido fuzzy matching and/or the
-completion buffer, invoke ido-find-file as usual (=C-x C-f=) and then
-press =C-;=.
-
-* Remove redundant tags of headlines
+** Remove redundant tags of headlines
   -- David Maus
 
 A small function that processes all headlines in current buffer and
@@ -976,7 +242,7 @@ headline or the #+FILETAGS: statement.
          t nil))))
 #+END_SRC
 
-* Different org-cycle-level behavior
+** Different org-cycle-level behavior
   -- Ryan Thompson
 
 In recent org versions, when your point (cursor) is at the end of an
@@ -1074,71 +340,241 @@ nil if before the first headline."
         t))))
 #+END_SRC
 
-* Restrict org-agenda-files by filetag
-  :PROPERTIES:
-  :CUSTOM_ID: set-agenda-files-by-filetag
-  :END:
-  - Matt Lundin
+** Add an effort estimate on the fly when clocking in
 
-It is often helpful to limit yourself to a subset of your agenda
-files. For instance, at work, you might want to see only files related
-to work (e.g., bugs, clientA, projectxyz, etc.). The FAQ has helpful
-information on filtering tasks using [[file:org-faq.org::#limit-agenda-with-tag-filtering][filetags]] and [[file:org-faq.org::#limit-agenda-with-category-match][custom agenda
-commands]]. These solutions, however, require reapplying a filter each
-time you call the agenda or writing several new custom agenda commands
-for each context. Another solution is to use directories for different
-types of tasks and to change your agenda files with a function that
-sets org-agenda-files to the appropriate directory. But this relies on
-hard and static boundaries between files.
-
-The following functions allow for a more dynamic approach to selecting
-a subset of files based on filetags:
+You can use =org-clock-in-prepare-hook= to add an effort estimate.
+This way you can easily have a "tea-timer" for your tasks when they
+don't already have an effort estimate.
 
 #+begin_src emacs-lisp
-  (defun my-org-agenda-restrict-files-by-filetag (&optional tag)
-    "Restrict org agenda files only to those containing filetag."
-    (interactive)
-    (let* ((tagslist (my-org-get-all-filetags))
-           (ftag (or tag 
-                     (completing-read "Tag: " 
-                                      (mapcar 'car tagslist)))))
-      (org-agenda-remove-restriction-lock 'noupdate)
-      (put 'org-agenda-files 'org-restrict (cdr (assoc ftag tagslist)))
-      (setq org-agenda-overriding-restriction 'files)))
-  
-  (defun my-org-get-all-filetags ()
-    "Get list of filetags from all default org-files."
-    (let ((files org-agenda-files)
-          tagslist x)
-      (save-window-excursion
-        (while (setq x (pop files))
-          (set-buffer (find-file-noselect x))
-          (mapc
-           (lambda (y)
-             (let ((tagfiles (assoc y tagslist)))
-               (if tagfiles
-                   (setcdr tagfiles (cons x (cdr tagfiles)))
-                 (add-to-list 'tagslist (list y x)))))
-           (my-org-get-filetags)))
-        tagslist)))
-  
-  (defun my-org-get-filetags ()
-    "Get list of filetags for current buffer"
-    (let ((ftags org-file-tags)
-          x)
-      (mapcar 
-       (lambda (x)
-         (org-substring-no-properties x))
-       ftags)))
+(add-hook 'org-clock-in-prepare-hook
+	  'my-org-mode-ask-effort)
+
+(defun my-org-mode-ask-effort ()
+  "Ask for an effort estimate when clocking in."
+  (unless (org-entry-get (point) "Effort")
+    (let ((effort
+	   (completing-read
+	    "Effort: "
+	    (org-entry-get-multivalued-property (point) "Effort"))))
+      (unless (equal effort "")
+	(org-set-property "Effort" effort)))))
 #+end_src
 
-Calling my-org-agenda-restrict-files-by-filetag results in a prompt
-with all filetags in your "normal" agenda files. When you select a
-tag, org-agenda-files will be restricted to only those files
-containing the filetag. To release the restriction, type C-c C-x >
-(org-agenda-remove-restriction-lock).
+Or you can use a default effort for such a timer:
 
-* Make it easier to set org-agenda-files from multiple directories
+#+begin_src emacs-lisp
+(add-hook 'org-clock-in-prepare-hook
+	  'my-org-mode-add-default-effort)
+
+(defvar org-clock-default-effort "1:00")
+
+(defun my-org-mode-add-default-effort ()
+  "Add a default effort estimation."
+  (unless (org-entry-get (point) "Effort")
+    (org-set-property "Effort" org-clock-default-effort)))
+#+end_src
+
+** Customize the size of the frame for remember
+
+#FIXME: gmane link?
+On emacs-orgmode, Ryan C. Thompson suggested this:
+
+#+begin_quote
+I am using org-remember set to open a new frame when used,
+and the default frame size is much too large. To fix this, I have
+designed some advice and a custom variable to implement custom
+parameters for the remember frame:
+#+end_quote
+
+#+begin_src emacs-lisp
+  (defcustom remember-frame-alist nil
+    "Additional frame parameters for dedicated remember frame."
+    :type 'alist
+    :group 'remember)
+
+  (defadvice remember (around remember-frame-parameters activate)
+    "Set some frame parameters for the remember frame."
+    (let ((default-frame-alist (append remember-frame-alist
+                                       default-frame-alist)))
+      ad-do-it))
+#+end_src
+
+Setting remember-frame-alist to =((width . 80) (height . 15)))= give a
+reasonable size for the frame.
+** Org table
+*** Dates computation
+
+**** Question ([[http://article.gmane.org/gmane.emacs.orgmode/15692][Xin Shi]])
+
+I have a table in org which stores the date, I'm wondering if there is
+any function to calculate the duration? For example:
+
+| Start Date |   End Date | Duration |
+|------------+------------+----------|
+| 2004.08.07 | 2005.07.08 |          |
+
+I tried to use B&-C&, but failed ...
+
+**** Answer ([[http://article.gmane.org/gmane.emacs.orgmode/15694][Nick Dokos]])
+
+Try the following:
+
+| Start Date |   End Date | Duration |
+|------------+------------+----------|
+| 2004.08.07 | 2005.07.08 |      335 |
+:#+TBLFM: $3=(date(<$2>)-date(<$1>))
+
+See this thread:
+
+    http://thread.gmane.org/gmane.emacs.orgmode/7741
+
+as well as this post (which is really a followup on the
+above):
+
+    http://article.gmane.org/gmane.emacs.orgmode/7753
+
+The problem that this last article pointed out was solved
+in
+
+    http://article.gmane.org/gmane.emacs.orgmode/8001
+
+and Chris Randle's original musings are at
+
+    http://article.gmane.org/gmane.emacs.orgmode/6536/
+
+*** Field coordinates in formulas (=@#= and =$#=)
+
+-- Michael Brand
+
+Following are some use cases that can be implemented with the
+_field coordinates in formulas_ described in the corresponding
+chapter in the [[http://orgmode.org/manual/References.html#References][Org manual]], available since =org-version= 6.35.
+
+**** Copy a column from a remote table into a column
+
+current column =$3= = remote column =$2=:
+: #+TBLFM: $3 = remote(FOO, @@#$2)
+
+**** Copy a row from a remote table transposed into a column
+
+current column =$1= = transposed remote row =@1=:
+: #+TBLFM: $1 = remote(FOO, @$#$@#)
+
+**** Transpose a table
+
+-- Michael Brand
+
+This is more like a demonstration of using _field coordinates in formulas_
+to [[http://en.wikipedia.org/wiki/Transpose][transpose]] a table or to do it without using org-babel.  The efficient
+and simple solution for this with the help of org-babel and Emacs Lisp has
+been provided by Thomas S. Dye on the [[http://thread.gmane.org/gmane.emacs.orgmode/23809/focus=23815][mailing list]].
+
+To transpose this 4x7 table
+
+: #+TBLNAME: FOO
+: | year | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 |
+: |------+------+------+------+------+------+------|
+: | min  |  401 |  501 |  601 |  701 |  801 |  901 |
+: | avg  |  402 |  502 |  602 |  702 |  802 |  902 |
+: | max  |  403 |  503 |  603 |  703 |  803 |  903 |
+
+start with a 7x4 table without any horizontal line (to have filled
+also the column header) and yet empty:
+
+: |   |   |   |   |
+: |   |   |   |   |
+: |   |   |   |   |
+: |   |   |   |   |
+: |   |   |   |   |
+: |   |   |   |   |
+: |   |   |   |   |
+
+Then add the =TBLFM= below with the same formula repeated for each column.
+After recalculation this will end up with the transposed copy:
+
+: | year | min | avg | max |
+: | 2004 | 401 | 402 | 403 |
+: | 2005 | 501 | 502 | 503 |
+: | 2006 | 601 | 602 | 603 |
+: | 2007 | 701 | 702 | 703 |
+: | 2008 | 801 | 802 | 803 |
+: | 2009 | 901 | 902 | 903 |
+: #+TBLFM: $1 = remote(FOO, @$#$@#) :: $2 = remote(FOO, @$#$@#) :: $3 = remote(FOO, @$#$@#) :: $4 = remote(FOO, @$#$@#)
+
+The formulas simply exchange row and column numbers by taking
+- the absolute remote row number =@$#= from the current column number =$#=
+- the absolute remote column number =$@#= from the current row number =@#=
+
+Possible field formulas from the remote table will have to be transferred
+manually.  Since there are no row formulas yet there is no need to transfer
+column formulas to row formulas or vice versa.
+
+**** Dynamic variation of ranges
+
+-- Michael Brand
+
+In this example all columns next to =quote= are calculated from the column
+=quote= and show the average change of the time series =quote[year]=
+during the period of the preceding =1=, =2=, =3= or =4= years:
+
+: | year | quote |   1 a |   2 a |   3 a |   4 a |
+: |------+-------+-------+-------+-------+-------|
+: | 2005 |    10 |       |       |       |       |
+: | 2006 |    12 | 0.200 |       |       |       |
+: | 2007 |    14 | 0.167 | 0.183 |       |       |
+: | 2008 |    16 | 0.143 | 0.155 | 0.170 |       |
+: | 2009 |    18 | 0.125 | 0.134 | 0.145 | 0.158 |
+: #+TBLFM: $3=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3::$4=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3::$5=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3::$6=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3
+
+The formula is the same for each column =$3= through =$6=.  This can easily
+be seen with the great formula editor invoked by C-c ' on the
+table. The important part of the formula without the field blanking is:
+
+: ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1
+
+which is the Emacs Calc implementation of the equation
+
+/AvgChange(i, a) = (quote[i] / quote[i - a]) ^ 1 / n - 1/
+
+where /i/ is the current time and /a/ is the length of the preceding period.
+** Archive in a date tree
+Posted to Org-mode mailing list by Osamu Okano
+[2010-04-21 Wed]
+#+begin_src emacs-lisp
+  ;; (setq org-archive-location "%s_archive::date-tree")
+  (defadvice org-archive-subtree
+    (around org-archive-subtree-to-data-tree activate)
+    "org-archive-subtree to date-tree"
+    (if
+        (string= "date-tree"
+                 (org-extract-archive-heading
+                  (org-get-local-archive-location)))
+        (let* ((dct (decode-time (org-current-time)))
+               (y (nth 5 dct))
+               (m (nth 4 dct))
+               (d (nth 3 dct))
+               (this-buffer (current-buffer))
+               (location (org-get-local-archive-location))
+               (afile (org-extract-archive-file location))
+               (org-archive-location
+                (format "%s::*** %04d-%02d-%02d %s" afile y m d
+                        (format-time-string "%A" (encode-time 0 0 0 d m y)))))
+          (message "afile=%s" afile)
+          (unless afile
+            (error "Invalid `org-archive-location'"))
+          (save-excursion
+            (switch-to-buffer (find-file-noselect afile))
+            (org-datetree-find-year-create y)
+            (org-datetree-find-month-create y m)
+            (org-datetree-find-day-create y m d)
+            (widen)
+            (switch-to-buffer this-buffer))
+          ad-do-it)
+      ad-do-it))
+#+end_src
+
+** Make it easier to set org-agenda-files from multiple directories
   - Matt Lundin
 
 #+begin_src emacs-lisp
@@ -1204,47 +640,447 @@ You can also easily use my-org-list-files to "mix and match"
 directories and extensions to generate different lists of agenda
 files.
 
-* Speed Commands
-  Speed commands are described [[http://orgmode.org/manual/Speed-keys.html#Speed-keys][here]] in the manual. Add your own speed
-  commands here.
-** Show next/prev heading tidily
-   - Dan Davison
-     These close the current heading and open the next/previous heading.
+** Restrict org-agenda-files by filetag
+  :PROPERTIES:
+  :CUSTOM_ID: set-agenda-files-by-filetag
+  :END:
+  - Matt Lundin
+
+It is often helpful to limit yourself to a subset of your agenda
+files. For instance, at work, you might want to see only files related
+to work (e.g., bugs, clientA, projectxyz, etc.). The FAQ has helpful
+information on filtering tasks using [[file:org-faq.org::#limit-agenda-with-tag-filtering][filetags]] and [[file:org-faq.org::#limit-agenda-with-category-match][custom agenda
+commands]]. These solutions, however, require reapplying a filter each
+time you call the agenda or writing several new custom agenda commands
+for each context. Another solution is to use directories for different
+types of tasks and to change your agenda files with a function that
+sets org-agenda-files to the appropriate directory. But this relies on
+hard and static boundaries between files.
+
+The following functions allow for a more dynamic approach to selecting
+a subset of files based on filetags:
+
 #+begin_src emacs-lisp
-(defun ded/org-show-next-heading-tidily ()
-  "Show next entry, keeping other entries closed."
-  (if (save-excursion (end-of-line) (outline-invisible-p))
-      (progn (org-show-entry) (show-children))
-    (outline-next-heading)
-    (unless (and (bolp) (org-on-heading-p))
-      (org-up-heading-safe)
-      (hide-subtree)
-      (error "Boundary reached"))
-    (org-overview)
-    (org-reveal t)
-    (org-show-entry)
-    (show-children)))
-
-(defun ded/org-show-previous-heading-tidily ()
-  "Show previous entry, keeping other entries closed."
-  (let ((pos (point)))
-    (outline-previous-heading)
-    (unless (and (< (point) pos) (bolp) (org-on-heading-p))
-      (goto-char pos)
-      (hide-subtree)
-      (error "Boundary reached"))
-    (org-overview)
-    (org-reveal t)
-    (org-show-entry)
-    (show-children)))
-
-(setq org-use-speed-commands t)
-(add-to-list 'org-speed-commands-user
-             '("n" ded/org-show-next-heading-tidily))
-(add-to-list 'org-speed-commands-user 
-             '("p" ded/org-show-previous-heading-tidily))
+  (defun my-org-agenda-restrict-files-by-filetag (&optional tag)
+    "Restrict org agenda files only to those containing filetag."
+    (interactive)
+    (let* ((tagslist (my-org-get-all-filetags))
+           (ftag (or tag 
+                     (completing-read "Tag: " 
+                                      (mapcar 'car tagslist)))))
+      (org-agenda-remove-restriction-lock 'noupdate)
+      (put 'org-agenda-files 'org-restrict (cdr (assoc ftag tagslist)))
+      (setq org-agenda-overriding-restriction 'files)))
+  
+  (defun my-org-get-all-filetags ()
+    "Get list of filetags from all default org-files."
+    (let ((files org-agenda-files)
+          tagslist x)
+      (save-window-excursion
+        (while (setq x (pop files))
+          (set-buffer (find-file-noselect x))
+          (mapc
+           (lambda (y)
+             (let ((tagfiles (assoc y tagslist)))
+               (if tagfiles
+                   (setcdr tagfiles (cons x (cdr tagfiles)))
+                 (add-to-list 'tagslist (list y x)))))
+           (my-org-get-filetags)))
+        tagslist)))
+  
+  (defun my-org-get-filetags ()
+    "Get list of filetags for current buffer"
+    (let ((ftags org-file-tags)
+          x)
+      (mapcar 
+       (lambda (x)
+         (org-substring-no-properties x))
+       ftags)))
 #+end_src
-* Use idle timer for automatic agenda views
+
+Calling my-org-agenda-restrict-files-by-filetag results in a prompt
+with all filetags in your "normal" agenda files. When you select a
+tag, org-agenda-files will be restricted to only those files
+containing the filetag. To release the restriction, type C-c C-x >
+(org-agenda-remove-restriction-lock).
+
+** Split horizontally for agenda
+
+If you would like to split the frame into two side-by-side windows when
+displaying the agenda, try this hack from Jan Rehders, which uses the
+`toggle-window-split' from
+
+http://www.emacswiki.org/cgi-bin/wiki/ToggleWindowSplit
+
+#+BEGIN_SRC emacs-lisp
+;; Patch org-mode to use vertical splitting
+(defadvice org-prepare-agenda (after org-fix-split)
+  (toggle-window-split))
+(ad-activate 'org-prepare-agenda)
+#+END_SRC
+
+** Automatically add an appointment when clocking in a task
+
+#+BEGIN_SRC emacs-lisp
+;; Make sure you have a sensible value for `appt-message-warning-time'
+(defvar bzg-org-clock-in-appt-delay 100
+  "Number of minutes for setting an appointment by clocking-in")
+#+END_SRC
+
+This function let's you add an appointment for the current entry.
+This can be useful when you need a reminder.
+
+#+BEGIN_SRC emacs-lisp
+(defun bzg-org-clock-in-add-appt (&optional n)
+  "Add an appointment for the Org entry at point in N minutes."
+  (interactive)
+  (save-excursion
+    (org-back-to-heading t)
+    (looking-at org-complex-heading-regexp)
+    (let* ((msg (match-string-no-properties 4))
+	   (ct-time (decode-time))
+	   (appt-min (+ (cadr ct-time)
+			(or n bzg-org-clock-in-appt-delay)))
+	   (appt-time ; define the time for the appointment
+	    (progn (setf (cadr ct-time) appt-min) ct-time)))
+      (appt-add (format-time-string
+		 "%H:%M" (apply 'encode-time appt-time)) msg)
+      (if (interactive-p) (message "New appointment for %s" msg)))))
+#+END_SRC
+
+You can advise =org-clock-in= so that =C-c C-x C-i= will automatically
+add an appointment:
+
+#+BEGIN_SRC emacs-lisp
+(defadvice org-clock-in (after org-clock-in-add-appt activate)
+  "Add an appointment when clocking a task in."
+  (bzg-org-clock-in-add-appt))
+#+END_SRC
+
+You may also want to delete the associated appointment when clocking
+out.  This function does this:
+
+#+BEGIN_SRC emacs-lisp
+(defun bzg-org-clock-out-delete-appt nil
+  "When clocking out, delete any associated appointment."
+  (interactive)
+  (save-excursion
+    (org-back-to-heading t)
+    (looking-at org-complex-heading-regexp)
+    (let* ((msg (match-string-no-properties 4)))
+      (setq appt-time-msg-list
+	    (delete nil
+		    (mapcar
+		     (lambda (appt)
+		       (if (not (string-match (regexp-quote msg)
+					      (cadr appt))) appt))
+		     appt-time-msg-list)))
+      (appt-check))))
+#+END_SRC
+
+And here is the advice for =org-clock-out= (=C-c C-x C-o=)
+
+#+BEGIN_SRC emacs-lisp
+(defadvice org-clock-out (before org-clock-out-delete-appt activate)
+  "Delete an appointment when clocking a task out."
+  (bzg-org-clock-out-delete-appt))
+#+END_SRC
+
+*IMPORTANT*: You can add appointment by clocking in in both an
+=org-mode= and an =org-agenda-mode= buffer.  But clocking out from
+agenda buffer with the advice above will bring an error.
+** Highlight the agenda line under cursor
+
+This is useful to make sure what task you are operating on.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
+#+END_SRC emacs-lisp
+
+Under XEmacs:
+
+#+BEGIN_SRC emacs-lisp
+;; hl-line seems to be only for emacs
+(require 'highline)
+(add-hook 'org-agenda-mode-hook '(lambda () (highline-mode 1)))
+
+;; highline-mode does not work straightaway in tty mode.
+;; I use a black background
+(custom-set-faces
+  '(highline-face ((((type tty) (class color))
+                    (:background "white" :foreground "black")))))
+#+END_SRC emacs-lisp
+
+** Remove time grid lines that are in an appointment
+
+The agenda shows lines for the time grid.  Some people think that
+these lines are a distraction when there are appointments at those
+times.  You can get rid of the lines which coincide exactly with the
+beginning of an appointment.  Michael Ekstrand has written a piece of
+advice that also removes lines that are somewhere inside an
+appointment:
+
+#+begin_src emacs-lisp
+(defun org-time-to-minutes (time)
+  "Convert an HHMM time to minutes"
+  (+ (* (/ time 100) 60) (% time 100)))
+
+(defun org-time-from-minutes (minutes)
+  "Convert a number of minutes to an HHMM time"
+  (+ (* (/ minutes 60) 100) (% minutes 60)))
+
+(defadvice org-agenda-add-time-grid-maybe (around mde-org-agenda-grid-tweakify
+                                                  (list ndays todayp))
+  (if (member 'remove-match (car org-agenda-time-grid))
+      (flet ((extract-window
+              (line)
+              (let ((start (get-text-property 1 'time-of-day line))
+                    (dur (get-text-property 1 'duration line)))
+                (cond
+                 ((and start dur)
+                  (cons start
+                        (org-time-from-minutes
+                         (+ dur (org-time-to-minutes start)))))
+                 (start start)
+                 (t nil)))))
+        (let* ((windows (delq nil (mapcar 'extract-window list)))
+               (org-agenda-time-grid
+                (list (car org-agenda-time-grid)
+                      (cadr org-agenda-time-grid)
+                      (remove-if
+                       (lambda (time)
+                         (find-if (lambda (w)
+                                    (if (numberp w)
+                                        (equal w time)
+                                      (and (>= time (car w))
+                                           (< time (cdr w)))))
+                                  windows))
+                       (caddr org-agenda-time-grid)))))
+          ad-do-it))
+    ad-do-it))
+(ad-activate 'org-agenda-add-time-grid-maybe)
+#+end_src
+
+** Group task list by a property
+
+This advice allows you to group a task list in Org-Mode.  To use it,
+set the variable =org-agenda-group-by-property= to the name of a
+property in the option list for a TODO or TAGS search.  The resulting
+agenda view will group tasks by that property prior to searching.
+
+#+begin_src emacs-lisp
+(defvar org-agenda-group-by-property nil
+  "Set this in org-mode agenda views to group tasks by property")
+
+(defun org-group-bucket-items (prop items)
+  (let ((buckets ()))
+    (dolist (item items)
+      (let* ((marker (get-text-property 0 'org-marker item))
+             (pvalue (org-entry-get marker prop t))
+             (cell (assoc pvalue buckets)))
+        (if cell
+            (setcdr cell (cons item (cdr cell)))
+          (setq buckets (cons (cons pvalue (list item))
+                              buckets)))))
+    (setq buckets (mapcar (lambda (bucket)
+                            (cons (car bucket)
+                                  (reverse (cdr bucket))))
+                          buckets))
+    (sort buckets (lambda (i1 i2)
+                    (string< (car i1) (car i2))))))
+
+(defadvice org-finalize-agenda-entries (around org-group-agenda-finalize
+                                               (list &optional nosort))
+  "Prepare bucketed agenda entry lists"
+  (if org-agenda-group-by-property
+      ;; bucketed, handle appropriately
+      (let ((text ""))
+        (dolist (bucket (org-group-bucket-items
+                         org-agenda-group-by-property
+                         list))
+          (let ((header (concat "Property "
+                                org-agenda-group-by-property
+                                " is "
+                                (or (car bucket) "<nil>") ":\n")))
+            (add-text-properties 0 (1- (length header))
+                                 (list 'face 'org-agenda-structure)
+                                 header)
+            (setq text
+                  (concat text header
+                          ;; recursively process
+                          (let ((org-agenda-group-by-property nil))
+                            (org-finalize-agenda-entries
+                             (cdr bucket) nosort))
+                          "\n\n"))))
+        (setq ad-return-value text))
+    ad-do-it))
+(ad-activate 'org-finalize-agenda-entries)
+#+end_src
+** Dynamically adjust tag position
+Here is a bit of code that allows you to have the tags always
+right-adjusted in the buffer.
+
+This is useful when you have bigger window than default window-size
+and you dislike the aesthetics of having the tag in the middle of the
+line.
+
+This hack solves the problem of adjusting it whenever you change the
+window size.
+Before saving it will revert the file to having the tag position be
+left-adjusted so that if you track your files with version control,
+you won't run into artificial diffs just because the window-size
+changed.
+
+*IMPORTANT*: This is probably slow on very big files.
+
+#+begin_src emacs-lisp
+(setq ba/org-adjust-tags-column t)
+
+(defun ba/org-adjust-tags-column-reset-tags ()
+  "In org-mode buffers it will reset tag position according to
+`org-tags-column'."
+  (when (and
+         (not (string= (buffer-name) "*Remember*"))
+         (eql major-mode 'org-mode))
+    (let ((b-m-p (buffer-modified-p)))
+      (condition-case nil
+          (save-excursion
+            (goto-char (point-min))
+            (command-execute 'outline-next-visible-heading)
+            ;; disable (message) that org-set-tags generates
+            (flet ((message (&rest ignored) nil))
+              (org-set-tags 1 t))
+            (set-buffer-modified-p b-m-p))
+        (error nil)))))
+
+(defun ba/org-adjust-tags-column-now ()
+  "Right-adjust `org-tags-column' value, then reset tag position."
+  (set (make-local-variable 'org-tags-column)
+       (- (- (window-width) (length org-ellipsis))))
+  (ba/org-adjust-tags-column-reset-tags))
+
+(defun ba/org-adjust-tags-column-maybe ()
+  "If `ba/org-adjust-tags-column' is set to non-nil, adjust tags."
+  (when ba/org-adjust-tags-column
+    (ba/org-adjust-tags-column-now)))
+
+(defun ba/org-adjust-tags-column-before-save ()
+  "Tags need to be left-adjusted when saving."
+  (when ba/org-adjust-tags-column
+     (setq org-tags-column 1)
+     (ba/org-adjust-tags-column-reset-tags)))
+
+(defun ba/org-adjust-tags-column-after-save ()
+  "Revert left-adjusted tag position done by before-save hook."
+  (ba/org-adjust-tags-column-maybe)
+  (set-buffer-modified-p nil))
+
+; automatically align tags on right-hand side
+(add-hook 'window-configuration-change-hook
+          'ba/org-adjust-tags-column-maybe)
+(add-hook 'before-save-hook 'ba/org-adjust-tags-column-before-save)
+(add-hook 'after-save-hook 'ba/org-adjust-tags-column-after-save)
+(add-hook 'org-agenda-mode-hook '(lambda ()
+                                  (setq org-agenda-tags-column (- (window-width)))))
+
+; between invoking org-refile and displaying the prompt (which
+; triggers window-configuration-change-hook) tags might adjust, 
+; which invalidates the org-refile cache
+(defadvice org-refile (around org-refile-disable-adjust-tags)
+  "Disable dynamically adjusting tags"
+  (let ((ba/org-adjust-tags-column nil))
+    ad-do-it))
+(ad-activate 'org-refile)
+#+end_src
+* Hacking Org and Emacs: Modify how org interacts with other Emacs packages.
+** org-remember-anything
+
+[[http://www.emacswiki.org/cgi-bin/wiki/Anything][Anything]] users may find the snippet below interesting:
+
+#+BEGIN_SRC emacs-lisp
+(defvar org-remember-anything
+  '((name . "Org Remember")
+    (candidates . (lambda () (mapcar 'car org-remember-templates)))
+    (action . (lambda (name)
+                (let* ((orig-template org-remember-templates)
+                       (org-remember-templates
+                        (list (assoc name orig-template))))
+                  (call-interactively 'org-remember))))))
+#+END_SRC
+
+You can add it to your 'anything-sources' variable and open remember directly
+from anything. I imagine this would be more interesting for people with many
+remember templatesm, so that you are out of keys to assign those to. You should
+get something like this:
+
+[[file:images/thumbs/org-remember-anything.png]]
+
+** Org-mode and saveplace.el
+
+Fix a problem with saveplace.el putting you back in a folded position:
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook
+          (lambda ()
+	    (when (outline-invisible-p)
+	      (save-excursion
+		(outline-previous-visible-heading 1)
+		(org-show-subtree)))))
+#+end_src
+
+** Using ido-completing-read to find attachments
+  -- Matt Lundin
+
+Org-attach is great for quickly linking files to a project. But if you
+use org-attach extensively you might find yourself wanting to browse
+all the files you've attached to org headlines. This is not easy to do
+manually, since the directories containing the files are not human
+readable (i.e., they are based on automatically generated ids). Here's
+some code to browse those files using ido (obviously, you need to be
+using ido):
+
+#+begin_src emacs-lisp
+  (load-library "find-lisp")
+
+  ;; Adapted from http://www.emacswiki.org/emacs/RecentFiles
+
+  (defun my-ido-find-org-attach ()
+    "Find files in org-attachment directory"
+    (interactive)
+    (let* ((enable-recursive-minibuffers t)
+           (files (find-lisp-find-files org-attach-directory "."))
+           (file-assoc-list
+            (mapcar (lambda (x)
+                      (cons (file-name-nondirectory x)
+                            x))
+                    files))
+           (filename-list
+            (remove-duplicates (mapcar #'car file-assoc-list)
+                               :test #'string=))
+           (filename (ido-completing-read "Org attachments: " filename-list nil t))
+           (longname (cdr (assoc filename file-assoc-list))))
+      (ido-set-current-directory
+       (if (file-directory-p longname)
+           longname
+         (file-name-directory longname)))
+      (setq ido-exit 'refresh
+            ido-text-init ido-text
+            ido-rotate-temp t)
+      (exit-minibuffer)))
+
+  (add-hook 'ido-setup-hook 'ido-my-keys)
+
+  (defun ido-my-keys ()
+    "Add my keybindings for ido."
+    (define-key ido-completion-map (kbd "C-;") 'my-ido-find-org-attach)
+    )
+#+end_src
+
+To browse your org attachments using ido fuzzy matching and/or the
+completion buffer, invoke ido-find-file as usual (=C-x C-f=) and then
+press =C-;=.
+
+** Use idle timer for automatic agenda views
 
 From John Wiegley's mailing list post (March 18, 2010):
 
@@ -1284,8 +1120,98 @@ whereas before I had a tendency to forget that it was there.
   
   (run-with-idle-timer 300 t 'jump-to-org-agenda)
 #+end_src
+** Link to Gnus messages by Message-Id
 
-* Send html messages and attachments with Wanderlust
+In a [[http://thread.gmane.org/gmane.emacs.orgmode/8860][recent thread]] on the Org-Mode mailing list, there was some
+discussion about linking to Gnus messages without encoding the folder
+name in the link.  The following code hooks in to the store-link
+function in Gnus to capture links by Message-Id when in nnml folders,
+and then provides a link type "mid" which can open this link.  The
+=mde-org-gnus-open-message-link= function uses the
+=mde-mid-resolve-methods= variable to determine what Gnus backends to
+scan.  It will go through them, in order, asking each to locate the
+message and opening it from the first one that reports success.
+
+It has only been tested with a single nnml backend, so there may be
+bugs lurking here and there.
+
+The logic for finding the message was adapted from [[http://www.emacswiki.org/cgi-bin/wiki/FindMailByMessageId][an Emacs Wiki
+article]].
+
+#+begin_src emacs-lisp
+;; Support for saving Gnus messages by Message-ID
+(defun mde-org-gnus-save-by-mid ()
+  (when (memq major-mode '(gnus-summary-mode gnus-article-mode))
+    (when (eq major-mode 'gnus-article-mode)
+      (gnus-article-show-summary))
+    (let* ((group gnus-newsgroup-name)
+           (method (gnus-find-method-for-group group)))
+      (when (eq 'nnml (car method))
+        (let* ((article (gnus-summary-article-number))
+               (header (gnus-summary-article-header article))
+               (from (mail-header-from header))
+               (message-id
+                (save-match-data
+                  (let ((mid (mail-header-id header)))
+                    (if (string-match "<\\(.*\\)>" mid)
+                        (match-string 1 mid)
+                      (error "Malformed message ID header %s" mid)))))
+               (date (mail-header-date header))
+               (subject (gnus-summary-subject-string)))
+          (org-store-link-props :type "mid" :from from :subject subject
+                                :message-id message-id :group group
+                                :link (org-make-link "mid:" message-id))
+          (apply 'org-store-link-props
+                 :description (org-email-link-description)
+                 org-store-link-plist)
+          t)))))
+
+(defvar mde-mid-resolve-methods '()
+  "List of methods to try when resolving message ID's.  For Gnus,
+it is a cons of 'gnus and the select (type and name).")
+(setq mde-mid-resolve-methods
+      '((gnus nnml "")))
+
+(defvar mde-org-gnus-open-level 1
+  "Level at which Gnus is started when opening a link")
+(defun mde-org-gnus-open-message-link (msgid)
+  "Open a message link with Gnus"
+  (require 'gnus)
+  (require 'org-table)
+  (catch 'method-found
+    (message "[MID linker] Resolving %s" msgid)
+    (dolist (method mde-mid-resolve-methods)
+      (cond
+       ((and (eq (car method) 'gnus)
+             (eq (cadr method) 'nnml))
+        (funcall (cdr (assq 'gnus org-link-frame-setup))
+                 mde-org-gnus-open-level)
+        (when gnus-other-frame-object
+          (select-frame gnus-other-frame-object))
+        (let* ((msg-info (nnml-find-group-number
+                          (concat "<" msgid ">")
+                          (cdr method)))
+               (group (and msg-info (car msg-info)))
+               (message (and msg-info (cdr msg-info)))
+               (qname (and group
+                           (if (gnus-methods-equal-p
+                                (cdr method)
+                                gnus-select-method)
+                               group
+                             (gnus-group-full-name group (cdr method))))))
+          (when msg-info
+            (gnus-summary-read-group qname nil t)
+            (gnus-summary-goto-article message nil t))
+          (throw 'method-found t)))
+       (t (error "Unknown link type"))))))
+
+(eval-after-load 'org-gnus
+  '(progn
+     (add-to-list 'org-store-link-functions 'mde-org-gnus-save-by-mid)
+     (org-add-link-type "mid" 'mde-org-gnus-open-message-link)))
+#+end_src
+
+** Send html messages and attachments with Wanderlust
   -- David Maus
 
 /Note/: The module [[file:org-contrib/org-mime.org][Org-mime]] in Org's contrib directory provides
@@ -1294,7 +1220,7 @@ still somewhat different: It allows you to toggle sending of html
 messages within Wanderlust transparently.  I.e. html markup of the
 message body is created right before sending starts.
 
-** Send HTML message
+*** Send HTML message
 
 Putting the code below in your .emacs adds following four functions:
 
@@ -1418,7 +1344,7 @@ you send HTML that looks quite good.
   (add-hook 'wl-draft-send-hook 'dmj/wl-send-html-message-maybe)
 #+end_src
 
-** Attach HTML of region or subtree
+*** Attach HTML of region or subtree
 
 Instead of sending a complete HTML message you might only send parts
 of an Org file as HTML for the poor souls who are plagued with
@@ -1458,48 +1384,127 @@ complete subtree otherwise.
         (message "html export done, pushed to kill ring and clipboard"))))
 #+end_src
 
-** Adopting for Gnus
+*** Adopting for Gnus
 
 The whole magic lies in the special strings that mark a HTML
 attachment.  So you might just have to find out what these special
 strings are in message-mode and modify the functions accordingly.
-* Archive in a date tree
-Posted to Org-mode mailing list by Osamu Okano
-[2010-04-21 Wed]
-#+begin_src emacs-lisp
-  ;; (setq org-archive-location "%s_archive::date-tree")
-  (defadvice org-archive-subtree
-    (around org-archive-subtree-to-data-tree activate)
-    "org-archive-subtree to date-tree"
-    (if
-        (string= "date-tree"
-                 (org-extract-archive-heading
-                  (org-get-local-archive-location)))
-        (let* ((dct (decode-time (org-current-time)))
-               (y (nth 5 dct))
-               (m (nth 4 dct))
-               (d (nth 3 dct))
-               (this-buffer (current-buffer))
-               (location (org-get-local-archive-location))
-               (afile (org-extract-archive-file location))
-               (org-archive-location
-                (format "%s::*** %04d-%02d-%02d %s" afile y m d
-                        (format-time-string "%A" (encode-time 0 0 0 d m y)))))
-          (message "afile=%s" afile)
-          (unless afile
-            (error "Invalid `org-archive-location'"))
-          (save-excursion
-            (switch-to-buffer (find-file-noselect afile))
-            (org-datetree-find-year-create y)
-            (org-datetree-find-month-create y m)
-            (org-datetree-find-day-create y m d)
-            (widen)
-            (switch-to-buffer this-buffer))
-          ad-do-it)
-      ad-do-it))
-#+end_src
+* Hacking Org and external Programs.
+** Use Org-mode with Screen [Andrew Hyatt]
 
-* Useful webjumps for conkeror
+"The general idea is that you start a task in which all the work will
+take place in a shell.  This usually is not a leaf-task for me, but
+usually the parent of a leaf task.  From a task in your org-file, M-x
+ash-org-screen will prompt for the name of a session.  Give it a name,
+and it will insert a link.  Open the link at any time to go the screen
+session containing your work!"
+
+http://article.gmane.org/gmane.emacs.orgmode/5276
+
+#+BEGIN_SRC emacs-lisp
+(require 'term)
+
+(defun ash-org-goto-screen (name)
+  "Open the screen with the specified name in the window"
+  (interactive "MScreen name: ")
+  (let ((screen-buffer-name (ash-org-screen-buffer-name name)))
+    (if (member screen-buffer-name
+                (mapcar 'buffer-name (buffer-list)))
+        (switch-to-buffer screen-buffer-name)
+      (switch-to-buffer (ash-org-screen-helper name "-dr")))))
+
+(defun ash-org-screen-buffer-name (name)
+  "Returns the buffer name corresponding to the screen name given."
+  (concat "*screen " name "*"))
+
+(defun ash-org-screen-helper (name arg)
+  ;; Pick the name of the new buffer.
+  (let ((term-ansi-buffer-name
+	 (generate-new-buffer-name
+	  (ash-org-screen-buffer-name name))))
+    (setq term-ansi-buffer-name
+          (term-ansi-make-term
+	   term-ansi-buffer-name "/usr/bin/screen" nil arg name))
+    (set-buffer term-ansi-buffer-name)
+    (term-mode)
+    (term-char-mode)
+    (term-set-escape-char ?\C-x)
+    term-ansi-buffer-name))
+
+(defun ash-org-screen (name)
+  "Start a screen session with name"
+  (interactive "MScreen name: ")
+  (save-excursion
+    (ash-org-screen-helper name "-S"))
+  (insert-string (concat "[[screen:" name "]]")))
+
+;; And don't forget to add ("screen" . "elisp:(ash-org-goto-screen
+;; \"%s\")") to org-link-abbrev-alist.
+#+END_SRC
+
+** Org Agenda + Appt + Zenity
+
+Russell Adams posted this setup [[http://article.gmane.org/gmane.emacs.orgmode/5806][on the list]].  It make sure your agenda
+appointments are known by Emacs, and it displays warnings in a [[http://live.gnome.org/Zenity][zenity]]
+popup window.
+
+#+BEGIN_SRC emacs-lisp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; For org appointment reminders
+
+;; Get appointments for today
+(defun my-org-agenda-to-appt ()
+  (interactive)
+  (setq appt-time-msg-list nil)
+  (let ((org-deadline-warning-days 0))    ;; will be automatic in org 5.23
+        (org-agenda-to-appt)))
+
+;; Run once, activate and schedule refresh
+(my-org-agenda-to-appt)
+(appt-activate t)
+(run-at-time "24:01" nil 'my-org-agenda-to-appt)
+
+; 5 minute warnings
+(setq appt-message-warning-time 15)
+(setq appt-display-interval 5)
+
+; Update appt each time agenda opened.
+(add-hook 'org-finalize-agenda-hook 'my-org-agenda-to-appt)
+
+; Setup zenify, we tell appt to use window, and replace default function
+(setq appt-display-format 'window)
+(setq appt-disp-window-function (function my-appt-disp-window))
+
+(defun my-appt-disp-window (min-to-app new-time msg)
+  (save-window-excursion (shell-command (concat
+    "/usr/bin/zenity --info --title='Appointment' --text='"
+    msg "' &") nil nil)))
+#+END_SRC
+
+** Org-Mode + gnome-osd
+
+Richard Riley uses gnome-osd in interaction with Org-Mode to display
+appointments.  You can look at the code on the [[http://www.emacswiki.org/emacs-en/OrgMode-OSD][emacswiki]].
+
+** remind2org
+
+  From Detlef Steuer
+
+http://article.gmane.org/gmane.emacs.orgmode/5073
+
+#+BEGIN_QUOTE
+Remind (http://www.roaringpenguin.com/products/remind) is a very powerful
+command line calendaring program. Its features superseed the possibilities
+of orgmode in the area of date specifying, so that I want to use it
+combined with orgmode.
+
+Using the script below I'm able use remind and incorporate its output in my
+agenda views.  The default of using 13 months look ahead is easily
+changed. It just happens I sometimes like to look a year into the
+future. :-)
+#+END_QUOTE
+
+** Useful webjumps for conkeror
 
 If you are using the [[http://conkeror.org][conkeror browser]], maybe you want to put this into
 your =~/.conkerorrc= file:
@@ -1512,7 +1517,7 @@ define_webjump("worg", "http://www.google.com/cse?cx=002987994228320350715%3Az4g
 It creates two [[http://conkeror.org/Webjumps][webjumps]] for easily searching the Worg website and the
 Org-mode mailing list.
 
-* Use MathJax for HTML export without requiring JavaScript
+** Use MathJax for HTML export without requiring JavaScript
 As of 2010-08-14, MathJax is the default method used to export math to HTML.
 
 If you like the results but do not want JavaScript in the exported pages,
