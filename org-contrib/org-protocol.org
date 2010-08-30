@@ -80,75 +80,13 @@ actions. Just register your custom sub-protocol and handler with the variable
 
   Windows users proceed to the section [[windows-setup][Windows]].
 
-# <<firefox-setup>>
-*** Firefox
+*** Linux Setup (Gnome)
 
-  As of March 2009 Firefox users follow the steps documented on
-  http://kb.mozillazine.org/Register_protocol. Here is a summary:
+    For this to work, you'll need the Gnome-Libraries to be installed.
 
-  1. Type "=about:config=" into the location bar and press enter.
-  2. Click "/I'll be careful, I promise!/" to continue.
-  3. Right-click on the grid
-  4. Choose "/New/" -> "/String/" from the context menu.
-  5. Enter "=network.protocol-handler.app.org-protocol=" as the properties name.
-  6. Click "/OK/".
-  7. Leave the value blank.
-  8. Next time you try to open a location "=org-protocol://...=" FF will ask you for
-     the program to use. Enter the path to emacsclient.
+    : gconftool-2 -s /desktop/gnome/url-handlers/org-protocol/command '/usr/local/bin/emacsclient %s' --type String
+    : gconftool-2 -s /desktop/gnome/url-handlers/org-protocol/enabled --type Boolean true
 
-# <<acrobat-setup>>
-*** Acrobat Reader
-    :PROPERTIES:
-    :CUSTOM_ID: acrobat-reader-setup
-    :END:
-
-    Adapted from [[http://article.gmane.org/gmane.emacs.orgmode/6810]]
-
-    You place a javascript file for each menu entry in
-    =~/.adobe/Acrobat/<VERSION>/JavaScripts= on unix-like systems or
-    =c:/Program Files/Adobe/Acrobat <VERSION>/Reader/Javascripts/= on
-    Windows, or wherever your Adobe Reader Installation might look for
-    javascript.
-
-    The examples given here will place new menu entries in the "Tools"
-    menu, after restarting Adobe Reader.
-
-# <<acrobat-store-link-js>>
-***** org-store-link.js
-: // from http://article.gmane.org/gmane.emacs.orgmode/6810
-: app.addMenuItem({cName:"org-store-link", cParent:"Tools",
-:    cExec:"app.launchURL('org-protocol://store-link://' + encodeURIComponent(this.URL) + '/' + encodeURIComponent(this.info.Title));"});
-
-# <<acrobat-capture-js>>
-***** org-capture.js
-: // from http://article.gmane.org/gmane.emacs.orgmode/6810
-: app.addMenuItem({cName:"org-capture", cParent:"Tools",
-:    cExec:"app.launchURL('org-protocol://capture://' + encodeURIComponent(this.URL) + '/' + encodeURIComponent(this.info.Title) + '/');"});
-
-    And this one, if you still use remember templates:
-
-# <<acrobat-remember-js>>
-***** org-remember.js
-: // from http://article.gmane.org/gmane.emacs.orgmode/6810
-: app.addMenuItem({cName:"org-remember", cParent:"Tools",
-:    cExec:"app.launchURL('org-protocol://remember://' + encodeURIComponent(this.URL) + '/' + encodeURIComponent(this.info.Title) + '/');"});
-
-
-# <<opera-setup>>
-*** Opera
-
-  Opera setup is described here:
-  http://www.opera.com/support/kb/view/535/.
-
-  To set up opera for use with org-protocol, follow these steps:
-
-  1. Choose "/Tools/" -> "/Prefences/" from the menu.
-  2. Select the tab "/Advanced/".
-  3. Choose "/Programs/" from the list on the left.
-  4. Now click the button "/Add/" on the very right.
-  5. In the new dialog window, enter "=org-protocol=" as "/Protocol/", choose the
-     radio button "/Open with other application/" and enter the path to
-     emacsclient.
 
 # <<windows-setup>>
 *** Windows setup
@@ -172,6 +110,66 @@ REGEDIT4
 @="\"C:\\Programme\\Emacs\\emacs\\bin\\emacsclientw.exe\" \"%1\""
 #+end_example
 
+*** Applications
+# <<firefox-setup>>
+***** Firefox
+
+      Please refer to http://kb.mozillazine.org/Register_protocol and use
+      "org-protocol" as protocol.
+
+# <<acrobat-setup>>
+***** Acrobat Reader
+    :PROPERTIES:
+    :CUSTOM_ID: acrobat-reader-setup
+    :END:
+
+    Adapted from [[http://article.gmane.org/gmane.emacs.orgmode/6810]]
+
+    You place a javascript file for each menu entry in
+    =~/.adobe/Acrobat/<VERSION>/JavaScripts= on unix-like systems or
+    =c:/Program Files/Adobe/Acrobat <VERSION>/Reader/Javascripts/= on
+    Windows, or wherever your Adobe Reader Installation might look for
+    javascript.
+
+    The examples given here will place new menu entries in the "Tools"
+    menu, after restarting Adobe Reader.
+
+# <<acrobat-store-link-js>>
+******* org-store-link.js
+: // from http://article.gmane.org/gmane.emacs.orgmode/6810
+: app.addMenuItem({cName:"org-store-link", cParent:"Tools",
+:    cExec:"app.launchURL('org-protocol://store-link://' + encodeURIComponent(this.URL) + '/' + encodeURIComponent(this.info.Title));"});
+
+# <<acrobat-capture-js>>
+******* org-capture.js
+: // from http://article.gmane.org/gmane.emacs.orgmode/6810
+: app.addMenuItem({cName:"org-capture", cParent:"Tools",
+:    cExec:"app.launchURL('org-protocol://capture://' + encodeURIComponent(this.URL) + '/' + encodeURIComponent(this.info.Title) + '/');"});
+
+    And this one, if you still use remember templates:
+
+# <<acrobat-remember-js>>
+******* org-remember.js
+: // from http://article.gmane.org/gmane.emacs.orgmode/6810
+: app.addMenuItem({cName:"org-remember", cParent:"Tools",
+:    cExec:"app.launchURL('org-protocol://remember://' + encodeURIComponent(this.URL) + '/' + encodeURIComponent(this.info.Title) + '/');"});
+
+
+# <<opera-setup>>
+***** Opera
+
+  Opera setup is described here:
+  http://www.opera.com/support/kb/view/535/.
+
+  To set up opera for use with org-protocol, follow these steps:
+
+  1. Choose "/Tools/" -> "/Prefences/" from the menu.
+  2. Select the tab "/Advanced/".
+  3. Choose "/Programs/" from the list on the left.
+  4. Now click the button "/Add/" on the very right.
+  5. In the new dialog window, enter "=org-protocol=" as "/Protocol/", choose the
+     radio button "/Open with other application/" and enter the path to
+     emacsclient.
 
 # <<test-org-protocol>>
 *** Verify the installation
@@ -209,8 +207,8 @@ REGEDIT4
 * Links and bookmarks: =org-protocol-store-link=
 
   =org-store-link= stores an Org-link insertable through =M-x org-insert-link= and
-  pushes the URL found on the =kill-ring= for yanking (=C-y=). The sub-protocol used
-  is "=store-link=":
+  pushes the URL found onto the =kill-ring= for yanking (=C-y=). The sub-protocol
+  used is "=store-link=":
 
   : emacsclient org-protocol:/store-link:/URL/TITLE
 
