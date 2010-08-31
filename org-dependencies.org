@@ -1,5 +1,5 @@
 #+TODO: TODO STARTED | DONE
-#+OPTIONS: toc:t ^:nil
+#+OPTIONS: toc:t
 
 * Dependencies
 
@@ -31,6 +31,29 @@ This assumes a standard LaTeX install.
 
 On Linux/Mac OSX/BSD, the TeXlive distribution is recommended.
 On Windows, most people prefer  MikTeX.
+
+** Where to get packages
+The best way to get these packages is by using the package manager
+that comes with your operating system. These generally contain many
+useful LaTeX packages.
+
+If that is not possible, then you can get individual LaTeX packages
+from the CTAN sites (see [[http://www.tex.ac.uk/cgi-bin/texfaq2html?label=archives][CTAN archives]] for more information), but the
+installation process is less straightforward (but more portable):
+generally speaking, a LaTeX package comes in two files: a .ins file
+and a .dtx file (usually packed in a zip or tgz archive). Processing
+the .ins file through latex separates out the code from the .dtx file
+and produces the pieces that need to be installed on your system, but
+then it is up to you to figure out where to copy these files on your
+system for TeX and friends to find them. Processing the .dtx file
+directly through latex produces the documentation of the package:
+
+    - latex foo.ins -> foo.sty, etc.
+    - pdflatex foo.dtx -> foo.pdf
+
+Many questions are answered by the [[http://www.tex.ac.uk/cgi-bin/texfaq2html?introduction=yes][TeX FAQ]] site, although the
+search capability is fairly primitive by today's standards: you
+will have to search a bit more diligently.
 
 *** STARTED article, book, report
 The LaTeX packages included by default are as follows:
@@ -83,9 +106,10 @@ does not mistreat Type 3 fonts.
 
 You can find more information about this problem in the TeX FAQ:
 
-To find out whether a document uses Type3 fonts, open it with
-Acrobat Reader/Evince, select Properties from the File menu and then
-select the Fonts tab.
+To find out whether a document uses Type3 fonts, open it with Acrobat
+Reader/Evince, select Properties from the File menu and then select
+the Fonts tab; alternatively, use the pdffonts program (part of the
+xpdf-reader package) from the command line.
 
 It is probably impossible to get rid of Type3 fonts completely
 (particularly if you are using special symbols or languages that
@@ -98,11 +122,11 @@ Ubuntu/Debian) e.g. includes the AMS CM fonts which work well.
 Similar packages exist for other Linux distributions and probably
 for other operating systems as well.
 
-Other fonts TBD.
 
 | Type1 font      | LaTeX package | Ubuntu container package |
 |-----------------+---------------+--------------------------|
-| Computer Modern | AMS fonts     | cm-super                 |
+| Computer Modern | amsfonts      | texlive-base             |
+| Euler           |               |                          |
 
 
 
