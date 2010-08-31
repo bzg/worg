@@ -1,4 +1,5 @@
 #+TODO: TODO STARTED | DONE
+#+OPTIONS: toc:t ^:nil
 
 * Dependencies
 
@@ -13,35 +14,48 @@ information), but if you don't or don't want to do it yourself, that's
 fine too: a note to the [[mailto:emacs-orgmode@gnu.org][orgmode mailing list]] will also do
 the job. Thanks!
 
-Version: Org-mode version 6.34c (release_6.34c.7.g566d)
+Version: Org-mode version 7.01trans (release_7.01h.224.gf6c09)
 
 ** TODO Exporting in general.
+Anything here?
 
 ** STARTED LaTeX export.
-The LaTeX class is selected using the
+The LaTeX class is selected using the construct
 
 :#+LaTeX_CLASS: <class>
 
-construct. org-latex predefines the treatment of the
-following LaTeX classeses (but you can of course customize
-this treatment to your heart's content): article, report, book
-and (in an experimental branch for now) beamer.
+org-latex predefines the treatment of the following LaTeX classes
+article, report, book, beamer - or you can roll your own. And
+you can, of course, customize the treatment to your heart's content.
+This assumes a standard LaTeX install.
+
+On Linux/Mac OSX/BSD, the TeXlive distribution is recommended.
+On Windows, most people prefer  MikTeX.
 
 *** STARTED article, book, report
 The LaTeX packages included by default are as follows:
 
-| LaTeX package | Ubuntu container package  | Options |
-|---------------+---------------------------+---------|
-| inputenc      | texlive-latex-base        | utf8    |
-| fontenc       | texlive-latex-base        | T1      |
-| graphicx      | texlive-latex-base        |         |
-| longtable     | texlive-latex-base        |         |
-| float         | texlive-latex-recommended |         |
-| wrapfig       | texlive-latex-extra       |         |
-| soul          | texlive-latex-extra       |         |
-| hyperref      | texlive-latex-base        |         |
+| LaTeX package | Ubuntu container package  | Options | Comments                          |
+|---------------+---------------------------+---------+-----------------------------------|
+| inputenc      | texlive-latex-base        | utf8    |                                   |
+| fontenc       | texlive-latex-base        | T1      |                                   |
+| fixltx2e      | texlive-latex-base        |         | Various LaTeX fixes - fix-cm too? |
+| graphicx      | texlive-latex-base        |         |                                   |
+| longtable     | texlive-latex-base        |         |                                   |
+| float         | texlive-latex-recommended |         | floating environments             |
+| wrapfig       | texlive-latex-extra       |         | text wrapping around figures      |
+| soul          | texlive-latex-extra       |         | Underline/strike through          |
+| t1enc         | texlive-latex-base        |         | Obsolete - remove?                |
+| textcomp      | texlive-latex-base        |         | Misc text symbols                 |
+| marvosym      | texlive-fonts-recommended |         | Euro symbol                       |
+| wasysym       | texlive-fonts-recommended |         | Misc symbols                      |
+| latexsym      | texlive-latex-base        |         | Math symbols                      |
+| amssymb       | texlive-base              |         | Math symbols                      |
+| hyperref      | texlive-latex-base        |         |                                   |
 
-*** TODO beamer (experimental for now)
+
+
+*** TODO beamer
 *** STARTED Symbols
 
 LaTeX syntax can be used to introduce many special symbols into a
@@ -53,12 +67,44 @@ by basic LaTeX, but some require the presence of extra packages.
 | =\EUR=      | \EUR                     | marvosym      | texlive-fonts-recommended |
 | =\euro=     | \euro                    | eurosym       | texlive-fonts-recommended |
 
-
+Note that marvosym is now included as part of the default setup so you
+do not need to include the package explicitly.
 
 ** STARTED PDF export.
 
 PDF export goes through LaTeX export first, so all the LaTeX dependencies
-apply here as well. As far as I know, there are no additional dependencies.
+apply here as well.
+
+Certain PDF viewers have been reported to produce more or less
+unreadable files if Adobe Type3 fonts are used in the document.
+Evince has been identified as one of those. One way around this
+problem is to not use Type3 fonts. Another is to use a viewer that
+does not mistreat Type 3 fonts.
+
+You can find more information about this problem in the TeX FAQ:
+
+To find out whether a document uses Type3 fonts, open it with
+Acrobat Reader/Evince, select Properties from the File menu and then
+select the Fonts tab.
+
+It is probably impossible to get rid of Type3 fonts completely
+(particularly if you are using special symbols or languages that
+don't use the Latin alphabet: in such cases, font availability is more
+limited and you just might not be able to find Type1 fonts to do the
+job). For standard latin-alphabet languages that use the Computer
+Modern fonts (including small variations e.g. Polish and Czech), you
+*can* find Type1 versions. The texlive-fonts-extra package (on
+Ubuntu/Debian) e.g. includes the AMS CM fonts which work well.
+Similar packages exist for other Linux distributions and probably
+for other operating systems as well.
+
+Other fonts TBD.
+
+| Type1 font      | LaTeX package | Ubuntu container package |
+|-----------------+---------------+--------------------------|
+| Computer Modern | AMS fonts     | cm-super                 |
+
+
 
 ** TODO DocBook export.
 
