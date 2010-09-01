@@ -2,7 +2,7 @@
  * @file
  * org-info.js
  *
- * Version: 0.1.3
+ * Version: 0.1.4
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -495,8 +495,8 @@ var org_html_manager = {
     t.BODY = document.getElementById("content");
     if(null == t.BODY) {
       if(5 > t.RUNS) {
-      t.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", t.RUN_INTERVAL);
-      return;
+        t.LOAD_CHECK = window.setTimeout("OrgHtmlManagerLoadCheck()", t.RUN_INTERVAL);
+        return;
       } else { // be backward compatible
         t.BODY = document.getElementsByTagName("body")[0];
       }}
@@ -715,7 +715,7 @@ var org_html_manager = {
 
     // Move the title into the first visible section.
     // TODO: show title above everything if FIXED_TOC !!!
-    t.TITLE = document.getElementsByTagName("h1")[0];
+    t.TITLE = t.BODY.getElementsByTagName("h1")[0];
     if(t.INNER_TITLE && !t.FIXED_TOC && t.VIEW != t.SLIDE_VIEW) {
       t.INNER_TITLE = t.TITLE.cloneNode(true);
       /* TODO: this is still based on wrong behaviour of browsers (same id for two elements)
