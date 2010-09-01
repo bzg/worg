@@ -113,7 +113,7 @@
 
   This example shows how to use Babel with =R= and =ascii= package.
 
-* /An Babel Demo/ -- A Comparison to Sweave
+* [[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/foo.org.html][/An Babel Demo/ -- A Comparison to Sweave]]
   :PROPERTIES:
   :CUSTOM_ID: foo
   :END:
@@ -130,76 +130,16 @@ Compare the two side-by-side.
 | Sweave | [[http://www.stat.umn.edu/~charlie/Sweave/foo.Rnw][foo.Rnw]]                                 | [[http://www.stat.umn.edu/~charlie/Sweave/foo.pdf][foo.pdf]] |
 | Babel  | [[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/foo.org][foo.org]] ([[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/foo.org.html][foo.org.html]] as seen in Emacs) | [[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/foo.pdf][foo.pdf]] |
 
-* Tracking finances
+* [[file:examples/finances.org][Tracking finances]]
 :PROPERTIES:
 :Author: Jason Dunsmore
 :CUSTOM_ID: tracking-finances
 :END:
 
-I like to track my expenses in Org tables.  For example:
-
-#+begin_src org
-  ,#+tblname: daily-expenses
-  ,| Expense | Category |
-  ,|---------+----------|
-  ,|       2 | Food     |
-  ,|       1 | House    |
-  ,|      10 | Clothes  |
-  ,|       3 | Food     |
-  ,|       5 | House    |
-#+end_src
-
-At the of the month, I want to see how much was spent in each
-category.  I wrote the following Babel function to calculate this:
-
-#+begin_src org
-  ,#+srcname: group-categories
-  ,#+begin_src emacs-lisp :var table=daily-expenses :colnames nil
-  ,  (defun category-sums (catcol valcol)
-  ,    "Sum each of the categories in an Org table.
-  ,  
-  ,  \(fn CATEGORYCOLUMN VALUECOLUMN)"
-  ,    (let (gcats
-  ,          result)
-  ,      (dolist (row table)
-  ,        (let ((cat (nth (1- catcol) row)))
-  ,          (when (not (member cat gcats))
-  ,            (push cat gcats))))
-  ,      (dolist (gcat gcats)
-  ,        (let ((sum 0))
-  ,          (dolist (row table)
-  ,            (let ((val (nth (1- valcol) row))
-  ,                  (cat (nth (1- catcol) row)))
-  ,              (when (equal gcat cat)
-  ,                (incf sum val))))
-  ,          (push (list gcat sum) result)))
-  ,      result))
-  ,  (category-sums 2 1)
-  ,#+end_src
-#+end_src
-
-Here is an example of the output:
-
-#+begin_src org
-  ,#+results: group-categories
-  ,| Category | Expense |
-  ,|----------+---------|
-  ,| Food     |       5 |
-  ,| House    |       6 |
-  ,| Clothes  |      10 |
-#+end_src
-
-Dan Davison provided an alternate way of doing this using an R
-function:
-
-#+begin_src org
-  ,#+begin_src R :var tab=daily-expenses :colnames yes
-  ,  attach(tab)
-  ,  aggregate(Expense ~ Category, FUN=sum)
-  ,#+end_src
-#+end_src
-
-** Using ledger for tracking finances
+An Emacs lisp function in a Babel source block aggregates entries in
+an Org-mode table, which can be useful in tracking finances.
+ 
+* Using Ledger for tracking finances
 
 Instead of using org directly, we can use ledger for tracking
 finances.  A [[file:examples/ledger.org][short tutorial]] is available which illustrates how ledger
