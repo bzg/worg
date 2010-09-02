@@ -1,4 +1,4 @@
-#+TITLE:     Using Ledger for accounting in org with babel
+#+TITLE:     Using Ledger for Accounting in Org-mode with Babel
 #+AUTHOR:    Eric S Fraga
 #+EMAIL:     e.fraga@ucl.ac.uk
 #+DATE:      2010.08.25 20:41:52
@@ -24,7 +24,7 @@ compatible with org mode in Emacs.  Using Babel, it is possible
 to record financial transactions conveniently in an org file and
 subsequently generate the financial reports required. 
 
-*** Getting started
+*** Getting Started
     :PROPERTIES:
     :ID:       a14c087b-c675-4b6f-b7d4-5974a140acb3
     :END:
@@ -72,7 +72,7 @@ subsection will present some simple expenses and income entries; the
 second subsection will show some example financial summaries you may
 wish to generate.
 
-*** Income and expenses records
+*** Income and Expenses Records
     :PROPERTIES:
     :tangle:   /tmp/account.ledger
     :END:
@@ -85,39 +85,37 @@ wish to generate.
     the =/tmp= directory makes life easier.  However, please be aware of
     confidentiality problems with this approach!
 
-***** Income entries
+***** Income Entries
       :PROPERTIES:
       :ID:       74fd73c2-41f9-41eb-97dd-1f8cb515d837
       :END:
 
       The first set of entries relates to income, either monthly pay or
-      interest, all typically going into one of my bank account.  Here
-      I have placed several entries but we could have had each entry
+      interest, all typically going into one of my bank accounts.  Here,
+      I have placed several entries, but we could have had each entry
       in a separate =src= block.
 
-#+begin_src org
-
-,#+begin_src ledger
-,2010/01/01 * Starting balance
-,  assets:bank:savings  £1300.00
-,  income:starting balances
-,2010/07/22 * Got paid
-,  assets:bank:chequing  £1000.00
-,  income:salary
-,2010/07/31 * Interest on bank savings
-,  assets:bank:savings  £3.53
-,  income:interest
-,2010/07/31 * Transfer savings
-,  assets:bank:savings  £250.00
-,  assets:bank:chequing
-,2010/08/01 got paid again
-,  assets:bank:chequing  £1000.00
-,  income:salary
-,#+end_src
-  
+#+begin_example
+#+begin_src ledger
+2010/01/01 * Starting balance
+  assets:bank:savings  £1300.00
+  income:starting balances
+2010/07/22 * Got paid
+  assets:bank:chequing  £1000.00
+  income:salary
+2010/07/31 * Interest on bank savings
+  assets:bank:savings  £3.53
+  income:interest
+2010/07/31 * Transfer savings
+  assets:bank:savings  £250.00
+  assets:bank:chequing
+2010/08/01 got paid again
+  assets:bank:chequing  £1000.00
+  income:salary
 #+end_src
+#+end_example
 
-***** expenses
+***** Expenses
       :PROPERTIES:
       :ID:       07d84b1d-892b-4367-86da-95a0380b8a45
       :END:
@@ -126,21 +124,19 @@ wish to generate.
       and food.  Again, these have all been placed in a single =src=
       block but could have been done individually.
 
-#+begin_src org
-
-,#+begin_src ledger
-,2010/07/23 Rent
-,  expenses:rent  £500.00
-,  assets:bank:chequing
-,2010/07/24 Food
-,  expenses:food  £150.00
-,  assets:bank:chequing
-,#+end_src
-  
+#+begin_example
+#+begin_src ledger
+2010/07/23 Rent
+  expenses:rent  £500.00
+  assets:bank:chequing
+2010/07/24 Food
+  expenses:food  £150.00
+  assets:bank:chequing
 #+end_src
+#+end_example
 
 
-*** Financial summaries
+*** Financial Summaries
 
     Assuming you have tangled the Ledger entries (=C-c C-v t=), you can now
     perform all kinds of calculations.  However, please *note* that
@@ -158,13 +154,11 @@ wish to generate.
       according to category is specified by passing the =:cmdline bal= argument
       to Ledger.
 
-#+begin_src org
-
-,#+begin_src ledger :cmdline bal :results value 
-,!include /tmp/account.ledger
-,#+end_src
-  
+#+begin_example
+#+begin_src ledger :cmdline bal :results value 
+!include /tmp/account.ledger
 #+end_src
+#+end_example
 
 #+results:
 :            £2653.53  assets
@@ -175,29 +169,26 @@ If you want a more detailed breakdown of where your money is and where
 it has been spent, you can specify the =:cmdline -s= flag to tell Ledger to
 include sub-accounts in the report.
 
-#+begin_src org
-
-,#+begin_src ledger :cmdline -s bal :results value 
-,!include /tmp/account.ledger
-,#+end_src
-  
+#+begin_example
+#+begin_src ledger :cmdline -s bal :results value 
+!include /tmp/account.ledger
 #+end_src
+#+end_example
 
-#+begin_src org 
-,#+results:
-,#+begin_example
-,           £2653.53  assets:bank
-,           £1100.00    chequing
-,           £1553.53    savings
-,            £650.00  expenses
-,            £150.00    food
-,            £500.00    rent
-,          £-3303.53  income
-,             £-3.53    interest
-,          £-2000.00    salary
-,          £-1300.00    starting balances
-,#+end_example
-#+end_src
+#+results:
+#+begin_example
+           £2653.53  assets:bank
+           £1100.00    chequing
+           £1553.53    savings
+            £650.00  expenses
+            £150.00    food
+            £500.00    rent
+          £-3303.53  income
+             £-3.53    interest
+          £-2000.00    salary
+          £-1300.00    starting balances
+#+end_example
+
 
 
 
@@ -211,55 +202,50 @@ include sub-accounts in the report.
       for each monthly period with a running total in the final column
       (which should be 0 at the end if all the entries are correct).
 
-#+begin_src org
-
-,#+begin_src ledger :cmdline -M reg
-,!include /tmp/account.ledger
-,#+end_src
-  
+#+begin_example
+#+begin_src ledger :cmdline -M reg
+!include /tmp/account.ledger
 #+end_src
+#+end_example
 
-#+begin_src org
-,#+results:
-,#+begin_example
-,2010/01/01 - 2010/01/31         assets:bank:savings       £1300.00    £1300.00
-,                                in:starting balances     £-1300.00            0
-,2010/07/01 - 2010/07/31         assets:bank:chequing       £100.00     £100.00
-,                                assets:bank:savings        £253.53     £353.53
-,                                expenses:food              £150.00     £503.53
-,                                expenses:rent              £500.00    £1003.53
-,                                income:interest             £-3.53    £1000.00
-,                                income:salary            £-1000.00            0
-,2010/08/01 - 2010/08/01         assets:bank:chequing      £1000.00    £1000.00
-,                                income:salary            £-1000.00            0
-,#+end_example
-#+end_src
+#+results:
+#+begin_example
+2010/01/01 - 2010/01/31         assets:bank:savings       £1300.00    £1300.00
+                                in:starting balances     £-1300.00            0
+2010/07/01 - 2010/07/31         assets:bank:chequing       £100.00     £100.00
+                                assets:bank:savings        £253.53     £353.53
+                                expenses:food              £150.00     £503.53
+                                expenses:rent              £500.00    £1003.53
+                                income:interest             £-3.53    £1000.00
+                                income:salary            £-1000.00            0
+2010/08/01 - 2010/08/01         assets:bank:chequing      £1000.00    £1000.00
+                                income:salary            £-1000.00            0
+#+end_example
+
 
 
 We could also generate a monthly report on our =assets= showing how
 these are increasing (or decreasing!).  In this case, the final column
 will be the running total of the =assets= in our ledger.
 
-#+begin_src org
-,#+begin_src ledger :cmdline -M reg assets
-,!include /tmp/account.ledger
-,#+end_src
+#+begin_example
+#+begin_src ledger :cmdline -M reg assets
+!include /tmp/account.ledger
 #+end_src
+#+end_example
 
-#+begin_src org
 
-,#+results:
-,: 2010/01/01 - 2010/01/31         assets:bank:savings       £1300.00    £1300.00
-,: 2010/07/01 - 2010/07/31         assets:bank:chequing       £100.00    £1400.00
-,:                                 assets:bank:savings        £253.53    £1653.53
-,: 2010/08/01 - 2010/08/01         assets:bank:chequing      £1000.00    £2653.53
+#+results:
+: 2010/01/01 - 2010/01/31         assets:bank:savings       £1300.00    £1300.00
+: 2010/07/01 - 2010/07/31         assets:bank:chequing       £100.00    £1400.00
+:                                 assets:bank:savings        £253.53    £1653.53
+: 2010/08/01 - 2010/08/01         assets:bank:chequing      £1000.00    £2653.53
 
   
-#+end_src
 
 * Summary
 
 This short tutorial shows how Ledger entries can be embedded in a org
 file and manipulated using [[http://orgmode.org/worg/org-contrib/babel/index.php][Babel]].  However, only simple Ledger
 features have been illustrated; please refer to the Ledger
-[[http://wiki.github.com/jwiegley/ledger/][documentation]] for examples of more complex interations with a ledger.
+[[http://wiki.github.com/jwiegley/ledger/][documentation]] for examples of more complex integrations with a ledger.
