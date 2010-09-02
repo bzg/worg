@@ -1829,10 +1829,28 @@ are several possible shortcuts you can use to enter them:
  - See Bernt Hansen's [[http://doc.norang.ca/org-mode.html#Yasnippets][org-mode setup]] for a good introduction to
    yasnippet.
 
-* Remember
+* Capture and remember
   :PROPERTIES:
   :CUSTOM_ID: Remember
   :END:
+
+** Can I use a variable or a function inside the `org-capture-templates' variable?
+
+Yes.  Use [[http://www.gnu.org/s/emacs/manual/html_node/elisp/Backquote.html][backquotes]].
+
+E.g. if you have a variable called =org-test-file= and you want the
+variable =org-capture-templates= to "understand" (i.e. evaluate)
+=org-test-file= when Emacs evaluates the =(setq org-capture-templates
+[...])= expression, use backquotes like this:
+
+#+begin_src emacs-lisp
+(setq org-capture-templates
+      `(("t" "Todo" entry (file+headline ,org-test-file "Tasks")
+       "* TODO %?\n  %i\n  %a")
+      ("b" "Buy" item (file+olp ,org-test-file "Stuff to Buy" "House")
+       "")))
+#+end_src
+
 ** Can I use the remember buffer to clock a customer phone call?
    :PROPERTIES:
    :CUSTOM_ID: use-remember-buffer-to-clock-phone-call
