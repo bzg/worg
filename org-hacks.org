@@ -18,7 +18,7 @@ This page is for ad hoc bits of code.  Feel free to add quick hacks and
 workaround.  Go crazy.
 
 
-* Hacking Org: Modifying orgmode itself.
+* Hacking Org: Modifying orgmode itself
 ** Compiling Org without make
    :PROPERTIES:
    :CUSTOM_ID: compiling-org-without-make
@@ -31,48 +31,48 @@ workaround.  Go crazy.
    =my/org-compile-sources= to suite your needs.
 
    #+BEGIN_SRC emacs-lisp
-     (defvar my/org-lisp-directory "~/.emacs.d/org/lisp"
-       "Directory where your org-mode files live.")
+   (defvar my/org-lisp-directory "~/.emacs.d/org/lisp"
+     "Directory where your org-mode files live.")
 
-     (defvar my/org-compile-sources t
-       "If `nil', never compile org-sources. `my/compile-org' will only create
-     the autoloads file `org-install.el' then. If `t', compile the sources, too.")
+   (defvar my/org-compile-sources t
+     "If `nil', never compile org-sources. `my/compile-org' will only create
+   the autoloads file `org-install.el' then. If `t', compile the sources, too.")
 
-     ;; Customize:
-     (setq my/org-lisp-directory "~/.emacs.d/org/lisp")
+   ;; Customize:
+   (setq my/org-lisp-directory "~/.emacs.d/org/lisp")
 
-     ;; Customize:
-     (setq  my/org-compile-sources t)
+   ;; Customize:
+   (setq  my/org-compile-sources t)
 
-     (defun my/compile-org(&optional directory)
-       "Compile all *.el files that come with org-mode."
-       (interactive)
-       (setq directory (concat
-                       	(file-truename
-                         (or directory my/org-lisp-directory)) "/"))
+   (defun my/compile-org(&optional directory)
+     "Compile all *.el files that come with org-mode."
+     (interactive)
+     (setq directory (concat
+                     	(file-truename
+                       (or directory my/org-lisp-directory)) "/"))
 
-       (add-to-list 'load-path directory)
+     (add-to-list 'load-path directory)
 
-       (let ((list-of-org-files (file-expand-wildcards (concat directory "*.el"))))
+     (let ((list-of-org-files (file-expand-wildcards (concat directory "*.el"))))
 
-         ;; create the org-install file
-         (require 'autoload)
-         (setq esf/org-install-file (concat directory "org-install.el"))
-         (find-file esf/org-install-file)
-         (erase-buffer)
-         (mapc (lambda (x)
-                 (generate-file-autoloads x))
-               list-of-org-files)
-         (insert "\n(provide (quote org-install))\n")
-         (save-buffer)
-         (kill-buffer)
-         (byte-compile-file esf/org-install-file t)
+       ;; create the org-install file
+       (require 'autoload)
+       (setq esf/org-install-file (concat directory "org-install.el"))
+       (find-file esf/org-install-file)
+       (erase-buffer)
+       (mapc (lambda (x)
+               (generate-file-autoloads x))
+             list-of-org-files)
+       (insert "\n(provide (quote org-install))\n")
+       (save-buffer)
+       (kill-buffer)
+       (byte-compile-file esf/org-install-file t)
 
-         (dolist (f list-of-org-files)
-           (if (file-exists-p (concat f "c")) ; delete compiled files
-               (delete-file (concat f "c")))
-           (if my/org-compile-sources     ; Compile, if `my/org-compile-sources' is t
-               (byte-compile-file f)))))
+       (dolist (f list-of-org-files)
+         (if (file-exists-p (concat f "c")) ; delete compiled files
+             (delete-file (concat f "c")))
+         (if my/org-compile-sources     ; Compile, if `my/org-compile-sources' is t
+             (byte-compile-file f)))))
    #+END_SRC
 ** Reload Org
 
@@ -101,6 +101,7 @@ To switch back to the compiled version just reload again with
 *** Show next/prev heading tidily
    - Dan Davison
      These close the current heading and open the next/previous heading.
+
 #+begin_src emacs-lisp
 (defun ded/org-show-next-heading-tidily ()
   "Show next entry, keeping other entries closed."
@@ -135,6 +136,7 @@ To switch back to the compiled version just reload again with
 (add-to-list 'org-speed-commands-user 
              '("p" ded/org-show-previous-heading-tidily))
 #+end_src
+
 ** Easy customization of TODO colors
   -- Ryan C. Thompson
 
@@ -204,14 +206,14 @@ If KWD is a number, get the corresponding match group."
    #+BEGIN_SRC emacs-lisp
      (defun org-log-current-defun ()
        (save-excursion
-	 (org-back-to-heading)
-	 (if (looking-at org-complex-heading-regexp)
-	     (match-string 4))))
-
+         (org-back-to-heading)
+         (if (looking-at org-complex-heading-regexp)
+             (match-string 4))))
+     
      (add-hook 'org-mode-hook
-	       (lambda ()
-		 (make-variable-buffer-local 'add-log-current-defun-function)
-		 (setq add-log-current-defun-function 'org-log-current-defun)))
+               (lambda ()
+                 (make-variable-buffer-local 'add-log-current-defun-function)
+                 (setq add-log-current-defun-function 'org-log-current-defun)))
    #+END_SRC
 
 ** Remove redundant tags of headlines
@@ -392,7 +394,7 @@ parameters for the remember frame:
     "Additional frame parameters for dedicated remember frame."
     :type 'alist
     :group 'remember)
-
+  
   (defadvice remember (around remember-frame-parameters activate)
     "Set some frame parameters for the remember frame."
     (let ((default-frame-alist (append remember-frame-alist
@@ -539,8 +541,10 @@ which is the Emacs Calc implementation of the equation
 
 where /i/ is the current time and /a/ is the length of the preceding period.
 ** Archive in a date tree
+
 Posted to Org-mode mailing list by Osamu Okano
 [2010-04-21 Wed]
+
 #+begin_src emacs-lisp
   ;; (setq org-archive-location "%s_archive::date-tree")
   (defadvice org-archive-subtree
@@ -934,63 +938,63 @@ changed.
 *IMPORTANT*: This is probably slow on very big files.
 
 #+begin_src emacs-lisp
-(setq ba/org-adjust-tags-column t)
-
-(defun ba/org-adjust-tags-column-reset-tags ()
-  "In org-mode buffers it will reset tag position according to
-`org-tags-column'."
-  (when (and
-         (not (string= (buffer-name) "*Remember*"))
-         (eql major-mode 'org-mode))
-    (let ((b-m-p (buffer-modified-p)))
-      (condition-case nil
-          (save-excursion
-            (goto-char (point-min))
-            (command-execute 'outline-next-visible-heading)
-            ;; disable (message) that org-set-tags generates
-            (flet ((message (&rest ignored) nil))
-              (org-set-tags 1 t))
-            (set-buffer-modified-p b-m-p))
-        (error nil)))))
-
-(defun ba/org-adjust-tags-column-now ()
-  "Right-adjust `org-tags-column' value, then reset tag position."
-  (set (make-local-variable 'org-tags-column)
-       (- (- (window-width) (length org-ellipsis))))
-  (ba/org-adjust-tags-column-reset-tags))
-
-(defun ba/org-adjust-tags-column-maybe ()
-  "If `ba/org-adjust-tags-column' is set to non-nil, adjust tags."
-  (when ba/org-adjust-tags-column
-    (ba/org-adjust-tags-column-now)))
-
-(defun ba/org-adjust-tags-column-before-save ()
-  "Tags need to be left-adjusted when saving."
-  (when ba/org-adjust-tags-column
-     (setq org-tags-column 1)
-     (ba/org-adjust-tags-column-reset-tags)))
-
-(defun ba/org-adjust-tags-column-after-save ()
-  "Revert left-adjusted tag position done by before-save hook."
-  (ba/org-adjust-tags-column-maybe)
-  (set-buffer-modified-p nil))
-
-; automatically align tags on right-hand side
-(add-hook 'window-configuration-change-hook
-          'ba/org-adjust-tags-column-maybe)
-(add-hook 'before-save-hook 'ba/org-adjust-tags-column-before-save)
-(add-hook 'after-save-hook 'ba/org-adjust-tags-column-after-save)
-(add-hook 'org-agenda-mode-hook '(lambda ()
-                                  (setq org-agenda-tags-column (- (window-width)))))
-
-; between invoking org-refile and displaying the prompt (which
-; triggers window-configuration-change-hook) tags might adjust, 
-; which invalidates the org-refile cache
-(defadvice org-refile (around org-refile-disable-adjust-tags)
-  "Disable dynamically adjusting tags"
-  (let ((ba/org-adjust-tags-column nil))
-    ad-do-it))
-(ad-activate 'org-refile)
+  (setq ba/org-adjust-tags-column t)
+  
+  (defun ba/org-adjust-tags-column-reset-tags ()
+    "In org-mode buffers it will reset tag position according to
+  `org-tags-column'."
+    (when (and
+           (not (string= (buffer-name) "*Remember*"))
+           (eql major-mode 'org-mode))
+      (let ((b-m-p (buffer-modified-p)))
+        (condition-case nil
+            (save-excursion
+              (goto-char (point-min))
+              (command-execute 'outline-next-visible-heading)
+              ;; disable (message) that org-set-tags generates
+              (flet ((message (&rest ignored) nil))
+                (org-set-tags 1 t))
+              (set-buffer-modified-p b-m-p))
+          (error nil)))))
+  
+  (defun ba/org-adjust-tags-column-now ()
+    "Right-adjust `org-tags-column' value, then reset tag position."
+    (set (make-local-variable 'org-tags-column)
+         (- (- (window-width) (length org-ellipsis))))
+    (ba/org-adjust-tags-column-reset-tags))
+  
+  (defun ba/org-adjust-tags-column-maybe ()
+    "If `ba/org-adjust-tags-column' is set to non-nil, adjust tags."
+    (when ba/org-adjust-tags-column
+      (ba/org-adjust-tags-column-now)))
+  
+  (defun ba/org-adjust-tags-column-before-save ()
+    "Tags need to be left-adjusted when saving."
+    (when ba/org-adjust-tags-column
+       (setq org-tags-column 1)
+       (ba/org-adjust-tags-column-reset-tags)))
+  
+  (defun ba/org-adjust-tags-column-after-save ()
+    "Revert left-adjusted tag position done by before-save hook."
+    (ba/org-adjust-tags-column-maybe)
+    (set-buffer-modified-p nil))
+  
+  ; automatically align tags on right-hand side
+  (add-hook 'window-configuration-change-hook
+            'ba/org-adjust-tags-column-maybe)
+  (add-hook 'before-save-hook 'ba/org-adjust-tags-column-before-save)
+  (add-hook 'after-save-hook 'ba/org-adjust-tags-column-after-save)
+  (add-hook 'org-agenda-mode-hook '(lambda ()
+                                    (setq org-agenda-tags-column (- (window-width)))))
+  
+  ; between invoking org-refile and displaying the prompt (which
+  ; triggers window-configuration-change-hook) tags might adjust, 
+  ; which invalidates the org-refile cache
+  (defadvice org-refile (around org-refile-disable-adjust-tags)
+    "Disable dynamically adjusting tags"
+    (let ((ba/org-adjust-tags-column nil))
+      ad-do-it))
+  (ad-activate 'org-refile)
 #+end_src
 * Hacking Org and Emacs: Modify how org interacts with other Emacs packages.
 ** org-remember-anything
@@ -1041,9 +1045,9 @@ using ido):
 
 #+begin_src emacs-lisp
   (load-library "find-lisp")
-
+  
   ;; Adapted from http://www.emacswiki.org/emacs/RecentFiles
-
+  
   (defun my-ido-find-org-attach ()
     "Find files in org-attachment directory"
     (interactive)
@@ -1067,13 +1071,12 @@ using ido):
             ido-text-init ido-text
             ido-rotate-temp t)
       (exit-minibuffer)))
-
+  
   (add-hook 'ido-setup-hook 'ido-my-keys)
-
+  
   (defun ido-my-keys ()
     "Add my keybindings for ido."
-    (define-key ido-completion-map (kbd "C-;") 'my-ido-find-org-attach)
-    )
+    (define-key ido-completion-map (kbd "C-;") 'my-ido-find-org-attach))
 #+end_src
 
 To browse your org attachments using ido fuzzy matching and/or the
@@ -1095,31 +1098,35 @@ whereas before I had a tendency to forget that it was there.
   - [[http://mid.gmane.org/55590EA7-C744-44E5-909F-755F0BBE452D@gmail.com][John Wiegley: Displaying your Org agenda after idle time]]
 
 #+begin_src emacs-lisp
-  (defun jump-to-org-agenda ()
-    (interactive)
-    (let ((buf (get-buffer "*Org Agenda*"))
-          wind)
-      (if buf
-          (if (setq wind (get-buffer-window buf))
-              (select-window wind)
-            (if (called-interactively-p)
-                (progn
-                  (select-window (display-buffer buf t t))
-                  (org-fit-window-to-buffer)
-                  ;; (org-agenda-redo)
-                  )
-              (with-selected-window (display-buffer buf)
+(defun jump-to-org-agenda ()
+  (interactive)
+  (let ((buf (get-buffer "*Org Agenda*"))
+        wind)
+    (if buf
+        (if (setq wind (get-buffer-window buf))
+            (select-window wind)
+          (if (called-interactively-p)
+              (progn
+                (select-window (display-buffer buf t t))
                 (org-fit-window-to-buffer)
                 ;; (org-agenda-redo)
-                )))
-        (call-interactively 'org-agenda-list)))
-    ;;(let ((buf (get-buffer "*Calendar*")))
-    ;;  (unless (get-buffer-window buf)
-    ;;    (org-agenda-goto-calendar)))
-    )
+                )
+            (with-selected-window (display-buffer buf)
+              (org-fit-window-to-buffer)
+              ;; (org-agenda-redo)
+              )))
+      (call-interactively 'org-agenda-list)))
+  ;;(let ((buf (get-buffer "*Calendar*")))
+  ;;  (unless (get-buffer-window buf)
+  ;;    (org-agenda-goto-calendar)))
+  )
   
-  (run-with-idle-timer 300 t 'jump-to-org-agenda)
+(run-with-idle-timer 300 t 'jump-to-org-agenda)
 #+end_src
+
+#+results:
+: [nil 0 300 0 t jump-to-org-agenda nil idle]
+
 ** Link to Gnus messages by Message-Id
 
 In a [[http://thread.gmane.org/gmane.emacs.orgmode/8860][recent thread]] on the Org-Mode mailing list, there was some
@@ -1357,31 +1364,31 @@ and clipboard.  If a region is active, it uses the region, the
 complete subtree otherwise.
 
 #+begin_src emacs-lisp
-  (defun dmj/org-export-region-as-html-attachment (beg end arg)
-    "Export region between BEG and END as html attachment.
-  If BEG and END are not set, use current subtree.  Region or
-  subtree is exported to html without header and footer, prefixed
-  with a mime entity string and pushed to clipboard and killring.
-  When called with prefix, mime entity is not marked as
-  attachment."
-    (interactive "r\nP")
-    (save-excursion
-      (let* ((beg (if (region-active-p) (region-beginning)
-                    (progn
-                      (org-back-to-heading)
-                      (point))))
-             (end (if (region-active-p) (region-end)
-                    (progn
-                      (org-end-of-subtree)
-                      (point))))
-             (html (concat "--[[text/html"
-                           (if arg "" "\nContent-Disposition: attachment")
-                           "]]\n"
-                           (org-export-region-as-html beg end t 'string))))
-        (when (fboundp 'x-set-selection)
-          (ignore-errors (x-set-selection 'PRIMARY html))
-          (ignore-errors (x-set-selection 'CLIPBOARD html)))
-        (message "html export done, pushed to kill ring and clipboard"))))
+(defun dmj/org-export-region-as-html-attachment (beg end arg)
+  "Export region between BEG and END as html attachment.
+If BEG and END are not set, use current subtree.  Region or
+subtree is exported to html without header and footer, prefixed
+with a mime entity string and pushed to clipboard and killring.
+When called with prefix, mime entity is not marked as
+attachment."
+  (interactive "r\nP")
+  (save-excursion
+    (let* ((beg (if (region-active-p) (region-beginning)
+                  (progn
+                    (org-back-to-heading)
+                    (point))))
+           (end (if (region-active-p) (region-end)
+                  (progn
+                    (org-end-of-subtree)
+                    (point))))
+           (html (concat "--[[text/html"
+                         (if arg "" "\nContent-Disposition: attachment")
+                         "]]\n"
+                         (org-export-region-as-html beg end t 'string))))
+      (when (fboundp 'x-set-selection)
+        (ignore-errors (x-set-selection 'PRIMARY html))
+        (ignore-errors (x-set-selection 'CLIPBOARD html)))
+      (message "html export done, pushed to kill ring and clipboard"))))
 #+end_src
 
 *** Adopting for Gnus
