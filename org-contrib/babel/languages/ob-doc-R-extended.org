@@ -424,7 +424,7 @@ just like we do with R files in ESS.
 
 You simply use the :session argument to the org-mode source block.   
 
-#+begin_src R :session :results output :exports (if (require 'ess) "both" "code")
+#+begin_src R :session (if (require 'ess) "*R*" "none") :results output
   square <- function(x) {
     x * x
   }
@@ -435,7 +435,7 @@ So, the above code block defines our function (square) and object (x).
 Now we want to apply call our square function with the x
 object. Without :session, we could not do this.
 
-#+begin_src R :exports (if (require 'ess) "both" "code")
+#+begin_src R
   square(x)
 #+end_src
 
@@ -443,7 +443,7 @@ Running the above code block will result in an error, since a new R
 session was started, and our objects were not available. Now try the
 same code block, but with the :session argument, as below.
 
-#+begin_src R :session :exports (if (require 'ess) "both" "code")
+#+begin_src R :session (if (require 'ess) "*R*" "none") :results output
   square(x)
 #+end_src
 
