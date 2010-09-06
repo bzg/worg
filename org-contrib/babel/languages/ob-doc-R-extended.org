@@ -424,7 +424,7 @@ just like we do with R files in ESS.
 
 You simply use the :session argument to the org-mode source block.   
 
-#+begin_src R :session :results output :exports (if (require 'ess "both" "code"))
+#+begin_src R :session :results output :exports (if (require 'ess) "both" "code")
   square <- function(x) {
     x * x
   }
@@ -435,7 +435,7 @@ So, the above code block defines our function (square) and object (x).
 Now we want to apply call our square function with the x
 object. Without :session, we could not do this.
 
-#+begin_src R :exports (if (require 'ess "both" "code"))
+#+begin_src R :exports (if (require 'ess) "both" "code")
   square(x)
 #+end_src
 
@@ -443,7 +443,7 @@ Running the above code block will result in an error, since a new R
 session was started, and our objects were not available. Now try the
 same code block, but with the :session argument, as below.
 
-#+begin_src R :session :exports (if (require 'ess "both" "code"))
+#+begin_src R :session :exports (if (require 'ess) "both" "code")
   square(x)
 #+end_src
 
@@ -714,7 +714,7 @@ from.
 This first example will not extract any code from the source block.
 It is the default behavior. 
 
-#+begin_src R :tangle no
+#+begin_src R :tangle no :exports code
 # tangle was not specified
 x <- 1:10
 print(x) 
@@ -725,7 +725,7 @@ This will place the code in source code block in
 org-mode-R-tutorial.R, since we don't specify a filename for the .R
 file.
 
-#+begin_src R :tangle yes
+#+begin_src R :tangle yes :exports code
 # tangle was specified, but no file given
 x <- 1:10
 print(x)
@@ -733,7 +733,7 @@ print(x)
 
 This will place the tangled code in Rcode.R, since we specify that name. 
 
-#+begin_src R :tangle Rcode.R
+#+begin_src R :tangle Rcode.R :exports code
 # tangle was specified, and a file name given (Rcode.R)
 x <- 1:10
 print(x)
