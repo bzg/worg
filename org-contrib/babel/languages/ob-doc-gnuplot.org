@@ -2,9 +2,9 @@
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
-#+TITLE:      Using gnuplot with Babel
+#+TITLE:      Org-babel-gnuplot
 #+AUTHOR:     John Hendy
-#+EMAIL:      
+#+EMAIL:      jw[dot]hendy[at]gmail[dot]com
 #+LANGUAGE:   en
 #+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
 
@@ -23,9 +23,329 @@
 #+end_html
 
 * Introduction
-Gnuplot code can be executed directly from within embedded code blocks
-in Org-mode documents.  These code blocks can access tabular data
-stored in the documents, and can include their output as embedded
-graphics in the documents.
+org-babel-gnuplot allows gnuplot code to be executed directly from
+within embedded code blocks in Org-mode documents. These code blocks
+can plot functions, graph data from tables stored in the documents,
+and can include their output as embedded graphics when the docuemnt is
+exported document.
 
-The following provides instructions and example usage (/pending/)...
+The following provides instructions and some examples of gnuplot
+usage. Since babel is simply allowing native code to run inside of
+Org-mode, all gnuplot documentation is applicable and valid. [fn:1]
+
+* Requirements and Setup
+To get gunplut up and running, you need gnuplot, obviously. It should
+be mentioned that one can also use Org-mode's gnuplot-mode as an
+alternative to babel. Instructions already exist on Worg for this.[fn:2] The
+.org file used to create the org-plot Worg entry is linked in the
+Introduction on that page and can be very helpful in getting a feel
+for using gnuplot by using the =#+PLOT= header above a table.
+
+This page, however, is about using gnuplot in it's "native" form, and for this
+we need to enable babel support for the gnuplot language. As of
+Org-mode 7.01, babel is included and there is no need to load it via
+.emacs. If you are using a previous release you need to do something
+like this:
+
+#+begin_example
+;; set up babel support
+(require 'org-babel)
+(require 'org-babel-init)
+(require 'org-babel-gnuplot)
+;; add additional languages with (require 'org-babel-language)
+#+end_example
+
+For those using the current version of Org-mode, this has been changed
+to the following syntax in .emacs:[fn:3]
+
+#+begin_example
+;; active Babel languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((gnuplot . t)))
+;; add additional languages with '((language . t)))
+#+end_example
+
+From then on, to access the power of gnuplot, the setup is generally
+like this:
+
+*Data Table* (if pulling from a table and not a formula)
+#+BEGIN_EXAMPLE
+#+tblname: data-table
+| x | y1 | y2 |
+|---+----+----|
+| 0 | 3  | 6  |
+| 1 | 4  | 7  |
+| 2 | 5  | 8  |
+#+END_EXAMPLE
+
+*Gnuplot Source Block*
+#+BEGIN_EXAMPLE
+#+begin_src gnuplot :var data=data-table :file output.png
+
+  gnuplot code goes here
+
+#+end_src
+#+END_EXAMPLE
+
+To run gnuplot and produce a resultant graph (or to produce any result
+from babel code blocks), simply move one's cursor anywhere in the code
+block and press =C-c C-c= (Ctrl+C followed by Ctrl+C) and type "yes"
+in the minibuffer when asked about executing the code. It's that
+simple!
+
+
+
+That's the gist. I'm fairly confident that the instructions previously
+noted for the =#+PLOT:= header above tables do the trick for most
+things, and thus I'll move on to my special interests. I would like to
+mention three quick notes first...  
+
+
+* Babel Header Arguments
+Various arguments are passed to source code blocks. The complete list
+is covered in the Org-mode manual.[fn:4] Some options frequently used for
+gnuplot are:
+- =:var data=data-table=
+  - When data is to be plotted from a table, it is helpful to use a
+    heading right above the table in the form =#+tblname=data-table=,
+    where "data-table" is replaced with some short name to identify
+    the table to gnuplot.
+- =:exports {code, results, both, none}=
+  - When the code is run and the document exported (e.g. to HTML or
+    \LaTeX PDF), what should appear? Just the code block itself? Only
+    the produced output (in this case a plot of some sort)? Both the
+    code and the accompanying results? Or nothing?
+- =:file foo.{png,eps,etc.}=
+  - This option specifies where the resulting output should be put. If
+    no option is given, a gnuplot window will open with the
+    resultant plot.
+
+Let's move on to examples!
+
+* Quick Gnuplot Overview
+As stated earlier, the full gnuplot documentation can and should be
+consulted as the official reference, but it might be helpful to lay
+out some common syntax here as a quick reference for those using
+Org-mode and babel. Any of the commands typed in =code= font below
+should be assumed to reside between babel code blocks (=#+begin_src
+gnuplot= and =#+end_src=).
+
+** Title and Axis Labels
+Set the title for the whole graph like this:
+#+begin_example
+set title "This Title Goes at the Top"
+#+end_example
+
+
+Set axis labels like so:
+#+begin_example
+set xlabel "This is the X Axis"
+set ylabel "This is the Y Axis"
+#+end_example
+
+** Graph Width/Height Raio
+The size ratio of the graph is controlled like so:
+- Wide & short: =set size ratio 0.5= (or any number less than 1)
+- Tall & thin: =set size ratio 2= (or any number greater than 1)
+- Square (1:1): =set size square=
+
+** Tic Marks
+Tic marks are set with the method "start,increment[,end]." Start is
+the beginning tic value, increment sets how far apart the tics are,
+the the optional end specifies a stopping value. If no end is given,
+the tics will carrry on by the increment value until the max x/y value
+is reached. Here are some examples:
+#+begin_example
+set xtics 0,10,100  %% tics every 10 from 0 -> 100
+set ytics -10,50    %% tics every 50 from -10 onward
+#+end_example
+
+Named tics can also be used. Two values are provided, a numerical
+value (where on the given axis the tic should be placed) and a name in
+quote to indicate what word should be placed at the tic instead of the
+numerical value. This is useful when either words are desired or
+irregular tics and/or complete control over placement is desired.
+#+begin_example
+set xtics ("Tic 1" -1, "Tic 2" 10, "Tic 3" 1001)
+#+end_example
+
+The gnuplot default is for tics to show up on both sides and the top and
+bottom of the graph. Stop this (tics only on left/bottom) by using:
+#+begin_example
+set xtics nomirror
+set ytics nomirror
+#+end_example
+
+** Plot
+The heart of gnuplot is the =plot= command. It is broken down into
+several sections:
+*** Plot what?
+This will either be a function or data. Plotting a function would look
+like this:
+#+begin_example
+f(x) = x**2
+plot f(x)
+#+end_example
+
+Plotting data would go like this (remembering we defined the variable
+"data" to equal the name of some table in the Org-mode document)
+#+begin_example
+plot data using x:y
+#+end_example
+
+The =x:y= identifies the column numbers in the table that should
+be used for the x values and corresponding y values. Using the command
+=plot data using 1:3= would tell gnuplot to go down the rows of the
+table and plot points using x values from the first column and
+corresponding y values from the third. "Using" can be abbreviated with
+as simply "u" which helps keep lines shorter.
+
+*** Plot how?
+To customize the look of plots, many options are available. To pass
+these options to gnuplot looks like this:
+#+begin_example
+plot data u 1:2 with lines
+#+end_example
+
+In this case gnuplot will use the linestyle =lines= to plot the
+data. This will create a colored line through the data points. Some
+commonly used options (and their abbreviations) are:
+- points (p)
+- dots (d)
+- lines (l)
+- linespoints (lp)
+- impulses (i)
+- steps
+- boxes
+
+One can find all available plot styles in the documentation or
+elsewhere.[fn:5] To thicken up lines or points, just add =lw #=
+(stands for "lineweight) after the style (e.g. =...with lines lw
+3=). The default weight is 1 which can look a little light. Use 2 or
+more for thicker, easier to see, lines and points. The word "with" can
+be abbreviated "w" to shorten code lines.
+
+*** Call it what?
+Add a title in the graph key like this:
+#+begin_example
+plot data u 1:2 w lines lw 2 title 'Data Set 1'
+#+end_example
+
+This is especially helpful when multiple data sets are plotted
+together. Sometimes, however, a key is not desired at all. When only
+one function or data set is plotted and its title is obvious, put this
+in the code block to get rid of the key altogether:
+#+begin_example
+set nokey
+#+end_example
+
+*** Any more?
+If more than one plot is to be made on the same graph, it's done like
+this for fuctions:
+#+begin_example
+f(x)=x**2
+g(x)=x**3
+h(x)=sqrt(x)
+plot f(x),g(x),h(x)
+#+end_example
+
+For data from tables, it's like this:
+#+begin_example
+plot data u 1:2 w lines, data u 1:3 w points, \
+     data u 1:4 w lp
+#+end_example
+
+This plots column 1 (x) against column 2 (y)  with lines, 1 against 3
+with points, and 1 against 4 with linespoints. The use of the =\=
+tells gnuplot to keep reading. Typically the end of a line signals the
+end of the command and gnuplot will complain since =data u 1:4 w lp=
+isn't a command all by itself without the =plot= preceding it. The =\=
+ensures that the whole command is understood. One can make an
+extremely long line, but =\= just helps keep thins looking tidy and
+for very long commands keeps one from scrolling left and right to
+track the line of code.
+
+
+** Putting it all together
+Given these options, a full bable block of code might look like this:
+
+#+begin_src gnuplot :exports code
+set title "Putting it All Together"
+
+set xlabel "X"
+set xrange [-8:8]
+set xtics -8,2,8
+
+
+set ylabel "Y"
+set yrange [-20:70]
+set ytics -20,10,70
+
+f(x) = x**2
+g(x) = x**3
+h(x) = 10*sqrt(abs(x))
+
+plot f(x) w lp lw 1, g(x) w p lw 2, h(x) w l lw 3
+#+end_src
+
+Or something like this for data:[fn:2]
+#+begin_example
+#+tblname: worg-data
+|   x |         y1 |         y2 |
+|-----+------------+------------|
+| 0.1 |      0.425 |      0.375 |
+| 0.2 |     0.3125 |     0.3375 |
+| 0.3 | 0.24999993 | 0.28333338 |
+| 0.4 |      0.275 |    0.28125 |
+| 0.5 |       0.26 |       0.27 |
+| 0.6 | 0.25833338 | 0.24999993 |
+| 0.7 | 0.24642845 | 0.23928553 |
+| 0.8 |    0.23125 |     0.2375 |
+| 0.9 | 0.23333323 |  0.2333332 |
+|   1 |     0.2225 |       0.22 |
+#+end_example
+
+#+begin_src gnuplot :var data=worg-data :exports code
+set title "Putting it All Together"
+
+set xlabel "X"
+set xrange [0:1]
+set xtics 0,0.1,1
+
+
+set ylabel "Y"
+set yrange [0.2:0.5]
+set ytics 0.2,0.05,0.5
+
+
+plot data u 1:2 w p lw 2 title 'x vs. y1', \
+     data u 1:3 w lp lw 1 title 'x vx. y2'
+#+end_src
+
+* TODO Basic Plots
+** Functions
+Some function examples
+
+** Plotting data
+Some simple plotting from data tables.
+
+* TODO Advanced Examples
+** Named/Unevenly Spaced Xtics
+** Different Scales
+** Broken X-Axis
+
+* TODO Miscellaneous Tips/Tricks
+* Footnotes
+
+[fn:1] Gnuplot manual downloads: http://www.gnuplot.info/documentation.html
+
+[fn:2] Org-plot on Worg: http://orgmode.org/worg/org-tutorials/org-plot.php
+
+[fn:3] 7.01 list of user visible changes: http://orgmode.org/Changes.html#ob-configuration-changes
+
+[fn:4] Org-mode manual on babel header args: http://orgmode.org/manual/Specific-header-arguments.html#Specific-header-arguments
+
+[fn:5] Nice plot style summary: http://t16web.lanl.gov/Kawano/gnuplot/intro/style-e.html
+
+
