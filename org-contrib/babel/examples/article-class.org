@@ -15,7 +15,7 @@
 #+XSLT: 
 #+BABEL: :exports code
 #+LaTeX_CLASS: org-article-subsubsection
-#+LaTeX_CLASS_OPTIONS: [koma,a5paper,landscape,utopia,10pt,listings,color,microtype,paralist]
+#+LaTeX_CLASS_OPTIONS: [article,letterpaper,landscape,times,12pt,listings,listings-bw,color,microtype,paralist]
 
 * Org-article class
   :PROPERTIES:
@@ -27,18 +27,223 @@ LaTeX exporter.  The class accepts numerous options, which the user
 can set either in =.emacs=, for default use with all org-article
 exports, or within the Org-mode file using =#+LaTeX_CLASS_OPTIONS:=.
 
+** How to use this Org-mode document
+   :PROPERTIES:
+   :VISIBILITY: folded
+   :END:
+
+You might be able to get the Org-mode document from GitHub using the following
+shell command, which works for me:
+
+#+source: get-from-github
+#+begin_src sh :exports code
+  git clone git@github.com:tsdye/org-article.git
+#+end_src
+
+Alternatively, this might work for you:
+
+#+source: get-from-github-alt
+#+begin_src sh :exports code
+  git clone git://github.com/tsdye/org-article.git
+#+end_src
+
+This will create a sub-directory, =org-article=, initialize the git
+repository and download the file =article-class.org= as part of the
+repository.  The Org-mode document can be tangled to produce the
+=org-article.cls= file.  This is done by running =org-babel-tangle=
+against the file, either by =M-x org-babel-tangle RET= or =C-c C-v
+[C-]t=.
+
+The resulting =org-article.cls= file should then be moved where LaTeX
+can find it.  In LaTeX setups that conform to the [[http://www.tex.ac.uk/tex-archive/tds/tds.html][Tex Directory
+Structure]], this might be =path/to/texmf-local/tex/latex/base=.  Once
+the file has been placed in an appropriate directory it is often the
+case that the directory database, such as the one maintained by
+[[http://tug.org/kpathsea/][Kpathsea]], must then be updated. The following shell commands work on
+my OS-X system with the [[http://tug.org/mactex/][MacTeX]] distribution:
+
+#+source: install-org-article
+#+begin_src sh :exports code
+  sudo cp org-article.cls /usr/local/texlive/texmf-local/tex/latex/base/
+  sudo mktexlsr
+#+end_src
+** Org-mode LaTeX export setup
+   :PROPERTIES:
+   :VISIBILITY: folded
+   :END:
+# <<export-setup>>
+There are two ways to setup =org-article.cls= and your choice will
+probably depend on the value of the variable
+=org-export-latex-packages-alist=.  If this variable is nil, then the
+following setup should work for you.  It asks Org-mode *not* to load
+the default packages, because these are loaded by =org-article.cls=.
+Then, it loads the packages in =org-export-latex-packages-alist=, which
+should consist of a single entry for the =inputenc= package.  Org-mode
+automatically sets the input encoding based on the status of the
+Org-mode buffer being exported.  Finally, any packages specified
+within the Org-mode buffer are loaded (the [EXTRA] argument).
+
+The =org-article.cls= setup for the case when
+=org-export-latex-packages-alist= is =nil=:
+
+#+begin_src emacs-lisp :exports code
+  (add-to-list 'org-export-latex-packages-alist
+               '(("AUTO" "inputenc" t)))
+  (add-to-list 'org-export-latex-classes
+            '("org-article-section"
+               "\\documentclass{org-article}
+               \\loadpackage[AUTO]{inputenc}
+               [NO-DEFAULT-PACKAGES]
+               [PACKAGES]
+               [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")))
+  (add-to-list 'org-export-latex-classes
+            '("org-article-subsection"
+               "\\documentclass{org-article}
+               [NO-DEFAULT-PACKAGES]
+               [PACKAGES]
+               [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")))
+  (add-to-list 'org-export-latex-classes
+            '("org-article-subsubsection"
+               "\\documentclass{org-article}
+               [NO-DEFAULT-PACKAGES]
+               [PACKAGES]
+               [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-export-latex-classes
+            '("org-article-paragraph"
+               "\\documentclass{org-article}
+               [NO-DEFAULT-PACKAGES]
+               [PACKAGES]
+               [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")))
+  (add-to-list 'org-export-latex-classes
+            '("org-article-subparagraph"
+               "\\documentclass{org-article}
+               [NO-DEFAULT-PACKAGES]
+               [PACKAGES]
+               [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+
+If, for some reason, =org-export-latex-packages-alist= is not =nil=, then
+the following setup should work.
+
+#+begin_src emacs-lisp :exports code
+      (add-to-list 'org-export-latex-classes
+                '("org-article-section"
+                   "\\documentclass{org-article}
+                   [NO-DEFAULT-PACKAGES]
+                   [EXTRA]"
+                   ("\\section{%s}" . "\\section*{%s}")))
+      (add-to-list 'org-export-latex-classes
+                '("org-article-subsection"
+                   "\\documentclass{org-article}
+                   [NO-DEFAULT-PACKAGES]
+                   [EXTRA]"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")))
+      (add-to-list 'org-export-latex-classes
+                '("org-article-subsubsection"
+                   "\\documentclass{org-article}
+                   [NO-DEFAULT-PACKAGES]
+                   [EXTRA]"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+      (add-to-list 'org-export-latex-classes
+                '("org-article-paragraph"
+                   "\\documentclass{org-article}
+                   [NO-DEFAULT-PACKAGES]
+                   [EXTRA]"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")))
+      (add-to-list 'org-export-latex-classes
+                '("org-article-subparagraph"
+                   "\\documentclass{org-article}
+                   [NO-DEFAULT-PACKAGES]
+                   [EXTRA]"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+
+In this case, you will need to specify the =inputenc= package in the
+Org-mode file:
+
+#+source: specify-inputenc
+#+begin_src emacs-lisp :exports code
+  ,#+LATEX_HEADER: \usepackage[AUTO]{inputenc} 
+#+end_src
+
+** Examples
+The functionality of =org-article.cls= can be demonstrated with the
+following two examples of pdf output generated by Org-mode LaTeX
+export of this Org-mode file.  In the first, these two lines were
+included at the top of the Org-mode file:
+
+#+source: first-example
+#+begin_src latex :exports code
+#+LaTeX_CLASS: org-article-subsubsection
+#+LaTeX_CLASS_OPTIONS: [article,letterpaper,times,12pt,listings,listings-bw,color,microtype]
+#+end_src
+
+The resulting [[file:article-class-times-art.pdf][pdf file]] is typeset with the standard LaTeX
+=article.cls= on 8.5 x 11 in. paper, using Times, Helvetica,
+and Courier fonts with a 12 point base size.  Source code listings are
+given in color, and microtypographic justification is applied.  As you
+can see in the resulting [[file:article-class-times-art.pdf][pdf file]], the output is mostly OK but there
+are problems with long lines, mostly in the source code listings, but
+also in the body text with long path names.
+
+In the second example, the following two lines were included in the
+top of the Org-mode file:
+
+#+source: second-example
+#+begin_src latex :exports code
+#+LaTeX_CLASS: org-article-subsubsection
+#+LaTeX_CLASS_OPTIONS: [koma,a5paper,landscape,utopia,10pt,listings,color,listings-color,microtype,paralist]
+#+end_src
+
+The resulting [[file:article-class-utopia-koma.pdf][pdf file]] is typeset with the KOMA-script =scrartcl.cls=
+on 5.8 x 8.3 in. paper in landscape mode, using Utopia, Bera,
+and Incosolata fonts with a 10 point base size.  Source code listings
+are given in color, and microtypographic justification is applied.  As
+you can see in the resulting [[file:article-class-times-art.pdf][pdf file]], the output is better than the
+first example, but there are still a few problems with long lines.  In
+addition, the =paralist= option has been set; compare the tightly-set
+list on page 3 with standard list on page 2 of the first example.
 ** The class file
    :PROPERTIES:
    :VISIBILITY: folded
    :END:
 The LaTeX class file has six standard parts:
 
-   - The identification part
-   - The initial code part
-   - The declaration of options part
-   - The execution of options part
-   - The package loading part
-   - The class code part
+   - Identification part :: Defines the nature of the file and
+        specifies the TeX format that it requires.
+   - Initial code part :: Loads packages used internally by the class file.
+   - Declaration of options part :: All options known to the class are
+        declared here.  It is forbidden to load packages in this part.
+   - Execution of options part :: Set default values and execute the
+        code for the options that have been declared.
+   - Package loading part :: Load packages with the options specified
+        in the declaration of options part using =\PassOptionsToPackage=.
+   - Main code part :: Usually used to define new commands and structures.
 
 #+source: org-article
 #+begin_src latex :tangle org-article.cls :noweb yes :exports code
@@ -51,6 +256,12 @@ The LaTeX class file has six standard parts:
 #+end_src
 
 *** Identification part
+
+This is a standard identification part.  The =\NeedsTeXFormat= command
+can take an optional argument with a release date for the oldest
+version of LaTeX that can use the class.  Since it is relatively easy
+to update LaTeX installations nowadays there is less reason to use
+this optional argument than there was in the past.  It is omitted here.
 
 #+source: identification-part
 #+begin_src latex :exports code
@@ -65,52 +276,17 @@ The LaTeX class file has six standard parts:
 The initial code part loads packages needed to process the class file
 and declares booleans for each of the class options.  Options defined
 by the base class, either the standard =article.cls= or the Koma class
-=srcartcl.cls=, are available by default and don't have to be declared
-here.
+=srcartcl.cls=, are passed on to those classes by default and don't
+have to be declared here.
 
 #+source: initial-code-part
 #+begin_src latex :noweb yes :exports code
   % Initial code part
-  % General programming for class file
+
   \RequirePackage{ifthen}
   \RequirePackage{calc}
   \RequirePackage{ifpdf}
-  
-  % The standard Org-mode packages
-  <<boolean-fontenc>>
-  <<boolean-fixltx2e>>
-  <<boolean-graphicx>>
-  <<boolean-longtable>>
-  <<boolean-float>>
-  <<boolean-wrapfig>>
-  <<boolean-soul>>
-  % <<boolean-t1enc>>
-  <<boolean-textcomp>>
-  <<boolean-marvosym>>
-  <<boolean-wasysym>>
-  <<boolean-latexsym>>
-  <<boolean-amssymb>>
-  <<boolean-hyperref>>
-  
-  % Base classes
-  <<boolean-koma>>
-  <<boolean-article>>  
 
-  % Font options
-  <<boolean-times>>
-  <<boolean-garamond>>
-  <<boolean-palatino>>
-  <<boolean-utopia>>
-  <<boolean-charter>>
-  
-  % Other packages
-  <<boolean-microtype>>
-  <<boolean-paralist>>
-  <<boolean-setspace>>
-  % <<boolean-topcapt>>
-  <<boolean-listings>>
-  <<boolean-color>>
-  
   % End of initial code part
 #+end_src
 
@@ -118,7 +294,7 @@ here.
 #+source: declaration-of-options-part
 #+begin_src latex :noweb yes :exports code
   % Declaration of options part
-  % Org-mode options
+  % Org-mode default packages
   <<option-fontenc>>
   <<option-fixltx2e>>
   <<option-graphicx>>
@@ -126,7 +302,6 @@ here.
   <<option-float>>
   <<option-wrapfig>>
   <<option-soul>>
-  % <<option-t1enc>>
   <<option-textcomp>>
   <<option-marvosym>>
   <<option-wasysym>>
@@ -158,10 +333,7 @@ here.
   <<pass-to-article>>  
 
   % Pass options to packages
-  % <<options-to-inputenc>>
-  % <<options-to-fontenc>>
   <<options-to-hyperref>>
-  % <<options-to-listings>>
   
   % End of declaration of options part
 #+end_src
@@ -170,8 +342,9 @@ here.
 #+source: execution-of-options-part
 #+begin_src latex :exports code
   % Execution of options part
-  
+
   \ProcessOptions\relax
+
   
   % End of execution of options part
 #+end_src
@@ -239,7 +412,7 @@ is no facility to disable loading =fontenc=.
   % End of class code part  
 #+end_src
 
-** Packages
+** LaTeX packages
    :PROPERTIES:
    :VISIBILITY: folded
    :END:
@@ -279,23 +452,15 @@ documentation on your system with the following shell command:
   texdoc koma
 #+end_src
 
-#+source: boolean-koma
-#+begin_src latex :exports none
-  \newboolean{koma}
-#+end_src
-
-#+source: boolean-article
-#+begin_src latex :exports none
-  \newboolean{article}
-#+end_src
-
 #+source: option-koma
 #+begin_src latex :exports none
+  \newboolean{koma}
   \DeclareOption{koma}{\setboolean{koma}{true}}
 #+end_src
 
 #+source: option-article
 #+begin_src latex :exports none
+  \newboolean{article}
   \DeclareOption{article}{\setboolean{article}{true}}
 #+end_src
 
@@ -451,13 +616,9 @@ option is provided to not load it.
 #+end_src
  
 
-#+source: boolean-inputenc
-#+begin_src latex :exports none
-  \newboolean{noinputenc}  
-#+end_src
-
 #+source: option-inputenc
 #+begin_src latex :exports none
+  \newboolean{noinputenc}  
   \DeclareOption{noinputenc}{\setboolean{noinputenc}{true}}  
 #+end_src
 
@@ -510,13 +671,9 @@ option is provided to not load it.
 Note that several of the font packages load =fontenc= themselves.
 These include [[garamond-font][Garamond]], [[palatino-font][Palatino]], [[charter-font][Charter]], and [[utopia-font][Utopia]].
 
-#+source: boolean-fontenc
-#+begin_src latex :exports none
-\newboolean{nofontenc}  
-#+end_src
-
 #+source: option-fontenc
 #+begin_src latex :exports none
+  \newboolean{nofontenc}  
   \DeclareOption{nofontenc}{\setboolean{nofontenc}{true}}
 #+end_src
 
@@ -556,14 +713,9 @@ option is provided to not load it.
   #+LaTeX_CLASS_OPTIONS: [nofixltx2e]
 #+end_src
  
-
-#+source: boolean-fixltx2e
-#+begin_src latex :exports none
-  \newboolean{nofixltx2e}
-#+end_src
-
 #+source: option-fixltx2e
 #+begin_src latex :exports none
+  \newboolean{nofixltx2e}
   \DeclareOption{nofixltx2e}{\setboolean{nofixltx2e}{true}}
 #+end_src
 
@@ -598,14 +750,9 @@ option is provided to not load it.
   #+LaTeX_CLASS_OPTIONS: [nographicx]
 #+end_src
  
-
-#+source: boolean-graphicx
-#+begin_src latex :exports none
-  \newboolean{nographicx}
-#+end_src
-
 #+source: option-graphicx
 #+begin_src latex :exports none
+  \newboolean{nographicx}
   \DeclareOption{nographicx}{\setboolean{nographicx}{true}}
 #+end_src
 
@@ -639,15 +786,10 @@ option is provided to not load it.
 #+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [nolongtable]
 #+end_src
- 
-
-#+source: boolean-longtable
-#+begin_src latex :exports none
-  \newboolean{nolongtable}
-#+end_src
 
 #+source: option-longtable
 #+begin_src latex :exports none
+  \newboolean{nolongtable}
   \DeclareOption{nolongtable}{\setboolean{nolongtable}{true}}
 #+end_src
 
@@ -684,15 +826,10 @@ option is provided to not load it.
 #+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [nofloat]
 #+end_src
- 
-
-#+source: boolean-float
-#+begin_src latex :exports none
-  \newboolean{nofloat}
-#+end_src
 
 #+source: option-float
 #+begin_src latex :exports none
+  \newboolean{nofloat}
   \DeclareOption{nofloat}{\setboolean{nofloat}{true}}
 #+end_src
 
@@ -729,14 +866,9 @@ option is provided to not load it.
   #+LaTeX_CLASS_OPTIONS: [nowrapfig]
 #+end_src
  
-
-#+source: boolean-wrapfig
-#+begin_src latex :exports none
-  \newboolean{nowrapfig}
-#+end_src
-
 #+source: option-wrapfig
 #+begin_src latex :exports none
+  \newboolean{nowrapfig}
   \DeclareOption{nowrapfig}{\setboolean{nowrapfig}{true}}
 #+end_src
 
@@ -767,14 +899,9 @@ option is provided to not load it.
   #+LaTeX_CLASS_OPTIONS: [nosoul]
 #+end_src
  
-
-#+source: boolean-soul
-#+begin_src latex :exports none
-  \newboolean{nosoul}
-#+end_src
-
 #+source: option-soul
 #+begin_src latex :exports none
+  \newboolean{nosoul}
   \DeclareOption{nosoul}{\setboolean{nosoul}{true}}
 #+end_src
 
@@ -794,14 +921,9 @@ option is provided to not load it.
   #+LaTeX_CLASS_OPTIONS: [not1enc]
 #+end_src
  
-
-#+source: boolean-t1enc
-#+begin_src latex :exports none
- \newboolean{not1enc} 
-#+end_src
-
 #+source: option-t1enc
 #+begin_src latex :exports none
+  \newboolean{not1enc} 
   \DeclareOption{not1enc}{\setboolean{not1enc}{true}}
 #+end_src
 
@@ -826,13 +948,9 @@ option is provided to not load it.
 #+end_src
  
 
-#+source: boolean-textcomp
-#+begin_src latex :exports none
-  \newboolean{notextcomp}
-#+end_src
-
 #+source: option-textcomp
 #+begin_src latex :exports none
+  \newboolean{notextcomp}
   \DeclareOption{notextcomp}{\setboolean{notextcomp}{true}}
 #+end_src
 
@@ -863,15 +981,10 @@ option is provided to not load it.
 #+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [nomarvosym]
 #+end_src
- 
-
-#+source: boolean-marvosym
-#+begin_src latex :exports none
-  \newboolean{nomarvosym}
-#+end_src
 
 #+source: option-marvosym
 #+begin_src latex :exports none
+  \newboolean{nomarvosym}
   \DeclareOption{nomarvosym}{\setboolean{nomarvosym}{true}}
 #+end_src
 
@@ -910,13 +1023,9 @@ option is provided to not load it.
   #+LaTeX_CLASS_OPTIONS: [nowasysym]
 #+end_src
  
-#+source: boolean-wasysym
-#+begin_src latex :exports none
-  \newboolean{nowasysym}
-#+end_src
-
 #+source: option-wasysym
 #+begin_src latex :exports none
+  \newboolean{nowasysym}
   \DeclareOption{nowasysym}{\setboolean{nowasysym}{true}}
 #+end_src
 
@@ -948,14 +1057,9 @@ option is provided to not load it.
   #+LaTeX_CLASS_OPTIONS: [nolatexsym]
 #+end_src
  
-
-#+source: boolean-latexsym
-#+begin_src latex :exports none
-  \newboolean{nolatexsym}
-#+end_src
-
 #+source: option-latexsym
 #+begin_src latex :exports none
+  \newboolean{nolatexsym}
   \DeclareOption{nolatexsym}{\setboolean{nolatexsym}{true}}
 #+end_src
 
@@ -969,8 +1073,10 @@ option is provided to not load it.
 **** Amssymb
 This package provides all the symbols defined in the American
 Mathematical Society's [[http://www.ams.org/publications/authors/tex/amsfonts][symbol fonts]] =msam= and =msbm=.  They are
-required to support =org-entities=.  The package is
-loaded without options.
+required to support =org-entities=.  It is superseded by the
+=mathdesign= package, which is used by various fonts.  If one of these
+is specified, then the =amssymb= package is not loaded. If the package is
+loaded, the it is loaded without options.
 
 You can probably read the =amssymb= package documentation by issuing
 the following shell command:
@@ -987,21 +1093,19 @@ option is provided to not load it.
 #+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [noamssymb]
 #+end_src
- 
-
-#+source: boolean-amssymb
-#+begin_src latex :exports none
-  \newboolean{noamssymb}
-#+end_src
 
 #+source: option-amssymb
 #+begin_src latex :exports none
+  \newboolean{noamssymb}
   \DeclareOption{noamssymb}{\setboolean{noamssymb}{true}}
 #+end_src
 
+Isn't loaded if Times, Charter, Utopia, or Garamond are loaded.  These
+use the =mathdesign= package, which apparently supersedes =amssymb=.
+
 #+source: load-amssymb
 #+begin_src latex :exports none
-  \ifthenelse{\boolean{noamssymb}}
+  \ifthenelse{\boolean{noamssymb}\or\boolean{utopia}\or\boolean{charter}\or\boolean{garamond}\or\boolean{times}}
   {}
   {\RequirePackage{amssymb}}
 #+end_src
@@ -1017,7 +1121,8 @@ loading part]].
 
 The =hyperref= package accepts numerous options, which can be given as
 =key = value= pairs.  Boolean options default to =true= when passed
-without a value.  Options are passed in the usual way, e.g.:
+without a value.  Options are passed in the usual way, and
+=org-article.cls= simply passes them on to =hyperref=.
 
 #+source: hyperref-options
 #+begin_src org :exports code
@@ -1060,15 +1165,10 @@ option is provided to not load it.
 #+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [nohyperref]
 #+end_src
- 
-
-#+source: boolean-hyperref
-#+begin_src latex :exports none
-  \newboolean{nohyperref}
-#+end_src
 
 #+source: option-hyperref
 #+begin_src latex :exports none
+  \newboolean{nohyperref}
   \DeclareOption{nohyperref}{\setboolean{nohyperref}{true}}
 #+end_src
 
@@ -1285,15 +1385,6 @@ set code examples and the like.  Each of the following options
 specifies all three of the fonts, but takes its name after the serif
 font used to set text.
 
-Certain of these fonts appear to conflict with the =amssymb= package
-that is one of the Org-mode default packages.  The =noamssymb= option
-will keep the =amssymb= package from loading and remove the potential
-conflict; of course, this will also make unavailable glyphs for
-certain of the =org-entities=.  If you require one of the
-=org-entities= in =amssymb= then you should either use the default
-fonts by not specifying a font option to =org-article.cls=, or perhaps
-configure a font selection that doesn't conflict with =amssymb=.
-
 **** Times
 # <<times-font>>
 
@@ -1314,15 +1405,10 @@ Kettler in 1955 for use in IBM typewriters.
 #+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [times]
 #+end_src
- 
-
-#+source: boolean-times
-#+begin_src latex :exports none
-  \newboolean{times}
-#+end_src
 
 #+source: option-times
 #+begin_src latex :exports none
+  \newboolean{times}
   \DeclareOption{times}{\setboolean{times}{true}}
 #+end_src
 
@@ -1354,14 +1440,9 @@ font is [[http://en.wikipedia.org/wiki/Inconsolata][Inconsolata]], which was cre
   #+LaTeX_CLASS_OPTIONS: [garamond]
 #+end_src
  
-
-#+source: boolean-garamond
-#+begin_src latex :exports none
-  \newboolean{garamond}
-#+end_src
-
 #+source: option-garamond
 #+begin_src latex :exports none
+  \newboolean{garamond}
   \DeclareOption{garamond}{\setboolean{garamond}{true}}
 #+end_src
 
@@ -1391,15 +1472,10 @@ for which it is an alternative.
 #+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [palatino]
 #+end_src
- 
-
-#+source: boolean-palatino
-#+begin_src latex :exports none
-  \newboolean{palatino}
-#+end_src
 
 #+source: option-palatino
 #+begin_src latex :exports none
+  \newboolean{palatino}
   \DeclareOption{palatino}{\setboolean{palatino}{true}}
 #+end_src
 
@@ -1424,19 +1500,16 @@ for which it is an alternative.
 Adobe in 1989.  It became free software in 2006.  It is paired here
 with Bera and Inconsolata, as is [[garamond-font][Garamond]].
 
+Note that the utopia font clashes with the =amssymb= package.
+
 #+source: org-buffer-utopia
 #+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [utopia]
 #+end_src
- 
-
-#+source: boolean-utopia
-#+begin_src latex :exports none
-  \newboolean{utopia}
-#+end_src
 
 #+source: option-utopia
 #+begin_src latex :exports none
+  \newboolean{utopia}
   \DeclareOption{utopia}{\setboolean{utopia}{true}}
 #+end_src
 
@@ -1460,19 +1533,16 @@ with Bera and Inconsolata, as is [[garamond-font][Garamond]].
 printers.  It is paired here with Helvetica and Courier, like [[times-font][Times]],
 for which it is an alternative.
 
+These fonts conflict with the =amssymb= package.
+
 #+source: org-buffer-charter
 #+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [charter]
 #+end_src
  
-
-#+source: boolean-charter
-#+begin_src latex :exports none
-  \newboolean{charter}
-#+end_src
-
 #+source: option-charter
 #+begin_src latex :exports none
+  \newboolean{charter}
   \DeclareOption{charter}{\setboolean{charter}{true}}
 #+end_src
 
@@ -1520,15 +1590,10 @@ it.
 #+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [microtype]
 #+end_src
- 
-
-#+source: boolean-microtype
-#+begin_src latex :exports none
-  \newboolean{microtype}
-#+end_src
 
 #+source: option-microtype
 #+begin_src latex :exports none
+  \newboolean{microtype}
   \DeclareOption{microtype}{\setboolean{microtype}{true}}
 #+end_src
 
@@ -1557,14 +1622,10 @@ it, and to set linespacing to doublespace.
   #+LaTeX_CLASS_OPTIONS: [setspace,doublespace]
 #+end_src
  
-#+source: boolean-setspace
+#+source: option-setspace
 #+begin_src latex :exports none
   \newboolean{setspace}
   \newboolean{doublespace}
-#+end_src
-
-#+source: option-setspace
-#+begin_src latex :exports none
   \DeclareOption{setspace}{\setboolean{setspace}{true}}
   \DeclareOption{doublespace}{\setboolean{doublespace}{true}}
 #+end_src
@@ -1609,14 +1670,9 @@ it.
   #+LaTeX_CLASS_OPTIONS: [paralist]
 #+end_src
  
-
-#+source: boolean-paralist
-#+begin_src latex :exports none
-  \newboolean{paralist}
-#+end_src
-
 #+source: option-paralist
 #+begin_src latex :exports none
+  \newboolean{paralist}
   \DeclareOption{paralist}{\setboolean{paralist}{true}}
 #+end_src
 
@@ -1647,15 +1703,10 @@ it.
 #+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [topcapt]
 #+end_src
- 
-
-#+source: boolean-topcapt
-#+begin_src latex :exports none
-  \newboolean{topcapt}
-#+end_src
 
 #+source: option-topcapt
 #+begin_src latex :exports none
+  \newboolean{topcapt}
   \DeclareOption{topcapt}{\setboolean{topcapt}{true}}
 #+end_src
 
@@ -1675,13 +1726,9 @@ output.
   #+LaTeX_CLASS_OPTIONS: [color]
 #+end_src
 
-#+source: boolean-color
-#+begin_src latex :exports none
-  \newboolean{color}
-#+end_src
-
 #+source: option-color
 #+begin_src latex :exports none
+  \newboolean{color}
   \DeclareOption{color}{\setboolean{color}{true}}  
 #+end_src
 
@@ -1697,9 +1744,11 @@ The =listings= package is a source code printer for LaTeX.  Except for
 the two options =draft= and =final=, which the =listings= package is
 configured to pick up itself from options passed to =\documentclass=,
 the other options were introduced to ease debugging or to trigger
-compatibility with earlier versions of the package.  None of these
-other options are exposed in =org-article.cls=.  Instead, code to
-(minimally) configure =listings= is present in the [[class-code-part][class code part]].
+compatibility with earlier versions of the package.  It seems unwise
+to use this mechanism because there is no reason to assume that it
+will be stable.  Instead, options for this package should be processed
+by =org-article.cls= itself using a =key = val= interface that sets values
+using the =listings= package's =lstset= function.
 
 This package is not loaded by default.  An option is provided to load
 it.
@@ -1709,14 +1758,39 @@ it.
   #+LaTeX_CLASS_OPTIONS: [listings]
 #+end_src
  
-#+source: boolean-listings
-#+begin_src latex :exports none
-  \newboolean{listings}
-#+end_src
-
 #+source: option-listings
 #+begin_src latex :exports none
+  \newboolean{listings}
   \DeclareOption{listings}{\setboolean{listings}{true}}
+  \DeclareOption{listings-bw}{%
+    \ifthenelse{\boolean{listings}}{%
+      \AtBeginDocument{%
+        \lstset{
+          basicstyle=\ttfamily\footnotesize,%
+          frame=lines,%
+          brealines=true%
+        }%
+      }%
+    }{}%
+  }
+  \DeclareOption{listings-color}{%
+    \ifthenelse{\boolean{listings}}{%
+      \AtBeginDocument{%
+        \definecolor{keywords}{RGB}{255,0,90}%
+        \definecolor{comments}{RGB}{60,179,113}%
+        \definecolor{back}{RGB}{231,231,231}%
+        \lstset{%
+          keywordstyle=\color{keywords},%
+          commentstyle=\color{comments},%
+          backgroundcolor=\color{back},%
+          basicstyle=\ttfamily\footnotesize,%
+          showstringspaces=false,%
+          frame=lines,%
+          breaklines=true%
+        }%
+      }%
+    }{}%
+  }
 #+end_src
 
 #+source: load-listings
@@ -1726,244 +1800,14 @@ it.
     {}
 #+end_src
 
-#+source: options-to-listings
-#+begin_src latex :exports none
-  \DeclareOption*{%
-    \PassOptionsToPackage{\CurrentOption}{listings}
-  }
-#+end_src
-
 #+source: listings-code
 #+begin_src latex :exports none
   \ifthenelse{\boolean{listings}}%
-  {\ifthenelse{\boolean{color}}%
-    {%
-      \definecolor{keywords}{RGB}{255,0,90}%
-      \definecolor{comments}{RGB}{60,179,113}%
-      \definecolor{fore}{RGB}{249,242,215}%
-      \definecolor{back}{RGB}{231,231,231}%
-      \lstset{%
-        basicstyle=\color{black},%
-        keywordstyle=\color{keywords},%
-        commentstyle=\color{comments},%
-        backgroundcolor=\color{back}}%
-    }%
-    {}%
     {\lstdefinelanguage{org}
-      {morecomment=[l]\#,
-      basicstyle=\footnotesize,
-      stringstyle=\ttfamily}%
+      {morecomment=[l]\#}%
     }
-    \lstset{%
-      basicstyle=\footnotesize,
-      showstringspaces=false,
-      stringstyle=\ttfamily
-    }}%
   {}%  
 #+end_src
-
-** How to use this Org-mode document
-   :PROPERTIES:
-   :VISIBILITY: folded
-   :END:
-
-You might be able to get the Org-mode document from GitHub using the following
-shell command, which works for me:
-
-#+source: get-from-github
-#+begin_src sh :exports code
-  git clone git@github.com:tsdye/org-article.git
-#+end_src
-
-Alternatively, this might work for you:
-
-#+source: get-from-github-alt
-#+begin_src sh :exports code
-  git clone git://github.com/tsdye/org-article.git
-#+end_src
-
-This will create a sub-directory, =org-article=, initialize the git
-repository and download the file =article-class.org= as part of the
-repository.  The Org-mode document can be tangled to produce the
-=org-article.cls= file.  This is done by running =org-babel-tangle=
-against the file, either by =M-x org-babel-tangle RET= or =C-c C-v
-[C-]t=.
-
-The resulting =org-article.cls= file should then be moved where LaTeX
-can find it.  In LaTeX setups that conform to the [[http://www.tex.ac.uk/tex-archive/tds/tds.html][Tex Directory
-Structure]], this might be =path/to/texmf-local/tex/latex/base=.  Once
-the file has been placed in an appropriate directory it is often the
-case that the directory database, such as the one maintained by
-[[http://tug.org/kpathsea/][Kpathsea]], must then be updated. The following shell commands work on
-my OS-X system with the [[http://tug.org/mactex/][MacTeX]] distribution:
-
-#+source: install-org-article
-#+begin_src sh :exports code
-  sudo cp org-article.cls /usr/local/texlive/texmf-local/tex/latex/base/
-  sudo mktexlsr
-#+end_src
-
-** Org-mode LaTeX export setup
-   :PROPERTIES:
-   :VISIBILITY: folded
-   :END:
-# <<export-setup>>
-There are two ways to setup =org-article.cls= and your choice will
-probably depend on the value of the variable
-=org-export-latex-packages-alist=.  If this variable is nil, then the
-following setup should work for you.  It asks Org-mode *not* to load
-the default packages, because these are loaded by =org-article.cls=.
-Then, it loads the packages in =org-export-latex-packages-alist=, which
-should consist of a single entry for the =inputenc= package.  Org-mode
-automatically sets the input encoding based on the status of the
-Org-mode buffer being exported.  Finally, any packages specified
-within the Org-mode buffer are loaded (the [EXTRA] argument).
-
-The =org-article.cls= setup for the case when
-=org-export-latex-packages-alist= is =nil=:
-
-#+begin_src emacs-lisp :exports code
-  (add-to-list 'org-export-latex-packages-alist
-               '(("AUTO" "inputenc" t)))
-  (add-to-list 'org-export-latex-classes
-            '("org-article-section"
-               "\\documentclass{org-article}
-               \\loadpackage[AUTO]{inputenc}
-               [NO-DEFAULT-PACKAGES]
-               [PACKAGES]
-               [EXTRA]"
-               ("\\section{%s}" . "\\section*{%s}")))
-  (add-to-list 'org-export-latex-classes
-            '("org-article-subsection"
-               "\\documentclass{org-article}
-               [NO-DEFAULT-PACKAGES]
-               [PACKAGES]
-               [EXTRA]"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")))
-  (add-to-list 'org-export-latex-classes
-            '("org-article-subsubsection"
-               "\\documentclass{org-article}
-               [NO-DEFAULT-PACKAGES]
-               [PACKAGES]
-               [EXTRA]"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-  (add-to-list 'org-export-latex-classes
-            '("org-article-paragraph"
-               "\\documentclass{org-article}
-               [NO-DEFAULT-PACKAGES]
-               [PACKAGES]
-               [EXTRA]"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}")))
-  (add-to-list 'org-export-latex-classes
-            '("org-article-subparagraph"
-               "\\documentclass{org-article}
-               [NO-DEFAULT-PACKAGES]
-               [PACKAGES]
-               [EXTRA]"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}")
-               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-#+end_src
-
-If, for some reason, =org-export-latex-packages-alist= is not =nil=, then
-the following setup should work.
-
-#+begin_src emacs-lisp :exports code
-      (add-to-list 'org-export-latex-classes
-                '("org-article-section"
-                   "\\documentclass{org-article}
-                   [NO-DEFAULT-PACKAGES]
-                   [EXTRA]"
-                   ("\\section{%s}" . "\\section*{%s}")))
-      (add-to-list 'org-export-latex-classes
-                '("org-article-subsection"
-                   "\\documentclass{org-article}
-                   [NO-DEFAULT-PACKAGES]
-                   [EXTRA]"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")))
-      (add-to-list 'org-export-latex-classes
-                '("org-article-subsubsection"
-                   "\\documentclass{org-article}
-                   [NO-DEFAULT-PACKAGES]
-                   [EXTRA]"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-      (add-to-list 'org-export-latex-classes
-                '("org-article-paragraph"
-                   "\\documentclass{org-article}
-                   [NO-DEFAULT-PACKAGES]
-                   [EXTRA]"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")))
-      (add-to-list 'org-export-latex-classes
-                '("org-article-subparagraph"
-                   "\\documentclass{org-article}
-                   [NO-DEFAULT-PACKAGES]
-                   [EXTRA]"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-#+end_src
-
-In this case, you will need to specify the =inputenc= package in the
-Org-mode file:
-
-#+source: specify-inputenc
-#+begin_src emacs-lisp :exports code
-  ,#+LATEX_HEADER: \usepackage[AUTO]{inputenc} 
-#+end_src
-
-** Examples
-The functionality of =org-article.cls= can be demonstrated with the
-following two examples of pdf output generated by Org-mode LaTeX
-export of this Org-mode file.  In the first, these two lines were
-included at the top of the Org-mode file:
-
-#+source: first-example
-#+begin_src latex :exports code
-#+LaTeX_CLASS: org-article-subsubsection
-#+LaTeX_CLASS_OPTIONS: [article,letterpaper,times,12pt,listings,color,microtype]
-#+end_src
-
-The resulting [[file:article-class-times-art.pdf][pdf file]] is typeset with the standard LaTeX
-=article.cls= on 8.5 x 11 in. paper, using Times, Helvetica,
-and Courier fonts with a 12 point base size.  Source code listings are
-given in color, and microtypographic justification is applied.  As you
-can see in the resulting [[file:article-class-times-art.pdf][pdf file]], the output is mostly OK but there
-are problems with long lines, mostly in the source code listings, but
-also in the body text with long path names.
-
-In the second example, the following two lines were included in the
-top of the Org-mode file:
-
-#+source: second-example
-#+begin_src latex :exports code
-#+LaTeX_CLASS: org-article-subsubsection
-#+LaTeX_CLASS_OPTIONS: [koma,a5paper,landscape,utopia,10pt,listings,color,microtype,paralist]
-#+end_src
-
-The resulting [[file:article-class-utopia-koma.pdf][pdf file]] is typeset with the KOMA-script =scrartcl.cls=
-on 5.8 x 8.3 in. paper in landscape mode, using Utopia, Bera,
-and Incosolata fonts with a 10 point base size.  Source code listings
-are given in color, and microtypographic justification is applied.  As
-you can see in the resulting [[file:article-class-times-art.pdf][pdf file]], the output is better than the
-first example, but there are still a few problems with long lines.  In
-addition, the =paralist= option has been set; compare the tightly-set
-list on page 3 with standard list on page 2 of the first example.
 
 * Notes                                                            :noexport:
 ** DONE fontenc is passed option TI by default
