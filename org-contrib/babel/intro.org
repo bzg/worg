@@ -1078,14 +1078,10 @@ For a simple example of usage, follow these 5 steps:
    #+begin_src emacs-lisp 
      ;;; init.el --- Where all the magic begins
      ;;
-     ;; This file loads both
-     ;; - Org-mode : http://orgmode.org/ and
-     ;; - Org-babel: http://orgmode.org/worg/org-contrib/babel/org-babel.php#library-of-babel
-     ;;
-     ;; It then loads the rest of our Emacs initialization from Emacs lisp
+     ;; This file loads Org-mode and then loads the rest of our Emacs initialization from Emacs lisp
      ;; embedded in literate Org-mode files.
      
-     ;; Load up Org Mode and Org Babel for elisp embedded in Org Mode files
+     ;; Load up Org Mode and (now included) Org Babel for elisp embedded in Org Mode files
      (setq dotfiles-dir (file-name-directory (or (buffer-file-name) load-file-name)))
      
      (let* ((org-dir (expand-file-name
@@ -1100,7 +1096,7 @@ For a simple example of usage, follow these 5 steps:
                                (or load-path nil))))
        ;; load up Org-mode and Org-babel
        (require 'org-install)
-       (require 'org-babel-init))
+       (require 'ob-tangle))
      
      ;; load up all literate org-mode files in this directory
      (mapc #'org-babel-load-file (directory-files dotfiles-dir t "\\.org$"))
