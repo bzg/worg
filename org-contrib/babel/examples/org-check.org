@@ -19,96 +19,96 @@ Check an Org-mode environment.
  buffer both safe and useful.
 
 * Instructions
-  - Download the file [[http://org-babel.tsdye2.com/org-check.org][org-check.org]]
+  - Download the file [[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/org-check.org][org-check.org]]
   - Calculate the table by putting point in the table and pressing =C-u C-c *=
   - Check the =results= column
     - if you see all "pass" results, then your environment passes
     - if you see "fail" or other unexpected results, then follow the
       link in the =topic= column for an explanation
 
-| task          | topic          | command          | arg                | results                                |
-|---------------+----------------+------------------+--------------------+----------------------------------------|
-| [[*Org%20Setup][Org-mode]]      |                |                  |                    |                                        |
-|               | [[*Org%20library][Library]]        | org-library      |                    | /Users/dk/.emacs.d/src/org/lisp/org.el |
-|               | [[*Org%20version][Version]]        | org-version      |                    | 6.36trans                              |
-|---------------+----------------+------------------+--------------------+----------------------------------------|
-| [[*Agenda][Agenda]]        |                |                  |                    |                                        |
-|               |                | chk-agenda-files |                    | pass                                   |
-|---------------+----------------+------------------+--------------------+----------------------------------------|
-| [[*Export%20LaTeX][LaTeX Export]]  |                |                  |                    |                                        |
-|               | [[*%20org-export-latex-classes][LaTeX classes]]  | chk-ltx-cls      |                    | pass                                   |
-|               |                | pkg-loaded       | 'org-latex         | pass                                   |
-|---------------+----------------+------------------+--------------------+----------------------------------------|
-| [[*HTML%20export][HTML export]]   |                |                  |                    |                                        |
-|               |                | pkg-loaded       | 'org-html          | pass                                   |
-|---------------+----------------+------------------+--------------------+----------------------------------------|
-| [[*Preview%20LaTeX][Preview Latex]] |                |                  |                    |                                        |
-|               |                | chk-ext-cmd      | "latex"            | pass                                   |
-|               |                | chk-sys-cmd      | "latex"            | pass                                   |
-|               |                | chk-ext-cmd      | "dvipng"           | pass                                   |
-|               |                | chk-sys-cmd      | "dvipng"           | pass                                   |
-|               | [[*chk-latex-scale][latex-scale]]    | chk-latex-scale  |                    | 1.0                                    |
-|               |                | pkg-loaded       | 'org-latex         | pass                                   |
-|---------------+----------------+------------------+--------------------+----------------------------------------|
-| [[*Make%20pdf%20files][Make Pdfs]]     |                |                  |                    |                                        |
-|               | [[* latex][latex]]          | chk-ext-cmd      | "latex"            | pass                                   |
-|               | [[* chk-latex-system][latex-system]]   | chk-sys-cmd      | "latex"            | pass                                   |
-|               | [[*LaTeX%20engine][latex-engine]]   | chk-latex-engine |                    | pdflatex                               |
-|               | [[*LaTeX%20engine%20present][engine-present]] | chk-engine-cmd   |                    | pass                                   |
-|---------------+----------------+------------------+--------------------+----------------------------------------|
-| [[*Babel][Org-babel]]     |                |                  |                    |                                        |
-|               | [[*Org%20babel%20provided][Org-babel]]      | pkg-loaded       | 'org-babel         | pass                                   |
-|               |                |                  |                    |                                        |
-|               | [[*R%20language%20configuration][R language]]     | chk-babel-lang   | "R"                | pass                                   |
-|               |                | chk-ext-cmd      | "R"                | pass                                   |
-|               |                | chk-sys-cmd      | "R"                | pass                                   |
-|               |                | pkg-loaded       | 'org-babel-R       | pass                                   |
-|               |                |                  |                    |                                        |
-|               | [[*C%20language%20configuration][C language]]     | chk-babel-lang   | "C"                | fail                                   |
-|               |                | chk-ext-cmd      | "cc"               | pass                                   |
-|               |                | chk-sys-cmd      | "cc"               | pass                                   |
-|               |                | pkg-loaded       | 'org-babel-C       | fail                                   |
-|               |                |                  |                    |                                        |
-|               | [[*Clojure%20language%20configuration][Clojure]]        | chk-babel-lang   | "clojure"          | fail                                   |
-|               |                | pkg-loaded       | 'org-babel-clojure | fail                                   |
-|               |                |                  |                    |                                        |
-|               | [[*Ditaa%20language%20configuration][Ditaa]]          | chk-babel-lang   | "ditaa"            | pass                                   |
-|               |                | pkg-loaded       | 'org-babel-ditaa   | pass                                   |
-|               |                |                  |                    |                                        |
-|               | [[*CSS%20configuration][CSS]]            | chk-babel-lang   | "css"              | fail                                   |
-|               |                | pkg-loaded       | 'org-babel-css     | fail                                   |
-|               |                |                  |                    |                                        |
-|               | [[*Gnuplot%20language%20configuration][Gnuplot]]        | chk-babel-lang   | "gnuplot"          | fail                                   |
-|               |                | chk-ext-cmd      | "gnuplot"          | fail                                   |
-|               |                | chk-sys-cmd      | "gnuplot"          | fail                                   |
-|               |                | pkg-loaded       | 'org-babel-gnuplot | fail                                   |
-|               |                |                  |                    |                                        |
-|               | [[*LaTeX%20language%20configuration][LaTeX]]          | chk-babel-lang   | "latex"            | pass                                   |
-|               |                | chk-ext-cmd      | "latex"            | pass                                   |
-|               |                | chk-sys-cmd      | "latex"            | pass                                   |
-|               |                | pkg-loaded       | 'org-babel-latex   | pass                                   |
-|               |                |                  |                    |                                        |
-|               | [[*MATLAB%20language%20configuration][MATLAB®]]        | chk-babel-lang   | "matlab"           | fail                                   |
-|               |                | chk-ext-cmd      | "matlab"           | fail                                   |
-|               |                | chk-sys-cmd      | "matlab"           | fail                                   |
-|               |                | pkg-loaded       | 'org-babel-matlab  | fail                                   |
-|               |                |                  |                    |                                        |
-|               | [[*Perl%20language%20configuration][Perl]]           | chk-babel-lang   | "perl"             | fail                                   |
-|               |                | chk-ext-cmd      | "perl"             | pass                                   |
-|               |                | chk-sys-cmd      | "perl"             | pass                                   |
-|               |                | pkg-loaded       | 'org-babel-perl    | fail                                   |
-|               |                |                  |                    |                                        |
-|               | [[*Python%20language%20configuration][Python]]         | chk-babel-lang   | "python"           | pass                                   |
-|               |                | chk-ext-cmd      | "python"           | pass                                   |
-|               |                | chk-sys-cmd      | "python"           | pass                                   |
-|               |                | pkg-loaded       | 'org-babel-python  | pass                                   |
-|               |                |                  |                    |                                        |
-|               | [[*Ruby%20language%20configuration][Ruby]]           | chk-babel-lang   | "ruby"             | fail                                   |
-|               |                | chk-ext-cmd      | "ruby"             | pass                                   |
-|               |                | chk-sys-cmd      | "ruby"             | pass                                   |
-|               |                | pkg-loaded       | 'org-babel-ruby    | fail                                   |
-|---------------+----------------+------------------+--------------------+----------------------------------------|
-#+TBLFM: $5='(if (> (length $4) 0) (sbe $3 (x $4)) (sbe $3))
+| task          | topic          | command          | arg                | results |
+|---------------+----------------+------------------+--------------------+---------|
+| [[*Org%20Setup][Org-mode]]      |                |                  |                    |         |
+|               | [[*Org%20library][Library]]        | org-library      |                    |         |
+|               | [[*Org%20version][Version]]        | org-version      |                    |         |
+|---------------+----------------+------------------+--------------------+---------|
+| [[*Agenda][Agenda]]        |                |                  |                    |         |
+|               |                | chk-agenda-files |                    |         |
+|---------------+----------------+------------------+--------------------+---------|
+| [[*Export%20LaTeX][LaTeX Export]]  |                |                  |                    |         |
+|               | [[*%20org-export-latex-classes][LaTeX classes]]  | chk-ltx-cls      |                    |         |
+|               |                | pkg-loaded       | 'org-latex         |         |
+|---------------+----------------+------------------+--------------------+---------|
+| [[*HTML%20export][HTML export]]   |                |                  |                    |         |
+|               |                | pkg-loaded       | 'org-html          |         |
+|---------------+----------------+------------------+--------------------+---------|
+| [[*Preview%20LaTeX][Preview Latex]] |                |                  |                    |         |
+|               |                | chk-ext-cmd      | "latex"            |         |
+|               |                | chk-sys-cmd      | "latex"            |         |
+|               |                | chk-ext-cmd      | "dvipng"           |         |
+|               |                | chk-sys-cmd      | "dvipng"           |         |
+|               | [[*chk-latex-scale][latex-scale]]    | chk-latex-scale  |                    |         |
+|               |                | pkg-loaded       | 'org-latex         |         |
+|---------------+----------------+------------------+--------------------+---------|
+| [[*Make%20pdf%20files][Make Pdfs]]     |                |                  |                    |         |
+|               | [[* latex][latex]]          | chk-ext-cmd      | "latex"            |         |
+|               | [[* chk-latex-system][latex-system]]   | chk-sys-cmd      | "latex"            |         |
+|               | [[*LaTeX%20engine][latex-engine]]   | chk-latex-engine |                    |         |
+|               | [[*LaTeX%20engine%20present][engine-present]] | chk-engine-cmd   |                    |         |
+|---------------+----------------+------------------+--------------------+---------|
+| [[*Babel][Org-babel]]     |                |                  |                    |         |
+|               | [[*Org%20babel%20provided][Org-babel]]      | pkg-loaded       | 'org-babel         |         |
+|               |                |                  |                    |         |
+|               | [[*R%20language%20configuration][R language]]     | chk-babel-lang   | "R"                |         |
+|               |                | chk-ext-cmd      | "R"                |         |
+|               |                | chk-sys-cmd      | "R"                |         |
+|               |                | pkg-loaded       | 'org-babel-R       |         |
+|               |                |                  |                    |         |
+|               | [[*C%20language%20configuration][C language]]     | chk-babel-lang   | "C"                |         |
+|               |                | chk-ext-cmd      | "cc"               |         |
+|               |                | chk-sys-cmd      | "cc"               |         |
+|               |                | pkg-loaded       | 'org-babel-C       |         |
+|               |                |                  |                    |         |
+|               | [[*Clojure%20language%20configuration][Clojure]]        | chk-babel-lang   | "clojure"          |         |
+|               |                | pkg-loaded       | 'org-babel-clojure |         |
+|               |                |                  |                    |         |
+|               | [[*Ditaa%20language%20configuration][Ditaa]]          | chk-babel-lang   | "ditaa"            |         |
+|               |                | pkg-loaded       | 'org-babel-ditaa   |         |
+|               |                |                  |                    |         |
+|               | [[*CSS%20configuration][CSS]]            | chk-babel-lang   | "css"              |         |
+|               |                | pkg-loaded       | 'org-babel-css     |         |
+|               |                |                  |                    |         |
+|               | [[*Gnuplot%20language%20configuration][Gnuplot]]        | chk-babel-lang   | "gnuplot"          |         |
+|               |                | chk-ext-cmd      | "gnuplot"          |         |
+|               |                | chk-sys-cmd      | "gnuplot"          |         |
+|               |                | pkg-loaded       | 'org-babel-gnuplot |         |
+|               |                |                  |                    |         |
+|               | [[*LaTeX%20language%20configuration][LaTeX]]          | chk-babel-lang   | "latex"            |         |
+|               |                | chk-ext-cmd      | "latex"            |         |
+|               |                | chk-sys-cmd      | "latex"            |         |
+|               |                | pkg-loaded       | 'org-babel-latex   |         |
+|               |                |                  |                    |         |
+|               | [[*MATLAB%20language%20configuration][MATLAB®]]        | chk-babel-lang   | "matlab"           |         |
+|               |                | chk-ext-cmd      | "matlab"           |         |
+|               |                | chk-sys-cmd      | "matlab"           |         |
+|               |                | pkg-loaded       | 'org-babel-matlab  |         |
+|               |                |                  |                    |         |
+|               | [[*Perl%20language%20configuration][Perl]]           | chk-babel-lang   | "perl"             |         |
+|               |                | chk-ext-cmd      | "perl"             |         |
+|               |                | chk-sys-cmd      | "perl"             |         |
+|               |                | pkg-loaded       | 'org-babel-perl    |         |
+|               |                |                  |                    |         |
+|               | [[*Python%20language%20configuration][Python]]         | chk-babel-lang   | "python"           |         |
+|               |                | chk-ext-cmd      | "python"           |         |
+|               |                | chk-sys-cmd      | "python"           |         |
+|               |                | pkg-loaded       | 'org-babel-python  |         |
+|               |                |                  |                    |         |
+|               | [[*Ruby%20language%20configuration][Ruby]]           | chk-babel-lang   | "ruby"             |         |
+|               |                | chk-ext-cmd      | "ruby"             |         |
+|               |                | chk-sys-cmd      | "ruby"             |         |
+|               |                | pkg-loaded       | 'org-babel-ruby    |         |
+|---------------+----------------+------------------+--------------------+---------|
+#+TBLFM: 
 
 * Tasks
 ** Org Setup
@@ -315,7 +315,6 @@ Check an Org-mode environment.
     - if =chk-sys-cmd= returns =fail= then you should check to see if
       Ruby is installed on your system
 
-
 ** HTML export
 * Commands
 ** Org stuff
@@ -444,7 +443,6 @@ Report the scale setting for inline images.  Default is 1.0.
 #+end_src
 
 #+results: chk-ltx-pkg
-     
 
 * Acknowledgments
 Many thanks to the following people for their generous help:
