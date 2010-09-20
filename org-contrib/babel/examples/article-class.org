@@ -15,7 +15,7 @@
 #+XSLT: 
 #+BABEL: :exports code
 #+LaTeX_CLASS: org-article-subsubsection
-#+LaTeX_CLASS_OPTIONS: [koma,a4paper,landscape,twocolumn,utopia,10pt,listings-sv,microtype,paralist]
+#+LaTeX_CLASS_OPTIONS: [koma,a3paper,DIV=15,landscape,twocolumn,palatino,10pt,listings-sv,microtype,paralist]
 
 
 * Org-article class
@@ -234,7 +234,7 @@ top of the Org-mode file:
 #+source: second-example
 #+begin_src org :exports code
 #+LaTeX_CLASS: org-article-subsubsection
-#+LaTeX_CLASS_OPTIONS: [koma,a4paper,landscape,twocolumn,utopia,10pt,listings-sv,microtype,paralist]
+#+LaTeX_CLASS_OPTIONS: [koma,a5paper,landscape,twocolumn,utopia,10pt,listings-sv,microtype,paralist]
 #+end_src
 
 The resulting [[http://www.tsdye2.com/org-babel/article-class-utopia-koma.pdf][pdf file]] is typeset with the KOMA-script =scrartcl.cls=
@@ -243,6 +243,24 @@ and Incosolata fonts with a 10 point base size.  Source code listings
 are given in color, and microtypographic justification is applied.  In
 addition, the =paralist= option has been set; compare the tightly-set
 list immediately below with the standard list of the first example.
+
+In the third example, the following two lines appeared at the top of
+the Org-mode file:
+
+#+source: third-example
+#+begin_src org :exports code
+  ,#+LaTeX_CLASS: org-article-subsubsection
+  ,#+LaTeX_CLASS_OPTIONS: [koma,a5paper,DIV=15,landscape,utopia,10pt,listings-sv,microtype,paralist]
+#+end_src
+
+The resulting [[http://www.tsdye2.com/org-babel/article-class-koma-div.pdf][pdf file]] is typeset with the KOMA-script =scrartcl.cls=
+on 5.8 x 8.3 in. paper in landscape mode, using Utopia, Bera, and
+Incosolata fonts with a 10 point base size.  The size of the text
+block has been increased by setting =DIV= to a relatively high number.
+Source code listings are given in color, and microtypographic
+justification is applied.  In addition, the =paralist= option has been
+set.
+
 ** The class file
    :PROPERTIES:
    :VISIBILITY: folded
@@ -580,7 +598,7 @@ sub-heads, etc., will be scaled accordingly.
 With the =koma= option, the size of the text block and the resulting
 margins can be altered using the option =DIV=.  A typical value of
 =DIV= is 9. Smaller text blocks with larger margins result when =DIV=
-takes a smaller value and larger text blocks with smaller margines
+takes a smaller value and larger text blocks with smaller margins
 result when =DIV= takes a larger value (fig. \ref{fig:div}).
 
 #+CAPTION: Text block sizes on A4 paper with different values of DIV
@@ -597,7 +615,7 @@ For example, to set the text block large and leave ample space for
 binding with a clip, one might pass the following options to the class
 when using the =koma= option.
 #+source: koma-text-block
-#+begin_src org
+#+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: koma,DIV=15,BCOR=15mm
 #+end_src
 
@@ -2009,6 +2027,8 @@ allow breaking of long lines.
    - Check which package is best to use
    - Troubles with xcolor
 ** Explanation of div
+   This table comes from the KOMA-script documentation.  It gives text
+   block and margin sizes on A4 paper with various settings of =DIV=.
 
 #+tblname: koma-div
 | DIV | width_[mm] | height_[mm] | top_[mm] | inner_[mm] |
@@ -2024,12 +2044,17 @@ allow breaking of long lines.
 |  14 |     165.00 |      233.36 |    21.21 |      15.00 |
 |  15 |     168.00 |      237.60 |    19.80 |      14.00 |
 
-#+begin_src R :session :var x = koma-div :file ../images/text-blocks.png
+This R script plots the text block information in the table.
+
+#+begin_src R :var x = koma-div :file ../images/text-blocks.png
   plot(x[,2], x[,3], xlim=c(0,260), ylim=c(0,260), type='n',
   xlab='Text block width (mm)', ylab='Text block height (mm)')
   rect(0,0,x[,2],x[,3])
   text(x=x[,2],y=x[,3],labels=x[,1],pos=3,offset=0.1)
 #+end_src
+
+#+results:
+[[file:../images/text-blocks.png]]
 
 
 
