@@ -1552,3 +1552,23 @@ The download archive contains an elisp file which integrates it into the Org
 export process (configurable per file with a "#+StaticMathJax:" line).
 
 Read README.org and the comments in org-static-mathjax.el for usage instructions.
+** Search Org files using lgrep
+
+Matt Lundi suggests this:
+
+#+begin_src emacs-lisp
+  (defun my-org-grep (search &optional context)
+    "Search for word in org files. 
+
+Prefix argument determines number of lines."
+    (interactive "sSearch for: \nP")
+    (let ((grep-find-ignored-files '("#*" ".#*"))
+	  (grep-template (concat "grep <X> -i -nH " 
+				 (when context
+				   (concat "-C" (number-to-string context)))
+				 " -e <R> <F>")))
+      (lgrep search "*org*" "/home/matt/org/")))
+
+  (global-set-key (kbd "<f8>") 'my-org-grep)
+#+end_src
+
