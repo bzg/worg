@@ -17,7 +17,6 @@
 This page is for ad hoc bits of code.  Feel free to add quick hacks and
 workaround.  Go crazy.
 
-
 * Hacking Org: Modifying orgmode itself
 ** Compiling Org without make
    :PROPERTIES:
@@ -243,6 +242,23 @@ headline or the #+FILETAGS: statement.
                 (if (member tag inherited) (org-toggle-tag tag 'off)))))
          t nil))))
 #+END_SRC
+
+** Remove empty property drawers
+
+David Maus proposed this:
+
+#+begin_src emacs-lisp
+(defun dmj:org:remove-empty-propert-drawers ()
+  "*Remove all empty property drawers in current file."
+  (interactive)
+  (unless (eq major-mode 'org-mode)
+    (error "You need to turn on Org mode for this function."))
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward ":PROPERTIES:" nil t)
+      (save-excursion
+	(org-remove-empty-drawer-at "PROPERTIES" (match-beginning 0))))))
+#+end_src
 
 ** Different org-cycle-level behavior
   -- Ryan Thompson
@@ -1536,3 +1552,23 @@ The download archive contains an elisp file which integrates it into the Org
 export process (configurable per file with a "#+StaticMathJax:" line).
 
 Read README.org and the comments in org-static-mathjax.el for usage instructions.
+** Search Org files using lgrep
+
+Matt Lundi suggests this:
+
+#+begin_src emacs-lisp
+  (defun my-org-grep (search &optional context)
+    "Search for word in org files. 
+
+Prefix argument determines number of lines."
+    (interactive "sSearch for: \nP")
+    (let ((grep-find-ignored-files '("#*" ".#*"))
+	  (grep-template (concat "grep <X> -i -nH " 
+				 (when context
+				   (concat "-C" (number-to-string context)))
+				 " -e <R> <F>")))
+      (lgrep search "*org*" "/home/matt/org/")))
+
+  (global-set-key (kbd "<f8>") 'my-org-grep)
+#+end_src
+
