@@ -167,21 +167,22 @@ support all features of the LaTeX exporter, then this can be handled
 in the .emacs using [DEFAULT-PACKAGES], [NO-DEFAULT-PACKAGES],
 [PACKAGES], [NO-PACKAGES], [EXTRA], [NO-EXTRA].    
 
-Here is a simple example that uses a LaTeX class that supports the
+Here is a simple example that uses a [[http://orgmode.org/worg/org-contrib/babel/examples/article-class.php][LaTeX class]] that supports the
 Org-mode requirements and leaves open the possibility of adding file
 specific packages:
   
 #+begin_src emacs-lisp
-    (add-to-list 'org-export-latex-classes
-          '("article"
-             "\\documentclass{org-ready}
-             [NO-DEFAULT-PACKAGES]
-             [EXTRA]"
-             ("\\section{%s}" . "\\section*{%s}")
-             ("\\subsection{%s}" . "\\subsection*{%s}")
-             ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-             ("\\paragraph{%s}" . "\\paragraph*{%s}")
-             ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  (add-to-list 'org-export-latex-classes
+        '("org-article"
+           "\\documentclass{org-article}
+           [NO-DEFAULT-PACKAGES]
+           [PACKAGES]
+           [EXTRA]"
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+           ("\\paragraph{%s}" . "\\paragraph*{%s}")
+           ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+end_src
 * Creating PDF Output
 The LaTeX exporter by default produces code ready for processing by
@@ -195,10 +196,25 @@ Org-mode offers a command to produce a PDF file from the LaTeX export.
 This is bound to =C-c C-e p=.  The command =C-c C-e d= does all this
 *and* opens the PDF file in the default reader.
 
-If you use a different TeX typesetting engine, then you will want to
+If you use a different TeX typesetting engine or would like to
+customize how Org-mode produces the pdf file, then you will want to
 modify the variable =org-latex-to-pdf-process=.  This is a list of
 strings, each of which contains a call to one of the TeX typesetting
 engines or to an auxiliary program, such as BibTeX, makeindex, etc.
+
+For example, the shell script =texi2dvi= will run =pdflatex= as many
+times as needed to build a pdf file successfully.  The following code
+in =.emacs= will instruct Org-mode to use =texi2dvi= when making a pdf
+file.  Note that you should check that =texi2dvi= is installed on your
+system and that it works correctly before adding this code to your
+=.emacs=. 
+ 
+#+source: texi2dvi
+#+begin_src emacs-lisp :exports code
+(setq org-latex-to-pdf-process
+   '("texi2dvi -p -b -c -V %f"))
+#+end_src
+
 
 * Exporting Parts of an Org-mode Buffer
 Tags can be used to select which parts of an Org-mode buffer are sent
