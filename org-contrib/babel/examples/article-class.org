@@ -15,7 +15,7 @@
 #+XSLT: 
 #+BABEL: :exports code
 #+LaTeX_CLASS: org-article
-#+LaTeX_CLASS_OPTIONS: [koma,letterpaper,utopia,11pt,listings-es,microtype,paralist,colorlinks=true,urlcolor=blue,secnums]
+#+LaTeX_CLASS_OPTIONS: [koma,letterpaper,captions=tableheading,utopia,11pt,listings-sv,microtype,paralist,colorlinks=true,urlcolor=blue,secnums,gantt]
 #+LATEX_HEADER: \usepackage[AUTO]{inputenc}
 
 * Org-article class
@@ -28,6 +28,7 @@ LaTeX exporter.  The class accepts numerous options, which the user
 can set either in =.emacs=, for default use with all org-article
 exports, or within the Org-mode file using =#+LaTeX_CLASS_OPTIONS:=.
 
+Some of the features include:
   - Default packages :: Options to keep individual LaTeX packages from
        loading make it somewhat easier to modify which LaTeX packages
        are loaded during the processing of LaTeX code exported by
@@ -44,7 +45,7 @@ exports, or within the Org-mode file using =#+LaTeX_CLASS_OPTIONS:=.
   - Double spacing :: An option is provided to set lines double spaced.
   - Table of contents :: The table of contents depth can be set
        independently of section numbering depth.
-  - Section numbering :: Section numbering depth can specified
+  - Section numbering :: Section numbering depth can be specified
        independently of the table of contents depth.
 
 ** How to use this Org-mode document
@@ -53,14 +54,7 @@ exports, or within the Org-mode file using =#+LaTeX_CLASS_OPTIONS:=.
    :END:
 
 You might be able to get the Org-mode document from GitHub using the following
-shell command, which works for me:
-
-#+source: get-from-github
-#+begin_src sh :exports code
-  git clone git@github.com:tsdye/org-article.git
-#+end_src
-
-Alternatively, this might work for you:
+shell command:
 
 #+source: get-from-github-alt
 #+begin_src sh :exports code
@@ -76,7 +70,7 @@ against the file, either by =M-x org-babel-tangle RET= or =C-c C-v
 
 The resulting =org-article.cls= file should then be moved where LaTeX
 can find it.  In LaTeX setups that conform to the [[http://www.tex.ac.uk/tex-archive/tds/tds.html][Tex Directory
-Structure]], this might be =path/to/texmf-local/tex/latex/base=.  Once
+Structure]], this might be path/to/texmf-local/tex/latex/base.  Once
 the file has been placed in an appropriate directory it is often the
 case that the directory database, such as the one maintained by
 [[http://tug.org/kpathsea/][Kpathsea]], must then be updated. The following shell commands work on
@@ -343,8 +337,10 @@ keep all the code specific to a particular package together in the
   <<option-setspace>>
   % <<option-topcapt>>
   <<option-listings>>  
+  <<option-minted>>  
   %  <<option-color>>
-  
+  <<option-gantt>>
+
   % Base class
   <<pass-to-koma>>
   <<pass-to-article>>  
@@ -408,7 +404,6 @@ package-specific code can be kept together in [[latex-packages][LaTeX packages]]
   <<load-wasysym>>  
   <<load-latexsym>>  
   <<load-amssymb>>  
-  <<load-hyperref>>  
   
   % Other packages
   <<load-paralist>>  
@@ -417,6 +412,8 @@ package-specific code can be kept together in [[latex-packages][LaTeX packages]]
   % <<load-topcapt>>
   <<load-listings>>
   <<load-color>>
+  <<load-minted>>
+  <<load-gantt>>
    
   % Font packages 
   <<load-times>>
@@ -424,6 +421,9 @@ package-specific code can be kept together in [[latex-packages][LaTeX packages]]
   <<load-palatino>>  
   <<load-charter>>  
   <<load-utopia>>  
+
+  % Hyperref asks to be loaded last
+  <<load-hyperref>>  
   
   % End of package loading part
   %
@@ -441,6 +441,7 @@ section.
   % Class code part
   <<setspace-code>>
   <<listings-code>>
+  <<gantt-code>>
   % End of class code part  
 #+end_src
 
@@ -579,6 +580,7 @@ result when =DIV= takes a larger value (fig. \ref{fig:div}).
 
 #+CAPTION: Text block sizes on A4 paper with different values of DIV
 #+LABEL: fig:div
+#+ATTR_LaTeX: width=0.5\textwidth
 #+results:
 [[file:../images/org-article-text-blocks.png]]
 
@@ -592,7 +594,7 @@ binding with a clip, one might pass the following options to the class
 when using the =koma= option.
 #+source: koma-text-block
 #+begin_src org :exports code
-  #+LaTeX_CLASS_OPTIONS: koma,DIV=15,BCOR=15mm
+  #+LaTeX_CLASS_OPTIONS: [koma,DIV=15,BCOR=15mm]
 #+end_src
 
 *** Table of contents
@@ -712,9 +714,7 @@ above the table.  Users of =article.cls= typically use a package,
 [[http://tug.ctan.org/cgi-bin/ctanPackageInformation.py?id%3Dtopcapt][=topcapt.sty=]], and place the command =\topcaption{}= above the
 captioned item.  With the Org-mode LaTeX exporter, this requires
 changes to the exported LaTeX code.  The [[http://www.ctan.org/tex-archive/macros/latex/contrib/koma-script/][KOMA-script]] =scrartcl.cls=
-provides an option that gets rid of the need for =topcapt.sty=, but
-the code produced by the LaTeX exporter must still be changed to
-place the caption above the table within the =table= environment:
+provides an option that gets rid of the need for =topcapt.sty=:
 
 #+source: koma-caption
 #+begin_src org :exports code
@@ -1862,7 +1862,7 @@ it.
     {}
 #+end_src
 
-*** Topcapt
+*** Topcapt                                                        :noexport:
 The =topcapt= package is needed when it is desired to set the caption
 of a table above the table.  In this case, the =\caption{}= command
 must be moved above the =tabular= environment and the command changed
@@ -2078,6 +2078,318 @@ margins.
   {}%  
 #+end_src
 
+*** Minted                                                         :noexport:
+
+Minted is a LaTeX package for formatting source code.  It is an
+alternative to the listings package.  It relies on an external piece
+of software called Pygments that needs to be installed separately.
+
+**** Installing Pygments
+
+#+source: org-buffer-minted
+#+begin_src org :exports code
+  #+LaTeX_CLASS_OPTIONS: [minted]
+#+end_src
+
+#+source: option-minted
+#+begin_src latex :exports code
+  \newboolean{minted}
+  \DeclareOption{minted}{\setboolean{minted}{true}}
+#+end_src
+
+#+source: load-minted
+#+begin_src latex :exports code
+  \ifthenelse{\boolean{minted}}
+    {\RequirePackage{minted}}
+    {}
+#+end_src
+
+*** GANTT charts
+Eric Fraga wrote this GANTT chart constructor, powered by an Org-mode
+table.  For everyday use, it requires that some Emacs lisp code be
+installed in the Library of Babel.
+
+**** GANTT Emacs lisp code
+
+The GANTT Emacs lisp code can either be placed in the buffer with the
+GANTT chart table or it can be installed in the [[http://orgmode.org/manual/Library-of-Babel.html#Library-of-Babel][Library of Babel]].
+Installing local code in the Library of Babel is best accomplished by
+establishing one or more Org-mode files for this purpose and keeping
+them in a place that won't be overwritten when Org-mode is updated.
+For each of these local files, place a line like the following in
+=.emacs= to make the source code blocks accessible to the Library:
+
+#+source: load-local-lob
+#+begin_src emacs-lisp :exports code
+  (org-babel-lob-ingest "~/org/local-lob.org")
+#+end_src
+
+The following source code block sent to the Org-mode list by Eric
+Fraga has been modified slightly.  It should be installed in the
+Library of Babel.
+
+#+begin_example
+#+source: elispgantt
+#+begin_src emacs-lisp :var table=gantttest
+(defun esf/generate-gantt-chart (table)
+  (let ((dates "")
+	(entries (nthcdr 2 table))
+	(milestones "")
+	(nmilestones 0)
+	(ntasks 0)
+	(projecttime 0)
+	(tasks "")
+	(xlength 1)
+	)
+    (message "Initial: %s\n" table)
+    (message "Entries: %s\n" entries)
+    (while entries
+      (let ((entry (first entries)))
+	(if (listp entry)
+	    (let ((id (first entry))
+		  (type (nth 1 entry))
+		  (label (nth 2 entry))
+		  (task (nth 3 entry))
+		  (dependencies (nth 4 entry))
+		  (start (nth 5 entry))
+		  (duration (nth 6 entry))
+		  (end (nth 7 entry))
+		  (alignment (nth 8 entry))
+		  )
+	      (if (> start projecttime) (setq projecttime start))
+	      (if (string= type "task")
+		  (let ((end (+ start duration))
+			(textposition (+ start (/ duration 2)))
+			(flush "")
+			)
+		    (if (string= alignment "left")
+			(progn
+			  (setq textposition start)
+			  (setq flush "[left]"))
+		      (if (string= alignment "right")
+			  (progn
+			    (setq textposition end)
+			    (setq flush "[right]"))
+			)
+		      )
+		    (setq tasks (format "%s  \\gantttask{%s}{%s}{%d}{%d}{%d}{%s}\n" tasks label task start end textposition flush))
+		    (setq ntasks (+ 1 ntasks))
+		    (if (> end projecttime)
+			(setq projecttime end))
+		    )
+		(if (string= type "milestone")
+		    (progn
+		      (setq milestones (format "%s  \\ganttmilestone{$\\begin{array}{c}\\mbox{%s}\\\\ \\mbox{%s}\\end{array}$}{%d}\n" milestones label task start))
+		      (setq nmilestones (+ 1 nmilestones)))
+		  (if (string= type "date")
+		      (setq dates (format "%s  \\ganttdateline{%s}{%d}\n" dates label start))
+		    (message "Ignoring entry with type %s\n" type)
+		    )
+		  )
+		)
+	      )
+	  (message "Ignoring non-list entry %s\n" entry)
+	  ) ; end if list entry
+	(setq entries (cdr entries))
+	)
+      ) ; end while entries left
+    (format "\\pgfdeclarelayer{background}
+\\pgfdeclarelayer{foreground}
+\\pgfsetlayers{background,foreground}
+\\renewcommand{\\ganttprojecttime}{%d}
+\\renewcommand{\\ganttntasks}{%d}
+\\noindent
+\\begin{tikzpicture}[y=-0.75cm,x=0.75\\textwidth]
+  \\begin{pgfonlayer}{background}
+    \\draw[very thin, red!10!white] (0,1+\\ganttntasks) grid [ystep=0.75cm,xstep=1/\\ganttprojecttime] (1,0);
+    \\draw[\\ganttdatelinecolour] (0,0) -- (1,0);
+    \\draw[\\ganttdatelinecolour] (0,1+\\ganttntasks) -- (1,1+\\ganttntasks);
+  \\end{pgfonlayer}
+%s
+%s
+%s
+\\end{tikzpicture}" projecttime ntasks tasks milestones dates)
+    )
+  )
+(esf/generate-gantt-chart table)
+#+end_src
+#+end_example
+
+**** The GANTT Option
+The GANTT facility can be loaded by adding the following line to the
+Org-mode buffer.
+
+#+source: org-buffer-gantt
+#+begin_src org :exports code
+  #+LaTeX_CLASS_OPTIONS: [gantt]
+#+end_src
+
+#+source: option-gantt
+#+begin_src latex :exports code
+  \newboolean{gantt}
+  \DeclareOption{gantt}{\setboolean{gantt}{true}}
+#+end_src
+
+The GANTT code requires the [[http://www.ctan.org/tex-archive/help/Catalogue/entries/pgf.html][pgf]] LaTeX packages written by Till Tantau.
+#+source: load-gantt
+#+begin_src latex :exports code
+  \ifthenelse{\boolean{gantt}}
+  {\RequirePackage{pgf, pgfarrows, pgfnodes, tikz}}
+  {}
+#+end_src
+
+Eric wrote several LaTeX commands to make the translation from
+Org-mode table to GANTT chart.
+
+#+source: gantt-code
+#+begin_src latex :exports code
+  \newcommand\ganttline[4]{% line, tag, start end
+    \node at (0,#1) [anchor=base east] {#2};
+    \fill[black!20!white] (#3/20,#1-.2) rectangle (#4/20,#1+.2);}
+  \newcounter{gantttask}
+  \newcommand{\gantttaskcolour}{blue!50!white}
+  \newcommand{\ganttmilestonecolour}{red!50!white}
+  \newcommand{\ganttdatelinecolour}{black!50!white}
+  \newcommand{\ganttprojecttime}{1}
+  \newcommand{\ganttntasks}{1}
+  \newcommand\gantttask[6]{% label, activity, start, end, labelpos, align
+    \begin{pgfonlayer}{foreground}
+      % \node at (0,\thegantttask) [anchor=base east] {#2};
+      \stepcounter{gantttask}
+      \node [left] at (0,\thegantttask) {#1};
+      \draw[fill=\gantttaskcolour] (#3/\ganttprojecttime,\thegantttask-0.4) rectangle (#4/\ganttprojecttime,\thegantttask +0.4);
+      \node at (#5/\ganttprojecttime,\thegantttask) #6 {#2};
+    \end{pgfonlayer}
+  }
+  \newcommand\ganttpoint[3]{% line, tag, date
+    \node at (0,#1) [anchor=base east] {#2};
+    \fill[black] (#3/\ganttprojecttime,#1) circle (0.1/\ganttprojecttime);
+  }
+  \newcommand\ganttdateline[2]{% tag, date
+    \begin{pgfonlayer}{background}
+      \draw[\ganttdatelinecolour] (#2/\ganttprojecttime,0) -- (#2/\ganttprojecttime,\thegantttask+1);
+      \node at (#2/\ganttprojecttime,0) [above] {#1};
+    \end{pgfonlayer}
+  }
+  \newcommand\ganttmilestone[2]{% tag, date
+    \begin{pgfonlayer}{foreground}
+      \node at (#2/\ganttprojecttime,\thegantttask+1.0) [below] {#1};
+      \draw[black,fill=\ganttmilestonecolour] (#2/\ganttprojecttime-0.1\ganttntasks/\ganttprojecttime,\thegantttask+0.9) rectangle (#2/\ganttprojecttime+0.1\ganttntasks/\ganttprojecttime,\thegantttask+1.1);
+    \end{pgfonlayer}
+  }
+  
+  
+#+end_src
+
+**** Input Table
+
+The Org-mode table that Eric used to test his code is named
+=ganttesttable=.  Perhaps the best way to understand its structure is
+to compare it to the GANTT chart it produces.
+
+#+CAPTION: Eric Fraga's GANTT chart input table
+#+tblname: gantttesttable
+    |    | type      | label | activity      | depends | start | duration | end | align |
+    |----+-----------+-------+---------------+---------+-------+----------+-----+-------|
+    |  1 | date      | Start |               |         |     0 |          |   0 |       |
+    |  2 | task      | 1.1   | Lit survey    |         |     0 |        3 |   3 | right |
+    |  3 | task      | 1.2   | Develop model |       2 |     3 |        9 |  12 | right |
+    |  4 | milestone | M1    | model         |       3 |    12 |          |  12 |       |
+    |  5 | task      | 1.3   | Implement     |       3 |    12 |        6 |  18 | left  |
+    |  6 | date      | Y1    |               |         |    12 |          |  12 |       |
+    |  7 | milestone | M2    | software      |       5 |    18 |          |  18 |       |
+    |----+-----------+-------+---------------+---------+-------+----------+-----+-------|
+    |  8 | task      | 2.1   | Surrogate     |       3 |    15 |        6 |  21 | left  |
+    |  9 | task      | 2.2   | Implement     |       7 |    21 |        3 |  24 | left  |
+    | 10 | milestone | M3    | software      |       8 |    24 |          |  24 |       |
+    | 11 | date      | End   |               |         |    24 |          |  24 |       |
+    |----+-----------+-------+---------------+---------+-------+----------+-----+-------|
+    #+TBLFM: $1=1+@-1::$8=$6+$7::@5$6=@-1$+2::@6$6=@-1$+2::@8$6=@-2$+2::@9$6=3+@4$+2::@10$6=@-1$+2
+
+
+**** Creating the GANTT chart
+In the Org-mode buffer, the call to the code in the Library of Babel
+passes =ganttesttable= to the function =elispgantt=.  Note that the
+header argument is set in the function call.
+
+#+begin_src org :exports code
+,#+lob: elispgantt(table=gantttesttable) :results output latex
+#+end_src
+
+The results are wrapped in =#+BEGIN_LaTeX= ... =#+END_LaTeX=.  
+
+#+source: elispgantt-output
+#+begin_src org :exports code
+#+BEGIN_LaTeX
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,foreground}
+\renewcommand{\ganttprojecttime}{24}
+\renewcommand{\ganttntasks}{5}
+\noindent
+\begin{tikzpicture}[y=-0.75cm,x=0.75\textwidth]
+  \begin{pgfonlayer}{background}
+    \draw[very thin, red!10!white] (0,1+\ganttntasks) grid [ystep=0.75cm,xstep=1/\ganttprojecttime] (1,0);
+    \draw[\ganttdatelinecolour] (0,0) -- (1,0);
+    \draw[\ganttdatelinecolour] (0,1+\ganttntasks) -- (1,1+\ganttntasks);
+  \end{pgfonlayer}
+  \gantttask{1.1}{Lit survey}{0}{3}{3}{[right]}
+  \gantttask{1.2}{Develop model}{3}{12}{12}{[right]}
+  \gantttask{1.3}{Implement}{12}{18}{12}{[left]}
+  \gantttask{2.1}{Surrogate}{15}{21}{15}{[left]}
+  \gantttask{2.2}{Implement}{21}{24}{21}{[left]}
+
+  \ganttmilestone{$\begin{array}{c}\mbox{M1}\\ \mbox{model}\end{array}$}{12}
+  \ganttmilestone{$\begin{array}{c}\mbox{M2}\\ \mbox{software}\end{array}$}{18}
+  \ganttmilestone{$\begin{array}{c}\mbox{M3}\\ \mbox{software}\end{array}$}{24}
+
+  \ganttdateline{Start}{0}
+  \ganttdateline{Y1}{12}
+  \ganttdateline{End}{24}
+
+\end{tikzpicture}
+#+END_LaTeX
+
+#+end_src
+
+
+The resulting GANTT chart is processed by LaTeX and appears in the PDF
+output without reference to an external file.  The chart does not appear in
+the HTML export.  The chart looks great, Eric!  
+
+
+#+BEGIN_LaTeX
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,foreground}
+\renewcommand{\ganttprojecttime}{24}
+\renewcommand{\ganttntasks}{5}
+\noindent
+\begin{tikzpicture}[y=-0.75cm,x=0.75\textwidth]
+  \begin{pgfonlayer}{background}
+    \draw[very thin, red!10!white] (0,1+\ganttntasks) grid [ystep=0.75cm,xstep=1/\ganttprojecttime] (1,0);
+    \draw[\ganttdatelinecolour] (0,0) -- (1,0);
+    \draw[\ganttdatelinecolour] (0,1+\ganttntasks) -- (1,1+\ganttntasks);
+  \end{pgfonlayer}
+  \gantttask{1.1}{Lit survey}{0}{3}{3}{[right]}
+  \gantttask{1.2}{Develop model}{3}{12}{12}{[right]}
+  \gantttask{1.3}{Implement}{12}{18}{12}{[left]}
+  \gantttask{2.1}{Surrogate}{15}{21}{15}{[left]}
+  \gantttask{2.2}{Implement}{21}{24}{21}{[left]}
+
+  \ganttmilestone{$\begin{array}{c}\mbox{M1}\\ \mbox{model}\end{array}$}{12}
+  \ganttmilestone{$\begin{array}{c}\mbox{M2}\\ \mbox{software}\end{array}$}{18}
+  \ganttmilestone{$\begin{array}{c}\mbox{M3}\\ \mbox{software}\end{array}$}{24}
+
+  \ganttdateline{Start}{0}
+  \ganttdateline{Y1}{12}
+  \ganttdateline{End}{24}
+
+\end{tikzpicture}
+#+END_LaTeX
+
+
+
 * Notes                                                            :noexport:
 ** DONE fontenc is passed option TI by default
    :LOGBOOK:
@@ -2087,8 +2399,9 @@ margins.
    :LOGBOOK:
    - State "DONE"       from "TODO"       [2010-09-13 Mon 07:26]
    :END:
-** STARTED investigate monotype fonts other than courier
+** DONE investigate monotype fonts other than courier
    :LOGBOOK:
+   - State "DONE"       from "STARTED"    [2010-10-17 Sun 10:34]
    - State "STARTED"    from "TODO"       [2010-09-13 Mon 07:26]
    :END:
    - Inconsolata is nice, modeled on Vera
@@ -2113,8 +2426,9 @@ margins.
    :LOGBOOK:
    - State "DONE"       from "TODO"       [2010-09-17 Fri 07:31]
    :END:
-** STARTED Sebastian Vauban's settings
+** DONE Sebastian Vauban's settings
    :LOGBOOK:
+   - State "DONE"       from "STARTED"    [2010-10-17 Sun 10:34]
    - State "STARTED"    from "TODO"       [2010-09-17 Fri 08:27]
    :END:
 #+begin_LaTeX
@@ -2174,7 +2488,7 @@ margins.
 
 This R script plots the text block information in the table.
 
-#+begin_src R :var x = koma-div :file ../images/org-article-text-blocks.png
+#+begin_src R :var x = koma-div :width 2000 :height 2000 :pointsize 40 :file ../images/org-article-text-blocks.png
   plot(x[,2], x[,3], xlim=c(0,260), ylim=c(0,260), type='n',
   xlab='Text block width (mm)', ylab='Text block height (mm)')
   rect(0,0,x[,2],x[,3])
@@ -2183,7 +2497,6 @@ This R script plots the text block information in the table.
 
 #+results:
 [[file:../images/org-article-text-blocks.png]]
-
 
 
 
