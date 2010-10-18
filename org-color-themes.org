@@ -16,9 +16,6 @@
 
 [[file:index.org][{Back to Worg's index}]]
 
-A collection of [[http://www.nongnu.org/color-theme/][color-themes]] with screenshots of their use in Org-mode
-files.  All themes presented here can be installed using the
-[[http://www.nongnu.org/color-theme/][color-theme]] package for Emacs theme management.
 
 # Contributing Screenshots to this page.
 #
@@ -32,5 +29,105 @@ files.  All themes presented here can be installed using the
 #    color theme and the link to your screen-shot respectively to the
 #    =screenshot= macro
 
-# Eric Schulte -- dark color theme
-{{{screenshot(color-theme-railscast.el, http://orgmode.org/worg/images/screenshots/schulte.dark-background.png)}}}
+* Org Colour Themes.
+A popular way of customizing Emacs colours is to use the color-theme
+package (see [[http://www.emacswiki.org/emacs/ColorTheme][color-theme emacswiki page]].)
+
+Here is a list of color themes that are aware of Org:
+You can see screen shots of these themes [[file:color-themes-screenshot.org][here]]. Once you have
+installed a theme it is easy to tweak its appearance by editing the
+theme's lisp file.
+
+Some of these themes are available in Worg in the color-themes
+directory, whilst others are linked either to the author's site, or to Github.
+
+There is a page with screenshots of each of the themes [[file:color-themes-screenshot.org][here]] .
+
+** [[http://www.brockman.se/software/zenburn/zenburn.el][color-theme-zenburn.el]] (maintained by Daniel Brockman)
+
+** [[file:~/Private/Dropbox/Worg/color-themes/color-theme-colorful-obsolescence.el][color-theme-colorful-obsolescence.el]] (Scott Jaderholm)
+
+Links to Scott's themes all point directly to his site.
+** [[http://jaderholm.com/color-themes/color-theme-wombat.el][color-theme-wombat.el]] (Scott Jaderholm)
+
+** [[*http://jaderholm.com/color-themes/color-theme-active.el][color-theme-active.el]] (Scott Jaderholm)
+
+** [[file:~/Private/Dropbox/Worg/color-themes/color-theme-sva.el][color-theme-sva.el]] (maintained by Sebastien Vauban)
+
+** [[file:~/Private/Dropbox/Worg/color-themes/color-theme-zenburn.el][color-theme-zenburn.el]] (Daniel Brockman Adrian C., Bastien Guerry)
+
+** [[file:~/Private/Dropbox/Worg/color-themes/color-theme-tangotango.el][color-theme-tangotango.el]] (Julien Barnier)
+[[http://blog.nozav.org/post/2010/07/12/Updated-tangotango-emacs-color-theme][Link]] to Julien's blog post about tangotango. [[http://github.com/juba/color-theme-tangotango][Link]] to the Github repository.
+
+** [[file:~/Private/Dropbox/Worg/color-themes/color-theme-folio.el][color-theme-folio.el]] color-theme-folio.el (David O'Toole)
+
+** [[file:~/Private/Dropbox/Worg/color-themes/color-theme-manoj.el][color-theme-manoj.el]] (maintained by [[http://www.golden-gryphon.com/blog/manoj/blog/2008/05/26/Theming_Emacs/][Memnon]])
+
+** [[file:~/Private/Dropbox/Worg/color-themes/color-theme-zenash.el][color-theme-zenash.el]] (maintained by Yavuz Arkun)
+A modified version of zenburn. [[http://github.com/yarkun/zenash][Link]] to the Github repository.
+
+** [[http://github.com/suvayu/.emacs.d/blob/master/lisp/color-theme-dark-emacs.el][color-theme-dark-emacs.el]] (maintained by Suvayu Ali)
+Based on theme made by the emacswiki user, ZWZ. The original theme can
+be found [[http://www.emacswiki.org/emacs/zwz][here]] . Suvayu has also made some org-mode font modifications
+outside of the coloor theme, which can be obtained [[http://github.com/suvayu/.emacs.d/blob/master/lisp/org-mode-settings.el#L69][here]]. Suvayu's
+[[http://github.com/suvayu/.emacs.d/blob/master/lisp/org-mode-settings.el#L69][init.el]] which gives more information on how to use his customizations
+is available [[http://github.com/suvayu/.emacs.d/blob/master/lisp/org-mode-settings.el#L69][here]].
+
+
+** Installing Org Colour Themes.
+First make sure that you have the Emacs color-theme package
+installed. Copy the lisp files for the themes into a directory in your
+Emacs load path.
+
+If you want to be able to easily cycle between different
+colour schemes, you need something like the following in your .emacs:
+
+#+BEGIN_SRC emacs-lisp
+(require 'color-theme)
+(setq color-theme-is-global t)
+(color-theme-initialize)
+
+(load "color-theme-colorful-obsolescence")
+(load "color-theme-zenburn")
+(load "color-theme-tangotango")
+(load "color-theme-railscast")
+(load "color-theme-sva")
+(load "color-theme-folio")
+(load "color-theme-zenash")
+(load "color-theme-manoj")
+
+(setq my-color-themes (list
+  'color-theme-tangotango
+  'color-theme-colorful-obsolescence 'color-theme-zenburn
+  'color-theme-sva 'color-theme-folio 
+  'color-theme-manoj 'color-theme-zenash
+  'color-theme-railscast
+))
+
+(defun my-theme-set-default () ; Set the first row
+      (interactive)
+      (setq theme-current my-color-themes)
+      (funcall (car theme-current)))
+     
+    (defun my-describe-theme () ; Show the current theme
+      (interactive)
+      (message "%s" (car theme-current)))
+     
+   ; Set the next theme (fixed by Chris Webber - tanks)
+    (defun my-theme-cycle ()		
+      (interactive)
+      (setq theme-current (cdr theme-current))
+      (if (null theme-current)
+      (setq theme-current my-color-themes))
+      (funcall (car theme-current))
+      (message "%S" (car theme-current)))
+    
+    (setq theme-current my-color-themes)
+    (setq color-theme-is-global nil) ; Initialization
+    (my-theme-set-default)
+    (global-set-key [f4] 'my-theme-cycle)
+  
+#+END_SRC
+
+Now you can cycle through the installed themes using the F4 key.
+
