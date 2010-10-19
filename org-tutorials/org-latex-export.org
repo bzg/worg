@@ -354,6 +354,32 @@ Similarly, the parts of =index.org= tagged =@HOME= can now be exported to
 : #+end_latex
 
 
+* Changing the title(page) layout
+The default title created by the LaTeX exporter is often just fine,
+but in cases where you would like to include specific information in
+the title, or create a custom title page, then perhaps the best way to
+do this was posted to the Org-mode list by Nick Dokos:
+
+#+begin_example
+#+LATEX_HEADER: \input{mytitle}
+ 
+ * Foo
+ foo
+ 
+ * Bar
+ bar
+#+end_example
+
+where the file mytitle.tex looks like this:
+
+#+begin_example
+\renewcommand\maketitle{\begin{titlepage}%
+FOO
+\end{titlepage}%
+}
+#+end_example
+
+And FOO is replaced by your custom title(page).
 
 * Footnotes
 
