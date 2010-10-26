@@ -1300,6 +1300,26 @@ For example:
 :     Some text
 : 12. More text [[target][go to]]
 
+** Org-mode is not opening mailto links in my default mail client
+   :PROPERTIES:
+   :CUSTOM_ID: mailto-links
+   :END:
+
+You can customize the function org-mode uses to open mailto links by
+setting the variable =org-link-mailto-program=:
+
+=M-x customize-variable org-link-mailto-program=
+
+The default function called is =browse-url=, which opens a mail
+composition buffer within Emacs. The type of buffer opened by
+browse-url depends on the setting of the variable =mail-user-agent=.
+Thus, if you want to ensure that mailto links use Gnus to open a
+message buffer, you could add the following to your =.emacs=:
+
+#+begin_src elisp
+(setq mail-user-agent 'gnus-user-agent)
+#+end_src
+
 * Plain Lists
   :PROPERTIES:
   :CUSTOM_ID: Plain-Lists
