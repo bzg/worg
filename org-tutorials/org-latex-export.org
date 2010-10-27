@@ -218,7 +218,6 @@ system and that it works correctly before adding this code to your
    '("texi2dvi -p -b -c -V %f"))
 #+end_src
 
-
 * Exporting Parts of an Org-mode Buffer
 Tags can be used to select which parts of an Org-mode buffer are sent
 to the LaTeX exporter.  In the typical case, the
@@ -356,7 +355,6 @@ Similarly, the parts of =index.org= tagged =@HOME= can now be exported to
 : \end{algorithm}
 : #+end_latex
 
-
 * Changing the title(page) layout
 The default title created by the LaTeX exporter is often just fine,
 but in cases where you would like to include specific information in
@@ -384,6 +382,48 @@ FOO
 
 And FOO is replaced by your custom title(page).
 
+* Arbitrary Semantic Markup
+Org-mode provides wiki-like markup for various display
+characteristics.  This is often handy and it translates directly into
+LaTeX, but the design philosophy of LaTeX is centered around semantic
+markup, "what you say is what you mean" rather than "what you see is
+what you get" (lampooned by zealous LaTeX users as "what you see is
+all you get").  In practice common semantic elements are defined in a
+LaTeX class or style file and these are marked up in text with
+commands often peculiar to the class or style file.  Clearly, there is
+no way that Org-mode can anticipate commands peculiar to arbitrary
+class or style files.  Fortunately, there turns out to be an effective
+way to introduce arbitrary semantic markup for export using the
+existing Org-mode link syntax.  
+
+Arbitrary semantic markup is implemented by defining a new link type
+in =.emacs=.   The following code block defines a new link type,
+=latex=, whose =path= argument can hold the name of any LaTeX
+command.  This one defines export markup for HTML and LaTeX.  A link
+such as =[latex:proglang][Org-mode]= will export
+=\proglang{Org-mode}= to the LaTeX file.  In this way, it is possible
+to make the Org-mode LaTeX exporter conform to the semantic markup
+defined in arbitrary style files.  Org-mode will even complete your
+new link type!
+
+#+source: semantic-markup
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span style=\"color:grey;\">%s</span>" desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+  
+#+end_src
+
+This non-obvious use of the Org-mode link syntax appeared on the
+Org-mode mailing list under the heading =text color + highlight= (!).
+There was a lively discussion there, to which the ideas of
+Samuel Wales, Christian Moe and Eric Schulte contributed directly to
+this implementation.    
 * Footnotes
 
 [fn:1] Based on posts to the mailing list by Karl Marino and Carsten
