@@ -154,6 +154,87 @@ about the number of list readers.
   :PROPERTIES:
   :CUSTOM_ID: Keeping-current
   :END:
+  
+** What is the easiest way to install latest version of Orgmode?
+
+   The easiest way to install or update Orgmode is through Emacs'
+   package manager.
+   
+   Orgmode is distributed as a ELPA-tar from [[http://elpa.gnu.org/packages/][GNU Emacs Lisp Package
+   Archive]] as well as from [[http://orgmode.org/pkg/daily/][Orgmode Emacs Lisp Archive]].
+   
+   Steps for adding Orgmode as a package archive:
+   1. Add Orgmode as a package archive. This can be done in two ways.
+      1. Use =M-x customize-variable RET package-archives=
+      2. Add the following line to your =.emacs= and reload Emacs.
+
+         #+begin_src emacs-lisp
+           (push '("Orgmode" . "http://orgmode.org/pkg/daily/") package-archives)
+         #+end_src
+		
+   2. Use the Emacs package manager's =M-x list-packages= to browse
+      and install the latest version.
+
+** How do I install Emacs package manager?
+   
+   If you are running Emacs-24 or find the command =M-x list-packages=
+   available you already have the package manager installed.
+   
+   Steps for installing package manager:
+   1. Download the latest package manager -
+      [[http://repo.or.cz/w/emacs.git/blob_plain/HEAD:/lisp/emacs-lisp/package.el][package.el]].
+   2. Add the following to your =.emacs= and reload Emacs.
+      #+begin_src emacs-lisp
+        ;; change "~/elisp/" as appropiate
+        (setq load-path (cons "~/elisp" load-path))
+        (package-initialize)
+      #+end_src
+   
+** I don't see Orgmode as an installation option in Package Manager Menu?
+   
+   Emacs Package Manager is a very recent addition to Emacs. Work is
+   under way to have have Orgmode seamlessly integrate with Emacs'
+   Package Manager. As a result, it will be some time before the
+   Orgmode packages are available and usable from either GNU or
+   Orgmode package archives.
+   
+   In the meanwhile, you can install Orgmode via package manager
+   through ELPA-compatible tar. Refer [[Installing from ELPA-tar][this FAQ entry]] for more information.
+   
+** How do I install Orgmode from a ELPA-compatible tarball?
+# <<Installing from ELPA-tar>>
+   
+   Orgmode is distributed as an ELPA-compatible tar which can be used
+   in conjunction with Emacs' package manager.
+   
+   1. If you are already running Orgmode, note the current version
+      reported by M-x org-version.
+   2. Download the latest tarball from [[http://orgmode.org/pkg/daily/][Orgmode repo]].
+   3. Do =M-x package-install-file=. When prompted for =Package file
+      name=, point it to .tar file downloaded in step 2.
+      
+      You will now see Package Manager compiling the files and
+      installing it.
+   4. Reload emacs. This step is very important.
+   5. Note the version of the new installation using M-x
+      org-version. If the new and old versions are different, the
+      installation is done and you are all set to enjoy the updated
+      Orgmode. Otherwise skip to step 6.
+   6. Review you load-path using =C-h v load-path=. Most likely that
+      your old installation path takes precedence over the path chosen
+      by package manager (which is typically
+      =~/.emacs.d/elpa/...=). Fix this anamoly by moving
+      =(package-initialize)= line in .emacs to a more appropriate
+      location.
+      
+***  Additional Note on =org-install.el=
+     Functionality of Orgmode's =org-install.el= is supplanted by
+     Package Manager's =org-autoloads.el=. 
+     
+     Since Package Manager autoloads Orgmode for you, the following
+     line =(require 'org-install)= in your =.emacs= is no longer
+     required and can be safely removed.
+   
 ** How do I keep current with Org mode development?
    :PROPERTIES:
    :CUSTOM_ID: keeping-current-with-Org-mode-development
