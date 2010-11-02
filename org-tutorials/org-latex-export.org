@@ -392,11 +392,24 @@ all you get").  In practice common semantic elements are defined in a
 LaTeX class or style file and these are marked up in text with
 commands often peculiar to the class or style file.  Clearly, there is
 no way that Org-mode can anticipate commands peculiar to arbitrary
-class or style files.  Fortunately, there turns out to be an effective
-way to introduce arbitrary semantic markup for export using the
+class or style files.  Fortunately, there turns out to be two effective
+ways to introduce arbitrary semantic markup for export using the
 existing Org-mode link syntax.  
 
-Arbitrary semantic markup is implemented by defining a new link type
+For simple block-level arbitrary markup, you can use the contributed
+package [[file:../org-contrib/org-special-blocks.org][org-special-blocks]], which turns ~#+begin_foo~ into
+~\begin{foo}~ upon Latex export. You can use ordinary Org markup
+inside the block. For example, you can wrap an abstract in
+
+: #+BEGIN_ABSTRACT
+: [Text of the abstract here.]
+: #+END_ABSTRACT
+
+For more complex cases, where you need to pass parameters or process
+block contents, but don't want to use literal Latex, you may want to
+explore the possibilities of the contributed  [[file:../contrib/org-exp-blocks][org-exp-blocks]].
+
+Inline arbitrary semantic markup can be implemented by defining a new link type
 in =.emacs=.   The following code block defines a new link type,
 =latex=, whose =path= argument can hold the name of any LaTeX
 command.  This one defines export markup for HTML and LaTeX.  A link
