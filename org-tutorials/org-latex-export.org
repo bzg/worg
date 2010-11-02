@@ -396,7 +396,7 @@ class or style files.  Fortunately, there turns out to be two effective
 ways to introduce arbitrary semantic markup for export using the
 existing Org-mode link syntax.  
 
-For simple block-level arbitrary markup, you can use the contributed
+For simple /block-level/ arbitrary markup, you can use the contributed
 package [[file:../org-contrib/org-special-blocks.org][org-special-blocks]], which turns ~#+begin_foo~ into
 ~\begin{foo}~ upon Latex export. You can use ordinary Org markup
 inside the block. For example, you can wrap an abstract in
@@ -409,7 +409,7 @@ For more complex cases, where you need to pass parameters or process
 block contents, but don't want to use literal Latex, you may want to
 explore the possibilities of the contributed  [[file:../contrib/org-exp-blocks][org-exp-blocks]].
 
-Inline arbitrary semantic markup can be implemented by defining a new link type
+/Inline/ arbitrary semantic markup can be implemented by defining a new link type
 in =.emacs=.   The following code block defines a new link type,
 =latex=, whose =path= argument can hold the name of any LaTeX
 command.  This one defines export markup for HTML and LaTeX.  A link
@@ -426,10 +426,9 @@ new link type!
    (lambda (path desc format)
      (cond
       ((eq format 'html)
-       (format "<span style=\"color:grey;\">%s</span>" desc))
+       (format "<span class=\"%s\">%s</span>" path desc))
       ((eq format 'latex)
        (format "\\%s{%s}" path desc)))))
-  
 #+end_src
 
 This non-obvious use of the Org-mode link syntax appeared on the
