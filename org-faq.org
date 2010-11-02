@@ -2835,14 +2835,48 @@ Add this to your .emacs and evaluate it.
         '((ps-print-color-p 'black-white)))
 #+END_SRC
 
+** How can I include e.g. an abstract in export to Latex and HTML?
+
+Org does not currently have special markup for abstracts, but you can
+extend the block-level structural and semantic markup in Org with the
+contributed package [[file:org-contrib/org-special-blocks.org][org-special-blocks]] (by Chris Gray). To turn it on,
+put this in your =.emacs=:
+
+: (require 'org-special-blocks)
+
+Now, you can mark up the abstract of your article like this:
+
+: #+BEGIN_ABSTRACT
+: Falling apples were observed and compared with pears. Newton's laws
+: were confirmed at the 95% confidence level.
+: #+END_ABSTRACT 
+
+Exporting to Latex gives wraps this in a
+=\begin{abstract}....\end{abstract}= environment, which just works. 
+
+HTML export wraps it in a ~<div class="abstract">...</div>~
+element. The HTML result won't look like anything special until you
+style it. Here is some sample CSS to get you started; put these in
+your document header:
+
+: #+STYLE: <style>.abstract {margin: 1em; padding: 1em; border: 1px solid black}
+: #+STYLE: .abstract:before {content: "Abstract: "; font-weight: bold}</style>
+
+Generally, =#+begin_foo= will work for any simple Latex =foo=
+environment not supported by existing Org markup.
+
+If you need to pass parameters, process the block content in some way,
+or support other exporters, you may want to consider whether you can
+customize it using Eric Schulte's [[file:org-contrib/org-exp-blocks.org][org-exp-blocks]] instead.
+
 ** How can I get colored source code when exporting to LaTeX?
    :PROPERTIES:
    :CUSTOM_ID: fontified_source_code_w_latex
    :END:
 
 As of Sun Aug 9 2009 the "current" version of Org-mode (see
-[[keeping-current-with-Org-mode-development]]) supports exporting source
-code to LaTeX using the listings package.
+[[keeping-current-with-Org-mode-development]]) supports exporting
+source code to LaTeX using the listings package.
 
 To turn on listing export add the following to your Org-mode
 customization.
