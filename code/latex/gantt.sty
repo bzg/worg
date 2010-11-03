@@ -1,0 +1,56 @@
+% package for creating GANTT charts.  Intended for use with org mode and babel
+% Eric S Fraga $Id: gantt.sty,v 1.4 2010/10/16 19:49:32 ucecesf Exp $
+\NeedsTeXFormat{LaTeX2e}[1994/12/01]
+\ProvidesPackage{gantt}
+\RequirePackage{tikz}
+
+\newcounter{gantttask}
+\newcommand{\gantttaskcolour}{blue!50!white}
+\newcommand{\ganttmilestonecolour}{red!50!white}
+\newcommand{\ganttdatelinecolour}{black!50!white}
+\newcommand{\ganttprojecttime}{1}
+\newcommand{\ganttntasks}{1}
+\newenvironment{gantt}[2]{%
+  \setcounter{gantttask}{0}
+  \pgfdeclarelayer{background}
+  \pgfdeclarelayer{foreground}
+  \pgfsetlayers{background,foreground}
+  \renewcommand{\ganttprojecttime}{#1}
+  \renewcommand{\ganttntasks}{#2}
+  \noindent
+  \begin{tikzpicture}[y=-0.75cm,x=0.75\textwidth]
+    \begin{pgfonlayer}{background}
+      \draw[very thin, red!10!white] (0,1+\ganttntasks) grid [ystep=0.75cm,xstep=1/\ganttprojecttime] (1,0);
+      \draw[\ganttdatelinecolour] (0,0) -- (1,0);
+      \draw[\ganttdatelinecolour] (0,1+\ganttntasks) -- (1,1+\ganttntasks);
+    \end{pgfonlayer}
+  }%beginning of gantt environment
+  {%end of gantt environment
+  \end{tikzpicture}
+}
+% 
+\newcommand\gantttask[6]{% label, activity, start, end, labelpos, align
+  \begin{pgfonlayer}{foreground}
+    % \node at (0,\thegantttask) [anchor=base east] {#2};
+    \stepcounter{gantttask}
+    \node [left] at (0,\thegantttask) {#1};
+    \draw[fill=\gantttaskcolour] (#3/\ganttprojecttime,\thegantttask-0.4) rectangle (#4/\ganttprojecttime,\thegantttask +0.4);
+    \node at (#5/\ganttprojecttime,\thegantttask) #6 {#2};
+  \end{pgfonlayer}
+}
+\newcommand\ganttpoint[3]{% line, tag, date
+  \node at (0,#1) [anchor=base east] {#2};
+  \fill[black] (#3/\ganttprojecttime,#1) circle (0.1/\ganttprojecttime);
+}
+\newcommand\ganttdateline[2]{% tag, date
+  \begin{pgfonlayer}{background}
+    \draw[\ganttdatelinecolour] (#2/\ganttprojecttime,0) -- (#2/\ganttprojecttime,\thegantttask+1);
+    \node at (#2/\ganttprojecttime,0) [above] {#1};
+  \end{pgfonlayer}
+}
+\newcommand\ganttmilestone[2]{% tag, date
+  \begin{pgfonlayer}{foreground}
+    \node at (#2/\ganttprojecttime,\thegantttask+1.0) [below] {#1};
+    \draw[black,fill=\ganttmilestonecolour] (#2/\ganttprojecttime-0.1\ganttntasks/\ganttprojecttime,\thegantttask+0.9) rectangle (#2/\ganttprojecttime+0.1\ganttntasks/\ganttprojecttime,\thegantttask+1.1);
+  \end{pgfonlayer}
+}
