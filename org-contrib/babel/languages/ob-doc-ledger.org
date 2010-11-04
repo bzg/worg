@@ -56,47 +56,115 @@ directly as follows:
    (sqlite . t)))
 #+end_src
 
-Once Ledger support in Babel has been enabled, we can use the
-tangling support in Babel to introduce Ledger entries throughout
-an org file.
+Once Ledger support in Babel has been enabled, we can use proceed to
+include Ledger entries within an org file.  There are three ways (at
+least) in which these can be included:
 
-The rest of this document presents an example of how to do this but
-only scratches the surface of what is possible in Ledger.  For further
-information on Ledger, check out [[http://wiki.github.com/jwiegley/ledger/][the project website]].
 
-* Embedded Ledger example
+1. place all Ledger entries within one source block and execute this
+   block with different arguments to generate the appropriate reports;
 
-In this example, we will separate the recording of financial
-transactions from the reporting of financial summaries.  The first
-subsection will present some simple expenses and income entries; the
-second subsection will show some example financial summaries you may
-wish to generate.
+2. place Ledger entries in more than one source block and use the
+   /noweb/ literary programming approach, supported by babel, to combine
+   these into one block elsewhere in the file for processing by
+   Ledger; and,
 
-*** Income and Expenses Records
-    :PROPERTIES:
-    :tangle:   /tmp/account.ledger
-    :END:
+3. place Ledger entries in different source blocks and use /tangling/ to
+   generate a Ledger file which you can subsequently process using
+   Ledger directly.
 
-    The property for this heading specifies where the tangled output
-    of the Ledger code blocks in what follows should end up.  I have
-    specified the file =/tmp/account.ledger=. By default, the file will
-    appear in the same directory where the org file resides but Ledger
-    will be invoked in =/tmp=, at least on a linux system so specifying
-    the =/tmp= directory makes life easier.  However, please be aware of
-    confidentiality problems with this approach!
 
-***** Income Entries
-      :PROPERTIES:
-      :ID:       74fd73c2-41f9-41eb-97dd-1f8cb515d837
-      :END:
+The first two are described in more detail in this short tutorial.
+This tutorial, however, only scratches the surface of what is possible
+in Ledger.  For further information on Ledger, check out [[http://wiki.github.com/jwiegley/ledger/][the project
+website]].
 
-      The first set of entries relates to income, either monthly pay or
-      interest, all typically going into one of my bank accounts.  Here,
-      I have placed several entries, but we could have had each entry
-      in a separate =src= block.
+* Embedded Ledger example with single source block
+
+The easiest, albeit possibly less useful, way in which to use Ledger
+within an org file is to use a single source block to record all
+Ledger entries.  The following is an example source block:
 
 #+begin_example
-#+begin_src ledger
+,#+srcname: allinone
+,#+begin_src ledger
+2010/01/01 * Starting balance
+  assets:bank:savings  £1300.00
+  income:starting balances
+2010/07/22 * Got paid
+  assets:bank:chequing  £1000.00
+  income:salary
+2010/07/23 Rent
+  expenses:rent  £500.00
+  assets:bank:chequing
+2010/07/24 Food
+  expenses:food  £150.00
+  assets:bank:chequing
+2010/07/31 * Interest on bank savings
+  assets:bank:savings  £3.53
+  income:interest
+2010/07/31 * Transfer savings
+  assets:bank:savings  £250.00
+  assets:bank:chequing
+2010/08/01 got paid again
+  assets:bank:chequing  £1000.00
+  income:salary
+,#+end_src
+#+end_example
+
+In this example, we have combined both expenses and income into one
+set of Ledger entries.  We can now generate register and balance
+reports (as well as many other types of reports) using babel to invoke
+Ledger with specific arguments.  The arguments are passed to Ledger
+using the =:cmdline= header argument.  In the code block above, there is
+no such argument so the system takes the default.  For Ledger code
+blocks, the default =:cmdline= argument is =bal= and the result of
+evaluating this code block (=C-c C-c=) would be:
+
+#+begin_example
+,#+results: allinone()
+:            £2653.53  assets
+:             £650.00  expenses
+:           £-3303.53  income
+#+end_example
+
+If, instead, you wished to generate a register of all the
+transactions, you would change the =#+begin_src= line for the code block
+to include the required command line option:
+
+: #+begin_src ledger :cmdline reg
+
+Evaluating the code block again would generate a different report.
+
+Having to change the actual directive on the code block and
+re-evaluate makes it difficult to have more than one view of your
+transactions and financial state.  Eventually, babel will support
+passing arguments to =#+call= evaluations of code blocks but this
+support is missing currently.  Instead, we can use the concepts of
+literary programming, as implemented by the =noweb= features of babel,
+to help us.
+
+* Multiple Ledger source blocks with noweb
+
+The =noweb= feature of babel allows us to expand references to other
+code blocks within a code block.  For Ledger, this can be used to
+group transactions according to type, say, and then bring various
+sets of transactions together to generate reports.
+
+Using the same transactions used above, we could consider splitting
+these into /expenses/ and /income/, as follows:
+
+*** Income Entries
+
+    The first set of entries relates to income, either monthly pay or
+    interest, all typically going into one of my bank accounts.  Here,
+    I have placed several entries, but we could have had each entry in
+    a separate =src= block.  Note that all code blocks you wish to refer
+    to later must have the =:noweb yes= babel header argument specified.
+
+#+begin_example
+,#+srcname: income
+#+begin_src ledger :noweb yes
 2010/01/01 * Starting balance
   assets:bank:savings  £1300.00
   income:starting balances
@@ -115,17 +183,15 @@ wish to generate.
 #+end_src
 #+end_example
 
-***** Expenses
-      :PROPERTIES:
-      :ID:       07d84b1d-892b-4367-86da-95a0380b8a45
-      :END:
+*** Expenses
 
-      The following entries relate to personal expenses, such as rent
-      and food.  Again, these have all been placed in a single =src=
-      block but could have been done individually.
+    The following entries relate to personal expenses, such as rent
+    and food.  Again, these have all been placed in a single =src= block
+    but could have been done individually.
 
 #+begin_example
-#+begin_src ledger
+,#+srcname: expenses
+#+begin_src ledger :noweb yes
 2010/07/23 Rent
   expenses:rent  £500.00
   assets:bank:chequing
@@ -138,110 +204,104 @@ wish to generate.
 
 *** Financial Summaries
 
-    Assuming you have tangled the Ledger entries (=C-c C-v t=), you can now
-    perform all kinds of calculations.  However, please *note* that
-    despite tangling to the current directory (where this org file
-    resides), on Linux systems at least, the direct execution of babel
-    =src= blocks takes place in =/tmp= so any references to the tangled
-    file generated must have the full path.
+    Given the ledger entries defined above in the =income= and =expenses=
+    code blocks, we can now refer to these using the =noweb= expansion
+    directives, =<<name>>=.  We can now define different code blocks to
+    generate specific reports for those transactions.  Below are two
+    examples, one to generate a balance report and one to generate a
+    register report of all transactions.
 
 ***** An overall balance summary
-      :PROPERTIES:
-      :ID:       b9747939-6380-495d-9520-aad8e4bf80ad
-      :END:
 
       The overall balance of your account and expenditure with a breakdown
       according to category is specified by passing the =:cmdline bal= argument
-      to Ledger.
+      to Ledger.  This code block can now be evaluated (=C-cC-c=) and
+      the results generated by incorporating the transactions referred
+      to by the =<<income>>= and =<<expenses>>== lines.
 
 #+begin_example
-#+begin_src ledger :cmdline bal :results value 
-!include /tmp/account.ledger
+,#+srcname: balance
+#+begin_src ledger :cmdline bal :noweb yes
+<<income>>
+<<expenses>>
 #+end_src
-#+end_example
 
-#+results:
+,#+results: balance
 :            £2653.53  assets
 :             £650.00  expenses
 :           £-3303.53  income
 
+#+end_example
+
 If you want a more detailed breakdown of where your money is and where
-it has been spent, you can specify the =:cmdline -s= flag to tell Ledger to
-include sub-accounts in the report.
+it has been spent, you can specify the =-s= flag (i.e. =:cmdline -s bal=)
+to tell Ledger to include sub-accounts in the report.
 
 #+begin_example
-#+begin_src ledger :cmdline -s bal :results value 
-!include /tmp/account.ledger
-#+end_src
+,#+begin_src ledger :cmdline -s bal :noweb yes
+<<income>>
+<<expenses>>
+,#+end_src
+
+,#+results:
+:           £2653.53  assets:bank
+:           £1100.00    chequing
+:           £1553.53    savings
+:            £650.00  expenses
+:            £150.00    food
+:            £500.00    rent
+:          £-3303.53  income
+:             £-3.53    interest
+:          £-2000.00    salary
+:          £-1300.00    starting balances
 #+end_example
-
-#+results:
-#+begin_example
-           £2653.53  assets:bank
-           £1100.00    chequing
-           £1553.53    savings
-            £650.00  expenses
-            £150.00    food
-            £500.00    rent
-          £-3303.53  income
-             £-3.53    interest
-          £-2000.00    salary
-          £-1300.00    starting balances
-#+end_example
-
-
-
 
 ***** Generating a monthly register
-      :PROPERTIES:
-      :ID:       d9a89c50-33fd-42cc-a6ed-adcf263422d8
-      :END:
 
-      You can also generate a monthly register by executing the
-      following =src= block.  This presents a summary of transactions
-      for each monthly period with a running total in the final column
-      (which should be 0 at the end if all the entries are correct).
+      You can also generate a monthly register (the =reg= command) by
+      executing the following =src= block.  This presents a summary of
+      transactions for each monthly period (the =-M= argument) with a
+      running total in the final column (which should be 0 at the end
+      if all the entries are correct).
 
 #+begin_example
-#+begin_src ledger :cmdline -M reg
-!include /tmp/account.ledger
-#+end_src
+,#+srcname: monthlyregister
+,#+begin_src ledger :cmdline -M reg :noweb yes
+<<income>>
+<<expenses>>
+,#+end_src
+
+,#+results: monthlyregister
+:2010/01/01 - 2010/01/31         assets:bank:savings       £1300.00    £1300.00
+:                                in:starting balances     £-1300.00            0
+:2010/07/01 - 2010/07/31         assets:bank:chequing       £100.00     £100.00
+:                                assets:bank:savings        £253.53     £353.53
+:                                expenses:food              £150.00     £503.53
+:                                expenses:rent              £500.00    £1003.53
+:                                income:interest             £-3.53    £1000.00
+:                                income:salary            £-1000.00            0
+:2010/08/01 - 2010/08/01         assets:bank:chequing      £1000.00    £1000.00
+:                                income:salary            £-1000.00            0
 #+end_example
-
-#+results:
-#+begin_example
-2010/01/01 - 2010/01/31         assets:bank:savings       £1300.00    £1300.00
-                                in:starting balances     £-1300.00            0
-2010/07/01 - 2010/07/31         assets:bank:chequing       £100.00     £100.00
-                                assets:bank:savings        £253.53     £353.53
-                                expenses:food              £150.00     £503.53
-                                expenses:rent              £500.00    £1003.53
-                                income:interest             £-3.53    £1000.00
-                                income:salary            £-1000.00            0
-2010/08/01 - 2010/08/01         assets:bank:chequing      £1000.00    £1000.00
-                                income:salary            £-1000.00            0
-#+end_example
-
-
 
 We could also generate a monthly report on our =assets= showing how
 these are increasing (or decreasing!).  In this case, the final column
 will be the running total of the =assets= in our ledger.
 
 #+begin_example
-#+begin_src ledger :cmdline -M reg assets
-!include /tmp/account.ledger
-#+end_src
-#+end_example
+,#+srcname: monthlyassetsregister
+,#+begin_src ledger :cmdline -M reg assets :noweb yes
+<<income>>
+<<expenses>>
+,#+end_src
 
-
-#+results:
+,#+results: monthlyassetsregister
 : 2010/01/01 - 2010/01/31         assets:bank:savings       £1300.00    £1300.00
 : 2010/07/01 - 2010/07/31         assets:bank:chequing       £100.00    £1400.00
 :                                 assets:bank:savings        £253.53    £1653.53
 : 2010/08/01 - 2010/08/01         assets:bank:chequing      £1000.00    £2653.53
 
-  
+#+end_example
 
 * Summary
 
