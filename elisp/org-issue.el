@@ -20,6 +20,12 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 ;;; History:
+;;
+;; 2010-11-07  David Maus  <dmaus@ictsoc.de>
+;; 
+;;   * org-issue.el (org-issue-link-gmane): Create link to mid
+;;   resolver, not find_root.
+;; 
 ;; 2010-08-21  David Maus  <dmaus@ictsoc.de>
 ;; 
 ;;   * org-issue.el (org-issue-url-escape): New function.
@@ -220,7 +226,7 @@ killring."
   (interactive)
   (let* ((msginfo (or msginfo (org-issue-get-msginfo)))
 	 (gmane (format
-		 "[[http://news.gmane.org/find-root.php?message_id=%s][%s]]"
+		 "[[http://mid.gmane.org/%s][%s]]"
 		 (car msginfo) (cdr msginfo))))
     (if (called-interactively-p)
 	(org-kill-new gmane)
