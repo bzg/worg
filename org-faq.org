@@ -615,34 +615,33 @@ for details.
    :CUSTOM_ID: making-sure-org-mode-is-up-to-date
    :END:
 
-Org-mode develops very quickly. If you are using a version of org-mode
+Org-mode develops very quickly. If you are using a version of Org-mode
 that shipped with emacs, there is a good chance that it is somewhat
 out of date.
 
-Many of the users on the org-mode mailing list are using either a
-recent release of org-mode or the
+Many of the users on the Org-mode mailing list are using either a
+recent release of Org-mode or the
 [[http://orgmode.org/index.html#sec-3.2][development version of
 org-mode from the git repository]].
 
 If some settings and features aren't working the way you expect, make
 sure that the version of the manual you are consulting matches the
-version of org-mode you are using.
+version of Org-mode you are using.
 
-   - You can check which version of org-mode you are using by
+   - You can check which version of Org-mode you are using by
      selection =Org --> Documentation --> Show Version= in the Emacs
      menu.
 
    - The [[http://orgmode.org/manual/index.html][online manual]] at [[http://orgmode.org][orgmode.org]] corresponds to the most recent
      release.
 
-   - The [[http://www.gnu.org/software/emacs/manual/html_node/org/index.html][manual]] at [[http://www.gnu.org][www.gnu.org]] corresponds to the version of org-mode
+   - The [[http://www.gnu.org/software/emacs/manual/html_node/org/index.html][manual]] at [[http://www.gnu.org][www.gnu.org]] corresponds to the version of Org-mode
      released with the latest official Gnu Emacs release. Compared
      with the manual at the orgmode.org, the manual at www.gnu.org is
      somewhat out of date.
 
-For instructions on how to stay current with org-mode, consult
-[[keeping-current-with-Org-mode-development][this FAQ]] or follow the
-instructions on [[http://orgmode.org][the official org-mode site]].
+For instructions on how to stay current with Org-mode, consult [[keeping-current-with-Org-mode-development][this
+FAQ]] or follow the instructions on [[http://orgmode.org][the official Org-mode site]].
 
 ** Can I get the visibility-cycling features in outline-mode and outline-minor-mode?
    :PROPERTIES:
@@ -671,8 +670,14 @@ promotion and demotion functionality.  /outline-magic.el/ is
 available at [[http://www.astro.uva.nl/~dominik/Tools/outline-magic.el][Outline Magic]].
 
 ** Can I save/restore the visibility state of an org-mode buffer?
+   :PROPERTIES:
+   :CUSTOM_ID: saving-visibility-state
+   :END:
 
-Well, no.
+Well, no---at least not automatically. You can, however, control the
+visibility of an org-file or of individual trees by adding
+instructions to your org file. See [[http://orgmode.org/manual/Visibility-cycling.html#Visibility-cycling][this section of the manual]] for more
+information.
 
 ** How can I keep track of changes in my Org files?
    :PROPERTIES:
@@ -714,13 +719,12 @@ mode using
    :END:
 
 Org-mode is flexible enough to accomodate a variety of organizational
-and time management schemes. Org's
-[[http://orgmode.org/manual/Document-Structure.html#Document-Structure][outline
-cycling and convenient editing and navigation commands]] make it
-possible to maintain all of your projects and notes in a single file.
-But org-mode's [[http://orgmode.org/manual/Hyperlinks.html#Hyperlinks][quick and easy hyperlinks]], along with [[http://orgmode.org/manual/Refiling-notes.html#Refiling-notes][easy refiling of
-notes and todos]], also make it a delight to maintain a private "wiki"
-consisting of multiple files.
+and time management schemes. Org's [[http://orgmode.org/manual/Document-Structure.html#Document-Structure][outline cycling and convenient
+editing and navigation commands]] make it possible to maintain all of
+your projects and notes in a single file. But org-mode's [[http://orgmode.org/manual/Hyperlinks.html#Hyperlinks][quick and
+easy hyperlinks]], along with [[http://orgmode.org/manual/Refiling-notes.html#Refiling-notes][easy refiling of notes and todos]], also
+make it a delight to maintain a private "wiki" consisting of multiple
+files.
 
 No matter how you organize your org files, org-mode's agenda commands
 make it easy to search all your notes and gather together crucial data
@@ -804,6 +808,10 @@ the following variable:
 #+end_src
 
 ** What does a minimal .emacs look like?
+   :PROPERTIES:
+   :CUSTOM_ID: minimal-emacs
+   :END:
+
 Using a stripped down minimal .emacs files removes broken custom
 settings as the cause of an issue and makes it easy to reproduce for
 other people.  The example below has system-specific paths that you'll
@@ -831,6 +839,7 @@ something like this:
 #+begin_src sh
   /Applications/emacs.app/Contents/MacOS/Emacs -Q -l ~/minimal.emacs
 #+end_src sh
+
 * Errors and general problems
   :PROPERTIES:
   :CUSTOM_ID: Errors
@@ -951,17 +960,27 @@ Yes, see the [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] s
    :CUSTOM_ID: loaded-old-org
    :END:
 
-When this sort of things happen, it probably is because Emacs is loading an old version of Org-mode instead of the one you expected. Check it with =M-x org-version=.
+When this sort of things happen, it probably is because Emacs is
+loading an old version of Org-mode instead of the one you expected.
+Check it with =M-x org-version=.
 
-This happens because Emacs loads first the system org-mode (the one included with Emacs) before the one in your directory. Check the =load-path= variable; you might see that your org-mode appears /after/ the system-wide path; this is bad.
+This happens because Emacs loads first the system org-mode (the one
+included with Emacs) before the one in your directory. Check the
+=load-path= variable; you might see that your org-mode appears /after/
+the system-wide path; this is bad.
 
 You should add your directories to the =load-path= at the beginning:
 
 :  (add-to-list 'load-path "~/.emacs.d/org-mode/lisp") (require 'org-install)
 
-Function =add-to-list= adds at the beginning. Don't use =append= because it appends at the end. Also be sure to use =(require 'org-install)= and not =(require 'org)=.
+Function =add-to-list= adds at the beginning. Don't use =append=
+because it appends at the end. Also be sure to use =(require
+'org-install)= and not =(require 'org)=.
 
-This wrong version loading may also happen if you have a byte-compiled =org.elc= from an old version together with a new =org.el=. Since Emacs prefers loading byte-compiled files (even if the =.el= is newer), it will load the old Org-mode.
+This wrong version loading may also happen if you have a byte-compiled
+=org.elc= from an old version together with a new =org.el=. Since
+Emacs prefers loading byte-compiled files (even if the =.el= is
+newer), it will load the old Org-mode.
 
 ** Why doesn't org-batch-agenda work under Win32?
    :PROPERTIES:
@@ -1020,8 +1039,19 @@ Here are some other ideas for speeding up the agenda:
 
 4. Make sure that your org files are byte-compiled.
 
-   I.e., make sure there are files ending in .elc in your org
+   I.e., make sure there are files ending in =.elc= in your org
    installation directory.
+
+5. Limit your agenda files (=org-agenda-files=) to files that have
+   active todos and or projects. 
+
+   If you have a number of older reference files---i.e., files you
+   search only occasionally---in your agenda files list, consider
+   removing them from your agenda files and adding them to
+   =org-agenda-text-search-extra-files= instead. Similarly, you might
+   consider searching some of your older reference files with =M-x
+   grep= so that Org-mode does not have to load them into memory when
+   the agenda is called.
 
 ** Visual-line-mode doesn't work well with org-mode
    :PROPERTIES:
@@ -1250,7 +1280,7 @@ may type =M-x RET show-all= to reveal all text in the org file.
 If you would prefer a symbol or face for indicating hidden text, you
 can customize the variable org-ellipses.
 
-** How do I yank a subtree so it's indented according to points' location?
+** How do I yank a subtree so it's indented according to the point's location?
    :PROPERTIES:
    :CUSTOM_ID: yank-indent-subtree
    :END:
@@ -1422,6 +1452,9 @@ You will be greeted with prompt in the minibuffer that allows for file
 completion using your preferred Emacs method for finding files.
 
 ** How can I use invisible targets within lists?
+   :PROPERTIES:
+   :CUSTOM_ID: invisible-targets-in-lists
+   :END:
 
 The usual way of turning radio links invisible is to comment them, but
 Org comments need to be at the beginning of the line, which breaks list
@@ -1854,6 +1887,9 @@ and is continued in the [[#table-float-fraction][next FAQ entry]].
     see the [[#table-high-precision][previous FAQ entry]].
 
 ** How can I center tables in LaTeX output?
+   :PROPERTIES:
+   :CATEGORY: centered-tables-in-latex
+   :END:
 
 Set the `org-export-latex-tables-centered' to `t':
 
@@ -2101,6 +2137,9 @@ variable =org-capture-templates= to "understand" (i.e. evaluate)
   :CUSTOM_ID: Agenda
   :END:
 ** How can I change the advanced warning time for deadlines?
+   :PROPERTIES:
+   :CUSTOM_ID: warning-period-for-deadlines
+   :END:
 ##<<warning-period-for-deadlines>>
 
 Deadline warnings appear in the daily agenda view a specified number
@@ -2997,6 +3036,9 @@ Thomas Dye]].  For a much more complex Beamer setup see the [[http://article.gma
 Thomas Dye]].
 
 ** How can I use RefTeX in Org-mode files for LaTeX export and in Org-babel LaTeX code blocks?
+   :PROPERTIES:
+   :CUSTOM_ID: using-reftex-in-org-mode
+   :END:
 
 [[http://www.gnu.org/software/auctex/reftex.html][RefTeX]] is an indispensable tool for the author of LaTeX documents.  It
 aids in creation of bibliographies, cross-references, indexes, and
@@ -3160,6 +3202,9 @@ tangling the LaTeX preamble and postamble, before
 =org-mode-article-modes= is activated for the Org-mode file.
 
 ** Why is my exported PDF file almost unreadable?
+   :PROPERTIES:
+   :CUSTOM_ID: unreadable-pdfs
+   :END:
 
 Some PDF viewers (earlier versions (< v6) of Acrobat Reader, Evince,
 possibly others) do not get along with Adobe Type3 fonts, producing
@@ -3173,6 +3218,9 @@ install Type1 versions of the problematic fonts. For more details, see
 the "PDF export" section of [[./org-dependencies.org][org-dependencies]].
 
 ** Can I add attributes to a link or an image in HTML export?
+   :PROPERTIES:
+   :CUSTOM_ID: html-image-and-link-attributes
+   :END:
 
 Yes.  Excerpt from [[http://orgmode.org/manual/Images-in-HTML-export.html#Images-in-HTML-export][Org's manual]]:
 
@@ -3196,8 +3244,8 @@ export to one of org-mode's supported export formats and then use an
 external tool or method to convert the exported file to doc or odt.
 While most of these methods work with simple documents, they may work
 more or less well when the document contains complex elements, such as
-footnotes, embedded images, and so on. (Note, the lists below are by
-no means comprehensive).
+footnotes, embedded images, math formulas, and so on. (Note, the lists
+below are by no means comprehensive).
 
 1. html -> odt/doc/rtf
    - open html in Open Office and save as odt/doc ([[http://permalink.gmane.org/gmane.emacs.orgmode/31482][see this post by
