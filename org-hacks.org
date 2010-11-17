@@ -1012,6 +1012,21 @@ changed.
       ad-do-it))
   (ad-activate 'org-refile)
 #+end_src
+** Disable vc for Org mode agenda files
+-- David Maus
+
+Even if you use Git to track your agenda files you might not need
+vc-mode to be enabled for these files.
+
+#+begin_src emacs-lisp
+  (add-hook 'find-file-hook 'dmj/disable-vc-for-agenda-files-hook)
+  (defun dmj/disable-vc-for-agenda-files-hook ()
+    "Disable vc-mode for Org agenda files."
+    (if (and (fboundp 'org-agenda-file-p)
+             (org-agenda-file-p (buffer-file-name)))
+        (remove-hook 'find-file-hook 'vc-find-file-hook)
+      (add-hook 'find-file-hook 'vc-find-file-hook)))
+#+end_src
 * Hacking Org and Emacs: Modify how org interacts with other Emacs packages.
 ** org-remember-anything
 

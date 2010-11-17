@@ -16,6 +16,7 @@
 This is the list of Org-mode hooks and function variables, with their
 documentation strings:
 
+
 * Hooks and Function variables
 
 ** =org-mode-hook=
@@ -63,11 +64,11 @@ Defined in: /org.el/
 ** =org-make-link-description-function=
 Defined in: /org.el/
 #+begin_example
-    Function to use to generate link descriptions from links. If
-    nil the link location will be used. This function must take two
-    parameters; the first is the link and the second the description
-    org-insert-link has generated, and should return the description
-    to use.
+    Function to use to generate link descriptions from links.
+    If nil the link location will be used.  This function must take
+    two parameters; the first is the link and the second the
+    description `org-insert-link' has generated, and should return the
+    description to use.
 #+end_example
 ** =org-link-translation-function=
 Defined in: /org.el/
@@ -170,6 +171,16 @@ Defined in: /org.el/
            'todo' or 'done', to indicate the general type of state.
     :to    new state, like in :from
 #+end_example
+** =org-get-priority-function=
+Defined in: /org.el/
+#+begin_example
+    Function to extract the priority from a string.
+    The string is normally the headline.  If this is nil Org computes the
+    priority from the priority cookie like [#A] in the headline.  It returns
+    an integer, increasing by 1000 for each priority level.
+    The user can set a different function here, which should take a string
+    as an argument and return the numeric priority.
+#+end_example
 ** =org-read-date-minibuffer-setup-hook=
 Defined in: /org.el/
 #+begin_example
@@ -180,7 +191,7 @@ Defined in: /org.el/
 ** =org-tags-sort-function=
 Defined in: /org.el/
 #+begin_example
-    When set, tags are sorted using this function as a comparator
+    When set, tags are sorted using this function as a comparator.
 #+end_example
 ** =org-after-tags-change-hook=
 Defined in: /org.el/
@@ -210,6 +221,14 @@ Defined in: /org.el/
 Defined in: /org.el/
 #+begin_example
     Functions to be called for special font lock stuff.
+#+end_example
+** =org-font-lock-set-keywords-hook=
+Defined in: /org.el/
+#+begin_example
+    Functions that can manipulate `org-font-lock-extra-keywords'.
+    This is calles after `org-font-lock-extra-keywords' is defined, but before
+    it is installed to be used by font lock.  This can be useful if something
+    needs to be inserted at a specific position in the font-lock sequence.
 #+end_example
 ** =org-after-demote-entry-hook=
 Defined in: /org.el/
@@ -245,7 +264,7 @@ Defined in: /org.el/
     `org-store-link-props' with a list of properties and values.
     Special properties are:
     
-    :type         The link prefix. like \"http\".  This must be given.
+    :type         The link prefix, like \"http\".  This must be given.
     :link         The link, like \"http://www.astro.uva.nl/~dominik\".
                   This is obligatory as well.
     :description  Optional default description for the second pair
@@ -274,6 +293,15 @@ Defined in: /org.el/
     nil to indicate that that Org-mode can continue with other options
     like exact and fuzzy text search.
 #+end_example
+** =org-open-at-point-functions=
+Defined in: /org.el/
+#+begin_example
+    Hook that is run when following a link at point.
+    
+    Functions in this hook must return t if they identify and follow
+    a link at point.  If they don't find anything interesting at point,
+    they must return nil.
+#+end_example
 ** =org-create-file-search-functions=
 Defined in: /org.el/
 #+begin_example
@@ -282,8 +310,8 @@ Defined in: /org.el/
     which the link should point.
     
     A function in the hook should first test if it would like to
-    handle this file type, for example by checking the major-mode or
-    the file extension.  If it decides not to handle this file, it
+    handle this file type, for example by checking the `major-mode'
+    or the file extension.  If it decides not to handle this file, it
     should just return nil to give other functions a chance.  If it
     does handle the file, it must return the search string to be used
     when following the link.  The search string will be part of the
@@ -306,8 +334,8 @@ Defined in: /org.el/
     Functions added to this hook must accept a single argument, the
     search string that was part of the file link, the part after the
     double colon.  The function must first check if it would like to
-    handle this search, for example by checking the major-mode or the
-    file extension.  If it decides not to handle this search, it
+    handle this search, for example by checking the `major-mode' or
+    the file extension.  If it decides not to handle this search, it
     should just return nil to give other functions a chance.  If it
     does handle the search, it must return a non-nil value to keep
     other functions from trying.
@@ -333,15 +361,13 @@ Defined in: /org.el/
 Defined in: /org.el/
 #+begin_example
     Hook for functions that pre-filter todo specs.
-    
-    Each function takes a todo spec and returns either `nil' or the spec
+    Each function takes a todo spec and returns either nil or the spec
     transformed into canonical form." )
     
     (defvar org-todo-get-default-hook nil
       "Hook for functions that get a default item for todo.
-    
     Each function takes arguments (NEW-MARK OLD-MARK) and returns either
-    `nil' or a string to be used for the todo mark." )
+    nil or a string to be used for the todo mark." )
     
     (defvar org-agenda-headline-snapshot-before-repeat)
     
@@ -358,10 +384,12 @@ Defined in: /org.el/
     When it starts with DONE, the DONE is removed.  And when neither TODO nor
     DONE are present, add TODO at the beginning of the heading.
     
-    With C-u prefix arg, use completion to determine the new state.
+    With \\[universal-argument] prefix arg, use completion to determine the new \
+    state.
     With numeric prefix arg, switch to that state.
-    With a double C-u prefix, switch to the next set of TODO keywords (nextset).
-    With a triple C-u prefix, circumvent any state blocking.
+    With a double \\[universal-argument] prefix, switch to the next set of TODO \
+    keywords (nextset).
+    With a triple \\[universal-argument] prefix, circumvent any state blocking.
     
     For calling through lisp, arg is also interpreted in the following way:
     'none             -> empty state
@@ -419,6 +447,23 @@ Defined in: /org.el/
     The functions must return nil if they are not responsible for this
     property.
 #+end_example
+** =org-speed-command-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for activating speed commands at strategic locations.
+    Hook functions are called in sequence until a valid handler is
+    found.
+    
+    Each hook takes a single argument, a user-pressed command key
+    which is also a `self-insert-command' from the global map.
+    
+    Within the hook, examine the cursor position and the command key
+    and return nil or a valid handler as appropriate. Handler could
+    be one of an interactive command, a function, or a form.
+    
+    Set `org-use-speed-commands' to non-nil value to enable this
+    hook. The default setting is `org-speed-command-default-hook'.
+#+end_example
 ** =org-ctrl-c-ctrl-c-hook=
 Defined in: /org.el/
 #+begin_example
@@ -438,8 +483,9 @@ Defined in: /org.el/
     This hook runs as the first action when TAB is pressed, even before
     `org-cycle' messes around with the `outline-regexp' to cater for
     inline tasks and plain list item folding.
-    If any function in this hook returns t, not other actions like table
-    field motion visibility cycling will be done.
+    If any function in this hook returns t, any other actions that
+    would have been caused by TAB (such as table field motion or visibility
+    cycling) will not occur.
 #+end_example
 ** =org-tab-after-check-for-table-hook=
 Defined in: /org.el/
@@ -596,6 +642,14 @@ Defined in: /org-agenda.el/
     have been removed when this is called, as will any matches for regular
     expressions listed in `org-agenda-entry-text-exclude-regexps'.
 #+end_example
+** =org-agenda-day-face-function=
+Defined in: /org-agenda.el/
+#+begin_example
+    Function called to determine what face should be used to display a day.
+    The only argument passed to that function is the day. It should
+    returns a face, or nil if does not want to specify a face and let
+    the normal rules apply.
+#+end_example
 ** =org-agenda-auto-exclude-function=
 Defined in: /org-agenda.el/
 #+begin_example
@@ -611,7 +665,7 @@ Defined in: /org-agenda.el/
 ** =org-agenda-mode-hook=
 Defined in: /org-agenda.el/
 #+begin_example
-    Hook for org-agenda-mode, run after the mode is turned on.
+    Hook for `org-agenda-mode', run after the mode is turned on.
 #+end_example
 ** =org-agenda-skip-function=
 Defined in: /org-agenda.el/
@@ -624,12 +678,34 @@ Defined in: /org-agenda.el/
     Never set this variable using `setq' or so, because then it will apply
     to all future agenda commands.  Instead, bind it with `let' to scope
     it dynamically into the agenda-constructing command.  A good way to set
-    it is through options in org-agenda-custom-commands.
+    it is through options in `org-agenda-custom-commands'.
 #+end_example
 ** =org-agenda-cleanup-fancy-diary-hook=
 Defined in: /org-agenda.el/
 #+begin_example
     Hook run when the fancy diary buffer is cleaned up.
+#+end_example
+** =org-agenda-before-sorting-filter-function=
+Defined in: /org-agenda.el/
+#+begin_example
+    Function to be applied to agenda items prior to sorting.
+    Prior to sorting also means just before they are inserted into the agenda.
+    
+    To aid sorting, you may revisit the original entries and add more text
+    properties which will later be used by the sorting functions.
+    
+    The function should take a string argument, an agenda line.
+    It has access to the text properties in that line, which contain among
+    other things, the property `org-hd-marker' that points to the entry
+    where the line comes from.  Note that not all lines going into the agenda
+    have this property, only most.
+    
+    The function should return the modified string.  It is probably best
+    to ONLY change text properties.
+    
+    You can also use this function as a filter, by returning nil for lines
+    you don't want to have in the agenda at all.  For this application, you
+    could bind the variable in the options section of a custom command.
 #+end_example
 ** =org-agenda-after-show-hook=
 Defined in: /org-agenda.el/
@@ -641,6 +717,17 @@ Defined in: /org-agenda.el/
 Defined in: /org-ascii.el/
 #+begin_example
     Hook run at the end of ASCII export, in the new buffer.
+#+end_example
+** =org-capture-before-finalize-hook=
+Defined in: /org-capture.el/
+#+begin_example
+    Hook that is run right before a remember process is finalized.
+    The remember buffer is still current when this hook runs.
+#+end_example
+** =org-capture-mode-hook=
+Defined in: /org-capture.el/
+#+begin_example
+    Hook for the minor `org-capture-mode'.
 #+end_example
 ** =org-clock-heading-function=
 Defined in: /org-clock.el/
@@ -680,13 +767,17 @@ Defined in: /org-clock.el/
 ** =org-ctags-open-link-functions=
 Defined in: /org-ctags.el/
 #+begin_example
-    List of functions to be prepended to ORG-OPEN-LINK-FUNCTIONS when
-    ORG-CTAGS is active.
+    List of functions to be prepended to ORG-OPEN-LINK-FUNCTIONS when ORG-CTAGS is active.
 #+end_example
 ** =org-export-docbook-final-hook=
 Defined in: /org-docbook.el/
 #+begin_example
     Hook run at the end of DocBook export, in the new buffer.
+#+end_example
+** =org-export-blocks-postblock-hook=
+Defined in: /org-exp-blocks.el/
+#+begin_example
+    Run after blocks have been processed with `org-export-blocks-preprocess'.
 #+end_example
 ** =org-export-first-hook=
 Defined in: /org-exp.el/
@@ -740,6 +831,12 @@ Defined in: /org-exp.el/
     This is run after blockquote/quote/verse/center have been marked
     with cookies.
 #+end_example
+** =org-export-preprocess-after-radio-targets-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook for preprocessing an export buffer.
+    This is run after radio target processing.
+#+end_example
 ** =org-export-preprocess-before-normalizing-links-hook=
 Defined in: /org-exp.el/
 #+begin_example
@@ -757,6 +854,12 @@ Defined in: /org-exp.el/
     Hook for preprocessing an export buffer.
     This is run as the last thing in the preprocessing buffer, just before
     returning the buffer string to the backend.
+#+end_example
+** =org-export-define-heading-targets-headline-hook=
+Defined in: /org-exp.el/
+#+begin_example
+    Hook that is run when a headline was matched during target search.
+    This is part of the preprocessing for export.
 #+end_example
 ** =org-export-format-drawer-function=
 Defined in: /org-exp.el/
@@ -838,15 +941,17 @@ Defined in: /org-latex.el/
 ** =org-export-latex-format-toc-function=
 Defined in: /org-latex.el/
 #+begin_example
-    The function formatting returning the string to createthe table of contents.
+    The function formatting returning the string to create the table of contents.
     The function mus take one parameter, the depth of the table of contents.
 #+end_example
 ** =org-checkbox-statistics-hook=
 Defined in: /org-list.el/
 #+begin_example
     Hook that is run whenever Org thinks checkbox statistics should be updated.
-    This hook runs even if `org-provide-checkbox-statistics' is nil, to it can
-    be used to implement alternative ways of collecting statistics information.
+    This hook runs even if checkbox rule in
+    `org-list-automatic-rules' does not apply, so it can be used to
+    implement alternative ways of collecting statistics
+    information.
 #+end_example
 ** =org-mobile-pre-push-hook=
 Defined in: /org-mobile.el/
@@ -935,6 +1040,11 @@ Defined in: /org-src.el/
     or similar things which you want to have when editing a source code file,
     but which mess up the display of a snippet in Org exported files.
 #+end_example
+** =org-export-taskjuggler-final-hook=
+Defined in: /org-taskjuggler.el/
+#+begin_example
+    Hook run at the end of TaskJuggler export, in the new buffer.
+#+end_example
 ** =org-timer-start-hook=
 Defined in: /org-timer.el/
 #+begin_example
@@ -970,6 +1080,8 @@ Defined in: /org-xoxo.el/
 #+begin_example
     Hook run after XOXO export, in the new buffer.
 #+end_example
+
+
 * Examples for using hooks
 
 Feel free to give example of how do you use these hooks.  Ideas for
