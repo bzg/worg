@@ -2724,6 +2724,28 @@ The item in the org file looks like this:
   ,  <%%(diary-float 10 1 4)>
 #+end_src
 
+** Why isn't the agenda showing all the times I put under a single entry?
+   :PROPERTIES:
+   :CATEGORY: multiple-timestamps-same-entry
+   :END:
+
+Probably because you have not set the following variable:
+
+: org-agenda-skip-additional-timestamps-same-entry
+
+The default value of this variable is t, which means that entries with
+multiple timestamps, such as the following...
+
+#+begin_src org
+  ,* Work really, really hard
+  ,  <2010-11-20 Sat 10:00>
+  ,  <2010-11-20 Sat 14:00>
+#+end_src
+
+...will only appear in the agenda at the time specified by the first
+timestamp. If you set org-agenda-skip-additional-timestamps-same-entry
+to nil, the item will appear will appear at all the times you specify.
+
 * Export
   :PROPERTIES:
   :CUSTOM_ID: Export
