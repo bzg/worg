@@ -2,7 +2,7 @@
  * @file
  * org-info.js
  *
- * Version: 0.1.4
+ * Version: 0.1.5
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -64,7 +64,7 @@
  * An OrgOutline stores some refs to its assoziated node in the document tree
  * along with some additional properties.
  */
-function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
+function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id, _toc_anchor)
 {
   var t = this;
   t.DIV = _div;
@@ -77,6 +77,7 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id)
   t.DIRTY = false;                     // Node is dirty, when children get
                                           // folded seperatly.
   t.STATE = OrgNode.STATE_FOLDED;
+  t.TOC   = _toc_anchor;
   t.DEPTH = _depth;                    // The Rootelement will have
                                           // the depth 0. All other
                                           // Nodes get the depth from
@@ -240,6 +241,17 @@ OrgNode.prototype.hideAllChildren = function ()
   this.hide();
 };
 
+/**
+ * Set class for links to current page to current and visited pages to visited_after_load
+ * Note: visited pages will be reset after reload!
+ */
+OrgNode.prototype.setLinkClass = function (on)
+{
+  if(this.TOC) {
+    if(on) this.TOC.className = "current";
+    else this.TOC.className = "visited_after_load";
+  }
+}
 
 //
 //  OrgNode methods for folding
@@ -762,7 +774,7 @@ var org_html_manager = {
         var c = li.childNodes[i];
         switch (c.nodeName) {
         case "A":
-          var newHref = this.mkNodeFromHref(c.href);
+          var newHref = this.mkNodeFromHref(c);
           if(false == newHref) {
             return false;
           }
@@ -804,9 +816,11 @@ var org_html_manager = {
 
   /**
    * Used by OrgHtmlManager::liToOutlines
+   * @param anchor <a...> element in the TOC, that links to a section.
    */
-  mkNodeFromHref: function (s)
+  mkNodeFromHref: function (anchor)
   {
+    s = anchor.href;
     if(s.match(this.REGEX)) {
       var matches = this.REGEX.exec(s);
       var id = matches[2];
@@ -829,15 +843,15 @@ var org_html_manager = {
       }
       var link = 'javascript:org_html_manager.navigateTo(' + sec + ')';
       if(depth > this.NODE.DEPTH) {
-        this.NODE = new OrgNode ( div, h, link, depth, this.NODE, id);
+        this.NODE = new OrgNode ( div, h, link, depth, this.NODE, id, anchor);
       }
       else if (depth == 2) {
-        this.NODE = new OrgNode ( div, h, link, depth, this.ROOT, id);
+        this.NODE = new OrgNode ( div, h, link, depth, this.ROOT, id, anchor);
       }
       else {
         var p = this.NODE;
         while(p.DEPTH > depth) p = p.PARENT;
-        this.NODE = new OrgNode ( div, h, link, depth, p.PARENT, id);
+        this.NODE = new OrgNode ( div, h, link, depth, p.PARENT, id, anchor);
       }
       this.SECS.push(this.NODE);
       // Prepare the tags-index:
@@ -1084,6 +1098,8 @@ var org_html_manager = {
           }
         }
     }
+    last_node.setLinkClass();
+    t.NODE.setLinkClass(true);
   },
 
   plainView: function (sec, skip_show_section)
