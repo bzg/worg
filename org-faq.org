@@ -20,8 +20,8 @@
 
 Welcome to the Org-mode FAQ.
 
-You can navigate the FAQ by clicking on any of the topics in the Table
-of Contents.
+You can navigate the FAQ by clicking on any of the topics in the Table of
+Contents.
 
 If your browser supports JavaScript, you can...
 
@@ -1739,17 +1739,18 @@ See [[http://orgmode.org/manual/Tables-in-HTML-export.html#Tables-in-HTML-export
 - *Short answer*
 
   Avoid
-  : | 0.16666667000000 |
-  : #+TBLFM: $1 = 1 / 2 * 3; p20 %.14f
+  : | 1 / 2 * 3 | 0.16666667000000 |
+  : #+TBLFM: $2 = $1; p20 %.14f
+
   and use
-  : | 0.16666666666667 |
-  : #+TBLFM: $1 = 1 / 2 * 3; p20 f14
+  : | 1 / 2 * 3 | 0.16666666666667 |
+  : #+TBLFM: $2 = $1 +.0; p20 f-14
 
 - *Longer answer*
 
   It is important to distinguish between the precision of
   1) =p20=: Calc internal calculation (=calc-internal-prec=)
-  2) =f14=: Calc float formatting, unlimited in precision (=calc-float-format=)
+  2) =f-14=: Calc float formatting, unlimited in precision (=calc-float-format=)
   3) =%.14f=: the =printf= reformatting, limited in precision
 
   See [[http://orgmode.org/manual/Formula-syntax-for-Calc.html#Formula-syntax-for-Calc][the Org manual]] (org-version 6.35 or newer) for more details.
@@ -1774,10 +1775,10 @@ See [[http://orgmode.org/manual/Tables-in-HTML-export.html#Tables-in-HTML-export
     - limited by Calc internal calculation precision from Org default
       (here =p12=)
       : | 0.16666666666700 |
-      : #+TBLFM: $1 = 1 / 2 * 3;     f14
+      : #+TBLFM: $1 = 1 / 2 * 3;     f-14
 
       : | 0.1666666666670000000 |
-      : #+TBLFM: $1 = 1 / 2 * 3;     f19
+      : #+TBLFM: $1 = 1 / 2 * 3;     f-19
 
     - limited by Calc float format from Org default (here =f8=)
       : | 0.16666667 |
@@ -1787,30 +1788,30 @@ See [[http://orgmode.org/manual/Tables-in-HTML-export.html#Tables-in-HTML-export
       : #+TBLFM: $1 = 1 / 2 * 3; p20
 
       : | 0.16666667000000 |
-      : #+TBLFM: $1 = 1 / 2 * 3;         %.14f
+      : #+TBLFM: $1 = 1 / 2 * 3;          %.14f
 
       : | 0.16666667000000 |
-      : #+TBLFM: $1 = 1 / 2 * 3; p20     %.14f
+      : #+TBLFM: $1 = 1 / 2 * 3; p20      %.14f
 
     - limited by Calc float format specified
       : | 0.166667 |
-      : #+TBLFM: $1 = 1 / 2 * 3;     f6
+      : #+TBLFM: $1 = 1 / 2 * 3;     f-6
 
       : | 0.16666666666667 |
-      : #+TBLFM: $1 = 1 / 2 * 3; p20 f14
+      : #+TBLFM: $1 = 1 / 2 * 3; p20 f-14
 
       : | 0.1666666666666666667 |
-      : #+TBLFM: $1 = 1 / 2 * 3; p20 f19
+      : #+TBLFM: $1 = 1 / 2 * 3; p20 f-19
 
     - limited by =printf= conversion to Emacs Lisp float
       : | 0.1666666699999999900 | the inaccuracy is platform dependent |
-      : #+TBLFM: $1 = 1 / 2 * 3;         %.19f
+      : #+TBLFM: $1 = 1 / 2 * 3;          %.19f
 
       : | 0.1666666699999999900 | the inaccuracy is platform dependent |
-      : #+TBLFM: $1 = 1 / 2 * 3; p20     %.19f
+      : #+TBLFM: $1 = 1 / 2 * 3; p20      %.19f
 
       : | 0.1666666666666666600 | the inaccuracy is platform dependent |
-      : #+TBLFM: $1 = 1 / 2 * 3; p20 f20 %.19f
+      : #+TBLFM: $1 = 1 / 2 * 3; p20 f-20 %.19f
 
     - limited by =printf= format specified
       : | 0.166667 |
@@ -1839,17 +1840,17 @@ and is continued in the [[#table-float-fraction][next FAQ entry]].
 - *Short answer*
 
   Avoid
-  : | 1 |
-  : #+TBLFM: $1 = 1 + 0; f3
+   : | 1 | 1 |
+   : #+TBLFM: $2 = $1; f-3
   and use
-  : | 1.000 |
-  : #+TBLFM: $1 = 1 + 0; %.3f
+   : | 1 | 1.000 |
+   : #+TBLFM: $2 = $1 +.0; f-3
 
 - *Longer answer*
 
   For =f3= and =f-3= see =`d f' (`calc-fix-notation')= in [[http://www.delorie.com/gnu/docs/calc/calc.html#SEC_Top][the Calc manual]]
   in the section Mode Settings -> Display Modes -> Float Formats
-  [[http://www.delorie.com/gnu/docs/calc/calc_163.html][found here as long as the section numbering is kept]].
+  [[http://www.delorie.com/gnu/docs/calc/calc_163.html][found here as long as the section numbering is unchanged]].
 
   Remember the formula debugger, toggled with =C-c {=,
   to view the processing stages like:
@@ -1862,26 +1863,32 @@ and is continued in the [[#table-float-fraction][next FAQ entry]].
   Following are some examples to demonstrate different float formats.
 
   - normal precision
-    : |----------------------+---------+-------+-------|
-    : | number               |      f3 |   f-3 |  %.3f |
-    : |----------------------+---------+-------+-------|
-    : | 1 + 0                |       1 |     1 | 1.000 |
-    : | 0 + 0                |       0 |     0 | 0.000 |
-    : |----------------------+---------+-------+-------|
-    : | 1 + 1 / 2 * 3 * 1000 |   1.000 | 1.000 | 1.000 |
-    : | 0 + 1 / 2 * 3 * 1000 | 1.67e-4 | 0.000 | 0.000 |
-    : |----------------------+---------+-------+-------|
-    : | 1 + 1 / 2 * 3 *  100 |   1.002 | 1.002 | 1.002 |
-    : | 0 + 1 / 2 * 3 *  100 |   0.002 | 0.002 | 0.002 |
-    : |----------------------+---------+-------+-------|
-    : #+TBLFM: $2 = $1; f3 :: $3 = $1; f-3 :: $4 = $1; %.3f
+    : |-----------+---------+-------+---------+----------+-------|
+    : |    number |      f3 |   f-3 | +.0; f3 | +.0; f-3 |  %.3f |
+    : |-----------+---------+-------+---------+----------+-------|
+    : |         1 |       1 |     1 |   1.000 |    1.000 | 1.000 |
+    : |         0 |       0 |     0 |   0.000 |    0.000 | 0.000 |
+    : |-----------+---------+-------+---------+----------+-------|
+    : |       1.0 |   1.000 | 1.000 |   1.000 |    1.000 | 1.000 |
+    : |       0.0 |   0.000 | 0.000 |   0.000 |    0.000 | 0.000 |
+    : |-----------+---------+-------+---------+----------+-------|
+    : | 1.0001666 |   1.000 | 1.000 |   1.000 |    1.000 | 1.000 |
+    : | 0.0001666 | 1.67e-4 | 0.000 | 1.67e-4 |    0.000 | 0.000 |
+    : |-----------+---------+-------+---------+----------+-------|
+    : | 1.0016666 |   1.002 | 1.002 |   1.002 |    1.002 | 1.002 |
+    : | 0.0016666 |   0.002 | 0.002 |   0.002 |    0.002 | 0.002 |
+    : |-----------+---------+-------+---------+----------+-------|
+    : #+TBLFM: $2 = $1; f3 :: $3 = $1; f-3 :: $4 = $1 +.0; f3 :: $5 = $1 +.0; f-3 :: $6 = $1; %.3f
 
   - high precision
     : |----------------------+--------------------------+-----------------------|
     : | number               |                      f19 |                  f-19 |
     : |----------------------+--------------------------+-----------------------|
-    : | 1 + 0                |                        1 |                     1 |
-    : | 0 + 0                |                        0 |                     0 |
+    : | 1                    |                        1 |                     1 |
+    : | 0                    |                        0 |                     0 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1.0                  |    1.0000000000000000000 | 1.0000000000000000000 |
+    : | 0.0                  |    0.0000000000000000000 | 0.0000000000000000000 |
     : |----------------------+--------------------------+-----------------------|
     : | 1 + 1 / 2 * 3 * 1e19 |    1.0000000000000000000 | 1.0000000000000000000 |
     : | 0 + 1 / 2 * 3 * 1e19 | 1.666666666666666667e-20 | 0.0000000000000000000 |
@@ -1890,6 +1897,23 @@ and is continued in the [[#table-float-fraction][next FAQ entry]].
     : | 0 + 1 / 2 * 3 * 1e18 |    0.0000000000000000002 | 0.0000000000000000002 |
     : |----------------------+--------------------------+-----------------------|
     : #+TBLFM: $2 = $1; p20 f19 :: $3 = $1; p20 f-19
+
+    : |----------------------+--------------------------+-----------------------|
+    : | number               |                 +.0; f19 |             +.0; f-19 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1                    |    1.0000000000000000000 | 1.0000000000000000000 |
+    : | 0                    |    0.0000000000000000000 | 0.0000000000000000000 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1.0                  |    1.0000000000000000000 | 1.0000000000000000000 |
+    : | 0.0                  |    0.0000000000000000000 | 0.0000000000000000000 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1 + 1 / 2 * 3 * 1e19 |    1.0000000000000000000 | 1.0000000000000000000 |
+    : | 0 + 1 / 2 * 3 * 1e19 | 1.666666666666666667e-20 | 0.0000000000000000000 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1 + 1 / 2 * 3 * 1e18 |    1.0000000000000000002 | 1.0000000000000000002 |
+    : | 0 + 1 / 2 * 3 * 1e18 |    0.0000000000000000002 | 0.0000000000000000002 |
+    : |----------------------+--------------------------+-----------------------|
+    : #+TBLFM: $2 = $1 +.0; p20 f19 :: $3 = $1 +.0; p20 f-19
 
     The =printf= reformatting (=%.19f=) cannot be used with high precision,
     see the [[#table-high-precision][previous FAQ entry]].
@@ -2731,6 +2755,28 @@ The item in the org file looks like this:
   ,* Labour Day (NZ)
   ,  <%%(diary-float 10 1 4)>
 #+end_src
+
+** Why isn't the agenda showing all the times I put under a single entry?
+   :PROPERTIES:
+   :CATEGORY: multiple-timestamps-same-entry
+   :END:
+
+Probably because you have not set the following variable:
+
+: org-agenda-skip-additional-timestamps-same-entry
+
+The default value of this variable is t, which means that entries with
+multiple timestamps, such as the following...
+
+#+begin_src org
+  ,* Work really, really hard
+  ,  <2010-11-20 Sat 10:00>
+  ,  <2010-11-20 Sat 14:00>
+#+end_src
+
+...will only appear in the agenda at the time specified by the first
+timestamp. If you set org-agenda-skip-additional-timestamps-same-entry
+to nil, the item will appear will appear at all the times you specify.
 
 * Export
   :PROPERTIES:
