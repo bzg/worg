@@ -2,7 +2,7 @@
  * @file
  * org-info.js
  *
- * Version: 0.1.5
+ * Version: 0.1.7
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -415,6 +415,9 @@ var org_html_manager = {
   CLICK_TIMEOUT: null,         // Mousehandling
   SECNUM_MAP: {},              // Map section numbers to OrgNodes
   TOC_LINK: null,              // Last link used in TOC
+  HOOKS: { run_hooks: false,   // Hoooks. run_hooks is false until onReady() is run.
+           onShowSection: [],
+           onReady: [] },
 
   /**
    * Setup the OrgHtmlManager for scanning.
@@ -487,7 +490,7 @@ var org_html_manager = {
   },
 
   /**
-   * Remove tags from headlin's inner HTML.
+   * Remove tags from headline's inner HTML.
    * @param s The headline's inner HTML.
    * @return @c s with all tags stripped.
    */
@@ -624,7 +627,8 @@ var org_html_manager = {
     if(t.STARTUP_MESSAGE) {
       t.warn("This page uses org-info.js. Press '?' for more information.", true);
     }
-
+    t.HOOKS.run_hooks = true;    // Unblock all hooks.
+    t.runHooks('onReady', null);
   },
 
 
@@ -1100,6 +1104,7 @@ var org_html_manager = {
     }
     last_node.setLinkClass();
     t.NODE.setLinkClass(true);
+    t.runHooks('onShowSection', {'last': last_node, 'current': t.NODE});
   },
 
   plainView: function (sec, skip_show_section)
@@ -2187,9 +2192,87 @@ var org_html_manager = {
       }
       t.showSection(t.NODE.IDX);
     }
-  }
+  },
 
+
+  /*
+    HOOKs
+  */
+
+  /**
+   * @private
+   * Run hooks.
+   * @param name Name of the hook to be executed.  One of the indicies in the
+   *             <code>OrgHtmlManager.HOOKS</code> variable.
+   * @param args The arguments to be passed to the hook function.
+   *             E.g. <code>{an: "object"}</code> or <code>["array"]</code>.
+   *             The first argument passed to the hook is the OrgHtmlManager
+   *             itself.
+   */
+  runHooks: function(name, args)
+  {
+    if(this.HOOKS.run_hooks) {
+      for(var i=0; i<this.HOOKS[name].length; ++i) {
+        this.HOOKS[name][i](this, args);
+      }
+    }
+  },
+
+  /**
+   * Add Hooks.
+   * This simply errors if <code>this.HOOKS[name]</code> is not an array.
+   * @param name Name of the hook, i.e. the index in <code>this.HOOKS</code>.
+   * @param func The function object.
+   */
+  addHook: function(name, func)
+  {
+    this.HOOKS[name].push(func);
+  },
+
+  /**
+   * Run a function to be executed after start up.
+   * To add several functions to the 'onReady' hook, call this method several
+   * times.
+   * The function will be called with just one parameter: the OrgHtmlManager
+   * object.
+   * In org-files, you could add this to your local setup:
+   * <pre>
+   * #+STYLE: <script type="text/javascript">
+   * #+STYLE: org_html_manager.onReady(function(){alert("Ready");});
+   * #+STYLE: </script>
+   *</pre>
+   * @param func The anonymous function object to be added to the 'onReady'
+   *             hook.
+   */
+  onReady: function(func)
+  {
+    this.addHook('onReady', func);
+  },
+
+  /**
+   * Run a function to be executed when a new section is shown.
+   * The function will be called with two parameters:
+   * 1. The OrgModeHtmlManager object itself (like every hook).
+   * 2. An object <code>{last: last_node, current: t.NODE}</code>.
+   * In org-files, you could add this to your local setup:
+   * <pre>
+   * #+STYLE: <script type="text/javascript">
+   * #+STYLE: org_html_manager.onShowSection(function(ohm, obj){
+   * #+STYLE:     alert("Showing "+ohm.rT(obj.current.H.innerHTML));
+   * #+STYLE: });
+   * #+STYLE: </script>
+   *</pre>
+   * To add several functions to this hook, call this method several times.
+   * @param func The anonymous function object to be added to the 'onReady'
+   *             hook.
+   */
+  onShowSection: function(func)
+  {
+    this.addHook('onShowSection', func);
+  }
 };
+
+
 
 
 
