@@ -94,7 +94,9 @@ If you want to contribute to Worg, keep reading.
 1. Go to your =Worg/= directory.
 
 2. Be sure to "pull" the last version of the repository.
-
+   
+  : ~$ git pull --rebase
+  
 3. Make some changes.  (If you want to learn more about various git
    workflow, read [[file:worg-git-advanced.org][this page]].)
 
@@ -124,7 +126,8 @@ agenda view.
 
 ** Register your changes under your name
 
-Information regarding your name can be stored in your ~/.gitconfig file.
+Information regarding your name can be stored in your global
+~/.gitconfig file, or in Worg/.git/config
 
 Edit it like this:
 
@@ -135,6 +138,36 @@ Edit it like this:
 Now your changes will be filed under your name.
 
 # I'm not sure this is useful at all:
+
+** Rebase to avoid merging commits
+   It's good practice to pull the current version of the repository
+   before making your own additions. But even if you do, someone might
+   make a change while you are working. So it will often be necessary
+   to pull immediately before pushing your new commit. In this
+   situation, if you use 'git pull' directly, then a 'merge commit'
+   will be generated, looking like this:
+
+#+begin_example
+commit aaaabbbbbbbbbaaaaaaaaabbbbbbbb
+Merge: bababa efefefef
+Author: Some one <name@domain>
+Date:   Wed Nov 24 00:00:01 2010 -0700
+
+    Merge branch 'master' of git+ssh://repo.or.cz/srv/git/Worg
+#+end_example
+
+   That's not a major problem, but it's nice to keep the commit logs
+   free of this stuff. To avoid generating the merge commit, use the
+   =--rebase= option when pulling:
+
+  : ~$ git pull --rebase
+
+   Basically this means that your commit will be put to the top of the
+   stack, as if no one had made any additions while you were
+   working. More advanced git users might make their changes in a
+   personal branch, and then rebase that branch against a freshly
+   pulled master branch before merging it in to master. The end result
+   would be the same as pulling with =--rebase=.
 
 ** Dealing with line endings
 
