@@ -2,7 +2,7 @@
  * @file
  * org-info.js
  *
- * Version: 0.1.7
+ * Version: 0.1.7.1
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
  *
@@ -72,19 +72,19 @@ function OrgNode ( _div, _heading, _link, _depth, _parent, _base_id, _toc_anchor
   t.IDX = -1;                          // The index in OrgHtmlManager::SECS[]
   t.HEADING = _heading;
   t.L = _link;
-  t.HAS_HIGHLIGHT = false;              // Node highlighted (search)
+  t.HAS_HIGHLIGHT = false;             // Node highlighted (search)
   t.PARENT = _parent;
   t.DIRTY = false;                     // Node is dirty, when children get
-                                          // folded seperatly.
+                                       // folded seperatly.
   t.STATE = OrgNode.STATE_FOLDED;
   t.TOC   = _toc_anchor;
   t.DEPTH = _depth;                    // The Rootelement will have
-                                          // the depth 0. All other
-                                          // Nodes get the depth from
-                                          // their h-level (h1, h2...)
+                                       // the depth 0. All other
+                                       // Nodes get the depth from
+                                       // their h-level (h1, h2...)
   t.FOLDER = null;
   t.CHILDREN = new Array();
-  t.NAV = "";                   // The info navigation
+  t.NAV = "";                          // The info navigation
   t.BUTTONS = null;
 
   if(null != t.PARENT) {
@@ -429,6 +429,13 @@ var org_html_manager = {
   setup: function ()
   {
     var t = this;
+    if(window['orgInfoHooks']) {
+      for(var i in orgInfoHooks) {
+        t.HOOKS[i] = orgInfoHooks[i];
+      }
+      t.HOOKS['run_hooks'] = false;
+    }
+
     if(location.search) { // enable overwriting of settings
       var sets = location.search.substring(1).split('&');
       for(var i = 0; i < sets.length; ++i) {
@@ -627,8 +634,8 @@ var org_html_manager = {
     if(t.STARTUP_MESSAGE) {
       t.warn("This page uses org-info.js. Press '?' for more information.", true);
     }
-    t.HOOKS.run_hooks = true;    // Unblock all hooks.
-    t.runHooks('onReady', null);
+    t.HOOKS.run_hooks = true;                    // Unblock all hooks.
+    t.runHooks('onReady', this.NODE);
   },
 
 
@@ -1048,6 +1055,7 @@ var org_html_manager = {
     var t = this;
     var section = parseInt(sec);
     var last_node = t.NODE;
+    var hook = 'onShowSection';
     if(t.HIDE_TOC && t.NODE == t.TOC && !t.FIXED_TOC) {
       OrgNode.hideElement(t.TOC.DIV);
       if(t.PLAIN_VIEW == t.VIEW) {
@@ -1062,6 +1070,7 @@ var org_html_manager = {
     if('?/toc/?' == sec || (!isNaN(section) && t.SECS[section])) {
       if('?/toc/?' == sec && t.HIDE_TOC)
         {
+          hook = 'onShowToc';
           t.NODE = t.TOC;
           t.ROOT.hideAllChildren();
           if(t.INFO_VIEW == t.VIEW)
@@ -1104,7 +1113,7 @@ var org_html_manager = {
     }
     last_node.setLinkClass();
     t.NODE.setLinkClass(true);
-    t.runHooks('onShowSection', {'last': last_node, 'current': t.NODE});
+    t.runHooks(hook, {'last': last_node, 'current': t.NODE});
   },
 
   plainView: function (sec, skip_show_section)
@@ -2211,7 +2220,7 @@ var org_html_manager = {
    */
   runHooks: function(name, args)
   {
-    if(this.HOOKS.run_hooks) {
+    if(this.HOOKS.run_hooks && this.HOOKS[name]) {
       for(var i=0; i<this.HOOKS[name].length; ++i) {
         this.HOOKS[name][i](this, args);
       }
@@ -2220,56 +2229,34 @@ var org_html_manager = {
 
   /**
    * Add Hooks.
-   * This simply errors if <code>this.HOOKS[name]</code> is not an array.
+   * If <code>this.HOOKS[name]</code> is not an array, it is created.
    * @param name Name of the hook, i.e. the index in <code>this.HOOKS</code>.
    * @param func The function object.
    */
   addHook: function(name, func)
   {
-    this.HOOKS[name].push(func);
+    if('run_hooks' != name) {
+      this.HOOKS[name].push(func);
+    }
   },
 
   /**
-   * Run a function to be executed after start up.
-   * To add several functions to the 'onReady' hook, call this method several
-   * times.
-   * The function will be called with just one parameter: the OrgHtmlManager
-   * object.
-   * In org-files, you could add this to your local setup:
-   * <pre>
-   * #+STYLE: <script type="text/javascript">
-   * #+STYLE: org_html_manager.onReady(function(){alert("Ready");});
-   * #+STYLE: </script>
-   *</pre>
-   * @param func The anonymous function object to be added to the 'onReady'
-   *             hook.
+   * Remove Hooks.
+   * @param name Name of the hook, i.e. the index in <code>this.HOOKS</code>.
+   * @param func The function object to be removed from the hook.  JavaScript
+   *             considers two functions written the same way identical.
    */
-  onReady: function(func)
+  removeHook: function(name, func)
   {
-    this.addHook('onReady', func);
-  },
-
-  /**
-   * Run a function to be executed when a new section is shown.
-   * The function will be called with two parameters:
-   * 1. The OrgModeHtmlManager object itself (like every hook).
-   * 2. An object <code>{last: last_node, current: t.NODE}</code>.
-   * In org-files, you could add this to your local setup:
-   * <pre>
-   * #+STYLE: <script type="text/javascript">
-   * #+STYLE: org_html_manager.onShowSection(function(ohm, obj){
-   * #+STYLE:     alert("Showing "+ohm.rT(obj.current.H.innerHTML));
-   * #+STYLE: });
-   * #+STYLE: </script>
-   *</pre>
-   * To add several functions to this hook, call this method several times.
-   * @param func The anonymous function object to be added to the 'onReady'
-   *             hook.
-   */
-  onShowSection: function(func)
-  {
-    this.addHook('onShowSection', func);
+    if(this.HOOKS[name]) {
+      for(var i = this.HOOKS[name].length - 1; i >= 0; --i) {
+        if(this.HOOKS[name][i] == func) {
+          this.HOOKS[name].splice(i, 1);
+        }
+      }
+    }
   }
+
 };
 
 
