@@ -39,14 +39,6 @@
   - It is more inconvenient to send the generated HTML page to a friend, since
     your friend will need to install the fonts used by jsMath.
 
-    
-    Because we are going to process the latex code with jsMath, the variable
-    org-export-with-LaTeX-fragments must be set to nil and the options
-    : #+OPTIONS: ^:nil
-    : #+OPTIONS: LaTeX:nil
-    must be in the beginning of the org file. These measures are necessary
-    assure that the latex code will be left intact by org-mode.
-
 * Download jsMath
   First we need to download jsMath for authors as explained in
   http://www.math.union.edu/~dpvc/jsMath/download/jsMath.html. The necessary
@@ -109,6 +101,23 @@
 
   As last, if the browser freezes when jsMath is being loaded, try disable the
   autoload feature in the easy/load.js file.
+
+* Org setup to keep LaTeX intact for jsMath
+  
+  /(Updated 2010-01-07 by CM)/
+
+  Because we are going to process the latex code with jsMath, we
+  must ensure that Org-mode leaves the latex code intact. This can
+  now be done by setting the variable
+  org-export-with-LaTeX-fragments to =verbatim=, e.g. by including
+  this line at the beginning of the Org file:
+  : #+OPTIONS: LaTeX:verbatim
+  (Previously, the same effect was achieved with the lines
+  : #+OPTIONS: ^:nil
+  : #+OPTIONS: LaTeX:nil
+  but this had the side effect of turning off sub- and superscripts
+  in all non-latex text. The new =verbatim= option can be used with
+  =^:t=.)
 
 * As pretty as it can get
   jsMath should be working with org-mode by now, but it is using the image fonts

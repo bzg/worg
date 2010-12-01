@@ -1,0 +1,102 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:nil skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE:      Org-babel: Uses
+#+AUTHOR:     David Hajage
+#+EMAIL:      dhajage at gmail dot com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:  ../uses.php
+#+LINK_HOME: http://orgmode.org/worg/
+
+* ascii package
+ [[http://cran.r-project.org/web/packages/ascii/index.html][=ascii=]] package (available on [[http://cran.r-project.org/][CRAN]]) creates appropriate plain text
+ representations of many =R= objects, and features an option to specify
+ that the plain text representations should be in Org format (as well
+ as [[http://www.methods.co.nz/asciidoc/][asciidoc]], [[http://txt2tags.sourceforge.net/][txt2tags]], [[http://docutils.sourceforge.net/rst.html][restructuredtext]] and [[http://en.wikipedia.org/wiki/Textile_(markup_language)][textile]]). This can be
+ particularly useful for retrieving non-tabular =R= data structures in
+ Org.
+
+* babel using ascii
+  :PROPERTIES:
+  :cache: yes
+  :END:
+  First, (install), load =ascii= package and set org as the default
+  output:
+
+#+srcname: ascii-example1
+#+begin_src R :results output code :session ascii
+  library(ascii)
+  options(asciiType="org")
+#+end_src R
+
+#+results[2ae9c000d5289fc56316a3d7d1a829b3af3fb2d9]: ascii-example1
+#+BEGIN_SRC R
+Le chargement a nécessité le package : proto
+#+END_SRC
+Then, use =ascii= function:
+
+#+srcname: ascii-example2
+#+begin_src R :results output org :session ascii
+  ascii(summary(table(1:4, 1:4)))
+#+end_src
+
+#+results[7a8dbb1c07076d9824022708eb216504d41fd3da]: ascii-example2
+- Number of cases in table: 4 
+- Number of factors: 2 
+- Test for independence of all factors:
+  - Chisq = 12, df = 9, p-value = 0.2133
+  - Chi-squared approximation may be incorrect
+#+srcname: ascii-example3
+#+begin_src R :results output org :session ascii
+counts <- c(18, 17, 15, 20, 10, 20, 25, 13, 12)
+outcome <- gl(3, 1, 9)
+treatment <- gl(3, 3)
+d.AD <- data.frame(treatment, outcome, counts)
+glm.D93 <- glm(counts ~ outcome + treatment, family = poisson())
+ascii(glm.D93)
+#+end_src
+
+#+results[bd61c121c58d9a7dc9eca128993a430e29db3cdf]: ascii-example3
+|             | Estimate | Std. Error | z value | Pr(> \vert z \vert ) |
+|-------------+----------+------------+---------+----------------------|
+| (Intercept) |     3.04 |       0.17 |   17.81 |                 0.00 |
+| outcome2    |    -0.45 |       0.20 |   -2.25 |                 0.02 |
+| outcome3    |    -0.29 |       0.19 |   -1.52 |                 0.13 |
+| treatment2  |     0.00 |       0.20 |    0.00 |                 1.00 |
+| treatment3  |     0.00 |       0.20 |    0.00 |                 1.00 |
+#+srcname: ascii-example4
+#+begin_src R :results output org :session ascii
+ascii(anova(glm.D93))
+#+end_src
+
+#+results[0f9107e56c83effc9e4cac0103894faf2adf0da4]: ascii-example4
+|           |   Df | Deviance | Resid. Df | Resid. Dev |
+|-----------+------+----------+-----------+------------|
+| NULL      |      |          |      8.00 |      10.58 |
+| outcome   | 2.00 |     5.45 |      6.00 |       5.13 |
+| treatment | 2.00 |     0.00 |      4.00 |       5.13 |
+#+srcname: ascii-example5
+#+begin_src R :results output org :session ascii
+  ascii(sessionInfo())
+#+end_src
+
+#+results[31e2b19dfb31d11768c6c0bde7272f1a06f35cf1]: ascii-example5
+- R version :: R version 2.11.0 (2010-04-22), i486-pc-linux-gnu
+- locale :: LC_CTYPE=fr_FR.utf8, LC_NUMERIC=C, LC_TIME=fr_FR.utf8, LC_COLLATE=fr_FR.utf8, LC_MONETARY=C, LC_MESSAGES=fr_FR.utf8, LC_PAPER=fr_FR.utf8, LC_NAME=C, LC_ADDRESS=C, LC_TELEPHONE=C, LC_MEASUREMENT=fr_FR.utf8, LC_IDENTIFICATION=C
+- attached base packages :: stats, graphics, grDevices, utils, datasets, methods, base
+- other attached packages :: ascii_0.6-3, proto_0.3-8
+* With =Sweave=
+  =ascii= package provides a [[http://www.stat.uni-muenchen.de/~leisch/Sweave/][=Sweave=]] driver for org markup.
+  
+  When using =Sweave=, just replace =RweaveLatex= driver by =RweaveOrg=:
+  
+:  Sweave("yourfile.Rnw", driver = RweaveOrg)
+  
+* Bug
+** Cell spanning
+   I am not an org guru, but as much I can know, org doesn't support
+   row or col spanning. =l/r/t/bgroup= options of =ascii= function are
+   ignored in org output, and some of [[http://eusebe.github.com/ascii/#_row_and_col_headings][these examples]] will not produce the
+   expected results.

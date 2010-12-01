@@ -22,20 +22,22 @@ your contribution will be useful:
 - you can submit *bug reports* -- Before sending a bug report, make sure
   you have read this section of Org's manual: [[http://orgmode.org/org.html#Feedback][Feedback]]
 
-- you can submit *feature requests* -- Org is already mature, but new ideas
-  keep popping up.  If you want to request a feature, it might be a good
-  idea to have a look at the current [[http://orgmode.org/todo.html][TODO list]] of Org, or to dig into the
-  mailing list for possible previous discussions about your idea.
+- you can submit *feature requests* -- Org is already mature, but new
+  ideas keep popping up.  If you want to request a feature, it might
+  be a good idea to have a look at the current [[http://orgmode.org/worg/org-issues.php][Issue tracking file]]
+  which captures both bug reports and feature requests.  Or dig into
+  the mailing list for possible previous discussions about your idea.
+  If you cannot find back your idea, formulate it as detailed as
+  possible, if possible with examples, and send it to the mailing
+  list.
 
 - you can submit *patches* -- You can submit patches to the mailing list.
 
-  If your patch is against a file that is part of Emacs, then it won't be
-  taken unless it is /less than 10 lines/ or you granted the rights on your
-  works to the Free Software Foundation, Inc.
+  If your patch is against a file that is part of Emacs, then your
+  total contribution (all patches you submit) should change /less than
+  20 lines/.  If you contribute more, you have to assign the copyright
+  of your contribution to the Free Software Foundation (see below).
   
-  If your patch is against a file that is not part of Emacs, then it might
-  be taken without worrying about its length, if the patch is good.
-
 - you can submit Org *add-ons* -- there are many Org add-ons.  The best way
   is to submit your code to the mailing list to discuss it with people.  If
   it is useful, you might consider contributing it to the =CONTRIB/=
@@ -45,24 +47,51 @@ your contribution will be useful:
   Org files that you can contribute to.  Learn what Worg is [[file:worg-about.org][about]] and how
   to contribute to it [[file:worg-git.org][through git]].
 
-* Contributing to Emacs org-mode
+* Copyright issues when contributing to Emacs org-mode
 
-Org is made of several files.  Those who are part of GNU Emacs are
+Org is made of many files.  Most of them are also distributed as part
+of GNU Emacs.  These files are called the /Org core/, and they are all
 copyrighted by the [[http://www.fsf.org][Free Software Foundation, Inc]].  If you consider
 contributing to these files, your first need to grant the right to
 include your works in GNU Emacs to the FSF.  For this you need to
-complete [[http://orgmode.org/request-assign-future.txt][this form]] and send it to [[mailto:assign@gnu.org][assign@gnu.org]].
+complete [[http://orgmode.org/request-assign-future.txt][this form]], send it to [[mailto:assign@gnu.org][assign@gnu.org]], and tell the Org-mode
+maintainer when this process is complete.  Some people consider this a
+hassle.  I don't want to discuss this in detail here - there are some
+good reasons for getting the copyright registered, an example is
+discussed in this [[http://twit.tv/floss117][FLOSS weekly podcast]].  Furthermore, by playing
+according to the Emacs rules, we gain the fantastic advantage that
+every version of Emacs ships with Org-mode already fully built in.  So
+please consider doing this - it makes our work as maintainers so much
+easier, because we can then take your patches without any additional
+work.
 
-If you want to understand /why/, please read this: [[http://www.gnu.org/licenses/why-assign.html][Why the FSF gets copyright assignments from contributors?]]
+If you want to learn more about /why/ copyright assignments are
+collected, read this: [[http://www.gnu.org/licenses/why-assign.html][Why the FSF gets copyright assignments from
+contributors?]]
+
 * Preferred way of submitting patches
 
 Org-mode is developed using /git/ as the version control system.  Git
-provides an amazing framework to collaborate on a project.  Git
-can be used to make patches and send them via email - this is fine for
-minor changes.  For more significant contributions, the best
-way to submit patches is through public branches of your repository
-clone.
+provides an amazing framework to collaborate on a project.  Git can be
+used to make patches and send them via email - this is perfectly fine
+for minor changes.
+#+begin_quote
+  This command will make a patch between the staging area (in
+  your computer), and the file you modified:
+  : git diff -p org-whatever.el > org-whatever.el.diff
+  If you already committed your changes to your index (staging
+  area), then you should compare against a particular branch (in
+  this example, origin/master):
+  : git diff -p origin/master org-whatever.el > org-whatever.el.diff
+  You email the output to the mailing list, adding =[PATCH]= to
+  the subject, and description of what you fixed or changed.
+#+end_quote
+These patches will be automatically registered at [[http://patchwork.newartisans.com/project/org-mode][John Wiegley's
+patchwork server]] and will then be accepted, rejected, or sent back to
+the author with a request for modification.
 
+For more significant contributions, the best way to submit patches is
+through public branches of your repository clone.
 
 1. Clone our git repository at =http://repo.or.cz/w/org-mode.git=
 
@@ -105,56 +134,163 @@ clone.
    : git branch -d NEWTOPIC
    : git push REMOTE :NEWTOPIC
 
-* Current contributors
+* Commit messages and ChangeLog entries
+
+We have decided to no longer keep a ChangeLog file to record changes
+to individual functions.  In a modern version control system like git,
+ChangeLog is duplicating information that should be in the commit
+message, and it is the main cause of merge conflicts.
+
+Instead, the change log entry should be part of the commit message.  A
+commit message should be constructed in the following way:
+
+- Line 1 of the commit message should always be a short description of
+  the overall change.  Line 1 does /not/ get a dot at the end.
+- Line 2 is an empty line
+- In line 3, the ChangeLog entry should start, in a similar format as
+  in the old ChangeLog files, but without the author information
+  (which is part of the commit anyway).
+- After the changelog, another empty line should come before any
+  additional information that the committer wishes to provide in order
+  to explain the patch.
+- If the change is a minor change made by a committer without
+  copyright assignment to the FSF, the commit message should also
+  contain the cookie =TINYCHANGE= (anywhere in the message).  When we
+  later produce the ChangeLog file for Emacs, the change will be
+  marked appropriately.
+
+Here is an example for such a message
+
+#+begin_example
+  Capture: Fix the case of using a template file
+      
+  ,* lisp/org-capture.el (org-capture-set-plist): Make sure txt is a string
+  before calling `string-match'.
+  (org-capture-templates): Fix customization type.
+  ,* doc/org.texi (Capture): Document using a file for a template
+      
+  The problem here was that a wrong keyword was given in the
+  customization type.  This let to a string-match against a list value.
+  
+  Modified from a patch proposal by Johan Friis.
+  
+  TINYCHANGE
+#+end_example
+
+If you are using /magit.el/ in Emacs, The ChangeLog-like such entries
+are easily made by pressing =C= in the diff listing.  Another option
+to make the entries is to use `C-x 4 a' in the changed function.  This
+will create entries in the ChangeLog file, and you can then cut and
+paste these to the commit message and remove the indentation.
+
+* Copyrighted contributors to Org-mode
+
+Here is the list of people who have contributed actual code to the
+Org-mode core.  Note that the manual contains a more extensive list
+with acknowledgments, including contributed ideas!  The lists below
+are mostly for house keeping, to help the maintainers keep track of
+copyright issues.
+
+** Current contributors
+  :PROPERTIES:
+  :CUSTOM_ID: contributors_with_fsf_papers
+  :END:
 
 Here is the list of people who signed the papers with the Free Software
 Foundation and can now freely submit code to Org files that are included
 within GNU Emacs:
 
-- Benjamin Andresen
-- Konstantin Antipin
-- Ian Barton
-- Thomas Baumann
-- Jan Böker
-- Lennart Borgman
-- Tom Breton
-- Baoqiu Cui
-- Sacha Chua
-- Dan Davison
-- Carsten Dominik
-- Adam Elliott
-- Miguel A. Figueroa-Villanueva
-- Mikael Fornius
-- Eric S. Fraga
-- Daniel M German
-- Bastien Guerry
-- Bernt Hansen
-- Magnus Henoch
-- Tomas Hlavaty
-- Tassilo Horn
-- Phil Jackson
-- Peter Jones
-- Tokuya Kameshima
-- Richard Klinda
-- Christopher League
-- David Maus
-- Ross Patterson
-- Jason Riedy
-- Richard Riley
-- Philip Rooke
-- Sebastian Rose
-- Eric Schulte
-- Charles Sebold
-- Paul Sexton
-- James TD Smith
-- Ulf Stegemann
-- Andy Steward
-- Christopher Suckling
-- David O'Toole
-- John Wiegley
-- Piotr Zielinski
+1. Russel Adams
+2. Benjamin Andresen
+3. Konstantin Antipin
+4. Julien Barnier
+5. Ian Barton
+6. Thomas Baumann
+7. Joel Boehland
+8. Jan Böker
+9. Lennart Borgman
+10. Tom Breton
+11. Andreas Burtzlaff
+12. Baoqiu Cui
+13. Sacha Chua
+14. Julien Danjou
+15. Dan Davison
+16. Carsten Dominik
+17. Stephen Eglen
+18. Christian Egli
+19. Adam Elliott
+20. Miguel A. Figueroa-Villanueva
+21. Mikael Fornius
+22. Eric S. Fraga
+23. Michael Gauland
+24. Daniel M German
+25. Manuel Giraud
+26. Nicolas Goaziou
+27. Bernd Grobauer
+28. Bastien Guerry
+29. Daniel M. Hackney
+30. Bernt Hansen
+31. Magnus Henoch
+32. Tomas Hlavaty
+33. Tassilo Horn
+34. Noorul Islam K M
+35. Erik Iverson
+36. Phil Jackson
+37. Peter Jones
+38. Tokuya Kameshima
+39. Richard Klinda
+40. Anthony Lander
+41. Christopher League
+42. Matt Lundin
+43. David Maus
+44. Nathan Neff
+45. Ross Patterson
+46. Juan Pechiar
+47. Martin Pohlack
+48. Jason Riedy
+49. Richard Riley
+50. Philip Rooke
+51. Sebastian Rose
+52. Eric Schulte
+53. Charles Sebold
+54. Paul Sexton
+55. James TD Smith
+56. Michael Sperber
+57. Ulf Stegemann
+58. Lukasz Stelmach
+59. Andy Steward
+60. Christopher Suckling
+61. David O'Toole
+62. Zhang Weize
+63. John Wiegley
+64. Piotr Zielinski
 
-thc
+** Processing
+
+These people have been asked to sign the papers, and they are
+currently considering it or a request is being processed by the FSF.
+
+1. Chris Gray
+
+** Tiny Changes
+
+These people have submitted tiny change patches that made it into Org
+without FSF papers.  When they submit more, we need to get papers
+eventually.  The limit is a cumulative change of 20 non-repetitive
+change lines.  Details are given in [[http://www.gnu.org/prep/maintain/maintain.html#Legally-Significant ][this document]].
+
+1. Robert P. Goldman
+2. Andy Lutomirski
+
+(this list may be incomplete - please help to complete it)
+
+** No FSF assignment
+
+These people cannot or prefer to not sign the FSF copyright papers,
+and we can only accept patches that do not change the core files (the
+ones that are also in Emacs).
+
+Luckily, this list is still empty.
 
 #+BEGIN: timestamp :string "Last update: " :format "%Y-%m-%d @ %H:%M"
 Last update: 06-04-2010 16:29

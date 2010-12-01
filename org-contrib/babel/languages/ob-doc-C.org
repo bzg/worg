@@ -1,0 +1,40 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Using C and makefile code with Babel
+#+AUTHOR:     Worg People
+#+EMAIL:      schulte.eric at gmail dot com, davison at stats dot ox dot ac dot uk
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+
+* Introduction
+Babel can evaluate C and C++ code.  As opposed to interpreted
+languages, which can be evaluated directly, C or C++ code is first
+compiled to an executable which is then run.  If a =main= method is
+not present in a code block then the entire block is wrapped in a
+trivial =main= function call.
+
+So, for example, the following simple code block can be evaluated and
+the results of evaluation inserted into the buffer.
+
+: #+begin_src c++ :includes <stdio.h>
+:   int a=1;
+:   int b=1;
+:   printf("%d\n", a+b);
+: #+end_src
+: 
+: #+results:
+: : 2
+
+* Language Specific Header Arguments
+Babel provides the following C and C++ specific header arguments:
+- =:cmdline= :: command line arguments to pass to the executable
+     compiled from the code block
+- =:flags= :: flags to pass to the C compiler
+- =:main= :: can be set to "no" to inhibit wrapping of the code block
+     in a =main= function call
+- =:includes= :: accepts either a single string name, or a list of
+     names of files to =#include= in the execution of the code block
+- =:defines= :: just like =:includes= but for =#defines= lines at the
+     top of the code

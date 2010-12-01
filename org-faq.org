@@ -4,7 +4,7 @@
 #+AUTHOR:    Worg people
 #+LANGUAGE:  en
 #+TITLE:     Org-mode Frequently Asked Questions
-#+INFOJS_OPT: view:info toc:1 path:http://orgmode.org/worg/code/org-info-js/org-info.js tdepth:1 ftoc:t buttons:0 mouse:underline
+#+INFOJS_OPT: view:content toc:1 path:http://orgmode.org/worg/code/org-info-js/org-info.js tdepth:1 ftoc:t buttons:0 mouse:underline
 #+OPTIONS:   H:3 num:nil toc:t \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
 
 #+begin_html
@@ -20,8 +20,8 @@
 
 Welcome to the Org-mode FAQ.
 
-You can navigate the FAQ by clicking on any of the topics in the Table
-of Contents.
+You can navigate the FAQ by clicking on any of the topics in the Table of
+Contents.
 
 If your browser supports JavaScript, you can...
 
@@ -154,16 +154,34 @@ about the number of list readers.
   :PROPERTIES:
   :CUSTOM_ID: Keeping-current
   :END:
-** How do I keep current with Org mode development?
+** My Emacs ships with an older version Org-mode! How do I upgrade?
+   :PROPERTIES:
+   :CUSTOM_ID: updating-org
+   :END:
+
+Org-mode develops quickly, which means that versions of Org-mode
+shipped with Emacs are more or less out-of-date. If you'd like to
+upgrade to the most recent version of org-mode, you have a number of
+options.
+
+ 1. Download the most recent release of org-mode ([[http://orgmode.org/org-7.3.zip][zip]] or [[http://orgmode.org/org-7.3.tar.gz][tarball]]) and
+    follow the [[http://orgmode.org/manual/Installation.html#Installation][installation instructions]] in the manual.
+ 2. Clone and install the development git repository as [[#keeping-current-with-Org-mode-development][explained
+    here]]. If you don't want to run the bleeding edge, you can still
+    use git [[#using-stable-releases-only][to track the most recent stable releases]].
+ 3. Install and updated org-mode automatically through the Emacs
+    Package Manager as [[#installing-via-elpa][explained in this FAQ]].
+
+** How do I keep current with bleeding edge development?
    :PROPERTIES:
    :CUSTOM_ID: keeping-current-with-Org-mode-development
    :END:
 
-   Org mode is developed in [[http://en.wikipedia.org/wiki/Git_(software)][Git]].  You can keep up-to-date with Org
-   mode developement by cloning Org mode repository and refreshing
-   your copy with latest changes whenever you wish.  You only need to
-   use two Git commands (clone and pull.)  Here are the steps in
-   brief (please customize locations to suit your setup):
+   Org mode is developed in [[http://en.wikipedia.org/wiki/Git_(software)][Git]]. You can keep up-to-date with Org-mode
+   developement by cloning Org mode repository and refreshing your
+   copy with latest changes whenever you wish. You only need to use
+   two Git commands (clone and pull.) Here are the steps in brief
+   (please customize locations to suit your setup):
 
    1. Select a location to house the Org mode repository (approx. 40
       MB; includes documentation, compiled elisp files and history
@@ -189,6 +207,9 @@ about the number of list readers.
       Please note that you can choose to /not/ compile at all and run
       using source =.el= files only.  Compiled files speed things up.
 
+      Also note that running =make install= is necessary only if you'd
+      like to install org-mode system-wide.
+
    4. This is where you configure Org mode with Emacs.  Please refer
       to [[./org-tutorials/index.org][Org tutorials]].
 
@@ -205,8 +226,8 @@ about the number of list readers.
 
    6. You should restart org mode to have the changes take effect (if
       you are not rebooting Emacs.)  Also since the intention is to
-      "keep up" with Org mode, you should visit ChangeLog and updated
-      sections of documentation for latest updates (use =git log=.)
+      "keep up" with Org mode, you should visit updated sections of
+      documentation for latest updates (use =git log=.)
 
    7. As you use your repository over time it will accumulate loose objects.
       You can reduce the total size of your git repository with
@@ -351,6 +372,69 @@ At anytime during the rebase conflict resolution you can say "oops this is all w
 using
 : $ git rebase --abort
 
+** How can I use a stable release version instead of the bleeding edge master?
+   :PROPERTIES:
+   :CUSTOM_ID: using-stable-releases-only
+   :END:
+
+The master branch of the git repository always contains the bleeding
+edge development code.  This is important for Org's fast development,
+because code on master gets checked out by many people daily and we
+quickly receive bug reports if something is wrong.  On rare occasions,
+this code may not function perfectly for a limited time while we are
+trying to fix things.
+
+Not everyone like to use this bleeding-edge code and face the danger
+to hit a surprising bug.
+
+Therefore, from time to time, we make a release.  This typically
+happens when the maintainers feel that
+
+1. they have reached a good point in the development
+2. the code has a feature set that should stay and be supported in the
+   future
+
+Stable releases are used as the basis for [[http://orgmode.org/index.html#sec-3_3][alternative distributions]] of
+Org, and they are also the code that gets merged into the Emacs
+distribution. If you want to work only with stable releases, you can
+always download [[http://orgmode.org/index.html#sec-3][them here]], but you can also also use the git
+repository to keep automatically up-to-date with the most recent
+stable releases (and save bandwidth!). Here's how to do so:
+
+*** Run a specific stable release
+
+In the repository, do
+
+: $ git fetch --tags
+: $ git tag
+
+To see which release tags are available.  Let's say you decide to use
+=release_7.01f=.
+
+: $ git checkout release_7.01f
+
+This set the working tree of the repository to the state of Org at the
+moment of release 7.01f.  You can then run Org from the repository be
+sure to use the stable release while development continues on the
+master branch.
+
+Later, when we release 7.02, you can switch to that using
+
+: $ git fetch --tags                   # to get all the new stuff
+: $ git tag
+: $ git checkout release_7.02
+
+*** Always run the most recent stable release
+
+Alternatively, if you just want to always run whatever the latest
+stable release is, you can do
+
+: $ git checkout -b stable origin/maint
+
+and then regularly update this branch by doing
+
+: $ git pull
+
 ** How can I install an up-to-date version of org-mode without "make" tools?
    :PROPERTIES:
    :CUSTOM_ID: installing-org-without-make-tools
@@ -367,11 +451,128 @@ customary =make clean && make && make install=.
 The result of that discussion is the file/function found in
 [[http://orgmode.org/worg/org-hacks.php#compiling-org-without-make]].
 
+** I don't use git. Can I download bleeding edge .zip and .tar.gz archives?
+
+   Yes. You can download [[http://orgmode.org][org-latest.zip]] or [[http://orgmode.org/org-latest.tar.gz][org-latest.tar.gz]] of
+   Org-mode -- these archives are udpated every day at midnight.
+
+   Alternatively, you can download a [[http://repo.or.cz/w/org-mode.git/snapshot][tar.gz snapshot from repo.or.cz]].
+
+** How can I install Org-mode through Emacs' Package Manager?
+   :PROPERTIES:
+   :CUSTOM_ID: installing-via-elpa
+   :END:
+
+   Emacs 24 includes an automated package management tool ([[http://tromey.com/elpa/][ELPA]]) that
+   can be used to install and upgrade elisp packages such as Org-mode.
+   If you are running an older version of Emacs (23 or earlier), you
+   will have to install the package manager before using it to install
+   Org-mode. See [[#installing-elpa][this FAQ]] for more details.
+
+   Org-mode is distributed as an ELPA package from [[http://elpa.gnu.org/packages/][GNU Emacs Lisp
+   Package Archive]] as well as from [[http://orgmode.org/pkg/daily/][Org-mode Emacs Lisp Archive]].
+   
+   Steps for adding Org-mode as a package archive:
+   1. Add Org-mode as a package archive. This can be done in two ways.
+      1. Use =M-x customize-variable RET package-archives=
+      2. Add the following line to your =.emacs= and reload Emacs.
+
+         #+begin_src emacs-lisp
+           (add-to-list 'package-archives '("Org-mode" . "http://orgmode.org/pkg/daily/"))
+         #+end_src
+		
+   2. Use the Emacs package manager's =M-x list-packages= to browse
+      and install the latest version.
+
+   3. If you get the following error "*Failed to download `Org-mode'
+      archive.*" in step 2, you can manually download the tarball and
+      install it. Refer [[Installing from ELPA-tar][this FAQ entry]] for more information.
+
+** How do I install Emacs package manager?
+   :PROPERTIES:
+   :CUSTOM_ID: installing-elpa
+   :END:
+   
+   If you are running Emacs-24 or find the command =M-x list-packages=
+   available you already have the package manager installed.
+   
+   Steps for installing package manager:
+   1. Download the latest package manager -
+      [[http://repo.or.cz/w/emacs.git/blob_plain/HEAD:/lisp/emacs-lisp/package.el][package.el]].
+   2. Add the following to your =.emacs= and reload Emacs.
+      #+begin_src emacs-lisp
+        ;; change "~/elisp/" as appropiate
+        (setq load-path (cons "~/elisp" load-path))
+        (require 'package)
+        (package-initialize)
+      #+end_src
+   
+** I don't see Org-mode as an installation option in Package Manager Menu?
+   :PROPERTIES:
+   :CUSTOM_ID: why-no-org-in-elpa
+   :END:
+   
+   Emacs Package Manager is a very recent addition to Emacs. Work is
+   under way to have have Org-mode seamlessly integrate with Emacs'
+   Package Manager. As a result, it will be some time before the
+   Org-mode packages are available and usable from either GNU or
+   Org-mode package archives.
+   
+   In the meanwhile, you can install Org-mode via package manager
+   through ELPA-compatible tar. Refer [[Installing from ELPA-tar][this FAQ entry]] for more information.
+   
+** How do I install Org-mode from a ELPA-compatible tarball?
+   :PROPERTIES:
+   :CUSTOM_ID: installing-from-elpa-tarball
+   :END:
+# <<Installing from ELPA-tar>>
+   
+   Org-mode is distributed as an ELPA-compatible tar which can be used
+   in conjunction with Emacs' package manager.
+   
+   1. If you are already running Org-mode, note the current version
+      reported by M-x org-version.
+   2. Download the latest tarball from [[http://orgmode.org/pkg/daily/][Org-mode repo]].
+   3. Do =M-x package-install-file=. When prompted for =Package file
+      name=, point it to .tar file downloaded in step 2.
+      
+      You will now see Package Manager compiling the files and
+      installing it.
+   4. Reload emacs. This step is very important.
+   5. Note the version of the new installation using M-x
+      org-version. If the new and old versions are different, the
+      installation is done and you are all set to enjoy the updated
+      Org-mode. Otherwise skip to step 6.
+   6. Review you load-path using =C-h v load-path=. Most likely that
+      your old installation path takes precedence over the path chosen
+      by package manager (which is typically
+      =~/.emacs.d/elpa/...=). Fix this anamoly by moving
+      =(package-initialize)= line in .emacs to a more appropriate
+      location.
+      
+   - Additional Note on =org-install.el= :: Functionality of Org-mode's
+     =org-install.el= is supplanted by Package Manager's
+     =org-autoloads.el=. Since Package Manager autoloads Org-mode for
+     you, the following line =(require 'org-install)= in your =.emacs=
+     is no longer required and can be safely removed.
+     
+** Why would I use ELPA tarballs instead of the snapshot tarballs?
+   :PROPERTIES:
+   :CUSTOM_ID: why-elpa
+   :END:
+   
+   ELPA-tarballs automate much the process of upgrading org-mode. Much
+   of the following grunt work is done automatically by the Package
+   Manager:
+   
+   1. Downloading, compiling, and activating of org-mode (including
+      setting org-mode's =load-path= and autoloads).
+   2. Updating info files.
+
 * Setup
   :PROPERTIES:
   :CUSTOM_ID: Setup
   :END:
-
 ** How can I quickly browse all Org options?
 
 =M-x org-customize RET=
@@ -414,35 +615,33 @@ for details.
    :CUSTOM_ID: making-sure-org-mode-is-up-to-date
    :END:
 
-Org-mode develops very quickly. There have been a great many changes,
-for instance, since the release of Emacs 22, which shipped with
-version 4.67d of org-mode. (Emacs 23 is expected to ship with version
-6.21b.)
+Org-mode develops very quickly. If you are using a version of Org-mode
+that shipped with emacs, there is a good chance that it is somewhat
+out of date.
 
-Many of the users on the org-mode mailing list are using either a
-recent release of org-mode or the
+Many of the users on the Org-mode mailing list are using either a
+recent release of Org-mode or the
 [[http://orgmode.org/index.html#sec-3.2][development version of
 org-mode from the git repository]].
 
 If some settings and features aren't working the way you expect, make
 sure that the version of the manual you are consulting matches the
-version of org-mode you are using.
+version of Org-mode you are using.
 
-   - You can check which version of org-mode you are using by
+   - You can check which version of Org-mode you are using by
      selection =Org --> Documentation --> Show Version= in the Emacs
      menu.
 
    - The [[http://orgmode.org/manual/index.html][online manual]] at [[http://orgmode.org][orgmode.org]] corresponds to the most recent
      release.
 
-   - The [[http://www.gnu.org/software/emacs/manual/html_node/org/index.html][manual]] at [[http://www.gnu.org][www.gnu.org]] corresponds to the version of org-mode
-     released with the latest official Gnu Emacs release (Emacs 22 and
-     org-mode 4.67d as of February 2009). Note: compared with the
-     manual at the orgmode.org, the manual at www.gnu.org is
-     considerably out of date.
+   - The [[http://www.gnu.org/software/emacs/manual/html_node/org/index.html][manual]] at [[http://www.gnu.org][www.gnu.org]] corresponds to the version of Org-mode
+     released with the latest official Gnu Emacs release. Compared
+     with the manual at the orgmode.org, the manual at www.gnu.org is
+     somewhat out of date.
 
-For instructions on how to stay current with org-mode, consult [[keeping-current-with-Org-mode-development][this
-FAQ]] or follow the instructions on [[http://orgmode.org][the official org-mode site]].
+For instructions on how to stay current with Org-mode, consult [[keeping-current-with-Org-mode-development][this
+FAQ]] or follow the instructions on [[http://orgmode.org][the official Org-mode site]].
 
 ** Can I get the visibility-cycling features in outline-mode and outline-minor-mode?
    :PROPERTIES:
@@ -471,8 +670,14 @@ promotion and demotion functionality.  /outline-magic.el/ is
 available at [[http://www.astro.uva.nl/~dominik/Tools/outline-magic.el][Outline Magic]].
 
 ** Can I save/restore the visibility state of an org-mode buffer?
+   :PROPERTIES:
+   :CUSTOM_ID: saving-visibility-state
+   :END:
 
-Well, no.
+Well, no---at least not automatically. You can, however, control the
+visibility of an org-file or of individual trees by adding
+instructions to your org file. See [[http://orgmode.org/manual/Visibility-cycling.html#Visibility-cycling][this section of the manual]] for more
+information.
 
 ** How can I keep track of changes in my Org files?
    :PROPERTIES:
@@ -514,13 +719,12 @@ mode using
    :END:
 
 Org-mode is flexible enough to accomodate a variety of organizational
-and time management schemes. Org's
-[[http://orgmode.org/manual/Document-Structure.html#Document-Structure][outline
-cycling and convenient editing and navigation commands]] make it
-possible to maintain all of your projects and notes in a single file.
-But org-mode's [[http://orgmode.org/manual/Hyperlinks.html#Hyperlinks][quick and easy hyperlinks]], along with [[http://orgmode.org/manual/Refiling-notes.html#Refiling-notes][easy refiling of
-notes and todos]], also make it a delight to maintain a private "wiki"
-consisting of multiple files.
+and time management schemes. Org's [[http://orgmode.org/manual/Document-Structure.html#Document-Structure][outline cycling and convenient
+editing and navigation commands]] make it possible to maintain all of
+your projects and notes in a single file. But org-mode's [[http://orgmode.org/manual/Hyperlinks.html#Hyperlinks][quick and
+easy hyperlinks]], along with [[http://orgmode.org/manual/Refiling-notes.html#Refiling-notes][easy refiling of notes and todos]], also
+make it a delight to maintain a private "wiki" consisting of multiple
+files.
 
 No matter how you organize your org files, org-mode's agenda commands
 make it easy to search all your notes and gather together crucial data
@@ -590,34 +794,6 @@ files in your =.emacs= file before you have set your org variables,
 since these will also cause org.el to be loaded. To be safe, load org
 files *after* you have set your variables.
 
-** Org-mode has a lot of colors?  How can I change them?
-   :PROPERTIES:
-   :CUSTOM_ID: customizing-org-faces
-   :END:
-
-This is a question that applies to Emacs as a whole, but it comes up
-quite frequently on the org-mode mailing list, so it is appropriate to
-discuss it here.
-
-If you would like to change the style of a face in org-mode (or any
-other Emacs mode), simply type =M-x customize-face [RET]= while the
-cursor is on the color/style you are interested in modifying. You will
-be given the opportunity to customize all the faces located at that
-point.
-
-If you would like an overview of all the faces in org-mode, you can
-type =C-u M-x list-faces-display [RET] org= and you will be shown all
-the faces defined by org-mode along with an illustration of their
-current settings.
-
-If you would like to customize org-faces and other aspects of
-org-appearance, type =M-x customize-group org-font-lock [RET]=.
-
-Finally, if you would like verbose information about the properties of
-the text under the cursor, you can type =C-u C-x ==.
-
-See the Worg page on [[file:org-tutorials/org-appearance.org][customizing Org appearance]] for further information.
-
 ** How can I make sure that timestamps appear in English?
    :PROPERTIES:
    :CUSTOM_ID: timestamps-and-system-time-locale
@@ -631,10 +807,52 @@ the following variable:
   (setq system-time-locale "C")
 #+end_src
 
+** What does a minimal .emacs look like?
+   :PROPERTIES:
+   :CUSTOM_ID: minimal-emacs
+   :END:
+
+Using a stripped down minimal .emacs files removes broken custom
+settings as the cause of an issue and makes it easy to reproduce for
+other people.  The example below has system-specific paths that you'll
+need to change for your own use.
+#+begin_src emacs-lisp
+  (add-to-list 'load-path (expand-file-name "~/git/org-mode/lisp"))
+  (add-to-list 'auto-mode-alist '("\\.\\(org\\  |org_archive\\|txt\\)$" . org-mode))
+  (setq org-agenda-files '("/tmp/test.org"))
+  (require 'org-install)
+  (require 'org-habit)
+
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cb" 'org-iswitchb)
+#+end_src
+
+You can save the minimal .emacs file to ~/minimal.emacs, add suspect
+configuration code to it, then start emacs something like this:
+#+begin_src sh
+  emacs -Q -l ~/minimal.emacs
+#+end_src
+
+On OS X, starting emacs with minimal configuration might look
+something like this:
+#+begin_src sh
+  /Applications/emacs.app/Contents/MacOS/Emacs -Q -l ~/minimal.emacs
+#+end_src sh
+
 * Errors and general problems
   :PROPERTIES:
   :CUSTOM_ID: Errors
   :END:
+** Opening Org files in Emacs leads to a crash
+   :PROPERTIES:
+   :CUSTOM_ID: Emacs-crashes-with-org-indent-mode
+   :END:
+   The only known case where Org-mode can crash Emacs is when you are
+   using =org-indent-mode= with Emacs 23.1 (in fact, any version of
+   Emacs before version 23.1.50.3).  Upgrade to Emacs 23.2 and the
+   problem should go away.
+
 ** When I try to use Org-mode, I always get the error message =(wrong-type-argument keymapp nil)=
    :PROPERTIES:
    :CUSTOM_ID: wrong-type-argument-keymapp
@@ -643,7 +861,7 @@ the following variable:
    This is a conflict with an outdated version of the /allout.el/, see
    the [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] section in the manual
 
-** How can I control the application launched by Org-mode to open a certain file type like pdf, html.... 
+** How can I control the application launched by Org-mode to open a certain file type like pdf, html....
    :PROPERTIES:
    :CUSTOM_ID: external-application-launched-to-open-file-link
    :END:
@@ -659,14 +877,14 @@ operating-system provides:
     You you have to check your mailcap settings, find the files:
 
     : /etc/mailcap
-    : 
-    : or  
-    : 
+    :
+    : or
+    :
     : $HOME/.mailcap
 
 and modify them accordingly. Please read their manual entry.
 
-*** Windows systems 
+*** Windows systems
     + for html pages you may configure the =browse-url-= variables through
       the Customize interface,
     + the pdf files are automatically opened with Acrobat Reader (if it is
@@ -710,7 +928,7 @@ of yasnippet).  Then try the following
 #+begin_src emacs-lisp
   (defun yas/org-very-safe-expand ()
     (let ((yas/fallback-behavior 'return-nil)) (yas/expand)))
-  
+
   (add-hook 'org-mode-hook
             (lambda ()
               ;; yasnippet (using the new org-cycle hooks)
@@ -742,17 +960,27 @@ Yes, see the [[http://orgmode.org/manual/Conflicts.html#Conflicts][Conflicts]] s
    :CUSTOM_ID: loaded-old-org
    :END:
 
-When this sort of things happen, it probably is because Emacs is loading an old version of Org-mode instead of the one you expected. Check it with =M-x org-version=.
+When this sort of things happen, it probably is because Emacs is
+loading an old version of Org-mode instead of the one you expected.
+Check it with =M-x org-version=.
 
-This happens because Emacs loads first the system org-mode (the one included with Emacs) before the one in your directory. Check the =load-path= variable; you might see that your org-mode appears /after/ the system-wide path; this is bad.
+This happens because Emacs loads first the system org-mode (the one
+included with Emacs) before the one in your directory. Check the
+=load-path= variable; you might see that your org-mode appears /after/
+the system-wide path; this is bad.
 
 You should add your directories to the =load-path= at the beginning:
 
 :  (add-to-list 'load-path "~/.emacs.d/org-mode/lisp") (require 'org-install)
 
-Function =add-to-list= adds at the beginning. Don't use =append= because it appends at the end. Also be sure to use =(require 'org-install)= and not =(require 'org)=.
+Function =add-to-list= adds at the beginning. Don't use =append=
+because it appends at the end. Also be sure to use =(require
+'org-install)= and not =(require 'org)=.
 
-This wrong version loading may also happen if you have a byte-compiled =org.elc= from an old version together with a new =org.el=. Since Emacs prefers loading byte-compiled files (even if the =.el= is newer), it will load the old Org-mode.
+This wrong version loading may also happen if you have a byte-compiled
+=org.elc= from an old version together with a new =org.el=. Since
+Emacs prefers loading byte-compiled files (even if the =.el= is
+newer), it will load the old Org-mode.
 
 ** Why doesn't org-batch-agenda work under Win32?
    :PROPERTIES:
@@ -802,7 +1030,7 @@ Here are some other ideas for speeding up the agenda:
    =(setq org-agenda-ndays 1)=
 
 2. Archive inactive items to separate files.
-   
+
    =C-c C-x C-s= (org-archive-subtree)
 
 3. Do not include the global todo list in your agenda view.
@@ -811,8 +1039,19 @@ Here are some other ideas for speeding up the agenda:
 
 4. Make sure that your org files are byte-compiled.
 
-   I.e., make sure there are files ending in .elc in your org
+   I.e., make sure there are files ending in =.elc= in your org
    installation directory.
+
+5. Limit your agenda files (=org-agenda-files=) to files that have
+   active todos and or projects. 
+
+   If you have a number of older reference files---i.e., files you
+   search only occasionally---in your agenda files list, consider
+   removing them from your agenda files and adding them to
+   =org-agenda-text-search-extra-files= instead. Similarly, you might
+   consider searching some of your older reference files with =M-x
+   grep= so that Org-mode does not have to load them into memory when
+   the agenda is called.
 
 ** Visual-line-mode doesn't work well with org-mode
    :PROPERTIES:
@@ -821,7 +1060,7 @@ Here are some other ideas for speeding up the agenda:
 
 Visual-line-mode "soft wraps" lines so that the visual edge of the
 buffer is considered a line break for purposes of navigation, even
-though there is no line break in reality. 
+though there is no line break in reality.
 
 In older versions of org-mode, org-beginning-of-line and
 org-end-of-line do not work well with visual line mode. (The two
@@ -842,6 +1081,75 @@ If you are using an older version of org mode, you can:
     (define-key org-mode-map "\C-a" 'move-beginning-of-line)
     (define-key org-mode-map "\C-e" 'move-end-of-line)))
 
+#+end_src
+* Faces and highlighting
+  :PROPERTIES:
+  :CUSTOM_ID: Faces
+  :END:
+** Org-mode has a lot of colors?  How can I change them?
+   :PROPERTIES:
+   :CUSTOM_ID: customizing-org-faces
+   :END:
+
+This is a question that applies to Emacs as a whole, but it comes up
+quite frequently on the org-mode mailing list, so it is appropriate to
+discuss it here.
+
+If you would like to change the style of a face in org-mode (or any
+other Emacs mode), simply type =M-x customize-face [RET]= while the
+cursor is on the color/style you are interested in modifying. You will
+be given the opportunity to customize all the faces located at that
+point.
+
+If you would like an overview of all the faces in org-mode, you can
+type =C-u M-x list-faces-display [RET] org= and you will be shown all
+the faces defined by org-mode along with an illustration of their
+current settings.
+
+If you would like to customize org-faces and other aspects of
+org-appearance, type =M-x customize-group org-font-lock [RET]=.
+
+Finally, if you would like verbose information about the properties of
+the text under the cursor, you can type =C-u C-x ==.
+
+See the Worg page on [[file:org-tutorials/org-appearance.org][customizing Org appearance]] for further information.
+** Why do I get a tiny font in column view when using emacs daemon?
+   :PROPERTIES:
+   :CUSTOM_ID: column-view-tiny-font
+   :END:
+
+When using emacs in daemon mode (=emacs --daemon=), client frames
+sometimes override the column view face settings, resulting in very
+small fonts. Here is a fix:
+
+#+begin_src emacs-lisp
+  (defun org-column-view-uses-fixed-width-face ()
+  ;; copy from org-faces.el
+  (when (fboundp 'set-face-attribute)
+      ;; Make sure that a fixed-width face is used when we have a column
+      ;; table.
+      (set-face-attribute 'org-column nil
+                          :height (face-attribute 'default :height)
+                          :family (face-attribute 'default :family))))
+
+   (when (and (fboundp 'daemonp) (daemonp))
+    (add-hook 'org-mode-hook 'org-column-view-uses-fixed-width-face))
+#+end_src
+
+This fix was provided in the following mailing list post:
+
+http://article.gmane.org/gmane.emacs.orgmode/27560
+** How can I stop the mouse cursor from highlighting lines in the agenda?
+   :PROPERTIES:
+   :CUSTOM_ID: ratpoison-for-agenda-highlighting
+   :END:
+
+You can add the following to your =.emacs=:
+
+#+begin_src emacs-lisp
+(add-hook 'org-finalize-agenda-hook
+    (lambda () (remove-text-properties
+	       (point-min) (point-max) '(mouse-face t))))
 #+end_src
 
 * Outline
@@ -972,7 +1280,7 @@ may type =M-x RET show-all= to reveal all text in the org file.
 If you would prefer a symbol or face for indicating hidden text, you
 can customize the variable org-ellipses.
 
-** How do I yank a subtree so it's indented according to points' location?
+** How do I yank a subtree so it's indented according to the point's location?
    :PROPERTIES:
    :CUSTOM_ID: yank-indent-subtree
    :END:
@@ -983,6 +1291,20 @@ Or set =org-yank-adjusted-subtrees= to =t= which will adjust the
 yanked headline's level correctly.
 
 Just use =C-k= and =C-y= as you would everywhere else in Emacs.
+
+** Can I read org-mode outlines in vim?
+   :PROPERTIES:
+   :CUSTOM_ID: org-outlines-in-vim
+   :END:
+
+Yes, there is a script that enables one to view and navigate folded
+outline/org files in vim (though without most of org-mode's
+functionality, of course).
+
+  - [[http://www.vim.org/scripts/script.php?script_id%3D1266][Emacs outline mode - Imitates Emacsen : vim online]]
+
+For instructions on how to set it up, please see [[http://mid.gmane.org/EA275862-B97A-4BAC-B879-177FD07A2D56@gaillourdet.net][this mailing list
+post]].
 
 * Todos and Tags
   :PROPERTIES:
@@ -1129,6 +1451,51 @@ You can use org-insert-link with a prefix argument:
 You will be greeted with prompt in the minibuffer that allows for file
 completion using your preferred Emacs method for finding files.
 
+** How can I use invisible targets within lists?
+   :PROPERTIES:
+   :CUSTOM_ID: invisible-targets-in-lists
+   :END:
+
+The usual way of turning radio links invisible is to comment them, but
+Org comments need to be at the beginning of the line, which breaks list
+indentation.  
+
+The workaround here is to add (INVISIBLE) after your <<target>>
+
+For example:
+
+: 11. <<target>>(INVISIBLE)
+:     Some text
+: 12. More text [[target][go to]]
+
+** Org-mode is not opening mailto links in my default mail client
+   :PROPERTIES:
+   :CUSTOM_ID: mailto-links
+   :END:
+
+You can customize the function org-mode uses to open mailto links by
+setting the variable =org-link-mailto-program=:
+
+=M-x customize-variable org-link-mailto-program=
+
+The default function called is =browse-url=, which opens a mail
+composition buffer within Emacs. The type of buffer opened by
+browse-url depends on the setting of the variable =mail-user-agent=.
+Thus, if you want to ensure that mailto links use Gnus to open a
+message buffer, you could add the following to your =.emacs=:
+
+#+begin_src elisp
+(setq mail-user-agent 'gnus-user-agent)
+#+end_src
+
+** Can I use CamelCase links?
+   :PROPERTIES:
+   :CUSTOM_ID: CamelCase-links
+   :END:
+
+Yes, you can with the contributed package org-wikinodes.el. Please
+consult the [[http://orgmode.org/worg/org-contrib/org-wikinodes.php][documentation]].
+
 * Plain Lists
   :PROPERTIES:
   :CUSTOM_ID: Plain-Lists
@@ -1189,13 +1556,25 @@ See also [[id:2463F4D8-F686-4CF3-AA07-08976F8A4972][Why is a blank line inserted
   :PROPERTIES:
   :CUSTOM_ID: Tables
   :END:
+** How can I make table alignment work with Asian character sets
+   :PROPERTIES:
+   :CUSTOM_ID: table-alignment-asian-characters
+   :END:
+
+When table alignment fails, it usually has to do with character sets
+where some characters have non-integer width.  Org will deal correctly
+with characters that are one or two or three ASCII characters wide,
+but not with characters that are, for example, 1.5 ASCII characters
+wide.  To make table alignment work you need to switch to a different
+character set.
+
 ** Can I plot data from a table?
    :PROPERTIES:
    :CUSTOM_ID: plotting-table-data
    :END:
 
-   Yes, you can, using org-plot.el written by James TD Smith and now
-   bundled with Org.  See [[http://orgmode.org/manual/Org-Plot.html#Org-Plot][the manual section about this]].
+   Yes, you can, using org-plot.el written by Eric Schulte and now
+   bundled with Org.  See [[http://orgmode.org/manual/Org_002dPlot.html#Org-Plot][the manual section about this]].
 
    See also [[file:org-tutorials/org-plot.org][this excellent tutorial]] by Eric Schulte.
 
@@ -1360,17 +1739,18 @@ See [[http://orgmode.org/manual/Tables-in-HTML-export.html#Tables-in-HTML-export
 - *Short answer*
 
   Avoid
-  : | 0.16666667000000 |
-  : #+TBLFM: $1 = 1 / 2 * 3; p20 %.14f
+  : | 1 / 2 * 3 | 0.16666667000000 |
+  : #+TBLFM: $2 = $1; p20 %.14f
+
   and use
-  : | 0.16666666666667 |
-  : #+TBLFM: $1 = 1 / 2 * 3; p20 f14
+  : | 1 / 2 * 3 | 0.16666666666667 |
+  : #+TBLFM: $2 = $1 +.0; p20 f-14
 
 - *Longer answer*
 
   It is important to distinguish between the precision of
   1) =p20=: Calc internal calculation (=calc-internal-prec=)
-  2) =f14=: Calc float formatting, unlimited in precision (=calc-float-format=)
+  2) =f-14=: Calc float formatting, unlimited in precision (=calc-float-format=)
   3) =%.14f=: the =printf= reformatting, limited in precision
 
   See [[http://orgmode.org/manual/Formula-syntax-for-Calc.html#Formula-syntax-for-Calc][the Org manual]] (org-version 6.35 or newer) for more details.
@@ -1395,10 +1775,10 @@ See [[http://orgmode.org/manual/Tables-in-HTML-export.html#Tables-in-HTML-export
     - limited by Calc internal calculation precision from Org default
       (here =p12=)
       : | 0.16666666666700 |
-      : #+TBLFM: $1 = 1 / 2 * 3;     f14
+      : #+TBLFM: $1 = 1 / 2 * 3;     f-14
 
       : | 0.1666666666670000000 |
-      : #+TBLFM: $1 = 1 / 2 * 3;     f19
+      : #+TBLFM: $1 = 1 / 2 * 3;     f-19
 
     - limited by Calc float format from Org default (here =f8=)
       : | 0.16666667 |
@@ -1408,30 +1788,30 @@ See [[http://orgmode.org/manual/Tables-in-HTML-export.html#Tables-in-HTML-export
       : #+TBLFM: $1 = 1 / 2 * 3; p20
 
       : | 0.16666667000000 |
-      : #+TBLFM: $1 = 1 / 2 * 3;         %.14f
+      : #+TBLFM: $1 = 1 / 2 * 3;          %.14f
 
       : | 0.16666667000000 |
-      : #+TBLFM: $1 = 1 / 2 * 3; p20     %.14f
+      : #+TBLFM: $1 = 1 / 2 * 3; p20      %.14f
 
     - limited by Calc float format specified
       : | 0.166667 |
-      : #+TBLFM: $1 = 1 / 2 * 3;     f6
+      : #+TBLFM: $1 = 1 / 2 * 3;     f-6
 
       : | 0.16666666666667 |
-      : #+TBLFM: $1 = 1 / 2 * 3; p20 f14
+      : #+TBLFM: $1 = 1 / 2 * 3; p20 f-14
 
       : | 0.1666666666666666667 |
-      : #+TBLFM: $1 = 1 / 2 * 3; p20 f19
+      : #+TBLFM: $1 = 1 / 2 * 3; p20 f-19
 
     - limited by =printf= conversion to Emacs Lisp float
       : | 0.1666666699999999900 | the inaccuracy is platform dependent |
-      : #+TBLFM: $1 = 1 / 2 * 3;         %.19f
+      : #+TBLFM: $1 = 1 / 2 * 3;          %.19f
 
       : | 0.1666666699999999900 | the inaccuracy is platform dependent |
-      : #+TBLFM: $1 = 1 / 2 * 3; p20     %.19f
+      : #+TBLFM: $1 = 1 / 2 * 3; p20      %.19f
 
       : | 0.1666666666666666600 | the inaccuracy is platform dependent |
-      : #+TBLFM: $1 = 1 / 2 * 3; p20 f20 %.19f
+      : #+TBLFM: $1 = 1 / 2 * 3; p20 f-20 %.19f
 
     - limited by =printf= format specified
       : | 0.166667 |
@@ -1460,17 +1840,17 @@ and is continued in the [[#table-float-fraction][next FAQ entry]].
 - *Short answer*
 
   Avoid
-  : | 1 |
-  : #+TBLFM: $1 = 1 + 0; f3
+   : | 1 | 1 |
+   : #+TBLFM: $2 = $1; f-3
   and use
-  : | 1.000 |
-  : #+TBLFM: $1 = 1 + 0; %.3f
+   : | 1 | 1.000 |
+   : #+TBLFM: $2 = $1 +.0; f-3
 
 - *Longer answer*
 
   For =f3= and =f-3= see =`d f' (`calc-fix-notation')= in [[http://www.delorie.com/gnu/docs/calc/calc.html#SEC_Top][the Calc manual]]
   in the section Mode Settings -> Display Modes -> Float Formats
-  [[http://www.delorie.com/gnu/docs/calc/calc_163.html][found here as long as the section numbering is kept]].
+  [[http://www.delorie.com/gnu/docs/calc/calc_163.html][found here as long as the section numbering is unchanged]].
 
   Remember the formula debugger, toggled with =C-c {=,
   to view the processing stages like:
@@ -1483,26 +1863,32 @@ and is continued in the [[#table-float-fraction][next FAQ entry]].
   Following are some examples to demonstrate different float formats.
 
   - normal precision
-    : |----------------------+---------+-------+-------|
-    : | number               |      f3 |   f-3 |  %.3f |
-    : |----------------------+---------+-------+-------|
-    : | 1 + 0                |       1 |     1 | 1.000 |
-    : | 0 + 0                |       0 |     0 | 0.000 |
-    : |----------------------+---------+-------+-------|
-    : | 1 + 1 / 2 * 3 * 1000 |   1.000 | 1.000 | 1.000 |
-    : | 0 + 1 / 2 * 3 * 1000 | 1.67e-4 | 0.000 | 0.000 |
-    : |----------------------+---------+-------+-------|
-    : | 1 + 1 / 2 * 3 *  100 |   1.002 | 1.002 | 1.002 |
-    : | 0 + 1 / 2 * 3 *  100 |   0.002 | 0.002 | 0.002 |
-    : |----------------------+---------+-------+-------|
-    : #+TBLFM: $2 = $1; f3 :: $3 = $1; f-3 :: $4 = $1; %.3f
+    : |-----------+---------+-------+---------+----------+-------|
+    : |    number |      f3 |   f-3 | +.0; f3 | +.0; f-3 |  %.3f |
+    : |-----------+---------+-------+---------+----------+-------|
+    : |         1 |       1 |     1 |   1.000 |    1.000 | 1.000 |
+    : |         0 |       0 |     0 |   0.000 |    0.000 | 0.000 |
+    : |-----------+---------+-------+---------+----------+-------|
+    : |       1.0 |   1.000 | 1.000 |   1.000 |    1.000 | 1.000 |
+    : |       0.0 |   0.000 | 0.000 |   0.000 |    0.000 | 0.000 |
+    : |-----------+---------+-------+---------+----------+-------|
+    : | 1.0001666 |   1.000 | 1.000 |   1.000 |    1.000 | 1.000 |
+    : | 0.0001666 | 1.67e-4 | 0.000 | 1.67e-4 |    0.000 | 0.000 |
+    : |-----------+---------+-------+---------+----------+-------|
+    : | 1.0016666 |   1.002 | 1.002 |   1.002 |    1.002 | 1.002 |
+    : | 0.0016666 |   0.002 | 0.002 |   0.002 |    0.002 | 0.002 |
+    : |-----------+---------+-------+---------+----------+-------|
+    : #+TBLFM: $2 = $1; f3 :: $3 = $1; f-3 :: $4 = $1 +.0; f3 :: $5 = $1 +.0; f-3 :: $6 = $1; %.3f
 
   - high precision
     : |----------------------+--------------------------+-----------------------|
     : | number               |                      f19 |                  f-19 |
     : |----------------------+--------------------------+-----------------------|
-    : | 1 + 0                |                        1 |                     1 |
-    : | 0 + 0                |                        0 |                     0 |
+    : | 1                    |                        1 |                     1 |
+    : | 0                    |                        0 |                     0 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1.0                  |    1.0000000000000000000 | 1.0000000000000000000 |
+    : | 0.0                  |    0.0000000000000000000 | 0.0000000000000000000 |
     : |----------------------+--------------------------+-----------------------|
     : | 1 + 1 / 2 * 3 * 1e19 |    1.0000000000000000000 | 1.0000000000000000000 |
     : | 0 + 1 / 2 * 3 * 1e19 | 1.666666666666666667e-20 | 0.0000000000000000000 |
@@ -1512,8 +1898,37 @@ and is continued in the [[#table-float-fraction][next FAQ entry]].
     : |----------------------+--------------------------+-----------------------|
     : #+TBLFM: $2 = $1; p20 f19 :: $3 = $1; p20 f-19
 
+    : |----------------------+--------------------------+-----------------------|
+    : | number               |                 +.0; f19 |             +.0; f-19 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1                    |    1.0000000000000000000 | 1.0000000000000000000 |
+    : | 0                    |    0.0000000000000000000 | 0.0000000000000000000 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1.0                  |    1.0000000000000000000 | 1.0000000000000000000 |
+    : | 0.0                  |    0.0000000000000000000 | 0.0000000000000000000 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1 + 1 / 2 * 3 * 1e19 |    1.0000000000000000000 | 1.0000000000000000000 |
+    : | 0 + 1 / 2 * 3 * 1e19 | 1.666666666666666667e-20 | 0.0000000000000000000 |
+    : |----------------------+--------------------------+-----------------------|
+    : | 1 + 1 / 2 * 3 * 1e18 |    1.0000000000000000002 | 1.0000000000000000002 |
+    : | 0 + 1 / 2 * 3 * 1e18 |    0.0000000000000000002 | 0.0000000000000000002 |
+    : |----------------------+--------------------------+-----------------------|
+    : #+TBLFM: $2 = $1 +.0; p20 f19 :: $3 = $1 +.0; p20 f-19
+
     The =printf= reformatting (=%.19f=) cannot be used with high precision,
     see the [[#table-high-precision][previous FAQ entry]].
+
+** How can I center tables in LaTeX output?
+   :PROPERTIES:
+   :CATEGORY: centered-tables-in-latex
+   :END:
+
+Set the `org-export-latex-tables-centered' to `t':
+
+: (defcustom org-export-latex-tables-centered t
+:   "When non-nil, tables are exported in a center environment."
+:   :group 'org-export-latex
+:   :type 'boolean)
 
 * Markup
   :PROPERTIES:
@@ -1638,7 +2053,7 @@ are several possible shortcuts you can use to enter them:
 
  - Immediately after "sbp" type =C-x a i l=.
 
- - Enter the expansion: 
+ - Enter the expansion:
 
    - =#+begin_src perl[C-q C-j][C-q C-j]#+end_src=
 
@@ -1660,10 +2075,30 @@ are several possible shortcuts you can use to enter them:
  - See Bernt Hansen's [[http://doc.norang.ca/org-mode.html#Yasnippets][org-mode setup]] for a good introduction to
    yasnippet.
 
-* Remember
+* Capture and remember
   :PROPERTIES:
   :CUSTOM_ID: Remember
   :END:
+** Can I use a variable or a function inside the `org-capture-templates' variable?
+   :PROPERTIES:
+   :CUSTOM_ID: variable-inside-capture-templates
+   :END:
+
+Yes.  Use [[http://www.gnu.org/s/emacs/manual/html_node/elisp/Backquote.html][backquotes]].
+
+E.g. if you have a variable called =org-test-file= and you want the
+variable =org-capture-templates= to "understand" (i.e. evaluate)
+=org-test-file= when Emacs evaluates the =(setq org-capture-templates
+[...])= expression, use backquotes like this:
+
+#+begin_src emacs-lisp
+(setq org-capture-templates
+      `(("t" "Todo" entry (file+headline ,org-test-file "Tasks")
+       "* TODO %?\n  %i\n  %a")
+      ("b" "Buy" item (file+olp ,org-test-file "Stuff to Buy" "House")
+       "")))
+#+end_src
+
 ** Can I use the remember buffer to clock a customer phone call?
    :PROPERTIES:
    :CUSTOM_ID: use-remember-buffer-to-clock-phone-call
@@ -1734,6 +2169,9 @@ are several possible shortcuts you can use to enter them:
   :CUSTOM_ID: Agenda
   :END:
 ** How can I change the advanced warning time for deadlines?
+   :PROPERTIES:
+   :CUSTOM_ID: warning-period-for-deadlines
+   :END:
 ##<<warning-period-for-deadlines>>
 
 Deadline warnings appear in the daily agenda view a specified number
@@ -1898,8 +2336,8 @@ difference between SCHEDULED, DEADLINE, and timestamps]].
    are done. Schedule a task if you want to be reminded to do
    something beginning on a certain day and until it is done.
 
-: ** TODO Scheduled item
-:    SCHEDULED: <2009-03-01 Sun>
+   : ** TODO Scheduled item
+   :    SCHEDULED: <2009-03-01 Sun>
 
 2. Items with a DEADLINE timestamp (set with =C-c C-d=) appear on your
    agenda in advance of the when they are due and remain on your
@@ -1909,15 +2347,15 @@ difference between SCHEDULED, DEADLINE, and timestamps]].
    deadlines will show up in the agenda. See [[warning-period-for-deadlines][this FAQ]] for more
    information.)
 
-: ** TODO Item with a deadline
-:    DEADLINE: <2009-01-20 Tue>
+   : ** TODO Item with a deadline
+   :    DEADLINE: <2009-01-20 Tue>
 
 3. An active timestamp (set with =C-c .=) will appear on your agenda
    only on the day it is scheduled. Use a timestamp for appointments
    or any reminders you want to show up only on a particular day.
 
-: ** TODO Item with an active timestamp
-: <2009-04-18 Sat>
+   : ** TODO Item with an active timestamp
+   : <2009-04-18 Sat>
 
 Note: items with inactive timestamps (set with C-c ! and marked by
 square brackets) will not show up in the agenda at all.
@@ -1974,6 +2412,40 @@ time-of-day indicator and the entry would appear in your agenda at
 If you would like to turn off the time-of-day search, you can
 configure the variable =org-agenda-search-headline-for-time= (requires
 org-mode >= 6.24).
+
+** How can I change the visibility of an item from the agenda?
+   :PROPERTIES:
+   :CUSTOM_ID: cycling-visibility-from-agenda
+   :END:
+
+You can add a keybinding as follows:
+
+#+begin_src emacs-lisp
+(add-hook 'org-agenda-mode-hook
+   (lambda ()
+     (define-key org-agenda-mode-map " " 'org-agenda-cycle-show)))
+#+end_src
+
+Then, as you press SPACE on an item on the agenda, it will cycle the
+visibility of its original location.
+
+** Is there any way to set org-mode so that tags don't appear in the agenda view?
+
+See the =org-agenda-remove-tags= variable.
+
+** I work late at night! How can I extend my current day past midnight?
+   :PROPERTIES:
+   :CUSTOM_ID: org-extend-today-until
+   :END:
+
+If you work past midnight, you may not want your daily agenda view to
+switch to the next day at 12 a.m. (the default). To extend your day,
+simply set the value of org-extend-today-until to a positive number
+corresponding to the number of hours you work past midnight. For
+example, the following setting will cause the current day to extend
+until 6 a.m.
+
+: (setq org-extend-today-until 6)
 
 * Appointments/Diary
   :PROPERTIES:
@@ -2143,12 +2615,168 @@ can find the number by invoking emacs' built-in calendar (=M-x
 calendar=), navigating to the appropriate week, and typing =p c=
 (calendar-iso-print-date).
 
+Please note: the order of the month, day, and year arguments depends
+on the variables =calendar-date-style= and/or
+=european=calendar=style=. (See the documentation for these variables
+with C-h v or M-x describe variable.) For instance, the example above
+works if =calendar-date-style= is set to ='american=. If
+=calendar-date-style= is set to ='iso=, then the arguments to the
+org-diary-class sexp would have the following format:
+
+: (org-diary-class Y1 M1 D1 Y2 M2 D2 DAYNAME &rest SKIP-WEEKS)
+
+Here is an alternative method, shared by Paul Sexton on the org
+mailing list:
+
+Let's say you are taking night classes in Spanish. The class is every
+Wednesday evening at 7pm, starting on 18 August, and runs for 8 weeks.
+Org-mode's timestamps do not support limited occurrences of recurrent
+items -- you have to schedule the item with infinite recurrences, then
+delete it when it finishes.
+
+To schedule the Spanish classes, put the following in your =.emacs=:
+
+#+begin_src emacs-lisp
+  (defun diary-limited-cyclic (recurrences interval m d y)
+    "For use in emacs diary. Cyclic item with limited number of recurrences.
+  Occurs every INTERVAL days, starting on YYYY-MM-DD, for a total of
+  RECURRENCES occasions."
+    (let ((startdate (calendar-absolute-from-gregorian (list m d y)))
+          (today (calendar-absolute-from-gregorian date)))
+      (and (not (minusp (- today startdate)))
+           (zerop (% (- today startdate) interval))
+           (< (floor (- today startdate) interval) recurrences))))
+#+end_src
+The item in the org file looks like this:
+
+#+begin_src org
+  ,** 19:00-21:00 Spanish lessons
+  ,   <%%(diary-limited-cyclic 8 7 8 18 2010)>
+#+end_src
+
 ** How can I set an event to occur every day except Saturday and Sunday?
 
-   #+begin_example
-   ** Daily meeting
-      <%%(memq (calendar-day-of-week date) '(1 2 3 4 5))>
-   #+end_example
+#+begin_src org
+  ,** Daily meeting
+  ,   <%%(memq (calendar-day-of-week date) '(1 2 3 4 5))>
+#+end_src
+
+** How do I schedule events relative to Easter Sunday?
+
+   Easter's date moves around from year to year according to a
+   complicated set of criteria which I do not claim to understand.
+   However the following code will allow you to schedule recurring
+   events relative to Easter Sunday.
+
+   Note: the function da-easter is from:
+   http://github.com/soren/elisp/blob/master/da-kalender.el
+
+   Put the following in your .emacs:
+
+#+begin_src emacs-lisp
+  (defun da-easter (year)
+    "Calculate the date for Easter Sunday in YEAR. Returns the date in the
+  Gregorian calendar, ie (MM DD YY) format."
+    (let* ((century (1+ (/ year 100)))
+           (shifted-epact (% (+ 14 (* 11 (% year 19))
+                                (- (/ (* 3 century) 4))
+                                (/ (+ 5 (* 8 century)) 25)
+                                (* 30 century))
+                             30))
+           (adjusted-epact (if (or (= shifted-epact 0)
+                                   (and (= shifted-epact 1)
+                                        (< 10 (% year 19))))
+                               (1+ shifted-epact)
+                             shifted-epact))
+           (paschal-moon (- (calendar-absolute-from-gregorian
+                             (list 4 19 year))
+                            adjusted-epact)))
+      (calendar-dayname-on-or-before 0 (+ paschal-moon 7))))
+
+
+  (defun da-easter-gregorian (year)
+    (calendar-gregorian-from-absolute (da-easter year)))
+
+  (defun calendar-days-from-easter ()
+    "When used in a diary sexp, this function will calculate how many days
+  are between the current date (DATE) and Easter Sunday."
+    (- (calendar-absolute-from-gregorian date)
+       (da-easter (calendar-extract-year date))))
+#+end_src
+
+    Now we can schedule the public holidays associated with Easter as
+    recurring events. Good Friday is 2 days before "Easter", Easter
+    Monday is one day after.
+
+#+begin_src org
+  ,* Good Friday
+  ,  <%%(= -2 (calendar-days-from-easter))>
+
+  ,* Easter Sunday
+  ,  <%%(= 0 (calendar-days-from-easter))>
+
+  ,* Easter Monday
+  ,  <%%(= 1 (calendar-days-from-easter))>
+#+end_src
+   [Source: Posted by Paul Sexton on Org-mode mailing list.]
+
+** How to schedule public holiday that is "the nearest Monday to DATE"?
+
+   In New Zealand each regional capital has an "Anniversary Day". The
+   date of Auckland's anniversary day is "the nearest Monday to 29
+   January".
+
+   Put this in your =.emacs=:
+
+#+begin_src emacs-lisp
+  (defun calendar-nearest-to (target-dayname target-day target-month)
+    "Recurring event that occurs in the nearest TARGET-DAYNAME to
+  the date TARGET-DAY, TARGET-MONTH each year."
+    (interactive)
+    (let* ((dayname (calendar-day-of-week date))
+           (target-date (list target-month target-day (calendar-extract-year date)))
+           (days-diff (abs (- (calendar-day-number date)
+                              (calendar-day-number target-date)))))
+      (and (= dayname target-dayname)
+           (< days-diff 4))))
+#+end_src
+
+   Now we can schedule Auckland Anniversary Day. The first argument,
+   1, means Monday (days of the week are numbered starting with
+   Sunday=0).
+
+   [Source: Originally posted by Paul Sexton on Org-mode mailing list.]
+
+** How to schedule public holiday on "the 4th Monday in October"?
+
+   This does not require any additions to =.emacs=:
+
+#+begin_src org
+  ,* Labour Day (NZ)
+  ,  <%%(diary-float 10 1 4)>
+#+end_src
+
+** Why isn't the agenda showing all the times I put under a single entry?
+   :PROPERTIES:
+   :CATEGORY: multiple-timestamps-same-entry
+   :END:
+
+Probably because you have not set the following variable:
+
+: org-agenda-skip-additional-timestamps-same-entry
+
+The default value of this variable is t, which means that entries with
+multiple timestamps, such as the following...
+
+#+begin_src org
+  ,* Work really, really hard
+  ,  <2010-11-20 Sat 10:00>
+  ,  <2010-11-20 Sat 14:00>
+#+end_src
+
+...will only appear in the agenda at the time specified by the first
+timestamp. If you set org-agenda-skip-additional-timestamps-same-entry
+to nil, the item will appear will appear at all the times you specify.
 
 * Export
   :PROPERTIES:
@@ -2179,8 +2807,29 @@ calendar=), navigating to the appropriate week, and typing =p c=
    :CUSTOM_ID: export-single-subtree
    :END:
 
-   If you want to export a subtree, mark the subtree as region and then
-   export.  Marking can be done with =C-c @ C-x C-x=, for example.
+If you want to export a subtree, mark the subtree as region and then
+export. Marking can be done with =C-c @ C-x C-x=, for example.
+
+Alternatively, you can select option =1= in the org export dispatcher
+(e.g.., =C-c C-e 1 h= to export the current subtree to html).
+
+By default, the title of the exported file will be set to the heading
+of the subtree. You can, however, [[#export-options-for-subtree][customize the title and other export
+options]].
+
+** How can I customize export options for a single subtree?
+   :PROPERTIES:
+   :CUSTOM_ID: export-options-for-subtree
+   :END:
+
+You can set unique export options for a [[#export-single-subtree][single subtree]] by using
+properties. Relevant properties include:
+ 
+ - EXPORT_TITLE
+ - EXPORT_AUTHOR
+ - EXPORT_DATE
+ - EXPORT_FILE_NAME
+ - EXPORT_OPTIONS (corresponds to the =#+OPTIONS:= [[http://orgmode.org/manual/Export-options.html#Export-options][configuration line]])
 
 ** How can I tell my calendar web application about appointments in my agenda files?
 
@@ -2317,27 +2966,64 @@ Add this to your .emacs and evaluate it.
         '((ps-print-color-p 'black-white)))
 #+END_SRC
 
+** How can I include e.g. an abstract in export to Latex and HTML?
+   :PROPERTIES:
+   :CUSTOM_ID: include-abstract-in-export-to-latex-and-html
+   :END:
+
+Org does not currently have special markup for abstracts, but for
+export purposes, you can extend the block-level structural and
+semantic markup in Org with the contributed package [[file:org-contrib/org-special-blocks.org][org-special-blocks]]
+(by Chris Gray). To turn it on, put this in your =.emacs=:
+
+: (require 'org-special-blocks)
+
+Now, you can mark up the abstract of your article like this:
+
+: #+BEGIN_ABSTRACT
+: Falling apples were observed and compared with pears. Newton's laws
+: were confirmed at the 95% confidence level.
+: #+END_ABSTRACT 
+
+Exporting to Latex wraps this in a
+=\begin{abstract}....\end{abstract}= environment, which just works.
+
+HTML export wraps it in a ~<div class="abstract">...</div>~
+element. The HTML result won't look like anything special until you
+style it. Here is some sample CSS to get you started; put these in
+your document header:
+
+: #+STYLE: <style>.abstract {margin: 1em; padding: 1em; border: 1px solid black}
+: #+STYLE: .abstract:before {content: "Abstract: "; font-weight: bold}</style>
+
+Generally, =#+begin_foo= will work for any simple Latex =foo=
+environment not supported by existing Org markup.
+
+If you need to pass parameters, process the block content in some way,
+or support other exporters, you may want to consider whether you can
+customize it using Eric Schulte's [[file:org-contrib/org-exp-blocks.org][org-exp-blocks]] instead.
+
 ** How can I get colored source code when exporting to LaTeX?
    :PROPERTIES:
    :CUSTOM_ID: fontified_source_code_w_latex
    :END:
 
 As of Sun Aug 9 2009 the "current" version of Org-mode (see
-[[keeping-current-with-Org-mode-development]]) supports exporting source
-code to LaTeX using the listings package.
+[[keeping-current-with-Org-mode-development]]) supports exporting
+source code to LaTeX using the listings package.
 
 To turn on listing export add the following to your Org-mode
 customization.
 #+begin_src emacs-lisp
   ;; requite org-latex so that the following variables are defined
   (require 'org-latex)
-  
+
   ;; tell org to use listings
   (setq org-export-latex-listings t)
-  
+
   ;; you must include the listings package
   (add-to-list 'org-export-latex-packages-alist '("" "listings"))
-  
+
   ;; if you want colored source code then you need to include the color package
   (add-to-list 'org-export-latex-packages-alist '("" "color"))
 #+end_src
@@ -2363,7 +3049,7 @@ something like the following
 \definecolor{back}{RGB}{51,51,51}
 \lstset{
   basicstyle=\color{fore},
-  keywordstyle=\color{keywords},  
+  keywordstyle=\color{keywords},
   commentstyle=\color{comments},
   backgroundcolor=\color{back}
 }
@@ -2404,6 +3090,9 @@ Thomas Dye]].  For a much more complex Beamer setup see the [[http://article.gma
 Thomas Dye]].
 
 ** How can I use RefTeX in Org-mode files for LaTeX export and in Org-babel LaTeX code blocks?
+   :PROPERTIES:
+   :CUSTOM_ID: using-reftex-in-org-mode
+   :END:
 
 [[http://www.gnu.org/software/auctex/reftex.html][RefTeX]] is an indispensable tool for the author of LaTeX documents.  It
 aids in creation of bibliographies, cross-references, indexes, and
@@ -2419,16 +3108,16 @@ RefTeX the locations of external data stores.  One way is to set the
 variable, =reftex-default-bibliography=.  Add lines like these to
 .emacs:
 
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
   (setq reftex-default-bibliography
         (quote
-         ("default.bib" "other-default.bib")))       
+         ("default.bib" "other-default.bib")))
 #+end_src
 
 In practice, this is a limited solution and the
 typical user will want to pass this information on a per-file basis.
 Two solutions to this problem were posted on a blog, [[http://www.mfasold.net/blog/2009/02/using-emacs-org-mode-to-draft-papers/][Mario's
-Braindump]].  
+Braindump]].
 
 The first solution, proposed by Mario, enables the RefTeX citation
 function in Org-mode.  Add these lines to .emacs:
@@ -2455,12 +3144,12 @@ With this setup, =C-c )= will invoke =reftex-citation= which will
 insert a reference in the usual way:
 
 #+begin_src org
-* test reftex
+  ,* test reftex
 
-This is a citation \cite{tierney90}.
+  ,This is a citation \cite{tierney90}.
 
-\bibliographystyle{plain}
-\bibliography{tsd}
+  ,\bibliographystyle{plain}
+  ,\bibliography{tsd}
 #+end_src
 
 This Org-mode file will export the following LaTeX output:
@@ -2471,28 +3160,28 @@ This Org-mode file will export the following LaTeX output:
   \usepackage[utf8]{inputenc}
   \usepackage[T1]{fontenc}
   \usepackage{hyperref}
-  
+
   \title{test.org}
   \author{Tom Dye}
   \date{2010-03-22 Mon}
-  
+
   \begin{document}
-  
+
   \maketitle
-  
+
   \setcounter{tocdepth}{3}
   \tableofcontents
   \vspace*{1cm}
-  
+
   \section{test reftex}
   \label{sec-1}
-  
-  
+
+
   This is a citation \cite{tierney90}.
-  
+
   \bibliographystyle{plain}
   \bibliography{tsd}
-  
+
   \end{document}
 #+end_src
 
@@ -2547,7 +3236,7 @@ Add the following lines to .emacs (adapted from  Kevin Brubeck Unhammer's [[http
     (and (buffer-file-name)
          (file-exists-p (buffer-file-name))
          (reftex-parse-all)))
-  
+
   (add-hook 'org-mode-hook
             (lambda ()
               (if (member "REFTEX" org-todo-keywords-1)
@@ -2565,6 +3254,142 @@ prompt for the master .tex file, which will be parsed in the usual
 way.  This means that the .tex file should already exist, perhaps by
 tangling the LaTeX preamble and postamble, before
 =org-mode-article-modes= is activated for the Org-mode file.
+
+** Why is my exported PDF file almost unreadable?
+   :PROPERTIES:
+   :CUSTOM_ID: unreadable-pdfs
+   :END:
+
+Some PDF viewers (earlier versions (< v6) of Acrobat Reader, Evince,
+possibly others) do not get along with Adobe Type3 fonts, producing
+almost unreadable screen output (printed output is OK). If you see
+this, first verify the fonts that your document uses: open it with
+Acrobat Reader or Evince, select "Properties" from the "File" menu and
+click on the "Fonts" tab; alternatively, you can use the pdffonts
+program (part of the xpdf-reader package) from the command line.  If
+that is indeed the problem, then either use a different viewer or
+install Type1 versions of the problematic fonts. For more details, see
+the "PDF export" section of [[./org-dependencies.org][org-dependencies]].
+
+** Can I add attributes to a link or an image in HTML export?
+   :PROPERTIES:
+   :CUSTOM_ID: html-image-and-link-attributes
+   :END:
+
+Yes.  Excerpt from [[http://orgmode.org/manual/Images-in-HTML-export.html#Images-in-HTML-export][Org's manual]]:
+
+If you need to add attributes to an inlined image, use a `#+ATTR_HTML'.
+In the example below we specify the `alt' and `title' attributes to
+support text viewers and accessibility, and align it to the right.
+
+:  #+CAPTION: A black cat stalking a spider
+:  #+ATTR_HTML: alt="cat/spider image" title="Action!" align="right"
+:  [[./img/a.jpg]]
+
+and you could use `http' addresses just as well.
+
+** How can I export an org file to rtf, odt (Open Office), or doc (Word)?
+   :PROPERTIES:
+   :CUSTOM_ID: convert-to-open-office
+   :END:
+
+While you cannot export directly from org to doc or odt, you can
+export to one of org-mode's supported export formats and then use an
+external tool or method to convert the exported file to doc or odt.
+While most of these methods work with simple documents, they may work
+more or less well when the document contains complex elements, such as
+footnotes, embedded images, math formulas, and so on. (Note, the lists
+below are by no means comprehensive).
+
+1. html -> odt/doc/rtf
+   - open html in Open Office and save as odt/doc ([[http://permalink.gmane.org/gmane.emacs.orgmode/31482][see this post by
+     Eric Fraga]])
+   - [[http://www.artofsolving.com/opensource/pyodconverter][PyODConverter]]
+   - [[http://johnmacfarlane.net/pandoc/][Pandoc]] (this works for LaTeX and docbook as well)
+   - (Mac only) The [[http://developer.apple.com/library/mac/#DOCUMENTATION/Darwin/Reference/ManPages/man1/textutil.1.html][textutil]] utility bundled with OS X can convert
+     from html to doc
+
+2. LaTeX -> odt/doc/rtf
+   - [[http://latex2rtf.sourceforge.net/][LaTeX2rtf]] (works well with index, footnotes, and references)
+   - [[http://www.tug.org/tex4ht/][TeX4ht]] (works with more complex latex elements, though can be
+     difficult to install)
+     - run =mk4ht oolatex file.tex=
+
+See [[http://permalink.gmane.org/gmane.emacs.orgmode/31168][this thread]] for further details.
+
+* MobileOrg
+
+** Which versions of MobileOrg do exist
+   :PROPERTIES:
+   :CUSTOM_ID: mobileorg_versions
+   :END:
+
+- MobileOrg for the iPhone/iPod Touch/iPad series of devices, by
+  Richard Moreland.  Check out
+  [[http://mobileorg.ncogni.to/][Richard's page]]
+- Matt Jones is developing a feature-equivalent application for
+  Android, see
+  [[http://wiki.github.com/matburt/mobileorg-android/][his project page]].
+
+** What can I do if I don't want to use Dropbox.com
+   :PROPERTIES:
+   :CUSTOM_ID: mobileorg_webdav
+   :END:
+
+Dropbox.com is the easiest way to connect between Emacs and MobileOrg,
+you can get a free account there.  If for some reason you cannot or do
+not want to use this path, you can use any webdav server.  On this
+webdav server you need to create a dedicated directory for the
+communication between Emacs and MobileOrg.  If you can mount that
+directory locally so that Emacs can directly write to it, just point
+to that directory using the variable =org-mobile-directory=.  Using
+the /tramp/ method, =org-mobile-directory= may point to a remote
+directory accessible through, for example, /ssh/ and /scp/:
+
+#+begin_src emacs-lisp
+(setq org-mobile-directory "/scpc:user@@remote.host:org/webdav/")
+#+end_src
+
+If Emacs cannot access the WebDAV directory directly using a /tramp/
+method, you can use a local directory for staging.  Other means must
+then be used to keep this directory in sync with the WebDAV directory.
+In the following example, files are staged in =~/stage/=, and Org-mode
+hooks take care of moving files to and from the WebDAV directory using
+/scp/.
+
+#+begin_src emacs-lisp
+(setq org-mobile-directory "~/stage/")
+(add-hook 'org-mobile-post-push-hook
+  (lambda () (shell-command "scp -r ~/stage/* user@@wdhost:mobile/")))
+(add-hook 'org-mobile-pre-pull-hook
+  (lambda () (shell-command "scp user@@wdhost:mobile/mobileorg.org ~/stage/ ")))
+(add-hook 'org-mobile-post-pull-hook
+  (lambda () (shell-command "scp ~/stage/mobileorg.org user@@wdhost:mobile/")))
+#+end_src
+
+* Mathjax
+
+** How to install MathJax on my server?
+   
+:PROPERTIES:
+:CUSTOM_ID: install_mathjax_on_server
+:END:
+
+Org uses MathJax as its default HTML display engine for equations.
+
+Org relies on the version of MathJax available from orgmode.org, but you
+might want to use another version and install MathJax on your own server.
+
+1. Download a [[http://sourceforge.net/projects/mathjax/files/][MathJax archive]].
+
+2. Upload it somewhere on your server (say http://me.org/mathjax/)
+
+3. Set the correct path in =org-export-html-mathjax-options= (i.e. replace
+   http://orgmode.org/mathjax/MathJax.js by
+   http://me.org/mathjax/MathJax.js)
+
+You can also get [[http://www.mathjax.org/resources/docs/?installation.html][MathJax from git or svn]] -- in this case, be careful not to
+forget to unzip the fonts.zip archive in the mathjax directory.
 
 * COMMENT HTML style specifications
 

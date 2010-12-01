@@ -1,0 +1,102 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Mscgen: Message Sequence Charts
+#+AUTHOR:     Juan Pechiar
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Babel support for
+  <a href="http://www.mcternan.me.uk/mscgen/">Mscgen</a>: Message sequence charts
+  </p>
+  </div>
+#+end_html
+
+* Introduction
+
+Mscgen is a utility for rendering message sequence charts.
+
+The charts are defined in text format as specified on the [[http://www.mcternan.me.uk/mscgen/][project homepage]].
+
+This Babel module is similar to ob-dot and ob-ditaa in that they
+just render an image from a text-based definition. Therefore many of
+the Babel concepts do not apply (things like sessions, variables,
+vector output).
+
+* Requirements
+
+  - Babel requires that Mscgen be installed on your system
+
+  - A path to executable must exist in the variable =exec-path=
+
+#+begin_src emacs-lisp :exports code
+  (setq exec-path (append exec-path '("/path/to/mscgen")))
+#+end_src
+
+* Enabling Babel's Mscgen support
+
+You need to add Mscgen to the =org-babel-load-languages= variable
+
+Customize thus:
+
+: M-x customize-variable RET org-babel-load-languages RET
+
+Or, add the commented line to =.emacs=:
+
+#+begin_src emacs-lisp :exports code
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)
+     (ditaa . t)
+     (dot . t)
+     (emacs-lisp . t)
+     (mscgen . t) ; this is the entry to activate mscgen
+     (latex . t)
+     (perl . t)
+     (python . t)
+     (ruby . t)
+     (screen . nil)
+     (sh . t)
+     (sql . nil)
+     (sqlite . nil)))
+#+end_src
+
+* Example usage
+
+The following is a trivial example of 2 messages between nodes A and B:
+
+: #+begin_src mscgen :file chart.png
+: msc {
+:   A,B;
+:   A -> B [ label = "send message" ];
+:   A <- B [ label = "receive answer" ];
+: }
+: #+end_src
+
+Which produces the following result:
+
+#+begin_html
+<img src="../../../images/babel/sequencechart.png" alt="message sequence chart" />
+#+end_html
+
+* Header arguments
+
+These header arguments are relevant for Mscgen:
+   - file :: the file argument is needed since the output from Mscgen is always to a file
+   - filetype :: optional file type, defaults to PNG
+
+Output file types (as of Mscgen version 2010W30) are:
+   - PNG (Portable Network Graphics) - default
+   - SVG (Scalable Vector Graphics)
+   - EPS (encapsulated PostScript)
+   - ismap (server-side image map)
+
+PNG results in a bitmap image, but it is supported in all export formats (i.e. by web browsers and by pdflatex).
+
+Other formats may result in a link to the actual file.
+
+In order to get higher resolution on PNG output, include a =width= or =hscale= statement.

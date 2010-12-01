@@ -1,0 +1,52 @@
+#+TITLE:Org-babel-octave-matlab
+#+AUTHOR: Dan Davison
+#+EMAIL:  davison at stats dot ox dot ac dot uk
+
+This file contains notes on using Matlab and Octave with Org-babel.
+
+An example of an octave block in Org-babel is
+
+#+begin_src org
+  ,#+begin_src octave :exports results
+  ,n = [1:10];
+  ,x = 5*n+4;
+  ,ans = x
+  ,#+end_src
+  
+  ,#+results:
+  ,| 9 | 14 | 19 | 24 | 29 | 34 | 39 | 44 | 49 | 54 |
+#+end_src
+
+Notice that the final line is "ans = x". Finishing the block with the
+simple statement "x" will not work. In Org-babel, Matlab and Octave
+return the result of the special variable "ans", which (in Octave at
+least) is automatically updated with "The most recently computed
+result that was not explicitly assigned to a variable". Therefore,
+both "ans =x" and "x + 0" would result in the desired result being
+returned, "x" alone will not.
+
+* Graphical output
+In order to get graphical output without leaving open graph windows
+during evaluation, the following can be used:
+
+#+begin_example
+#+begin_src octave :output file :file chart.png
+figure( 1, "visible" , "off" );
+sombrero;
+print -dpng chart.png
+#+end_src
+#+end_example
+
+The =figure= command opens an invisible graph window where the next plot commands should act.
+
+Then, the =print= command exports the graph to a file.
+
+
+
+* Org config							   :noexport:
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>

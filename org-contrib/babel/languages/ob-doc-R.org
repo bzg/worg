@@ -52,6 +52,15 @@
     - unpack ess-VERSION.tgz in .emacs.d/src
     - for me, this created ess-5.6, need an alias named ess?
     - where to put (require 'ess-site)?
+* Examples
+  :PROPERTIES:
+  :CUSTOM_ID: examples
+  :END:
+Examples demonstrating the use of R code within Org-mode.
+
+- [[file:R/RBabelExample.org][RBabelExample]] ([[http://repo.or.cz/w/Worg.git/blob/HEAD:/org-contrib/babel/languages/R/RBabelExample.org][.org]], [[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/languages/R/RBabelExample.pdf][.pdf]]) -- a short introductory example
+- [[file:../uses.org::#foo][foo.org]] ([[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/foo.org][.org]], [[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/foo.pdf][.pdf]],  [[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/foo.org.html][preview]]) -- a more complex example
+
 * Configuration in Org-babel				     :Write:noexport:
 ** Variables
 * Language-specific Features 					      :Write:
@@ -169,6 +178,74 @@ xtable(summary(lm(y ~ x)))
 \end{center}
 \end{table}
 #+END_LaTeX
+** Org output from R
+David Hajage's [[http://cran.r-project.org/web/packages/ascii/index.html][ascii]] R package creates appropriate plain text
+representations of many R objects, and features an option to specify
+that the plain text representations should be in Org format. This can
+be particularly useful for retrieving non-tabular R data structures in
+Org.
+
+In R:
+#+begin_example 
+> library(ascii)
+> options(asciiType = "org")
+> library(Hmisc)
+> ascii(describe(esoph))
+#+CAPTION: esoph
+- 5 Variable
+- 88 Observations
+
+*agegp*
+|  n | missing | unique |
+| 88 |       0 |      6 |
+
+|           | 25-34 | 35-44 | 45-54 | 55-64 | 65-74 | 75+ |
+| Frequency |    15 |    15 |    16 |    16 |    15 |  11 |
+| %         |    17 |    17 |    18 |    18 |    17 |  12 |
+
+*alcgp*
+|  n | missing | unique |
+| 88 |       0 |      4 |
+
+ 0-39g/day (23, 26%), 40-79 (23, 26%), 80-119 (21, 24%), 120+ (21, 24%)
+
+*tobgp*
+|  n | missing | unique |
+| 88 |       0 |      4 |
+
+ 0-9g/day (24, 27%), 10-19 (24, 27%), 20-29 (20, 23%), 30+ (20, 23%)
+
+*ncases*
+|  n | missing | unique |  Mean | .05 | .10 | .25 | .50 | .75 | .90 | .95 |
+| 88 |       0 |     10 | 2.273 | 0.0 | 0.0 | 0.0 | 1.0 | 4.0 | 5.3 | 6.0 |
+
+|           |  0 |  1 |  2 |  3 | 4 | 5 | 6 | 8 | 9 | 17 |
+| Frequency | 29 | 16 | 11 |  9 | 8 | 6 | 5 | 1 | 2 |  1 |
+| %         | 33 | 18 | 12 | 10 | 9 | 7 | 6 | 1 | 2 |  1 |
+
+*ncontrols*
+|  n | missing | unique |  Mean | .05 | .10 | .25 | .50 |  .75 |  .90 |  .95 |
+| 88 |       0 |     30 | 11.08 | 1.0 | 1.0 | 3.0 | 6.0 | 14.0 | 29.1 | 40.0 |
+
+ lowest:  1  2  3  4  5, highest: 40 46 48 49 60
+#+end_example
+
+
+ From Org-babel:
+#+begin_src R :results output org
+  library(ascii)
+  options(asciiType="org")
+  ascii(summary(table(1:4, 1:4)))
+#+end_src
+
+#+results:
+Loading required package: proto
+- Number of cases in table: 4 
+- Number of factors: 2 
+- Test for independence of all factors:
+  - Chisq = 12, df = 9, p-value = 0.2133
+  - Chi-squared approximation may be incorrect
+
 ** ess-switch-to-end-of-ESS
    When in an org mode R code edit buffer with an associated R
    session, ess-switch-to-end-of-ESS will bring the R session buffer

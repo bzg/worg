@@ -1,0 +1,72 @@
+#+TITLE:     org-wikinodes.el -- CamelCase wiki-like links to Org-mode nodes
+#+OPTIONS:   ^:{} author:nil
+#+STARTUP: odd
+
+* Introduction
+
+/org-wikinodes.el/ implements CamelCase wiki-like links in Org mode.
+However, while most wiki implementations use files as the basic data
+unit, it is more natural for Org to use outline nodes.
+
+/org-wikinodes.el/ turns CamelCase words into links to CamelCase
+headlines and creates missing headlines if necessary.
+
+* Installation
+
+Like with most contribued modules, just customize the variable
+=org-modules= and select the line for /org-wikinodes/.
+
+If you want to use this module only in some files/directories but not
+in others, set your general preference in the variable
+=org-wikinodes-active= and then use Emacs [[http://www.gnu.org/software/emacs/manual/html_node/emacs/File-Variables.html][file variables]] or
+[[http://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html][directory-local variables]] to change things where necessary.
+
+* How to use this module
+
+When this package is activated, any headlines that consist of only a
+single CamelCase word, optionally with a TODO keyword, a priority
+cookie and tags, are treated as a wiki node.
+
+#+begin_src org
+  ,* TODO [#C] ThisIsAWikiNodeInOrgMode    :test:
+#+end_src
+
+Writing the CamelCase word plainly in the text will create a link to
+that node.
+
+Following the link will jump to it, and you can return to the previous
+position with =C-c &=.  If the target does not exist, it can be
+created.  By default the user will be asked if the target should be
+created, but the exact behavior can be modified using the user option
+=org-wikinodes-create-targets=.
+
+* Wiki links across files
+
+By default a match for a link is only attempted in the current file.
+However, you can make Org consider headlines in all org files in the
+same directory by setting
+
+: (setq org-wikinodes-scope 'directory)
+
+In this case, to speed things up, a cache is created that remembers in
+which file a particular node can be found.  The cache is updated
+directly if you create nodes automatically by following CamelCase
+links to non-existing headlines.  However, if you create a new node by
+hand (just typing it), then you need to clear the cache before the
+node can be found from a link in a different file.  To clear the
+cache, press =C-c C-c= in any headline that is just a CamelCase word.
+
+* Export and publishing
+
+/org-wikinodes.el/ fully supports export and publishing.  Links will
+be functional in the published version of the files.
+
+* CamelCase words are hard to read
+
+Yes, this is true.  If you find this problematic, try =glasses-mode=
+which makes =CamelCase= words more readable by displaying them like
+=Camel_Case=.
+
+* Author
+
+/org-wikinodes.el/ was written by Carsten Dominik.

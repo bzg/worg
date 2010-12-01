@@ -1,0 +1,83 @@
+#+TITLE:   org-velocity.el --- something like Notational Velocity for Org
+#+AUTHOR:    Paul M. Rodriguez
+
+* General
+
+=org-velocity= implements an interface for Org inspired by the
+minimalist notetaking program Notational Velocity.  The idea is to
+allow you to amass and access brief notes on many subjects
+with minimal fuss.  
+
+* How to use it 
+
+Org-velocity can be used in two ways: to store and access notes from
+anywhere in a universal bucket file; or to navigate any Org file.
+
+** The interface
+
+The central command, =org-velocity-read=, prompts for search terms.
+The result is a list of all entries where those search terms appear,
+either in the heading or in the text.
+
+If there is only one result, =org-velocity= offers to visit that entry
+in an indirect buffer.
+
+If there are no results, =org-velocity= offers to create a new entry
+using =org-rememember= and supplies the search terms to the Remember
+buffer as its heading.
+
+If there is more than one result, =org-velocity= displays a buffer
+with the headings of all matching entries.  An entry is selected
+either by clicking on it or typing the hint character beside it.  Once
+selected the entry is visited in an indirect buffer.
+
+*** Navigating Org files
+
+The easiest way to try =org-velocity= is in an existing Org file.
+First [[* Loading it][load it]], then run:
+
+: M-x org-velocity-read
+
+*** Using a bucket file
+
+You can set a bucket file with:
+
+: M-x customize-variable RET org-velocity-bucket RET 
+
+Org-velocity will then use the bucket file as its target whenever it
+is called outside of Org.
+
+** Configuration
+
+To configure =org-velocity=, do:
+
+: M-x customize-group RET org-velocity RET
+
+You may also want to bind =org-velocity-read= to a key.  Add a line
+like this to your =.emacs=:
+
+: (global-set-key (kbd "C-c v") 'org-velocity-read)
+ 
+** Loading it (No surprises here)
+
+The easiest way is by 
+
+	M-x customize-apropos org-modules
+
+Check the line for velocity.  This will cause it to be loaded every
+time you start org-mode.
+
+You'll still have to load it manually the first time.
+
+Of course, you can also just try it out by loading it manually.
+
+If you prefer to manually customize your emacs then make sure that the
+path to org's contrib directory is in your load-path and add the
+following to your =.emacs=.
+
+: (require 'org-velocity)
+
+* Credits
+
+  Paul M. Rodriguez wrote =org-velocity= incorporating suggestions
+  from Carsten Dominik and Bastien Guerry.

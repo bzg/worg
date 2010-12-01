@@ -1,0 +1,48 @@
+#+TITLE:     org-mac-link-grabber.el -- Grab links from open Mac applications
+#+OPTIONS:   ^:{} author:nil
+#+STARTUP: odd
+
+[[file:index.org][{Back to Worg's contibutions index}]]
+
+* Overview 
+
+  This code will allow you to grab the current link or selection from
+  an open mac application and insert it as a hyperlink at point in an
+  org-mode document.
+
+*** Supported Applications
+
+	The following applications are currently supported:
+	- Finder.app
+	- Mail.app
+	- Address Book.app
+	- Safari.app
+	- Firefox.app
+	- Firefox.app with the Vimperator plugin
+	- Google Chrome.app
+	- Together.app
+
+* Installation
+  
+  Customize the org group by typing =M-x customize-group RET org RET=, then
+  expand the /Modules/ section, and enable =mac-link-grabber=.
+
+  You may also optionally bind a key to activate the link grabber menu, like
+  this:
+
+  : (add-hook 'org-mode-hook (lambda () 
+  :   (define-key org-mode-map (kbd "C-c g") 'omlg-grab-link)))
+
+* Usage 
+
+  Activate the grabber by typing *C-c g* (or whatever key you decided
+  to bind, as above), or type *M-x omlg-grab-link RET*. This will give
+  you a menu in the modeline allowing you to select an application.
+  The current selection in that application will be inserted at point
+  as a hyperlink in your org-mode document.
+
+* Customizing
+
+  You may customize which applications appear in the grab menu by
+  customizing the group /org-mac-link-grabber/. Changes take effect
+  immediately.

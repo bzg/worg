@@ -39,7 +39,7 @@
 ** <<<Download>>>
 
    - A list of Changes can be found [[file:changes.org][here]] (separat file).
-   - Download the [[file:org-info.js][minified version]] or the [[file:org-info-src.js][sourc code]].
+   - Download the [[file:org-info.js][minified version]] or the [[file:org-info-src.js][source code]].
    - Create the minified versions from the sources using the [[file:Makefile][Makefile]] and a
      little [[file:sed.txt][sed script]].
 
@@ -49,7 +49,10 @@
    the development by tracking the Worg repo as well, available at
    [[http://repo.or.cz/w/Worg.git]].
 
-** <<Terms used throughout this Document>>
+** Terms used throughout this Document
+   :PROPERTIES:
+   :CUSTOM_ID: terms
+   :END:
 
    The script knows three different so called /view modes/. One may toggle the
    view mode by pressing '=m=' or click the /toggle view/ link the script adds to
@@ -76,9 +79,10 @@
 
    A *section* is everything with a headline.
 
-
-* <<Features>>
-
+* Features
+  :PROPERTIES:
+  :CUSTOM_ID: features
+  :END:
 ** Appearance
 
    + *Toggle plain view, info view and presentation* ::
@@ -179,7 +183,8 @@
      version 0.0.7.3a (fixed in current Org-mode versions). If you export with
      =skip:nil=, you may add this to your stylesheet:
      : #text-before-first-headline {color:red;font-weight:bold;}
-
+   + Hooks :: The OrgHtmlManager object provides hooks (two currently) to add
+              custom actions.
 
 * Shortcuts
   :PROPERTIES:
@@ -323,7 +328,7 @@
         /Up|HOME|HELP|Toggle view/ links next to _each_ headline in plain view
         mode.
 
-*** Per File Basis: #+INFOJS\_OPT
+*** Per File Basis: ~#+INFOJS_OPT~
 
     A single file may overwrite the global options using a line like this:
 
@@ -424,7 +429,10 @@ org_html_manager.setup ();
 
       Don't forget to add an export target for the script itself ;-)
 
-* <<Linking to Files using the Script>>
+* Linking to Files using the Script
+  :PROPERTIES:
+  :CUSTOM_ID: linking
+  :END:
 
   Just use the ordinary link syntax to link to files that use the script. Append
   the section to the URL if neccessary:
@@ -461,7 +469,10 @@ org_html_manager.setup ();
   *Note* also that everything but =[0-9a-zA-Z\.-_]= should be URL encoded if used
   as an options value.
 
-* <<CSS>>
+* CSS
+  :PROPERTIES:
+  :CUSTOM_ID: css
+  :END:
 
   Here is an excerpt from the stylesheet for this file. Be carful not to mess
   things up when trying to position the console.
@@ -518,8 +529,7 @@ org_html_manager.setup ();
 /* END STYLES FOR org-info.js */
 #+END_SRC
 
-
-* <<Supported Browsers>>
+* Supported Browsers
 
   The functionality of the script is based on =DOM=. This leads to some
   incompatibility with legacy browsers. But hey, it's 2009, isn't it?
@@ -555,7 +565,7 @@ org_html_manager.setup ();
    If you manage to get this thingy working in any browser please let us know, so
    we can update the above table.
 
-* <<Why Do I Need a T.O.C?>>
+* Why Do I Need a T.O.C?
 
   Currently the script depends on the table of contents in the resulting
   XHTML. The TOC can be hidden though.
@@ -625,7 +635,7 @@ org_html_manager.setup ();
   which is valid XHTML but not understood by all browsers. I'll use the first
   version throughout this document where ever the space allows to do so.
 
-** Using Set()
+** Using ~set()~
    :PROPERTIES:
    :CUSTOM_ID: using-set
    :END:
@@ -678,6 +688,56 @@ org_html_manager.setup ();
    + =HELP= ::
      Display a little message on page load? Defaults to no message. Set to =1=
      to display the startup message.
+
+* Hooks
+   :PROPERTIES:
+   :CUSTOM_ID: hooks
+   :END:
+
+   Currently two hooks are provided.  Each hook function is called with one or
+   more parameters the first of which is the OrgHtmlManager object.
+
+   - '~onReady~' :: This hook is run once the document is loaded, the view is
+                  setup and the startup section is shown.  The second parameter
+                  is the first section shown, i.e. an OrgNode object.
+   - '~onShowSection~' :: This one runs after showing a new section.  This hook is
+        not called for the first section shown.  Use the '~onReady~' hook for the
+        first section.  The second parameter is an object with to OrgNodes: the
+        previously shown section and the current section.
+
+
+   To add functions to the hooks, fill a global object ~orgInfoHooks~ with the
+   function objects you need.  This is necessary, because code added via the
+   ~#+STYLE:~ option lines is executed before org-info.js is loaded.
+
+#+begin_src org
+  ,#+STYLE: <script type="text/javascript">
+  ,#+STYLE: /* <![CDATA[ */
+  ,#+STYLE:
+  ,#+STYLE: var f = function(){ alert("I'll be removed :("); };
+  ,#+STYLE:
+  ,#+STYLE: orgInfoHooks = {
+  ,#+STYLE:  'onReady': [
+  ,#+STYLE:     function(ohm, sec){alert("I'm the only 'onReady' hook here.");}
+  ,#+STYLE:   ],
+  ,#+STYLE: 'onShowSection': [
+  ,#+STYLE:     f,
+  ,#+STYLE:     function (ohm, secs) {
+  ,#+STYLE:       alert("You're looking at section "+secs['current']['I']+":\n"+
+  ,#+STYLE:             "\n            <<< "+ohm.rT(secs['current']['H']['innerHTML'])+" >>>");},
+  ,#+STYLE:     function(){
+  ,#+STYLE:          alert("I'll now remove my f and myself, too.");
+  ,#+STYLE:          org_html_manager.removeHook('onShowSection', f);
+  ,#+STYLE:          org_html_manager.removeHook('onShowSection',
+  ,#+STYLE:              orgInfoHooks['onShowSection'][ orgInfoHooks['onShowSection'].length - 1 ]);}
+  ,#+STYLE:   ]};
+  ,#+STYLE: /* ]]> */
+  ,#+STYLE: </script>
+#+end_src
+
+   *Make sure to remove hook functions at the end of the hook*.  Strange things
+   could happen otherwise (the hook loop will overlook a member. While the hook
+   loop runs in first hook first, the remove loop removes the last hook first).
 
 * How it works
 
@@ -784,8 +844,8 @@ org_html_manager.setup ();
   patents, I have to apply some license to my work to protect it and stay
   unprotected.
 
-  Hence the script was originally licensed under [[http://www.gnu.org/licenses/old-licenses/gpl-2.0.html][GPL 2]]. Since v.0.1.1.6 the
-  license was changed to [[http://www.gnu.org/licenses/gpl-3.0.html][GPL version 3]]. This document is subject to [[http://www.fsf.org/licensing/licenses/fdl.txt][GFDL]].
+  Hence the script was originally licensed under GPL 2. Since v.0.1.1.6 the
+  license was changed to [[http://www.gnu.org/licenses/old-licenses/gpl-2.0.html][GPL version 3]]. This document is subject to [[http://www.fsf.org/licensing/licenses/fdl.txt][GFDL]].
 
 * THE END
 
