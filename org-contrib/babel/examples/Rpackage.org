@@ -59,7 +59,7 @@ This document contains
   support for R code with ESS (http://ess.r-project.org/).
 
 - This document is to be put in the top level source directory of an R
-  package (i.e. at the same level as the DESCRIPTION file). To try it
+ package (i.e. at the same level as the DESCRIPTION file). To try it
   out using the built in package, create a fresh diretory named
   =countRows= and just put it there.
 
@@ -71,8 +71,8 @@ This document contains
   likely need to be changed.
 
 * Typical Workflow
-  - [[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/Rpackage.org][Download]] the =.org= version of this document
-  - Create a package directory (naming it like the package is convenient)
+ - [[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/Rpackage.org][Download]] the =.org= version of this document
+ - Create a package directory (naming it like the package is convenient)
   - Copy the =.org= version of this document into that directory
   - Move point to the  =set up .Rbuildignore= headline and execute it
     (see [[howrun][1]])  
@@ -201,12 +201,14 @@ grep 'require(' R/*
 : grep 'require(' R/*
 : #+end_src
 
-** set up .Rbuildignore
+** set up .Rbuildignore and man, R, and Rlib directories
 
 - This document sits in the top level source directory. So, ignore it
   and its offspring when checking, installing and building.
 - List all files to ignore under =#+results: rbi=  (including this
   one!). Regular expressions are allowed.
+- Rlib is optional. If you want to INSTALL in the system directory,
+  you own't need it.
 
 : #+results: rbi
 #+results: rbi
@@ -216,10 +218,16 @@ Only need to run this once (unless you add more ignorable files).
 
 #+begin_src R :results output silent :var rbld=rbi 
 cat(rbld,'\n', file=".Rbuildignore")
+dir.create("man")
+dir.create("R")
+dir.create("../Rlib")
 #+end_src
 
 : #+begin_src R :results output silent :var rbld=rbi 
 : cat(rbld,'\n', file=".Rbuildignore")
+: dir.create("man")
+: dir.create("R")
+: dir.create("../Rlib")
 : #+end_src
 
 * Project Specific Entries
@@ -488,8 +496,12 @@ almost every src block and TODO item.
   perhaps develop some tests to be sure it does what it is supposed to
   do.
 - Here is an easy-to-read tryout of the =count.rows= function:
+- You may need to edit or delete the =.libPaths= call to suit your
+  setup
 
 : #+begin_src R :session :results output :exports both
+:  .libPaths( new = "./Rlib")
+:   require( countRows ) 
 :   simple.df <- data.frame( diag(1:4), row.names=letters[ 1:4 ])
 :   repeated.df <- simple.df[ rep( 1:4, 4:1 ), ]
 :   simple.df
@@ -497,6 +509,8 @@ almost every src block and TODO item.
 : #+end_src
 
 #+begin_src R :session :results output :exports results
+  .libPaths( new = "./Rlib")
+  require( countRows ) 
   simple.df <- data.frame( diag(1:4), row.names=letters[ 1:4 ])
   repeated.df <- simple.df[ rep( 1:4, 4:1 ), ]
   simple.df
@@ -505,6 +519,7 @@ almost every src block and TODO item.
 
 #+results:
 #+begin_example
+Loading required package: countRows
   X1 X2 X3 X4
 a  1  0  0  0
 b  0  2  0  0

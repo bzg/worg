@@ -594,6 +594,59 @@ Posted to Org-mode mailing list by Osamu Okano
       ad-do-it))
 #+end_src
 
+** Preserve top level headings when archiving to a file
+   - Matt Lundin
+
+To preserve (somewhat) the integrity of your archive structure while
+archiving lower level items to a file, you can use the following
+defadvice:
+
+#+begin_src emacs-lisp
+  (defadvice org-archive-subtree (around my-org-archive-subtree activate)
+    (let ((org-archive-location 
+           (if (save-excursion (org-back-to-heading)
+                               (> (org-outline-level) 1))
+               (concat (car (split-string org-archive-location "::"))
+                       "::* "
+                       (car (org-get-outline-path)))
+             org-archive-location)))
+      ad-do-it))
+#+end_src
+
+Thus, if you have an outline structure such as...
+
+#+begin_src org
+  ,* Heading
+  ,** Subheading
+  ,*** Subsubheading
+#+end_src
+
+...archiving "Subsubheading" to a new file will set the location in
+the new file to the top level heading:
+
+#+begin_src org
+  
+  ,* Heading
+  ,** Subsubheading
+#+end_src
+
+While this hack obviously destroys the outline hierarchy somewhat, it
+at least preserves the logic of level one groupings.
+
+** Promote all items in subtree
+   - Matt Lundin
+
+ This function will promote all items in a subtree. Since I use
+ subtrees primarily to organize projects, the function is somewhat
+ unimaginatively called my-org-un-project:
+
+#+begin_src emacs-lisp
+  (defun my-org-un-project ()
+    (interactive)
+    (org-map-entries 'org-do-promote "LEVEL>1" 'tree)
+    (org-cycle t))
+#+end_src
+
 ** Make it easier to set org-agenda-files from multiple directories
   - Matt Lundin
 
