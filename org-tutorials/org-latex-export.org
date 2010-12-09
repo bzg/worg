@@ -436,6 +436,36 @@ Org-mode mailing list under the heading =text color + highlight= (!).
 There was a lively discussion there, to which the ideas of
 Samuel Wales, Christian Moe and Eric Schulte contributed directly to
 this implementation.    
+* Using the tabularx and booktabs packages
+The LaTeX exporter is currently able to export tabular and longtable
+environments. In situations where the width of the table needs to be
+specified, the tabularx package is a good solution, but this isn't
+supported by the exporter.  You can get the tabularx environment with
+the proper setup and calling a handy function in the Library of Babel.
+
+First, load the tabularx and booktabs packages:
+
+=#+LATEX_HEADER: \usepackage{tabularx,booktabs}=
+
+Then, give your table a name, e.g., =#+tblname: test-table= and put it
+somewhere the LaTeX exporter won't see.
+
+Finally, create a LaTeX source block something like this:
+
+: #+source: tabularx-export
+: #+begin_src latex :exports results :results latex
+:   \begin{table}[htb!]
+:   \centering
+:   \footnotesize
+:   \caption{A table to test the tabularx environment}
+:   \label{tab:test-table}
+:   <<booktabs(table=test-table,align="lX",env="tabularx",width="\\textwidth")>>  
+:   \end{table}
+:  #+end_src
+
+When you export the file to LaTeX, this code block is expanded in a
+=#+results:= block and wrapped in =#+BEGIN_LaTeX= ... =#+END_LaTeX=.
+
 * Footnotes
 
 [fn:1] Based on posts to the mailing list by Karl Marino and Carsten
