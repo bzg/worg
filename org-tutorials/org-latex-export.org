@@ -72,7 +72,7 @@ and easy to use and maintain.
 * More Highly-Structured Documents
 
 You can prepare more highly structured LaTeX documents by adding a few
-lines to =org-export-latex-classes= in the .emacs.
+lines to =org-export-latex-classes= in =.emacs=.
 
 #+begin_src emacs-lisp
   (add-to-list 'org-export-latex-classes
@@ -167,7 +167,7 @@ buffer:
 If the user has custom LaTeX document classes that conflict with the
 default packages or that only require a few of the default packages to
 support all features of the LaTeX exporter, then this can be handled
-in the .emacs using [DEFAULT-PACKAGES], [NO-DEFAULT-PACKAGES],
+in =.emacs= using [DEFAULT-PACKAGES], [NO-DEFAULT-PACKAGES],
 [PACKAGES], [NO-PACKAGES], [EXTRA], [NO-EXTRA].    
 
 Here is a simple example that uses a [[http://orgmode.org/worg/org-contrib/babel/examples/article-class.php][LaTeX class]] that supports the
@@ -331,31 +331,8 @@ The parts of =index.org= tagged =@WORK= can now be exported to
 Similarly, the parts of =index.org= tagged =@HOME= can now be exported to
 =~/notes/export/home/index.tex= with =C-c C-e X= and selecting the
 =home= project.
-
-* Exporting Pseudo-Code
-  The LaTeX exporter will fontify exported code blocks written in any
-  language that has an associated Emacs mode for editing.  If you want
-  to export pseudo-code, for which there is no corresponding Emacs
-  mode, then one approach is to use =#+begin_latex ... #+end_latex=
-  and write the pseudo-code directly in LaTeX.  This depends on the
-  LaTeX [[http://www.ctan.org/tex-archive/macros/latex/contrib/listings/][listings package]], which is one of the default packages used by
-  Org-mode. 
-
-  Dan Davison provided this example on the Org-mode list:
-
-: #+begin_latex
-: \begin{algorithm}
-:  \caption{An algorithm}
-:  \label{alg:myalg}
-:  \begin{lstlisting}[mathescape,escapeinside='']
-:    '\foreach individual $i$'
-:        '\foreach group $k$'
-:            $\gamma_{ik} \getsp Q_{k}\prod_{l}\prod_{a=1}^{2}P_{lkX_{ila}}$
-:  \end{lstlisting}
-: \end{algorithm}
-: #+end_latex
-
-* Changing the title(page) layout
+* Styling the Frontmatter
+** Titles and Title Page Layout
 The default title created by the LaTeX exporter is often just fine,
 but in cases where you would like to include specific information in
 the title, or create a custom title page, then perhaps the best way to
@@ -379,8 +356,6 @@ FOO
 \end{titlepage}%
 }
 #+end_example
-
-And FOO is replaced by your custom title(page).
 
 * Arbitrary Semantic Markup
 Org-mode provides wiki-like markup for various display
@@ -406,7 +381,7 @@ inside the block. For example, you can wrap an abstract in
 : #+END_ABSTRACT
 
 For more complex cases, where you need to pass parameters or process
-block contents, but don't want to use literal Latex, you may want to
+block contents, but don't want to use literal LaTeX, you may want to
 explore the possibilities of the contributed  [[file:../contrib/org-exp-blocks][org-exp-blocks]].
 
 /Inline/ arbitrary semantic markup can be implemented by defining a new link type
@@ -436,25 +411,85 @@ Org-mode mailing list under the heading =text color + highlight= (!).
 There was a lively discussion there, to which the ideas of
 Samuel Wales, Christian Moe and Eric Schulte contributed directly to
 this implementation.    
-* Using the tabularx and booktabs packages
-The LaTeX exporter is currently able to export tabular and longtable
-environments. In situations where the width of the table needs to be
-specified, the tabularx package is a good solution, but this isn't
-supported by the exporter.  You can get the tabularx environment with
-the proper setup and calling a handy function in the Library of Babel.
 
-The following steps assume that =org-babel-load-languages= has an entry =(latex
-. t)= and that functions in the Library of Babel are available.  I
-have this in =.emacs= (but don't know if it is necessary):
+* Exporting Listings                                               :noexport:
+** Exporting Pseudo-Code
+  The LaTeX exporter will fontify exported code blocks written in any
+  language that has an associated Emacs mode for editing.  If you want
+  to export pseudo-code, for which there is no corresponding Emacs
+  mode, then one approach is to use =#+begin_latex ... #+end_latex=
+  and write the pseudo-code directly in LaTeX.  This depends on the
+  LaTeX [[http://www.ctan.org/tex-archive/macros/latex/contrib/listings/][listings package]], which is one of the default packages used by
+  Org-mode. 
+
+  Dan Davison provided this example on the Org-mode list:
+
+: #+begin_latex
+: \begin{algorithm}
+:  \caption{An algorithm}
+:  \label{alg:myalg}
+:  \begin{lstlisting}[mathescape,escapeinside='']
+:    '\foreach individual $i$'
+:        '\foreach group $k$'
+:            $\gamma_{ik} \getsp Q_{k}\prod_{l}\prod_{a=1}^{2}P_{lkX_{ila}}$
+:  \end{lstlisting}
+: \end{algorithm}
+: #+end_latex
+* Exporting Tables
+LaTeX divides table handling into two parts: typesetting the actual
+table, and placing the table on the page along with a caption and
+cross-reference information.
+
+LaTeX provides several environments for typesetting tables.  The LaTeX
+exporter currently supports a well-rounded subset of these:
+
+  - tabular :: table doesn't break across pages, user responsible for
+               determining column widths
+  - tabularx :: table doesn't break across pages, width of table
+                specified by user, automatic calculation of column widths
+  - tabulary :: like tabularx, but tries harder to calculate optimal
+                column widths
+  - longtable :: table breaks across pages, can't be used in a
+                 multicolumn page layout
+
+Because the various tabular envionments don't break across pages, they
+are typically "floated" by wrapping them in a =table= environment, or
+for a table that spans columns in a multi-column page layout, a
+=table*= environment.  LaTeX will the float the typeset table to an
+appropriate place in the output, ensuring that the table doesn't run
+off the end of the page (unless it is taller than the text height).
+Note that the LaTeX environments responsible for handling the
+information specified by =#+CAPTION:= and =#+LABEL:= are =table=,
+=table*=, and =longtable=.  If =tabular=, =tabularx=, and =tabulary=
+are used by themselves, then they won't support captions and
+cross-references. 
+
+** Table Rules
+The tables in many high-quality publications use rules of different
+widths for the different "lines" in a table.  The horizontal rules at
+the top and bottom of a table are heavier than the rule separating the
+column heads from the table body.  In general, good table design
+discourages the use of vertical rules; they are superfluous in an
+otherwise well-designed table.
+
+The LaTeX exporter currently uses rules of the same width everywhere
+in a table.  It is possible to get book quality tables
+
+The following steps assume that the =org-babel-load-languages=
+variable has an entry =(latex . t)= and that functions in the Library
+of Babel are available.  I have this in =.emacs= so that Org-mode
+knows where to find the Library of Babel (but don't know if it
+is strictly necessary):
 :  (org-babel-lob-ingest "/path/to/library-of-babel.org")
 
 
-First, load the tabularx and booktabs packages:
+First, load the =booktabs= package:
 
-=#+LATEX_HEADER: \usepackage{tabularx,booktabs}=
+: #+LATEX_HEADER: \usepackage{booktabs}
 
 Then, give your table a name, e.g., =#+tblname: test-table= and put it
-somewhere the LaTeX exporter won't see.
+somewhere the LaTeX exporter won't see, perhaps in a sub-tree tagged with
+=:noexport:=.
 
 Finally, create a LaTeX source block something like this:
 
@@ -463,14 +498,416 @@ Finally, create a LaTeX source block something like this:
 :   \begin{table}[htb!]
 :   \centering
 :   \footnotesize
-:   \caption{A table to test the tabularx environment}
+:   \caption{A table to test booktabs}
 :   \label{tab:test-table}
-:   <<booktabs(table=test-table,align="lX",env="tabularx",width="\\textwidth")>>  
+:   <<booktabs(table=test-table,align="lrl",env="tabular")>>  
 :   \end{table}
 :  #+end_src
 
 When you export the file to LaTeX, this code block is expanded in a
 =#+results:= block and wrapped in =#+BEGIN_LaTeX= ... =#+END_LaTeX=.
+If the table has column heads, then the rule beneath them should be
+finer than the rules at the top and bottom of the table.
+
+* Exporting Lists
+In standard LaTeX, lists are set with a lot of vertical white space
+and it is sometimes nicer to set them more compactly.  This is
+accomplished with the =paralist= package.
+
+: #+LaTeX_HEADER: \usepackage{paralist}
+
+Then you can redefine the standard LaTeX list environments with their
+compact =paralist= equivalents:
+
+: #+LaTeX_HEADER: \let\itemize\compactitem
+: #+LaTeX_HEADER: \let\description\compactdesc
+: #+LaTeX_HEADER: \let\enumerate\compactenum  
+
+The =paralist= package has a facility for setting lists in paragraphs,
+rather than displayed separately.  Typically the lists in a paragraph
+are enumerated and it is possible to set Org-mode's enumerated lists
+in paragraph, while displaying itemized and description lists.
+
+: #+LaTeX_HEADER: \let\enumerate\inparaenum
+
+Alternatively, you can specify how to enumerate the list.  These two
+examples use lowercase Roman numerals in parentheses and lowercase
+letters in parentheses.
+
+: #+LaTeX_HEADER: \renewenvironment{enumerate}{\begin{inparaenum}[(i)]}{\end{inparaenum}}
+: #+LaTeX_HEADER: \renewenvironment{enumerate}{\begin{inparaenum}[(a)]}{\end{inparaenum}}
+
+* Fonts
+The default LaTeX font is Computer Modern, which was designed by
+Donald Knuth.  Computer Modern is perfectly serviceable, but not as
+nice as other fonts available for LaTeX.  Alternative font sets are
+suggested below.
+
+There are many choices and your choice of which ones to use will be
+guided, in part, by whether or not your document uses math.  If so,
+then you'll want to choose a font with math support.
+
+Another consideration will be whether or not the font clashes with the
+=amssymb= package that Org-mode loads by default.
+
+LaTeX documents might need three text fonts, one for the serif
+typeface used for text, the sans-serif typeface often used for heads
+and sub-heads, and the monospace typewriter typeface typically used to
+set code examples and the like.  Choosing fonts that look good with
+one another is part of the typesetter's art; some care has been taken
+to match fonts in each set.
+
+** Bera
+# <<bera-font>>
+
+Bera is the LaTeX version of the Bitstream's Vera family of fonts.
+The family includes serif, sans-serif, and monospace fonts designed to
+work well with one another. 
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage[scaled]{beraserif}
+: #+LaTeX_HEADER: \usepackage[scaled]{berasans} 
+: #+LaTeX_HEADER: \usepackage[scaled]{beramono}
+
+** Charter
+# <<charter-font>>
+
+[[http://en.wikipedia.org/wiki/Bitstream_Charter][Charter]] was designed to reproduce well on low-resolution 300 dpi
+printers.  It is paired here with Helvetica and Courier, like [[times-font][Times]],
+for which it is an alternative.  Helvetica is set a bit smaller to
+match the shape of the Charter font.  These fonts conflict with the
+[[latex:package][amssymb]] package.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage[bitstream-charter]{mathdesign}
+: #+LaTeX_HEADER: \usepackage[scaled=.9]{helvet} 
+: #+LaTeX_HEADER: \usepackage{courier} % tt
+
+** Garamond
+# <<garamond-font>>
+
+[[http://en.wikipedia.org/wiki/Garamond][Garamond]] refers to a group of old-style serif typefaces and is named
+after the sixteenth-century type designer, Claude Garamond.  It is an
+elegant typeface.  Garamond requires a bit more leading than normal.
+The sans-serif font is Latin Modern and the typewriter font is
+Courier.  Both were chosen to match the shape and stroke weight of
+Garamond.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage[urw-garamond]{mathdesign}
+: #+LaTeX_HEADER: \usepackage{lmodern} 
+: #+LaTeX_HEADER: \usepackage{courier}
+: #+LaTeX_HEADER: \linespread{1.0609}
+
+** KP family
+# <<kp-font>>
+
+The [[http://tug.ctan.org/pkg/kpfonts][KP font family]] is produced by Christophe Caignaert for the
+Johannes Kepler project.  The family supports math.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage{kpfonts}
+
+** Libertine
+# <<libertine-font>>
+
+The [[http://www.linuxlibertine.org/][Linux Libertine Project]] produces OpenSource fonts.  Libertine is a
+replacement for Times New Roman and includes a companion sans-serif
+font.  It was used to typeset the Wikipedia logo.  The monospace
+typewriter font is Latin Modern.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage{libertine}
+: #+LaTeX_HEADER: \renewcommand*\oldstylenums[1]{{\fontfamily{fxlj}\selectfont #1}}
+: #+LaTeX_HEADER: \usepackage{lmodern}
+** Nimbus                                                     
+# <<nimbus-font>>
+
+The Nimbus font set uses fonts from the [[http://www.gust.org.pl/projects/e-foundry/tex-gyre/][Tex-Gyre]] distribution, which
+provides a rich collection of diacritical characters in the attempt to
+cover as many Latin-based scripts as possible.  The serif font is
+Termes, which is a replacement for Times Roman.  The sans-serif font
+is Heros, which is a replacement for Helvetica.  The monospace font is
+Cursor, which is a Courier replacement.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc}
+: #+LaTeX_HEADER: \usepackage{tgtermes}
+: #+LaTeX_HEADER: \usepackage[scale=.85]{tgheros}
+: #+LaTeX_HEADER: \usepackage{tgcursor}
+
+** Palatino
+# <<palatino-font>>
+
+The beautiful, old-style serif font, [[http://en.wikipedia.org/wiki/Palatino][Palatino]], was designed by [[http://en.wikipedia.org/wiki/Herman_Zapf][Herman
+Zapf]].  It is somewhat heavier and easier to read than [[garamond-font][Garamond]].
+Palatino gets a bit more leading than normal.  It is paired here with
+Helvetica and Courier, as is [[times-font][Times]], for which it is an alternative.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc}
+: #+LaTeX_HEADER: \usepackage{mathpazo}
+: #+LaTeX_HEADER: \linespread{1.05}
+: #+LaTeX_HEADER: \usepackage[scaled]{helvet}
+: #+LaTeX_HEADER: \usepackage{courier}
+
+** Times
+# <<times-font>>
+
+The =times= option uses URW Nimbus Roman, a Times clone, for the serif
+font, URW Nimbus Sans, a Helvetica clone, for the sans-serif font,
+and URW Nimbus Mono, a Courier clone, for the typewriter font.  This
+is a standard set of common typefaces typically used in scientific
+publications.  All of the fonts should be included in a typical LaTeX
+distribution. 
+
+[[http://en.wikipedia.org/wiki/Times_Roman][Times New Roman]] was designed by [[http://en.wikipedia.org/wiki/Stanley_Morison][Stanley Morison]] for /The Times/ of
+London during a redesign of the newspaper prompted, in part, by
+Morison's criticism of its typography in 1929.  [[http://en.wikipedia.org/wiki/Helvetica][Helvetica]] was
+developed in 1957 by [[http://en.wikipedia.org/wiki/Max_Miedinger][Max Miedinger]].  Helvetica looks better with Times
+if it is set slightly smaller than the serif font.  [[http://en.wikipedia.org/wiki/Courier_(typeface)][Courier]] was
+designed by Howard Kettler in 1955 for use in IBM typewriters.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc}
+: #+LaTeX_HEADER: \usepackage{mathptmx} 
+: #+LaTeX_HEADER: \usepackage[scaled=.90]{helvet} 
+: #+LaTeX_HEADER: \usepackage{courier}
+
+** Utopia
+# <<utopia-font>>
+
+[[http://en.wikipedia.org/wiki/Utopia_(typeface)][Utopia]] is a transitional serif font designed by [[http://en.wikipedia.org/wiki/Robert_Slimbach][Robert Slimbach]] for
+Adobe in 1989.  It became free software in 2006.  It is paired here
+with the Bera sans serif and monospaced fonts.  Note that the Utopia
+font clashes with the [[latex:package][amssymb]] package.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage[adobe-utopia]{mathdesign}
+: #+LaTeX_HEADER: \usepackage[scaled]{berasans} 
+: #+LaTeX_HEADER: \usepackage[scaled]{beramono}
+
+* Bibliography
+
+The [[latex:package][biblatex]] package, which recently emerged from beta status, offers
+support for the full range of citation styles, including the numeric
+styles favored by scientists, the author-date styles used by social
+scientists, and the footnote styles popular in the humanities.  Thanks
+to work by Ali Tofigh and Joost Kremers, it is possible to manage
+citations using the [[http://ebib.sourceforge.net/][ebib]] program for managing BibTeX databases.
+
+You'll need two additions to the LaTeX preamble, one to load biblatex
+and the other to specify the =*.bib= files that hold the BibTeX
+database.  Loading biblatex without options defaults to a numeric
+citation style typical in the sciences.
+
+: #+LaTeX_HEADER: \usepackage{biblatex}
+: #+LaTeX_HEADER: \bibliography{my-bib,my-other-bib}
+
+There are a number of citation and bibliography styles that ship with
+biblatex and there is a growing body of contributed styles.  These can
+be selected by passing options to biblatex.  The author/date style
+used in the social sciences can be selected:
+
+: #+LaTeX_HEADER: \usepackage[style=authordate]{biblatex}
+
+Or a footnote style:
+
+: #+LaTeX_HEADER: \usepackage[style=verbose]{biblatex}
+
+** Natbib citations
+
+Biblatex supports the various citation commands implemented by
+[[latex:package][natbib]].
+
+: #+LaTeX_HEADER: \usepackage[natbib]{biblatex}
+
+The commands all start with =cite= and end with one or more letters
+that indicate a style.  The most commonly used commands are:
+  1. [[latex:progstruct][citep]] for parenthetical citations, e.g., (Jones, 1958);
+  2. [[latex:progstruct][citet]] for textual citations, e.g., Jones (1958);
+  3. [[latex:progstruct][citealt]] for textual citations without parentheses, e.g. Jones 1958.
+There are starred versions of most commands that will output the full
+author lists rather than use the abbreviation =et. al.=
+
+** Using Ebib and Extended Link Syntax
+
+Using ebib with Org-mode was the idea of Ali Tofigh, who sent this
+message to the Org-mode list:
+
+A while ago I asked on this list about connecting org-mode with ebib,
+which is a bibtex database manager for emacs. Thanks to Joost Kremers,
+there is now a solution.
+
+I asked the developer of ebib, Joost Kremers, if he could write a
+function that would start ebib on a given bibtex entry. He kindly
+added this functionality to the 'ebib' function (which starts ebib in
+emacs) and it is now available in the ebib git repository (see
+http://ebib.sourceforge.net). If you are using ebib and would like to
+get org-mode to open bibtex entries do the following:
+
+1) Install the latest development version of ebib.
+
+2) make sure =ebib-preload-bib-files= is set properly so that your =.bib= file is loaded by ebib when ebib starts
+
+3) add the following line to your =.emacs=:
+: (org-add-link-type "ebib" 'ebib)
+
+Now you can insert ebib links in your documents like this:
+=[ebib:Jones1998][some paper title]=. Opening this link should now
+result in ebib starting, loading your default bibtex database, and
+highlighting the bibtex entry Jones1998. Alternatively, if you already
+have started ebib, then opening the link will get you to the bibtex
+entry in your opened ebib database.
+
+*** Natbib citation commands
+The link types defined for use with ebib can also format output for
+the LaTeX exporter.  The following link types insert the natbib
+citation commands.
+
+#+source: define-citep-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citep" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\citep[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-citet-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "citet" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\citet[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-citealt-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citealt" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\citealt[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-citealp-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citealp" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\citealp[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-citealtstar-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citealt*" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\citealt*[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-citealpstar-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citealp*" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\citealp*[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-citepstar-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citep*" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\citep*[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-citetstar-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citet*" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\citet*[%s]{%s}" desc path)))))
+#+end_src
+
+
+*** Biblatex citation commands
+The following six link types are defined for the standard biblatex
+citation commands.
+
+#+source: define-cite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "cite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\cite[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-parencite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "parencite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\parencite[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-footcite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "footcite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\footcite[%s]{%s}" desc path)))))
+#+end_src
+
+
+#+source: define-cap-cite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "Cite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\Cite[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-cap-parencite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "Parencite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\Parencite[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-cap-footcite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "Footcite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\Footcite[%s]{%s}" desc path)))))
+#+end_src
+
 
 * Footnotes
 
