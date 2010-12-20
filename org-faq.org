@@ -2045,40 +2045,60 @@ are several possible shortcuts you can use to enter them:
 
 3) [[http://orgmode.org/manual/Literal-examples.html#Literal-examples][Abbrevs]]
 
- - Activate the abbrev minor-mode in org-mode:
+   - Activate the abbrev minor-mode in org-mode:
 
-   + M-x abbrev-mode
+     + M-x abbrev-mode
 
-   + /Permanently/:
+     + /Permanently/:
 
        + =(add-hook 'org-mode-hook (lambda () (abbrev-mode 1)))=
 
- - In org-mode, type "sbp" (a sample abbreviation for a perl source
-   block).
+   - In org-mode, type "sbp" (a sample abbreviation for a perl source
+     block).
 
- - Immediately after "sbp" type =C-x a i l=.
+   - Immediately after "sbp" type =C-x a i l=.
 
- - Enter the expansion:
+   - Enter the expansion:
 
-   - =#+begin_src perl[C-q C-j][C-q C-j]#+end_src=
+     - =#+begin_src perl[C-q C-j][C-q C-j]#+end_src=
 
-   - Note: =C-q C-j= creates a new line in the minibuffer
+     - Note: =C-q C-j= creates a new line in the minibuffer
 
- - Now, whenever, you type sbp followed by =SPACE= or =RET= in an
-   org-mode buffer, the src block will magically appear.
+   - Now, whenever, you type sbp followed by =SPACE= or =RET= in an
+     org-mode buffer, the src block will magically appear.
 
- - To review your list of abbrevs, type =M-x edit-abbrevs=.
+   - To review your list of abbrevs, type =M-x edit-abbrevs=.
 
- - If you want more complex completion (like yasnippet) you can combine
-   abbrev mode with [[http://www.emacswiki.org/emacs/SkeletonMode][skeletons]].
+4) [[http://www.slashgear.com/nokia-n900-android-dual-boot-hack-video-2371099/][Skeletons]]
 
-4) [[http://code.google.com/p/yasnippet/][Yasnippet]]
+   - Skeletons offer a simple way of automatically entering text.
+     Here's a skeleton that queries for the type of block and wraps
+     the active region inside it:
+ 
+     #+begin_src elisp
+       (define-skeleton skel-org-block
+	 "Insert an org block, querying for type."
+	 "Type: "
+	 "#+begin_" str "\n"
+	 _ - \n
+	 "#+end_" str "\n")
+     #+end_src
 
- - Several org-mode users install yasnippet for convenient, complex
-   expansion.
+   - Simply type skel-org-block to insert the block.
 
- - See Bernt Hansen's [[http://doc.norang.ca/org-mode.html#Yasnippets][org-mode setup]] for a good introduction to
-   yasnippet.
+     - You can bind this to a key.
+
+     - You can also create an abbrev that invokes this function:
+
+       : (define-abbrev org-mode-abbrev-table "blk" "" 'skel-org-block)
+
+5) [[http://code.google.com/p/yasnippet/][Yasnippet]]
+
+   - Several org-mode users install yasnippet for convenient, complex
+     expansion.
+
+   - See Bernt Hansen's [[http://doc.norang.ca/org-mode.html#Yasnippets][org-mode setup]] for a good introduction to
+     yasnippet.
 
 * Capture and remember
   :PROPERTIES:
