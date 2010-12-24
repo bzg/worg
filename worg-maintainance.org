@@ -27,3 +27,38 @@ sections in Worg.
 - David Maus is taking care of [[file:org-issues.org][org-issues.org]]
 - [Adopt a directory/page here]
 
+
+* Worg doesn't publish correctly - what to do?
+
+** What need to be taken care of?
+
+/Do we have to avoid certain constructs in the Org files to avoid the bug
+to come back?/
+
+Yes, When quoting examples (in org-issues.org or elsewhere), we need to be
+careful about not including syntactic elements at the wrong place.
+
+Also, exporting Worg is made using the last Org release, not the latest
+Org version from git: so anything that is exportable with bleeding-edge
+Org is not always exportable with the Org version on the server.
+
+** How to track down a publishing problem?
+
+From Bastien's email (on 2010-12-24 Fri):
+
+#+begin_quote
+Here is how I tracked down the problem if it helps :
+
+- I tried to export locally with latest Org (from git) to see where the
+  export process stops: I found org-issues.org was the culprit
+
+- I took a quick look at org-issues.org be couldn't spot the problem
+
+- I then tried to export by first commenting out the 1st-level trees in
+  org-issues.org except one: reiterated this till I found the ill-formed
+  tree. 
+
+- Then focus on this tree to find the problem.
+
+Quick long and a bit too manual - but effective.
+#+end_quote
