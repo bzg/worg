@@ -331,31 +331,6 @@ The parts of =index.org= tagged =@WORK= can now be exported to
 Similarly, the parts of =index.org= tagged =@HOME= can now be exported to
 =~/notes/export/home/index.tex= with =C-c C-e X= and selecting the
 =home= project.
-* Styling the Frontmatter
-** Titles and Title Page Layout
-The default title created by the LaTeX exporter is often just fine,
-but in cases where you would like to include specific information in
-the title, or create a custom title page, then perhaps the best way to
-do this was posted to the Org-mode list by Nick Dokos:
-
-#+begin_example
-#+LATEX_HEADER: \input{mytitle}
- 
- * Foo
- foo
- 
- * Bar
- bar
-#+end_example
-
-where the file mytitle.tex looks like this:
-
-#+begin_example
-\renewcommand\maketitle{\begin{titlepage}%
-FOO
-\end{titlepage}%
-}
-#+end_example
 
 * Markup
 Org-mode provides wiki-like markup for various display
@@ -463,6 +438,76 @@ spaces in the =PATH= argument.
 
 Here is an example of its use:
 : [[caption:A caption in the List of Figures][A caption for a figure.]]
+* Styling the Frontmatter
+The Org-mode LaTeX exporter requires configuration to gain full access
+to the LaTeX frontmatter formatting capacity.
+ 
+** Abstract, contents, and lists of figures and tables
+In the default configuration, the Org-mode LaTeX exporter includes a
+function that sandwiches the LaTeX =\tableofcontents= command between
+a command that sets the depth of the headings that appear in the table
+of contents (based on the number of headline levels that will be
+exported as headings, rather than lists) and a command to add some
+vertical space.  Neither of these additions to the =\tableofcontents=
+command is especially desireable.  It is often the case that one wants
+the table of contents depth to differ from the depth to which sections
+are numbered.  Also, in the LaTeX world, the space between the end of one
+element and the start of another is something that is specified within
+a class or style file, rather than within the document itself.  Formatting with
+the class or style file exclusively can give the finished document a pleasing
+stylistic uniformity that is difficult to achieve in an ad hoc way.
+Also, hardwiring the table of contents in this way always puts it
+directly following the output of the LaTeX =maketitle= command.  In
+practice, however, it is often useful to print an abstract or
+executive summary between the title and the table of contents.
+Fortunately, the LaTeX exporter is coded in such a way that it is
+possible for the user to alter this behavior relatively easily.
+
+#+source: format-no-toc
+#+begin_src emacs-lisp :exports code
+(defun org-export-latex-no-toc (depth)  
+    (when depth
+      (format "%% Org-mode is exporting headings to %s levels.\n"
+              depth)))
+  (setq org-export-latex-format-toc-function 'org-export-latex-no-toc)
+#+end_src
+
+With this setup, place the abstract and =#+LATEX:= commands for
+frontmatter before the first exported headline, e.g.,
+
+: #+BEGIN_abstract
+:   [Abstract here]
+: #+END_abstract
+: #+LATEX: \tableofcontents
+: #+LATEX: \listoftables
+: #+LATEX: \listoffigures
+: * First Exported Headline
+
+
+** Titles and Title Page Layout
+The default title created by the LaTeX exporter is often just fine,
+but in cases where you would like to include specific information in
+the title, or create a custom title page, then perhaps the best way to
+do this was posted to the Org-mode list by Nick Dokos:
+
+#+begin_example
+#+LATEX_HEADER: \input{mytitle}
+ 
+ * Foo
+ foo
+ 
+ * Bar
+ bar
+#+end_example
+
+where the file mytitle.tex looks like this:
+
+#+begin_example
+\renewcommand\maketitle{\begin{titlepage}%
+FOO
+\end{titlepage}%
+}
+#+end_example
 
 * Exporting Listings                                               :noexport:
 ** Exporting Pseudo-Code
