@@ -236,7 +236,23 @@ more strongly than "or" (=|=). For instance, the following search...
 There, are, however several other ways to achieve the grouping effect
 of parentheses:
 
-1. Use a slightly more verbose query as a substitute for the logic of
+1. Use a regular expression
+
+   To invoke the "grouping" logic of parentheses, you can construct a
+   regular expression:
+
+   : +{computer\|work}+email
+
+   Note: you can also use the special property =ALLTAGS= (which
+   queries the same data as a normal tags search) together with a
+   regular expression:
+
+   : ALLTAGS={computer\|work}+email
+   
+   (In the next section we'll learn more about how property searches
+   and regular expressions are constructed.)
+
+2. Use a slightly more verbose query as a substitute for the logic of
    parentheses. E.g.,
 
    : computer&email|work&email
@@ -244,23 +260,11 @@ of parentheses:
    This search will match all headlines tagged either with "computer"
    and "email" or with "work" and "email." 
 
-2. Use [[http://orgmode.org/manual/Agenda-commands.html#Agenda-commands][agenda filtering]].
+3. Use [[http://orgmode.org/manual/Agenda-commands.html#Agenda-commands][agenda filtering]].
 
-   This is perhaps the most practical option. Simply search for all
-   headlines tagged with "computer" or "work" and then use the
-   agenda's tag filtering capabilities (=/=) to see only those
-   headlines among the results that have the tag "email."
-
-3. Use a property search with regular expressions.
-
-   To invoke the "grouping" logic of parentheses, you can use the
-   special property =ALLTAGS= (which queries the same data as a normal
-   tags search) together with a regular expression:
-
-   : ALLTAGS={computer\|work}+email
-
-   In the next section we'll learn more about how such property
-   searches are constructed.
+   Simply search for all headlines tagged with "computer" or "work"
+   and then use the agenda's tag filtering capabilities (=/=) to see
+   only those headlines among the results that have the tag "email."
 
 ** Property searches
    :PROPERTIES:
