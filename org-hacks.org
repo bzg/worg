@@ -1230,76 +1230,121 @@ The logic for finding the message was adapted from [[http://www.emacswiki.org/cg
 article]].
 
 #+begin_src emacs-lisp
-;; Support for saving Gnus messages by Message-ID
-(defun mde-org-gnus-save-by-mid ()
-  (when (memq major-mode '(gnus-summary-mode gnus-article-mode))
-    (when (eq major-mode 'gnus-article-mode)
-      (gnus-article-show-summary))
-    (let* ((group gnus-newsgroup-name)
-           (method (gnus-find-method-for-group group)))
-      (when (eq 'nnml (car method))
-        (let* ((article (gnus-summary-article-number))
-               (header (gnus-summary-article-header article))
-               (from (mail-header-from header))
-               (message-id
-                (save-match-data
-                  (let ((mid (mail-header-id header)))
-                    (if (string-match "<\\(.*\\)>" mid)
-                        (match-string 1 mid)
-                      (error "Malformed message ID header %s" mid)))))
-               (date (mail-header-date header))
-               (subject (gnus-summary-subject-string)))
-          (org-store-link-props :type "mid" :from from :subject subject
-                                :message-id message-id :group group
-                                :link (org-make-link "mid:" message-id))
-          (apply 'org-store-link-props
-                 :description (org-email-link-description)
-                 org-store-link-plist)
-          t)))))
+  ;; Support for saving Gnus messages by Message-ID
+  (defun mde-org-gnus-save-by-mid ()
+    (when (memq major-mode '(gnus-summary-mode gnus-article-mode))
+      (when (eq major-mode 'gnus-article-mode)
+        (gnus-article-show-summary))
+      (let* ((group gnus-newsgroup-name)
+             (method (gnus-find-method-for-group group)))
+        (when (eq 'nnml (car method))
+          (let* ((article (gnus-summary-article-number))
+                 (header (gnus-summary-article-header article))
+                 (from (mail-header-from header))
+                 (message-id
+                  (save-match-data
+                    (let ((mid (mail-header-id header)))
+                      (if (string-match "<\\(.*\\)>" mid)
+                          (match-string 1 mid)
+                        (error "Malformed message ID header %s" mid)))))
+                 (date (mail-header-date header))
+                 (subject (gnus-summary-subject-string)))
+            (org-store-link-props :type "mid" :from from :subject subject
+                                  :message-id message-id :group group
+                                  :link (org-make-link "mid:" message-id))
+            (apply 'org-store-link-props
+                   :description (org-email-link-description)
+                   org-store-link-plist)
+            t)))))
+  
+  (defvar mde-mid-resolve-methods '()
+    "List of methods to try when resolving message ID's.  For Gnus,
+  it is a cons of 'gnus and the select (type and name).")
+  (setq mde-mid-resolve-methods
+        '((gnus nnml "")))
+  
+  (defvar mde-org-gnus-open-level 1
+    "Level at which Gnus is started when opening a link")
+  (defun mde-org-gnus-open-message-link (msgid)
+    "Open a message link with Gnus"
+    (require 'gnus)
+    (require 'org-table)
+    (catch 'method-found
+      (message "[MID linker] Resolving %s" msgid)
+      (dolist (method mde-mid-resolve-methods)
+        (cond
+         ((and (eq (car method) 'gnus)
+               (eq (cadr method) 'nnml))
+          (funcall (cdr (assq 'gnus org-link-frame-setup))
+                   mde-org-gnus-open-level)
+          (when gnus-other-frame-object
+            (select-frame gnus-other-frame-object))
+          (let* ((msg-info (nnml-find-group-number
+                            (concat "<" msgid ">")
+                            (cdr method)))
+                 (group (and msg-info (car msg-info)))
+                 (message (and msg-info (cdr msg-info)))
+                 (qname (and group
+                             (if (gnus-methods-equal-p
+                                  (cdr method)
+                                  gnus-select-method)
+                                 group
+                               (gnus-group-full-name group (cdr method))))))
+            (when msg-info
+              (gnus-summary-read-group qname nil t)
+              (gnus-summary-goto-article message nil t))
+            (throw 'method-found t)))
+         (t (error "Unknown link type"))))))
+  
+  (eval-after-load 'org-gnus
+    '(progn
+       (add-to-list 'org-store-link-functions 'mde-org-gnus-save-by-mid)
+       (org-add-link-type "mid" 'mde-org-gnus-open-message-link)))
+#+end_src
 
-(defvar mde-mid-resolve-methods '()
-  "List of methods to try when resolving message ID's.  For Gnus,
-it is a cons of 'gnus and the select (type and name).")
-(setq mde-mid-resolve-methods
-      '((gnus nnml "")))
+** Store link upon sending a message in Gnus
 
-(defvar mde-org-gnus-open-level 1
-  "Level at which Gnus is started when opening a link")
-(defun mde-org-gnus-open-message-link (msgid)
-  "Open a message link with Gnus"
-  (require 'gnus)
-  (require 'org-table)
-  (catch 'method-found
-    (message "[MID linker] Resolving %s" msgid)
-    (dolist (method mde-mid-resolve-methods)
-      (cond
-       ((and (eq (car method) 'gnus)
-             (eq (cadr method) 'nnml))
-        (funcall (cdr (assq 'gnus org-link-frame-setup))
-                 mde-org-gnus-open-level)
-        (when gnus-other-frame-object
-          (select-frame gnus-other-frame-object))
-        (let* ((msg-info (nnml-find-group-number
-                          (concat "<" msgid ">")
-                          (cdr method)))
-               (group (and msg-info (car msg-info)))
-               (message (and msg-info (cdr msg-info)))
-               (qname (and group
-                           (if (gnus-methods-equal-p
-                                (cdr method)
-                                gnus-select-method)
-                               group
-                             (gnus-group-full-name group (cdr method))))))
-          (when msg-info
-            (gnus-summary-read-group qname nil t)
-            (gnus-summary-goto-article message nil t))
-          (throw 'method-found t)))
-       (t (error "Unknown link type"))))))
+Ulf Stegemann came up with this solution (see his [[http://www.mail-archive.com/emacs-orgmode@gnu.org/msg33278.html][original message]]):
 
-(eval-after-load 'org-gnus
-  '(progn
-     (add-to-list 'org-store-link-functions 'mde-org-gnus-save-by-mid)
-     (org-add-link-type "mid" 'mde-org-gnus-open-message-link)))
+#+begin_src emacs-lisp
+(defun ulf-message-send-and-org-gnus-store-link (&optional arg)
+  "Send message with `message-send-and-exit' and store org link to message copy.
+If multiple groups appear in the Gcc header, the link refers to
+the copy in the last group."
+  (interactive "P")
+    (save-excursion
+      (save-restriction
+	(message-narrow-to-headers)
+	(let ((gcc (car (last
+			 (message-unquote-tokens
+			  (message-tokenize-header
+			   (mail-fetch-field "gcc" nil t) " ,")))))
+	      (buf (current-buffer))
+	      (message-kill-buffer-on-exit nil)
+	      id to from subject desc link newsgroup xarchive)
+        (message-send-and-exit arg)
+        (or
+         ;; gcc group found ...
+         (and gcc
+              (save-current-buffer
+                (progn (set-buffer buf)
+                       (setq id (org-remove-angle-brackets
+                                 (mail-fetch-field "Message-ID")))
+                       (setq to (mail-fetch-field "To"))
+                       (setq from (mail-fetch-field "From"))
+                       (setq subject (mail-fetch-field "Subject"))))
+              (org-store-link-props :type "gnus" :from from :subject subject
+                                    :message-id id :group gcc :to to)
+              (setq desc (org-email-link-description))
+              (setq link (org-gnus-article-link
+                          gcc newsgroup id xarchive))
+              (setq org-stored-links
+                    (cons (list link desc) org-stored-links)))
+         ;; no gcc group found ...
+         (message "Can not create Org link: No Gcc header found."))))))
+
+(define-key message-mode-map [(control c) (control meta c)]
+  'ulf-message-send-and-org-gnus-store-link)
 #+end_src
 
 ** Send html messages and attachments with Wanderlust
