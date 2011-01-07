@@ -111,7 +111,7 @@
 ;;
 ;; Available functions:
 ;;
-;; `org-issue-new': File a news issue for current message Create a new
+;; `org-issue-new': File a new issue for current message.  Create a new
 ;;                  TODO in `org-issue-issue-file' below the headline
 ;;                  "New Issues" with keyword NEW.  If customization
 ;;                  variable `org-issue-message-flag' is non-nil and
@@ -129,7 +129,7 @@
 ;;                                   the message flag is removed.
 ;;
 ;; `org-issue-link-gmane' : An Org mode web link pointing to current
-;;                          message on gmane is pushed to killring and
+;;                          message on gmane is pushed to kill-ring and
 ;;                          clipboard.
 ;;
 
@@ -142,13 +142,13 @@
 (defcustom org-issue-message-flag 'issue
   "Flag that indicates an issue.
 Set this to nil if you do not want messages to be flagged.  The
-flag is added in removed by the functions `org-issue-new',
+flag is added or removed by the functions `org-issue-new',
 `org-issue-close',  and `org-issue-update'."
   :type 'symbol
   :group 'org-issue)
 
 (defun org-issue-replace-brackets (s)
-  "Return S with all square brackets replace by parentheses."
+  "Return S with all square brackets replaced by parentheses."
   (while (string-match "\\[" s)
     (setq s (replace-match "(" nil nil s)))
   (while (string-match "\\]" s)
@@ -162,7 +162,7 @@ flag is added in removed by the functions `org-issue-new',
   s)
 
 (defun org-issue-get-msginfo ()
-  "Return cons with message id in car and subject in cdr."
+  "Return a cons with message id in car and subject in cdr."
   (cond
    ((eq major-mode 'wl-summary-mode)
     (org-issue-get-msginfo:wl))
@@ -181,7 +181,7 @@ flag is added in removed by the functions `org-issue-new',
 		 (format "%%%X" chr))) s ""))
 
 (defun org-issue-get-msginfo:gnus ()
-  "Return cons with message id in car and subject in cdr.
+  "Return a cons with message id in car and subject in cdr.
 Operates on Gnus messages."
   (let ((header (with-current-buffer gnus-summary-buffer
 		  (gnus-summary-article-header))))
@@ -194,7 +194,7 @@ Operates on Gnus messages."
        (mail-header-subject header))))))
 
 (defun org-issue-get-msginfo:wl ()
-  "Return cons with message id in car and subject in cdr.
+  "Return a cons with message id in car and subject in cdr.
 Operates on Wanderlust messages."
   (let* ((num (wl-summary-message-number))
 	 (ent (if (fboundp 'elmo-message-entity)
@@ -222,7 +222,7 @@ Operates on Wanderlust messages."
 (defun org-issue-link-gmane (&optional msginfo)
   "Return web link to gmane for current message.
 If called interactively, the link is also pushed to clipboard and
-killring."
+kill-ring."
   (interactive)
   (let* ((msginfo (or msginfo (org-issue-get-msginfo)))
 	 (gmane (format
