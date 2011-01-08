@@ -111,7 +111,7 @@ Here is a standard setup for export to a LaTeX book class:
 #+begin_src emacs-lisp
   (add-to-list 'org-export-latex-classes
                `("book"
-                 "\\documentclass[11pt,letter]{book}"
+                 "\\documentclass{book}"
                  ("\\part{%s}" . "\\part*{%s}")
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
@@ -126,6 +126,30 @@ Then, in the Org file with a book-full of notes, add this line:
   #+LaTeX_CLASS: book 
 #+end_src
 
+# <<koma-script>>
+A useful set of alternatives is the [[http://www.komascript.de/][KOMA script]] classes.  These have a
+somewhat more modern design than the standard LaTeX classes.  
+
+For example, the KOMA script article class can be configured in =.emacs=.
+
+#+begin_src emacs-lisp :
+  (add-to-list 'org-export-latex-classes
+            '("koma-article"
+               "\\documentclass{scrartcl}"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+
+Then, this class can be used by including the following line in the
+Org-mode file.
+
+#+begin_src org
+  #+LaTeX_CLASS: koma-article
+#+end_src
+
 * Passing Options to Document Classes
 The standard LaTeX document classes, =article=, =report=, =book=,
 =slides=, and =letter= take options that, where applicable, select the
@@ -138,6 +162,39 @@ line like this in your Org-mode file:
 
 #+begin_src org
   #+LaTeX_CLASS_OPTIONS: [a4paper,twoside,twocolumn] 
+#+end_src
+
+A useful option with the [[koma-script][KOMA script]] classes typesets table captions
+properly.  The standard LaTeX classes will incorrectly typeset table captions
+exported by Org-mode above the table.  The following option to the
+[[koma-script][KOMA script]] classes accomplishes this.
+
+#+begin_src org
+  #+LaTeX_CLASS_OPTIONS: [captions=tableheading] 
+#+end_src
+* Using Custom Classes
+If the user has custom LaTeX document classes that conflict with the
+default packages or that only require a few of the default packages to
+support all features of the LaTeX exporter, then this can be handled
+in =.emacs= using [DEFAULT-PACKAGES], [NO-DEFAULT-PACKAGES],
+[PACKAGES], [NO-PACKAGES], [EXTRA], [NO-EXTRA].    
+
+Here is a simple example that uses an experimental [[http://orgmode.org/worg/org-contrib/babel/examples/article-class.html][LaTeX class]] that
+supports the Org-mode requirements and leaves open the possibility of
+adding file specific packages:
+  
+#+begin_src emacs-lisp
+  (add-to-list 'org-export-latex-classes
+        '("org-article"
+           "\\documentclass{org-article}
+           [NO-DEFAULT-PACKAGES]
+           [PACKAGES]
+           [EXTRA]"
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+           ("\\paragraph{%s}" . "\\paragraph*{%s}")
+           ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+end_src
 
 * Specifying LaTeX Packages
@@ -162,30 +219,6 @@ file can be specified by inserting a line like this in the Org-mode
 buffer:
 #+begin_src org
   ,#+LATEX_HEADER: \usepackage{xyz}
-#+end_src
-* Using Custom Classes
-If the user has custom LaTeX document classes that conflict with the
-default packages or that only require a few of the default packages to
-support all features of the LaTeX exporter, then this can be handled
-in =.emacs= using [DEFAULT-PACKAGES], [NO-DEFAULT-PACKAGES],
-[PACKAGES], [NO-PACKAGES], [EXTRA], [NO-EXTRA].    
-
-Here is a simple example that uses a [[http://orgmode.org/worg/org-contrib/babel/examples/article-class.html][LaTeX class]] that supports the
-Org-mode requirements and leaves open the possibility of adding file
-specific packages:
-  
-#+begin_src emacs-lisp
-  (add-to-list 'org-export-latex-classes
-        '("org-article"
-           "\\documentclass{org-article}
-           [NO-DEFAULT-PACKAGES]
-           [PACKAGES]
-           [EXTRA]"
-           ("\\section{%s}" . "\\section*{%s}")
-           ("\\subsection{%s}" . "\\subsection*{%s}")
-           ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-           ("\\paragraph{%s}" . "\\paragraph*{%s}")
-           ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+end_src
 * Creating PDF Output
 The LaTeX exporter by default produces code ready for processing by
