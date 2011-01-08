@@ -146,7 +146,7 @@ For example, the KOMA script article class can be configured in =.emacs=.
 Then, this class can be used by including the following line in the
 Org-mode file.
 
-#+begin_src org
+#+begin_src org :exports code
   #+LaTeX_CLASS: koma-article
 #+end_src
 
@@ -160,7 +160,7 @@ document classes can define their own options, as needed.
 You can pass options to the LaTeX =\documentclass= macro by putting a
 line like this in your Org-mode file:
 
-#+begin_src org
+#+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [a4paper,twoside,twocolumn] 
 #+end_src
 
@@ -172,6 +172,7 @@ exported by Org-mode above the table.  The following option to the
 #+begin_src org
   #+LaTeX_CLASS_OPTIONS: [captions=tableheading] 
 #+end_src
+
 * Using Custom Classes
 If the user has custom LaTeX document classes that conflict with the
 default packages or that only require a few of the default packages to
@@ -179,7 +180,7 @@ support all features of the LaTeX exporter, then this can be handled
 in =.emacs= using [DEFAULT-PACKAGES], [NO-DEFAULT-PACKAGES],
 [PACKAGES], [NO-PACKAGES], [EXTRA], [NO-EXTRA].    
 
-Here is a simple example that uses an experimental [[http://orgmode.org/worg/org-contrib/babel/examples/article-class.html][LaTeX class]] that
+Here is a simple example that uses an experimental [[http://orgmode.org/worg/org-contrib/babel/examples/article-class.html][LaTeX class]][fn:3] that
 supports the Org-mode requirements and leaves open the possibility of
 adding file specific packages:
   
@@ -195,6 +196,52 @@ adding file specific packages:
            ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
            ("\\paragraph{%s}" . "\\paragraph*{%s}")
            ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+
+The Org-mode LaTeX exporter uses several packages to support special characters
+used by =org-entities=.  One of these, =amsmath=, conflicts with
+several [[font-section][LaTeX fonts]].  If you want finer control over which packages
+are loaded, then it makes sense to define an export class like this
+in =.emacs=:
+
+#+begin_src emacs-lisp :tangle no
+  (add-to-list 'org-export-latex-classes
+            '("koma-article"
+               "\\documentclass{scrartcl}
+               [NO-DEFAULT-PACKAGES]
+               [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+
+Alternatively, export classes can be defined on a per-file basis in a
+source code block that is evaluated prior to LaTeX export.  This is
+perhaps the most flexible way to set up LaTeX export.  Here is an
+example:
+
+#+begin_example 
+  #+source: setup
+  #+begin_src emacs-lisp :results silent
+    (add-to-list 'org-export-latex-classes
+            '("per-file-class"
+               "\\documentclass{scrartcl}
+               [NO-DEFAULT-PACKAGES]
+               [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  #+end_src
+#+end_example
+
+Then, add this line to the Org-mode file:
+
+#+begin_src org :exports code
+  #+LaTeX_CLASS: per-file-class
 #+end_src
 
 * Specifying LaTeX Packages
@@ -668,6 +715,7 @@ letters in parentheses.
 : #+LaTeX_HEADER: \renewenvironment{enumerate}{\begin{inparaenum}[(a)]}{\end{inparaenum}}
 
 * Fonts
+# <<font-section>>
 The default LaTeX font is Computer Modern, which was designed by
 Donald Knuth.  Computer Modern is perfectly serviceable, but not as
 nice as other fonts available for LaTeX.  Alternative font sets are
@@ -1049,5 +1097,7 @@ Org-mode mailing list under the heading =text color + highlight= (!).
 There was a lively discussion there, to which the ideas of
 Samuel Wales, Christian Moe and Eric Schulte contributed directly to
 this implementation.    
+[fn:3] The results of this experiment are now included in this
+document.  
 
 
