@@ -251,22 +251,43 @@ functionality through the addition of packages necessarily makes the
 software more difficult to use.  Like LaTeX itself, the Org-mode LaTeX
 exporter has struck its own balance between functionality and ease of
 use with the addition of several LaTeX packages.  These are written
-out in the LaTeX header as LaTeX \usepackage{} commands.
+out in the LaTeX header as LaTeX =\usepackage= commands.
 
-The names of the LaTeX packages are kept in a data structure designed
-for ease of maintenance as additional features are added to the LaTeX
-exporter.  Packages in the default packages list,
+Org-mode keeps the names of the LaTeX packages it uses in a data
+structure designed for ease of maintenance as additional features are
+added to the LaTeX exporter.  Packages in the default packages list,
 =org-export-latex-default-packages-alist=, are required to support all
 features of the LaTeX exporter.  This list is typically specified in
 the Org-mode source code and its documentation contains a warning not
 to modify it.  Packages not included on the default packages list that
 the user needs consistently can be added to
-=org-export-latex-packages-alist=.  Packages needed for a particular
-file can be specified by inserting a line like this in the Org-mode
-buffer:
-#+begin_src org
+=org-export-latex-packages-alist=.
+
+Packages needed for a particular file can be specified by inserting a
+line like this in the Org-mode buffer:
+#+begin_src org :exports code
   ,#+LATEX_HEADER: \usepackage{xyz}
 #+end_src
+
+If you are using an export class that specifies
+=[NO-DEFAULT-PACKAGES]= then you will almost certainly need to specify
+packages in the =#+LATEX_HEADER=.  Doing things this way has the
+advantage that LaTeX packages that are highly configurable can be
+tailored for a particular use.  Perhaps the best example among the
+packages in =org-export-latex-default-packages-alist= is =hyperref=,
+which has an elaborate list of keyval options.  PDF output destined
+for interactive use might load =hyperref= with options to distinguish
+links with attractive colors, for instance.  This might be achieved
+with following lines, which load the =xcolor= package[fn:4] and then
+use named colors to distinguish external blue links from internal red
+links:
+
+#+source: hyperref-header
+#+begin_src org :exports code
+  ,  #+LATEX_HEADER: \usepackage[hyperref,x11names]{xcolor}
+  ,  #+LATEX_HEADER: \usepackage[colorlinks=true,urlcolor=SteelBlue4,linkcolor=Firebrick4]{hyperref}
+#+end_src
+
 * Creating PDF Output
 The LaTeX exporter by default produces code ready for processing by
 pdflatex.  pdflatex calls the pdfTeX program, a modern extension of
@@ -418,12 +439,12 @@ characteristics.  This is often handy and it translates directly into
 LaTeX, but the design philosophy of LaTeX is centered around semantic
 markup, "what you say is what you mean" rather than "what you see is
 what you get" (lampooned by zealous LaTeX users as "what you see is
-all you get").  In practice common semantic elements are defined in a
-LaTeX class or style file and these are marked up in text with
-commands often peculiar to the class or style file.  Clearly, there is
-no way that Org-mode can anticipate commands peculiar to arbitrary
-class or style files.  Fortunately, there are facilities for inline
-and block-level markup.
+all you get").  In practice, LaTeX users define common semantic
+elements in a LaTeX class or style file and these are marked up in
+text with commands often peculiar to the class or style file.
+Clearly, there is no way that Org-mode can anticipate commands
+peculiar to arbitrary class or style files.  Fortunately, there are
+facilities for inline and block-level markup.
 
 ** Block-level Markup
 For simple /block-level/ arbitrary markup, you can use the contributed
@@ -863,7 +884,7 @@ font clashes with the [[latex:package][amssymb]] package.
 : #+LaTeX_HEADER: \usepackage[scaled]{beramono}
 
 * Bibliography
-
+# <<bibliography section>>
 The [[latex:package][biblatex]] package, which recently emerged from beta status, offers
 support for the full range of citation styles, including the numeric
 styles favored by scientists, the author-date styles used by social
@@ -1099,5 +1120,7 @@ Samuel Wales, Christian Moe and Eric Schulte contributed directly to
 this implementation.    
 [fn:3] The results of this experiment are now included in this
 document.  
+[fn:4] The =xcolor= manual is an education in color management and is
+highly recommended reading.
 
 
