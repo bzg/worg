@@ -17,8 +17,9 @@
 This page is for ad hoc bits of code. Feel free to add quick hacks and
 workaround. Go crazy.
 
-* Hacking Org: Modifying orgmode itself
-** Compiling Org without make
+* Hacking Org: Working within Org-mode.
+** Building and Managing Org
+*** Compiling Org without make
 :PROPERTIES:
 :CUSTOM_ID: compiling-org-without-make
 :END:
@@ -73,7 +74,7 @@ the autoloads file `org-install.el' then. If `t', compile the sources, too.")
       (if my/org-compile-sources     ; Compile, if `my/org-compile-sources' is t
           (byte-compile-file f)))))
 #+END_SRC
-** Reload Org
+*** Reload Org
 
 As of Org version 6.23b (released Sunday Feb 22, 2009) there is a new
 function to reload org files.
@@ -94,7 +95,8 @@ To switch back to the compiled version just reload again with
 
 : M-x org-reload
 
-** Speed Commands
+** Enhancing the Org experience.
+*** Speed Commands
 Speed commands are described [[http://orgmode.org/manual/Speed-keys.html#Speed-keys][here]] in the manual. Add your own speed
 commands here.
 *** Show next/prev heading tidily
@@ -136,65 +138,7 @@ commands here.
              '("p" ded/org-show-previous-heading-tidily))
 #+end_src
 
-** Easy customization of TODO colors
--- Ryan C. Thompson
-
-Here is some code I came up with some code to make it easier to
-customize the colors of various TODO keywords. As long as you just
-want a different color and nothing else, you can customize the
-variable org-todo-keyword-faces and use just a string color (i.e. a
-string of the color name) as the face, and then org-get-todo-face
-will convert the color to a face, inheriting everything else from
-the standard org-todo face.
-
-To demonstrate, I currently have org-todo-keyword-faces set to
-
-#+BEGIN_SRC emacs-lisp
-(("IN PROGRESS" . "dark orange")
- ("WAITING" . "red4")
- ("CANCELED" . "saddle brown"))
-#+END_SRC emacs-lisp
-
-  Here's the code, in a form you can put in your =.emacs=
-
-#+BEGIN_SRC emacs-lisp
-(eval-after-load 'org-faces
- '(progn
-    (defcustom org-todo-keyword-faces nil
-      "Faces for specific TODO keywords.
-This is a list of cons cells, with TODO keywords in the car and
-faces in the cdr.  The face can be a symbol, a color, or a
-property list of attributes, like (:foreground \"blue\" :weight
-bold :underline t)."
-      :group 'org-faces
-      :group 'org-todo
-      :type '(repeat
-              (cons
-               (string :tag "Keyword")
-               (choice color (sexp :tag "Face")))))))
-
-(eval-after-load 'org
- '(progn
-    (defun org-get-todo-face-from-color (color)
-      "Returns a specification for a face that inherits from org-todo
- face and has the given color as foreground. Returns nil if
- color is nil."
-      (when color
-        `(:inherit org-warning :foreground ,color)))
-
-    (defun org-get-todo-face (kwd)
-      "Get the right face for a TODO keyword KWD.
-If KWD is a number, get the corresponding match group."
-      (if (numberp kwd) (setq kwd (match-string kwd)))
-      (or (let ((face (cdr (assoc kwd org-todo-keyword-faces))))
-            (if (stringp face)
-                (org-get-todo-face-from-color face)
-              face))
-          (and (member kwd org-done-keywords) 'org-done)
-          'org-todo))))
-#+END_SRC emacs-lisp
-
-** Changelog support for org headers
+*** Changelog support for org headers
 -- James TD Smith
 
 Put the following in your =.emacs=, and =C-x 4 a= and other functions which
@@ -215,52 +159,7 @@ buffer.
               (setq add-log-current-defun-function 'org-log-current-defun)))
 #+END_SRC
 
-** Remove redundant tags of headlines
--- David Maus
-
-A small function that processes all headlines in current buffer and
-removes tags that are local to a headline and inherited by a parent
-headline or the #+FILETAGS: statement.
-
-#+BEGIN_SRC emacs-lisp
-  (defun dmj/org-remove-redundant-tags ()
-    "Remove redundant tags of headlines in current buffer.
-
-  A tag is considered redundant if it is local to a headline and
-  inherited by a parent headline."
-    (interactive)
-    (when (eq major-mode 'org-mode)
-      (save-excursion
-        (org-map-entries
-         '(lambda ()
-            (let ((alltags (split-string (or (org-entry-get (point) "ALLTAGS") "") ":"))
-                  local inherited tag)
-              (dolist (tag alltags)
-                (if (get-text-property 0 'inherited tag)
-                    (push tag inherited) (push tag local)))
-              (dolist (tag local)
-                (if (member tag inherited) (org-toggle-tag tag 'off)))))
-         t nil))))
-#+END_SRC
-
-** Remove empty property drawers
-
-David Maus proposed this:
-
-#+begin_src emacs-lisp
-(defun dmj:org:remove-empty-propert-drawers ()
-  "*Remove all empty property drawers in current file."
-  (interactive)
-  (unless (eq major-mode 'org-mode)
-    (error "You need to turn on Org mode for this function."))
-  (save-excursion
-    (goto-char (point-min))
-    (while (re-search-forward ":PROPERTIES:" nil t)
-      (save-excursion
-	(org-remove-empty-drawer-at "PROPERTIES" (match-beginning 0))))))
-#+end_src
-
-** Different org-cycle-level behavior
+*** Different org-cycle-level behavior
 -- Ryan Thompson
 
 In recent org versions, when your point (cursor) is at the end of an
@@ -357,70 +256,7 @@ nil if before the first headline."
                 do (org-do-promote))))
         t))))
 #+END_SRC
-
-** Add an effort estimate on the fly when clocking in
-
-You can use =org-clock-in-prepare-hook= to add an effort estimate.
-This way you can easily have a "tea-timer" for your tasks when they
-don't already have an effort estimate.
-
-#+begin_src emacs-lisp
-(add-hook 'org-clock-in-prepare-hook
-	  'my-org-mode-ask-effort)
-
-(defun my-org-mode-ask-effort ()
-  "Ask for an effort estimate when clocking in."
-  (unless (org-entry-get (point) "Effort")
-    (let ((effort
-	   (completing-read
-	    "Effort: "
-	    (org-entry-get-multivalued-property (point) "Effort"))))
-      (unless (equal effort "")
-	(org-set-property "Effort" effort)))))
-#+end_src
-
-Or you can use a default effort for such a timer:
-
-#+begin_src emacs-lisp
-(add-hook 'org-clock-in-prepare-hook
-	  'my-org-mode-add-default-effort)
-
-(defvar org-clock-default-effort "1:00")
-
-(defun my-org-mode-add-default-effort ()
-  "Add a default effort estimation."
-  (unless (org-entry-get (point) "Effort")
-    (org-set-property "Effort" org-clock-default-effort)))
-#+end_src
-
-** Customize the size of the frame for remember
-
-#FIXME: gmane link?
-On emacs-orgmode, Ryan C. Thompson suggested this:
-
-#+begin_quote
-I am using org-remember set to open a new frame when used,
-and the default frame size is much too large. To fix this, I have
-designed some advice and a custom variable to implement custom
-parameters for the remember frame:
-#+end_quote
-
-#+begin_src emacs-lisp
-(defcustom remember-frame-alist nil
-  "Additional frame parameters for dedicated remember frame."
-  :type 'alist
-  :group 'remember)
-
-(defadvice remember (around remember-frame-parameters activate)
-  "Set some frame parameters for the remember frame."
-  (let ((default-frame-alist (append remember-frame-alist
-                                     default-frame-alist)))
-    ad-do-it))
-#+end_src
-
-Setting remember-frame-alist to =((width . 80) (height . 15)))= give a
-reasonable size for the frame.
-** Org table
+*** Org table
 *** Dates computation
 
 **** Question ([[http://article.gmane.org/gmane.emacs.orgmode/15692][Xin Shi]])
@@ -556,45 +392,52 @@ which is the Emacs Calc implementation of the equation
 /AvgChange(i, a) = (quote[i] / quote[i - a]) ^ 1 / n - 1/
 
 where /i/ is the current time and /a/ is the length of the preceding period.
-** Archive in a date tree
 
-Posted to Org-mode mailing list by Osamu Okano
-[2010-04-21 Wed]
+*** Customize the size of the frame for remember
+(Note: this hack is likely out of date due to the development of
+[[org-capture]].) 
+
+#FIXME: gmane link?
+On emacs-orgmode, Ryan C. Thompson suggested this:
+
+#+begin_quote
+I am using org-remember set to open a new frame when used,
+and the default frame size is much too large. To fix this, I have
+designed some advice and a custom variable to implement custom
+parameters for the remember frame:
+#+end_quote
 
 #+begin_src emacs-lisp
-;; (setq org-archive-location "%s_archive::date-tree")
-(defadvice org-archive-subtree
-  (around org-archive-subtree-to-data-tree activate)
-  "org-archive-subtree to date-tree"
-  (if
-      (string= "date-tree"
-               (org-extract-archive-heading
-                (org-get-local-archive-location)))
-      (let* ((dct (decode-time (org-current-time)))
-             (y (nth 5 dct))
-             (m (nth 4 dct))
-             (d (nth 3 dct))
-             (this-buffer (current-buffer))
-             (location (org-get-local-archive-location))
-             (afile (org-extract-archive-file location))
-             (org-archive-location
-              (format "%s::*** %04d-%02d-%02d %s" afile y m d
-                      (format-time-string "%A" (encode-time 0 0 0 d m y)))))
-        (message "afile=%s" afile)
-        (unless afile
-          (error "Invalid `org-archive-location'"))
-        (save-excursion
-          (switch-to-buffer (find-file-noselect afile))
-          (org-datetree-find-year-create y)
-          (org-datetree-find-month-create y m)
-          (org-datetree-find-day-create y m d)
-          (widen)
-          (switch-to-buffer this-buffer))
-        ad-do-it)
+(defcustom remember-frame-alist nil
+  "Additional frame parameters for dedicated remember frame."
+  :type 'alist
+  :group 'remember)
+
+(defadvice remember (around remember-frame-parameters activate)
+  "Set some frame parameters for the remember frame."
+  (let ((default-frame-alist (append remember-frame-alist
+                                     default-frame-alist)))
     ad-do-it))
 #+end_src
 
-** Preserve top level headings when archiving to a file
+Setting remember-frame-alist to =((width . 80) (height . 15)))= give a
+reasonable size for the frame.
+*** Promote all items in subtree
+- Matt Lundin
+
+This function will promote all items in a subtree. Since I use
+subtrees primarily to organize projects, the function is somewhat
+unimaginatively called my-org-un-project:
+
+#+begin_src emacs-lisp
+(defun my-org-un-project ()
+  (interactive)
+  (org-map-entries 'org-do-promote "LEVEL>1" 'tree)
+  (org-cycle t))
+#+end_src
+
+** Archiving Content in Org-Mode
+*** Preserve top level headings when archiving to a file
 - Matt Lundin
 
 To preserve (somewhat) the integrity of your archive structure while
@@ -632,308 +475,91 @@ the new file to the top level heading:
 While this hack obviously destroys the outline hierarchy somewhat, it
 at least preserves the logic of level one groupings.
 
-** Promote all items in subtree
-- Matt Lundin
+*** Archive in a date tree
 
-This function will promote all items in a subtree. Since I use
-subtrees primarily to organize projects, the function is somewhat
-unimaginatively called my-org-un-project:
+Posted to Org-mode mailing list by Osamu Okano
+[2010-04-21 Wed]
 
 #+begin_src emacs-lisp
-(defun my-org-un-project ()
-  (interactive)
-  (org-map-entries 'org-do-promote "LEVEL>1" 'tree)
-  (org-cycle t))
-#+end_src
-
-** Make it easier to set org-agenda-files from multiple directories
-- Matt Lundin
-
-#+begin_src emacs-lisp
-(defun my-org-list-files (dirs ext)
-  "Function to create list of org files in multiple subdirectories.
-This can be called to generate a list of files for
-org-agenda-files or org-refile-targets.
-
-DIRS is a list of directories.
-
-EXT is a list of the extensions of files to be included."
-  (let ((dirs (if (listp dirs)
-                  dirs
-                (list dirs)))
-        (ext (if (listp ext)
-                 ext
-               (list ext)))
-        files)
-    (mapc 
-     (lambda (x)
-       (mapc 
-        (lambda (y)
-          (setq files 
-                (append files 
-                        (file-expand-wildcards 
-                         (concat (file-name-as-directory x) "*" y)))))
-        ext))
-     dirs)
-    (mapc
-     (lambda (x)
-       (when (or (string-match "/.#" x)
-                 (string-match "#$" x))
-         (setq files (delete x files))))
-     files)
-    files))
-
-(defvar my-org-agenda-directories '("~/org/")
-  "List of directories containing org files.")
-(defvar my-org-agenda-extensions '(".org")
-  "List of extensions of agenda files")
-
-(setq my-org-agenda-directories '("~/org/" "~/work/"))
-(setq my-org-agenda-extensions '(".org" ".ref"))
-
-(defun my-org-set-agenda-files ()
-  (interactive)
-  (setq org-agenda-files (my-org-list-files 
-                          my-org-agenda-directories
-                          my-org-agenda-extensions)))
-
-(my-org-set-agenda-files)
-#+end_src
-
-The code above will set your "default" agenda files to all files
-ending in ".org" and ".ref" in the directories "~/org/" and "~/work/".
-You can change these values by setting the variables
-my-org-agenda-extensions and my-org-agenda-directories. The function
-my-org-agenda-files-by-filetag uses these two variables to determine
-which files to search for filetags (i.e., the larger set from which
-the subset will be drawn).
-
-You can also easily use my-org-list-files to "mix and match"
-directories and extensions to generate different lists of agenda
-files.
-
-** Restrict org-agenda-files by filetag
-  :PROPERTIES:
-  :CUSTOM_ID: set-agenda-files-by-filetag
-  :END:
-- Matt Lundin
-
-It is often helpful to limit yourself to a subset of your agenda
-files. For instance, at work, you might want to see only files related
-to work (e.g., bugs, clientA, projectxyz, etc.). The FAQ has helpful
-information on filtering tasks using [[file:org-faq.org::#limit-agenda-with-tag-filtering][filetags]] and [[file:org-faq.org::#limit-agenda-with-category-match][custom agenda
-commands]]. These solutions, however, require reapplying a filter each
-time you call the agenda or writing several new custom agenda commands
-for each context. Another solution is to use directories for different
-types of tasks and to change your agenda files with a function that
-sets org-agenda-files to the appropriate directory. But this relies on
-hard and static boundaries between files.
-
-The following functions allow for a more dynamic approach to selecting
-a subset of files based on filetags:
-
-#+begin_src emacs-lisp
-(defun my-org-agenda-restrict-files-by-filetag (&optional tag)
-  "Restrict org agenda files only to those containing filetag."
-  (interactive)
-  (let* ((tagslist (my-org-get-all-filetags))
-         (ftag (or tag 
-                   (completing-read "Tag: " 
-                                    (mapcar 'car tagslist)))))
-    (org-agenda-remove-restriction-lock 'noupdate)
-    (put 'org-agenda-files 'org-restrict (cdr (assoc ftag tagslist)))
-    (setq org-agenda-overriding-restriction 'files)))
-
-(defun my-org-get-all-filetags ()
-  "Get list of filetags from all default org-files."
-  (let ((files org-agenda-files)
-        tagslist x)
-    (save-window-excursion
-      (while (setq x (pop files))
-        (set-buffer (find-file-noselect x))
-        (mapc
-         (lambda (y)
-           (let ((tagfiles (assoc y tagslist)))
-             (if tagfiles
-                 (setcdr tagfiles (cons x (cdr tagfiles)))
-               (add-to-list 'tagslist (list y x)))))
-         (my-org-get-filetags)))
-      tagslist)))
-
-(defun my-org-get-filetags ()
-  "Get list of filetags for current buffer"
-  (let ((ftags org-file-tags)
-        x)
-    (mapcar 
-     (lambda (x)
-       (org-substring-no-properties x))
-     ftags)))
-#+end_src
-
-Calling my-org-agenda-restrict-files-by-filetag results in a prompt
-with all filetags in your "normal" agenda files. When you select a
-tag, org-agenda-files will be restricted to only those files
-containing the filetag. To release the restriction, type C-c C-x >
-(org-agenda-remove-restriction-lock).
-
-** Split horizontally for agenda
-
-If you would like to split the frame into two side-by-side windows when
-displaying the agenda, try this hack from Jan Rehders, which uses the
-`toggle-window-split' from
-
-http://www.emacswiki.org/cgi-bin/wiki/ToggleWindowSplit
-
-#+BEGIN_SRC emacs-lisp
-;; Patch org-mode to use vertical splitting
-(defadvice org-prepare-agenda (after org-fix-split)
-  (toggle-window-split))
-(ad-activate 'org-prepare-agenda)
-#+END_SRC
-
-** Automatically add an appointment when clocking in a task
-
-#+BEGIN_SRC emacs-lisp
-;; Make sure you have a sensible value for `appt-message-warning-time'
-(defvar bzg-org-clock-in-appt-delay 100
-  "Number of minutes for setting an appointment by clocking-in")
-#+END_SRC
-
-This function let's you add an appointment for the current entry.
-This can be useful when you need a reminder.
-
-#+BEGIN_SRC emacs-lisp
-(defun bzg-org-clock-in-add-appt (&optional n)
-  "Add an appointment for the Org entry at point in N minutes."
-  (interactive)
-  (save-excursion
-    (org-back-to-heading t)
-    (looking-at org-complex-heading-regexp)
-    (let* ((msg (match-string-no-properties 4))
-	   (ct-time (decode-time))
-	   (appt-min (+ (cadr ct-time)
-			(or n bzg-org-clock-in-appt-delay)))
-	   (appt-time ; define the time for the appointment
-	    (progn (setf (cadr ct-time) appt-min) ct-time)))
-      (appt-add (format-time-string
-		 "%H:%M" (apply 'encode-time appt-time)) msg)
-      (if (interactive-p) (message "New appointment for %s" msg)))))
-#+END_SRC
-
-You can advise =org-clock-in= so that =C-c C-x C-i= will automatically
-add an appointment:
-
-#+BEGIN_SRC emacs-lisp
-(defadvice org-clock-in (after org-clock-in-add-appt activate)
-  "Add an appointment when clocking a task in."
-  (bzg-org-clock-in-add-appt))
-#+END_SRC
-
-You may also want to delete the associated appointment when clocking
-out.  This function does this:
-
-#+BEGIN_SRC emacs-lisp
-(defun bzg-org-clock-out-delete-appt nil
-  "When clocking out, delete any associated appointment."
-  (interactive)
-  (save-excursion
-    (org-back-to-heading t)
-    (looking-at org-complex-heading-regexp)
-    (let* ((msg (match-string-no-properties 4)))
-      (setq appt-time-msg-list
-	    (delete nil
-		    (mapcar
-		     (lambda (appt)
-		       (if (not (string-match (regexp-quote msg)
-					      (cadr appt))) appt))
-		     appt-time-msg-list)))
-      (appt-check))))
-#+END_SRC
-
-And here is the advice for =org-clock-out= (=C-c C-x C-o=)
-
-#+BEGIN_SRC emacs-lisp
-(defadvice org-clock-out (before org-clock-out-delete-appt activate)
-  "Delete an appointment when clocking a task out."
-  (bzg-org-clock-out-delete-appt))
-#+END_SRC
-
-*IMPORTANT*: You can add appointment by clocking in in both an
-=org-mode= and an =org-agenda-mode= buffer.  But clocking out from
-agenda buffer with the advice above will bring an error.
-** Highlight the agenda line under cursor
-
-This is useful to make sure what task you are operating on.
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
-#+END_SRC emacs-lisp
-
-Under XEmacs:
-
-#+BEGIN_SRC emacs-lisp
-;; hl-line seems to be only for emacs
-(require 'highline)
-(add-hook 'org-agenda-mode-hook '(lambda () (highline-mode 1)))
-
-;; highline-mode does not work straightaway in tty mode.
-;; I use a black background
-(custom-set-faces
-  '(highline-face ((((type tty) (class color))
-                    (:background "white" :foreground "black")))))
-#+END_SRC emacs-lisp
-
-** Remove time grid lines that are in an appointment
-
-The agenda shows lines for the time grid.  Some people think that
-these lines are a distraction when there are appointments at those
-times.  You can get rid of the lines which coincide exactly with the
-beginning of an appointment.  Michael Ekstrand has written a piece of
-advice that also removes lines that are somewhere inside an
-appointment:
-
-#+begin_src emacs-lisp
-(defun org-time-to-minutes (time)
-  "Convert an HHMM time to minutes"
-  (+ (* (/ time 100) 60) (% time 100)))
-
-(defun org-time-from-minutes (minutes)
-  "Convert a number of minutes to an HHMM time"
-  (+ (* (/ minutes 60) 100) (% minutes 60)))
-
-(defadvice org-agenda-add-time-grid-maybe (around mde-org-agenda-grid-tweakify
-                                                  (list ndays todayp))
-  (if (member 'remove-match (car org-agenda-time-grid))
-      (flet ((extract-window
-              (line)
-              (let ((start (get-text-property 1 'time-of-day line))
-                    (dur (get-text-property 1 'duration line)))
-                (cond
-                 ((and start dur)
-                  (cons start
-                        (org-time-from-minutes
-                         (+ dur (org-time-to-minutes start)))))
-                 (start start)
-                 (t nil)))))
-        (let* ((windows (delq nil (mapcar 'extract-window list)))
-               (org-agenda-time-grid
-                (list (car org-agenda-time-grid)
-                      (cadr org-agenda-time-grid)
-                      (remove-if
-                       (lambda (time)
-                         (find-if (lambda (w)
-                                    (if (numberp w)
-                                        (equal w time)
-                                      (and (>= time (car w))
-                                           (< time (cdr w)))))
-                                  windows))
-                       (caddr org-agenda-time-grid)))))
-          ad-do-it))
+;; (setq org-archive-location "%s_archive::date-tree")
+(defadvice org-archive-subtree
+  (around org-archive-subtree-to-data-tree activate)
+  "org-archive-subtree to date-tree"
+  (if
+      (string= "date-tree"
+               (org-extract-archive-heading
+                (org-get-local-archive-location)))
+      (let* ((dct (decode-time (org-current-time)))
+             (y (nth 5 dct))
+             (m (nth 4 dct))
+             (d (nth 3 dct))
+             (this-buffer (current-buffer))
+             (location (org-get-local-archive-location))
+             (afile (org-extract-archive-file location))
+             (org-archive-location
+              (format "%s::*** %04d-%02d-%02d %s" afile y m d
+                      (format-time-string "%A" (encode-time 0 0 0 d m y)))))
+        (message "afile=%s" afile)
+        (unless afile
+          (error "Invalid `org-archive-location'"))
+        (save-excursion
+          (switch-to-buffer (find-file-noselect afile))
+          (org-datetree-find-year-create y)
+          (org-datetree-find-month-create y m)
+          (org-datetree-find-day-create y m d)
+          (widen)
+          (switch-to-buffer this-buffer))
+        ad-do-it)
     ad-do-it))
-(ad-activate 'org-agenda-add-time-grid-maybe)
 #+end_src
 
-** Group task list by a property
+** Using and Managing Org-Metadata
+*** Remove redundant tags of headlines
+-- David Maus
+
+A small function that processes all headlines in current buffer and
+removes tags that are local to a headline and inherited by a parent
+headline or the #+FILETAGS: statement.
+
+#+BEGIN_SRC emacs-lisp
+  (defun dmj/org-remove-redundant-tags ()
+    "Remove redundant tags of headlines in current buffer.
+
+  A tag is considered redundant if it is local to a headline and
+  inherited by a parent headline."
+    (interactive)
+    (when (eq major-mode 'org-mode)
+      (save-excursion
+        (org-map-entries
+         '(lambda ()
+            (let ((alltags (split-string (or (org-entry-get (point) "ALLTAGS") "") ":"))
+                  local inherited tag)
+              (dolist (tag alltags)
+                (if (get-text-property 0 'inherited tag)
+                    (push tag inherited) (push tag local)))
+              (dolist (tag local)
+                (if (member tag inherited) (org-toggle-tag tag 'off)))))
+         t nil))))
+#+END_SRC
+
+*** Remove empty property drawers
+
+David Maus proposed this:
+
+#+begin_src emacs-lisp
+(defun dmj:org:remove-empty-propert-drawers ()
+  "*Remove all empty property drawers in current file."
+  (interactive)
+  (unless (eq major-mode 'org-mode)
+    (error "You need to turn on Org mode for this function."))
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward ":PROPERTIES:" nil t)
+      (save-excursion
+	(org-remove-empty-drawer-at "PROPERTIES" (match-beginning 0))))))
+#+end_src
+
+*** Group task list by a property
 
 This advice allows you to group a task list in Org-Mode.  To use it,
 set the variable =org-agenda-group-by-property= to the name of a
@@ -988,7 +614,7 @@ agenda view will group tasks by that property prior to searching.
     ad-do-it))
 (ad-activate 'org-finalize-agenda-entries)
 #+end_src
-** Dynamically adjust tag position
+*** Dynamically adjust tag position
 Here is a bit of code that allows you to have the tags always
 right-adjusted in the buffer.
 
@@ -1064,7 +690,295 @@ changed.
     ad-do-it))
 (ad-activate 'org-refile)
 #+end_src
-** Disable vc for Org mode agenda files
+** Org Agenda and Task Management
+*** Make it easier to set org-agenda-files from multiple directories
+- Matt Lundin
+
+#+begin_src emacs-lisp
+(defun my-org-list-files (dirs ext)
+  "Function to create list of org files in multiple subdirectories.
+This can be called to generate a list of files for
+org-agenda-files or org-refile-targets.
+
+DIRS is a list of directories.
+
+EXT is a list of the extensions of files to be included."
+  (let ((dirs (if (listp dirs)
+                  dirs
+                (list dirs)))
+        (ext (if (listp ext)
+                 ext
+               (list ext)))
+        files)
+    (mapc 
+     (lambda (x)
+       (mapc 
+        (lambda (y)
+          (setq files 
+                (append files 
+                        (file-expand-wildcards 
+                         (concat (file-name-as-directory x) "*" y)))))
+        ext))
+     dirs)
+    (mapc
+     (lambda (x)
+       (when (or (string-match "/.#" x)
+                 (string-match "#$" x))
+         (setq files (delete x files))))
+     files)
+    files))
+
+(defvar my-org-agenda-directories '("~/org/")
+  "List of directories containing org files.")
+(defvar my-org-agenda-extensions '(".org")
+  "List of extensions of agenda files")
+
+(setq my-org-agenda-directories '("~/org/" "~/work/"))
+(setq my-org-agenda-extensions '(".org" ".ref"))
+
+(defun my-org-set-agenda-files ()
+  (interactive)
+  (setq org-agenda-files (my-org-list-files 
+                          my-org-agenda-directories
+                          my-org-agenda-extensions)))
+
+(my-org-set-agenda-files)
+#+end_src
+
+The code above will set your "default" agenda files to all files
+ending in ".org" and ".ref" in the directories "~/org/" and "~/work/".
+You can change these values by setting the variables
+my-org-agenda-extensions and my-org-agenda-directories. The function
+my-org-agenda-files-by-filetag uses these two variables to determine
+which files to search for filetags (i.e., the larger set from which
+the subset will be drawn).
+
+You can also easily use my-org-list-files to "mix and match"
+directories and extensions to generate different lists of agenda
+files.
+
+*** Restrict org-agenda-files by filetag
+  :PROPERTIES:
+  :CUSTOM_ID: set-agenda-files-by-filetag
+  :END:
+- Matt Lundin
+
+It is often helpful to limit yourself to a subset of your agenda
+files. For instance, at work, you might want to see only files related
+to work (e.g., bugs, clientA, projectxyz, etc.). The FAQ has helpful
+information on filtering tasks using [[file:org-faq.org::#limit-agenda-with-tag-filtering][filetags]] and [[file:org-faq.org::#limit-agenda-with-category-match][custom agenda
+commands]]. These solutions, however, require reapplying a filter each
+time you call the agenda or writing several new custom agenda commands
+for each context. Another solution is to use directories for different
+types of tasks and to change your agenda files with a function that
+sets org-agenda-files to the appropriate directory. But this relies on
+hard and static boundaries between files.
+
+The following functions allow for a more dynamic approach to selecting
+a subset of files based on filetags:
+
+#+begin_src emacs-lisp
+(defun my-org-agenda-restrict-files-by-filetag (&optional tag)
+  "Restrict org agenda files only to those containing filetag."
+  (interactive)
+  (let* ((tagslist (my-org-get-all-filetags))
+         (ftag (or tag 
+                   (completing-read "Tag: " 
+                                    (mapcar 'car tagslist)))))
+    (org-agenda-remove-restriction-lock 'noupdate)
+    (put 'org-agenda-files 'org-restrict (cdr (assoc ftag tagslist)))
+    (setq org-agenda-overriding-restriction 'files)))
+
+(defun my-org-get-all-filetags ()
+  "Get list of filetags from all default org-files."
+  (let ((files org-agenda-files)
+        tagslist x)
+    (save-window-excursion
+      (while (setq x (pop files))
+        (set-buffer (find-file-noselect x))
+        (mapc
+         (lambda (y)
+           (let ((tagfiles (assoc y tagslist)))
+             (if tagfiles
+                 (setcdr tagfiles (cons x (cdr tagfiles)))
+               (add-to-list 'tagslist (list y x)))))
+         (my-org-get-filetags)))
+      tagslist)))
+
+(defun my-org-get-filetags ()
+  "Get list of filetags for current buffer"
+  (let ((ftags org-file-tags)
+        x)
+    (mapcar 
+     (lambda (x)
+       (org-substring-no-properties x))
+     ftags)))
+#+end_src
+
+Calling my-org-agenda-restrict-files-by-filetag results in a prompt
+with all filetags in your "normal" agenda files. When you select a
+tag, org-agenda-files will be restricted to only those files
+containing the filetag. To release the restriction, type C-c C-x >
+(org-agenda-remove-restriction-lock).
+
+*** Highlight the agenda line under cursor
+
+This is useful to make sure what task you are operating on.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
+#+END_SRC emacs-lisp
+
+Under XEmacs:
+
+#+BEGIN_SRC emacs-lisp
+;; hl-line seems to be only for emacs
+(require 'highline)
+(add-hook 'org-agenda-mode-hook '(lambda () (highline-mode 1)))
+
+;; highline-mode does not work straightaway in tty mode.
+;; I use a black background
+(custom-set-faces
+  '(highline-face ((((type tty) (class color))
+                    (:background "white" :foreground "black")))))
+#+END_SRC emacs-lisp
+
+*** Split horizontally for agenda
+
+If you would like to split the frame into two side-by-side windows when
+displaying the agenda, try this hack from Jan Rehders, which uses the
+`toggle-window-split' from
+
+http://www.emacswiki.org/cgi-bin/wiki/ToggleWindowSplit
+
+#+BEGIN_SRC emacs-lisp
+;; Patch org-mode to use vertical splitting
+(defadvice org-prepare-agenda (after org-fix-split)
+  (toggle-window-split))
+(ad-activate 'org-prepare-agenda)
+#+END_SRC
+
+*** Automatically add an appointment when clocking in a task
+
+#+BEGIN_SRC emacs-lisp
+;; Make sure you have a sensible value for `appt-message-warning-time'
+(defvar bzg-org-clock-in-appt-delay 100
+  "Number of minutes for setting an appointment by clocking-in")
+#+END_SRC
+
+This function let's you add an appointment for the current entry.
+This can be useful when you need a reminder.
+
+#+BEGIN_SRC emacs-lisp
+(defun bzg-org-clock-in-add-appt (&optional n)
+  "Add an appointment for the Org entry at point in N minutes."
+  (interactive)
+  (save-excursion
+    (org-back-to-heading t)
+    (looking-at org-complex-heading-regexp)
+    (let* ((msg (match-string-no-properties 4))
+	   (ct-time (decode-time))
+	   (appt-min (+ (cadr ct-time)
+			(or n bzg-org-clock-in-appt-delay)))
+	   (appt-time ; define the time for the appointment
+	    (progn (setf (cadr ct-time) appt-min) ct-time)))
+      (appt-add (format-time-string
+		 "%H:%M" (apply 'encode-time appt-time)) msg)
+      (if (interactive-p) (message "New appointment for %s" msg)))))
+#+END_SRC
+
+You can advise =org-clock-in= so that =C-c C-x C-i= will automatically
+add an appointment:
+
+#+BEGIN_SRC emacs-lisp
+(defadvice org-clock-in (after org-clock-in-add-appt activate)
+  "Add an appointment when clocking a task in."
+  (bzg-org-clock-in-add-appt))
+#+END_SRC
+
+You may also want to delete the associated appointment when clocking
+out.  This function does this:
+
+#+BEGIN_SRC emacs-lisp
+(defun bzg-org-clock-out-delete-appt nil
+  "When clocking out, delete any associated appointment."
+  (interactive)
+  (save-excursion
+    (org-back-to-heading t)
+    (looking-at org-complex-heading-regexp)
+    (let* ((msg (match-string-no-properties 4)))
+      (setq appt-time-msg-list
+	    (delete nil
+		    (mapcar
+		     (lambda (appt)
+		       (if (not (string-match (regexp-quote msg)
+					      (cadr appt))) appt))
+		     appt-time-msg-list)))
+      (appt-check))))
+#+END_SRC
+
+And here is the advice for =org-clock-out= (=C-c C-x C-o=)
+
+#+BEGIN_SRC emacs-lisp
+(defadvice org-clock-out (before org-clock-out-delete-appt activate)
+  "Delete an appointment when clocking a task out."
+  (bzg-org-clock-out-delete-appt))
+#+END_SRC
+
+*IMPORTANT*: You can add appointment by clocking in in both an
+=org-mode= and an =org-agenda-mode= buffer.  But clocking out from
+agenda buffer with the advice above will bring an error.
+
+*** Remove time grid lines that are in an appointment
+
+The agenda shows lines for the time grid.  Some people think that
+these lines are a distraction when there are appointments at those
+times.  You can get rid of the lines which coincide exactly with the
+beginning of an appointment.  Michael Ekstrand has written a piece of
+advice that also removes lines that are somewhere inside an
+appointment:
+
+#+begin_src emacs-lisp
+(defun org-time-to-minutes (time)
+  "Convert an HHMM time to minutes"
+  (+ (* (/ time 100) 60) (% time 100)))
+
+(defun org-time-from-minutes (minutes)
+  "Convert a number of minutes to an HHMM time"
+  (+ (* (/ minutes 60) 100) (% minutes 60)))
+
+(defadvice org-agenda-add-time-grid-maybe (around mde-org-agenda-grid-tweakify
+                                                  (list ndays todayp))
+  (if (member 'remove-match (car org-agenda-time-grid))
+      (flet ((extract-window
+              (line)
+              (let ((start (get-text-property 1 'time-of-day line))
+                    (dur (get-text-property 1 'duration line)))
+                (cond
+                 ((and start dur)
+                  (cons start
+                        (org-time-from-minutes
+                         (+ dur (org-time-to-minutes start)))))
+                 (start start)
+                 (t nil)))))
+        (let* ((windows (delq nil (mapcar 'extract-window list)))
+               (org-agenda-time-grid
+                (list (car org-agenda-time-grid)
+                      (cadr org-agenda-time-grid)
+                      (remove-if
+                       (lambda (time)
+                         (find-if (lambda (w)
+                                    (if (numberp w)
+                                        (equal w time)
+                                      (and (>= time (car w))
+                                           (< time (cdr w)))))
+                                  windows))
+                       (caddr org-agenda-time-grid)))))
+          ad-do-it))
+    ad-do-it))
+(ad-activate 'org-agenda-add-time-grid-maybe)
+#+end_src
+*** Disable vc for Org mode agenda files
 -- David Maus
 
 Even if you use Git to track your agenda files you might not need
@@ -1079,7 +993,101 @@ vc-mode to be enabled for these files.
       (remove-hook 'find-file-hook 'vc-find-file-hook)
     (add-hook 'find-file-hook 'vc-find-file-hook)))
 #+end_src
-* Hacking Org and Emacs: Modify how org interacts with other Emacs packages.
+
+*** Easy customization of TODO colors
+-- Ryan C. Thompson
+
+Here is some code I came up with some code to make it easier to
+customize the colors of various TODO keywords. As long as you just
+want a different color and nothing else, you can customize the
+variable org-todo-keyword-faces and use just a string color (i.e. a
+string of the color name) as the face, and then org-get-todo-face
+will convert the color to a face, inheriting everything else from
+the standard org-todo face.
+
+To demonstrate, I currently have org-todo-keyword-faces set to
+
+#+BEGIN_SRC emacs-lisp
+(("IN PROGRESS" . "dark orange")
+ ("WAITING" . "red4")
+ ("CANCELED" . "saddle brown"))
+#+END_SRC emacs-lisp
+
+  Here's the code, in a form you can put in your =.emacs=
+
+#+BEGIN_SRC emacs-lisp
+(eval-after-load 'org-faces
+ '(progn
+    (defcustom org-todo-keyword-faces nil
+      "Faces for specific TODO keywords.
+This is a list of cons cells, with TODO keywords in the car and
+faces in the cdr.  The face can be a symbol, a color, or a
+property list of attributes, like (:foreground \"blue\" :weight
+bold :underline t)."
+      :group 'org-faces
+      :group 'org-todo
+      :type '(repeat
+              (cons
+               (string :tag "Keyword")
+               (choice color (sexp :tag "Face")))))))
+
+(eval-after-load 'org
+ '(progn
+    (defun org-get-todo-face-from-color (color)
+      "Returns a specification for a face that inherits from org-todo
+ face and has the given color as foreground. Returns nil if
+ color is nil."
+      (when color
+        `(:inherit org-warning :foreground ,color)))
+
+    (defun org-get-todo-face (kwd)
+      "Get the right face for a TODO keyword KWD.
+If KWD is a number, get the corresponding match group."
+      (if (numberp kwd) (setq kwd (match-string kwd)))
+      (or (let ((face (cdr (assoc kwd org-todo-keyword-faces))))
+            (if (stringp face)
+                (org-get-todo-face-from-color face)
+              face))
+          (and (member kwd org-done-keywords) 'org-done)
+          'org-todo))))
+#+END_SRC emacs-lisp
+
+*** Add an effort estimate on the fly when clocking in
+
+You can use =org-clock-in-prepare-hook= to add an effort estimate.
+This way you can easily have a "tea-timer" for your tasks when they
+don't already have an effort estimate.
+
+#+begin_src emacs-lisp
+(add-hook 'org-clock-in-prepare-hook
+	  'my-org-mode-ask-effort)
+
+(defun my-org-mode-ask-effort ()
+  "Ask for an effort estimate when clocking in."
+  (unless (org-entry-get (point) "Effort")
+    (let ((effort
+	   (completing-read
+	    "Effort: "
+	    (org-entry-get-multivalued-property (point) "Effort"))))
+      (unless (equal effort "")
+	(org-set-property "Effort" effort)))))
+#+end_src
+
+Or you can use a default effort for such a timer:
+
+#+begin_src emacs-lisp
+(add-hook 'org-clock-in-prepare-hook
+	  'my-org-mode-add-default-effort)
+
+(defvar org-clock-default-effort "1:00")
+
+(defun my-org-mode-add-default-effort ()
+  "Add a default effort estimation."
+  (unless (org-entry-get (point) "Effort")
+    (org-set-property "Effort" org-clock-default-effort)))
+#+end_src
+
+* Hacking Org: Working with Org-mode and other Emacs Packages.
 ** org-remember-anything
 
 [[http://www.emacswiki.org/cgi-bin/wiki/Anything][Anything]] users may find the snippet below interesting:
@@ -1524,7 +1532,7 @@ attachment."
 The whole magic lies in the special strings that mark a HTML
 attachment.  So you might just have to find out what these special
 strings are in message-mode and modify the functions accordingly.
-* Hacking Org and external Programs.
+* Hacking Org: Working with Org-mode and External Programs.
 ** Use Org-mode with Screen [Andrew Hyatt]
 
 "The general idea is that you start a task in which all the work will
