@@ -1101,6 +1101,17 @@ Hack sent by Kiwon Um:
 (run-at-time nil 300 'kiwon/org-agenda-redo-in-other-window)
 #+end_src
 
+*** Reschedule agenda items to today with a single command
+
+This was suggested by Carsten in reply to David Abrahams:
+
+#+begin_example emacs-lisp
+(defun org-agenda-reschedule-to-today ()
+  (interactive)
+  (flet ((org-read-date (&rest rest) (current-time)))
+    (call-interactively 'org-agenda-schedule)))
+#+end_example
+
 * Hacking Org: Working with Org-mode and other Emacs Packages.
 ** org-remember-anything
 
