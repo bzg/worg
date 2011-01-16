@@ -436,6 +436,28 @@ unimaginatively called my-org-un-project:
   (org-cycle t))
 #+end_src
 
+*** Turn a heading into an Org link
+
+From David Maus:
+
+#+begin_src emacs-lisp
+  (defun dmj:turn-headline-into-org-mode-link ()
+    "Replace word at point by an Org mode link."
+    (interactive)
+    (when (org-at-heading-p)
+      (let ((hl-text (nth 4 (org-heading-components))))
+        (unless (or (null hl-text)
+                    (org-string-match-p "^[ \t]*:[^:]+:$" hl-text))
+          (beginning-of-line)
+          (search-forward hl-text (point-at-eol))
+          (replace-string
+           hl-text
+           (format "[[file:%s.org][%s]]"
+                   (org-link-escape hl-text)
+                   (org-link-escape hl-text '((?\] . "%5D") (?\[ . "%5B"))))
+           nil (- (point) (length hl-text)) (point))))))
+#+end_src
+
 ** Archiving Content in Org-Mode
 *** Preserve top level headings when archiving to a file
 - Matt Lundin
