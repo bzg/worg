@@ -257,6 +257,43 @@ nil if before the first headline."
         t))))
 #+END_SRC
 *** Org table
+
+**** Transpose tables (Juan Pechiar)
+
+This function by Juan Pechiar will transpose a table:
+
+#+begin_src emacs-lisp
+(defun org-transpose-table-at-point ()
+  "Transpose orgmode table at point, eliminate hlines"
+  (interactive)
+  (let ((contents 
+	 (apply #'mapcar* #'list
+		;; remove 'hline from list
+		(remove-if-not 'listp  
+			       ;; signals error if not table
+			       (org-table-to-lisp)))))
+    (delete-region (org-table-begin) (org-table-end))
+    (insert (mapconcat (lambda(x) (concat "| " (mapconcat 'identity x " | " ) "  |\n" ))
+		       contents ""))
+    (org-table-align)))
+#+end_src
+
+So a table like
+
+: | 1 | 2 | 4 | 5 |
+: |---+---+---+---|
+: | a | b | c | d |
+: | e | f | g | h |
+
+will be transposed as
+
+: | 1 | a | e |
+: | 2 | b | f |
+: | 4 | c | g |
+: | 5 | d | h |
+
+(Note that horizontal lines disappeared.)
+
 *** Dates computation
 
 **** Question ([[http://article.gmane.org/gmane.emacs.orgmode/15692][Xin Shi]])
