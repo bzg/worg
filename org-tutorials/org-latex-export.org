@@ -968,36 +968,46 @@ entry in your opened ebib database.
 *** Natbib citation commands
 The link types defined for use with ebib can also format output for
 the LaTeX exporter.  The following link types insert the natbib
-citation commands.
+citation commands, using an optional command if the citation link
+includes a description.
 
 #+source: define-citep-link
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp :results silent
   (org-add-link-type 
    "citep" 'ebib
    (lambda (path desc format)
      (cond
       ((eq format 'latex)
-       (format "\\citep[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "citep:" desc)))
+             (format "\\citep{%s}" path)
+             (format "\\citep[%s]{%s}" desc path)
+)))))
 #+end_src
 
 #+source: define-citet-link
-#+begin_src emacs-lisp :exports code
+#+begin_src emacs-lisp :results silent
   (org-add-link-type 
    "citet" 'ebib
    (lambda (path desc format)
      (cond
       ((eq format 'latex)
-       (format "\\citet[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "citet:" desc)))
+             (format "\\citet{%s}" path)
+             (format "\\citet[%s]{%s}" desc path)
+)))))
 #+end_src
 
 #+source: define-citealt-link
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp :results silent
   (org-add-link-type 
    "citealt" 'ebib
    (lambda (path desc format)
      (cond
       ((eq format 'latex)
-       (format "\\citealt[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "citealt:" desc)))
+             (format "\\citealt{%s}" path)
+             (format "\\citealt[%s]{%s}" desc path)
+)))))
 #+end_src
 
 #+source: define-citealp-link
@@ -1007,7 +1017,10 @@ citation commands.
    (lambda (path desc format)
      (cond
       ((eq format 'latex)
-       (format "\\citealp[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "citealp:" desc)))
+           (format "\\citealp{%s}" path)
+         (format "\\citealp[%s]{%s}" desc path)
+         )))))
 #+end_src
 
 #+source: define-citealtstar-link
@@ -1017,7 +1030,10 @@ citation commands.
    (lambda (path desc format)
      (cond
       ((eq format 'latex)
-       (format "\\citealt*[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "citealt*:" desc)))
+           (format "\\citealt*{%s}" path)
+         (format "\\citealt*[%s]{%s}" desc path)
+         )))))
 #+end_src
 
 #+source: define-citealpstar-link
@@ -1027,7 +1043,10 @@ citation commands.
    (lambda (path desc format)
      (cond
       ((eq format 'latex)
-       (format "\\citealp*[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "citealp*:" desc)))
+           (format "\\citealp*{%s}" path)
+         (format "\\citealp*[%s]{%s}" desc path)
+         )))))
 #+end_src
 
 #+source: define-citepstar-link
@@ -1037,7 +1056,10 @@ citation commands.
    (lambda (path desc format)
      (cond
       ((eq format 'latex)
-       (format "\\citep*[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "citep*:" desc)))
+           (format "\\citep*{%s}" path)
+         (format "\\citep*[%s]{%s}" desc path)
+         )))))
 #+end_src
 
 #+source: define-citetstar-link
@@ -1047,11 +1069,14 @@ citation commands.
    (lambda (path desc format)
      (cond
       ((eq format 'latex)
-       (format "\\citet*[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "citet*:" desc)))
+             (format "\\citet*{%s}" path)
+             (format "\\citet*[%s]{%s}" desc path)
+)))))
 #+end_src
 
 
-*** Biblatex citation commands
+*** Biblatex citation commands                                     :noexport:
 The following six link types are defined for the standard biblatex
 citation commands.
 
