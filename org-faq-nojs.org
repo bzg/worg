@@ -1,11 +1,8 @@
-#+OPTIONS:   H:2 num:t toc:t \n:nil @:t ::t |:t ^:t *:t TeX:t
 #+EMAIL:     carsten.dominik@gmail.com
 #+AUTHOR:    Worg people
 #+LANGUAGE:  en
 #+TITLE:     Org-mode Frequently Asked Questions
-#+OPTIONS:   H:3 num:nil toc:t \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
-
-[[file:index.org][{Back to Worg's index}]]
+#+OPTIONS:   toc:t H:2
 
 * Welcome
   :PROPERTIES:
@@ -13,21 +10,6 @@
   :END:
 
 Welcome to the Org-mode FAQ.
-
-You can navigate the FAQ by clicking on any of the topics in the Table of
-Contents.
-
-If your browser supports JavaScript, you can...
-
-- move through the topics by typing "=n=" (next) and "=p=" (previous).
-
-- see an outline view of the FAQ by typing "=m=" or clicking "=toggle
-  view=" (above).
-
-- search the FAQ by typing "=s=" (basic search) or "=o=" (occur tree).
-
-- see a full list of navigation commands by typing "=?=" or clicking
-  "=Help=" (above).
 
 * What is org-mode?
   :PROPERTIES:
@@ -1999,11 +1981,9 @@ automatically.
 If the following occurs:
 
 #+begin_src org
-
-#+OPTIONS: toc:nil
-Some entered text.
-# More entered tex.
-
+  ,#+OPTIONS: toc:nil
+  ,Some entered text.
+  ,# More entered tex.
 #+end_src
 
 Make sure that the variable comment-start is nil.
@@ -3420,23 +3400,3 @@ might want to use another version and install MathJax on your own server.
 
 You can also get [[http://www.mathjax.org/resources/docs/?installation.html][MathJax from git or svn]] -- in this case, be careful not to
 forget to unzip the fonts.zip archive in the mathjax directory.
-
-* COMMENT HTML style specifications
-
-#+begin_src emacs-lisp
-  (defun org-faq-make-target ()
-    "Make hard target for current headline."
-    (interactive)
-    (if (not (org-on-heading-p))
-        (error "Not on a headline"))
-    (let ((h (org-trim (org-get-heading 'no-tags))))
-      (if (string-match "[ \t]*\\?\\'" h)
-          (setq h (replace-match "" t t h)))
-      (while (string-match "[ \t]+" h)
-        (setq h (replace-match "-" t t h)))
-      (org-entry-put nil "CUSTOM_ID" h)))
-#+end_src
-
-
-
-
