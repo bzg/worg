@@ -19,6 +19,9 @@ Org-mode LaTeX export is easy.  Place the following code in your
 .emacs and you're ready to go.
 
 #+begin_src emacs-lisp
+  (require 'org-latex)
+  (unless (boundp 'org-export-latex-classes)
+    (setq org-export-latex-classes nil))
   (add-to-list 'org-export-latex-classes
                '("article"
                  "\\documentclass{article}"
@@ -69,7 +72,7 @@ and easy to use and maintain.
 * More Highly-Structured Documents
 
 You can prepare more highly structured LaTeX documents by adding a few
-lines to =org-export-latex-classes= in the .emacs.
+lines to =org-export-latex-classes= in =.emacs=.
 
 #+begin_src emacs-lisp
   (add-to-list 'org-export-latex-classes
@@ -108,7 +111,7 @@ Here is a standard setup for export to a LaTeX book class:
 #+begin_src emacs-lisp
   (add-to-list 'org-export-latex-classes
                `("book"
-                 "\\documentclass[11pt,letter]{book}"
+                 "\\documentclass{book}"
                  ("\\part{%s}" . "\\part*{%s}")
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
@@ -123,6 +126,30 @@ Then, in the Org file with a book-full of notes, add this line:
   #+LaTeX_CLASS: book 
 #+end_src
 
+# <<koma-script>>
+A useful set of alternatives is the [[http://www.komascript.de/][KOMA script]] classes.  These have a
+somewhat more modern design than the standard LaTeX classes.  
+
+For example, the KOMA script article class can be configured in =.emacs=.
+
+#+begin_src emacs-lisp :
+  (add-to-list 'org-export-latex-classes
+            '("koma-article"
+               "\\documentclass{scrartcl}"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+
+Then, this class can be used by including the following line in the
+Org-mode file.
+
+#+begin_src org :exports code
+  #+LaTeX_CLASS: koma-article
+#+end_src
+
 * Passing Options to Document Classes
 The standard LaTeX document classes, =article=, =report=, =book=,
 =slides=, and =letter= take options that, where applicable, select the
@@ -133,8 +160,88 @@ document classes can define their own options, as needed.
 You can pass options to the LaTeX =\documentclass= macro by putting a
 line like this in your Org-mode file:
 
-#+begin_src org
+#+begin_src org :exports code
   #+LaTeX_CLASS_OPTIONS: [a4paper,twoside,twocolumn] 
+#+end_src
+
+A useful option with the [[koma-script][KOMA script]] classes typesets table captions
+properly.  The standard LaTeX classes will incorrectly typeset table captions
+exported by Org-mode above the table.  The following option to the
+[[koma-script][KOMA script]] classes accomplishes this.
+
+#+begin_src org
+  #+LaTeX_CLASS_OPTIONS: [captions=tableheading] 
+#+end_src
+
+* Using Custom Classes
+If the user has custom LaTeX document classes that conflict with the
+default packages or that only require a few of the default packages to
+support all features of the LaTeX exporter, then this can be handled
+in =.emacs= using [DEFAULT-PACKAGES], [NO-DEFAULT-PACKAGES],
+[PACKAGES], [NO-PACKAGES], [EXTRA], [NO-EXTRA].    
+
+Here is a simple example that uses an experimental [[http://orgmode.org/worg/org-contrib/babel/examples/article-class.html][LaTeX class]][fn:3] that
+supports the Org-mode requirements and leaves open the possibility of
+adding file specific packages:
+  
+#+begin_src emacs-lisp
+  (add-to-list 'org-export-latex-classes
+        '("org-article"
+           "\\documentclass{org-article}
+           [NO-DEFAULT-PACKAGES]
+           [PACKAGES]
+           [EXTRA]"
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+           ("\\paragraph{%s}" . "\\paragraph*{%s}")
+           ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+
+The Org-mode LaTeX exporter uses several packages to support special characters
+used by =org-entities=.  One of these, =amsmath=, conflicts with
+several [[font-section][LaTeX fonts]].  If you want finer control over which packages
+are loaded, then it makes sense to define an export class like this
+in =.emacs=:
+
+#+begin_src emacs-lisp :tangle no
+  (add-to-list 'org-export-latex-classes
+            '("koma-article"
+               "\\documentclass{scrartcl}
+               [NO-DEFAULT-PACKAGES]
+               [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+
+Alternatively, export classes can be defined on a per-file basis in a
+source code block that is evaluated prior to LaTeX export.  This is
+perhaps the most flexible way to set up LaTeX export.  Here is an
+example:
+
+#+begin_example 
+  #+source: setup
+  #+begin_src emacs-lisp :results silent
+    (add-to-list 'org-export-latex-classes
+            '("per-file-class"
+               "\\documentclass{scrartcl}
+               [NO-DEFAULT-PACKAGES]
+               [EXTRA]"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  #+end_src
+#+end_example
+
+Then, add this line to the Org-mode file:
+
+#+begin_src org :exports code
+  #+LaTeX_CLASS: per-file-class
 #+end_src
 
 * Specifying LaTeX Packages
@@ -144,45 +251,52 @@ functionality through the addition of packages necessarily makes the
 software more difficult to use.  Like LaTeX itself, the Org-mode LaTeX
 exporter has struck its own balance between functionality and ease of
 use with the addition of several LaTeX packages.  These are written
-out in the LaTeX header as LaTeX \usepackage{} commands.
+out in the LaTeX header as LaTeX =\usepackage= commands.
 
-The names of the LaTeX packages are kept in a data structure designed
-for ease of maintenance as additional features are added to the LaTeX
-exporter.  Packages in the default packages list,
+Org-mode keeps the names of the LaTeX packages it uses in a data
+structure designed for ease of maintenance as additional features are
+added to the LaTeX exporter.  Packages in the default packages list,
 =org-export-latex-default-packages-alist=, are required to support all
 features of the LaTeX exporter.  This list is typically specified in
 the Org-mode source code and its documentation contains a warning not
 to modify it.  Packages not included on the default packages list that
 the user needs consistently can be added to
-=org-export-latex-packages-alist=.  Packages needed for a particular
-file can be specified by inserting a line like this in the Org-mode
-buffer:
-#+begin_src org
+=org-export-latex-packages-alist=.
+
+Packages needed for a particular file can be specified by inserting a
+line like this in the Org-mode buffer:
+#+begin_src org :exports code
   ,#+LATEX_HEADER: \usepackage{xyz}
 #+end_src
-* Using Custom Classes
-If the user has custom LaTeX document classes that conflict with the
-default packages or that only require a few of the default packages to
-support all features of the LaTeX exporter, then this can be handled
-in the .emacs using [DEFAULT-PACKAGES], [NO-DEFAULT-PACKAGES],
-[PACKAGES], [NO-PACKAGES], [EXTRA], [NO-EXTRA].    
 
-Here is a simple example that uses a LaTeX class that supports the
-Org-mode requirements and leaves open the possibility of adding file
-specific packages:
-  
-#+begin_src emacs-lisp
-    (add-to-list 'org-export-latex-classes
-          '("article"
-             "\\documentclass{org-ready}
-             [NO-DEFAULT-PACKAGES]
-             [EXTRA]"
-             ("\\section{%s}" . "\\section*{%s}")
-             ("\\subsection{%s}" . "\\subsection*{%s}")
-             ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-             ("\\paragraph{%s}" . "\\paragraph*{%s}")
-             ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+If you are using an export class that specifies
+=[NO-DEFAULT-PACKAGES]= then you will almost certainly need to specify
+packages in the =#+LATEX_HEADER=.  Doing things this way has the
+advantage that LaTeX packages that are highly configurable can be
+tailored for a particular use.  Perhaps the best example among the
+packages in =org-export-latex-default-packages-alist= is =hyperref=,
+which has an elaborate list of keyval options.  PDF output destined
+for interactive use might load =hyperref= with options to distinguish
+links with attractive colors, for instance.  This might be achieved
+with following lines, which load the =xcolor= package[fn:4] and then
+use named colors to distinguish external blue links from internal red
+links:
+
+#+source: hyperref-header
+#+begin_src org :exports code
+  ,  #+LATEX_HEADER: \usepackage[hyperref,x11names]{xcolor}
+  ,  #+LATEX_HEADER: \usepackage[colorlinks=true,urlcolor=SteelBlue4,linkcolor=Firebrick4]{hyperref}
 #+end_src
+
+In addition, you can pick up the encoding used in the Org-mode buffer and pass
+this information on to LaTeX by loading the =inputenc= package as
+follows:
+
+#+source: inputenc
+#+begin_src org :exports code
+  #+LATEX_HEADER: \usepackage[AUTO]{inputenc}
+#+end_src
+
 * Creating PDF Output
 The LaTeX exporter by default produces code ready for processing by
 pdflatex.  pdflatex calls the pdfTeX program, a modern extension of
@@ -195,10 +309,24 @@ Org-mode offers a command to produce a PDF file from the LaTeX export.
 This is bound to =C-c C-e p=.  The command =C-c C-e d= does all this
 *and* opens the PDF file in the default reader.
 
-If you use a different TeX typesetting engine, then you will want to
+If you use a different TeX typesetting engine or would like to
+customize how Org-mode produces the pdf file, then you will want to
 modify the variable =org-latex-to-pdf-process=.  This is a list of
 strings, each of which contains a call to one of the TeX typesetting
 engines or to an auxiliary program, such as BibTeX, makeindex, etc.
+
+For example, the shell script =texi2dvi= will run =pdflatex= as many
+times as needed to build a pdf file successfully.  The following code
+in =.emacs= will instruct Org-mode to use =texi2dvi= when making a pdf
+file.  Note that you should check that =texi2dvi= is installed on your
+system and that it works correctly before adding this code to your
+=.emacs=. 
+ 
+#+source: texi2dvi
+#+begin_src emacs-lisp :exports code
+(setq org-latex-to-pdf-process
+   '("texi2dvi -p -b -c -V %f"))
+#+end_src
 
 * Exporting Parts of an Org-mode Buffer
 Tags can be used to select which parts of an Org-mode buffer are sent
@@ -265,7 +393,7 @@ the tree-level tag, as in the following example.
 In the multiple export case, tags used to select a tree or subtree for
 export are defined in =.emacs= as part of the configuration needed to
 specify the many properties of a publication project.  A tutorial
-illustrates [[http://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.php][the flexibility of the publishing mechanism]] using an HTML
+illustrates [[http://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html][the flexibility of the publishing mechanism]] using an HTML
 example.  The intricacies of the publishing mechanism are beyond the
 scope of of this LaTeX export tutorial.  Here, a working example[fn:1]
 is described.
@@ -314,7 +442,185 @@ Similarly, the parts of =index.org= tagged =@HOME= can now be exported to
 =~/notes/export/home/index.tex= with =C-c C-e X= and selecting the
 =home= project.
 
-* Exporting Pseudo-Code
+* Markup
+Org-mode provides wiki-like markup for various display
+characteristics.  This is often handy and it translates directly into
+LaTeX, but the design philosophy of LaTeX is centered around semantic
+markup, "what you say is what you mean" rather than "what you see is
+what you get" (lampooned by zealous LaTeX users as "what you see is
+all you get").  In practice, LaTeX users define common semantic
+elements in a LaTeX class or style file and these are marked up in
+text with commands often peculiar to the class or style file.
+Clearly, there is no way that Org-mode can anticipate commands
+peculiar to arbitrary class or style files.  Fortunately, there are
+facilities for inline and block-level markup.
+
+** Block-level Markup
+For simple /block-level/ arbitrary markup, you can use the contributed
+package [[file:../org-contrib/org-special-blocks.org][org-special-blocks]], which turns ~#+begin_foo~ into
+~\begin{foo}~ upon LaTeX export. You can use ordinary Org markup
+inside the block. For example, you can wrap an abstract in
+
+: #+BEGIN_ABSTRACT
+: [Text of the abstract here.]
+: #+END_ABSTRACT
+
+For more complex cases, where you need to pass parameters or process
+block contents, but don't want to use literal LaTeX, you may want to
+explore the possibilities of the contributed [[file:../contrib/org-exp-blocks][org-exp-blocks]] package.
+
+An example of block-level markup for a results block that will be
+typeset with a shaded background:
+
+: LaTeX_HEADER: \usepackage{framed}
+: LaTeX_HEADER: \usepackage{xcolor}
+: LaTeX_HEADER: \definecolor{shadecolor}{gray}{.95}
+: LaTeX_HEADER: \newenvironment{results}{\begin{shaded}}{\end{shaded}}
+
+
+
+** Inline Markup
+/Inline/ arbitrary semantic markup can be implemented by defining a new link type
+in =.emacs=.[fn:2]   The following code block defines a new link type,
+=latex=, whose =path= argument can hold the name of any LaTeX
+command.  This one defines export markup for HTML and LaTeX.  A link
+such as =[latex:proglang][Org-mode]= will export
+=\proglang{Org-mode}= to the LaTeX file.  In this way, it is possible
+to make the Org-mode LaTeX exporter conform to the semantic markup
+defined in arbitrary style files.  Org-mode will even complete your
+new link type!
+
+#+source: semantic-markup
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+Two examples of LaTeX commands for inline semantic markup:
+
+: LaTeX_HEADER: \let\progstruct=\texttt
+: LaTeX_HEADER: \newcommand{\progexample}[1]{{\ttfamily\small #1}}
+
+** Captions
+The LaTeX caption command is typically passed two arguments: the
+required argument, which is typeset with the figure or table; and the
+optional argument, which appears in the List of Figures or List of
+Tables.  It is common nowadays, especially in the sciences, to have
+long captions (actually captions plus legends) with figures and much
+abbreviated versions, typically less than a line long, in the List of
+Figures.  In addition, many styles require that figure captions end
+with a period; the caption passed to the List of Figures should not
+end in a period.
+ 
+The Org-mode =#+CAPTION:= macro wraps its argument in =\caption{...}=
+but doesn't handle an optional argument.  It is most useful for
+tables, especially with style sheets that don't end table captions
+with a period.  The same caption serves equally well with the table
+and, assuming it fits on a line, with the List of Tables.
+
+Another option is to use =#+LATEX:= and just write the
+=\caption[...]{...}= directly.  This works well for LaTeX export, but
+it does nothing for HTML.
+
+This link establishes a caption that works with both LaTeX and html
+and can be used to mark blocks that Org-mode doesn't recognize by
+default.  Note that you currently have to enter these links by hand
+and not with the usual =org-insert-link= function, which doesn't allow
+spaces in the =PATH= argument.
+
+#+source: define-caption-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type
+   "caption" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"caption\">%s</span>" desc))
+      ((eq format 'latex)
+       (format "\\caption[%s]{%s}" path desc)))))  
+#+end_src
+
+Here is an example of its use:
+: [[caption:A caption in the List of Figures][A caption for a figure.]]
+* Styling the Frontmatter
+The Org-mode LaTeX exporter requires configuration to gain full access
+to the LaTeX frontmatter formatting capacity.
+ 
+** Abstract, contents, and lists of figures and tables
+In the default configuration, the Org-mode LaTeX exporter includes a
+function that sandwiches the LaTeX =\tableofcontents= command between
+a command that sets the depth of the headings that appear in the table
+of contents (based on the number of headline levels that will be
+exported as headings, rather than lists) and a command to add some
+vertical space.  Neither of these additions to the =\tableofcontents=
+command is especially desireable.  It is often the case that one wants
+the table of contents depth to differ from the depth to which sections
+are numbered.  Also, in the LaTeX world, the space between the end of one
+element and the start of another is something that is specified within
+a class or style file, rather than within the document itself.  Formatting with
+the class or style file exclusively can give the finished document a pleasing
+stylistic uniformity that is difficult to achieve in an ad hoc way.
+Also, hardwiring the table of contents in this way always puts it
+directly following the output of the LaTeX =maketitle= command.  In
+practice, however, it is often useful to print an abstract or
+executive summary between the title and the table of contents.
+Fortunately, the LaTeX exporter is coded in such a way that it is
+possible for the user to alter this behavior relatively easily.
+
+#+source: format-no-toc
+#+begin_src emacs-lisp :exports code
+(defun org-export-latex-no-toc (depth)  
+    (when depth
+      (format "%% Org-mode is exporting headings to %s levels.\n"
+              depth)))
+  (setq org-export-latex-format-toc-function 'org-export-latex-no-toc)
+#+end_src
+
+With this setup, place the abstract and =#+LATEX:= commands for
+frontmatter before the first exported headline, e.g.,
+
+: #+BEGIN_abstract
+:   [Abstract here]
+: #+END_abstract
+: #+LATEX: \tableofcontents
+: #+LATEX: \listoftables
+: #+LATEX: \listoffigures
+: * First Exported Headline
+
+
+** Titles and Title Page Layout
+The default title created by the LaTeX exporter is often just fine,
+but in cases where you would like to include specific information in
+the title, or create a custom title page, then perhaps the best way to
+do this was posted to the Org-mode list by Nick Dokos:
+
+#+begin_example
+#+LATEX_HEADER: \input{mytitle}
+ 
+ * Foo
+ foo
+ 
+ * Bar
+ bar
+#+end_example
+
+where the file mytitle.tex looks like this:
+
+#+begin_example
+\renewcommand\maketitle{\begin{titlepage}%
+FOO
+\end{titlepage}%
+}
+#+end_example
+
+* Exporting Listings                                               :noexport:
+** Exporting Pseudo-Code
   The LaTeX exporter will fontify exported code blocks written in any
   language that has an associated Emacs mode for editing.  If you want
   to export pseudo-code, for which there is no corresponding Emacs
@@ -336,7 +642,504 @@ Similarly, the parts of =index.org= tagged =@HOME= can now be exported to
 :  \end{lstlisting}
 : \end{algorithm}
 : #+end_latex
+* Exporting Tables
+LaTeX divides table handling into two parts: typesetting the actual
+table, and placing the table on the page along with a caption and
+cross-reference information.
 
+LaTeX provides several environments for typesetting tables.  The LaTeX
+exporter currently supports a well-rounded subset of these:
+
+  - tabular :: table doesn't break across pages, user responsible for
+               determining column widths
+  - tabularx :: table doesn't break across pages, width of table
+                specified by user, automatic calculation of column widths
+  - tabulary :: like tabularx, but tries harder to calculate optimal
+                column widths
+  - longtable :: table breaks across pages, can't be used in a
+                 multicolumn page layout
+
+Because the various tabular envionments don't break across pages, they
+are typically "floated" by wrapping them in a =table= environment, or
+for a table that spans columns in a multi-column page layout, a
+=table*= environment.  LaTeX will the float the typeset table to an
+appropriate place in the output, ensuring that the table doesn't run
+off the end of the page (unless it is taller than the text height).
+Note that the LaTeX environments responsible for handling the
+information specified by =#+CAPTION:= and =#+LABEL:= are =table=,
+=table*=, and =longtable=.  If =tabular=, =tabularx=, and =tabulary=
+are used by themselves, then they won't support captions and
+cross-references. 
+
+** Table Rules
+The tables in many high-quality publications use rules of different
+widths for the different "lines" in a table.  The horizontal rules at
+the top and bottom of a table are heavier than the rule separating the
+column heads from the table body.  In general, good table design
+discourages the use of vertical rules; they are superfluous in an
+otherwise well-designed table.
+
+The LaTeX exporter currently uses rules of the same width everywhere
+in a table.  It is possible to get book quality tables
+
+The following steps assume that the =org-babel-load-languages=
+variable has an entry =(latex . t)= and that functions in the Library
+of Babel are available.  I have this in =.emacs= so that Org-mode
+knows where to find the Library of Babel (but don't know if it
+is strictly necessary):
+:  (org-babel-lob-ingest "/path/to/library-of-babel.org")
+
+
+First, load the =booktabs= package:
+
+: #+LATEX_HEADER: \usepackage{booktabs}
+
+Then, give your table a name, e.g., =#+tblname: test-table= and put it
+somewhere the LaTeX exporter won't see, perhaps in a sub-tree tagged with
+=:noexport:=.
+
+Finally, create a LaTeX source block something like this:
+
+: #+source: tabularx-export
+: #+begin_src latex :exports results :results latex
+:   \begin{table}[htb!]
+:   \centering
+:   \footnotesize
+:   \caption{A table to test booktabs}
+:   \label{tab:test-table}
+:   <<booktabs(table=test-table,align="lrl",env="tabular")>>  
+:   \end{table}
+:  #+end_src
+
+When you export the file to LaTeX, this code block is expanded in a
+=#+results:= block and wrapped in =#+BEGIN_LaTeX= ... =#+END_LaTeX=.
+If the table has column heads, then the rule beneath them should be
+finer than the rules at the top and bottom of the table.
+
+* Exporting Lists
+In standard LaTeX, lists are set with a lot of vertical white space
+and it is sometimes nicer to set them more compactly.  This is
+accomplished with the =paralist= package.
+
+: #+LaTeX_HEADER: \usepackage{paralist}
+
+Then you can redefine the standard LaTeX list environments with their
+compact =paralist= equivalents:
+
+: #+LaTeX_HEADER: \let\itemize\compactitem
+: #+LaTeX_HEADER: \let\description\compactdesc
+: #+LaTeX_HEADER: \let\enumerate\compactenum  
+
+The =paralist= package has a facility for setting lists in paragraphs,
+rather than displayed separately.  Typically the lists in a paragraph
+are enumerated and it is possible to set Org-mode's enumerated lists
+in paragraph, while displaying itemized and description lists.
+
+: #+LaTeX_HEADER: \let\enumerate\inparaenum
+
+Alternatively, you can specify how to enumerate the list.  These two
+examples use lowercase Roman numerals in parentheses and lowercase
+letters in parentheses.
+
+: #+LaTeX_HEADER: \renewenvironment{enumerate}{\begin{inparaenum}[(i)]}{\end{inparaenum}}
+: #+LaTeX_HEADER: \renewenvironment{enumerate}{\begin{inparaenum}[(a)]}{\end{inparaenum}}
+
+* Fonts
+# <<font-section>>
+The default LaTeX font is Computer Modern, which was designed by
+Donald Knuth.  Computer Modern is perfectly serviceable, but not as
+nice as other fonts available for LaTeX.  Alternative font sets are
+suggested below.
+
+There are many choices and your choice of which ones to use will be
+guided, in part, by whether or not your document uses math.  If so,
+then you'll want to choose a font with math support.
+
+Another consideration will be whether or not the font clashes with the
+=amssymb= package that Org-mode loads by default.
+
+LaTeX documents might need three text fonts, one for the serif
+typeface used for text, the sans-serif typeface often used for heads
+and sub-heads, and the monospace typewriter typeface typically used to
+set code examples and the like.  Choosing fonts that look good with
+one another is part of the typesetter's art; some care has been taken
+to match fonts in each set.
+
+** Bera
+# <<bera-font>>
+
+Bera is the LaTeX version of the Bitstream's Vera family of fonts.
+The family includes serif, sans-serif, and monospace fonts designed to
+work well with one another. 
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage[scaled]{beraserif}
+: #+LaTeX_HEADER: \usepackage[scaled]{berasans} 
+: #+LaTeX_HEADER: \usepackage[scaled]{beramono}
+
+** Charter
+# <<charter-font>>
+
+[[http://en.wikipedia.org/wiki/Bitstream_Charter][Charter]] was designed to reproduce well on low-resolution 300 dpi
+printers.  It is paired here with Helvetica and Courier, like [[times-font][Times]],
+for which it is an alternative.  Helvetica is set a bit smaller to
+match the shape of the Charter font.  These fonts conflict with the
+[[latex:package][amssymb]] package.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage[bitstream-charter]{mathdesign}
+: #+LaTeX_HEADER: \usepackage[scaled=.9]{helvet} 
+: #+LaTeX_HEADER: \usepackage{courier} % tt
+
+** Garamond
+# <<garamond-font>>
+
+[[http://en.wikipedia.org/wiki/Garamond][Garamond]] refers to a group of old-style serif typefaces and is named
+after the sixteenth-century type designer, Claude Garamond.  It is an
+elegant typeface.  Garamond requires a bit more leading than normal.
+The sans-serif font is Latin Modern and the typewriter font is
+Courier.  Both were chosen to match the shape and stroke weight of
+Garamond.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage[urw-garamond]{mathdesign}
+: #+LaTeX_HEADER: \usepackage{lmodern} 
+: #+LaTeX_HEADER: \usepackage{courier}
+: #+LaTeX_HEADER: \linespread{1.0609}
+
+** KP family
+# <<kp-font>>
+
+The [[http://tug.ctan.org/pkg/kpfonts][KP font family]] is produced by Christophe Caignaert for the
+Johannes Kepler project.  The family supports math.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage{kpfonts}
+
+** Libertine
+# <<libertine-font>>
+
+The [[http://www.linuxlibertine.org/][Linux Libertine Project]] produces OpenSource fonts.  Libertine is a
+replacement for Times New Roman and includes a companion sans-serif
+font.  It was used to typeset the Wikipedia logo.  The monospace
+typewriter font is Latin Modern.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage{libertine}
+: #+LaTeX_HEADER: \renewcommand*\oldstylenums[1]{{\fontfamily{fxlj}\selectfont #1}}
+: #+LaTeX_HEADER: \usepackage{lmodern}
+** Nimbus                                                     
+# <<nimbus-font>>
+
+The Nimbus font set uses fonts from the [[http://www.gust.org.pl/projects/e-foundry/tex-gyre/][Tex-Gyre]] distribution, which
+provides a rich collection of diacritical characters in the attempt to
+cover as many Latin-based scripts as possible.  The serif font is
+Termes, which is a replacement for Times Roman.  The sans-serif font
+is Heros, which is a replacement for Helvetica.  The monospace font is
+Cursor, which is a Courier replacement.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc}
+: #+LaTeX_HEADER: \usepackage{tgtermes}
+: #+LaTeX_HEADER: \usepackage[scale=.85]{tgheros}
+: #+LaTeX_HEADER: \usepackage{tgcursor}
+
+** Palatino
+# <<palatino-font>>
+
+The beautiful, old-style serif font, [[http://en.wikipedia.org/wiki/Palatino][Palatino]], was designed by [[http://en.wikipedia.org/wiki/Herman_Zapf][Herman
+Zapf]].  It is somewhat heavier and easier to read than [[garamond-font][Garamond]].
+Palatino gets a bit more leading than normal.  It is paired here with
+Helvetica and Courier, as is [[times-font][Times]], for which it is an alternative.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc}
+: #+LaTeX_HEADER: \usepackage{mathpazo}
+: #+LaTeX_HEADER: \linespread{1.05}
+: #+LaTeX_HEADER: \usepackage[scaled]{helvet}
+: #+LaTeX_HEADER: \usepackage{courier}
+
+** Times
+# <<times-font>>
+
+The =times= option uses URW Nimbus Roman, a Times clone, for the serif
+font, URW Nimbus Sans, a Helvetica clone, for the sans-serif font,
+and URW Nimbus Mono, a Courier clone, for the typewriter font.  This
+is a standard set of common typefaces typically used in scientific
+publications.  All of the fonts should be included in a typical LaTeX
+distribution. 
+
+[[http://en.wikipedia.org/wiki/Times_Roman][Times New Roman]] was designed by [[http://en.wikipedia.org/wiki/Stanley_Morison][Stanley Morison]] for /The Times/ of
+London during a redesign of the newspaper prompted, in part, by
+Morison's criticism of its typography in 1929.  [[http://en.wikipedia.org/wiki/Helvetica][Helvetica]] was
+developed in 1957 by [[http://en.wikipedia.org/wiki/Max_Miedinger][Max Miedinger]].  Helvetica looks better with Times
+if it is set slightly smaller than the serif font.  [[http://en.wikipedia.org/wiki/Courier_(typeface)][Courier]] was
+designed by Howard Kettler in 1955 for use in IBM typewriters.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc}
+: #+LaTeX_HEADER: \usepackage{mathptmx} 
+: #+LaTeX_HEADER: \usepackage[scaled=.90]{helvet} 
+: #+LaTeX_HEADER: \usepackage{courier}
+
+** Utopia
+# <<utopia-font>>
+
+[[http://en.wikipedia.org/wiki/Utopia_(typeface)][Utopia]] is a transitional serif font designed by [[http://en.wikipedia.org/wiki/Robert_Slimbach][Robert Slimbach]] for
+Adobe in 1989.  It became free software in 2006.  It is paired here
+with the Bera sans serif and monospaced fonts.  Note that the Utopia
+font clashes with the [[latex:package][amssymb]] package.
+
+: #+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+: #+LaTeX_HEADER: \usepackage[adobe-utopia]{mathdesign}
+: #+LaTeX_HEADER: \usepackage[scaled]{berasans} 
+: #+LaTeX_HEADER: \usepackage[scaled]{beramono}
+
+* Bibliography
+# <<bibliography section>>
+The [[latex:package][biblatex]] package, which recently emerged from beta status, offers
+support for the full range of citation styles, including the numeric
+styles favored by scientists, the author-date styles used by social
+scientists, and the footnote styles popular in the humanities.  Thanks
+to work by Ali Tofigh and Joost Kremers, it is possible to manage
+citations using the [[http://ebib.sourceforge.net/][ebib]] program for managing BibTeX databases.
+
+You'll need two additions to the LaTeX preamble, one to load biblatex
+and the other to specify the =*.bib= files that hold the BibTeX
+database.  Loading biblatex without options defaults to a numeric
+citation style typical in the sciences.
+
+: #+LaTeX_HEADER: \usepackage{biblatex}
+: #+LaTeX_HEADER: \bibliography{my-bib,my-other-bib}
+
+There are a number of citation and bibliography styles that ship with
+biblatex and there is a growing body of contributed styles.  These can
+be selected by passing options to biblatex.  The author/date style
+used in the social sciences can be selected:
+
+: #+LaTeX_HEADER: \usepackage[style=authordate]{biblatex}
+
+Or a footnote style:
+
+: #+LaTeX_HEADER: \usepackage[style=verbose]{biblatex}
+
+** Natbib citations
+
+Biblatex supports the various citation commands implemented by
+[[latex:package][natbib]].
+
+: #+LaTeX_HEADER: \usepackage[natbib]{biblatex}
+
+The commands all start with =cite= and end with one or more letters
+that indicate a style.  The most commonly used commands are:
+  1. [[latex:progstruct][citep]] for parenthetical citations, e.g., (Jones, 1958);
+  2. [[latex:progstruct][citet]] for textual citations, e.g., Jones (1958);
+  3. [[latex:progstruct][citealt]] for textual citations without parentheses, e.g. Jones 1958.
+There are starred versions of most commands that will output the full
+author lists rather than use the abbreviation =et. al.=
+
+** Using Ebib and Extended Link Syntax
+
+Using ebib with Org-mode was the idea of Ali Tofigh, who sent this
+message to the Org-mode list:
+
+A while ago I asked on this list about connecting org-mode with ebib,
+which is a bibtex database manager for emacs. Thanks to Joost Kremers,
+there is now a solution.
+
+I asked the developer of ebib, Joost Kremers, if he could write a
+function that would start ebib on a given bibtex entry. He kindly
+added this functionality to the 'ebib' function (which starts ebib in
+emacs) and it is now available in the ebib git repository (see
+http://ebib.sourceforge.net). If you are using ebib and would like to
+get org-mode to open bibtex entries do the following:
+
+1) Install the latest development version of ebib.
+
+2) make sure =ebib-preload-bib-files= is set properly so that your =.bib= file is loaded by ebib when ebib starts
+
+3) add the following line to your =.emacs=:
+: (org-add-link-type "ebib" 'ebib)
+
+Now you can insert ebib links in your documents like this:
+=[ebib:Jones1998][some paper title]=. Opening this link should now
+result in ebib starting, loading your default bibtex database, and
+highlighting the bibtex entry Jones1998. Alternatively, if you already
+have started ebib, then opening the link will get you to the bibtex
+entry in your opened ebib database.
+
+*** Natbib citation commands
+The link types defined for use with ebib can also format output for
+the LaTeX exporter.  The following link types insert the natbib
+citation commands, using an optional command if the citation link
+includes a description.
+
+#+source: define-citep-link
+#+begin_src emacs-lisp :results silent
+  (org-add-link-type 
+   "citep" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "citep:" desc)))
+             (format "\\citep{%s}" path)
+             (format "\\citep[%s]{%s}" desc path)
+)))))
+#+end_src
+
+#+source: define-citet-link
+#+begin_src emacs-lisp :results silent
+  (org-add-link-type 
+   "citet" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "citet:" desc)))
+             (format "\\citet{%s}" path)
+             (format "\\citet[%s]{%s}" desc path)
+)))))
+#+end_src
+
+#+source: define-citealt-link
+#+begin_src emacs-lisp :results silent
+  (org-add-link-type 
+   "citealt" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "citealt:" desc)))
+             (format "\\citealt{%s}" path)
+             (format "\\citealt[%s]{%s}" desc path)
+)))))
+#+end_src
+
+#+source: define-citealp-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citealp" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "citealp:" desc)))
+           (format "\\citealp{%s}" path)
+         (format "\\citealp[%s]{%s}" desc path)
+         )))))
+#+end_src
+
+#+source: define-citealtstar-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citealt*" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "citealt*:" desc)))
+           (format "\\citealt*{%s}" path)
+         (format "\\citealt*[%s]{%s}" desc path)
+         )))))
+#+end_src
+
+#+source: define-citealpstar-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citealp*" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "citealp*:" desc)))
+           (format "\\citealp*{%s}" path)
+         (format "\\citealp*[%s]{%s}" desc path)
+         )))))
+#+end_src
+
+#+source: define-citepstar-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citep*" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "citep*:" desc)))
+           (format "\\citep*{%s}" path)
+         (format "\\citep*[%s]{%s}" desc path)
+         )))))
+#+end_src
+
+#+source: define-citetstar-link
+#+begin_src emacs-lisp 
+  (org-add-link-type 
+   "citet*" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "citet*:" desc)))
+             (format "\\citet*{%s}" path)
+             (format "\\citet*[%s]{%s}" desc path)
+)))))
+#+end_src
+
+
+*** Biblatex citation commands                                     :noexport:
+The following six link types are defined for the standard biblatex
+citation commands.
+
+#+source: define-cite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "cite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\cite[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-parencite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "parencite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\parencite[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-footcite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "footcite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\footcite[%s]{%s}" desc path)))))
+#+end_src
+
+
+#+source: define-cap-cite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "Cite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\Cite[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-cap-parencite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "Parencite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\Parencite[%s]{%s}" desc path)))))
+#+end_src
+
+#+source: define-cap-footcite-link
+#+begin_src emacs-lisp :exports code
+  (org-add-link-type 
+   "Footcite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'latex)
+       (format "\\Footcite[%s]{%s}" desc path)))))
+#+end_src
 
 
 * Footnotes
@@ -344,3 +1147,14 @@ Similarly, the parts of =index.org= tagged =@HOME= can now be exported to
 [fn:1] Based on posts to the mailing list by Karl Marino and Carsten
 Dominik.  Thanks to Bernt Hansen and Nick Dokos for help debugging a
 problem implementing the publishing project.
+[fn:2] This non-obvious use of the Org-mode link syntax appeared on the
+Org-mode mailing list under the heading =text color + highlight= (!).
+There was a lively discussion there, to which the ideas of
+Samuel Wales, Christian Moe and Eric Schulte contributed directly to
+this implementation.    
+[fn:3] The results of this experiment are now included in this
+document.  
+[fn:4] The =xcolor= manual is an education in color management and is
+highly recommended reading.
+
+

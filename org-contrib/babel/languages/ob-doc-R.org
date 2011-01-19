@@ -65,18 +65,19 @@ Examples demonstrating the use of R code within Org-mode.
 ** Variables
 * Language-specific Features 					      :Write:
 ** Graphical output 							:Fix:
-    If a =:file filename.ext= header arg is provided to an R block,
-    then graphical output from the source block is captured on
-    disk, and the output of the source block is a link to the
-    resulting file (as is also the case with the graphics-only
-    languages such as gnuplot, ditaa, dot, and asymptote.)
+    If a =:file filename.ext= header argument is provided to an R
+    source block, then the output from the source block will depend on
+    the value of the =:results= header argument.
 
-    An attempt is made to find an R graphics device corresponding to
-    the file extension.  Currently, the following extensions are
-    recognized: .png, .jpg, .jpeg, .tiff, .bmp, .pdf, .ps,
-    .postscript, and .svg.  If the extension of the file name passed
-    to =:file= is not recognized, png format output is created by
-    default.
+    If the value is =:results graphics= then "base" graphics output is
+    captured on disk, and a link to the graphics file is inserted into
+    the Org-mode buffer (as is also the case with the graphics-only
+    languages such as gnuplot, ditaa, dot, and asymptote.)  An attempt
+    is made to find an R graphics device corresponding to the file
+    extension.  Currently, the following extensions are recognized:
+    .png, .jpg, .jpeg, .tiff, .bmp, .pdf, .ps, .postscript, and .svg.
+    If the extension of the file name passed to =:file= is not
+    recognized, png format output is created by default.
     
 # <<r-dev-header-args>>
     Additionally, values for several arguments to the R graphics
@@ -105,6 +106,26 @@ Examples demonstrating the use of R code within Org-mode.
       plot(matrix(rnorm(100), ncol=2), type="l")
     #+end_src
 #+end_example
+
+If "base" graphics aren't begin generated, then additional header
+arguments might be needed.  For example, with the =ggplot2= package,
+graphics output requires =:results output graphics=.  The following
+example writes the graphics output to the file specified in the
+=:file= header argument.
+
+#+begin_example
+  ,#+srcname: r-edge-angle-histogram
+  ,#+begin_src R :results output graphics :var x=whole-adzes :file r/adze_edge_angle.png :width 400 :height 300
+    library(ggplot2)
+    adze.edge.angle <- ggplot(x, aes(edge_angle))
+    adze.edge.angle + geom_histogram(aes(y=..density..)) +
+    geom_density(weight=2) + xlab("Measured cutting edge angle (degrees)")
+  ,#+end_src
+  
+  ,#+results:
+  [[file:r/adze_edge_angle.png]]
+#+end_example
+
 ** Missing Values					     :Write:noexport:
 * Additions to Org-babel                                              :Write:
 ** Header Arguments

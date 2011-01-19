@@ -1,0 +1,630 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-
+#+TITLE:     Rpackage.org
+#+AUTHOR:    Charles C. Berry    
+#+EMAIL:     cberry@tajo.ucsd.edu
+#+DATE:      2010-12-08 Thur
+#+DESCRIPTION: R Package Development Helpers
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+
+#+BABEL: :exports none
+
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+Org-babel support for building 
+  <a href="http://www.r-project.org/">R</a> packages
+  </p>
+  <p>
+  <a href="http://www.r-project.org/">
+  <img src="http://www.r-project.org/Rlogo.jpg"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+
+* Document Purpose 
+
+This document contains  
+- tools useful for writing R extensions called /packages/
+- source code to create a simple R package.
+
+* R packages
+
+- The [[http://www.r-project.org][R language and environment]] for statistical computation and
+  graphics has a powerful system for developing and distributing
+  software enhancements and datasets called /packages/.
+- A vast archive of such packages ---called [[http://cran.r-project.org/][CRAN]] --- is available.
+- Users can create their own packages by following instructions in
+  [[http://cran.r-project.org/doc/manuals/R-exts.html][Writing R Extensions]].
+
+* Some notes on this document and =org-babel=
+
+- This document provides tools for R package development using org-mode.
+
+- There are two somewhat contrary philosphies about how R packages are
+  managed using =org-babel=. 
+  - One camp holds that all of the code for a package should be kept
+    in one master =*.org= document, which when tangled produces the source
+    directory files needed. The =.org= document also holds notes, utility
+    functions, navigation tools, and code snippets. A very simple R
+    package is included below, and it can be checked, installed, and
+    run from this =.org= document.
+  - The other camp leaves the =R= and =Rd= code and other package
+    files in the package directory subfolders and edits them
+    there. 
+  - The tools shown here support either approach.
+
+- Some introductory tips at [[file:languages/ob-doc-R.org][ob-doc-R]] show how to enable full editing
+  support for R code with ESS (http://ess.r-project.org/).
+
+- This document is to be put in the top level source directory of an R
+ package (i.e. at the same level as the DESCRIPTION file). To try it
+  out using the built in package, create a fresh diretory named
+  =countRows= and just put it there.
+
+- version control blocks here use svn calls, and you may need to
+  replace these with your own.
+
+- =#+begin_src sh ... #+end_src= shell blocks work on systems that
+  support unix-like shells. On Windows systems these blocks would
+  likely need to be changed.
+
+* Typical Workflow
+ - [[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/Rpackage.org][Download]] the =.org= version of this document
+ - Create a package directory (naming it like the package is convenient)
+  - Copy the =.org= version of this document into that directory
+  - Move point to the  =set up .Rbuildignore= headline and execute it
+    (see [[howrun][1]])  
+  - Create some package files, *or* create src blocks at outlined in
+    this document and run =org-babel-tangle= to create the package
+    files.
+  - Repeat these  steps:
+    - Either 
+      - INSTALL the package[[howrun][1]] or
+      - check the package[[howrun][1]]
+      - Load some code (i.e. for a function) using ESS and try it out.
+      - Inspect a formatted help page
+    - Edit the code. Retangle as, and if, needed.
+  - Once the package is ready, build it or INSTALL it to a permanent
+    location
+# <<howrun>> 
+:    1. moving point to the corresponding headline, then
+:       typing 'C-c C-v C-s y' or 
+:       'M-x org-babel-execute-subtree'
+:       will execute each tool.
+
+* R procedures
+
+** check package
+
+- Environment variables like these may be added in the next src block:
+   - =export R_LIBS=Rlib=
+   - =export R_ARCH=x86_64=
+
+#+begin_src sh :results output
+CWD=`pwd`
+cd ..; R CMD check $CWD | sed 's/^*/ */'
+#+end_src
+
+: #+begin_src sh :results output
+: CWD=`pwd`
+: cd ..; R CMD check $CWD | sed 's/^*/ */'
+: #+end_src
+
+** INSTALL package
+
+- customize the =rckopts= variable, possibly "rckopts="
+- Variables may be also added next src block
+  -- =export R_ARCH=x86_64=
+
+#+begin_src sh :results output :var rckopts="--library=./Rlib"
+CWD=`pwd`
+cd ..; R CMD INSTALL $rckopts $CWD
+#+end_src
+
+: #+begin_src sh :results output :var rckopts="--library=./Rlib"
+: CWD=`pwd`
+: cd ..; R CMD INSTALL $rckopts $CWD
+: #+end_src
+
+** build package
+
+#+begin_src sh :results output
+CWD=`pwd`
+cd ..; R CMD build $CWD
+#+end_src
+
+: #+begin_src sh :results output
+: CWD=`pwd`
+: cd ..; R CMD build $CWD
+: #+end_src
+
+** help pages
+
+- The src block adds enough asterisks to the line listing each
+  filename to turn it into a headline at the next level down. This is
+  helpful if you have a lot of help pages and want to fold them up for
+  browsing.
+
+#+begin_src R :results output :var hdlev=(car (org-heading-components))
+  linestart <- paste( c( "\n", rep('*', hdlev+1 ) ), collapse='')
+  rd.files <- Sys.glob("man/*.Rd")
+  for ( ird in rd.files ){
+    hlp.txt <- capture.output(tools:::Rd2txt( ird ) )
+    hlp.txt <- gsub( "_\b","", hlp.txt)
+    headline <- paste( linestart, ird ,'\n' )
+    cat( headline, hlp.txt , sep='\n')
+  }
+#+end_src
+
+: #+begin_src R :results output :var hdlev=(car (org-heading-components))
+:   linestart <- paste( c( "\n", rep('*', hdlev+1 ) ), collapse='')
+:   rd.files <- Sys.glob("man/*.Rd")
+:   for ( ird in rd.files ){
+:     hlp.txt <- capture.output(tools:::Rd2txt( ird ) )
+:     hlp.txt <- gsub( "_\b","", hlp.txt)
+:     headline <- paste( linestart, ird ,'\n' )
+:     cat( headline, hlp.txt , sep='\n')
+:   }
+: #+end_src
+  
+
+** load library
+
+#+begin_src R :session :results output :var libname=(file-name-directory buffer-file-name)
+## customize the next line as needed: 
+.libPaths(new = file.path(getwd(),"Rlib") )
+require( basename(libname), character.only=TRUE)
+#+end_src
+
+- this loads the library into an R session
+- customize or delete the =.libPaths= line as desired 
+
+
+: #+begin_src R :session :var libname=(file-name-directory buffer-file-name)
+: .libPaths(new = file.path(getwd(),"Rlib") )
+: require( basename(libname), character.only=TRUE)
+: #+end_src
+
+** grep require( 
+
+- if you keep all your source code in this =.org= document, then you do not
+  need to do this - instead just type =C-s require(=
+- list package dependencies that might need to be dealt with
+
+#+begin_src sh :results output
+grep 'require(' R/*
+#+end_src
+
+: #+begin_src sh :results output
+: grep 'require(' R/*
+: #+end_src
+
+** set up .Rbuildignore and man, R, and Rlib directories
+
+- This document sits in the top level source directory. So, ignore it
+  and its offspring when checking, installing and building.
+- List all files to ignore under =#+results: rbi=  (including this
+  one!). Regular expressions are allowed.
+- Rlib is optional. If you want to INSTALL in the system directory,
+  you own't need it.
+
+: #+results: rbi
+#+results: rbi
+: Rpackage.*
+
+Only need to run this once (unless you add more ignorable files).
+
+#+begin_src R :results output silent :var rbld=rbi 
+cat(rbld,'\n', file=".Rbuildignore")
+dir.create("man")
+dir.create("R")
+dir.create("../Rlib")
+#+end_src
+
+: #+begin_src R :results output silent :var rbld=rbi 
+: cat(rbld,'\n', file=".Rbuildignore")
+: dir.create("man")
+: dir.create("R")
+: dir.create("../Rlib")
+: #+end_src
+
+* Project Specific Entries
+
+Package specific notes and blocks go here. It is a good idea to have
+several second level headlines --- possibly including the package code
+--- to group things by topic/idea, then a third level headline for
+almost every src block and TODO item.
+
+** Package structure and src languages				    :ARCHIVE:noexport:
+
+- The top level directory may contain these files (and others):
+
+| filename    | filetype      |
+|-------------+---------------|
+| INDEX       | text          |
+| NAMESPACE   | R-like script |
+| configure   | Bourne shell  |
+| cleanup     | Bourne shell  |
+| LICENSE     | text          |
+| LICENCE     | text          |
+| COPYING     | text          |
+| NEWS        | text          |
+| DESCRIPTION | [[http://www.debian.org/doc/debian-policy/ch-controlfields.html][DCF]]           |
+|-------------+---------------|
+
+
+ 
+   and subdirectories
+| direname | types of files                                   |
+|----------+--------------------------------------------------|
+| R        | R                                                |
+| data     | various                                          |
+| demo     | R                                                |
+| exec     | various                                          |
+| inst     | various                                          |
+| man      | Rd                                               |
+| po       | poEdit                                           |
+| src      | .c, .cc or .cpp, .f, .f90, .f95, .m, .mm, .M, .h |
+| tests    | R, Rout                                          |
+|----------+--------------------------------------------------|
+
+** Example: The countRows package
+
+- This example illustrates how to use the =.org= document as the source code
+  master. By navigating to the =INSTALL package= headline and entering
+  =C-c C-v C-s y=, the INSTALL command is run. Likewise for =check
+  package=, =help pages=, and the other tools.
+
+- The =countRows= package implements a simple, but quick way to count the rows of
+  a =data.frame=. It is akin to =sort | uniq -c= in a Unix-alike shell.
+
+- The package is based on a function that was posted in this [[https://stat.ethz.ch/pipermail/r-help/2008-January/151489.html][reply]] to
+  a [[https://stat.ethz.ch/pipermail/r-help/2008-January/151372.html][query]] on the R-help list.
+
+*** The DESCRIPTION File
+
+- The DESCRIPTION file is obligatory
+- It follows Debian Control File format.
+- Required and optional fields are described in [[http://cran.r-project.org/doc/manuals/R-exts.html][Writing R Extensions]].
+
+#+begin_src sh :results silent :tangle DESCRIPTION :eval nil
+  Package: countRows
+  Type: Package
+  Title: Count Rows of a data.frame
+  Version: 1.0
+  Date: 2010-12-08
+  Author: Charles C. Berry
+  Maintainer: Charles Berry <cberry@tajo.ucsd.edu>
+  Description: One of many ways to count the rows of a data.frame. 
+          Akin to 'sort | uniq -c' shell command
+  License: GPL-3
+  LazyLoad: yes
+#+end_src
+
+: #+begin_src sh :results silent :tangle DESCRIPTION :eval nil
+: Package: countRows
+: Type: Package
+: Title: Count Rows of a data.frame
+: Version: 1.0
+: Date: 2010-12-08
+: Author: Charles C. Berry
+: Maintainer: Charles Berry <cberry@tajo.ucsd.edu>
+: Description: One of many ways to count the rows of a data.frame. 
+:         Akin to 'sort | uniq -c' shell command
+: License: GPL-3
+: LazyLoad: yes
+: #+end_src 
+
+*** R code
+
+- Each =#+begin_src R= block defines one or more functions. 
+- The =:tangle= header tells where to place the code
+
+**** count.rows function
+
+#+begin_src R :eval nil :tangle R/count.rows.R
+  count.rows <-
+    function( x )
+    {
+      order.x <- do.call( order, as.data.frame(x) )
+      equal.to.previous <-
+        rowSums( x[tail(order.x,-1),] != x[head(order.x,-1),] )==0
+       tf.runs <- rle(equal.to.previous)
+       counts <- c(1,
+                   unlist(mapply( function(x,y) if (y) x+1 else (rep(1,x)),
+                                 tf.runs$length, tf.runs$value )))
+       counts <- counts[ c( diff( counts ) <= 0, TRUE ) ]
+       unique.rows <- which( c(TRUE, !equal.to.previous ) )
+       cbind( counts, x[ order.x[ unique.rows ], ,drop=FALSE ] )
+     }
+#+end_src
+
+
+: #+begin_src R :eval nil :exports code :tangle R/count.rows.R  
+:   count.rows <-
+:     function( x )
+:     {
+:       order.x <- do.call( order, as.data.frame(x) )
+:       equal.to.previous <-
+:         rowSums( x[tail(order.x,-1),] != x[head(order.x,-1),] )==0
+:        tf.runs <- rle(equal.to.previous)
+:        counts <- c(1,
+:                    unlist(mapply( function(x,y) if (y) x+1 else (rep(1,x)),
+:                                  tf.runs$length, tf.runs$value )))
+:        counts <- counts[ c( diff( counts ) <= 0, TRUE ) ]
+:        unique.rows <- which( c(TRUE, !equal.to.previous ) )
+:        cbind( counts, x[ order.x[ unique.rows ], ,drop=FALSE ] )
+:      }
+: #+end_src 
+
+*** Rd help page markup
+
+- There is usually one =#+begin_src Rd= block for each help page
+- Usually one page covers the package as a whole and other cover the
+  functions and datasets it includes.
+
+**** count.rows
+#+begin_src Rd :eval nil :tangle man/count.rows.Rd
+  \name{count.rows}
+  \alias{count.rows}
+  \title{ Count \code{data.frame} rows }
+  \description{ Counts the unique rows of a \code{data.frame} }
+  \usage{ count.rows(x) }
+  \arguments{
+    \item{x}{
+      Just a \code{data.frame} or \code{matrix}
+    }
+  }
+  \details{
+    Basically, this function tries to be smart about counting
+    rows. It relies on the \code{\link{order}} function and basic logic to
+    do the heavy lifting.  
+  }
+  \value{
+    A \code{data.frame} with a column named \code{counts}, all the olumns
+    of \code{x} and the rows that would appear in \code{unique( x )}. 
+  }
+  \author{
+    Charles C. Berry \email{ccberry@ucsd.tajo.edu }
+  }
+  \examples{
+  hec.frame <- as.data.frame( HairEyeColor )
+  hec.frame <-
+    hec.frame[ rep(1:nrow(hec.frame), hec.frame$Freq ), ]
+  hec.counts <- count.rows( hec.frame )
+  all.equal( hec.counts$counts, hec.counts$Freq )
+  hec.counts
+  
+  }
+   \keyword{ manip }
+#+end_src
+
+: #+begin_src Rd :eval nil :tangle man/count.rows.Rd
+:   \name{count.rows}
+:   \alias{count.rows}
+:   \title{ Count \code{data.frame} rows }
+:   \description{ Counts the unique rows of a \code{data.frame} }
+:   \usage{ count.rows(x) }
+:   \arguments{
+:     \item{x}{
+:       Just a \code{data.frame} or \code{matrix}
+:     }
+:   }
+:   \details{
+:     Basically, this function tries to be smart about counting
+:     rows. It relies on the \code{\link{order}} function and basic logic to
+:     do the heavy lifting.  
+:   }
+:   \value{
+:     A \code{data.frame} with a column named \code{counts}, all the olumns
+:     of \code{x} and the rows that would appear in \code{unique( x )}. 
+:   }
+:   \author{
+:     Charles C. Berry \email{ccberry@ucsd.tajo.edu }
+:   }
+:   \examples{
+:   hec.frame <- as.data.frame( HairEyeColor )
+:   hec.frame <-
+:     hec.frame[ rep(1:nrow(hec.frame), hec.frame$Freq ), ]
+:   hec.counts <- count.rows( hec.frame )
+:   all.equal( hec.counts$counts, hec.counts$Freq )
+:   hec.counts
+:   
+:   }
+:    \keyword{ manip }
+: #+end_src 
+
+**** countRows-package
+
+#+begin_src Rd :eval nil :tangle man/countRows-package.Rd
+  \name{countRows-package}
+  \alias{countRows-package}
+  \alias{countRows}
+  \docType{package}
+  \title{Count \code{data.frame} rows }
+  \description{  Counts the unique rows of a \code{data.frame} }
+  \details{
+  \tabular{ll}{
+  Package: \tab countRows\cr
+  Type: \tab Package\cr
+  Version: \tab 1.0\cr
+  Date: \tab 2010-12-08\cr
+  License: \tab GPL-3\cr
+  LazyLoad: \tab yes\cr
+  }
+  
+  There is only one function in this package, \code{count.rows} and it
+  does what it says.
+  }
+  \author{
+  Charles C. Berry \email{cberry@ucsd.tajo.edu}
+  }
+  \keyword{ package }
+#+end_src
+
+: #+begin_src Rd :eval nil :tangle man/countRows-package.Rd
+:   \name{countRows-package}
+:   \alias{countRows-package}
+:   \alias{countRows}
+:   \docType{package}
+:   \title{Count \code{data.frame} rows }
+:   \description{  Counts the unique rows of a \code{data.frame} }
+:   \details{
+:   \tabular{ll}{
+:   Package: \tab countRows\cr
+:   Type: \tab Package\cr
+:   Version: \tab 1.0\cr
+:   Date: \tab 2010-12-08\cr
+:   License: \tab GPL-3\cr
+:   LazyLoad: \tab yes\cr
+:   }
+:   
+:   There is only one function in this package, \code{count.rows} and it
+:   does what it says.
+:   }
+:   \author{
+:   Charles C. Berry \email{cberry@ucsd.tajo.edu}
+:   }
+:   \keyword{ package }
+: #+end_src 
+
+*** Tests and Tryouts
+
+- As part of developing a package one must try out some code and
+  perhaps develop some tests to be sure it does what it is supposed to
+  do.
+- Here is an easy-to-read tryout of the =count.rows= function:
+- You may need to edit or delete the =.libPaths= call to suit your
+  setup
+
+: #+begin_src R :session :results output :exports both
+:  .libPaths( new = "./Rlib")
+:   require( countRows ) 
+:   simple.df <- data.frame( diag(1:4), row.names=letters[ 1:4 ])
+:   repeated.df <- simple.df[ rep( 1:4, 4:1 ), ]
+:   simple.df
+:   count.rows( repeated.df )  
+: #+end_src
+
+#+begin_src R :session :results output :exports results
+  .libPaths( new = "./Rlib")
+  require( countRows ) 
+  simple.df <- data.frame( diag(1:4), row.names=letters[ 1:4 ])
+  repeated.df <- simple.df[ rep( 1:4, 4:1 ), ]
+  simple.df
+  count.rows( repeated.df )  
+#+end_src
+
+#+results:
+#+begin_example
+Loading required package: countRows
+  X1 X2 X3 X4
+a  1  0  0  0
+b  0  2  0  0
+c  0  0  3  0
+d  0  0  0  4
+  counts X1 X2 X3 X4
+d      1  0  0  0  4
+c      2  0  0  3  0
+b      3  0  2  0  0
+a      4  1  0  0  0
+#+end_example
+
+* Version Control, Navigation, and setup tasks
+** list files for convenient navigation 
+
+- Use this if you do not use the =.org= document to keep the master for the
+ source code
+- It is useful when in a terminal window on a remote machine, and speedbar
+  is not a good option. =C-u C-c C-o= or =Mouse-1= will open the file
+  point is on.
+
+#+begin_src R :results output verbatim :var cwd="."
+  cat(paste("file:",list.files(cwd,".*",recursive=TRUE),sep=''),sep='\n')
+#+end_src
+
+: #+begin_src R :results output verbatim :var cwd="."
+:   cat(paste("file:",list.files(cwd,".*",recursive=TRUE),sep=''),sep='\n')
+: #+end_src
+
+** Speedbar navigation
+
+- Use this if you do not use the =.org= document to keep the master for the
+  source code
+- Make speedbar stick to the package source directory by typing 't' in
+  its frame after executing this block:
+
+#+begin_src emacs-lisp :results output silent
+  (require 'speedbar)
+  (ess-S-initialize-speedbar)
+  ;; uncomment this line if it isn't in ~/.emacs:
+  ;; (add-to-list 'auto-mode-alist '("\\.Rd\\'" . Rd-mode))
+  (speedbar-add-supported-extension ".Rd")
+  (speedbar-add-supported-extension "NAMESPACE")
+  (speedbar-add-supported-extension "DESCRIPTION")
+  (speedbar 1)
+#+end_src
+
+
+
+: #+begin_src emacs-lisp :results output silent
+:   (require 'speedbar)
+:   (ess-S-initialize-speedbar)
+:   ;; uncomment this line if it isn't in ~/.emacs:
+:   ;; (add-to-list 'auto-mode-alist '("\\.Rd\\'" . Rd-mode))
+:   (speedbar-add-supported-extension ".Rd")
+:   (speedbar-add-supported-extension "NAMESPACE")
+:   (speedbar-add-supported-extension "DESCRIPTION")
+:   (speedbar 1)
+: #+end_src
+
+
+** Version Control
+
+- If you don't use svn, substitute the relevant version control
+  command in each block in this section
+
+- Each of these can be run by putting point on the headline then
+  keying =C-c C-v C-s y=
+
+- Possibly add --username=<> --password=<> to the svn commands
+
+*** svn list 
+
+- Show what files are version controlled
+
+#+begin_src sh :results output
+svn list --recursive 
+#+end_src
+
+: #+begin_src sh :results output
+: svn list --recursive 
+: #+end_src
+
+*** svn update 
+
+- Use at the start of each session to sync changes from other machines
+
+#+begin_src sh :results output
+svn update 
+#+end_src
+
+: #+begin_src sh :results output
+: svn update 
+: #+end_src
+
+*** svn commit
+
+- At the end of a day's work commit the changes
+
+#+begin_src sh :results output
+svn commit  -m "edits"
+#+end_src
+
+: #+begin_src sh :results output
+: svn commit  -m "edits"
+: #+end_src
+
+

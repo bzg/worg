@@ -4,7 +4,7 @@
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c)
 #+TITLE:      Org ad hoc code, quick hacks and workarounds
 #+AUTHOR:     Worg people
-#+EMAIL:      bzg AT altern DOT org
+#+EMAIL:      mdl AT imapmail DOT org
 #+LANGUAGE:   en
 #+PRIORITIES: A C B
 #+CATEGORY:   worg
@@ -14,67 +14,67 @@
 
 [[file:index.org][{Back to Worg's index}]]
 
-This page is for ad hoc bits of code.  Feel free to add quick hacks and
-workaround.  Go crazy.
+This page is for ad hoc bits of code. Feel free to add quick hacks and
+workaround. Go crazy.
 
+* Hacking Org: Working within Org-mode.
+** Building and Managing Org
+*** Compiling Org without make
+:PROPERTIES:
+:CUSTOM_ID: compiling-org-without-make
+:END:
 
-* Hacking Org: Modifying orgmode itself
-** Compiling Org without make
-   :PROPERTIES:
-   :CUSTOM_ID: compiling-org-without-make
-   :END:
+This file is the result of  [[http://article.gmane.org/gmane.emacs.orgmode/15264][one of our discussions]] on the mailing list.
+Enhancements welcome.
 
-   This file is the result of  [[http://article.gmane.org/gmane.emacs.orgmode/15264][one of our discussions]] on the mailing list.
-   Enhancements wellcome.
+To use this function, adjust the variables =my/org-lisp-directory= and
+=my/org-compile-sources= to suite your needs.
 
-   To use this function, adjust the variables =my/org-lisp-directory= and
-   =my/org-compile-sources= to suite your needs.
+#+BEGIN_SRC emacs-lisp
+(defvar my/org-lisp-directory "~/.emacs.d/org/lisp"
+  "Directory where your org-mode files live.")
 
-   #+BEGIN_SRC emacs-lisp
-   (defvar my/org-lisp-directory "~/.emacs.d/org/lisp"
-     "Directory where your org-mode files live.")
+(defvar my/org-compile-sources t
+  "If `nil', never compile org-sources. `my/compile-org' will only create
+the autoloads file `org-install.el' then. If `t', compile the sources, too.")
 
-   (defvar my/org-compile-sources t
-     "If `nil', never compile org-sources. `my/compile-org' will only create
-   the autoloads file `org-install.el' then. If `t', compile the sources, too.")
+;; Customize:
+(setq my/org-lisp-directory "~/.emacs.d/org/lisp")
 
-   ;; Customize:
-   (setq my/org-lisp-directory "~/.emacs.d/org/lisp")
+;; Customize:
+(setq  my/org-compile-sources t)
 
-   ;; Customize:
-   (setq  my/org-compile-sources t)
+(defun my/compile-org(&optional directory)
+  "Compile all *.el files that come with org-mode."
+  (interactive)
+  (setq directory (concat
+                  	(file-truename
+                    (or directory my/org-lisp-directory)) "/"))
 
-   (defun my/compile-org(&optional directory)
-     "Compile all *.el files that come with org-mode."
-     (interactive)
-     (setq directory (concat
-                     	(file-truename
-                       (or directory my/org-lisp-directory)) "/"))
+  (add-to-list 'load-path directory)
 
-     (add-to-list 'load-path directory)
+  (let ((list-of-org-files (file-expand-wildcards (concat directory "*.el"))))
 
-     (let ((list-of-org-files (file-expand-wildcards (concat directory "*.el"))))
+    ;; create the org-install file
+    (require 'autoload)
+    (setq esf/org-install-file (concat directory "org-install.el"))
+    (find-file esf/org-install-file)
+    (erase-buffer)
+    (mapc (lambda (x)
+            (generate-file-autoloads x))
+          list-of-org-files)
+    (insert "\n(provide (quote org-install))\n")
+    (save-buffer)
+    (kill-buffer)
+    (byte-compile-file esf/org-install-file t)
 
-       ;; create the org-install file
-       (require 'autoload)
-       (setq esf/org-install-file (concat directory "org-install.el"))
-       (find-file esf/org-install-file)
-       (erase-buffer)
-       (mapc (lambda (x)
-               (generate-file-autoloads x))
-             list-of-org-files)
-       (insert "\n(provide (quote org-install))\n")
-       (save-buffer)
-       (kill-buffer)
-       (byte-compile-file esf/org-install-file t)
-
-       (dolist (f list-of-org-files)
-         (if (file-exists-p (concat f "c")) ; delete compiled files
-             (delete-file (concat f "c")))
-         (if my/org-compile-sources     ; Compile, if `my/org-compile-sources' is t
-             (byte-compile-file f)))))
-   #+END_SRC
-** Reload Org
+    (dolist (f list-of-org-files)
+      (if (file-exists-p (concat f "c")) ; delete compiled files
+          (delete-file (concat f "c")))
+      (if my/org-compile-sources     ; Compile, if `my/org-compile-sources' is t
+          (byte-compile-file f)))))
+#+END_SRC
+*** Reload Org
 
 As of Org version 6.23b (released Sunday Feb 22, 2009) there is a new
 function to reload org files.
@@ -95,12 +95,13 @@ To switch back to the compiled version just reload again with
 
 : M-x org-reload
 
-** Speed Commands
-   Speed commands are described [[http://orgmode.org/manual/Speed-keys.html#Speed-keys][here]] in the manual. Add your own speed
-   commands here.
+** Enhancing the Org experience.
+*** Speed Commands
+Speed commands are described [[http://orgmode.org/manual/Speed-keys.html#Speed-keys][here]] in the manual. Add your own speed
+commands here.
 *** Show next/prev heading tidily
-   - Dan Davison
-     These close the current heading and open the next/previous heading.
+- Dan Davison
+  These close the current heading and open the next/previous heading.
 
 #+begin_src emacs-lisp
 (defun ded/org-show-next-heading-tidily ()
@@ -137,115 +138,29 @@ To switch back to the compiled version just reload again with
              '("p" ded/org-show-previous-heading-tidily))
 #+end_src
 
-** Easy customization of TODO colors
-  -- Ryan C. Thompson
+*** Changelog support for org headers
+-- James TD Smith
 
-  Here is some code I came up with some code to make it easier to
-  customize the colors of various TODO keywords. As long as you just
-  want a different color and nothing else, you can customize the
-  variable org-todo-keyword-faces and use just a string color (i.e. a
-  string of the color name) as the face, and then org-get-todo-face
-  will convert the color to a face, inheriting everything else from
-  the standard org-todo face.
-
-  To demonstrate, I currently have org-todo-keyword-faces set to
+Put the following in your =.emacs=, and =C-x 4 a= and other functions which
+use =add-log-current-defun= like =magit-add-log= will pick up the nearest org
+headline as the "current function" if you add a changelog entry from an org
+buffer.
 
 #+BEGIN_SRC emacs-lisp
-(("IN PROGRESS" . "dark orange")
- ("WAITING" . "red4")
- ("CANCELED" . "saddle brown"))
-#+END_SRC emacs-lisp
-
-  Here's the code, in a form you can put in your =.emacs=
-
-#+BEGIN_SRC emacs-lisp
-(eval-after-load 'org-faces
- '(progn
-    (defcustom org-todo-keyword-faces nil
-      "Faces for specific TODO keywords.
-This is a list of cons cells, with TODO keywords in the car and
-faces in the cdr.  The face can be a symbol, a color, or a
-property list of attributes, like (:foreground \"blue\" :weight
-bold :underline t)."
-      :group 'org-faces
-      :group 'org-todo
-      :type '(repeat
-              (cons
-               (string :tag "Keyword")
-               (choice color (sexp :tag "Face")))))))
-
-(eval-after-load 'org
- '(progn
-    (defun org-get-todo-face-from-color (color)
-      "Returns a specification for a face that inherits from org-todo
- face and has the given color as foreground. Returns nil if
- color is nil."
-      (when color
-        `(:inherit org-warning :foreground ,color)))
-
-    (defun org-get-todo-face (kwd)
-      "Get the right face for a TODO keyword KWD.
-If KWD is a number, get the corresponding match group."
-      (if (numberp kwd) (setq kwd (match-string kwd)))
-      (or (let ((face (cdr (assoc kwd org-todo-keyword-faces))))
-            (if (stringp face)
-                (org-get-todo-face-from-color face)
-              face))
-          (and (member kwd org-done-keywords) 'org-done)
-          'org-todo))))
-#+END_SRC emacs-lisp
-
-** Changelog support for org headers
-   -- James TD Smith
-
-   Put the following in your =.emacs=, and =C-x 4 a= and other functions which
-   use =add-log-current-defun= like =magit-add-log= will pick up the nearest org
-   headline as the "current function" if you add a changelog entry from an org
-   buffer.
-
-   #+BEGIN_SRC emacs-lisp
-     (defun org-log-current-defun ()
-       (save-excursion
-         (org-back-to-heading)
-         (if (looking-at org-complex-heading-regexp)
-             (match-string 4))))
-     
-     (add-hook 'org-mode-hook
-               (lambda ()
-                 (make-variable-buffer-local 'add-log-current-defun-function)
-                 (setq add-log-current-defun-function 'org-log-current-defun)))
-   #+END_SRC
-
-** Remove redundant tags of headlines
-  -- David Maus
-
-A small function that processes all headlines in current buffer and
-removes tags that are local to a headline and inherited by a parent
-headline or the #+FILETAGS: statement.
-
-#+BEGIN_SRC emacs-lisp
-  (defun dmj/org-remove-redundant-tags ()
-    "Remove redundant tags of headlines in current buffer.
-
-  A tag is considered redundant if it is local to a headline and
-  inherited by a parent headline."
-    (interactive)
-    (when (eq major-mode 'org-mode)
-      (save-excursion
-        (org-map-entries
-         '(lambda ()
-            (let ((alltags (split-string (or (org-entry-get (point) "ALLTAGS") "") ":"))
-                  local inherited tag)
-              (dolist (tag alltags)
-                (if (get-text-property 0 'inherited tag)
-                    (push tag inherited) (push tag local)))
-              (dolist (tag local)
-                (if (member tag inherited) (org-toggle-tag tag 'off)))))
-         t nil))))
+  (defun org-log-current-defun ()
+    (save-excursion
+      (org-back-to-heading)
+      (if (looking-at org-complex-heading-regexp)
+          (match-string 4))))
+  
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (make-variable-buffer-local 'add-log-current-defun-function)
+              (setq add-log-current-defun-function 'org-log-current-defun)))
 #+END_SRC
 
-** Different org-cycle-level behavior
-  -- Ryan Thompson
+*** Different org-cycle-level behavior
+-- Ryan Thompson
 
 In recent org versions, when your point (cursor) is at the end of an
 empty header line (like after you first created the header), the TAB
@@ -341,70 +256,44 @@ nil if before the first headline."
                 do (org-do-promote))))
         t))))
 #+END_SRC
+*** Org table
 
-** Add an effort estimate on the fly when clocking in
+**** Transpose tables (Juan Pechiar)
 
-You can use =org-clock-in-prepare-hook= to add an effort estimate.
-This way you can easily have a "tea-timer" for your tasks when they
-don't already have an effort estimate.
-
-#+begin_src emacs-lisp
-(add-hook 'org-clock-in-prepare-hook
-	  'my-org-mode-ask-effort)
-
-(defun my-org-mode-ask-effort ()
-  "Ask for an effort estimate when clocking in."
-  (unless (org-entry-get (point) "Effort")
-    (let ((effort
-	   (completing-read
-	    "Effort: "
-	    (org-entry-get-multivalued-property (point) "Effort"))))
-      (unless (equal effort "")
-	(org-set-property "Effort" effort)))))
-#+end_src
-
-Or you can use a default effort for such a timer:
+This function by Juan Pechiar will transpose a table:
 
 #+begin_src emacs-lisp
-(add-hook 'org-clock-in-prepare-hook
-	  'my-org-mode-add-default-effort)
-
-(defvar org-clock-default-effort "1:00")
-
-(defun my-org-mode-add-default-effort ()
-  "Add a default effort estimation."
-  (unless (org-entry-get (point) "Effort")
-    (org-set-property "Effort" org-clock-default-effort)))
+(defun org-transpose-table-at-point ()
+  "Transpose orgmode table at point, eliminate hlines"
+  (interactive)
+  (let ((contents 
+	 (apply #'mapcar* #'list
+		;; remove 'hline from list
+		(remove-if-not 'listp  
+			       ;; signals error if not table
+			       (org-table-to-lisp)))))
+    (delete-region (org-table-begin) (org-table-end))
+    (insert (mapconcat (lambda(x) (concat "| " (mapconcat 'identity x " | " ) "  |\n" ))
+		       contents ""))
+    (org-table-align)))
 #+end_src
 
-** Customize the size of the frame for remember
+So a table like
 
-#FIXME: gmane link?
-On emacs-orgmode, Ryan C. Thompson suggested this:
+: | 1 | 2 | 4 | 5 |
+: |---+---+---+---|
+: | a | b | c | d |
+: | e | f | g | h |
 
-#+begin_quote
-I am using org-remember set to open a new frame when used,
-and the default frame size is much too large. To fix this, I have
-designed some advice and a custom variable to implement custom
-parameters for the remember frame:
-#+end_quote
+will be transposed as
 
-#+begin_src emacs-lisp
-  (defcustom remember-frame-alist nil
-    "Additional frame parameters for dedicated remember frame."
-    :type 'alist
-    :group 'remember)
-  
-  (defadvice remember (around remember-frame-parameters activate)
-    "Set some frame parameters for the remember frame."
-    (let ((default-frame-alist (append remember-frame-alist
-                                       default-frame-alist)))
-      ad-do-it))
-#+end_src
+: | 1 | a | e |
+: | 2 | b | f |
+: | 4 | c | g |
+: | 5 | d | h |
 
-Setting remember-frame-alist to =((width . 80) (height . 15)))= give a
-reasonable size for the frame.
-** Org table
+(Note that horizontal lines disappeared.)
+
 *** Dates computation
 
 **** Question ([[http://article.gmane.org/gmane.emacs.orgmode/15692][Xin Shi]])
@@ -540,96 +429,379 @@ which is the Emacs Calc implementation of the equation
 /AvgChange(i, a) = (quote[i] / quote[i - a]) ^ 1 / n - 1/
 
 where /i/ is the current time and /a/ is the length of the preceding period.
-** Archive in a date tree
+
+*** Customize the size of the frame for remember
+(Note: this hack is likely out of date due to the development of
+[[org-capture]].) 
+
+#FIXME: gmane link?
+On emacs-orgmode, Ryan C. Thompson suggested this:
+
+#+begin_quote
+I am using org-remember set to open a new frame when used,
+and the default frame size is much too large. To fix this, I have
+designed some advice and a custom variable to implement custom
+parameters for the remember frame:
+#+end_quote
+
+#+begin_src emacs-lisp
+(defcustom remember-frame-alist nil
+  "Additional frame parameters for dedicated remember frame."
+  :type 'alist
+  :group 'remember)
+
+(defadvice remember (around remember-frame-parameters activate)
+  "Set some frame parameters for the remember frame."
+  (let ((default-frame-alist (append remember-frame-alist
+                                     default-frame-alist)))
+    ad-do-it))
+#+end_src
+
+Setting remember-frame-alist to =((width . 80) (height . 15)))= give a
+reasonable size for the frame.
+*** Promote all items in subtree
+- Matt Lundin
+
+This function will promote all items in a subtree. Since I use
+subtrees primarily to organize projects, the function is somewhat
+unimaginatively called my-org-un-project:
+
+#+begin_src emacs-lisp
+(defun my-org-un-project ()
+  (interactive)
+  (org-map-entries 'org-do-promote "LEVEL>1" 'tree)
+  (org-cycle t))
+#+end_src
+
+*** Turn a heading into an Org link
+
+From David Maus:
+
+#+begin_src emacs-lisp
+  (defun dmj:turn-headline-into-org-mode-link ()
+    "Replace word at point by an Org mode link."
+    (interactive)
+    (when (org-at-heading-p)
+      (let ((hl-text (nth 4 (org-heading-components))))
+        (unless (or (null hl-text)
+                    (org-string-match-p "^[ \t]*:[^:]+:$" hl-text))
+          (beginning-of-line)
+          (search-forward hl-text (point-at-eol))
+          (replace-string
+           hl-text
+           (format "[[file:%s.org][%s]]"
+                   (org-link-escape hl-text)
+                   (org-link-escape hl-text '((?\] . "%5D") (?\[ . "%5B"))))
+           nil (- (point) (length hl-text)) (point))))))
+#+end_src
+
+** Archiving Content in Org-Mode
+*** Preserve top level headings when archiving to a file
+- Matt Lundin
+
+To preserve (somewhat) the integrity of your archive structure while
+archiving lower level items to a file, you can use the following
+defadvice:
+
+#+begin_src emacs-lisp
+(defadvice org-archive-subtree (around my-org-archive-subtree activate)
+  (let ((org-archive-location 
+         (if (save-excursion (org-back-to-heading)
+                             (> (org-outline-level) 1))
+             (concat (car (split-string org-archive-location "::"))
+                     "::* "
+                     (car (org-get-outline-path)))
+           org-archive-location)))
+    ad-do-it))
+#+end_src
+
+Thus, if you have an outline structure such as...
+
+#+begin_src org
+,* Heading
+,** Subheading
+,*** Subsubheading
+#+end_src
+
+...archiving "Subsubheading" to a new file will set the location in
+the new file to the top level heading:
+
+#+begin_src org
+,* Heading
+,** Subsubheading
+#+end_src
+
+While this hack obviously destroys the outline hierarchy somewhat, it
+at least preserves the logic of level one groupings.
+
+*** Archive in a date tree
 
 Posted to Org-mode mailing list by Osamu Okano
 [2010-04-21 Wed]
 
 #+begin_src emacs-lisp
-  ;; (setq org-archive-location "%s_archive::date-tree")
-  (defadvice org-archive-subtree
-    (around org-archive-subtree-to-data-tree activate)
-    "org-archive-subtree to date-tree"
-    (if
-        (string= "date-tree"
-                 (org-extract-archive-heading
-                  (org-get-local-archive-location)))
-        (let* ((dct (decode-time (org-current-time)))
-               (y (nth 5 dct))
-               (m (nth 4 dct))
-               (d (nth 3 dct))
-               (this-buffer (current-buffer))
-               (location (org-get-local-archive-location))
-               (afile (org-extract-archive-file location))
-               (org-archive-location
-                (format "%s::*** %04d-%02d-%02d %s" afile y m d
-                        (format-time-string "%A" (encode-time 0 0 0 d m y)))))
-          (message "afile=%s" afile)
-          (unless afile
-            (error "Invalid `org-archive-location'"))
-          (save-excursion
-            (switch-to-buffer (find-file-noselect afile))
-            (org-datetree-find-year-create y)
-            (org-datetree-find-month-create y m)
-            (org-datetree-find-day-create y m d)
-            (widen)
-            (switch-to-buffer this-buffer))
-          ad-do-it)
-      ad-do-it))
+;; (setq org-archive-location "%s_archive::date-tree")
+(defadvice org-archive-subtree
+  (around org-archive-subtree-to-data-tree activate)
+  "org-archive-subtree to date-tree"
+  (if
+      (string= "date-tree"
+               (org-extract-archive-heading
+                (org-get-local-archive-location)))
+      (let* ((dct (decode-time (org-current-time)))
+             (y (nth 5 dct))
+             (m (nth 4 dct))
+             (d (nth 3 dct))
+             (this-buffer (current-buffer))
+             (location (org-get-local-archive-location))
+             (afile (org-extract-archive-file location))
+             (org-archive-location
+              (format "%s::*** %04d-%02d-%02d %s" afile y m d
+                      (format-time-string "%A" (encode-time 0 0 0 d m y)))))
+        (message "afile=%s" afile)
+        (unless afile
+          (error "Invalid `org-archive-location'"))
+        (save-excursion
+          (switch-to-buffer (find-file-noselect afile))
+          (org-datetree-find-year-create y)
+          (org-datetree-find-month-create y m)
+          (org-datetree-find-day-create y m d)
+          (widen)
+          (switch-to-buffer this-buffer))
+        ad-do-it)
+    ad-do-it))
 #+end_src
 
-** Make it easier to set org-agenda-files from multiple directories
-  - Matt Lundin
+** Using and Managing Org-Metadata
+*** Remove redundant tags of headlines
+-- David Maus
+
+A small function that processes all headlines in current buffer and
+removes tags that are local to a headline and inherited by a parent
+headline or the #+FILETAGS: statement.
+
+#+BEGIN_SRC emacs-lisp
+  (defun dmj/org-remove-redundant-tags ()
+    "Remove redundant tags of headlines in current buffer.
+
+  A tag is considered redundant if it is local to a headline and
+  inherited by a parent headline."
+    (interactive)
+    (when (eq major-mode 'org-mode)
+      (save-excursion
+        (org-map-entries
+         '(lambda ()
+            (let ((alltags (split-string (or (org-entry-get (point) "ALLTAGS") "") ":"))
+                  local inherited tag)
+              (dolist (tag alltags)
+                (if (get-text-property 0 'inherited tag)
+                    (push tag inherited) (push tag local)))
+              (dolist (tag local)
+                (if (member tag inherited) (org-toggle-tag tag 'off)))))
+         t nil))))
+#+END_SRC
+
+*** Remove empty property drawers
+
+David Maus proposed this:
 
 #+begin_src emacs-lisp
-  (defun my-org-list-files (dirs ext)
-    "Function to create list of org files in multiple subdirectories.
-  This can be called to generate a list of files for
-  org-agenda-files or org-refile-targets.
-  
-  DIRS is a list of directories.
-  
-  EXT is a list of the extensions of files to be included."
-    (let ((dirs (if (listp dirs)
-                    dirs
-                  (list dirs)))
-          (ext (if (listp ext)
-                   ext
-                 (list ext)))
-          files)
-      (mapc 
-       (lambda (x)
-         (mapc 
-          (lambda (y)
-            (setq files 
-                  (append files 
-                          (file-expand-wildcards 
-                           (concat (file-name-as-directory x) "*" y)))))
-          ext))
-       dirs)
-      (mapc
-       (lambda (x)
-         (when (or (string-match "/.#" x)
-                   (string-match "#$" x))
-           (setq files (delete x files))))
-       files)
-      files))
-  
-  (defvar my-org-agenda-directories '("~/org/")
-    "List of directories containing org files.")
-  (defvar my-org-agenda-extensions '(".org")
-    "List of extensions of agenda files")
-  
-  (setq my-org-agenda-directories '("~/org/" "~/work/"))
-  (setq my-org-agenda-extensions '(".org" ".ref"))
-  
-  (defun my-org-set-agenda-files ()
-    (interactive)
-    (setq org-agenda-files (my-org-list-files 
-                            my-org-agenda-directories
-                            my-org-agenda-extensions)))
-  
-  (my-org-set-agenda-files)
+(defun dmj:org:remove-empty-propert-drawers ()
+  "*Remove all empty property drawers in current file."
+  (interactive)
+  (unless (eq major-mode 'org-mode)
+    (error "You need to turn on Org mode for this function."))
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward ":PROPERTIES:" nil t)
+      (save-excursion
+	(org-remove-empty-drawer-at "PROPERTIES" (match-beginning 0))))))
+#+end_src
+
+*** Group task list by a property
+
+This advice allows you to group a task list in Org-Mode.  To use it,
+set the variable =org-agenda-group-by-property= to the name of a
+property in the option list for a TODO or TAGS search.  The resulting
+agenda view will group tasks by that property prior to searching.
+
+#+begin_src emacs-lisp
+(defvar org-agenda-group-by-property nil
+  "Set this in org-mode agenda views to group tasks by property")
+
+(defun org-group-bucket-items (prop items)
+  (let ((buckets ()))
+    (dolist (item items)
+      (let* ((marker (get-text-property 0 'org-marker item))
+             (pvalue (org-entry-get marker prop t))
+             (cell (assoc pvalue buckets)))
+        (if cell
+            (setcdr cell (cons item (cdr cell)))
+          (setq buckets (cons (cons pvalue (list item))
+                              buckets)))))
+    (setq buckets (mapcar (lambda (bucket)
+                            (cons (car bucket)
+                                  (reverse (cdr bucket))))
+                          buckets))
+    (sort buckets (lambda (i1 i2)
+                    (string< (car i1) (car i2))))))
+
+(defadvice org-finalize-agenda-entries (around org-group-agenda-finalize
+                                               (list &optional nosort))
+  "Prepare bucketed agenda entry lists"
+  (if org-agenda-group-by-property
+      ;; bucketed, handle appropriately
+      (let ((text ""))
+        (dolist (bucket (org-group-bucket-items
+                         org-agenda-group-by-property
+                         list))
+          (let ((header (concat "Property "
+                                org-agenda-group-by-property
+                                " is "
+                                (or (car bucket) "<nil>") ":\n")))
+            (add-text-properties 0 (1- (length header))
+                                 (list 'face 'org-agenda-structure)
+                                 header)
+            (setq text
+                  (concat text header
+                          ;; recursively process
+                          (let ((org-agenda-group-by-property nil))
+                            (org-finalize-agenda-entries
+                             (cdr bucket) nosort))
+                          "\n\n"))))
+        (setq ad-return-value text))
+    ad-do-it))
+(ad-activate 'org-finalize-agenda-entries)
+#+end_src
+*** Dynamically adjust tag position
+Here is a bit of code that allows you to have the tags always
+right-adjusted in the buffer.
+
+This is useful when you have bigger window than default window-size
+and you dislike the aesthetics of having the tag in the middle of the
+line.
+
+This hack solves the problem of adjusting it whenever you change the
+window size.
+Before saving it will revert the file to having the tag position be
+left-adjusted so that if you track your files with version control,
+you won't run into artificial diffs just because the window-size
+changed.
+
+*IMPORTANT*: This is probably slow on very big files.
+
+#+begin_src emacs-lisp
+(setq ba/org-adjust-tags-column t)
+
+(defun ba/org-adjust-tags-column-reset-tags ()
+  "In org-mode buffers it will reset tag position according to
+`org-tags-column'."
+  (when (and
+         (not (string= (buffer-name) "*Remember*"))
+         (eql major-mode 'org-mode))
+    (let ((b-m-p (buffer-modified-p)))
+      (condition-case nil
+          (save-excursion
+            (goto-char (point-min))
+            (command-execute 'outline-next-visible-heading)
+            ;; disable (message) that org-set-tags generates
+            (flet ((message (&rest ignored) nil))
+              (org-set-tags 1 t))
+            (set-buffer-modified-p b-m-p))
+        (error nil)))))
+
+(defun ba/org-adjust-tags-column-now ()
+  "Right-adjust `org-tags-column' value, then reset tag position."
+  (set (make-local-variable 'org-tags-column)
+       (- (- (window-width) (length org-ellipsis))))
+  (ba/org-adjust-tags-column-reset-tags))
+
+(defun ba/org-adjust-tags-column-maybe ()
+  "If `ba/org-adjust-tags-column' is set to non-nil, adjust tags."
+  (when ba/org-adjust-tags-column
+    (ba/org-adjust-tags-column-now)))
+
+(defun ba/org-adjust-tags-column-before-save ()
+  "Tags need to be left-adjusted when saving."
+  (when ba/org-adjust-tags-column
+     (setq org-tags-column 1)
+     (ba/org-adjust-tags-column-reset-tags)))
+
+(defun ba/org-adjust-tags-column-after-save ()
+  "Revert left-adjusted tag position done by before-save hook."
+  (ba/org-adjust-tags-column-maybe)
+  (set-buffer-modified-p nil))
+
+; automatically align tags on right-hand side
+(add-hook 'window-configuration-change-hook
+          'ba/org-adjust-tags-column-maybe)
+(add-hook 'before-save-hook 'ba/org-adjust-tags-column-before-save)
+(add-hook 'after-save-hook 'ba/org-adjust-tags-column-after-save)
+(add-hook 'org-agenda-mode-hook '(lambda ()
+                                  (setq org-agenda-tags-column (- (window-width)))))
+
+; between invoking org-refile and displaying the prompt (which
+; triggers window-configuration-change-hook) tags might adjust, 
+; which invalidates the org-refile cache
+(defadvice org-refile (around org-refile-disable-adjust-tags)
+  "Disable dynamically adjusting tags"
+  (let ((ba/org-adjust-tags-column nil))
+    ad-do-it))
+(ad-activate 'org-refile)
+#+end_src
+** Org Agenda and Task Management
+*** Make it easier to set org-agenda-files from multiple directories
+- Matt Lundin
+
+#+begin_src emacs-lisp
+(defun my-org-list-files (dirs ext)
+  "Function to create list of org files in multiple subdirectories.
+This can be called to generate a list of files for
+org-agenda-files or org-refile-targets.
+
+DIRS is a list of directories.
+
+EXT is a list of the extensions of files to be included."
+  (let ((dirs (if (listp dirs)
+                  dirs
+                (list dirs)))
+        (ext (if (listp ext)
+                 ext
+               (list ext)))
+        files)
+    (mapc 
+     (lambda (x)
+       (mapc 
+        (lambda (y)
+          (setq files 
+                (append files 
+                        (file-expand-wildcards 
+                         (concat (file-name-as-directory x) "*" y)))))
+        ext))
+     dirs)
+    (mapc
+     (lambda (x)
+       (when (or (string-match "/.#" x)
+                 (string-match "#$" x))
+         (setq files (delete x files))))
+     files)
+    files))
+
+(defvar my-org-agenda-directories '("~/org/")
+  "List of directories containing org files.")
+(defvar my-org-agenda-extensions '(".org")
+  "List of extensions of agenda files")
+
+(setq my-org-agenda-directories '("~/org/" "~/work/"))
+(setq my-org-agenda-extensions '(".org" ".ref"))
+
+(defun my-org-set-agenda-files ()
+  (interactive)
+  (setq org-agenda-files (my-org-list-files 
+                          my-org-agenda-directories
+                          my-org-agenda-extensions)))
+
+(my-org-set-agenda-files)
 #+end_src
 
 The code above will set your "default" agenda files to all files
@@ -644,11 +816,11 @@ You can also easily use my-org-list-files to "mix and match"
 directories and extensions to generate different lists of agenda
 files.
 
-** Restrict org-agenda-files by filetag
+*** Restrict org-agenda-files by filetag
   :PROPERTIES:
   :CUSTOM_ID: set-agenda-files-by-filetag
   :END:
-  - Matt Lundin
+- Matt Lundin
 
 It is often helpful to limit yourself to a subset of your agenda
 files. For instance, at work, you might want to see only files related
@@ -665,41 +837,41 @@ The following functions allow for a more dynamic approach to selecting
 a subset of files based on filetags:
 
 #+begin_src emacs-lisp
-  (defun my-org-agenda-restrict-files-by-filetag (&optional tag)
-    "Restrict org agenda files only to those containing filetag."
-    (interactive)
-    (let* ((tagslist (my-org-get-all-filetags))
-           (ftag (or tag 
-                     (completing-read "Tag: " 
-                                      (mapcar 'car tagslist)))))
-      (org-agenda-remove-restriction-lock 'noupdate)
-      (put 'org-agenda-files 'org-restrict (cdr (assoc ftag tagslist)))
-      (setq org-agenda-overriding-restriction 'files)))
-  
-  (defun my-org-get-all-filetags ()
-    "Get list of filetags from all default org-files."
-    (let ((files org-agenda-files)
-          tagslist x)
-      (save-window-excursion
-        (while (setq x (pop files))
-          (set-buffer (find-file-noselect x))
-          (mapc
-           (lambda (y)
-             (let ((tagfiles (assoc y tagslist)))
-               (if tagfiles
-                   (setcdr tagfiles (cons x (cdr tagfiles)))
-                 (add-to-list 'tagslist (list y x)))))
-           (my-org-get-filetags)))
-        tagslist)))
-  
-  (defun my-org-get-filetags ()
-    "Get list of filetags for current buffer"
-    (let ((ftags org-file-tags)
-          x)
-      (mapcar 
-       (lambda (x)
-         (org-substring-no-properties x))
-       ftags)))
+(defun my-org-agenda-restrict-files-by-filetag (&optional tag)
+  "Restrict org agenda files only to those containing filetag."
+  (interactive)
+  (let* ((tagslist (my-org-get-all-filetags))
+         (ftag (or tag 
+                   (completing-read "Tag: " 
+                                    (mapcar 'car tagslist)))))
+    (org-agenda-remove-restriction-lock 'noupdate)
+    (put 'org-agenda-files 'org-restrict (cdr (assoc ftag tagslist)))
+    (setq org-agenda-overriding-restriction 'files)))
+
+(defun my-org-get-all-filetags ()
+  "Get list of filetags from all default org-files."
+  (let ((files org-agenda-files)
+        tagslist x)
+    (save-window-excursion
+      (while (setq x (pop files))
+        (set-buffer (find-file-noselect x))
+        (mapc
+         (lambda (y)
+           (let ((tagfiles (assoc y tagslist)))
+             (if tagfiles
+                 (setcdr tagfiles (cons x (cdr tagfiles)))
+               (add-to-list 'tagslist (list y x)))))
+         (my-org-get-filetags)))
+      tagslist)))
+
+(defun my-org-get-filetags ()
+  "Get list of filetags for current buffer"
+  (let ((ftags org-file-tags)
+        x)
+    (mapcar 
+     (lambda (x)
+       (org-substring-no-properties x))
+     ftags)))
 #+end_src
 
 Calling my-org-agenda-restrict-files-by-filetag results in a prompt
@@ -708,7 +880,29 @@ tag, org-agenda-files will be restricted to only those files
 containing the filetag. To release the restriction, type C-c C-x >
 (org-agenda-remove-restriction-lock).
 
-** Split horizontally for agenda
+*** Highlight the agenda line under cursor
+
+This is useful to make sure what task you are operating on.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
+#+END_SRC emacs-lisp
+
+Under XEmacs:
+
+#+BEGIN_SRC emacs-lisp
+;; hl-line seems to be only for emacs
+(require 'highline)
+(add-hook 'org-agenda-mode-hook '(lambda () (highline-mode 1)))
+
+;; highline-mode does not work straightaway in tty mode.
+;; I use a black background
+(custom-set-faces
+  '(highline-face ((((type tty) (class color))
+                    (:background "white" :foreground "black")))))
+#+END_SRC emacs-lisp
+
+*** Split horizontally for agenda
 
 If you would like to split the frame into two side-by-side windows when
 displaying the agenda, try this hack from Jan Rehders, which uses the
@@ -723,7 +917,7 @@ http://www.emacswiki.org/cgi-bin/wiki/ToggleWindowSplit
 (ad-activate 'org-prepare-agenda)
 #+END_SRC
 
-** Automatically add an appointment when clocking in a task
+*** Automatically add an appointment when clocking in a task
 
 #+BEGIN_SRC emacs-lisp
 ;; Make sure you have a sensible value for `appt-message-warning-time'
@@ -793,29 +987,8 @@ And here is the advice for =org-clock-out= (=C-c C-x C-o=)
 *IMPORTANT*: You can add appointment by clocking in in both an
 =org-mode= and an =org-agenda-mode= buffer.  But clocking out from
 agenda buffer with the advice above will bring an error.
-** Highlight the agenda line under cursor
 
-This is useful to make sure what task you are operating on.
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
-#+END_SRC emacs-lisp
-
-Under XEmacs:
-
-#+BEGIN_SRC emacs-lisp
-;; hl-line seems to be only for emacs
-(require 'highline)
-(add-hook 'org-agenda-mode-hook '(lambda () (highline-mode 1)))
-
-;; highline-mode does not work straightaway in tty mode.
-;; I use a black background
-(custom-set-faces
-  '(highline-face ((((type tty) (class color))
-                    (:background "white" :foreground "black")))))
-#+END_SRC emacs-lisp
-
-** Remove time grid lines that are in an appointment
+*** Remove time grid lines that are in an appointment
 
 The agenda shows lines for the time grid.  Some people think that
 these lines are a distraction when there are appointments at those
@@ -864,139 +1037,141 @@ appointment:
     ad-do-it))
 (ad-activate 'org-agenda-add-time-grid-maybe)
 #+end_src
+*** Disable vc for Org mode agenda files
+-- David Maus
 
-** Group task list by a property
-
-This advice allows you to group a task list in Org-Mode.  To use it,
-set the variable =org-agenda-group-by-property= to the name of a
-property in the option list for a TODO or TAGS search.  The resulting
-agenda view will group tasks by that property prior to searching.
+Even if you use Git to track your agenda files you might not need
+vc-mode to be enabled for these files.
 
 #+begin_src emacs-lisp
-(defvar org-agenda-group-by-property nil
-  "Set this in org-mode agenda views to group tasks by property")
-
-(defun org-group-bucket-items (prop items)
-  (let ((buckets ()))
-    (dolist (item items)
-      (let* ((marker (get-text-property 0 'org-marker item))
-             (pvalue (org-entry-get marker prop t))
-             (cell (assoc pvalue buckets)))
-        (if cell
-            (setcdr cell (cons item (cdr cell)))
-          (setq buckets (cons (cons pvalue (list item))
-                              buckets)))))
-    (setq buckets (mapcar (lambda (bucket)
-                            (cons (car bucket)
-                                  (reverse (cdr bucket))))
-                          buckets))
-    (sort buckets (lambda (i1 i2)
-                    (string< (car i1) (car i2))))))
-
-(defadvice org-finalize-agenda-entries (around org-group-agenda-finalize
-                                               (list &optional nosort))
-  "Prepare bucketed agenda entry lists"
-  (if org-agenda-group-by-property
-      ;; bucketed, handle appropriately
-      (let ((text ""))
-        (dolist (bucket (org-group-bucket-items
-                         org-agenda-group-by-property
-                         list))
-          (let ((header (concat "Property "
-                                org-agenda-group-by-property
-                                " is "
-                                (or (car bucket) "<nil>") ":\n")))
-            (add-text-properties 0 (1- (length header))
-                                 (list 'face 'org-agenda-structure)
-                                 header)
-            (setq text
-                  (concat text header
-                          ;; recursively process
-                          (let ((org-agenda-group-by-property nil))
-                            (org-finalize-agenda-entries
-                             (cdr bucket) nosort))
-                          "\n\n"))))
-        (setq ad-return-value text))
-    ad-do-it))
-(ad-activate 'org-finalize-agenda-entries)
+(add-hook 'find-file-hook 'dmj/disable-vc-for-agenda-files-hook)
+(defun dmj/disable-vc-for-agenda-files-hook ()
+  "Disable vc-mode for Org agenda files."
+  (if (and (fboundp 'org-agenda-file-p)
+           (org-agenda-file-p (buffer-file-name)))
+      (remove-hook 'find-file-hook 'vc-find-file-hook)
+    (add-hook 'find-file-hook 'vc-find-file-hook)))
 #+end_src
-** Dynamically adjust tag position
-Here is a bit of code that allows you to have the tags always
-right-adjusted in the buffer.
 
-This is useful when you have bigger window than default window-size
-and you dislike the aesthetics of having the tag in the middle of the
-line.
+*** Easy customization of TODO colors
+-- Ryan C. Thompson
 
-This hack solves the problem of adjusting it whenever you change the
-window size.
-Before saving it will revert the file to having the tag position be
-left-adjusted so that if you track your files with version control,
-you won't run into artificial diffs just because the window-size
-changed.
+Here is some code I came up with some code to make it easier to
+customize the colors of various TODO keywords. As long as you just
+want a different color and nothing else, you can customize the
+variable org-todo-keyword-faces and use just a string color (i.e. a
+string of the color name) as the face, and then org-get-todo-face
+will convert the color to a face, inheriting everything else from
+the standard org-todo face.
 
-*IMPORTANT*: This is probably slow on very big files.
+To demonstrate, I currently have org-todo-keyword-faces set to
+
+#+BEGIN_SRC emacs-lisp
+(("IN PROGRESS" . "dark orange")
+ ("WAITING" . "red4")
+ ("CANCELED" . "saddle brown"))
+#+END_SRC emacs-lisp
+
+  Here's the code, in a form you can put in your =.emacs=
+
+#+BEGIN_SRC emacs-lisp
+(eval-after-load 'org-faces
+ '(progn
+    (defcustom org-todo-keyword-faces nil
+      "Faces for specific TODO keywords.
+This is a list of cons cells, with TODO keywords in the car and
+faces in the cdr.  The face can be a symbol, a color, or a
+property list of attributes, like (:foreground \"blue\" :weight
+bold :underline t)."
+      :group 'org-faces
+      :group 'org-todo
+      :type '(repeat
+              (cons
+               (string :tag "Keyword")
+               (choice color (sexp :tag "Face")))))))
+
+(eval-after-load 'org
+ '(progn
+    (defun org-get-todo-face-from-color (color)
+      "Returns a specification for a face that inherits from org-todo
+ face and has the given color as foreground. Returns nil if
+ color is nil."
+      (when color
+        `(:inherit org-warning :foreground ,color)))
+
+    (defun org-get-todo-face (kwd)
+      "Get the right face for a TODO keyword KWD.
+If KWD is a number, get the corresponding match group."
+      (if (numberp kwd) (setq kwd (match-string kwd)))
+      (or (let ((face (cdr (assoc kwd org-todo-keyword-faces))))
+            (if (stringp face)
+                (org-get-todo-face-from-color face)
+              face))
+          (and (member kwd org-done-keywords) 'org-done)
+          'org-todo))))
+#+END_SRC emacs-lisp
+
+*** Add an effort estimate on the fly when clocking in
+
+You can use =org-clock-in-prepare-hook= to add an effort estimate.
+This way you can easily have a "tea-timer" for your tasks when they
+don't already have an effort estimate.
 
 #+begin_src emacs-lisp
-  (setq ba/org-adjust-tags-column t)
-  
-  (defun ba/org-adjust-tags-column-reset-tags ()
-    "In org-mode buffers it will reset tag position according to
-  `org-tags-column'."
-    (when (and
-           (not (string= (buffer-name) "*Remember*"))
-           (eql major-mode 'org-mode))
-      (let ((b-m-p (buffer-modified-p)))
-        (condition-case nil
-            (save-excursion
-              (goto-char (point-min))
-              (command-execute 'outline-next-visible-heading)
-              ;; disable (message) that org-set-tags generates
-              (flet ((message (&rest ignored) nil))
-                (org-set-tags 1 t))
-              (set-buffer-modified-p b-m-p))
-          (error nil)))))
-  
-  (defun ba/org-adjust-tags-column-now ()
-    "Right-adjust `org-tags-column' value, then reset tag position."
-    (set (make-local-variable 'org-tags-column)
-         (- (- (window-width) (length org-ellipsis))))
-    (ba/org-adjust-tags-column-reset-tags))
-  
-  (defun ba/org-adjust-tags-column-maybe ()
-    "If `ba/org-adjust-tags-column' is set to non-nil, adjust tags."
-    (when ba/org-adjust-tags-column
-      (ba/org-adjust-tags-column-now)))
-  
-  (defun ba/org-adjust-tags-column-before-save ()
-    "Tags need to be left-adjusted when saving."
-    (when ba/org-adjust-tags-column
-       (setq org-tags-column 1)
-       (ba/org-adjust-tags-column-reset-tags)))
-  
-  (defun ba/org-adjust-tags-column-after-save ()
-    "Revert left-adjusted tag position done by before-save hook."
-    (ba/org-adjust-tags-column-maybe)
-    (set-buffer-modified-p nil))
-  
-  ; automatically align tags on right-hand side
-  (add-hook 'window-configuration-change-hook
-            'ba/org-adjust-tags-column-maybe)
-  (add-hook 'before-save-hook 'ba/org-adjust-tags-column-before-save)
-  (add-hook 'after-save-hook 'ba/org-adjust-tags-column-after-save)
-  (add-hook 'org-agenda-mode-hook '(lambda ()
-                                    (setq org-agenda-tags-column (- (window-width)))))
-  
-  ; between invoking org-refile and displaying the prompt (which
-  ; triggers window-configuration-change-hook) tags might adjust, 
-  ; which invalidates the org-refile cache
-  (defadvice org-refile (around org-refile-disable-adjust-tags)
-    "Disable dynamically adjusting tags"
-    (let ((ba/org-adjust-tags-column nil))
-      ad-do-it))
-  (ad-activate 'org-refile)
+(add-hook 'org-clock-in-prepare-hook
+	  'my-org-mode-ask-effort)
+
+(defun my-org-mode-ask-effort ()
+  "Ask for an effort estimate when clocking in."
+  (unless (org-entry-get (point) "Effort")
+    (let ((effort
+	   (completing-read
+	    "Effort: "
+	    (org-entry-get-multivalued-property (point) "Effort"))))
+      (unless (equal effort "")
+	(org-set-property "Effort" effort)))))
 #+end_src
-* Hacking Org and Emacs: Modify how org interacts with other Emacs packages.
+
+Or you can use a default effort for such a timer:
+
+#+begin_src emacs-lisp
+(add-hook 'org-clock-in-prepare-hook
+	  'my-org-mode-add-default-effort)
+
+(defvar org-clock-default-effort "1:00")
+
+(defun my-org-mode-add-default-effort ()
+  "Add a default effort estimation."
+  (unless (org-entry-get (point) "Effort")
+    (org-set-property "Effort" org-clock-default-effort)))
+#+end_src
+
+*** Refresh the agenda view regurally
+
+Hack sent by Kiwon Um:
+
+#+begin_src emacs-lisp
+(defun kiwon/org-agenda-redo-in-other-window ()
+  "Call org-agenda-redo function even in the non-agenda buffer."
+  (interactive)
+  (let ((agenda-window (get-buffer-window org-agenda-buffer-name t)))
+    (when agenda-window
+      (with-selected-window agenda-window (org-agenda-redo)))))
+(run-at-time nil 300 'kiwon/org-agenda-redo-in-other-window)
+#+end_src
+
+*** Reschedule agenda items to today with a single command
+
+This was suggested by Carsten in reply to David Abrahams:
+
+#+begin_example emacs-lisp
+(defun org-agenda-reschedule-to-today ()
+  (interactive)
+  (flet ((org-read-date (&rest rest) (current-time)))
+    (call-interactively 'org-agenda-schedule)))
+#+end_example
+
+* Hacking Org: Working with Org-mode and other Emacs Packages.
 ** org-remember-anything
 
 [[http://www.emacswiki.org/cgi-bin/wiki/Anything][Anything]] users may find the snippet below interesting:
@@ -1033,7 +1208,7 @@ Fix a problem with saveplace.el putting you back in a folded position:
 #+end_src
 
 ** Using ido-completing-read to find attachments
-  -- Matt Lundin
+-- Matt Lundin
 
 Org-attach is great for quickly linking files to a project. But if you
 use org-attach extensively you might find yourself wanting to browse
@@ -1044,39 +1219,39 @@ some code to browse those files using ido (obviously, you need to be
 using ido):
 
 #+begin_src emacs-lisp
-  (load-library "find-lisp")
-  
-  ;; Adapted from http://www.emacswiki.org/emacs/RecentFiles
-  
-  (defun my-ido-find-org-attach ()
-    "Find files in org-attachment directory"
-    (interactive)
-    (let* ((enable-recursive-minibuffers t)
-           (files (find-lisp-find-files org-attach-directory "."))
-           (file-assoc-list
-            (mapcar (lambda (x)
-                      (cons (file-name-nondirectory x)
-                            x))
-                    files))
-           (filename-list
-            (remove-duplicates (mapcar #'car file-assoc-list)
-                               :test #'string=))
-           (filename (ido-completing-read "Org attachments: " filename-list nil t))
-           (longname (cdr (assoc filename file-assoc-list))))
-      (ido-set-current-directory
-       (if (file-directory-p longname)
-           longname
-         (file-name-directory longname)))
-      (setq ido-exit 'refresh
-            ido-text-init ido-text
-            ido-rotate-temp t)
-      (exit-minibuffer)))
-  
-  (add-hook 'ido-setup-hook 'ido-my-keys)
-  
-  (defun ido-my-keys ()
-    "Add my keybindings for ido."
-    (define-key ido-completion-map (kbd "C-;") 'my-ido-find-org-attach))
+(load-library "find-lisp")
+
+;; Adapted from http://www.emacswiki.org/emacs/RecentFiles
+
+(defun my-ido-find-org-attach ()
+  "Find files in org-attachment directory"
+  (interactive)
+  (let* ((enable-recursive-minibuffers t)
+         (files (find-lisp-find-files org-attach-directory "."))
+         (file-assoc-list
+          (mapcar (lambda (x)
+                    (cons (file-name-nondirectory x)
+                          x))
+                  files))
+         (filename-list
+          (remove-duplicates (mapcar #'car file-assoc-list)
+                             :test #'string=))
+         (filename (ido-completing-read "Org attachments: " filename-list nil t))
+         (longname (cdr (assoc filename file-assoc-list))))
+    (ido-set-current-directory
+     (if (file-directory-p longname)
+         longname
+       (file-name-directory longname)))
+    (setq ido-exit 'refresh
+          ido-text-init ido-text
+          ido-rotate-temp t)
+    (exit-minibuffer)))
+
+(add-hook 'ido-setup-hook 'ido-my-keys)
+
+(defun ido-my-keys ()
+  "Add my keybindings for ido."
+  (define-key ido-completion-map (kbd "C-;") 'my-ido-find-org-attach))
 #+end_src
 
 To browse your org attachments using ido fuzzy matching and/or the
@@ -1218,6 +1393,51 @@ it is a cons of 'gnus and the select (type and name).")
      (org-add-link-type "mid" 'mde-org-gnus-open-message-link)))
 #+end_src
 
+** Store link upon sending a message in Gnus
+
+Ulf Stegemann came up with this solution (see his [[http://www.mail-archive.com/emacs-orgmode@gnu.org/msg33278.html][original message]]):
+
+#+begin_src emacs-lisp
+(defun ulf-message-send-and-org-gnus-store-link (&optional arg)
+  "Send message with `message-send-and-exit' and store org link to message copy.
+If multiple groups appear in the Gcc header, the link refers to
+the copy in the last group."
+  (interactive "P")
+    (save-excursion
+      (save-restriction
+	(message-narrow-to-headers)
+	(let ((gcc (car (last
+			 (message-unquote-tokens
+			  (message-tokenize-header
+			   (mail-fetch-field "gcc" nil t) " ,")))))
+	      (buf (current-buffer))
+	      (message-kill-buffer-on-exit nil)
+	      id to from subject desc link newsgroup xarchive)
+        (message-send-and-exit arg)
+        (or
+         ;; gcc group found ...
+         (and gcc
+              (save-current-buffer
+                (progn (set-buffer buf)
+                       (setq id (org-remove-angle-brackets
+                                 (mail-fetch-field "Message-ID")))
+                       (setq to (mail-fetch-field "To"))
+                       (setq from (mail-fetch-field "From"))
+                       (setq subject (mail-fetch-field "Subject"))))
+              (org-store-link-props :type "gnus" :from from :subject subject
+                                    :message-id id :group gcc :to to)
+              (setq desc (org-email-link-description))
+              (setq link (org-gnus-article-link
+                          gcc newsgroup id xarchive))
+              (setq org-stored-links
+                    (cons (list link desc) org-stored-links)))
+         ;; no gcc group found ...
+         (message "Can not create Org link: No Gcc header found."))))))
+
+(define-key message-mode-map [(control c) (control meta c)]
+  'ulf-message-send-and-org-gnus-store-link)
+#+end_src
+
 ** Send html messages and attachments with Wanderlust
   -- David Maus
 
@@ -1231,39 +1451,39 @@ message body is created right before sending starts.
 
 Putting the code below in your .emacs adds following four functions:
 
-   - dmj/wl-send-html-message
+- dmj/wl-send-html-message
 
-     Function that does the job: Convert everything between "--text
-     follows this line--" and first mime entity (read: attachment) or
-     end of buffer into html markup using `org-export-region-as-html'
-     and replaces original body with a multipart MIME entity with the
-     plain text version of body and the html markup version.  Thus a
-     recipient that prefers html messages can see the html markup,
-     recipients that prefer or depend on plain text can see the plain
-     text.
+  Function that does the job: Convert everything between "--text
+  follows this line--" and first mime entity (read: attachment) or
+  end of buffer into html markup using `org-export-region-as-html'
+  and replaces original body with a multipart MIME entity with the
+  plain text version of body and the html markup version.  Thus a
+  recipient that prefers html messages can see the html markup,
+  recipients that prefer or depend on plain text can see the plain
+  text.
 
-     Cannot be called interactively: It is hooked into SEMI's
-     `mime-edit-translate-hook' if message should be HTML message.
+  Cannot be called interactively: It is hooked into SEMI's
+  `mime-edit-translate-hook' if message should be HTML message.
 
-   - dmj/wl-send-html-message-draft-init
+- dmj/wl-send-html-message-draft-init
 
-     Cannot be called interactively: It is hooked into WL's
-     `wl-mail-setup-hook' and provides a buffer local variable to
-     toggle.
+  Cannot be called interactively: It is hooked into WL's
+  `wl-mail-setup-hook' and provides a buffer local variable to
+  toggle.
 
-   - dmj/wl-send-html-message-draft-maybe
+- dmj/wl-send-html-message-draft-maybe
 
-     Cannot be called interactively: It is hooked into WL's
-     `wl-draft-send-hook' and hooks `dmj/wl-send-html-message' into
-     `mime-edit-translate-hook' depending on whether HTML message is
-     toggled on or off
+  Cannot be called interactively: It is hooked into WL's
+  `wl-draft-send-hook' and hooks `dmj/wl-send-html-message' into
+  `mime-edit-translate-hook' depending on whether HTML message is
+  toggled on or off
 
-   - dmj/wl-send-html-message-toggle
+- dmj/wl-send-html-message-toggle
 
-     Toggles sending of HTML message.  If toggled on, the letters
-     "HTML" appear in the mode line.
+  Toggles sending of HTML message.  If toggled on, the letters
+  "HTML" appear in the mode line.
 
-     Call it interactively!  Or bind it to a key in `wl-draft-mode'.
+  Call it interactively!  Or bind it to a key in `wl-draft-mode'.
 
 If you have to send HTML messages regularly you can set a global
 variable `dmj/wl-send-html-message-toggled-p' to the string "HTML" to
@@ -1277,78 +1497,78 @@ So even if you feel uncomfortable with sending HTML messages at least
 you send HTML that looks quite good.
 
 #+begin_src emacs-lisp
-  (defun dmj/wl-send-html-message ()
-    "Send message as html message.
-  Convert body of message to html using
-    `org-export-region-as-html'."
-    (require 'org)
-    (save-excursion
-      (let (beg end html text)
-        (goto-char (point-min))
-        (re-search-forward "^--text follows this line--$")
-        ;; move to beginning of next line
-        (beginning-of-line 2)
-        (setq beg (point))
-        (if (not (re-search-forward "^--\\[\\[" nil t))
-            (setq end (point-max))
-          ;; line up
-          (end-of-line 0)
-          (setq end (point)))
-        ;; grab body
-        (setq text (buffer-substring-no-properties beg end))
-        ;; convert to html
-        (with-temp-buffer
-          (org-mode)
-          (insert text)
-          ;; handle signature
-          (when (re-search-backward "^-- \n" nil t)
-            ;; preserve link breaks in signature
-            (insert "\n#+BEGIN_VERSE\n")
-            (goto-char (point-max))
-            (insert "\n#+END_VERSE\n")
-            ;; grab html
-            (setq html (org-export-region-as-html
-                        (point-min) (point-max) t 'string))))
-        (delete-region beg end)
-        (insert
-         (concat
-          "--" "<<alternative>>-{\n"
-          "--" "[[text/plain]]\n" text
-          "--" "[[text/html]]\n"  html
-          "--" "}-<<alternative>>\n")))))
-  
-  (defun dmj/wl-send-html-message-toggle ()
-    "Toggle sending of html message."
-    (interactive)
-    (setq dmj/wl-send-html-message-toggled-p
-          (if dmj/wl-send-html-message-toggled-p
-              nil "HTML"))
-    (message "Sending html message toggled %s"
-             (if dmj/wl-send-html-message-toggled-p
-                 "on" "off")))
-  
-  (defun dmj/wl-send-html-message-draft-init ()
-    "Create buffer local settings for maybe sending html message."
-    (unless (boundp 'dmj/wl-send-html-message-toggled-p)
-      (setq dmj/wl-send-html-message-toggled-p nil))
-    (make-variable-buffer-local 'dmj/wl-send-html-message-toggled-p)
-    (add-to-list 'global-mode-string
-                 '(:eval (if (eq major-mode 'wl-draft-mode)
-                             dmj/wl-send-html-message-toggled-p))))
-  
-  (defun dmj/wl-send-html-message-maybe ()
-    "Maybe send this message as html message.
-  
-  If buffer local variable `dmj/wl-send-html-message-toggled-p' is
-  non-nil, add `dmj/wl-send-html-message' to
-  `mime-edit-translate-hook'."
-    (if dmj/wl-send-html-message-toggled-p
-        (add-hook 'mime-edit-translate-hook 'dmj/wl-send-html-message)
-      (remove-hook 'mime-edit-translate-hook 'dmj/wl-send-html-message)))
-  
-  (add-hook 'wl-draft-reedit-hook 'dmj/wl-send-html-message-draft-init)
-  (add-hook 'wl-mail-setup-hook 'dmj/wl-send-html-message-draft-init)
-  (add-hook 'wl-draft-send-hook 'dmj/wl-send-html-message-maybe)
+(defun dmj/wl-send-html-message ()
+  "Send message as html message.
+Convert body of message to html using
+  `org-export-region-as-html'."
+  (require 'org)
+  (save-excursion
+    (let (beg end html text)
+      (goto-char (point-min))
+      (re-search-forward "^--text follows this line--$")
+      ;; move to beginning of next line
+      (beginning-of-line 2)
+      (setq beg (point))
+      (if (not (re-search-forward "^--\\[\\[" nil t))
+          (setq end (point-max))
+        ;; line up
+        (end-of-line 0)
+        (setq end (point)))
+      ;; grab body
+      (setq text (buffer-substring-no-properties beg end))
+      ;; convert to html
+      (with-temp-buffer
+        (org-mode)
+        (insert text)
+        ;; handle signature
+        (when (re-search-backward "^-- \n" nil t)
+          ;; preserve link breaks in signature
+          (insert "\n#+BEGIN_VERSE\n")
+          (goto-char (point-max))
+          (insert "\n#+END_VERSE\n")
+          ;; grab html
+          (setq html (org-export-region-as-html
+                      (point-min) (point-max) t 'string))))
+      (delete-region beg end)
+      (insert
+       (concat
+        "--" "<<alternative>>-{\n"
+        "--" "[[text/plain]]\n" text
+        "--" "[[text/html]]\n"  html
+        "--" "}-<<alternative>>\n")))))
+
+(defun dmj/wl-send-html-message-toggle ()
+  "Toggle sending of html message."
+  (interactive)
+  (setq dmj/wl-send-html-message-toggled-p
+        (if dmj/wl-send-html-message-toggled-p
+            nil "HTML"))
+  (message "Sending html message toggled %s"
+           (if dmj/wl-send-html-message-toggled-p
+               "on" "off")))
+
+(defun dmj/wl-send-html-message-draft-init ()
+  "Create buffer local settings for maybe sending html message."
+  (unless (boundp 'dmj/wl-send-html-message-toggled-p)
+    (setq dmj/wl-send-html-message-toggled-p nil))
+  (make-variable-buffer-local 'dmj/wl-send-html-message-toggled-p)
+  (add-to-list 'global-mode-string
+               '(:eval (if (eq major-mode 'wl-draft-mode)
+                           dmj/wl-send-html-message-toggled-p))))
+
+(defun dmj/wl-send-html-message-maybe ()
+  "Maybe send this message as html message.
+
+If buffer local variable `dmj/wl-send-html-message-toggled-p' is
+non-nil, add `dmj/wl-send-html-message' to
+`mime-edit-translate-hook'."
+  (if dmj/wl-send-html-message-toggled-p
+      (add-hook 'mime-edit-translate-hook 'dmj/wl-send-html-message)
+    (remove-hook 'mime-edit-translate-hook 'dmj/wl-send-html-message)))
+
+(add-hook 'wl-draft-reedit-hook 'dmj/wl-send-html-message-draft-init)
+(add-hook 'wl-mail-setup-hook 'dmj/wl-send-html-message-draft-init)
+(add-hook 'wl-draft-send-hook 'dmj/wl-send-html-message-maybe)
 #+end_src
 
 *** Attach HTML of region or subtree
@@ -1396,7 +1616,7 @@ attachment."
 The whole magic lies in the special strings that mark a HTML
 attachment.  So you might just have to find out what these special
 strings are in message-mode and modify the functions accordingly.
-* Hacking Org and external Programs.
+* Hacking Org: Working with Org-mode and External Programs.
 ** Use Org-mode with Screen [Andrew Hyatt]
 
 "The general idea is that you start a task in which all the work will
@@ -1495,7 +1715,7 @@ appointments.  You can look at the code on the [[http://www.emacswiki.org/emacs-
 
 ** remind2org
 
-  From Detlef Steuer
+From Detlef Steuer
 
 http://article.gmane.org/gmane.emacs.orgmode/5073
 
@@ -1536,3 +1756,23 @@ The download archive contains an elisp file which integrates it into the Org
 export process (configurable per file with a "#+StaticMathJax:" line).
 
 Read README.org and the comments in org-static-mathjax.el for usage instructions.
+** Search Org files using lgrep
+
+Matt Lundi suggests this:
+
+#+begin_src emacs-lisp
+  (defun my-org-grep (search &optional context)
+    "Search for word in org files. 
+
+Prefix argument determines number of lines."
+    (interactive "sSearch for: \nP")
+    (let ((grep-find-ignored-files '("#*" ".#*"))
+	  (grep-template (concat "grep <X> -i -nH " 
+				 (when context
+				   (concat "-C" (number-to-string context)))
+				 " -e <R> <F>")))
+      (lgrep search "*org*" "/home/matt/org/")))
+
+  (global-set-key (kbd "<f8>") 'my-org-grep)
+#+end_src
+

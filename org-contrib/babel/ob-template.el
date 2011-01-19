@@ -120,6 +120,11 @@ called by `org-babel-execute-src-block'"
     ;;
     ;; for external evaluation the functions defined in
     ;; `org-babel-eval' will probably be helpful.
+    ;;
+    ;; when forming a shell command, or a fragment of code in some
+    ;; other language, please preprocess any file names involved with
+    ;; the function `org-babel-process-file-name'. (See the way that
+    ;; function is used in the language files)
     ))
 
 ;; This function should be used to assign any variables in params in

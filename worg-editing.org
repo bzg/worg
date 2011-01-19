@@ -1,7 +1,7 @@
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c)
-#+EMAIL:      bzg AT altern DOT org
+#+EMAIL:      mdl AT imapmail DOT org
 #+TITLE:      How to edit Worg files?
 #+AUTHOR:     Worg people
 #+LANGUAGE:   en
@@ -15,6 +15,9 @@ Since Worg is just starting now, these conventions are just suggestions,
 not recommendations.  Please improve this.
 
 * Conventions
+  :PROPERTIES:
+  :CUSTOM_ID: worg-conventions
+  :END:
 ** To-do keywords
 
 Here is a table with default to-do keywords and their meaning.
@@ -43,6 +46,41 @@ changes.
 (Suggestion: the farther from the index page you are, the more flexible
 the conventions should perhaps be.)
 
+* How do I link to other Worg files?
+  :PROPERTIES:
+  :CUSTOM_ID: creating-links
+  :END:
+
+Links to other Worg pages should have the following format:
+
+: [[file:index.org][Worg's home page]]
+
+This link will converted to a relative html link on export that looks
+like this:
+
+[[file:index.org][Worg's home page]]
+
+The filename should be a relative path. Thus, if you are creating a
+link to the index from within the org-tutorials directory, you should
+enter the path as follows:
+
+: [[file:../index.org][Worg's home page]]
+
+The easiest way to create links to files is by typing C-c C-l while
+editing an org file. This will prompt you for both components of the
+link. (Be sure to enter "file:" before the path; this indicates the
+type of link.) 
+
+To enter file links more easily, you can simply type C-u C-c C-l. This
+will allow you to locate the file using emacs' built-in completion
+facilities and will automatically add the "file:" prefix. 
+
+One note of caution here: the path of the resulting link created
+depends on the setting of org-link-file-path-type. To ensure that you
+always use relative links, you can add the following to your .emacs:
+
+(setq org-link-file-path-type 'relative)
+
 * What is the default header for new files?
 
 You can find a default header here: [[file:worg-header.org][worg-header.org]]
@@ -55,7 +93,7 @@ the file to the repository index with =git add *.org=
 * What about dynamic blocks
 
 If you are using dynamic blocks in Worg, please don't forget to add the
-relevant code in the =elisp/worg.el= file.  See for example the dynamic
+relevant code in the [[file:code/elisp/worg.el][code/elisp/worg.el]] file.  See for example the dynamic
 block for the timestamp in the [[file:index.org][index]] page.
 
 * What about macros
@@ -78,7 +116,7 @@ If you are using macros, please add them to =macros.setupfile=.
          icon used is different.
 
     - BeginBlindText ... EndBlindText :: creates a =<span></span>= element, that
-         greys out the text. Used for text, that is just there to fill paragraphs
+         greys out the text. Used for text that is there just to fill paragraphs
          to demonstrate text flow (see:
          [[file:./org-tutorials/images-and-xhtml-export.org]] for an example).
 
