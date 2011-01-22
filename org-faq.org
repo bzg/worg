@@ -3293,6 +3293,147 @@ way.  This means that the .tex file should already exist, perhaps by
 tangling the LaTeX preamble and postamble, before
 =org-mode-article-modes= is activated for the Org-mode file.
 
+** How can I use XeLaTeX for LaTeX export instead of pdfLaTeX?
+   :PROPERTIES:
+   :CUSTOM_ID: using-xelatex-for-pdf-export
+   :END:
+[[http://en.wikipedia.org/wiki/XeTeX][ XeLaTeX]] is an alternative to pdfLaTeX for typesetting LaTeX
+documents. XeTeX can use any fonts installed in the operating system
+without configuring TeX font metrics, and can make direct use of
+advanced typographic features of OpenType and other font formats. By
+default, org-mode exports =org= files to =pdf= via pdflatex. 
+
+Here is one way to smoothly incorporate XeLaTeX into org-mode's export
+process. This solution takes advantage of [[http://www.phys.psu.edu/~collins/software/latexmk-jcc][latexmk]], a perl script a
+script that intelligently and automatically manages latex compilation
+sensibly. It is included with TeXLive, but at present the version
+included is not quite up-to-date enough for our needs. Version 4.20
+and higher includes an option allowing you to specify which program to
+use when "pdflatex" is called. Install a current version of latexmk as
+per the instructions on the [[http://www.phys.psu.edu/~collins/software/latexmk-jcc][latexmk]] site. If necessary, disable the
+older version that comes with TeXLive. This is likely in
+=/usr/texbin/=, and you should rename or remove it. Then you can put
+the following in your =~/.emacs.d/= or equivalent:
+
+#+begin_src emacs-lisp
+  (require 'org-latex)
+  (setq org-export-latex-listings t)
+  
+  ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
+  ;; but adapted to use latexmk 4.20 or higher.  
+  (defun my-auto-tex-cmd ()
+    "When exporting from .org with latex, automatically run latex,
+       pdflatex, or xelatex as appropriate, using latexmk."
+    (let ((texcmd)))
+    ;; default command: oldstyle latex via dvi
+    (setq texcmd "latexmk -dvi -pdfps -quiet %f")        
+    ;; pdflatex -> .pdf
+    (if (string-match "LATEX_CMD: pdflatex" (buffer-string))
+        (setq texcmd "latexmk -pdf -quiet %f"))
+    ;; xelatex -> .pdf
+    (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+        (setq texcmd "latexmk -pdflatex=xelatex -pdf -quiet %f"))
+    ;; LaTeX compilation command
+    (setq org-latex-to-pdf-process (list texcmd)))
+  
+  (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-cmd)
+  
+  
+  ;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
+  (setq org-export-latex-packages-alist
+        '(("" "graphicx" t)
+              ("" "longtable" nil)
+              ("" "float" nil)))
+    
+  (defun my-auto-tex-parameters ()
+        "Automatically select the tex packages to include."
+        ;; default packages for ordinary latex or pdflatex export
+        (setq org-export-latex-default-packages-alist
+              '(("AUTO" "inputenc" t)
+                ("T1"   "fontenc"   t)
+                (""     "fixltx2e"  nil)
+                (""     "wrapfig"   nil)
+                (""     "soul"      t)
+                (""     "textcomp"  t)
+                (""     "marvosym"  t)
+                (""     "wasysym"   t)
+                (""     "latexsym"  t)
+                (""     "amssymb"   t)
+                (""     "hyperref"  nil)))
+    
+        ;; Packages to include when xelatex is used
+        (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+            (setq org-export-latex-default-packages-alist
+                  '(("" "fontspec" t)
+                    ("" "xunicode" t)
+                    ("" "url" t)
+                    ("" "rotating" t)
+                    ("american" "babel" t)
+                    ("babel" "csquotes" t)
+                    ("" "soul" t)
+                    ("xetex" "hyperref" nil)
+                    )))
+        
+        (if (string-match "LATEX_CMD: xelatex" (buffer-string))
+            (setq org-export-latex-classes
+                  (cons '("article"
+                          "\\documentclass[11pt,article,oneside]{memoir}"
+                          ("\\section{%s}" . "\\section*{%s}")
+                          ("\\subsection{%s}" . "\\subsection*{%s}")
+                          ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                          ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                          ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+                        org-export-latex-classes))))  
+      
+  (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)  
+#+end_src
+
+The =my-auto-tex-cmd= function looks at your =.org= file and checks
+whether you've specified which latex to use. If there are no
+instructions, it just runs regular old latex. If it finds the string
+=LATEX_CMD: pdflatex= in your file, it runs pdflatex. If it finds
+=LATEX_CMD: xelatex=, it runs xelatex. Because control is handed off
+to latexmk, nothing else is needed: it takes care of figuring things
+out so that the references and citations are correct.
+
+The second half of the code above specifies the latex packages that
+will be included in the =.tex= file. The variable
+=org-export-latex-packages-alist= specifies a list of packages that
+are always included in the header of latex documents, regardless of
+how they are compiled. The variable
+=org-export-latex-default-packages-alist= adds additional packages
+depending on whether latex/pdflatex or xelatex is being used. You can
+change the content of these as needed. 
+
+Finally, the =org-export-latex-classes= variable redefines elements of
+the =.tex= file's preamble for the xelatex case. These can also be
+customized as needed. 
+
+By way of example, an =.org= file you want compiled with xelatex might
+contain the following header:
+
+: #+TITLE: My Paper
+: #+AUTHOR: Kieran Healy
+: #+DATE: 
+: #+OPTIONS: toc:nil num:nil
+: #+LATEX_CMD: xelatex
+: 
+: #+BEGIN_LaTeX
+: \setsansfont[Mapping=tex-text]{Unit-Bold} 
+: \setmonofont[Mapping=tex-text,Scale=MatchLowercase]{PragmataPro} 
+: \setromanfont[Mapping=tex-text,Numbers=OldStyle]{Minion Pro} 
+: \maketitle
+: #+END_LaTeX
+
+If you always want to have the same font setup in your xelatex
+documents, the =fontspec= related commands can go in the
+=org-export-latex-classes= setting instead.
+
+The upshot is that when you want to export an =.org= file using
+XeLaTeX, you can now simply make sure the line =LATEX_CMD: xelatex= is
+in your =.org= file, then do =C-c C-e d= as usual, and org-mode, with
+latexmk in the background, does the rest for you.
+
 ** Why is my exported PDF file almost unreadable?
    :PROPERTIES:
    :CUSTOM_ID: unreadable-pdfs
