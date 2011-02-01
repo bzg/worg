@@ -572,6 +572,18 @@ Posted to Org-mode mailing list by Osamu Okano
     ad-do-it))
 #+end_src
 
+*** Add inherited tags to archived entries
+
+To make =org-archive-subtree= keep inherited tags, Osamu OKANO suggests to
+advise the function like this:
+
+#+begin_example
+(defadvice org-archive-subtree
+  (before add-inherited-tags-before-org-archive-subtree activate)
+    "add inherited tags before org-archive-subtree"
+    (org-set-tags-to (org-get-tags-at)))
+#+end_example
+
 ** Using and Managing Org-Metadata
 *** Remove redundant tags of headlines
 -- David Maus
