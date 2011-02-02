@@ -1,3 +1,4 @@
+#!/usr/bin/awk -f
 # awk script for converting an iCal formatted file to a sequence of org-mode headings.
 # this may not work in general but seems to work for day and timed events from Google's
 # calendar, which is really all I need right now...
@@ -52,6 +53,10 @@ function datetimestamp(input)
 }
 
 BEGIN {
+    ### config section
+    icaltime_local = 0;
+    ### end config section
+
     # use a colon to separate the type of data line from the actual contents
     FS = ":";
     
@@ -61,7 +66,10 @@ BEGIN {
     # strftime() is in hours * 100 so we multiply by 36 to get
     # seconds.  This does not work for time zones that are not an
     # integral multiple of hours (e.g. Newfoundland)
-    seconds = gensub("([+-])0", "\\1", "", strftime("%z")) * 36;
+    if(icaltime_local)
+	seconds = 0;
+    else
+	seconds = gensub("([+-])0", "\\1", "", strftime("%z")) * 36;
     
     date = "";
     entry = ""
@@ -76,7 +84,10 @@ BEGIN {
     print "#+AUTHOR:    Eric S Fraga"
     print "#+EMAIL:     e.fraga@ucl.ac.uk"
     print "#+DESCRIPTION: converted using the ical2org awk script"
-    print "#+CATEGORY: " NAME
+    print "#+CATEGORY: google"
+    print "#+STARTUP: hidestars"
+    print "#+STARTUP: overview"
+    print "#+SEQ_TODO: GCAL"
     print " "
 }
 
@@ -118,16 +129,20 @@ BEGIN {
 
 # this type of entry represents a day entry, not timed, with date stamp YYYYMMDD
 
-/^DTSTART;[^:]*/ {
-    date = gensub("([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9]).*[\r]", "\\1-\\2-\\3", "g", $2)
-    # print date
+/^DTSTART;VALUE=DATE/ {
+    datetmp = gensub("([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])(.*[\r])", "\\1T000000\\2", "g", $2)
+    date = strftime("%Y-%m-%d %a %H:%M", datetimestamp(datetmp));
+}
+/^DTEND;VALUE=DATE/ {
+    datetmp = gensub("([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])(.*[\r])", "\\1T000000\\2", "g", $2)
+    time2 = strftime("%Y-%m-%d %a %H:%M", datetimestamp(datetmp));
+    date = date ">--<" time2;
 }
 
 # this represents a timed entry with date and time stamp YYYYMMDDTHHMMSS
 # we ignore the seconds
 
-/^DTSTART:/ {
-    # print $0
+/^DTSTART[:;][^V]/ {
     date = strftime("%Y-%m-%d %a %H:%M", datetimestamp($2));
     # print date;
 }
@@ -136,10 +151,10 @@ BEGIN {
 # date+time found by the DTSTART entry.  We assume that entry was there, of course.
 # should probably add some error checking here!  In time...
 
-/^DTEND:/ {
+/^DTEND[:;][^V]/ {
     # print $0
-    time2 = strftime("%H:%M", datetimestamp($2));
-    date = date "-" time2;
+    time2 = strftime("%Y-%m-%d %a %H:%M", datetimestamp($2));
+    date = date ">--<" time2;
 }
 
 # The description will the contents of the entry in org-mode.
@@ -162,8 +177,15 @@ BEGIN {
 # the unique ID will be stored as a property of the entry
 
 /^UID/ { 
-    $1 = "";
-    id = gensub("\r", "", "g", $0);
+    id = gensub("\r", "", "g", $2);
+}
+
+/^LOCATION/ {
+    location = gensub("\r", "", "g", $2);
+}
+
+/^STATUS/ {
+    status = gensub("\r", "", "g", $2);
 }
 
 # when we reach the end of the event line, we output everything we
@@ -172,19 +194,26 @@ BEGIN {
 
 /^END:VEVENT/ {
     # translate \n sequences to actual newlines and unprotect commas (,)
-    print "* " gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary))
+    print "* GCAL " gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary))
+    print "   SCHEDULED: <" date ">"
+    if(length(location))
+	print "   LOCATION: " location
+    if(length(status))
+	print "   STATUS: " status
     print "  :PROPERTIES:"
     print "  :ID:       " id
     print "  :END:"
-    print "  <" date ">"
     # for the entry, convert all embedded "\n" strings to actual newlines
     print ""
     # translate \n sequences to actual newlines and unprotect commas (,)
+    if(length(entry)>1)
     print gensub("\\\\,", ",", "g", gensub("\\\\n", "\n", "g", entry));
     print "** COMMENT original iCal entry"
     print gensub("\r", "", "g", icalentry)
     summary = ""
     date = ""
+    location = ""
+    status = ""
     entry = ""
     icalentry = ""
     indescription = 0
