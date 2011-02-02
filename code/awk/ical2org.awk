@@ -55,6 +55,9 @@ function datetimestamp(input)
 BEGIN {
     ### config section
     icaltime_local = 0;
+    max_age = -1; # in days
+                  # set this to -1 to get all entries or to N>0 to only get 
+                  # that start or end less than N days ago
     ### end config section
 
     # use a colon to separate the type of data line from the actual contents
@@ -78,7 +81,7 @@ BEGIN {
     icalentry = ""  # the full entry for inspection
     id = ""
     indescription = 0;
-    time2given = 0;
+    lasttimestamp=-1;
     
     print "#+TITLE:     Main Google calendar entries"
     print "#+AUTHOR:    Eric S Fraga"
@@ -132,11 +135,13 @@ BEGIN {
 /^DTSTART;VALUE=DATE/ {
     datetmp = gensub("([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])(.*[\r])", "\\1T000000\\2", "g", $2)
     date = strftime("%Y-%m-%d %a %H:%M", datetimestamp(datetmp));
+    if(max_age>0)     lasttimestamp = datetimestamp(datetmp);
 }
 /^DTEND;VALUE=DATE/ {
     datetmp = gensub("([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])(.*[\r])", "\\1T000000\\2", "g", $2)
     time2 = strftime("%Y-%m-%d %a %H:%M", datetimestamp(datetmp));
     date = date ">--<" time2;
+    if(max_age>0)     lasttimestamp = datetimestamp(datetmp);
 }
 
 # this represents a timed entry with date and time stamp YYYYMMDDTHHMMSS
@@ -144,6 +149,7 @@ BEGIN {
 
 /^DTSTART[:;][^V]/ {
     date = strftime("%Y-%m-%d %a %H:%M", datetimestamp($2));
+    if(max_age>0)     lasttimestamp = datetimestamp($2);
     # print date;
 }
 
@@ -155,6 +161,7 @@ BEGIN {
     # print $0
     time2 = strftime("%Y-%m-%d %a %H:%M", datetimestamp($2));
     date = date ">--<" time2;
+    if(max_age>0)     lasttimestamp = datetimestamp($2);
 }
 
 # The description will the contents of the entry in org-mode.
@@ -162,7 +169,7 @@ BEGIN {
 
 /^DESCRIPTION/ { 
     $1 = "";
-    entry = entry "\n" gensub("\r", "", "g", $0);
+    entry = entry gensub("\r", "", "g", $0);
     indescription = 1;
 }
 
@@ -193,6 +200,9 @@ BEGIN {
 # date/time stamp, unique ID property and the contents, if any
 
 /^END:VEVENT/ {
+    #output event
+    if(max_age<0 || ( lasttimestamp>0 && systime()<lasttimestamp+max_age*24*60*60 ) )
+    {
     # translate \n sequences to actual newlines and unprotect commas (,)
     print "* GCAL " gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary))
     print "   SCHEDULED: <" date ">"
@@ -210,6 +220,7 @@ BEGIN {
     print gensub("\\\\,", ",", "g", gensub("\\\\n", "\n", "g", entry));
     print "** COMMENT original iCal entry"
     print gensub("\r", "", "g", icalentry)
+    }
     summary = ""
     date = ""
     location = ""
@@ -218,6 +229,7 @@ BEGIN {
     icalentry = ""
     indescription = 0
     insummary = 0
+    lasttimestamp = -1
 }
 
 # Local Variables:
