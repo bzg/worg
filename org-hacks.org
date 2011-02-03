@@ -1788,3 +1788,21 @@ Prefix argument determines number of lines."
   (global-set-key (kbd "<f8>") 'my-org-grep)
 #+end_src
 
+** Automatic screenshot insertion
+
+Suggested by Jonathan Bisson:
+
+#+begin_src emacs-lisp
+  (defun my-screenshot ()
+  "Take a screenshot into a unique-named file in the current buffer file
+  directory and insert a link to this file."
+    (interactive)
+    (setq filename
+          (concat
+           (make-temp-name
+            (file-name-directory (buffer-file-name))) ".jpg"))
+    (call-process "import" nil nil nil filename)
+    (insert (concat "[[" filename "]]"))
+    (org-display-inline-images))
+#+end_src
+
