@@ -3481,27 +3481,49 @@ and you could use `http' addresses just as well.
    :CUSTOM_ID: convert-to-open-office
    :END:
 
-While you cannot export directly from org to doc or odt, you can
-export to one of org-mode's supported export formats and then use an
-external tool or method to convert the exported file to doc or odt.
-While most of these methods work with simple documents, they may work
-more or less well when the document contains complex elements, such as
-footnotes, embedded images, math formulas, and so on. (Note, the lists
-below are by no means comprehensive).
+There are two approaches:
+- Use the development version of Org->Odt exporter
 
-1. html -> odt/doc/rtf
-   - open html in Open Office and save as odt/doc ([[http://permalink.gmane.org/gmane.emacs.orgmode/31482][see this post by
-     Eric Fraga]])
-   - [[http://www.artofsolving.com/opensource/pyodconverter][PyODConverter]]
-   - [[http://johnmacfarlane.net/pandoc/][Pandoc]] (this works for LaTeX and docbook as well)
-   - (Mac only) The [[http://developer.apple.com/library/mac/#DOCUMENTATION/Darwin/Reference/ManPages/man1/textutil.1.html][textutil]] utility bundled with OS X can convert
-     from html to doc
+  A native Org to OpenDocumentText exporter is in the works. The
+  exporter is currently not part of Orgmode repository.  See the
+  following [[http://lists.gnu.org/archive/html/emacs-orgmode/2011-01/msg01210.html][Announcement]] on the mailing list for further details.
+  
+  At the moment, the exporter supports the following most commonly
+  used features of Org
+  - Various Character Styles
+  - Various Paragraph Styles (including Source Blocks)
+  - Embedded ODT
+  - Embedded MathML
+  - Numbered, Bulleted and Description lists
+  - Embedding and Resizing of Images including embedding of LaTeX
+    fragments
+  - Fuzzy, Dedicated and Radio Targets and Links
+  - Tables
+  - Footnotes
+  - Special markups for elements like TODOs, Timestamps and Tags
 
-2. LaTeX -> odt/doc/rtf
-   - [[http://latex2rtf.sourceforge.net/][LaTeX2rtf]] (works well with index, footnotes, and references)
-   - [[http://www.tug.org/tex4ht/][TeX4ht]] (works with more complex latex elements, though can be
-     difficult to install)
-     - run =mk4ht oolatex file.tex=
+
+- Use existing exporters 
+
+  Export to one of org-mode's supported export formats and then use an
+  external tool or method to convert the exported file to doc or odt.
+
+  With simple documents, these methods work well. However for complex
+  documents containing footnotes, embedded images, math formuale etc
+  the results may be less than satisfactory. (Note, the lists below
+  are by no means comprehensive).
+  1. html -> odt/doc/rtf
+     - open html in Open Office and save as odt/doc ([[http://permalink.gmane.org/gmane.emacs.orgmode/31482][see this post by
+  	Eric Fraga]])
+     - [[http://www.artofsolving.com/opensource/pyodconverter][PyODConverter]]
+     - [[http://johnmacfarlane.net/pandoc/][Pandoc]] (this works for LaTeX and docbook as well)
+     - (Mac only) The [[http://developer.apple.com/library/mac/#DOCUMENTATION/Darwin/Reference/ManPages/man1/textutil.1.html][textutil]] utility bundled with OS X can convert
+  	from html to doc
+  2. LaTeX -> odt/doc/rtf
+      - [[http://latex2rtf.sourceforge.net/][LaTeX2rtf]] (works well with index, footnotes, and references)
+      - [[http://www.tug.org/tex4ht/][TeX4ht]] (works with more complex latex elements, though can be
+	difficult to install)
+	- run =mk4ht oolatex file.tex=
 
 See [[http://permalink.gmane.org/gmane.emacs.orgmode/31168][this thread]] for further details.
 
