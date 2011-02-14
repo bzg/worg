@@ -3547,6 +3547,32 @@ There are two approaches:
 
 See [[http://permalink.gmane.org/gmane.emacs.orgmode/31168][this thread]] for further details.
 
+* Backup
+
+Since =org= files are so central to your life, you probably want to back
+them up in a safe place.
+
+If the =org= file you want to back up are in a single directory, the
+preferred method is to us a =RCS= (Revision Control System) -- pick up your
+favorite ([[http://git-scm.com/][git]], [[http://bazaar.canonical.com/en/][bazaar]], [[http://mercurial.selenic.com/][mercurial]], [[http://subversion.apache.org/][subversion]], [[http://www.nongnu.org/cvs/][cvs]], etc.).  Depending on the
+RCS you use and how you use it, you can have a /local/ backup or sync it on
+a remote place.
+
+If you want to store all your =org= files from your =$HOME= to a single
+=~/org/backup/= folder, you can use this shell script (as [[http://article.gmane.org/gmane.emacs.orgmode/37655][suggested by
+Suvayu Ali]]):
+
+#+begin_src shell
+mkdir -p ~/org/backup && \
+find $HOME -type f -name '*\.org' ! -path "$HOME/org/*" \
+     -exec cp -t ~/org/backup/ \{\} \;
+#+end_src
+
+It will recursively search for =org= files in your =$HOME= directory
+(except those in =~/org/backup/=) and copy them to =~/org/backup/=.
+You can then use rsync to make sure =~/org/backup/= also lives on a 
+remote and safe place.
+
 * MobileOrg
 
 ** Which versions of MobileOrg do exist
