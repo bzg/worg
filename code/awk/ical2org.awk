@@ -32,13 +32,20 @@
 
 # a function to take the iCal formatted date+time, convert it into an
 # internal form (seconds since time 0), and adjust according to the
-# local time zone (specified by +-seconds calculated in the BEGIN
+# local time zone (specified by +-UTC_offset calculated in the BEGIN
 # section)
 
 function datetimestamp(input)
 {
     # convert the iCal Date+Time entry to a format that mktime can understand
-    datespec = gensub("([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])T([0-9][0-9])([0-9][0-9])([0-9][0-9]).*[\r]*", "\\1 \\2 \\3 \\4 \\5 \\6", "g", input);
+    
+    # datespec in UTC, i.e. ending with Z
+    UTC = "no"
+    UTC = gensub("([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])T([0-9][0-9])([0-9][0-9])([0-9][0-9])Z.*[\r]*", "yes", "g", input);
+    
+    # parse date and time
+    datespec  = gensub("([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])T([0-9][0-9])([0-9][0-9])([0-9][0-9]).*[\r]*", "\\1 \\2 \\3 \\4 \\5 \\6", "g", input);
+
     # print "date spec : " datespec; convert this date+time into
     # seconds from the beginning of time and include adjustment for
     # time zone, as determined in the BEGIN section below.  For time
@@ -46,7 +53,11 @@ function datetimestamp(input)
     # what happens when UTC time is a different day to local time and
     # especially when an event with a duration crosses midnight in UTC
     # time.  It should work but...
-    timestamp = mktime(datespec) + seconds;
+    if(UTC == "yes")
+	timestamp = mktime(datespec) + UTC_offset ;
+    else
+	timestamp = mktime(datespec);
+	
     # print "adjusted    : " timestamp
     # print "Time stamp  : " strftime("%Y-%m-%d %H:%M", timestamp);
     return timestamp;
@@ -54,7 +65,6 @@ function datetimestamp(input)
 
 BEGIN {
     ### config section
-    icaltime_local = 0;
     max_age = -1; # in days
                   # set this to -1 to get all entries or to N>0 to only get 
                   # that start or end less than N days ago
@@ -69,10 +79,7 @@ BEGIN {
     # strftime() is in hours * 100 so we multiply by 36 to get
     # seconds.  This does not work for time zones that are not an
     # integral multiple of hours (e.g. Newfoundland)
-    if(icaltime_local)
-	seconds = 0;
-    else
-	seconds = gensub("([+-])0", "\\1", "", strftime("%z")) * 36;
+    UTC_offset = gensub("([+-])0", "\\1", "", strftime("%z")) * 36;
     
     date = "";
     entry = ""
