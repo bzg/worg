@@ -65,7 +65,7 @@ function datetimestamp(input)
 
 BEGIN {
     ### config section
-    max_age = -1; # in days
+    max_age =  7; # in days
                   # set this to -1 to get all entries or to N>0 to only get 
                   # that start or end less than N days ago
     ### end config section
