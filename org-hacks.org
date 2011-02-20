@@ -95,6 +95,48 @@ To switch back to the compiled version just reload again with
 
 : M-x org-reload
 
+*** Check for possibly problematic old link escapes
+:PROPERTIES:
+:CUSTOM_ID: check-old-link-escapes
+:END:
+
+Starting with version 7.5 Org uses [[http://en.wikipedia.org/wiki/Percent-encoding][percent escaping]] more consistently
+and with a modified algorithm to determine which characters to escape
+and how.
+
+As a side effect this modified behaviour might break existing links if
+they contain a sequence of characters that look like a percent esage
+(e.g. =[0-9A-Fa-f]{2}=) but are in fact not a percent escape.
+
+The function below can be used to perform a preliminary check for such
+links in an Org mode file.  It will run through all links in the file
+and issue a warning if it finds a percent escape sequence which is not
+in old Org's list of known percent escapes.
+
+#+begin_src emacs-lisp
+  (defun dmaus/org-check-percent-escapes ()
+    "*Check buffer for possibly problematic old link escapes."
+    (interactive)
+    (when (eq major-mode 'org-mode)
+      (let ((old-escapes '("%20" "%5B" "%5D" "%E0" "%E2" "%E7" "%E8" "%E9"
+                           "%EA" "%EE" "%F4" "%F9" "%FB" "%3B" "%3D" "%2B")))
+        (unless (boundp 'warning-suppress-types)
+          (setq warning-suppress-types nil))
+        (widen)
+        (show-all)
+        (goto-char (point-min))
+        (while (re-search-forward org-any-link-re nil t)
+          (let ((end (match-end 0)))
+            (goto-char (match-beginning 0))
+            (while (re-search-forward "%[0-9a-zA-Z]\\{2\\}" end t)
+              (let ((escape (match-string-no-properties 0)))
+                (unless (member (upcase escape) old-escapes)
+                  (warn "Found unknown percent escape sequence %s at buffer %s, position %d"
+                        escape
+                        (buffer-name)
+                        (- (point) 3))))))))))
+#+end_src
+
 ** Enhancing the Org experience.
 *** Speed Commands
 Speed commands are described [[http://orgmode.org/manual/Speed-keys.html#Speed-keys][here]] in the manual. Add your own speed
