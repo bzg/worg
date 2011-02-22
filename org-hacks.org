@@ -542,13 +542,15 @@ From David Maus:
 Paul Sexton [[http://article.gmane.org/gmane.emacs.orgmode/38014][posted]] this function to count words in an Org buffer:
 
 #+begin_src emacs-lisp
-(defun org-word-count (beg end &optional count-latex-macro-args? count-footnotes?)
+(defun org-word-count (beg end
+                           &optional count-latex-macro-args?
+                           count-footnotes?)
   "Report the number of words in the Org mode buffer or selected region.
 Ignores:
 - comments
 - tables
 - source code blocks (#+BEGIN_SRC ... #+END_SRC, and inline blocks)
-- hyperlinks
+- hyperlinks (but does count words in hyperlink descriptions)
 - tags, priorities, and TODO keywords in headers
 - sections tagged as 'not for export'.
 
@@ -568,13 +570,19 @@ of its arguments."
     (save-excursion
       (goto-char beg)
       (while (< (point) end)
-        (re-search-forward "\\w+\\W*")
         (cond
          ;; Ignore comments.
          ((or (org-in-commented-line) (org-at-table-p))
           nil)
-         ;; Ignore hyperlinks.
-         ;; TODO need to count text of the link's description.
+         ;; Ignore hyperlinks. But if link has a description, count
+         ;; the words within the description.
+         ((looking-at org-bracket-link-analytic-regexp)
+          (when (match-string-no-properties 5)
+            (let ((desc (match-string-no-properties 5)))
+              (save-match-data 
+                (incf wc (length (remove "" (org-split-string
+                                             desc "\\W")))))))
+          (goto-char (match-end 0)))
          ((looking-at org-any-link-re)
           (goto-char (match-end 0)))
          ;; Ignore source code blocks.
@@ -616,7 +624,8 @@ of its arguments."
                   (org-forward-same-level 1)
                 nil))
              (t
-              (incf wc))))))))
+              (incf wc))))))
+        (re-search-forward "\\w+\\W*")))
     (message (format "%d words in %s." wc
                      (if mark-active "region" "buffer")))))
 #+end_src
