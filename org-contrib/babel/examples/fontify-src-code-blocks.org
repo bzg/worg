@@ -1,0 +1,70 @@
+#+TITLE:     Pretty fontification of source code blocks
+#+AUTHOR:    Sebastien Vauban
+#+EMAIL:     sva@mygooglest.com
+#+DATE:      2011-02-22
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  en_US
+
+* Description
+
+This article is some "theming guide" about customizing the look and feel of an
+Org-Babel buffer inside Emacs. We'll show you how you can improve the
+appearance of source code blocks.
+
+* Screenshot
+
+Screenshot for the *Leuven* theme (light theme, i.e. with a white background,
+also known as =color-theme-sva=):
+
+[[file:../images/fontified-src-code-blocks.png]]
+
+To configure "native fontification" (as in the above screenshot), set the
+following in your =.emacs= file:
+
+#+begin_src emacs-lisp
+;; fontify code in code blocks
+(setq org-src-fontify-natively t)
+#+end_src
+
+* Configuration File
+
+- To get the above full contributed theme, please visit [[XXX][Installing themes]] and
+  copy the file =color-theme-sva.el= in your =load-path=.
+
+- If you want to keep your existing Emacs color theme, and you only want to
+  customize the "delimiter lines" of the code blocks, either:
+
+  + add the following lines to your current color theme:
+
+    #+begin_src emacs-lisp
+    (org-block-begin-line
+     ((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+    (org-block-background
+     ((t (:background "#FFFFEA"))))
+    (org-block-end-line
+     ((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+    #+end_src
+
+  + define these faces, in your =.emacs= file, /before/ requiring Org (if you
+    don't have your own color theme):
+
+    #+begin_src emacs-lisp
+    (defface org-block-begin-line
+      '((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF")))
+      "Face used for the line delimiting the begin of source blocks.")
+
+    (defface org-block-background
+      '((t (:background "#FFFFEA")))
+      "Face used for the source block background.")
+
+    (defface org-block-end-line
+      '((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF")))
+      "Face used for the line delimiting the end of source blocks.")
+    #+end_src
+
+* Further extensions
+
+When we will have some spare time, our intention is to get the reserved
+keywords of Org-Babel (such as =:var= and =:exports=) somehow highlighted.
+Stay tuned -- or give some help!
