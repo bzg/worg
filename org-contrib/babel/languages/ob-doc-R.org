@@ -66,8 +66,9 @@ Examples demonstrating the use of R code within Org-mode.
 * Language-specific Features 					      :Write:
 ** Graphical output 							:Fix:
     If a =:file filename.ext= header argument is provided to an R
-    source block, then the output from the source block will depend on
-    the value of the =:results= header argument.
+    source block, then the output from the source block will go to the
+    named file. What that output is depends on the value of the
+    =:results= header argument.
 
     If the value is =:results graphics= then "base" graphics output is
     captured on disk, and a link to the graphics file is inserted into
@@ -79,6 +80,90 @@ Examples demonstrating the use of R code within Org-mode.
     If the extension of the file name passed to =:file= is not
     recognized, png format output is created by default.
     
+
+    For further clarification of =:file= and =:results=, see [[http://thread.gmane.org/gmane.emacs.orgmode/35396/focus=35766][this
+    thread]], which is reproduced in part below:
+
+#+begin_src org
+  ,From: Dan Davison <dandavison7 <at> gmail.com>
+  ,Subject: Re: [babel] R: New handling of file output
+  ,Newsgroups: gmane.emacs.orgmode
+  ,Date: 2010-12-21 16:57:46 GMT (9 weeks, 4 days and 19 minutes ago)
+  ,Dan Davison <dandavison7 <at> gmail.com> writes:
+
+  ,> Please note the following changes to the way that org-babel handles
+  ,> file output. These may break existing org-babel files which use
+  ,> the :file header argument.
+  ,>
+  ,> :file <filename> should be understood as saying "write the result
+  ,> to <filename> and return a link to <filename>".
+  ,>
+  ,> This works for all languages. For graphics languages (e.g. ditaa, dot,
+  ,> gnuplot) there is no change in behavior: "result" in the above is the
+  ,> graphics, and a link to the image is placed in the org buffer. For
+  ,> general-purpose languages (e.g. emacs-lisp, python, R, ruby, shell),
+  ,> the "result" written to file is the normal org-babel result (string,
+  ,> number, table).
+  ,>
+  ,> This is a backwards-incompatible change for R, which was previously
+  ,> interpreting :file to mean "send graphics to file". I will send a
+  ,> separate email concerning R.
+
+  ,Previously R understood :file <filename> to mean "save graphics to
+  ,<filename>"[1]; now R behaves like other languages and sends the normal
+  ,org-babel result to file (string, number, table). To tell R to save
+  ,graphics[1] to file, use :results graphics.
+
+  ,Some examples:
+
+  ,Wrong!
+
+  ,#+begin_src R :file img.png
+  ,hist(rnorm(100))
+  ,"img.png is going to contain this string."
+  ,#+end_src
+
+  ,Use :results graphics save graphics:
+
+  ,#+begin_src R :file img.png :results graphics
+  ,hist(rnorm(100))
+  ,"But now img.png is going to contain graphics."
+  ,#+end_src
+
+  ,You may want to use `org-babel-default-header-args:R' to make this
+  ,more convenient:
+
+  ,#+begin_src emacs-lisp
+  ,  (setq org-babel-default-header-args:R
+  ,        '((:results . "graphics")))
+  ,#+end_src
+
+  ,Alternatively the :results graphics header can be set in a property
+  ,drawer for the subtree, or a #+babel: line, as usual.
+
+  ,Now this will do what was intended
+  ,#+begin_src R :file img.png
+  ,hist(rnorm(100))
+  ,#+end_src
+
+  ,Here is an example of saving something other than base graphics to file,
+  ,and returning a link to the file. Note that :file is not used, and the
+  ,filename must be returned. This could be used to save images created by
+  ,non-base graphics libraries:
+
+  ,#+begin_src R :results file :var file="savefile"
+  ,write.something.to.file <- function(f) cat("hello", file=f)
+  ,write.something.to.file(f=file)
+  ,file
+  ,#+end_src
+
+  ,* Footnotes
+  ,[1] This only works for "base" graphics.
+
+#+end_src
+
+
+
 # <<r-dev-header-args>>
     Additionally, values for several arguments to the R graphics
     device can be passed using header args:
@@ -100,12 +185,13 @@ Examples demonstrating the use of R code within Org-mode.
     =:R-dev-args= to pass background and foreground colors.  Note that
     both of these arguments can also be passed directly as
     header args, using =:fg= and =:bg=.
-    
-#+begin_example 
-    #+begin_src R :file z.pdf :width 8 :height 8 :R-dev-args bg="olivedrab", fg="hotpink"
-      plot(matrix(rnorm(100), ncol=2), type="l")
-    #+end_src
-#+end_example
+
+#+begin_src org
+  ,#+header: :width 8 :height 8 :R-dev-args bg="olivedrab", fg="hotpink"
+  ,#+begin_src R :file z.pdf :results graphics
+  ,plot(matrix(rnorm(100), ncol=2), type="l")
+  ,#+end_src
+#+end_src
 
 If "base" graphics aren't begin generated, then additional header
 arguments might be needed.  For example, with the =ggplot2= package,
