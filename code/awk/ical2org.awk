@@ -97,7 +97,6 @@ BEGIN {
     print "#+CATEGORY: google"
     print "#+STARTUP: hidestars"
     print "#+STARTUP: overview"
-    print "#+SEQ_TODO: GCAL"
     print " "
 }
 
@@ -211,7 +210,7 @@ BEGIN {
     if(max_age<0 || ( lasttimestamp>0 && systime()<lasttimestamp+max_age*24*60*60 ) )
     {
     # translate \n sequences to actual newlines and unprotect commas (,)
-    print "* GCAL " gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary))
+    print "* " gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary))
     print "   SCHEDULED: <" date ">"
     if(length(location))
 	print "   LOCATION: " location
