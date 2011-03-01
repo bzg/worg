@@ -211,7 +211,7 @@ BEGIN {
     {
     # translate \n sequences to actual newlines and unprotect commas (,)
     print "* " gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary))
-    print "   SCHEDULED: <" date ">"
+    print "  <" date ">"
     print "  :PROPERTIES:"
     print "  :ID:       " id
     if(length(location))
