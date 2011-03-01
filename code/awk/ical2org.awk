@@ -212,12 +212,12 @@ BEGIN {
     # translate \n sequences to actual newlines and unprotect commas (,)
     print "* " gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary))
     print "   SCHEDULED: <" date ">"
-    if(length(location))
-	print "   LOCATION: " location
-    if(length(status))
-	print "   STATUS: " status
     print "  :PROPERTIES:"
     print "  :ID:       " id
+    if(length(location))
+	print "  :LOCATION: " location
+    if(length(status))
+	print "  :STATUS: " status
     print "  :END:"
     # for the entry, convert all embedded "\n" strings to actual newlines
     print ""
