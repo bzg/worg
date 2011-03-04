@@ -1764,6 +1764,71 @@ attachment."
 The whole magic lies in the special strings that mark a HTML
 attachment.  So you might just have to find out what these special
 strings are in message-mode and modify the functions accordingly.
+** Add sunrise/sunset times to the agenda.
+  -- Nick Dokos
+
+The diary package provides the function =diary-sunrise-sunset= which can be used
+in a diary s-expression in some agenda file like this:
+
+#+begin_src org
+%%(diary-sunrise-sunset)
+#+end_src
+
+Seb Vauban asked if it is possible to put sunrise and sunset in
+separate lines. Here is a hack to do that. It adds two functions (they
+have to be available before the agenda is shown, so I add them early
+in my org-config file which is sourced from .emacs, but you'll have to
+suit yourself here) that just parse the output of
+diary-sunrise-sunset, instead of doing the right thing which would be
+to take advantage of the data structures that diary/solar.el provides.
+In short, a hack - so perfectly suited for inclusion here :-)
+
+The functions (and latitude/longitude settings which you have to modify for
+your location) are as follows:
+
+#begin_src emacs-lisp
+(setq calendar-latitude 40.3)
+(setq calendar-longitude -71.0)
+(defun diary-sunrise ()
+  (let ((dss (diary-sunrise-sunset)))
+    (with-temp-buffer
+      (insert dss)
+      (goto-char (point-min))
+      (while (re-search-forward " ([^)]*)" nil t)
+        (replace-match "" nil nil))
+      (goto-char (point-min))
+      (search-forward ",")
+      (buffer-substring (point-min) (match-beginning 0)))))
+
+(defun diary-sunset ()
+  (let ((dss (diary-sunrise-sunset))
+        start end)
+    (with-temp-buffer
+      (insert dss)
+      (goto-char (point-min))
+      (while (re-search-forward " ([^)]*)" nil t)
+        (replace-match "" nil nil))
+      (goto-char (point-min))
+      (search-forward ", ")
+      (setq start (match-end 0))
+      (search-forward " at")
+      (setq end (match-beginning 0))
+      (goto-char start)
+      (capitalize-word 1)
+      (buffer-substring start end))))
+#end_src
+
+You also need to add a couple of diary s-expressions in one of your agenda
+files:
+
+#+begin_src org
+%%(diary-sunrise)
+%%(diary-sunset)
+#+end_src
+
+The thread on the mailing list that started this can be found [[http://thread.gmane.org/gmane.emacs.orgmode/38723Here%20is%20a%20pointer%20to%20the%20thread%20on%20the%20mailing%20list][here]].
+In comparison to the version posted on the mailing list, this one
+gets rid of the timezone information.
 * Hacking Org: Working with Org-mode and External Programs.
 ** Use Org-mode with Screen [Andrew Hyatt]
 
@@ -1906,7 +1971,7 @@ export process (configurable per file with a "#+StaticMathJax:" line).
 Read README.org and the comments in org-static-mathjax.el for usage instructions.
 ** Search Org files using lgrep
 
-Matt Lundi suggests this:
+Matt Lundin suggests this:
 
 #+begin_src emacs-lisp
   (defun my-org-grep (search &optional context)
