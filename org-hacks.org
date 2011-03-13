@@ -670,6 +670,30 @@ the new file to the top level heading:
 While this hack obviously destroys the outline hierarchy somewhat, it
 at least preserves the logic of level one groupings.
 
+A slightly more complex version of this hack will not only keep the
+archive organized by top-level headings, but will also preserve the
+tags found on those headings:
+
+#+begin_src emacs-lisp
+(defadvice org-archive-subtree (around my-org-archive-subtree-low-level activate)
+  (let ((tags (my-org-inherited-no-file-tags))
+	(org-archive-location 
+	 (if (save-excursion (org-back-to-heading)
+			     (> (org-outline-level) 1))
+	     (concat (car (split-string org-archive-location "::"))
+		     "::* "
+		     (car (org-get-outline-path)))
+	   org-archive-location)))
+    ad-do-it
+    (with-current-buffer (find-file-noselect (org-extract-archive-file))
+      (save-excursion
+	(catch 'break
+	  (while t
+	    (when (= 1 (org-up-heading-safe))
+	      (throw 'break t))))
+	(org-set-tags-to tags)))))
+#+end_src
+
 *** Archive in a date tree
 
 Posted to Org-mode mailing list by Osamu Okano [2010-04-21 Wed].
