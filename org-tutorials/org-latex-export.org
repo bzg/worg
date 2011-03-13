@@ -452,8 +452,29 @@ all you get").  In practice, LaTeX users define common semantic
 elements in a LaTeX class or style file and these are marked up in
 text with commands often peculiar to the class or style file.
 Clearly, there is no way that Org-mode can anticipate commands
-peculiar to arbitrary class or style files.  Fortunately, there are
-facilities for inline and block-level markup.
+peculiar to arbitrary class or style files.  Fortunately, Org-mode
+provides facilities to define special characters and to specify inline
+and block-level markup.
+
+** Special Characters
+The variable =org-entities-user= holds the information needed to
+define special characters.  In response to a question posed by Rasmus
+Pank Roulund, Lawrence Mitchell described how to use this variable to
+define an escaped space, which is used in LaTeX to insert a single
+space, instead of a double space, after a period that doesn't end a
+sentence.
+
+With this definition:
+
+: (setq org-entities-user '(("space" "\\ " nil " " " " " " " ")))
+
+then
+
+: this is some text, e.g.\space foo bar
+
+is exported as
+
+: this is some text, e.g.\  foo bar
 
 ** Block-level Markup
 For simple /block-level/ arbitrary markup, you can use the contributed
@@ -476,7 +497,6 @@ typeset with a shaded background:
 : LaTeX_HEADER: \usepackage{xcolor}
 : LaTeX_HEADER: \definecolor{shadecolor}{gray}{.95}
 : LaTeX_HEADER: \newenvironment{results}{\begin{shaded}}{\end{shaded}}
-
 
 
 ** Inline Markup
@@ -619,7 +639,7 @@ FOO
 }
 #+end_example
 
-* Exporting Listings                                               :noexport:
+* Exporting Listings
 ** Exporting Pseudo-Code
   The LaTeX exporter will fontify exported code blocks written in any
   language that has an associated Emacs mode for editing.  If you want
@@ -642,6 +662,176 @@ FOO
 :  \end{lstlisting}
 : \end{algorithm}
 : #+end_latex
+** Typesetting and Fontifying Source Code
+Org-mode supports two LaTeX packages for typesetting and fontifying
+source code; listings and minted.  The listings package is a pure
+LaTeX implementation that works reasonably well, but the package
+appears to be orphaned and the latest documentation was written
+in 2007.  In contrast, the minted package is not a pure LaTeX solution
+and relies on an external Python script, pygmentize, to typeset and
+fontify source code.  This package appears to be actively maintained.
+Both packages are included in the TeXLive and MacTeX LaTeX
+distributions.  If your distribution lacks one or the other, then
+you'll need to check the documentation for instructions how to install
+them. 
+
+The two packages are structured somewhat differently, but it is
+possible to configure Org-mode so that these differences are mostly
+smoothed over, making it possible to generate LaTeX code that will
+work with either package.  The two main differences have to do with
+the minted package's generation of language names by appending =code=
+to the language name; this convention is not followed by the listings
+package.  In addition, the minted package defines /styles/, by which
+it means colorizing semantic elements of the programming language.
+This facility is not implemented in the listings package.
+
+The following sections show the basics of listings and minted setups
+which, when exported to LaTeX, illustrate the ability of each package
+to typeset and fontify source code on a per-language basis.
+
+** Example minted setup
+
+In this example, the minted package is specified in the
+=#+LaTeX_HEADER:=.  This is followed by a command to use the minted
+style =emacs=, which colors source code in a way familiar to emacs
+users.  The final =#+LaTeX_HEADER:= line uses the =newminted= macro to
+set the font size for code blocks of =common-lisp=. 
+
+The source code block =setup-minted= includes emacs-lisp code that
+might typically appear in .emacs, but can be useful in a source code
+block where it can be used to configure LaTeX export for an individual
+document.  In the source code block, the variables that control LaTeX
+export using the minted package are configured.  First,
+=org-export-latex-listings= is set to use the minted package.  Then,
+the variable =org-export-latex-custom-lang-environments= is used to
+associate the emacs-lisp code of an Org-mode source code block with
+the common-lisp language that the minted package knows how to parse.
+Note that this is given as =common-lispcode= here, but as
+=common-lisp= in the call to the =newminted= macro.  The minted
+package appends =code= to language names by default.  The variable
+=org-export-latex-minted-options= sets typesetting options that will
+apply to all programming languages.  See the minted package
+documentation for the very many options that can be set with key/val
+pairs. The three entries in the association list call for source code
+blocks to be framed with lines, set in a very small font, and
+identified with line numbers.  In relation to these settings, the
+emacs-lisp code will be set at a slightly larger font size.  Finally,
+the variable =org-latex-to-pdf-process= is set using the
+=-shell-escape= option so the external pygmentize program can be
+called and its results incorporated into the pdf document.  Note that
+using the =-shell-escape= option creates security holes.
+
+A Python source code block at the end illustrates how the default
+emacs-style code differs from the specially formatted emacs-lisp
+source code.
+
+#+begin_example 
+, #+LATEX_CLASS: article
+, #+LaTeX_HEADER: \usepackage{minted}
+, #+LaTeX_HEADER: \usemintedstyle{emacs}
+, #+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
+
+, #+source: setup-minted
+, #+begin_src emacs-lisp :exports both :results silent
+     (setq org-export-latex-listings 'minted)
+     (setq org-export-latex-custom-lang-environments
+           '(
+            (emacs-lisp "common-lispcode")
+             ))
+     (setq org-export-latex-minted-options
+           '(("frame" "lines")
+             ("fontsize" "\\scriptsize")
+             ("linenos" "")))
+     (setq org-latex-to-pdf-process
+           '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+, #+end_src
+
+, #+source: another-listing
+, #+begin_src python :exports code
+   x = str(y)
+, #+end_src
+#+end_example
+ 
+When this example is exported (=C-c C-e d=) the resulting pdf file
+contains two source code blocks nicely typeset and colored in a way
+common to many emacs setups.
+
+** Example listings setup
+
+In this example, the listings package is specified in the
+=#+LaTeX_HEADER:=.  It is followed by three =#+LaTeX_HEADER:= lines
+that construct a call to the =lstnewenvironment= command that
+associates the language identifier =common-lispcode= with the =Lisp=
+language that the listings package knows how to parse, and configures
+typesetting options that will apply to code identified as
+=common-lispcode=.  Note that =common-lispcode= is used here simply to
+conform with the setup used by the minted package for typesetting
+emacs-lisp code.  The final =#+LaTeX_HEADER:= line defines a new LaTeX
+command that configures typesetting Python code inline.
+
+The source code block =setup-listings= instructs Org-mode to use the
+listings package.  It sets the variable
+=org-export-latex-custom-lang-environments= to associate =emacs-lisp=
+source code in Org-mode with =common-lispcode=, as defined by
+=lstnewenvironment=.  Then it configures default options in the
+variable =org-export-latex-listings-options= that place a frame around
+source code blocks, set code in a fairly small font, and number lines
+at the left with tiny numbers.  The variable
+=org-latex-to-pdf-process= doesn't need to use the =-shell-escape=
+option in the call to pdflatex because the listings package is pure
+LaTeX and doesn't rely on the output of external programs.  A new link
+type, =latex=, is defined.  This can be used to markup inline code
+snippets.  This is followed by a short Python source code block that
+illustrates the difference between the default typesetting options and
+the options specified for =emacs-lisp= source code blocks.  Finally,
+the =latex= link type is used to call the new =python= command to
+typeset an inline code snippet.
+
+#+begin_example 
+, #+LATEX_CLASS: article
+, #+LaTeX_HEADER: \usepackage{listings}
+, #+LaTeX_HEADER: \lstnewenvironment{common-lispcode}
+, #+LaTeX_HEADER: {\lstset{language={Lisp},basicstyle={\ttfamily\footnotesize},frame=single,breaklines=true}}
+, #+LaTeX_HEADER: {}
+, #+LaTeX_HEADER: \newcommand{\python}[1]{\lstset{language={Python},basicstyle={\ttfamily\small}}\lstinline{#1}}
+
+, #+source: setup-listings
+, #+begin_src emacs-lisp :exports both :results silent
+  (setq org-export-latex-listings 'listings)
+  (setq org-export-latex-custom-lang-environments
+        '((emacs-lisp "common-lispcode")))
+  (setq org-export-latex-listings-options
+        '(("frame" "lines")
+          ("basicstyle" "\\footnotesize")
+          ("numbers" "left")
+          ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+        '("pdflatex -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+, #+end_src
+
+, #+source: another-listing
+, #+begin_src python :exports code
+  x = str(y)
+, #+end_src
+
+, This is an inline snippet of Python: [[latex:python][x = str(y)]].
+#+end_example
+
+When this example is exported, both source code blocks are typeset
+without any semantic markup, which would be specified by element,
+rather than with a style as with the minted package.
 * Exporting Tables
 LaTeX divides table handling into two parts: typesetting the actual
 table, and placing the table on the page along with a caption and
@@ -891,6 +1081,25 @@ font clashes with the [[latex:package][amssymb]] package.
 : #+LaTeX_HEADER: \usepackage[adobe-utopia]{mathdesign}
 : #+LaTeX_HEADER: \usepackage[scaled]{berasans} 
 : #+LaTeX_HEADER: \usepackage[scaled]{beramono}
+
+* Cross-references
+The Org-mode LaTeX exporter assigns its own labels to section
+headings.  In response to a question from Rasmus Pank Roulund on how
+to resolve a label when cross-referencing a section heading, Lawrence
+Mitchell pointed out that with the following setting:
+
+: (setq org-export-latex-hyperref-format "\\ref{%s}")
+
+a link to a headline will cross reference properly during LaTeX
+export.
+
+For example,
+
+: * My Headline
+: In section [[My Headline]] we discuss ...
+
+exports to LaTeX correctly.  Note that the link must match the
+headline exactly for this to work.
 
 * Bibliography
 # <<bibliography section>>
