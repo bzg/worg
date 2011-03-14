@@ -675,31 +675,32 @@ archive organized by top-level headings, but will also preserve the
 tags found on those headings:
 
 #+begin_src emacs-lisp
-(defun my-org-inherited-no-file-tags ()
-  (let ((tags (org-entry-get nil "ALLTAGS" 'inherited)))
-    (mapc (lambda (tag)
-            (setq tags 
-                  (replace-regexp-in-string (concat tag ":") "" tags)))
-          org-file-tags)
-    (if (string= ":" tags) nil tags)))
-
-(defadvice org-archive-subtree (around my-org-archive-subtree-low-level activate)
-  (let ((tags (my-org-inherited-no-file-tags))
-	(org-archive-location 
-	 (if (save-excursion (org-back-to-heading)
-			     (> (org-outline-level) 1))
-	     (concat (car (split-string org-archive-location "::"))
-		     "::* "
-		     (car (org-get-outline-path)))
-	   org-archive-location)))
-    ad-do-it
-    (with-current-buffer (find-file-noselect (org-extract-archive-file))
-      (save-excursion
-	(catch 'break
-	  (while t
-	    (when (= 1 (org-up-heading-safe))
-	      (throw 'break t))))
-	(org-set-tags-to tags)))))
+  (defun my-org-inherited-no-file-tags ()
+    (let ((tags (org-entry-get nil "ALLTAGS" 'selective))
+          (ltags (org-entry-get nil "TAGS")))
+      (mapc (lambda (tag)
+              (setq tags 
+                    (replace-regexp-in-string (concat tag ":") "" tags)))
+            (append org-file-tags (when ltags (split-string ltags ":" t))))
+      (if (string= ":" tags) nil tags)))
+  
+  (defadvice org-archive-subtree (around my-org-archive-subtree-low-level activate)
+    (let ((tags (my-org-inherited-no-file-tags))
+          (org-archive-location 
+           (if (save-excursion (org-back-to-heading)
+                               (> (org-outline-level) 1))
+               (concat (car (split-string org-archive-location "::"))
+                       "::* "
+                       (car (org-get-outline-path)))
+             org-archive-location)))
+      ad-do-it
+      (with-current-buffer (find-file-noselect (org-extract-archive-file))
+        (save-excursion
+          (catch 'break
+            (while t
+              (when (= 1 (org-up-heading-safe))
+                (throw 'break t))))
+          (org-set-tags-to tags)))))
 #+end_src
 
 *** Archive in a date tree
