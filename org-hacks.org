@@ -138,7 +138,7 @@ in old Org's list of known percent escapes.
             (goto-char end))))))
 #+end_src
 
-** Enhancing the Org experience.
+** Enhancing the Org experience
 *** Speed Commands
 Speed commands are described [[http://orgmode.org/manual/Speed-keys.html#Speed-keys][here]] in the manual. Add your own speed
 commands here.
@@ -336,6 +336,73 @@ will be transposed as
 : | 5 | d | h |
 
 (Note that horizontal lines disappeared.)
+
+*** Times computation
+**** Manipulate hours/minutes/seconds in table formulas
+
+Martin Halder [[http://article.gmane.org/gmane.emacs.orgmode/39487][wanted]] to "generate a simple table with time format "hh:mm"
+and auto calculate daily sum".  He [[http://article.gmane.org/gmane.emacs.orgmode/39519][ended up]] with these functions, which can
+be useful:
+
+#+begin_src emacs-lisp
+(defun my-sec (arg)
+  (if (string-match org-timer-re arg)
+      (org-timer-hms-to-secs arg)
+    (org-timer-hms-to-secs (concat arg ":00"))))
+
+(defun my-hms (s)
+  (let (m h)
+    (setq s (abs s)
+          m (/ s 60) s (- s (* 60 m))
+          h (/ m 60) m (- m (* 60 h)))
+    (format "%d:%02d" h m)))
+
+(defun my-ihms (s)
+  (let (m h)
+    (setq s (/ (* s 10000) 3600)
+          s (abs s)
+          m (/ s 100) s (- s (* 100 m))
+          h (/ m 100) m (- m (* 100 h)))
+    (format "%d.%02d" h m)))
+#+end_src
+
+Using this function, you can create a table like this one:
+
+: | Date             | Start | Lunch |  Back |   End |  Sum |  Ind |
+: |------------------+-------+-------+-------+-------+------+------|
+: | [2011-03-01 Tue] |  8:00 | 12:00 | 12:30 | 18:15 | 9:45 | 9.75 |
+: #+TBLFM: $6='(my-hms (+ (- (my-sec $5) (my-sec $4)) (- (my-sec $3) (my-sec $2)))):: \
+:          $7='(my-ihms (+ (- (my-sec $5) (my-sec $4)) (- (my-sec $3) (my-sec $2))))
+
+**** Subtracting durations in seconds
+
+#+begin_src emacs-lisp
+(defun org-hh:mm:ss-string-to-seconds (s)
+  "Convert a string HH:MM:SS to a number of seconds."
+  (when (string-match "\\([0-9]+\\):\\([0-9]+\\):\\([0-9]+\\)" s)
+    (let ((hour (string-to-number (match-string 1 s)))
+	  (min (string-to-number (match-string 2 s)))
+	  (sec (string-to-number (match-string 3 s))))
+      (+ (* hour 3600) (* min 60) sec))))
+
+(defun org-subtract-hh:mm:ss-time (t1 t2)
+  "Substract time value from hh:mm:ss"
+  (let* ((sec (- (org-hh:mm:ss-string-to-seconds t2)
+		 (org-hh:mm:ss-string-to-seconds t1)))
+	 (hour (floor (/ sec 3600)))
+	 (min (floor (/ (- sec (* 3600 hour)) 60)))
+	 (secs (round (- sec (* 3600 hour) (* 60 min)))))
+    (format "%.2d:%.2d:%.2d" hour min secs)))
+#+end_src
+
+With these function, you can subtract durations in a table like this:
+
+: | Part  |    Begin |      End | Duration |
+: |-------+----------+----------+----------|
+: | One   | 00:00:00 | 00:01:11 | 00:01:11 |
+: | Two   | 00:01:12 | 00:02:00 | 00:00:48 |
+: | Three | 00:02:05 | 00:16:06 | 00:14:01 |
+: #+TBLFM: $4='(org-subtract-hh:mm:ss-time $2 $3)
 
 *** Dates computation
 
