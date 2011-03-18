@@ -1,0 +1,143 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+TITLE:      Encrypting org Files.
+#+AUTHOR:     Ian Barton
+#+EMAIL:      ian at manor-farm dot org
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+{Back to Worg's index}]]
+
+* General Information About Encrypting Files with Emacs.
+Emacs uses EasyPG as an interface to gnupg. If you have a recent
+version of Emacs (at least 23) EasyPG is part of Emacs. However,
+several package managers include a version of EasyPG for use with
+earlier versions of Emacs. If your version of Emacs comes with EasyPG,
+don't install the EasyPG package, as this will lead to conflicts.
+
+To set up Emacs for transparent encryption and decryption our need the
+add the following to your .emacs:
+
+#+BEGIN_SRC emacs-lisp
+   (require 'epa-file)
+   (epa-file-enable)
+#+END_SRC
+
+* Encrypting the Whole File Using EasyPG.
+If you want to encrypt the whole file using gnupg, but still have the
+decrypted file recognized as an org file, you should make:
+
+B-*- mode:org; epa-file-encrypt-to: ("me@mydomain.com") -*-
+
+the first line in the file. Where "me@mydomain.com" is the email
+address associated with your default gnupg key. Note that gpg
+encrypted files should be saved with the default extension of .gpg.
+
+When you open the file you will be prompted for your password and
+Emacs will display the decrypted contents in org-mode. When you save
+the file it would automatically be encrypted.
+
+* Symmetric or Public Key Encryption.
+If you use symmetric encryption all that is required to
+encrypt/decrypt your file is the pass phrase. Using Public Key
+Encryption, you require both your private key and your pass phrase.
+
+EasyPG can use both methods of encryption. If you want to use
+symmetric encryption omitting the "epa-file-encrypt-to:" from your
+.gpg file should do the trick. If this doesn't work, you may try
+setting the variable:
+
+#+BEGIN_SRC emacs-lisp
+  (setq epa-file-select-keys nil) 
+#+END_SRC
+
+Conversely, if you want to use Public Key Encryption make sure that
+you specify "epa-file-encrypt-to: " at the beginning of your file.
+
+* Encrypting Specific Entries in an org File with org-crypt.
+If you just want to encrypt the text of an entry, but not the
+headline, or properties you can use org-crypt. In order to use
+org-crypt you need to add something like the following to your .emacs:
+
+#+BEGIN_SRC emacs-lisp
+(require 'org-crypt)
+(org-crypt-use-before-save-magic)
+(setq org-tags-exclude-from-inheritance (quote ("crypt")))
+;; GPG key to use for encryption
+;; Either the Key ID or set to nil to use symmetric encryption.
+(setq org-crypt-key nil)
+#+END_SRC
+
+Now any text below a headline that has a :crypt: tag will be
+automatically be encrypted when the file is saved. If you want to use
+a different tag just customize the "org-crypt-tag-matcher" setting.
+
+Preventing tag inheritance stops you having encrypted text inside
+encrypted text.
+
+To decrypt the text just call "M-x org-decrypt-entry" and the
+encrypted text where the point is will be replaced with the plain
+text. If you use this feature a lot, you will probably want to bind
+"M-x org-decrypt-entry" to a key.
+
+Entries with a :crypt: tag will be automatically be encrypted when you
+save the file.
+
+If you have autosave turned on and decrypt the files encrypted
+entries, the autosave file will contain the entries in plain text. For
+this reason your should disable autosave for encrypted files.
+
+* Using gnupg-agent to Cache Your Passwords.
+If you need to decrypt files frequently, you will probably get fed up
+of typing in your password each time you open an encrypted file. You
+can use gpg-agent to cache your passwords, so you only need to type
+your password once. Obviously this has security implications and it's
+up to you to decide whether you want your passwords cached.
+
+On Debian based systems your can install gpg-agent using your
+package manager:
+
+#+BEGIN_SRC sh
+  sudo apt-get install gpg-agent
+#+END_SRC
+
+You can configure gnupg-agent by editing ~/.gnupg/gpg-agent.conf. As a
+minimum you will probably want to set:
+
+- default-cache-ttl the time the cahse entry is valid in seconds. The
+  default is 600.
+- max-cache-ttl the maximum time a cache entry is valid in
+  seconds. After this time the cache entry will be expired even if it
+  has been accessed recently.
+
+
+To ensure that gnupg uses gnupg-agent you should edit
+~/.gnupg/gpg.conf and make sure that the use-agent line is
+un-commented.
+
+If you are using a console based system you need to:
+
+#+BEGIN_SRC sh
+  eval $(gpg-agent)
+#+END_SRC
+
+in your shell's startup script.
+
+If you are using a window manager you will probably want to install
+one of the pin entry programs, such as pinentry-gtk2 or pinentry-qt,
+so that X can prompt you for your pass phrase.
+
+
+Now when you try to open a .gpg file, or decrypt some text encrypted
+with org-crypt, you will be prompted for your pass phrase, but your
+password will be cached so re-opening the file, or decrypting another
+region will not prompt you for your password again.
+
+* Emacs Backup Files - a Warning.
+With org-crypt, if you have autosave turned on and decrypt the
+entries, the autosave file will contain the entries in plain text. For
+this reason your should disable autosave for encrypted files.
+
