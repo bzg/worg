@@ -37,6 +37,7 @@
   </style>
 #+end_html
 
+
 [[file:index.org][{Back to Worg's index}]]
 
 * What is org-mode?
@@ -88,10 +89,10 @@ The Unicorn is the logo of Org-mode because:
 - A unicorn is a fabulous creature.  Org-mode wants to be a fabulous
   creation.
 
-Using a unicorn was originally /Bastien Guerry's/ idea, his friend
-/Christophe Bataillon/ designed the logo for us, and /Greg Newman/
-gave it a refresh some time later.  Bastien writes why he chose a
-unicorn:
+Using a unicorn was originally /Bastien Guerry's/ idea.  His friend,
+the french artist [[http://intemperies.over-blog.com/][Christophe Bataillon]], designed the logo for us, and
+/Greg Newman/ gave it a refresh some time later.  Bastien writes why
+he chose a unicorn:
 
 #+BEGIN_QUOTE
 The first reason is not linked to the animal, but to the sounding of the
@@ -125,6 +126,12 @@ possession of the Org-mode author.
   whole set of pictures [[http://www.flickr.com/photos/tcburt/sets/72157614543357071/][on his flickr page]].
 
 - Are unicorns real?  Answer [[http://article.gmane.org/gmane.emacs.orgmode/11687/match%3Drosslaird%2Bunicorn][here]] by Ross Laird.
+
+** Is Org's documentation written in Org?
+
+No.  Org's documentation is written in TeXinfo, which is the standard
+format for Emacs documentation.  There is no export mechanism from Org 
+to TeXinfo (yet).
 
 * Mailing list
 ** Why hasn't my email to the mailing list shown up yet?
@@ -1098,6 +1105,22 @@ If you are using an older version of org mode, you can:
     (define-key org-mode-map "\C-e" 'move-end-of-line)))
 
 #+end_src
+** Can I hide blocks at startup?
+
+Yes:
+
+#+begin_src emacs-lisp
+(setq org-hide-block-startup t)
+#+end_src
+
+Or use
+
+#+begin_src org
+,#+STARTUP: hideblocks
+#+end_src
+
+on a per-file basis.
+
 * Faces and highlighting
   :PROPERTIES:
   :CUSTOM_ID: Faces
@@ -1577,6 +1600,16 @@ See also [[id:2463F4D8-F686-4CF3-AA07-08976F8A4972][Why is a blank line inserted
   :PROPERTIES:
   :CUSTOM_ID: Tables
   :END:
+** Will there ever be support for multiple lines in a table field?
+   :PROPERTIES:
+   :CUSTOM_ID: table-multiline-fields
+   :END:
+
+   No.
+
+   You can embed tables created with the table.el package in org-mode
+   buffers, with mixed success when it comes to export and publishing.
+
 ** How can I make table alignment work with Asian character sets
    :PROPERTIES:
    :CUSTOM_ID: table-alignment-asian-characters
@@ -2548,7 +2581,7 @@ until 6 a.m.
    :CUSTOM_ID: automatic-reminders
    :END:
 
-  See [[http://article.gmane.org/gmane.emacs.orgmode/5271][this post]] by N. Dokos on the list.
+  See [[http://article.gmane.org/gmane.emacs.orgmode/5271][this post]] by N. Dokos on the list. See also Russell Adams's hack in [[file:org-hacks.org::#agenda-appt-zenity][org-hacks]].
 ** How can I make =appt= notice my Org appointments?
    :PROPERTIES:
    :CUSTOM_ID: appt-notice-my-Org-appointments
@@ -2828,6 +2861,10 @@ multiple timestamps, such as the following...
 ...will only appear in the agenda at the time specified by the first
 timestamp. If you set org-agenda-skip-additional-timestamps-same-entry
 to nil, the item will appear will appear at all the times you specify.
+
+** Can I import iCal events/appts from Gnus?
+
+Yes.  Vagn Johansen wrote [[http://ozymandias.dk/emacs/org-import-calendar.el][org-import-calendar.el]] which lets you do this.
 
 * Export
   :PROPERTIES:
@@ -3526,6 +3563,32 @@ There are two approaches:
 	- run =mk4ht oolatex file.tex=
 
 See [[http://permalink.gmane.org/gmane.emacs.orgmode/31168][this thread]] for further details.
+
+* Backup
+
+Since =org= files are so central to your life, you probably want to back
+them up in a safe place.
+
+If the =org= file you want to back up are in a single directory, the
+preferred method is to us a =RCS= (Revision Control System) -- pick up your
+favorite ([[http://git-scm.com/][git]], [[http://bazaar.canonical.com/en/][bazaar]], [[http://mercurial.selenic.com/][mercurial]], [[http://subversion.apache.org/][subversion]], [[http://www.nongnu.org/cvs/][cvs]], etc.).  Depending on the
+RCS you use and how you use it, you can have a /local/ backup or sync it on
+a remote place.
+
+If you want to store all your =org= files from your =$HOME= to a single
+=~/org/backup/= folder, you can use this shell script (as [[http://article.gmane.org/gmane.emacs.orgmode/37655][suggested by
+Suvayu Ali]]):
+
+#+begin_src sh
+mkdir -p ~/org/backup && \
+find $HOME -type f -name '*\.org' ! -path "$HOME/org/*" \
+     -exec cp -t ~/org/backup/ \{\} \;
+#+end_src
+
+It will recursively search for =org= files in your =$HOME= directory
+(except those in =~/org/backup/=) and copy them to =~/org/backup/=.
+You can then use rsync to make sure =~/org/backup/= also lives on a 
+remote and safe place.
 
 * MobileOrg
 

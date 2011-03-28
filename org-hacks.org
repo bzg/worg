@@ -95,7 +95,50 @@ To switch back to the compiled version just reload again with
 
 : M-x org-reload
 
-** Enhancing the Org experience.
+*** Check for possibly problematic old link escapes
+:PROPERTIES:
+:CUSTOM_ID: check-old-link-escapes
+:END:
+
+Starting with version 7.5 Org uses [[http://en.wikipedia.org/wiki/Percent-encoding][percent escaping]] more consistently
+and with a modified algorithm to determine which characters to escape
+and how.
+
+As a side effect this modified behaviour might break existing links if
+they contain a sequence of characters that look like a percent escape
+(e.g. =[0-9A-Fa-f]{2}=) but are in fact not a percent escape.
+
+The function below can be used to perform a preliminary check for such
+links in an Org mode file.  It will run through all links in the file
+and issue a warning if it finds a percent escape sequence which is not
+in old Org's list of known percent escapes.
+
+#+begin_src emacs-lisp
+  (defun dmaus/org-check-percent-escapes ()
+    "*Check buffer for possibly problematic old link escapes."
+    (interactive)
+    (when (eq major-mode 'org-mode)
+      (let ((old-escapes '("%20" "%5B" "%5D" "%E0" "%E2" "%E7" "%E8" "%E9"
+                           "%EA" "%EE" "%F4" "%F9" "%FB" "%3B" "%3D" "%2B")))
+        (unless (boundp 'warning-suppress-types)
+          (setq warning-suppress-types nil))
+        (widen)
+        (show-all)
+        (goto-char (point-min))
+        (while (re-search-forward org-any-link-re nil t)
+          (let ((end (match-end 0)))
+            (goto-char (match-beginning 0))
+            (while (re-search-forward "%[0-9a-zA-Z]\\{2\\}" end t)
+              (let ((escape (match-string-no-properties 0)))
+                (unless (member (upcase escape) old-escapes)
+                  (warn "Found unknown percent escape sequence %s at buffer %s, position %d"
+                        escape
+                        (buffer-name)
+                        (- (point) 3)))))
+            (goto-char end))))))
+#+end_src
+
+** Enhancing the Org experience
 *** Speed Commands
 Speed commands are described [[http://orgmode.org/manual/Speed-keys.html#Speed-keys][here]] in the manual. Add your own speed
 commands here.
@@ -293,6 +336,76 @@ will be transposed as
 : | 5 | d | h |
 
 (Note that horizontal lines disappeared.)
+
+*** Times computation
+**** Manipulate hours/minutes/seconds in table formulas
+
+Both Bastien and Martin Halder have posted code ([[http://article.gmane.org/gmane.emacs.orgmode/39519][Bastien's code]] and
+[[http://article.gmane.org/gmane.emacs.orgmode/39519][Martin's code]]) for interpreting =dd:dd= or =dd:dd:dd= strings (where
+"=d=" is any digit) as time values in Org-mode table formula.  These
+functions have now been wrapped up into a =with-time= macro which can
+be used in table formula to translate table cell values to and from
+numerical values for algebraic manipulation.
+
+Here is the code implementing this macro.
+#+begin_src emacs-lisp :results silent
+  (defun org-time-string-to-seconds (s)
+    "Convert a string HH:MM:SS to a number of seconds."
+    (cond
+     ((and (stringp s)
+           (string-match "\\([0-9]+\\):\\([0-9]+\\):\\([0-9]+\\)" s))
+      (let ((hour (string-to-number (match-string 1 s)))
+            (min (string-to-number (match-string 2 s)))
+            (sec (string-to-number (match-string 3 s))))
+        (+ (* hour 3600) (* min 60) sec)))
+     ((and (stringp s)
+           (string-match "\\([0-9]+\\):\\([0-9]+\\)" s))
+      (let ((min (string-to-number (match-string 1 s)))
+            (sec (string-to-number (match-string 2 s))))
+        (+ (* min 60) sec)))
+     ((stringp s) (string-to-number s))
+     (t s)))
+
+  (defun org-time-seconds-to-string (secs)
+    "Convert a number of seconds to a time string."
+    (cond ((>= secs 3600) (format-seconds "%h:%.2m:%.2s" secs))
+          ((>= secs 60) (format-seconds "%m:%.2s" secs))
+          (t (format-seconds "%s" secs))))
+
+  (defmacro with-time (time-output-p &rest exprs)
+    "Evaluate an org-table formula, converting all fields that look
+  like time data to integer seconds.  If TIME-OUTPUT-P then return
+  the result as a time value."
+    (list
+     (if time-output-p 'org-time-seconds-to-string 'identity)
+     (cons 'progn
+           (mapcar
+            (lambda (expr)
+              `,(cons (car expr)
+                      (mapcar
+                       (lambda (el)
+                         (if (listp el)
+                             (list 'with-time nil el)
+                           (org-time-string-to-seconds el)))
+                       (cdr expr))))
+            `,@exprs))))
+#+end_src
+
+Which allows the following forms of table manipulation such as adding
+and subtracting time values.
+: | Date             | Start | Lunch |  Back |   End |  Sum |
+: |------------------+-------+-------+-------+-------+------|
+: | [2011-03-01 Tue] |  8:00 | 12:00 | 12:30 | 18:15 | 9:45 |
+: #+TBLFM: $6='(with-time t (+ (- $5 $4) (- $3 $2)))
+
+and dividing time values by integers
+: |  time | miles | minutes/mile |
+: |-------+-------+--------------|
+: | 34:43 |   2.9 |        11:58 |
+: | 32:15 |  2.77 |        11:38 |
+: | 33:56 |   3.0 |        11:18 |
+: | 52:22 |  4.62 |        11:20 |
+: #+TBLFM: $3='(with-time t (/ $1 $2))
 
 *** Dates computation
 
@@ -495,6 +608,99 @@ From David Maus:
            nil (- (point) (length hl-text)) (point))))))
 #+end_src
 
+*** Count words in an Org buffer
+
+Paul Sexton [[http://article.gmane.org/gmane.emacs.orgmode/38014][posted]] this function to count words in an Org buffer:
+
+#+begin_src emacs-lisp
+(defun org-word-count (beg end
+                           &optional count-latex-macro-args?
+                           count-footnotes?)
+  "Report the number of words in the Org mode buffer or selected region.
+Ignores:
+- comments
+- tables
+- source code blocks (#+BEGIN_SRC ... #+END_SRC, and inline blocks)
+- hyperlinks (but does count words in hyperlink descriptions)
+- tags, priorities, and TODO keywords in headers
+- sections tagged as 'not for export'.
+
+The text of footnote definitions is ignored, unless the optional argument
+COUNT-FOOTNOTES? is non-nil.
+
+If the optional argument COUNT-LATEX-MACRO-ARGS? is non-nil, the word count
+includes LaTeX macro arguments (the material between {curly braces}).
+Otherwise, and by default, every LaTeX macro counts as 1 word regardless
+of its arguments."
+  (interactive "r")
+  (unless mark-active
+    (setf beg (point-min)
+	  end (point-max)))
+  (let ((wc 0)
+	(latex-macro-regexp "\\\\[A-Za-z]+\\(\\[[^]]*\\]\\|\\){\\([^}]*\\)}"))
+    (save-excursion
+      (goto-char beg)
+      (while (< (point) end)
+        (cond
+         ;; Ignore comments.
+         ((or (org-in-commented-line) (org-at-table-p))
+          nil)
+         ;; Ignore hyperlinks. But if link has a description, count
+         ;; the words within the description.
+         ((looking-at org-bracket-link-analytic-regexp)
+          (when (match-string-no-properties 5)
+            (let ((desc (match-string-no-properties 5)))
+              (save-match-data 
+                (incf wc (length (remove "" (org-split-string
+                                             desc "\\W")))))))
+          (goto-char (match-end 0)))
+         ((looking-at org-any-link-re)
+          (goto-char (match-end 0)))
+         ;; Ignore source code blocks.
+         ((org-in-regexps-block-p "^#\\+BEGIN_SRC\\W" "^#\\+END_SRC\\W")
+          nil)
+         ;; Ignore inline source blocks, counting them as 1 word.
+         ((save-excursion
+            (backward-char)
+            (looking-at org-babel-inline-src-block-regexp))
+          (goto-char (match-end 0))
+          (setf wc (+ 2 wc)))
+         ;; Count latex macros as 1 word, ignoring their arguments.
+         ((save-excursion
+            (backward-char)
+            (looking-at latex-macro-regexp))
+          (goto-char (if count-latex-macro-args?
+                         (match-beginning 2)
+                       (match-end 0)))
+          (setf wc (+ 2 wc)))
+         ;; Ignore footnotes.
+         ((and (not count-footnotes?)
+               (or (org-footnote-at-definition-p)
+                   (org-footnote-at-reference-p)))
+          nil)
+         (t
+          (let ((contexts (org-context)))
+            (cond
+             ;; Ignore tags and TODO keywords, etc.
+             ((or (assoc :todo-keyword contexts)
+                  (assoc :priority contexts)
+                  (assoc :keyword contexts)
+                  (assoc :checkbox contexts))
+              nil)
+             ;; Ignore sections marked with tags that are
+             ;; excluded from export.
+             ((assoc :tags contexts)
+              (if (intersection (org-get-tags-at) org-export-exclude-tags
+                                :test 'equal)
+                  (org-forward-same-level 1)
+                nil))
+             (t
+              (incf wc))))))
+        (re-search-forward "\\w+\\W*")))
+    (message (format "%d words in %s." wc
+                     (if mark-active "region" "buffer")))))
+#+end_src
+
 ** Archiving Content in Org-Mode
 *** Preserve top level headings when archiving to a file
 - Matt Lundin
@@ -534,10 +740,44 @@ the new file to the top level heading:
 While this hack obviously destroys the outline hierarchy somewhat, it
 at least preserves the logic of level one groupings.
 
+A slightly more complex version of this hack will not only keep the
+archive organized by top-level headings, but will also preserve the
+tags found on those headings:
+
+#+begin_src emacs-lisp
+  (defun my-org-inherited-no-file-tags ()
+    (let ((tags (org-entry-get nil "ALLTAGS" 'selective))
+          (ltags (org-entry-get nil "TAGS")))
+      (mapc (lambda (tag)
+              (setq tags 
+                    (replace-regexp-in-string (concat tag ":") "" tags)))
+            (append org-file-tags (when ltags (split-string ltags ":" t))))
+      (if (string= ":" tags) nil tags)))
+  
+  (defadvice org-archive-subtree (around my-org-archive-subtree-low-level activate)
+    (let ((tags (my-org-inherited-no-file-tags))
+          (org-archive-location 
+           (if (save-excursion (org-back-to-heading)
+                               (> (org-outline-level) 1))
+               (concat (car (split-string org-archive-location "::"))
+                       "::* "
+                       (car (org-get-outline-path)))
+             org-archive-location)))
+      ad-do-it
+      (with-current-buffer (find-file-noselect (org-extract-archive-file))
+        (save-excursion
+          (catch 'break
+            (while t
+              (when (= 1 (org-up-heading-safe))
+                (throw 'break t))))
+          (org-set-tags-to tags)))))
+#+end_src
+
 *** Archive in a date tree
 
-Posted to Org-mode mailing list by Osamu Okano
-[2010-04-21 Wed]
+Posted to Org-mode mailing list by Osamu Okano [2010-04-21 Wed].
+
+(Make sure org-datetree.el is loaded for this to work.)
 
 #+begin_src emacs-lisp
 ;; (setq org-archive-location "%s_archive::date-tree")
@@ -1628,6 +1868,71 @@ attachment."
 The whole magic lies in the special strings that mark a HTML
 attachment.  So you might just have to find out what these special
 strings are in message-mode and modify the functions accordingly.
+** Add sunrise/sunset times to the agenda.
+  -- Nick Dokos
+
+The diary package provides the function =diary-sunrise-sunset= which can be used
+in a diary s-expression in some agenda file like this:
+
+#+begin_src org-mode
+%%(diary-sunrise-sunset)
+#+end_src
+
+Seb Vauban asked if it is possible to put sunrise and sunset in
+separate lines. Here is a hack to do that. It adds two functions (they
+have to be available before the agenda is shown, so I add them early
+in my org-config file which is sourced from .emacs, but you'll have to
+suit yourself here) that just parse the output of
+diary-sunrise-sunset, instead of doing the right thing which would be
+to take advantage of the data structures that diary/solar.el provides.
+In short, a hack - so perfectly suited for inclusion here :-)
+
+The functions (and latitude/longitude settings which you have to modify for
+your location) are as follows:
+
+#+begin_src emacs-lisp
+(setq calendar-latitude 40.3)
+(setq calendar-longitude -71.0)
+(defun diary-sunrise ()
+  (let ((dss (diary-sunrise-sunset)))
+    (with-temp-buffer
+      (insert dss)
+      (goto-char (point-min))
+      (while (re-search-forward " ([^)]*)" nil t)
+        (replace-match "" nil nil))
+      (goto-char (point-min))
+      (search-forward ",")
+      (buffer-substring (point-min) (match-beginning 0)))))
+
+(defun diary-sunset ()
+  (let ((dss (diary-sunrise-sunset))
+        start end)
+    (with-temp-buffer
+      (insert dss)
+      (goto-char (point-min))
+      (while (re-search-forward " ([^)]*)" nil t)
+        (replace-match "" nil nil))
+      (goto-char (point-min))
+      (search-forward ", ")
+      (setq start (match-end 0))
+      (search-forward " at")
+      (setq end (match-beginning 0))
+      (goto-char start)
+      (capitalize-word 1)
+      (buffer-substring start end))))
+#+end_src
+
+You also need to add a couple of diary s-expressions in one of your agenda
+files:
+
+#+begin_src org-mode
+%%(diary-sunrise)
+%%(diary-sunset)
+#+end_src
+
+The thread on the mailing list that started this can be found [[http://thread.gmane.org/gmane.emacs.orgmode/38723Here%20is%20a%20pointer%20to%20the%20thread%20on%20the%20mailing%20list][here]].
+In comparison to the version posted on the mailing list, this one
+gets rid of the timezone information.
 * Hacking Org: Working with Org-mode and External Programs.
 ** Use Org-mode with Screen [Andrew Hyatt]
 
@@ -1682,8 +1987,10 @@ http://article.gmane.org/gmane.emacs.orgmode/5276
 #+END_SRC
 
 ** Org Agenda + Appt + Zenity
-
-Russell Adams posted this setup [[http://article.gmane.org/gmane.emacs.orgmode/5806][on the list]].  It make sure your agenda
+#+BEGIN_HTML
+<a name="agenda-appt-zenity"></a>
+#+END_HTML
+Russell Adams posted this setup [[http://article.gmane.org/gmane.emacs.orgmode/5806][on the list]].  It makes sure your agenda
 appointments are known by Emacs, and it displays warnings in a [[http://live.gnome.org/Zenity][zenity]]
 popup window.
 
@@ -1770,7 +2077,7 @@ export process (configurable per file with a "#+StaticMathJax:" line).
 Read README.org and the comments in org-static-mathjax.el for usage instructions.
 ** Search Org files using lgrep
 
-Matt Lundi suggests this:
+Matt Lundin suggests this:
 
 #+begin_src emacs-lisp
   (defun my-org-grep (search &optional context)
@@ -1788,3 +2095,25 @@ Prefix argument determines number of lines."
   (global-set-key (kbd "<f8>") 'my-org-grep)
 #+end_src
 
+** Automatic screenshot insertion
+
+Suggested by Jonathan Bisson:
+
+#+begin_src emacs-lisp
+  (defun my-screenshot ()
+  "Take a screenshot into a unique-named file in the current buffer file
+  directory and insert a link to this file."
+    (interactive)
+    (setq filename
+          (concat
+           (make-temp-name
+            (file-name-directory (buffer-file-name))) ".jpg"))
+    (call-process "import" nil nil nil filename)
+    (insert (concat "[[" filename "]]"))
+    (org-display-inline-images))
+#+end_src
+
+** Capture invitations/appointments from MS Exchange emails
+
+Dirk-Jan C.Binnema [[http://article.gmane.org/gmane.emacs.orgmode/27684/][provided]] code to do this.  Please check
+[[file:code/elisp/org-exchange-capture.el][org-exchange-capture.el]]

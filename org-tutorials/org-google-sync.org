@@ -1,7 +1,7 @@
 #+TITLE:   Google Calendar Synchronization
 #+AUTHOR:    Arun Persaud
 #+EMAIL:     arun@nubati.net
-#+DATE:      <2011-01-27 Thu>
+#+DATE:      <2011-02-28 Mon>
 #+DESCRIPTION: 
 #+KEYWORDS: 
 #+LANGUAGE:  en
@@ -33,7 +33,7 @@ synchronization by following these steps:
 
 1. Download the above script and save it as 'ical2org'.
    Make sure that the script is in your PATH and don't forget to set
-   the executbale flag (chmod u+x ical2org). You can also customize the 
+   the executable flag (chmod u+x ical2org). You can also customize the 
    script a bit by changing the variables in the config section of the script.
 2. Find your private URL for your calendar
   + Log into Google Calendar
@@ -46,14 +46,14 @@ synchronization by following these steps:
    This can be done for example using 'wget <url>'
 4. Transform into org-file
    Use the downloaded script via 'ical2org < icsfile > orgfile'. Where
-   icsfile is the path to the file you downloaded from google and
+   icsfile is the path to the file you downloaded from Google and
    orgfile is the org-mode file you want to create.
 5. Add the orgfile to your agenda and test
 
 If this all works you can automate the task via cron. Create a script
 such as the following that will automatically download and convert
 your calendar. Make sure that this file is only readable by you (chmod
-700 <file>), since it will contain the url to your google calendar.
+700 <file>), since it will contain the url to your Google calendar.
 
 #+begin_src sh
 #!/bin/bash
@@ -63,7 +63,7 @@ WGET=<path to wget>
 ICS2ORG=<path to ical2org>
 ICSFILE=<path for icsfile>
 ORGFILE=<path to orgfile>
-URL=<url to your private google calendar>
+URL=<url to your private Google calendar>
 
 # no customization needed below
 
@@ -81,14 +81,108 @@ crontab:
 This will sync every 15 minutes starting at 5 minutes past the hour.
 
 * From org to Google Calendar
-  'still needs editing'
 
-  possible paths
+  There are at least two possible paths to get the information into Google:
+
   1. export from org mode to .ics; upload .ics to a public web server
-     giving it a hidden/secret name; tell google to import this .ics
+     giving it a hidden/secret name; tell Google to import this .ics
      file
-  2. use googlecl to import event when you create them into google
-     calendar (update entries won't be reflected in google). See [fn:2]
+  2. use googlecl to import event when you create them into Google
+     calendar (update entries won't be reflected in Google). See [fn:2]
+
+  The first one has the disadvantage that the item won't show up in
+  your "main" calendar and therefore you can't easily share them with
+  others. Nevertheless, this route is relatively easy and therefore
+  we'll discuss it below.  The second option (as described in the link)
+  should work well, if you don't need to change things. 
+
+  Also keep in mind that your mileage will vary, since everything
+  described on this page works for some people, but perhaps not for
+  you... if this is the case, feel free to ask on the org-email list
+  and perhaps we can add missing features.
+
+  Back to the topic. To implement 1., we need org to export an .ics
+  file, which can be achieved using the function:
+  org-export-icalendar-combine-agenda-files.
+  This will export all entries in you agenda. If you only want to
+  export certain ones, you can set up a filter. For this we will
+  define a filter function and then tell Emacs to use this filter.
+  The filter shown here, will exclude items with a category "google"
+  (for example from the ical2org script) and "private" and also only
+  export entries that have a date and a time range set (that is, a
+  start and a end time stamp). You can modify the function though to
+  do anything you want!
+
+#+begin_src emacs-lisp
+
+  ;;; define categories that should be excluded
+  (setq org-export-exclude-category (list "google" "private"))
+
+  ;;; define filter. The filter is called on each entry in the agenda.
+  ;;; It defines a regexp to search for two timestamps, gets the start
+  ;;; and end point of the entry and does a regexp search. It also
+  ;;; checks if the category of the entry is in an exclude list and
+  ;;; returns either t or nil to skip or include the entry.
+
+  (defun org-mycal-export-limit ()
+    "Limit the export to items that have a date, time and a range. Also exclude certain categories."
+    (setq org-tst-regexp "<\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\} ... [0-9]\\{2\\}:[0-9]\\{2\\}[^\r\n>]*?\
+  \)>")
+    (setq org-tstr-regexp (concat org-tst-regexp "--?-?" org-tst-regexp))
+    (save-excursion
+      ; get categories
+      (setq mycategory (org-get-category))
+      ; get start and end of tree
+      (org-back-to-heading t)
+      (setq mystart    (point))
+      (org-end-of-subtree)
+      (setq myend      (point))
+      (goto-char mystart)
+      ; search for timerange
+      (setq myresult (re-search-forward org-tstr-regexp myend t))
+      ; search for categories to exclude
+      (setq mycatp (member mycategory org-export-exclude-category))
+      ; return t if ok, nil when not ok
+      (if (and myresult (not mycatp)) t nil)))
+  
+  ;;; activate filter and call export function
+  (defun org-mycal-export () 
+    (let ((org-icalendar-verify-function 'org-mycal-export-limit))
+      (org-export-icalendar-combine-agenda-files)))
+#+end_src
+
+  To use these function you can include the above code in your .emacs
+  file and then in case you run Emacs server call
+
+#+begin_src sh
+  emacsclient -e "(save-excursion (org-mycal-export))"
+#+end_src 
+ 
+  in your shell to generate the .ics file.
+  
+  If you want to export also TODO items that have a SCHEDULED timestamp, you can set
+
+#+begin_src sh
+  (setq org-icalendar-use-scheduled '(todo-start event-if-todo))
+#+end_src
+  
+  in your .emacs.
+
+  Another Emacs variable that you might want to look into is:
+  org-icalendar-honor-noexport-tag.
+
+  You can now automate this via a cron job to generate updated .ics
+  files.
+
+  The next step is to give the file a cryptic name (so that other
+  people have a hard time accessing your file, also make sure that
+  your web server doesn't show an index for your directory, etc.) and
+  copy it to a public accessible web server. Then log into your Google
+  calendar and in the left column under "Other calendars" use
+  "Add"->"Add by url" to point Google at your freshly generated .ics
+  file and you should be all set up. Once you done this Google will
+  every now and then (every few hours?) look for a newer version of your .ics file and
+  include this in your calendar.
 
 * Footnotes
 [fn:1] http://article.gmane.org/gmane.emacs.orgmode/26848

@@ -1,7 +1,7 @@
-;;; color-theme-sva.el --- my color theme
+;;; color-theme-leuven.el --- Light, but colorful color theme
 
-;; Copyright (C) 2003-2010 Sebastien Vauban
-;; Time-stamp: <2010-10-07 Thu 10:53 sva on mundaneum>
+;; Copyright (C) 2003-2011 Sebastien Vauban
+;; $Date: 2011-02-24 12:09:40 +0100 (Thu, 24 Feb 2011) $
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -20,32 +20,42 @@
 ;; Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
 ;; MA 02111-1307, USA.
 
+;;* TODO:
+
+;; - [ ] Have a look at http://websitetips.com/colortools/sitepro/
+;; - [ ] Remove inherit properties
+
 ;;* Code:
 
 (require 'color-theme)
 
-(defun color-theme-sva ()
+(defun color-theme-leuven ()
   "Color theme by Sebastien Vauban."
   (interactive)
   (let*
       ;; inherit properties, independently of definition order
-      ((ol1 '(:family "Arial" :height 1.8 :weight bold :box (:line-width 1 :color "#0000CC") :foreground "cornflower blue" :background "LightSteelBlue1"))
-       (ol2 '(:family "Arial" :height 1.6 :weight bold :box (:line-width 1 :color "#00CC00") :foreground "lime green" :background "DarkSeaGreen1"))
-       (ol3 '(:family "Arial" :height 1.3 :weight bold :foreground "#F9A049"))
-       (ol4 '(:family "Arial" :height 1.2 :weight bold :foreground "red3"))
-       (ol5 '(:family "Arial" :height 1.1 :weight bold :foreground "cornflower blue"))
-       (ol6 '(:family "Arial" :height 1.1 :weight bold :foreground "lime green"))
-       (ol7 '(:family "Arial" :height 1.1 :weight bold :foreground "#F9A049"))
-       (ol8 '(:family "Arial" :height 1.1 :weight bold :foreground "red3"))
-       (inline-code '(:foreground "blue1" :background "#EAFFEA"))
-       (block-code '(:foreground "blue1" :background "#FFFFEA"))
-       (directory '(:weight bold :foreground "blue" :background "#FFF58F"))
+      ((block-code '(:foreground "blue" :background "#FFFFEA"))
+       (cancel '(:slant italic :strike-through t :foreground "gray55"))
+       (clock-line '(:box (:line-width 1 :color "#FFBB00") :foreground "black" :background "#BFBF00"))
+       (column '(:height 1.0 :weight normal :slant normal :underline nil :strike-through nil :foreground "black" :background "#BFBF00"))
+       (diff-added '(:foreground "#2B7E2A" :background "#CCFFCC"))
+       (diff-hunk-header '(:box (:line-width 1 :color "#D7D7D7") :foreground "#999999" :background "#F7F7F7"))
+       (diff-none '(:foreground "gray33"))
+       (diff-removed '(:foreground "dark magenta" :background "#FFCCCC"))
+       (directory '(:weight bold :foreground "blue" :background "#FFFFD2"))
+       (inline-code '(:box (:line-width 1 :color "#EFEF99") :foreground "#444444"))
        (marked-line '(:weight bold :foreground "white" :background "red"))
-       (clock-line '(:box (:line-width 1 :color "#9EABB6") :foreground "black" :background "#BFBF00"))
-       (column '(:height 1.0 :weight normal :slant normal :underline nil :strike-through nil :box (:line-width 1 :color "black") :foreground "black" :background "#EEE8AA"))
+       (ol1 '(:height 1.0 :weight bold :overline "#0000CC" :foreground "#0077CC" :background "#DFF1FA")) ; 1.8
+       (ol2 '(:height 1.0 :weight bold :overline "#00CC00" :foreground "#2EAE2C" :background "#E8FADA")) ; 1.6
+       (ol3 '(:height 1.0 :weight bold :foreground "#FD8008")) ; 1.3
+       (ol4 '(:height 1.0 :weight bold :slant normal :foreground "#E3258D")) ; 1.2
+       (ol5 '(:height 1.0 :weight bold :slant italic :foreground "#0077CC")) ; 1.1
+       (ol6 '(:height 1.0 :weight bold :slant italic :foreground "#2EAE2C")) ; 1.1
+       (ol7 '(:height 1.0 :weight bold :slant italic :foreground "#FD8008")) ; 1.1
+       (ol8 '(:height 1.0 :weight bold :slant italic :foreground "#E3258D")) ; 1.1
        (symlink '(:foreground "deep sky blue")))
     (color-theme-install
-     `(color-theme-sva
+     `(color-theme-leuven
        ;; frame parameters
        ((background-color . "white")
         (background-mode . light)
@@ -88,33 +98,61 @@
        (diary-face ((t (:foreground "#87C9FC"))))  ;"dark cyan"
        (holiday-face ((t (:background "#B6B2AE"))))  ; "red"
 
+       (change-log-date-face ((t (:foreground "purple"))))
+       ;; (change-log-email
+       (change-log-file ((t (:weight bold :foreground "#4183C4"))))
+       ;; (change-log-list
+       ;; (change-log-name
+
        ;; IRC
-       (circe-highlight-all-nicks-face ((t (:foreground "blue"))))  ; other nicks
-       (circe-highlight-nick-face ((t (:foreground "firebrick"))))  ; message with my nick cited
-       (circe-my-message-face ((t (:foreground "red"))))
+       (circe-highlight-all-nicks-face ((t (:foreground "blue" :background "#F0F0F0")))) ; other nick names
+       (circe-highlight-nick-face ((t (:foreground "#009300" :background "#F0F0F0")))) ; messages with my nick cited
+       (circe-my-message-face ((t (:foreground "#8B8B8B" :background "#F0F0F0"))))
        (circe-originator-face ((t (:foreground "blue"))))
+       (circe-prompt-face ((t (:foreground "red"))))
+       (circe-server-face ((t (:foreground "#99CAE5"))))
+       (lui-button-face ((t (:underline t :foreground "#0077CC"))))
+       (lui-highlight-face ((t (:box '(:line-width 1 :color "#CC0000") :foreground "#CC0000" :background "#FFFF88")))) ; my nickname
+       (lui-time-stamp-face ((t (:foreground "purple"))))
 
        ;; column-marker
-       (column-marker-1-face ((t (:background "DarkSeaGreen1"))))
-       (column-marker-2-face ((t (:background "lemon chiffon"))))
-       (column-marker-3-face ((t (:background "misty rose"))))
+       (column-marker-1-face ((t (:background "#EBFFEB"))))
+       (column-marker-2-face ((t (:background "#FFFFEB"))))
+       (column-marker-3-face ((t (:background "#FFEBEB"))))
 
-       (comint-highlight-input ((t (:weight bold))))
-       (comint-highlight-prompt ((t (:foreground "blue"))))
+       (comint-highlight-input ((t ,block-code)))
+       (comint-highlight-prompt ((t (:foreground "#008ED1" :background "#EAEAFF"))))
+
+       ;; used in modeline by grep and compile
+       (compilation-error ((t (:weight bold :foreground "red"))))
+       (compilation-info ((t (:weight bold :foreground "green3"))))
+       (compilation-warning ((t (:weight bold :foreground "orange"))))
 
        (css-selector ((t (:weight bold :foreground "blue"))))
 
        ;; custom
-       (custom-button-pressed-face ((t (:foreground "black" :background "light grey" :box (:line-width 2 :style pressed-button)))))
-       (custom-changed-face ((t (:foreground "white" :background "blue"))))
-       (custom-face-tag-face ((t (:underline t))))
-       (custom-invalid-face ((t (:foreground "yellow" :background "red"))))
-       (custom-modified-face ((t (:foreground "white" :background "blue"))))
-       (custom-rogue-face ((t (:foreground "pink" :background "black"))))
-       (custom-saved-face ((t (:underline t))))
-       (custom-set-face ((t (:foreground "blue" :background "white"))))
-       (custom-state-face ((t (:foreground "green4"))))
-       (custom-variable-button-face ((t (:weight bold :underline t))))
+       (custom-button ((t (:background "lightgrey" :foreground "black" :box (:line-width 2 :style released-button)))))
+       (custom-button-mouse ((t (:background "grey90" :foreground "black" :box (:line-width 2 :style released-button)))))
+       (custom-button-pressed ((t (:foreground "black" :background "light grey" :box (:line-width 2 :style pressed-button)))))
+       (custom-button-pressed-unraised ((t (:underline t :foreground "magenta4"))))
+       (custom-button-unraised ((t (:underline t))))
+       (custom-changed ((t (:foreground "white" :background "blue"))))
+       (custom-comment ((t (:background "gray85"))))
+       (custom-comment-tag ((t (:foreground "blue4"))))
+       (custom-documentation ((t (nil))))
+       (custom-face-tag ((t (:family "Sans Serif" :weight bold :height 1.2))))
+       (custom-group-tag ((t (:bold t :foreground "blue1" :weight bold :height 1.2))))
+       (custom-group-tag-1 ((t (:bold t :family "Sans Serif" :foreground "red1" :weight bold :height 1.2))))
+       (custom-invalid ((t (:foreground "yellow" :background "red"))))
+       (custom-link ((t (:underline t :foreground "blue1"))))
+       (custom-modified ((t (:foreground "white" :background "blue"))))
+       (custom-rogue ((t (:foreground "pink" :background "black"))))
+       (custom-saved ((t (:underline t))))
+       (custom-set ((t (:foreground "blue" :background "white"))))
+       (custom-state ((t (:foreground "green4"))))
+       (custom-themed ((t (:background "blue1" :foreground "white"))))
+       (custom-variable-button ((t (:weight bold :underline t))))
+       (custom-variable-tag ((t (:bold t :family "Sans Serif" :foreground "blue1" :weight bold :height 1.2))))
 
        ;; cvs
        (cvs-filename-face ((t (:foreground "blue4"))))
@@ -126,14 +164,19 @@
        (cvs-unknown-face ((t (:foreground "red"))))
 
        ;; diff
-       (diff-added ((t (:foreground "#2B7E2A" :background "#DDFFDD"))))
+       (diff-added ((t ,diff-added)))
+       (diff-changed ((t (:foreground "blue" :background "#DDDDFF"))))
+       (diff-context ((t ,diff-none)))
        (diff-file-header ((t (:foreground "red" :background "#EAF2F5"))))
+       (diff-file1-hunk-header  ((t (:foreground "dark magenta" :background "#EAF2F5"))))
+       (diff-file2-hunk-header  ((t (:foreground "#2B7E2A" :background "#EAF2F5"))))
        (diff-header ((t (:foreground "#999999" :background "#EAF2F5"))))
-       (diff-hunk-header ((t (:foreground "#999999" :background "#EAF2F5"))))
-       (diff-index ((t (:foreground "#4183C4" :background "#EAF2F5"))))
+       (diff-hunk-header ((t ,diff-hunk-header)))
+       (diff-index ((t (:family "Sans Serif" :height 1.1 :weight bold :foreground "#4183C4" :background "#EAF2F5"))))
        (diff-indicator-added ((t (:background "#AAFFAA"))))
+       (diff-indicator-changed ((t (:background "#AAAAFF"))))
        (diff-indicator-removed ((t (:background "#FFAAAA"))))
-       (diff-removed ((t (:foreground "dark magenta" :background "#FFDDDD"))))
+       (diff-removed ((t ,diff-removed)))
 
        ;; dircolors
        (dircolors-face-asm ((t (:foreground "black"))))
@@ -159,39 +202,52 @@
        (dircolors-face-yacc ((t (:foreground "black"))))
 
        ;; dired
-       (dired-face-boring ((t (:foreground "gray65"))))
-       (dired-face-directory ((t (:weight bold))))
-       (dired-face-executable ((t (:foreground "green3"))))
-       (dired-face-flagged ((t (:weight bold :foreground "white" :background "red"))))
-       (dired-face-header ((t (:foreground "black" :background "gray75"))))
-       (dired-face-marked ((t (:background "pale violet red"))))
-       (dired-face-permissions ((t (:foreground "black" :background "gray75"))))
-       (dired-face-setuid ((t (:foreground "red"))))
-       (dired-face-socket ((t (:foreground "magenta"))))
-       (dired-face-symlink ((t ,symlink)))
+       (dired-directory ((t ,directory)))
+       (dired-header ((t ,directory)))
+       (dired-ignored ((t (:strike-through t :foreground "red"))))
+       (dired-mark ((t ,marked-line)))
+       (dired-marked ((t ,marked-line)))
+       (dired-symlink ((t ,symlink)))
 
        ;; dired+
        (diredp-compressed-file-suffix ((t (:foreground "red"))))
        (diredp-date-time ((t (:foreground "purple"))))
        (diredp-dir-heading ((t ,directory)))
        (diredp-dir-priv ((t ,directory)))
-       (diredp-exec-priv ((t (:background "green"))))
+       (diredp-exec-priv ((t (:background "#03C03C"))))
        (diredp-executable-tag ((t (:foreground "green3" :background "white"))))
        (diredp-file-name ((t (:foreground "black"))))
-       (diredp-file-suffix ((t (:foreground "#6DB604"))))
+       (diredp-file-suffix ((t (:foreground "#008000"))))
        (diredp-flag-mark-line ((t ,marked-line)))
        (diredp-ignored-file-name ((t (:strike-through t :foreground "red"))))
-       (diredp-read-priv ((t (:foreground "white" :background "blue"))))
-       (diredp-write-priv ((t (:foreground "white" :background "red"))))
+       (diredp-read-priv ((t (:background "#0A99FF"))))
+       (diredp-write-priv ((t (:foreground "white" :background "#FF4040"))))
+
+       ;; ediff
+       (ediff-current-diff-A ((t (:foreground "gray33" :background "#FFFF99"))))
+       (ediff-current-diff-B ((t (:foreground "gray33" :background "#FFFF99"))))
+       (ediff-fine-diff-A ((t (:foreground "dark magenta" :background "#FFAAAA"))))
+       (ediff-fine-diff-B ((t (:foreground "#2B7E2A" :background "#AAFFAA"))))
+       (ediff-current-diff-C ((t (:foreground "black" :background "cyan"))))
+
+       ;; egg
+       (egg-branch ((t (:foreground "SkyBlue" :height 1.1))))
+       (egg-diff-add ((t ,diff-added)))
+       (egg-diff-del ((t ,diff-removed)))
+       (egg-diff-file-header ((t (:family "Sans Serif" :height 1.1 :weight bold :foreground "#4183C4"))))
+       (egg-diff-hunk-header ((t ,diff-hunk-header)))
+       (egg-diff-none ((t ,diff-none)))
+       (egg-header ((t (:weight bold :height 1.1))))
+       (egg-section-title ((t (:family "Sans Serif" :height 1.8 :weight bold :foreground "cornflower blue"))))
 
        ;; flypell
-       (flyspell-duplicate-face ((t (:weight bold :underline t :foreground "gold3"))))
-       (flyspell-incorrect-face ((t (:weight bold :underline t :foreground "red"))))
+       (flyspell-duplicate-face ((t (:underline "#008000"))))
+       (flyspell-incorrect-face ((t (:underline "red"))))
 
        ;; LaTeX
        (font-latex-bold-face ((t (:weight bold :foreground "medium sea green"))))
-       (font-latex-math-face ((t (:foreground "blue1"))))
-       (font-latex-sectioning-1-face ((t (:family "Arial" :height 2.7 :weight bold :foreground "cornflower blue"))))
+       (font-latex-math-face ((t (:foreground "blue"))))
+       (font-latex-sectioning-1-face ((t (:family "Sans Serif" :height 2.7 :weight bold :foreground "cornflower blue"))))
        (font-latex-sectioning-2-face ((t ,ol1)))
        (font-latex-sectioning-3-face ((t ,ol2)))
        (font-latex-sectioning-4-face ((t ,ol3)))
@@ -205,9 +261,13 @@
        (font-lock-comment-face ((t (:slant italic :foreground "red"))))
        (font-lock-constant-face ((t (:foreground "dark cyan"))))
        (font-lock-doc-face ((t (:foreground "#EB4264"))))
+       (font-lock-doc-string-face ((t (:foreground "#3041C4"))))
        (font-lock-function-name-face ((t (:foreground "blue"))))
        (font-lock-keyword-face ((t (:foreground "purple1"))))
+       (font-lock-preprocessor-face ((t (:foreground "red")))) ;; see `printf' in AWK
        (font-lock-reference-face ((t (:foreground "dark cyan"))))
+       (font-lock-regexp-grouping-backslash ((t (:bold t :weight bold))))
+       (font-lock-regexp-grouping-construct ((t (:bold t :weight bold))))
        (font-lock-string-face ((t (:foreground "#3AA221"))))
        (font-lock-type-face ((t (:foreground "forest green"))))
        (font-lock-variable-name-face ((t (:foreground "magenta"))))
@@ -233,30 +293,32 @@
        (gnus-group-mail-1-face ((t (:weight bold :foreground "#FF50B0"))))
        (gnus-group-mail-2-empty-face ((t (:foreground "#660066"))))
        (gnus-group-mail-2-face ((t (:weight bold :foreground "#FF0066"))))
-       (gnus-group-mail-3-empty-face ((t (:foreground "#007777"))))
-       (gnus-group-mail-3-face ((t (:weight bold :foreground "#FF7777"))))
+       (gnus-group-mail-3-empty-face ((t (:foreground "gray50"))))
+       (gnus-group-mail-3-face ((t (:weight bold :foreground "black"))))
+       (gnus-group-mail-low-empty-face ((t ,cancel)))
+       (gnus-group-mail-low-face ((t ,cancel)))
        (gnus-group-news-1-empty-face ((t (:foreground "#5050B0"))))
        (gnus-group-news-1-face ((t (:weight bold :foreground "#FF50B0"))))
        (gnus-group-news-2-empty-face ((t (:foreground "#660066"))))
        (gnus-group-news-2-face ((t (:weight bold :foreground "#FF0066"))))
-       (gnus-group-news-3-empty-face ((t (:foreground "#007777"))))
-       (gnus-group-news-3-face ((t (:weight bold :foreground "#FF7777"))))
+       (gnus-group-news-3-empty-face ((t (:foreground "gray50"))))
+       (gnus-group-news-3-face ((t (:weight bold :foreground "black"))))
        (gnus-group-news-4-empty-face ((t (:foreground "#990000"))))
        (gnus-group-news-4-face ((t (:weight bold :foreground "#FF0000"))))
        (gnus-group-news-5-empty-face ((t (:foreground "#000099"))))
        (gnus-group-news-5-face ((t (:weight bold :foreground "#FF0099"))))
-       (gnus-group-news-6-empty-face ((t (:foreground "#BB6600"))))
-       (gnus-group-news-6-face ((t (:weight bold :foreground "#FF6600"))))
-       (gnus-header-content-face ((t (:family "Arial" :foreground "#3399CC"))))
-       (gnus-header-from-face ((t (:family "Arial" :foreground "blue"))))
-       (gnus-header-name-face ((t (:family "Arial" :weight bold :foreground "#3399CC"))))
-       (gnus-header-newsgroups-face ((t (:family "Arial" :foreground "#3399CC"))))
+       (gnus-group-news-6-empty-face ((t (:foreground "gray50"))))
+       (gnus-group-news-6-face ((t (:weight bold :foreground "gray50"))))
+       (gnus-header-content-face ((t (:family "Sans Serif" :foreground "#3399CC"))))
+       (gnus-header-from-face ((t (:family "Sans Serif" :foreground "blue"))))
+       (gnus-header-name-face ((t (:family "Sans Serif" :weight bold :foreground "#3399CC"))))
+       (gnus-header-newsgroups-face ((t (:family "Sans Serif" :foreground "#3399CC"))))
        (gnus-header-subject-face ((t (:weight bold :foreground "#FF6633"))))
        (gnus-picon-face ((t (:foreground "yellow" :background "white"))))
        (gnus-picon-xbm-face ((t (:foreground "yellow" :background "white"))))
        (gnus-signature-face ((t (:foreground "#7F7F7F"))))
-       (gnus-splash-face ((t (:foreground "gold"))))
-       (gnus-summary-cancelled-face ((t (:slant italic :strike-through t :foreground "gray55"))))
+       (gnus-splash-face ((t (:foreground "#FF8C00"))))
+       (gnus-summary-cancelled-face ((t ,cancel)))
        (gnus-summary-high-ancient-face ((t (:weight normal :foreground "#1A44B6" :background "#E0E0E0"))))
        (gnus-summary-high-read-face ((t (:weight normal :foreground "#1A44B6" :background "#E0E0E0"))))
        (gnus-summary-high-ticked-face ((t (:weight normal :foreground "#009900"))))
@@ -267,14 +329,15 @@
        (gnus-summary-low-unread-face ((t (:slant italic :foreground "gray50"))))
        (gnus-summary-normal-ancient-face ((t (:foreground "black" :background "#E0E0E0"))))
        (gnus-summary-normal-read-face ((t (:foreground "black" :background "#E0E0E0"))))
-       (gnus-summary-normal-ticked-face ((t (:foreground "#009900"))))
+       (gnus-summary-normal-ticked-face ((t (:foreground "#FD8008")))) ;; #009900
        (gnus-summary-normal-unread-face ((t (:foreground "black"))))
-       (gnus-summary-selected-face ((t (:background "#FFD0D0"))))
+       (gnus-summary-selected-face ((t (:background "#FFD0D0" :underline t))))
        (gnus-x-face ((t (:foreground "black" :background "white"))))
 
+       (header-line ((t (:weight bold :underline "black" :overline "black" :foreground "black" :background "#FFFF88"))))
        (highlight ((t (:background "#FFFFA0"))))  ; used by hlt package of Drew Adams
        (highlight-symbol-face ((t (:background "#FFFFA0"))))
-       (hl-line ((t (:background "cornsilk3"))))  ; #E6FEC0 or #D4EAFF
+       (hl-line ((t (:underline t :background "#C6C3C6"))))
 
        (html-helper-bold-face ((t (:weight bold :foreground "black"))))
        (html-helper-italic-face ((t (:slant italic :foreground "black"))))
@@ -282,22 +345,24 @@
        (html-tag-face ((t (:foreground "blue"))))
 
        ;; Info / info+
-       (info-file ((t (:family "Arial" :height 1.8 :weight bold :box (:line-width 1 :color "#0000CC") :foreground "cornflower blue" :background "LightSteelBlue1")))) 
+       (info-file ((t (:family "Sans Serif" :height 1.8 :weight bold :box (:line-width 1 :color "#0000CC") :foreground "cornflower blue" :background "LightSteelBlue1")))) 
        (info-header-node ((t (:underline t :foreground "orange"))))  ; nodes in header
        (info-header-xref ((t (:underline t :foreground "dodger blue"))))  ; cross references in header
-       (info-menu-header ((t (:family "Arial" :height 1.6 :weight bold :underline t :foreground "#00CC00"))))  ; menu titles (headers) -- major topics
+       (info-menu-header ((t (:family "Sans Serif" :height 1.6 :weight bold :underline t :foreground "#00CC00"))))  ; menu titles (headers) -- major topics
        (info-menu-star ((t (:foreground "black"))))  ; every 3rd menu item
        (info-node ((t (:underline t :foreground "blue"))))  ; node names
        (info-quoted-name ((t ,inline-code)))
        (info-string ((t (:foreground "green4"))))  ; strings ("...")
-       (info-title-1-face ((t (:family "Arial" :height 1.6 :weight bold :box (:line-width 1 :color "#00CC00") :foreground "lime green" :background "DarkSeaGreen1"))))
-       (info-title-2-face ((t (:family "Arial" :height 1.3 :weight bold :foreground "#F9A049"))))
-       (info-title-3-face ((t (:family "Arial" :height 1.2 :weight bold :foreground "red3"))))
+       (Info-title-1-face ((t ,ol1)))
+       (Info-title-2-face ((t ,ol2)))
+       (Info-title-3-face ((t ,ol3)))
+       (Info-title-4-face ((t ,ol4)))
        (info-xref ((t (:weight bold :underline t :foreground "blue"))))  ; unvisited cross-references
        (info-xref-visited ((t (:weight bold :foreground "magenta4"))))  ; previously visited cross-references
 
        ;; highlighting matches
-       (isearch ((t (:weight bold :foreground "#EE6600" :background "yellow"))))
+       (isearch ((t (:weight bold :box (:line-width 1 :color "#A0A0A0") :foreground "#EE6600" :background "yellow"))))
+       (isearch-fail ((t (:weight bold :foreground "white" :background "red"))))
        (isearch-lazy-highlight-face ((t (:weight bold :foreground "blue" :background "#CCFFFF"))))  ; for GNU Emacs
        (isearch-secondary ((t (:weight bold :foreground "blue" :background "#CCFFFF"))))  ; for XEmacs
 
@@ -305,53 +370,53 @@
 
        (linum ((t (:foreground "#AFB7BA" :background "#DDEEFF"))))
 
-       ;; IRC
-       (lui-button-face ((t (:underline t :foreground "blue"))))
-       (lui-highlight-face ((t (:foreground "red"))))  ; my nick
-       (lui-time-stamp-face ((t (:foreground "orange"))))
-
-       ;; (magit-branch ((t )))
-       (magit-diff-add ((t (:inherit diff-added))))
-       (magit-diff-del ((t (:inherit diff-removed))))
-       ;; (magit-diff-file-header ((t )))
-       ;; (magit-diff-hunk-header ((t )))
-       ;; (magit-diff-none ((t )))
-       ;; (magit-header ((t )))
-       ;; (magit-item-highlight ((t )))
-       ;; (magit-item-mark ((t )))
-       ;; (magit-log-head-label ((t )))
-       ;; (magit-log-tag-label ((t )))
-       ;; (magit-section-title ((t )))
+       (magit-branch ((t (:foreground "SkyBlue" :height 1.1))))
+       (magit-diff-add ((t ,diff-added)))
+       (magit-diff-del ((t ,diff-removed)))
+       (magit-diff-file-header ((t (:family "Sans Serif" :height 1.1 :weight bold :foreground "#4183C4"))))
+       (magit-diff-hunk-header ((t ,diff-hunk-header)))
+       (magit-diff-none ((t ,diff-none)))
+       (magit-header ((t (:foreground "white" :background "#FF4040"))))
+       (magit-item-highlight ((t (:background "#EAF2F5"))))
+       (magit-item-mark ((t ,marked-line)))
+       (magit-log-head-label ((t (:box (:line-width 1 :color "blue" :style nil)))))
+       (magit-log-tag-label ((t (:box (:line-width 1 :color "#00CC00" :style nil)))))
+       (magit-section-title ((t (:family "Sans Serif" :height 1.8 :weight bold :foreground "cornflower blue"))))
 
        ;; make
        (makefile-space-face ((t (:background "hot pink"))))
        (makefile-targets ((t (:weight bold :foreground "blue"))))
 
-       (match ((t (:weight bold :foreground "#EE6600" :background "yellow"))))
+       (match ((t (:weight bold :foreground "#EE6600" :background "pink"))))
 
        ;; Message
        (message-cited-text-face ((t (:foreground "#5050B0"))))
-       (message-header-cc-face ((t (:family "Arial" :foreground "blue"))))
-       (message-header-name-face ((t (:family "Arial" :weight bold :foreground "#3399CC"))))
-       (message-header-newsgroups-face ((t (:family "Arial" :foreground "#3399CC"))))
-       (message-header-other-face ((t (:family "Arial" :foreground "#3399CC"))))
+       (message-header-cc-face ((t (:family "Sans Serif" :foreground "blue"))))
+       (message-header-name-face ((t (:family "Sans Serif" :weight bold :foreground "#3399CC"))))
+       (message-header-newsgroups-face ((t (:family "Sans Serif" :foreground "#3399CC"))))
+       (message-header-other-face ((t (:family "Sans Serif" :foreground "#3399CC"))))
        (message-header-subject-face ((t (:weight bold :foreground "#FF6633"))))
-       (message-header-to-face ((t (:family "Arial" :foreground "blue"))))
+       (message-header-to-face ((t (:family "Sans Serif" :foreground "blue"))))
        (message-header-xheader-face ((t (:foreground "red"))))
        (message-mml-face ((t (:foreground "forest green"))))
-       (message-separator-face ((t (:family "Arial" :weight bold :foreground "red"))))
+       (message-separator-face ((t (:family "Sans Serif" :weight bold :foreground "red"))))
 
-       (minibuffer-prompt ((t (:weight bold :foreground "#FF6633"))))
+       (mm-uu-extract ((t ,block-code)))
+
+       (minibuffer-noticeable-prompt ((t (:weight bold :foreground "black" :background "gold"))))
+       (minibuffer-prompt ((t (:weight bold :foreground "black" :background "gold"))))
 
        ;; GNU Emacs mode-line
-       (mode-line ((t (:box (:line-width 1 :color "#9EABB6") :foreground "#FFC77F" :background "#0097CB"))))
-       (mode-line-buffer-id ((t (:weight bold :foreground "white" :background "#0097CB"))))
+       (mode-line ((t (:box (:line-width 1 :color "#254394") :foreground "#D4EAFF" :background "#4241EF"))))
+       (mode-line-buffer-id ((t (:weight bold :foreground "white"))))
        (mode-line-highlight ((t (:foreground "yellow"))))
-       (mode-line-inactive ((t (:box (:line-width 1 :color "#9EABB6") :foreground "#617A82" :background "#006382"))))
+       (mode-line-inactive ((t (:box (:line-width 1 :color "#636363") :foreground "#818181" :background "#C6C3C6"))))
 
        ;; XEmacs modeline
-       (modeline-mousable ((t (:foreground "firebrick"))))  ; major-mode string
+       (modeline-mousable ((t (:weight bold :foreground "firebrick")))) ; major-mode
        (modeline-mousable-minor-mode ((t (:foreground "green4"))))
+
+       (mumamo-background-chunk-major ((t (:background "white"))))
 
        ;; non-breaking space
        (nobreak-space ((t (:background "#C6C3C6"))))
@@ -371,23 +436,24 @@
        (org-agenda-clocking ((t ,clock-line)))
        (org-agenda-column-dateline ((t (:inherit org-column))))
        ;; (org-agenda-column-dateline ((t (:background "deep sky blue" :height 79 :family "Consolas"))))
-       (org-agenda-date ((t (:height 1.6 :weight bold :foreground "#0063F5")))) ; "87C9FC"
-       ;; (org-agenda-date ((t (:foreground "blue1"))))
-       (org-agenda-date-today ((t (:foreground "purple"))))  ; "#CCCCFF"  ; inherit
-       ;; (org-agenda-date-today ((t (:slant italic :weight bold :foreground "blue1"))))
-       (org-agenda-date-weekend ((t (:foreground "dim gray"))))  ; "#B6B2AE"  ; inherit
-       ;; (org-agenda-date-weekend ((t (:weight bold :foreground "blue1"))))
+       (org-agenda-current-time ((t (:weight bold :underline t :foreground "purple"))))
+       (org-agenda-date ((t (:height 1.6 :weight bold :foreground "#0063F5")))) ; "#87C9FC"
+       (org-agenda-date-today ((t (:height 1.6 :weight bold :foreground "purple"))))  ; "#CCCCFF"  ; inherit
+       (org-agenda-date-weekend ((t (:height 1.6 :weight bold :foreground "dim gray"))))  ; "#B6B2AE"  ; inherit
        (org-agenda-diary ((t (:weight bold :foreground "green4" :background "light blue"))))
        (org-agenda-dimmed-todo-face ((t (:foreground "gold2"))))  ; org-blocked-todo
        (org-agenda-done ((t (:foreground "gray50" :background "#EAFFEA"))))
        (org-agenda-restriction-lock ((t (:foreground "white" :background "SkyBlue4"))))
-       (org-agenda-structure ((t (:foreground "#008ED1"))))
+       (org-agenda-structure ((t (:weight bold :foreground "white" :background "#0099FF"))))
        (org-archived ((t (:foreground "gray70"))))
        (org-beamer-tag ((t (:box (:line-width 1 :color "#00CC00" :style nil)))))
        (org-block ((t ,block-code)))
-       (org-checkbox ((t (:weight bold :background "gray"))))
+       (org-block-background ((t (:background "#FFFFEA"))))
+       (org-block-begin-line ((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+       (org-block-end-line ((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+       (org-checkbox ((t (:weight bold :foreground "white" :background "#777777" :box (:line-width 1 :style pressed-button)))))
        (org-clock-overlay ((t (:foreground "white" :background "SkyBlue4"))))
-       (org-code ((t ,inline-code)))
+       (org-code ((t (:foreground "#0077CC" :background "#EAFFEA"))))
        (org-column ((t ,column)))
        ;; (org-column ((t (:background "gold" :height 79 :family "Consolas"))))
        (org-column-title ((t (:inherit org-column))))
@@ -396,15 +462,16 @@
        (org-dim ((t (:foreground "#AAAAAA"))))
        (org-document-info ((t (:foreground "midnight blue"))))
        (org-document-info-keyword ((t (:foreground "#008ED1" :background "#EAEAFF"))))
-       (org-document-title ((t (:family "Arial" :height 1.8 :weight bold :foreground "blue"))))
-       (org-done ((t (:weight bold :box (:line-width 1 :color "black") :foreground "gray31"))))
-       ;; (org-done ((t (:foreground "green3" :weight bold :strike-through t))))
+       (org-document-title ((t (:family "Sans Serif" :height 1.8 :weight bold :foreground "blue"))))
+       (org-done ((t (:weight bold :box (:line-width 1 :color "#666666") :foreground "white" :background "#888888"))))
        (org-drawer ((t (:foreground "light sky blue"))))
-       (org-ellipsis ((t (:foreground "white"))))
+       (org-ellipsis ((t (:underline "#B0EEB0" :foreground "#00BB00"))))
+       (org-example ((t (:foreground "blue" :background "#EAFFEA"))))
        (org-footnote ((t (:underline t :foreground "#008ED1"))))
        (org-formula ((t (:foreground "chocolate1"))))
-       (org-headline-done ((t (:family "Arial" :height 1.6 :weight bold :strike-through t :box (:line-width 1 :color "gray67") :foreground "gray67" :background "gray92"))))
-       (org-latex-and-export-specials ((t (:foreground "blue1"))))
+       (org-headline-done ((t (:height 1.0 :weight bold :strike-through t :foreground "#A7A6AA")))) ; 1.4
+       (org-hide ((t (:foreground "#666666" :background "#FFFFCC"))))
+       (org-latex-and-export-specials ((t (:foreground "blue"))))
        (org-level-1 ((t ,ol1)))
        (org-level-2 ((t ,ol2)))
        (org-level-3 ((t ,ol3)))
@@ -413,46 +480,27 @@
        (org-level-6 ((t ,ol6)))
        (org-level-7 ((t ,ol7)))
        (org-level-8 ((t ,ol8)))
+       (org-link ((t (:underline t :foreground "#0077CC"))))
        (org-meta-line ((t (:foreground "#008ED1" :background "#EAEAFF"))))
        (org-mode-line-clock ((t ,clock-line)))
-       (org-mode-line-clock-overrun ((t (:weight bold :box (:line-width 1 :color "#9EABB6") :foreground "white" :background "#FF4040"))))
+       (org-mode-line-clock-overrun ((t (:weight bold :box (:line-width 1 :color "#FFBB00") :foreground "white" :background "#FF4040"))))
        (org-property-value ((t (nil))))
-       (org-scheduled ((t (:foreground "blue"))))
-       (org-scheduled-previously ((t (:foreground "red"))))
-       (org-scheduled-today ((t (:foreground "#00BB00"))))
+       (org-quote ((t (:slant italic :foreground "dim gray"))))
+       (org-scheduled ((t (:foreground "#0077CC"))))
+       (org-scheduled-previously ((t (:foreground "#0077CC"))))
+       (org-scheduled-today ((t (:slant italic :foreground "purple"))))
        (org-sexp-date ((t (:foreground "purple"))))
        (org-special-keyword ((t (:foreground "#00BB00" :background "#EAFFEA"))))
-       (org-table ((t (:foreground "blue1" :background "#EAFFEA"))))
-       (org-tag ((t (:height 1.0 :weight bold :slant italic :foreground "#816A7D" :background "#F7B8DE"))))
+       (org-table ((t (:foreground "blue" :background "#EAFFEA"))))
+       (org-tag ((t (:height 1.0 :weight normal :slant italic :foreground "#816A7D" :background "#F7B8DE"))))
        (org-target ((t (:underline t))))
        (org-time-grid ((t (:foreground "#008ED1"))))
        (org-todo ((t (:weight bold :box (:line-width 1 :color "red3") :foreground "white" :background "#FF5555"))))
        (org-upcoming-deadline ((t (:foreground "#FF5555"))))
        ;; (org-upcoming-deadline ((t (:foreground "white" :background "#E9A36A" :weight bold))))
        (org-verbatim ((t ,inline-code)))
-       (org-warning ((t (:weight bold :foreground "#D80000" :background "white"))))
-
-       ;; Org non-standard faces
-       (my/org-deadline-later ((t (:foreground "black" :background "#AACAFC"))))
-       (my/org-deadline-today ((t (:weight bold :foreground "white" :background "#E9A36A"))))
-       (my/org-deadline-tomorrow ((t (:weight bold :foreground "black" :background "#B4F1B3"))))
-       (my/org-deadline-yesterday ((t (:weight bold :foreground "white" :background "#D80000"))))
-
-       (my/org-started-kwd-face ((t (:weight bold :box (:line-width 1 :color "orange red") :foreground "black" :background "#FF9000"))))
-       (my/org-waiting-kwd-face ((t (:weight bold :box (:line-width 1 :color "#00CC00") :foreground "black" :background "chartreuse"))))
-       (my/org-delegated-kwd-face ((t (:weight bold :box (:line-width 1 :color "#00CC00") :foreground "black" :background "chartreuse"))))
-       (my/org-deferred-kwd-face ((t (:weight bold :box (:line-width 1 :color "steel blue") :foreground "black" :background "cyan"))))
-       (my/org-someday-kwd-face ((t (:weight bold :box (:line-width 1 :color "steel blue") :foreground "black" :background "cyan"))))
-       (my/org-canceled-kwd-face ((t (:weight bold :box (:line-width 1 :color "#D80000") :foreground "red" :background "cyan"))))
-
-       (my/org-quote-kwd-face ((t (:weight bold :box (:line-width 1 :color "red3") :foreground "white" :background "#FF5555"))))
-       (my/org-quoted-kwd-face ((t (:weight bold :box (:line-width 1 :color "red3") :foreground "black" :background "#FF9000"))))
-       (my/org-approved-kwd-face ((t (:weight bold :box (:line-width 1 :color "red3") :foreground "black" :background "chartreuse"))))
-       (my/org-rejected-kwd-face ((t (:weight bold :box (:line-width 1 :color "red3") :foreground "red" :background "cyan"))))
-       (my/org-expired-kwd-face ((t (:weight bold :box (:line-width 1 :color "red3") :foreground "white" :background "gray31"))))
-
-       (my/org-openpo-kwd-face ((t (:weight bold :box (:line-width 1 :color "orange red") :foreground "white" :background "#FF5555"))))
-       (my/org-closedpo-kwd-face ((t (:weight bold :box (:line-width 1 :color "orange red") :foreground "white" :background "gray31"))))
+       (org-verse ((t (:slant italic :foreground "dim gray" :background "#EEEEEE"))))
+       (org-warning ((t (:weight bold :box (:line-width 1 :color "#4488BB") :foreground "#5C88D3" :background "#BBDDFF"))))
 
        ;; pabbrev
        (pabbrev-debug-display-label-face ((t (:background "chartreuse"))))
@@ -470,16 +518,19 @@
        ;; pretty print ^L
        (pp^L-highlight ((t (:strike-through t :inherit shadow))))
 
-       (recover-this-file ((t (:foreground "white" :background "red"))))
+       (recover-this-file ((t (:background "tomato"))))
 
        ;; selection, selected region
        (region ((t (:background "#D2D9E0"))))  ; for GNU Emacs ; was seashell2
        (zmacs-region ((t (:background "gray84"))))  ; for XEmacs
 
-       (secondary-selection ((t (:foreground "purple" :background "yellow"))))  ; used by Org-mode for highlighting matched entries and keywords
+       ;; used by Org-mode for highlighting matched entries and keywords
+       (secondary-selection ((t (:weight bold :foreground "white" :background "#335EA8"))))
+
+       (shadow ((t (:weight bold :foreground "#666666" :background "#FFFFCC"))))
 
        ;; for `cat <<EOF' in shell scripts
-       (sh-heredoc ((t (:foreground "blue1"))))
+       (sh-heredoc ((t (:foreground "blue"))))
 
        ;; shell
        (shell-option-face ((t (:foreground "forest green"))))
@@ -502,7 +553,7 @@
 
        ;; subversion
        (svn-status-directory-face ((t ,directory)))
-       (svn-status-filename-face ((t (:foreground "magenta3"))))
+       (svn-status-filename-face ((t (:weight bold :foreground "#4183C4"))))
        (svn-status-locked-face ((t (:weight bold :foreground "red"))))
        (svn-status-marked-face ((t ,marked-line)))
        (svn-status-marked-popup-face ((t (:weight bold :foreground "green3"))))
@@ -511,7 +562,7 @@
        (svn-status-update-available-face ((t (:foreground "orange"))))
 
        ;; TeX
-       (tex-verbatim ((t (:foreground "blue1"))))
+       (tex-verbatim ((t (:foreground "blue"))))
 
        ;; tool-bar
        (tool-bar ((t (:box (:line-width 1 :style released-button) :foreground "black" :background "gray75"))))
@@ -523,6 +574,25 @@
        (trailing-whitespace ((t (:background "#D5FFD5"))))
 
        (traverse-match-face ((t (:weight bold :foreground "blue violet"))))
+
+       (vc-annotate-face-FF3F3F ((t (:foreground "#FF3F3F" :background "black"))))
+       (vc-annotate-face-FF6C3F ((t (:foreground "#FF3F3F" :background "black"))))
+       (vc-annotate-face-FF993F ((t (:foreground "#FF993F" :background "black"))))
+       (vc-annotate-face-FFC63F ((t (:foreground "#FF993F" :background "black"))))
+       (vc-annotate-face-FFF33F ((t (:foreground "#FFF33F" :background "black"))))
+       (vc-annotate-face-DDFF3F ((t (:foreground "#FFF33F" :background "black"))))
+       (vc-annotate-face-B0FF3F ((t (:foreground "#B0FF3F" :background "black"))))
+       (vc-annotate-face-83FF3F ((t (:foreground "#B0FF3F" :background "black"))))
+       (vc-annotate-face-56FF3F ((t (:foreground "#4BFF4B" :background "black"))))
+       (vc-annotate-face-3FFF56 ((t (:foreground "#4BFF4B" :background "black"))))
+       (vc-annotate-face-3FFF83 ((t (:foreground "#3FFFB0" :background "black"))))
+       (vc-annotate-face-3FFFB0 ((t (:foreground "#3FFFB0" :background "black"))))
+       (vc-annotate-face-3FFFDD ((t (:foreground "#3FF3FF" :background "black"))))
+       (vc-annotate-face-3FF3FF ((t (:foreground "#3FF3FF" :background "black"))))
+       (vc-annotate-face-3FC6FF ((t (:foreground "#3F99FF" :background "black"))))
+       (vc-annotate-face-3F99FF ((t (:foreground "#3F99FF" :background "black"))))
+       (vc-annotate-face-3F6CFF ((t (:foreground "#3F3FFF" :background "black"))))
+       (vc-annotate-face-3F3FFF ((t (:foreground "#3F3FFF" :background "black"))))
 
        ;; w3m
        (w3m-anchor ((t (:foreground "blue"))))
@@ -557,12 +627,15 @@
        (widget-field-face ((t (:background "gray85"))))
        (widget-inactive-face ((t (:foreground "dim gray"))))
        (widget-single-line-field-face ((t (:background "gray85"))))
+
+       (yas/field-debug-face ((t (:background "ivory2"))))
+       (yas/field-highlight-face ((t (:background "DarkSeaGreen1"))))
        ))))
 
 (add-to-list 'color-themes
-             '(color-theme-sva "Sva" "Sebastien Vauban"))
+             '(color-theme-leuven "Leuven" "Sebastien Vauban"))
 
-(provide 'color-theme-sva)
+(provide 'color-theme-leuven)
 
 
 ;; This is for the sake of Emacs.
@@ -572,4 +645,4 @@
 ;; eval: (when (fboundp 'rainbow-mode) (rainbow-mode))
 ;; End:
 
-;;; color-theme-sva.el ends here
+;;; color-theme-leuven.el ends here

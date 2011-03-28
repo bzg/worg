@@ -66,8 +66,9 @@ Examples demonstrating the use of R code within Org-mode.
 * Language-specific Features 					      :Write:
 ** Graphical output 							:Fix:
     If a =:file filename.ext= header argument is provided to an R
-    source block, then the output from the source block will depend on
-    the value of the =:results= header argument.
+    source block, then the output from the source block will go to the
+    named file. What that output is depends on the value of the
+    =:results= header argument.
 
     If the value is =:results graphics= then "base" graphics output is
     captured on disk, and a link to the graphics file is inserted into
@@ -79,6 +80,10 @@ Examples demonstrating the use of R code within Org-mode.
     If the extension of the file name passed to =:file= is not
     recognized, png format output is created by default.
     
+
+    For further clarification of =:file= and =:results=, see [[http://thread.gmane.org/gmane.emacs.orgmode/35396/focus=35766][this
+    thread]].
+
 # <<r-dev-header-args>>
     Additionally, values for several arguments to the R graphics
     device can be passed using header args:
@@ -100,12 +105,13 @@ Examples demonstrating the use of R code within Org-mode.
     =:R-dev-args= to pass background and foreground colors.  Note that
     both of these arguments can also be passed directly as
     header args, using =:fg= and =:bg=.
-    
-#+begin_example 
-    #+begin_src R :file z.pdf :width 8 :height 8 :R-dev-args bg="olivedrab", fg="hotpink"
-      plot(matrix(rnorm(100), ncol=2), type="l")
-    #+end_src
-#+end_example
+
+#+begin_src org
+  ,#+header: :width 8 :height 8 :R-dev-args bg="olivedrab", fg="hotpink"
+  ,#+begin_src R :file z.pdf :results graphics
+  ,plot(matrix(rnorm(100), ncol=2), type="l")
+  ,#+end_src
+#+end_src
 
 If "base" graphics aren't begin generated, then additional header
 arguments might be needed.  For example, with the =ggplot2= package,

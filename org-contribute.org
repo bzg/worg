@@ -20,18 +20,19 @@ Every contribution to Org is very welcome.  Here is a list of areas where
 your contribution will be useful:
 
 - you can submit *bug reports* -- Before sending a bug report, make sure
-  you have read this section of Org's manual: [[http://orgmode.org/org.html#Feedback][Feedback]]
+  you have read this section of Org's manual: [[http://orgmode.org/org.html#Feedback][Feedback]]  You can also read
+  this great text: "[[http://www.chiark.greenend.org.uk/~sgtatham/bugs.html][How to Send Bug Reports Effectively]]"
 
-- you can submit *feature requests* -- Org is already mature, but new
-  ideas keep popping up.  If you want to request a feature, it might
-  be a good idea to have a look at the current [[http://orgmode.org/worg/org-issues.html][Issue tracking file]]
-  which captures both bug reports and feature requests.  Or dig into
-  the mailing list for possible previous discussions about your idea.
-  If you cannot find back your idea, formulate it as detailed as
-  possible, if possible with examples, and send it to the mailing
-  list.
+- you can submit *feature requests* -- Org is already mature, but new ideas
+  keep popping up.  If you want to request a feature, it might be a good
+  idea to have a look at the current [[http://orgmode.org/worg/org-issues.html][Issue tracking file]] which captures
+  both bug reports and feature requests.  Or dig into the mailing list for
+  possible previous discussions about your idea.  If you cannot find back
+  your idea, formulate it as detailed as possible, if possible with
+  examples, and send it to the mailing list.
 
 - you can submit *patches* -- You can submit patches to the mailing list.
+  See the [[For Org contributors: preferred way of submitting patches][Preferred way of submitting patches]] section for details.
 
   If your patch is against a file that is part of Emacs, then your
   total contribution (all patches you submit) should change /less than
@@ -49,46 +50,97 @@ your contribution will be useful:
 
 * Copyright issues when contributing to Emacs org-mode
 
-Org is made of many files.  Most of them are also distributed as part
-of GNU Emacs.  These files are called the /Org core/, and they are all
+Org is made of many files.  Most of them are also distributed as part of
+GNU Emacs.  These files are called the /Org core/, and they are all
 copyrighted by the [[http://www.fsf.org][Free Software Foundation, Inc]].  If you consider
-contributing to these files, your first need to grant the right to
-include your works in GNU Emacs to the FSF.  For this you need to
-complete [[http://orgmode.org/request-assign-future.txt][this form]], send it to [[mailto:assign@gnu.org][assign@gnu.org]], and tell the Org-mode
-maintainer when this process is complete.  Some people consider this a
-hassle.  I don't want to discuss this in detail here - there are some
-good reasons for getting the copyright registered, an example is
-discussed in this [[http://twit.tv/floss117][FLOSS weekly podcast]].  Furthermore, by playing
-according to the Emacs rules, we gain the fantastic advantage that
-every version of Emacs ships with Org-mode already fully built in.  So
-please consider doing this - it makes our work as maintainers so much
-easier, because we can then take your patches without any additional
-work.
+contributing to these files, your first need to grant the right to include
+your works in GNU Emacs to the FSF.  For this you need to complete [[http://orgmode.org/request-assign-future.txt][this
+form]], send it to [[mailto:assign@gnu.org][assign@gnu.org]], and tell the Org-mode maintainer when this
+process is complete.  Some people consider this a hassle.  I don't want to
+discuss this in detail here - there are some good reasons for getting the
+copyright registered, an example is discussed in this [[http://twit.tv/floss117][FLOSS weekly podcast]].
+Furthermore, by playing according to the Emacs rules, we gain the fantastic
+advantage that every version of Emacs ships with Org-mode already fully
+built in.  So please consider doing this - it makes our work as maintainers
+so much easier, because we can then take your patches without any
+additional work.
 
 If you want to learn more about /why/ copyright assignments are
 collected, read this: [[http://www.gnu.org/licenses/why-assign.html][Why the FSF gets copyright assignments from
 contributors?]]
 
-* Preferred way of submitting patches
+* For Org developers
+
+1. Send your public key to [[mailto:emacs-orgmode%20AT%20dunsmor%20DOT%20com][Jason Dunsmore]].  
+
+2. Wait for confirmation that your public key has been added to the server.
+
+3. Clone =org-mode.git= repository like this:
+
+: ~$ git clone orgmode@orgmode.org:org-mode.git
+
+3. Commit your changes and push them.
+
+If you are undertaking big changes, please create a dedicated branch for
+them.
+
+* For Org contributors: preferred way of submitting patches
 
 Org-mode is developed using /git/ as the version control system.  Git
-provides an amazing framework to collaborate on a project.  Git can be
-used to make patches and send them via email - this is perfectly fine
-for minor changes.
+provides an amazing framework to collaborate on a project.  Git can be used
+to make patches and send them via email -- this is perfectly fine for minor
+changes.
+
+These patches will be automatically registered at [[http://patchwork.newartisans.com/project/org-mode][John Wiegley's patchwork
+server]] and will then be accepted, rejected, or sent back to the author with
+a request for modification.
+
+** Sending quick fixes
+
 #+begin_quote
-  This command will make a patch between the staging area (in
-  your computer), and the file you modified:
+  This command will make a patch between the staging area (in your
+  computer), and the file you modified:
+
   : git diff -p org-whatever.el > org-whatever.el.diff
-  If you already committed your changes to your index (staging
-  area), then you should compare against a particular branch (in
-  this example, origin/master):
+
+  If you already committed your changes to your index (staging area), then
+  you should compare against a particular branch (in this example,
+  origin/master):
+
   : git diff -p origin/master org-whatever.el > org-whatever.el.diff
-  You email the output to the mailing list, adding =[PATCH]= to
-  the subject, and description of what you fixed or changed.
+
+  You email the output to the mailing list, adding =[PATCH]= to the
+  subject, and description of what you fixed or changed.
 #+end_quote
-These patches will be automatically registered at [[http://patchwork.newartisans.com/project/org-mode][John Wiegley's
-patchwork server]] and will then be accepted, rejected, or sent back to
-the author with a request for modification.
+
+** Sending commits
+
+For more significant changes, you might want to work in several steps and
+send each commit separately.  Here is the suggested workflow
+
+#+begin_quote
+:   ~$ git pull                 # make sure your repo is up to date
+:   ~$ git branch my-changes    # create a new branch
+:   ~$ git checkout my-changes  # switch to this new branch
+
+  ... make some changes (1) ...
+
+:   ~$ git commit -m "This is change (1)"  # Commit your change
+
+  ... make another change (2) ...
+
+:   ~$ git commit -m "This is change (2)"  # Commit your change
+:   ~$ git format-patch master             # Creates two patches
+
+  ... Then two patches for your two commits are ready to be sent to the
+  list and detected by the patchwork server.
+#+end_quote
+
+Write useful commit messages: unless your change is very small, please
+provide 1) a reason for it in your email and 2) a ChangeLog entry in the
+commit message.
+
+** Sharing changes from a public branch
 
 For more significant contributions, the best way to submit patches is
 through public branches of your repository clone.
@@ -136,10 +188,10 @@ through public branches of your repository clone.
 
 * Commit messages and ChangeLog entries
 
-We have decided to no longer keep a ChangeLog file to record changes
-to individual functions.  In a modern version control system like git,
-ChangeLog is duplicating information that should be in the commit
-message, and it is the main cause of merge conflicts.
+We have decided to no longer keep a ChangeLog file to record changes to
+individual functions.  In a modern version control system like git,
+ChangeLog is duplicating information that should be in the commit message,
+and it is the main cause of merge conflicts.
 
 Instead, the change log entry should be part of the commit message.  A
 commit message should be constructed in the following way:
@@ -177,11 +229,11 @@ Here is an example for such a message
   TINYCHANGE
 #+end_example
 
-If you are using /magit.el/ in Emacs, The ChangeLog-like such entries
-are easily made by pressing =C= in the diff listing.  Another option
-to make the entries is to use `C-x 4 a' in the changed function.  This
-will create entries in the ChangeLog file, and you can then cut and
-paste these to the commit message and remove the indentation.
+If you are using /magit.el/ in Emacs, The ChangeLog-like such entries are
+easily made by pressing =C= in the diff listing.  Another option to make
+the entries is to use `C-x 4 a' in the changed function.  This will create
+entries in the ChangeLog file, and you can then cut and paste these to the
+commit message and remove the indentation.
 
 * Copyrighted contributors to Org-mode
 
@@ -200,75 +252,78 @@ Here is the list of people who signed the papers with the Free Software
 Foundation and can now freely submit code to Org files that are included
 within GNU Emacs:
 
-1. Russel Adams
-2. Benjamin Andresen
-3. Konstantin Antipin
-4. Julien Barnier
-5. Ian Barton
-6. Thomas Baumann
-7. Joel Boehland
-8. Jan Böker
-9. Lennart Borgman
-10. Tom Breton
-11. Andreas Burtzlaff
-12. Puneeth Chaganti
-13. Sacha Chua
-14. Baoqiu Cui
-15. Julien Danjou
-16. Dan Davison
-17. Carsten Dominik
-18. Stephen Eglen
-19. Christian Egli
-20. Adam Elliott
-21. Miguel A. Figueroa-Villanueva
-22. Mikael Fornius
+1. Adam Elliott
+2. Andreas Burtzlaff
+3. Andy Steward
+4. Anthony Lander
+5. Baoqiu Cui
+6. Barry Leonard Gidden
+7. Bastien Guerry
+8. Benjamin Andresen
+9. Bernd Grobauer
+10. Bernt Hansen
+11. Brian James Gough
+12. Carsten Dominik
+13. Charles Sebold
+14. Christian Egli
+15. Christopher League
+16. Christopher Miles Gray
+17. Christopher Suckling
+18. Dan Davison
+19. Daniel M German
+20. Daniel M. Hackney
+21. David Maus
+22. David O'Toole
 23. Eric S. Fraga
-24. Michael Gauland
-25. Daniel M German
-26. Manuel Giraud
-27. Nicolas Goaziou
-28. Brian James Gough
-29. Christopher Miles Gray
-30. Bernd Grobauer
-31. Bastien Guerry
-32. Daniel M. Hackney
-33. Bernt Hansen
-34. Magnus Henoch
-35. Tomas Hlavaty
-36. Tassilo Horn
-37. Noorul Islam K M
-38. Erik Iverson
-39. Phil Jackson
-40. Peter Jones
-41. Tokuya Kameshima
-42. Richard Klinda
-43. Seweryn Kokot
-44. Anthony Lander
-45. Christopher League
-46. Matt Lundin
-47. David Maus
+24. Eric Schulte
+25. Erik Iverson
+26. Ian Barton
+27. James TD Smith
+28. Jan Böker
+29. Jason Riedy
+30. Jeffrey Ryan Horn
+31. Joel Boehland
+32. John Wiegley
+33. Juan Pechiar
+34. Julien Barnier
+35. Julien Danjou
+36. Konstantin Antipin
+37. Lennart Borgman
+38. Lukasz Stelmach
+39. Magnus Henoch
+40. Manuel Giraud
+41. Martin Pohlack
+42. Martyn Jago
+43. Matt Lundin
+44. Michael Gauland
+45. Michael Sperber
+46. Miguel A. Figueroa-Villanueva
+47. Mikael Fornius
 48. Nathan Neff
-49. Ross Patterson
-50. Juan Pechiar
-51. Martin Pohlack
-52. Jason Riedy
-53. Richard Riley
+49. Nicolas Goaziou
+50. Noorul Islam K M
+51. Paul Sexton
+52. Peter Jones
+53. Phil Jackson
 54. Philip Rooke
-55. Sebastian Rose
-56. Eric Schulte
-57. Charles Sebold
-58. Paul Sexton
-59. James TD Smith
-60. Michael Sperber
-61. Ulf Stegemann
-62. Lukasz Stelmach
-63. Andy Steward
-64. Christopher Suckling
-65. David O'Toole
-66. Sebastien Vauban
-67. Zhang Weize
-68. John Wiegley
-69. Piotr Zielinski
+55. Piotr Zielinski
+56. Puneeth Chaganti
+57. Richard Klinda
+58. Richard Riley
+59. Ross Patterson
+60. Russel Adams
+61. Sacha Chua
+62. Sebastian Rose
+63. Sebastien Vauban
+64. Seweryn Kokot
+65. Stephen Eglen
+66. Tassilo Horn
+67. Thomas Baumann
+68. Tokuya Kameshima
+69. Tom Breton
+70. Tomas Hlavaty
+71. Ulf Stegemann
+72. Zhang Weize
 
 ** Processing
 
