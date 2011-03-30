@@ -1,0 +1,190 @@
+
+#+TITLE:     Tracking actions through a series of meetings
+#+AUTHOR:    Carsten Dominik
+#+EMAIL:     carsten.dominik@gmail.com
+#+DATE:      2011-03-30
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+LINK_UP:   
+#+LINK_HOME: 
+
+* Introduction
+
+Org-mode can be used very well for taking notes and for capturing
+action items during the meeting.  This keeps the tasks inside the
+notes and works really well for planning out projects.
+
+When documenting a series of meetings with Org-mode, a different work
+flow is required.  Such a meeting series usually has a set of tasks
+which are continuously being defined during the meetings, and which
+need to be tracked from meeting to meeting until completion.  So
+usually the meeting notes contains the current list of tasks.  Done
+tasks disappear from the meeting notes, but still need to be available
+to the person who is running the series of meeting.
+
+* Requirements
+
+To use the work flow described here, you will need the bleeding edge
+git version of 2011-03-30 or any release that was created after this
+date.  Basic task tracking has been possible with Org of cause since
+day one, but exporting without DONE tasks, and a few helpful tools
+described below are only recent additions.
+
+* Setup
+
+Use a special Org file to document the meetings and to track the
+actions.  In the file,  I have the following setup.
+
+#+begin_src org
+  ,#+TODO: TODO(t) | CANCELED(c) DONE(d)
+  ,#+OPTIONS: tasks:todo
+#+end_src
+
+Of cause you can define the TODO keywords any way you like.  The
+=#+OPTIONS= line arranges for DONE tasks to be excluded from export,
+so that when you sent around the list of actions to the participants,
+these tasks will not clutter the list.  If you want to keep DONE tasks
+in the list, either always or occasionally, modify this line to say
+=#+OPTIONS: tasks:t=.
+
+* How to identify tasks
+
+It is useful to identify a task in a unique way, so that you can get
+back to it easily in the next meeting.  The method I am choosing here
+is to simply number the tasks sequentially, in the sequence they come
+up.  Org has a command to create tasks in this way, to ensure that the
+sequential number is indeed not already taken.  To bind this command to
+a key, use (for example)
+
+#+begin_src emacs-lisp
+(define-key org-mode-map "\C-cn" 'org-new-numbered-action)
+#+end_src
+
+The command =org-new-numbered-action= uses the specification in
+=org-numbered-action-format= to insert a task like this:
+
+#+begin_src org
+   ,** TODO Action #2:                                 :#2:
+#+end_src
+
+You can also call the command with a prefix argument in order to
+insert an inline-task.
+
+With the default setup, the action starts with "Action #2", and it is
+tagged by "#2" to that I can tag other stuff relating to this action
+and search for it.
+
+* The work flow
+
+** Before a meeting
+
+For each meeting I start a new top-level section in the document for
+the notes.  In the notes I create new actions and leave them there for
+the time being.
+
+I also have a top-level section "ACTIONS" in the file.  This section
+contains all the actions from previous meetings, each action
+identified by its unique number.  I have this section right after the
+meeting notes sections, so that I can easily export the latest meeting
+notes together with the action list, simply by narrowing the buffer to
+the two sequential trees.  Here is an example what this might look
+like
+
+#+begin_src org
+  ,* Notes from <2011-03-16 Wed>                                       :ARCHIVE:
+  ,* Notes from <2011-03-23 Wed>                                       :ARCHIVE:
+  ,* Notes from <2011-03-30 Wed>
+  ,** Present at meeting
+  ,   - [X] Peter
+  ,   - [X] Sarah
+  ,   - [X] Sam
+  ,** Agenda
+  ,   - Comments and corrections to last meting notes
+  ,   - Reports from the sub teams
+  ,   - Discussion
+  ,   - Final round
+  ,** Notes
+  ,   ...
+  , 
+  ,* ACTIONS
+  ,  This is the general list of Actions
+  ,** DONE Action #1 Inventory of equipment                           :#1:Sarah:
+  ,** DONE Action #2 Definition of main goals                         :#2:Peter:
+  ,** TODO Action #4 Talk to companies                                  :#4:Sam:
+  
+#+end_src
+
+** During the meeting
+
+During the meeting, take notes and create new actions.  You could add
+these new actions immediately to the global list, or you could define
+the actions inside the notes for now.  Below I will show how to copy
+or mode the actions to the general list.
+
+When I create actions, I also tag them with the names of people who
+are responsible, so that it later becomes easy to track progress and
+to send reminders.
+
+** After the meeting
+
+After the meeting, I organize the notes of the current meeting until
+they are ready to be sent out.  I like to keep the newly defined
+actions inside the meeting notes, to highlight them as new.  Once
+satisfied with the notes, the new actions need to be integrated with
+the general list of actions.
+
+*** Copying the actions from the meeting notes to the action list
+
+I then *copy* the new actions from the last meeting to the ACTIONS
+section.  For this task I use the command =M-x
+org-collect-todos-in-subtree=.  It will copy all the actions in a
+subtree and put them into the kill ring, so that I can simply paste
+them with =C-c C-x C-y= into the ACTIONS list.  There I organize the
+actions, change the sequence, create subsections with related actions
+together etc.  Some groups have trivial task lists, then the list just
+stays simple and flat.  For complex consortia I do a lot of
+analysis, structuring, and ordering.
+
+*** Sending out the notes
+
+To send the meeting notes and the current list of actions, I narrow
+the buffer to the node with the meeting notes and the node with the
+action list, export to the desired format, and mail it out.
+
+*** Deactivate tasks in the meeting notes
+
+I then deactivate any actions in the meeting notes I just sent around
+by marking the entire new notes tree with an ARCHIVE tag.  Then, TODO
+lists and other Agenda views will get entries only from the ACTIONS
+tree, not from the meeting notes.  Instead of copying, you could also
+*move* (refile) the actions to the ACTIONS tree, but I like to keep
+them deactivated in the notes, so that I have a copy of the notes
+exactly as sent around, in the file.  The idea is that the meeting
+notes are fixed, and all procedural stuff with the actions will be
+added and tracked in the ACTIONS tree.
+
+** Between meetings
+
+Between meetings I use the ACTIONS tree to generate reminders for
+people in the list, check DONE tasks off etc.  Before the next
+meeting, I create an agenda view to show me which actions have been
+closed during the last period.  I add this list to the agenda for the
+next meeting to inform everyone about the stuff that is closed and off
+the list.  I also attach an export of the current ACTIONS tree to the
+agenda, for reference during the following meeting.  The DONE items
+will not be on that tree anymore.  The nice thing is that the members
+of the meeting always have an uncluttered list of actions, while I as
+the responsible person still have all the old tasks and the history of
+the entire project at my finger tips.
+
+* Final remarks
+
+This setup has worked really well for me, both for meetings that
+happen locally, and for meetings with international groups who meet
+via telephone/video conferencing.  I hope it will do the same for
+you.
+
