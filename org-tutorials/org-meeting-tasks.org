@@ -32,7 +32,7 @@ to the person who is running the series of meeting.
 
 To use the work flow described here, you will need the bleeding edge
 git version of 2011-03-30 or any release that was created after this
-date.  Basic task tracking has been possible with Org of cause since
+date.  Basic task tracking has been possible with Org, of course, since
 day one, but exporting without DONE tasks, and a few helpful tools
 described below are only recent additions.
 
@@ -49,7 +49,7 @@ actions.  In the file,  I have the following setup.
 Of cause you can define the TODO keywords any way you like.  The
 =#+OPTIONS= line arranges for DONE tasks to be excluded from export,
 so that when you sent around the list of actions to the participants,
-these tasks will not clutter the list.  If you want to keep DONE tasks
+these completed tasks will not clutter the list.  If you want to keep DONE tasks
 in the list, either always or occasionally, modify this line to say
 =#+OPTIONS: tasks:t=.
 
@@ -125,7 +125,7 @@ like
 During the meeting, take notes and create new actions.  You could add
 these new actions immediately to the global list, or you could define
 the actions inside the notes for now.  Below I will show how to copy
-or mode the actions to the general list.
+or move the actions to the general list.
 
 When I create actions, I also tag them with the names of people who
 are responsible, so that it later becomes easy to track progress and
@@ -170,25 +170,30 @@ action list, export to the desired format, and mail it out.
         
         The =toc= option is not strictly necessary but minutes of
         meetings are typically only a few pages so a table of contents
-        is seldom required.
+        is seldom required.  However, it *can* be useful for generating
+        a list of actions.
 
-     2. The numbering of actions is done instead by explicitly putting
+     2. The numbering of actions is done by explicitly putting
         the number into the headline.  I do this by customising the
         =org-numbered-action-format= variable to the string
         
-        : "TODO %d. \\action{?} "
+        : "TODO %d. \\action{?}"
 
      3. To support this type of headline, I have defined the =\action= LaTeX macro:
         
         : #+latex_header: \newcommand{\action}[1]{\marginpar{\fbox{#1}}}
 
+        I will typically put the name or initials of the person
+        responsible for taking the action in lieu of the =?= as the
+        argument to the action macro in the headline, such as:
         
-     I will typically put the name or initials of the person
-     responsible for taking the action in lieu of the =?= as the
-     argument to the action macro in the headline.  This, on export,
-     will put that person's name or initials in the right margin of
-     the page with a box around it, making it very easy to identify
-     who has actions and who does not.
+        #+begin_src org
+        , ** TODO 3. \action{ESF} Prepare plan.         :#3:
+        #+end_src
+
+        The macro, on export, will place the person's name or initials
+        in the right margin of the page with a box around it, making
+        it very easy to identify who has actions and who does not.
 
      I do customise the LaTeX export further but those customisations
      are not specific to minute taking.
@@ -207,7 +212,7 @@ added and tracked in the ACTIONS tree.
 
 ** Between meetings
 
-Between meetings I use the ACTIONS tree to generate reminders for
+Between meetings, I use the ACTIONS tree to generate reminders for
 people in the list, check DONE tasks off etc.  Before the next
 meeting, I create an agenda view to show me which actions have been
 closed during the last period.  I add this list to the agenda for the
