@@ -156,6 +156,7 @@ analysis, structuring, and ordering.
 To send the meeting notes and the current list of actions, I narrow
 the buffer to the node with the meeting notes and the node with the
 action list, export to the desired format, and mail it out.
+
 *** Deactivate tasks in the meeting notes
 
 I then deactivate any actions in the meeting notes I just sent around
@@ -173,62 +174,72 @@ added and tracked in the ACTIONS tree.
 Between meetings, I use the ACTIONS tree to generate reminders for
 people in the list, check DONE tasks off etc.  Before the next
 meeting, I create an agenda view to show me which actions have been
-closed during the last period.  I add this list to the agenda for the
-next meeting to inform everyone about the stuff that is closed and off
-the list.  I also attach an export of the current ACTIONS tree to the
-agenda, for reference during the following meeting.  The DONE items
-will not be on that tree anymore.  The nice thing is that the members
-of the meeting always have an uncluttered list of actions, while I as
-the responsible person still have all the old tasks and the history of
-the entire project at my finger tips.
+closed during the last period.  I create this view in the following
+way:  With the cursor in the actions tree I do
 
-* Other ideas
-** Exporting to LaTeX (by Eric S Fraga)
-      I use LaTeX to create the minutes I circulate to the people that
-      attended a meeting.  I have adopted Carsten's workflow but have
-      customised some of the behaviour to better suit the LaTeX export.
-      The customisations address primarily the formatting of the
-      actions and identifying the person responsible for each action.
+: C-c a < < a         ;; Agenda view restricted on subtree
+: v L                 ;; turn on logging
 
-      1. I customise the export options to not include TODO keywords or
-         tags and to not number the sections, using:
-         
-         : #+OPTIONS: tags:nil todo:nil num:nil toc:nil
-         
-         The =toc= option is not strictly necessary but minutes of
-         meetings are typically only a few pages so a table of contents
-         is seldom required.  However, it *can* be useful for generating
-         a list of actions.
+I extract what needs to be reported to the group and add that to the
+invitation mailing for the next telecon.  I also attach an export of
+the current ACTIONS tree to the agenda, for reference during the
+following meeting.  The DONE items will not be on that tree anymore.
+The nice thing is that the members of the meeting always have an
+uncluttered list of actions, while I as the responsible person still
+have all the old tasks and the history of the entire project at my
+finger tips.
 
-      2. The numbering of actions is done by explicitly putting
-         the number into the headline.  I do this by customising the
-         =org-numbered-action-format= variable to the string
-         
-         : "TODO %d. \\action{?}"
-
-      3. To support this type of headline, I have defined the =\action= LaTeX macro:
-         
-         : #+latex_header: \newcommand{\action}[1]{\marginpar{\fbox{#1}}}
-
-         I will typically put the name or initials of the person
-         responsible for taking the action in lieu of the =?= as the
-         argument to the action macro in the headline, such as:
-         
-         #+begin_src org
-         , ** TODO 3. \action{ESF} Prepare plan.         :#3:
-         #+end_src
-
-         The macro, on export, will place the person's name or initials
-         in the right margin of the page with a box around it, making
-         it very easy to identify who has actions and who does not.
-
-      I do customise the LaTeX export further but those customisations
-      are not specific to minute taking.
-
-* Final remarks
+* Conclusion
 
 This setup has worked really well for me, both for meetings that
 happen locally, and for meetings with international groups who meet
-via telephone/video conferencing.  I hope it will do the same for
-you.
+via telephone/video conferencing.
+
+In the section below, I welcome contributions by anone, describing
+additional ideas and modification to the workflow.
+
+* Other ideas and remarks about this workflow
+
+** Exporting to LaTeX (by Eric S Fraga)
+
+I use LaTeX to create the minutes I circulate to the people that
+attended a meeting.  I have adopted Carsten's workflow but have
+customised some of the behaviour to better suit the LaTeX export.
+The customisations address primarily the formatting of the
+actions and identifying the person responsible for each action.
+
+1. I customise the export options to not include TODO keywords or
+   tags and to not number the sections, using:
+         
+   : #+OPTIONS: tags:nil todo:nil num:nil toc:nil
+         
+   The =toc= option is not strictly necessary but minutes of
+   meetings are typically only a few pages so a table of contents
+   is seldom required.  However, it *can* be useful for generating
+   a list of actions.
+
+2. The numbering of actions is done by explicitly putting
+   the number into the headline.  I do this by customising the
+   =org-numbered-action-format= variable to the string
+         
+   : "TODO %d. \\action{?}"
+
+3. To support this type of headline, I have defined the =\action= LaTeX macro:
+         
+   : #+latex_header: \newcommand{\action}[1]{\marginpar{\fbox{#1}}}
+
+   I will typically put the name or initials of the person
+   responsible for taking the action in lieu of the =?= as the
+   argument to the action macro in the headline, such as:
+         
+   #+begin_src org
+     , ** TODO 3. \action{ESF} Prepare plan.         :#3:
+   #+end_src
+
+   The macro, on export, will place the person's name or initials
+   in the right margin of the page with a box around it, making
+   it very easy to identify who has actions and who does not.
+
+ I do customise the LaTeX export further but those customisations
+ are not specific to minute taking.
 
