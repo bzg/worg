@@ -156,48 +156,6 @@ analysis, structuring, and ordering.
 To send the meeting notes and the current list of actions, I narrow
 the buffer to the node with the meeting notes and the node with the
 action list, export to the desired format, and mail it out.
-**** Exporting to LaTeX (by Eric S Fraga)
-     I use LaTeX to create the minutes I circulate to the people that
-     attended a meeting.  I have adopted Carsten's workflow but have
-     customised some of the behaviour to better suit the LaTeX export.
-     The customisations address primarily the formatting of the
-     actions and identifying the person responsible for each action.
-
-     1. I customise the export options to not include TODO keywords or
-        tags and to not number the sections, using:
-        
-        : #+OPTIONS: tags:nil todo:nil num:nil toc:nil
-        
-        The =toc= option is not strictly necessary but minutes of
-        meetings are typically only a few pages so a table of contents
-        is seldom required.  However, it *can* be useful for generating
-        a list of actions.
-
-     2. The numbering of actions is done by explicitly putting
-        the number into the headline.  I do this by customising the
-        =org-numbered-action-format= variable to the string
-        
-        : "TODO %d. \\action{?}"
-
-     3. To support this type of headline, I have defined the =\action= LaTeX macro:
-        
-        : #+latex_header: \newcommand{\action}[1]{\marginpar{\fbox{#1}}}
-
-        I will typically put the name or initials of the person
-        responsible for taking the action in lieu of the =?= as the
-        argument to the action macro in the headline, such as:
-        
-        #+begin_src org
-        , ** TODO 3. \action{ESF} Prepare plan.         :#3:
-        #+end_src
-
-        The macro, on export, will place the person's name or initials
-        in the right margin of the page with a box around it, making
-        it very easy to identify who has actions and who does not.
-
-     I do customise the LaTeX export further but those customisations
-     are not specific to minute taking.
-
 *** Deactivate tasks in the meeting notes
 
 I then deactivate any actions in the meeting notes I just sent around
@@ -223,6 +181,49 @@ will not be on that tree anymore.  The nice thing is that the members
 of the meeting always have an uncluttered list of actions, while I as
 the responsible person still have all the old tasks and the history of
 the entire project at my finger tips.
+
+* Other ideas
+** Exporting to LaTeX (by Eric S Fraga)
+      I use LaTeX to create the minutes I circulate to the people that
+      attended a meeting.  I have adopted Carsten's workflow but have
+      customised some of the behaviour to better suit the LaTeX export.
+      The customisations address primarily the formatting of the
+      actions and identifying the person responsible for each action.
+
+      1. I customise the export options to not include TODO keywords or
+         tags and to not number the sections, using:
+         
+         : #+OPTIONS: tags:nil todo:nil num:nil toc:nil
+         
+         The =toc= option is not strictly necessary but minutes of
+         meetings are typically only a few pages so a table of contents
+         is seldom required.  However, it *can* be useful for generating
+         a list of actions.
+
+      2. The numbering of actions is done by explicitly putting
+         the number into the headline.  I do this by customising the
+         =org-numbered-action-format= variable to the string
+         
+         : "TODO %d. \\action{?}"
+
+      3. To support this type of headline, I have defined the =\action= LaTeX macro:
+         
+         : #+latex_header: \newcommand{\action}[1]{\marginpar{\fbox{#1}}}
+
+         I will typically put the name or initials of the person
+         responsible for taking the action in lieu of the =?= as the
+         argument to the action macro in the headline, such as:
+         
+         #+begin_src org
+         , ** TODO 3. \action{ESF} Prepare plan.         :#3:
+         #+end_src
+
+         The macro, on export, will place the person's name or initials
+         in the right margin of the page with a box around it, making
+         it very easy to identify who has actions and who does not.
+
+      I do customise the LaTeX export further but those customisations
+      are not specific to minute taking.
 
 * Final remarks
 
