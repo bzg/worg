@@ -33,8 +33,12 @@ to the person who is running the series of meeting.
 To use the work flow described here, you will need the bleeding edge
 git version of 2011-03-30 or any release that was created after this
 date.  Basic task tracking has been possible with Org, of course, since
-day one, but exporting without DONE tasks, and a few helpful tools
-described below are only recent additions.
+day one, but exporting without DONE tasks is a only recent addition.
+
+Also, this tutorial assumes that you are using the helper functions
+shown in section [[id:F18E5D49-BFAC-4C17-A108-E069E46F141E][Custom code]].  This is not strictly necessary - you
+could do the corresponding steps by hand - but if you are using this
+work flow more often, you may appreciate these tools.
 
 * Setup
 
@@ -58,16 +62,16 @@ in the list, either always or occasionally, modify this line to say
 It is useful to identify a task in a unique way, so that you can get
 back to it easily in the next meeting.  The method I am choosing here
 is to simply number the tasks sequentially, in the sequence they come
-up.  Org has a command to create tasks in this way, to ensure that the
-sequential number is indeed not already taken.  To bind this command to
-a key, use (for example)
+up.  The [[id:F18E5D49-BFAC-4C17-A108-E069E46F141E][custom code]] below defines a command to create tasks in this
+way, to ensure that the sequential number is indeed not already taken.
+To bind this command to a key, use (for example)
 
 #+begin_src emacs-lisp
-(define-key org-mode-map "\C-cn" 'org-new-numbered-action)
+(define-key org-mode-map "\C-cn" 'org-mactions-new-numbered-action)
 #+end_src
 
-The command =org-new-numbered-action= uses the specification in
-=org-numbered-action-format= to insert a task like this:
+The command =org-mactions-new-numbered-action= uses the specification
+in =org-mactions-numbered-action-format= to insert a task like this:
 
 #+begin_src org
    ,** TODO Action #2:                                 :#2:
@@ -143,12 +147,12 @@ the general list of actions.
 
 I then *copy* the new actions from the last meeting to the ACTIONS
 section.  For this task I use the command =M-x
-org-collect-todos-in-subtree=.  It will copy all the actions in a
-subtree and put them into the kill ring, so that I can simply paste
-them with =C-c C-x C-y= into the ACTIONS list.  There I organize the
-actions, change the sequence, create subsections with related actions
-together etc.  Some groups have trivial task lists, then the list just
-stays simple and flat.  For complex consortia I do a lot of
+org-mactions-collect-todos-in-subtree=.  It will copy all the actions
+in a subtree and put them into the kill ring, so that I can simply
+paste them with =C-c C-x C-y= into the ACTIONS list.  There I organize
+the actions, change the sequence, create subsections with related
+actions together etc.  Some groups have trivial task lists, then the
+list just stays simple and flat.  For complex consortia I do a lot of
 analysis, structuring, and ordering.
 
 *** Sending out the notes
@@ -197,6 +201,64 @@ via telephone/video conferencing.
 
 In the section below, I welcome contributions by anyone, describing
 additional ideas and modification to the workflow.
+
+* Custom code
+  :PROPERTIES:
+  :ID:       F18E5D49-BFAC-4C17-A108-E069E46F141E
+  :END:
+
+Here is some custom code to help entering numbered actions, and to
+collect TODO items in a subtree into a flat list.
+
+#+begin_src emacs-lisp
+  (defcustom org-mactions-numbered-action-format "TODO Action #%d "
+    "Default structure of the headling of a new action.
+  %d will become the number of the action."
+    :group 'org-edit-structure
+    :type 'string)  
+  
+  (defun org-mactions-new-numbered-action (&optional inline)
+    "Insert a new numbered action, using `org-mactions-numbered-action-format'.
+  With prefix argument, insert an inline task."
+    (interactive "P")
+    (let* ((num (let ((re "\\`#\\([0-9]+\\)\\'"))
+                  (1+ (apply 'max 0
+                             (mapcar
+                              (lambda (e)
+                                (if (string-match re (car e))
+                                    (string-to-number (match-string 1 (car e)))
+                                  0))
+                              (org-get-buffer-tags))))))
+           (tag (concat "#" (number-to-string num))))
+      (if inline
+            (org-inlinetask-insert-task)
+        (org-insert-heading nil 'force))
+      (unless (eql (char-before) ?\ ) (insert " "))
+      (insert (format org-mactions-numbered-action-format num))
+      (org-toggle-tag tag 'on)
+      (if (= (point-max) (point-at-bol))
+          (save-excursion (goto-char (point-at-eol)) (insert "\n")))
+      (unless (eql (char-before) ?\ ) (insert " "))))
+  
+   (defun org-mactions-collect-todos-in-subtree ()
+    "Collect all TODO items in the current subtree into a flat list."
+     (interactive)
+     (let ((buf (get-buffer-create "Org TODO Collect"))
+           (cnt 0) beg end string)
+       (with-current-buffer buf (erase-buffer) (org-mode))
+       (org-map-entries
+        (lambda ()
+          (setq beg (point) end (org-end-of-subtree t t) cnd (1+ cnt)
+                string (buffer-substring beg end))
+          (with-current-buffer buf (org-paste-subtree 1 string)))
+        (format "TODO={%s}" (regexp-opt org-not-done-keywords))
+        'tree)
+       (if (= cnt 0)
+           (message "No TODO items in subtree")
+         (message "%d TODO entries copied to kill ring" cnt)
+         (prog1 (with-current-buffer buf (buffer-string))
+           (kill-buffer buf)))))
+#+end_src
 
 * Other ideas and remarks about this workflow
 
