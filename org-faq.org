@@ -442,33 +442,29 @@ The result of that discussion is the file/function found in
 
    Alternatively, you can download a [[http://orgmode.org/w/org-mode.git/snapshot][tar.gz snapshot from orgmode.org]].
 
-** How can I install Org-mode through Emacs' Package Manager?
+** How do I install Org-mode through Emacs' Package Manager?
    :PROPERTIES:
    :CUSTOM_ID: installing-via-elpa
    :END:
 
-   Emacs 24 includes an automated package management tool ([[http://tromey.com/elpa/][ELPA]]) that
-   can be used to install and upgrade elisp packages such as Org-mode.
-   If you are running an older version of Emacs (23 or earlier), you
-   will have to install the package manager before using it to install
-   Org-mode. See [[#installing-elpa][this FAQ]] for more details.
+   Daily builds of Org-mode is distributed as an ELPA package from
+   both [[http://elpa.gnu.org/packages/][GNU Emacs Lisp Package Archive]] as well as from [[http://orgmode.org/pkg/daily/][Org-mode Emacs
+   Lisp Archive]].  
 
-   Org-mode is distributed as an ELPA package from [[http://elpa.gnu.org/packages/][GNU Emacs Lisp
-   Package Archive]] as well as from [[http://orgmode.org/pkg/daily/][Org-mode Emacs Lisp Archive]].
-   
-   Steps for adding Org-mode as a package archive:
-   1. Add Org-mode as a package archive. This can be done in two ways.
-      1. Use =M-x customize-variable RET package-archives=
-      2. Add the following line to your =.emacs= and reload Emacs.
-
+   Steps for installing Org with package manager:
+   1. Do =M-x list-packages= to browse available packages
+   2. If the above command is unavailable you need to [[#installing-elpa][install package
+      manager]] before proceeding ahead.
+   3. If you see `org' as available package skip to step 5.
+   4. Add Orgmode as a package archive. This can be done in two ways:
+      1) Use =M-x customize-variable RET package-archives=
+      2) Add the following line to your =.emacs= and reload Emacs.
          #+begin_src emacs-lisp
            (add-to-list 'package-archives '("Org-mode" . "http://orgmode.org/pkg/daily/"))
          #+end_src
-		
-   2. Use the Emacs package manager's =M-x list-packages= to browse
-      and install the latest version.
-
-   3. If you get the following error "*Failed to download `Org-mode'
+   5. Press 'i' to mark the package for installation
+   6. Press 'x' to install 
+   7. If you get the following error "*Failed to download `Org-mode'
       archive.*" in step 2, you can manually download the tarball and
       install it. Refer [[Installing from ELPA-tar][this FAQ entry]] for more information.
 
@@ -477,16 +473,20 @@ The result of that discussion is the file/function found in
    :CUSTOM_ID: installing-elpa
    :END:
    
-   If you are running Emacs-24 or find the command =M-x list-packages=
+   If you are running Emacs 24 or find the command =M-x list-packages=
    available you already have the package manager installed.
    
-   Steps for installing package manager:
-   1. Download the latest package manager -
-      [[http://repo.or.cz/w/emacs.git/blob_plain/HEAD:/lisp/emacs-lisp/package.el][package.el]].
+   Steps for installing package manager on emacs-23:
+   1. Download the package manager [[http://repo.or.cz/w/emacs.git/blob_plain/1a0a666f941c99882093d7bd08ced15033bc3f0c:/lisp/emacs-lisp/package.el][package.el]]
+
    2. Add the following to your =.emacs= and reload Emacs.
       #+begin_src emacs-lisp
         ;; change "~/elisp/" as appropiate
         (setq load-path (cons "~/elisp" load-path))
+        
+        ;; Add the below lines *at the end* of your .emacs. This
+        ;; ensures that packages installed with package manager
+        ;; overrides other local installation
         (require 'package)
         (package-initialize)
       #+end_src
