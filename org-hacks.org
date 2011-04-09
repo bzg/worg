@@ -338,6 +338,9 @@ will be transposed as
 (Note that horizontal lines disappeared.)
 
 *** Times computation
+    :PROPERTIES:
+    :CUSTOM_ID: time-computation
+    :END:
 **** Manipulate hours/minutes/seconds in table formulas
 
 Both Bastien and Martin Halder have posted code ([[http://article.gmane.org/gmane.emacs.orgmode/39519][Bastien's code]] and
@@ -446,6 +449,59 @@ in
 and Chris Randle's original musings are at
 
     http://article.gmane.org/gmane.emacs.orgmode/6536/
+
+*** Hex computation
+As with [[#time-computation][Times computation]], the following code allows Computation with
+Hex values in Org-mode tables using the =with-hex= macro.
+
+Here is the code implementing this macro.
+#+begin_src emacs-lisp
+  (defun org-hex-strip-lead (str)
+    (if (and (> (length str) 2) (string= (substring str 0 2) "0x"))
+        (substring str 2) str))
+  
+  (defun org-hex-to-hex (int)
+    (format "0x%x" int))
+  
+  (defun org-hex-to-dec (str)
+    (cond
+     ((and (stringp str)
+           (string-match "\\([0-9a-f]+\\)" (setf str (org-hex-strip-lead str))))
+      (let ((out 0))
+        (mapc
+         (lambda (ch)
+           (setf out (+ (* out 16)
+                        (if (and (>= ch 48) (<= ch 57)) (- ch 48) (- ch 87)))))
+         (coerce (match-string 1 str) 'list))
+        out))
+     ((stringp str) (string-to-number str))
+     (t str)))
+  
+  (defmacro with-hex (hex-output-p &rest exprs)
+    "Evaluate an org-table formula, converting all fields that look
+      like hexadecimal to decimal integers.  If HEX-OUTPUT-P then
+      return the result as a hex value."
+    (list
+     (if hex-output-p 'org-hex-to-hex 'identity)
+     (cons 'progn
+           (mapcar
+            (lambda (expr)
+              `,(cons (car expr)
+                      (mapcar (lambda (el)
+                                (if (listp el)
+                                    (list 'with-hex nil el)
+                                  (org-hex-to-dec el)))
+                              (cdr expr))))
+            `,@exprs))))
+#+end_src
+
+Which allows the following forms of table manipulation such as adding
+and subtracting hex values.
+| 0x10 | 0x0 | 0x10 |  16 |
+| 0x20 | 0x1 | 0x21 |  33 |
+| 0x30 | 0x2 | 0x32 |  50 |
+| 0xf0 | 0xf | 0xff | 255 |
+#+TBLFM: $3='(with-hex 'hex (+ $2 $1))::$4='(with-hex nil (identity $3))
 
 *** Field coordinates in formulas (=@#= and =$#=)
 
