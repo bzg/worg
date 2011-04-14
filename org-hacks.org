@@ -986,16 +986,16 @@ when the tag "=clockout_note=" is found in a headline. It uses the tag
 ("=clockout_note=") so inheritance can also be used...
 
 #+begin_src emacs-lisp
-     (defun rgr/check-for-clock-out-note()
-           (interactive)
-           (save-excursion
-             (set-mark (goto-char (org-entry-beginning-position)))
-             (let ((tags (org-get-tags)))
-               (message "tags: %s " tags)
-               (if (member "clockout_note" tags)
-                   (org-add-note)))))
- 
-     (add-hook 'org-clock-out-hook 'rgr/check-for-clock-out-note)
+  (defun rgr/check-for-clock-out-note()
+        (interactive)
+        (save-excursion 
+          (org-back-to-heading)
+          (let ((tags (org-get-tags)))
+            (and tags (message "tags: %s " tags)
+                 (when (member "clocknote" tags)
+                   (org-add-note))))))
+   
+  (add-hook 'org-clock-out-hook 'rgr/check-for-clock-out-note)
 #+end_src
 *** Dynamically adjust tag position
 Here is a bit of code that allows you to have the tags always
