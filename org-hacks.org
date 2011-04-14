@@ -978,6 +978,25 @@ agenda view will group tasks by that property prior to searching.
     ad-do-it))
 (ad-activate 'org-finalize-agenda-entries)
 #+end_src
+*** A way to tag a task so that when clocking-out user is prompted to take a note.
+    Thanks to Richard Riley (see [[http://permalink.gmane.org/gmane.emacs.orgmode/40896][this post on the mailing list]]).
+
+A small hook run when clocking out of a task that prompts for a note
+when the tag "=clockout_note=" is found in a headline. It uses the tag
+("=clockout_note=") so inheritance can also be used...
+
+#+begin_src emacs-lisp
+     (defun rgr/check-for-clock-out-note()
+           (interactive)
+           (save-excursion
+             (set-mark (goto-char (org-entry-beginning-position)))
+             (let ((tags (org-get-tags)))
+               (message "tags: %s " tags)
+               (if (member "clockout_note" tags)
+                   (org-add-note)))))
+ 
+     (add-hook 'org-clock-out-hook 'rgr/check-for-clock-out-note)
+#+end_src
 *** Dynamically adjust tag position
 Here is a bit of code that allows you to have the tags always
 right-adjusted in the buffer.
