@@ -49,12 +49,10 @@ use strict;
 
 $/ = "\n*";
 
-my %daysofweek = ( 1, "Mon", 2, "Tue", 3, "Wed", 4, "Thu", 5, "Fri",
-		  6, "Sat", 7, "Sun" );
+my @daysofweek = ( "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" );
 
-my %months = ( 1, "Jan", 2, "Feb", 3, "Mar", 4, "Apr", 5, "May", 6,
-	      "Jun", 7, "Jul", 8, "Aug", 9, "Sep", 10, "Oct", 11,
-	      "Nov", 12, "Dec", );
+my @months = ( "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+	      "Sep", "Oct", "Nov", "Dec", );
 
 sub subtract_time {
   my @time1 = split(/:/, shift(@_));
@@ -101,12 +99,8 @@ while (<>) {
       # recurring events
       # TODO Figure out way to support multiples of month and year
 
-      # Right now, only +1m and +1y work. This is due to limitation of
-      # remind syntax (or, rather, a limitation of my knowledge of
-      # remind syntax.
-
-      # REM 2 MSG Second day of every month
-      # REM Jan 2 MSG January 2 every year
+      # Right now, only +1m and +1y work. This is due to a limitation
+      # in my knowledge of remind syntax).
       my $trigdate;
       if (defined $repeater) {
       	$repeater =~ /([0-9]+)([dmwy])/;
@@ -114,7 +108,7 @@ while (<>) {
       	if ($type eq "y") {
       	  my @ymd = split(/-/, $timestamp);
 	  $trigdate = "[trigdate() >= '$timestamp']";
-      	  $timestamp = "$months{$ymd[1]} $ymd[2]";
+      	  $timestamp = "$months[$ymd[1] - 1] $ymd[2]";
       	} elsif ($type eq "w") {
       	  $timestamp = sprintf("%s *%d", $timestamp, ($interval * 7));
       	} elsif ($type eq "m") {
@@ -147,7 +141,7 @@ while (<>) {
       # differentiate between "<%%.*>" and "%%.* event"
       # the former uses the headline; the latter the string after sexp
       $headline = $event unless (/<%%.*>/);
-      $dow = $daysofweek{$dow};
+      $dow = $daysofweek[$dow - 1];
       my ($m1, $d1, $y1) = split(/\s+/, $start);
       my ($m2, $d2, $y2) = split(/\s+/, $end);
       if ($headtrim == 0) {
