@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# org2remind: perl utility to convert org-mode appointments to remind
+# org2remind.pl: perl utility to convert org-mode appointments to remind
 
 # Copyright (C) 2011 Matt Lundin <mdl at imapmail.org>
 
@@ -24,15 +24,15 @@
 #
 # To convert org-mode appointments to remind data, simply call the
 # following script on one or more org files:
-# perl org2remind ~/org/*.org
+# perl org2remind.pl ~/org/*.org
 #
 # The results of this script can saved in a file...
 # perl org2remind.pl ~/org/*.org >> org.rem
 # ...or piped directly into a remind command...
-# perl org2remind ~/org/*.org | remind -
+# perl org2remind.pl ~/org/*.org | remind -
 #
 # For a nice calendar of the current month, use the following:
-# perl org2remind ~/org/*.org | remind -c -
+# perl org2remind.pl ~/org/*.org | remind -c -
 #
 # This is similar to org2rem.el (in the contrib directory of the
 # org-mode repository), except that, instead of saving files from
