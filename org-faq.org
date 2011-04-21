@@ -2448,6 +2448,15 @@ Yes, you can use the library "find-lisp."
 This will add all files ending in =org= in the directory "~/org"
 and all of its subdirectories to your list of agenda files.
 
+If on a *nix machine, you can also use the find utility, which can be
+faster than the find-lisp library:
+
+: (setq org-agenda-files 
+:       (mapcar 'abbreviate-file-name 
+:               (split-string 
+:                (shell-command-to-string "find ~/org -name \"*.org\"") "\n")))
+
+
 See [[http://thread.gmane.org/gmane.emacs.orgmode/8992][this thread]] on the mailing list for more information.
 
 ** Why does an item appearing at the wrong time of day in my agenda?
