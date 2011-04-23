@@ -42,20 +42,20 @@
 # Currently, the script supports appointments (i.e., active
 # timestamps) and the org-diary-class sexp.
 #
-# TODO: add option to include SCHEDULED and DEADLINE items.
-# TODO: parse simple diary sexps
+# TODO add option to include SCHEDULED and DEADLINE items.
+# TODO parse simple diary sexps
+# TODO accomodate spans <ts1>--<ts2>
 
 use strict;
 
 $/ = "\n*";
 
-my @daysofweek = ( "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" );
-
-my @months = ( "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
-	      "Sep", "Oct", "Nov", "Dec", );
+# TODO check CPAN for localization tools
+my @daysofweek = qw/ Mon Tue Wed Thu Fri Sat Sun /;
+my @months = qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec /;
 
 sub subtract_time {
-  my @time1 = split(/:/, shift(@_));
+  my @time1 = split(/:/, shift(@_));p
   my $minutes1 = $time1[0] * 60 + $time1[1];
   my @time2 = split(/:/, shift(@_));
   my $minutes2 = $time2[0] * 60 + $time2[1];
@@ -98,9 +98,8 @@ while (<>) {
       }
       # recurring events
       # TODO Figure out way to support multiples of month and year
-
       # Right now, only +1m and +1y work. This is due to a limitation
-      # in my knowledge of remind syntax).
+      # in my knowledge of remind syntax.
       my $trigdate;
       if (defined $repeater) {
       	$repeater =~ /([0-9]+)([dmwy])/;
