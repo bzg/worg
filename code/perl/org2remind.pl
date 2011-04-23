@@ -55,7 +55,7 @@ my @daysofweek = qw/ Mon Tue Wed Thu Fri Sat Sun /;
 my @months = qw/ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec /;
 
 sub subtract_time {
-  my @time1 = split(/:/, shift(@_));p
+  my @time1 = split(/:/, shift(@_));
   my $minutes1 = $time1[0] * 60 + $time1[1];
   my @time2 = split(/:/, shift(@_));
   my $minutes2 = $time2[0] * 60 + $time2[1];
