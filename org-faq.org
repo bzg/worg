@@ -1,42 +1,8 @@
-#+EMAIL:     carsten.dominik@gmail.com
+#+EMAIL:     mdl AT imapmail DOT org
 #+AUTHOR:    Worg people
 #+LANGUAGE:  en
 #+TITLE:     Org-mode Frequently Asked Questions
 #+OPTIONS:   toc:t H:2
-
-#+begin_html
-  <style type="text/css">
-    <!--/*--><![CDATA[/*><!--*/
-      #table-of-contents {
-        font-size: inherit;
-        position: relative;
-        background: white;
-        -webkit-box-shadow: 0 0 0 0;
-        -moz-box-shadow: 0 0 0 0;
-        -webkit-border-bottom-left-radius: 0;
-        -moz-border-radius-bottomleft: 0;
-        text-align: left;
-        max-height: none;
-        overflow: none; }
-        #table-of-contents h2 {
-          font-size: inherit;
-          max-width: none;
-          font-weight: bold;
-          padding-left: 0;
-          padding-left: 0;
-          padding-top: 0;
-          padding-bottom: 0; }
-        #table-of-contents #text-table-of-contents {
-          display: block;
-          text-align: left; }
-        #table-of-contents:hover #text-table-of-contents {
-          display: block;
-          padding: 0;
-          margin-top: 0; }
-    /*]]>*/-->
-  </style>
-#+end_html
-
 
 [[file:index.org][{Back to Worg's index}]]
 
@@ -44,6 +10,82 @@
   :PROPERTIES:
   :CUSTOM_ID: What-is-org-mode
   :END:
+** Can Org-mode do "x"? Does org have "x" feature?
+   :PROPERTIES:
+   :CUSTOM_ID: can-org-do-x
+   :END:
+
+In its default setup, Org-mode offers a simple outlining and task
+management environment. But it also has a huge number of features and
+settings "under the hood." Advanced users have configured Org-mode for
+almost every conceivable use scenario.
+
+Org-mode has a very active community and rich and extensive
+documentation. Before emailing the mailing list to ask whether
+Org-mode has a particular feature or setting, please consult the
+following:
+
+ - Read/search the manual.
+
+   - http://orgmode.org/manual/index.html
+
+     - Make sure to check out the following indexes:
+
+       - [[http://orgmode.org/manual/Main-Index.html#Main-Index][Main Index]]
+       - [[http://orgmode.org/manual/Key-Index.html#Key-Index][Key Index]]
+       - [[http://orgmode.org/manual/Variable-Index.html#Variable-Index][Variable Index]]
+
+   - The manual is also easily available from within emacs.
+
+     To read the manual within emacs, you can evaluate =(info
+     "(org)")= within emacs---i.e., type =C-x C-e= after the closing
+     paragraph of the info expression above.
+
+     You can also type =M-x info= and navigate to "Org Mode".
+
+     You can search the entire manual by typing ~C-s term~. Keep
+     pressing ~C-s~ to cycle through the results
+
+ - Search the [[http://dir.gmane.org/gmane.emacs.orgmode][mailing list archives]].
+
+   There is a good chance that the feature you are looking for has
+   already been discussed (most likely several times).
+
+ - Check for features from within emacs.
+
+   - Emacs has a wonderful built help system.
+
+   - You can browse (and change) most customization options by typing
+     =M-x org-customize=.
+
+   - You can check for a feature by typing =M-x apropos [RET] [word]= or
+     =C-h a word=. This will search for all functions and variables
+     matching the term (or regexp) you enter.
+
+   - You can browse (and search for) org functions, variables, and
+     faces by using =M-x describe-variable= (=C-h v=), =M-x
+     describe-function= (=C-h f=), or =M-x describe-face=.
+
+     After invoking one of these commands, simply type =org-[TAB]= to
+     see a full list of relevant functions or variables or faces. You
+     can then drill down further: e.g., =org-export-[TAB]= for export
+     features.
+
+ - Checkout the [[file:org-tutorials/index.org][tutorials on Worg]].
+
+   Several of these tutorials discuss advanced features (e.g.,
+   searching, custom agenda commands, tables, publishing) of Org-mode
+   in depth.
+
+   There are many other resources on Worg as well:
+
+   - [[http://orgmode.org/worg/org-configs/index.html][Org Customization]] :: Includes a guide for beginners.
+
+   - [[http://orgmode.org/worg/org-hacks.html][Org Hacks]] :: User-generated modifications and add-ons.
+
+   - [[http://orgmode.org/worg/org-glossary.html][Org Glossary]] :: An explanation of basic Org-mode terms and
+                     concepts.
+
 ** Can I implement a GTD workflow with Org-mode?
    :PROPERTIES:
    :CUSTOM_ID: GTD-workflow-with-Org-mode
@@ -89,10 +131,10 @@ The Unicorn is the logo of Org-mode because:
 - A unicorn is a fabulous creature.  Org-mode wants to be a fabulous
   creation.
 
-Using a unicorn was originally /Bastien Guerry's/ idea, his friend
-/Christophe Bataillon/ designed the logo for us, and /Greg Newman/
-gave it a refresh some time later.  Bastien writes why he chose a
-unicorn:
+Using a unicorn was originally /Bastien Guerry's/ idea.  His friend,
+the french artist [[http://intemperies.over-blog.com/][Christophe Bataillon]], designed the logo for us, and
+/Greg Newman/ gave it a refresh some time later.  Bastien writes why
+he chose a unicorn:
 
 #+BEGIN_QUOTE
 The first reason is not linked to the animal, but to the sounding of the
@@ -132,8 +174,56 @@ possession of the Org-mode author.
 No.  Org's documentation is written in TeXinfo, which is the standard
 format for Emacs documentation.  There is no export mechanism from Org 
 to TeXinfo (yet).
-
 * Mailing list
+** I think my Org-mode is broken! How do I report a bug?
+   :PROPERTIES:
+   :CUSTOM_ID: bug-reporting
+   :END:
+
+ 1. Make sure you are running [[#updating-org][the latest version of Org-mode]].
+
+ 2. Read [[http://orgmode.org/manual/Feedback.html][this section]] of the manual.
+
+ 3. Provide a minimal example that duplicates the bug.
+
+    - Create a minimal .emacs file and start emacs with that file as
+      detailed in [[#minimal-emacs][these instructions]].
+
+    - Create a sample, minimal .org file that reliably reproduces the
+      problem and post it to the mailing list.
+
+      - Some users call this an "[[#ecm][ECM]]", a French acronym that means a
+        "complete minimal example".
+      
+** What is an "ECM"?
+   :PROPERTIES:
+   :CUSTOM_ID: ecm
+   :END:
+
+This is a French acronym used by some mailing list members; it stands
+for "Exemple Complet Minimal", or "Complete Minimal Example". The term
+refers to test files that can reliably reproduce a bug with the
+minimal amount of code. When you report a bug to the mailing list, you
+should provide a minimal .org file (with no more text than necessary)
+that demonstrates the bug. See [[http://permalink.gmane.org/gmane.emacs.orgmode/41281][this post]] for more information.
+
+** What should I do before contacting the mailing list?
+   :PROPERTIES:
+   :CUSTOM_ID: when-to-contact-mailing-list
+   :END:
+
+   The Org-mode mailing list is a high volume list, in which community
+   members discuss use cases, configuration, bugs, and developments.
+
+   If you are new to Org-mode, please read/search the excellent [[http://orgmode.org/manual/index.html][manual]]
+   (and pay special attention to the indexes) before asking your
+   question.
+
+   You should also [[http://dir.gmane.org/gmane.emacs.orgmode][search the mailing list]] to see if your issue has
+   already been discussed.
+
+   See [[#can-org-do-x][this faq]] for more details.
+   
 ** Why hasn't my email to the mailing list shown up yet?
    :PROPERTIES:
    :CUSTOM_ID: ml-post-delay
@@ -476,51 +566,64 @@ The result of that discussion is the file/function found in
 
    Alternatively, you can download a [[http://orgmode.org/w/org-mode.git/snapshot][tar.gz snapshot from orgmode.org]].
 
-** How can I install Org-mode through Emacs' Package Manager?
+** How do I install Org-mode through Emacs' Package Manager?
    :PROPERTIES:
    :CUSTOM_ID: installing-via-elpa
    :END:
 
-   Emacs 24 includes an automated package management tool ([[http://tromey.com/elpa/][ELPA]]) that
-   can be used to install and upgrade elisp packages such as Org-mode.
-   If you are running an older version of Emacs (23 or earlier), you
-   will have to install the package manager before using it to install
-   Org-mode. See [[#installing-elpa][this FAQ]] for more details.
+   Daily builds of Org-mode is distributed as an ELPA package from
+   both [[http://elpa.gnu.org/packages/][GNU Emacs Lisp Package Archive]] as well as from [[http://orgmode.org/pkg/daily/][Org-mode Emacs
+   Lisp Archive]].  
 
-   Org-mode is distributed as an ELPA package from [[http://elpa.gnu.org/packages/][GNU Emacs Lisp
-   Package Archive]] as well as from [[http://orgmode.org/pkg/daily/][Org-mode Emacs Lisp Archive]].
-   
-   Steps for adding Org-mode as a package archive:
-   1. Add Org-mode as a package archive. This can be done in two ways.
-      1. Use =M-x customize-variable RET package-archives=
-      2. Add the following line to your =.emacs= and reload Emacs.
+   Steps for installing Org with package manager:
+   1) Do =M-x list-packages= to browse available packages
+   2) If the above command is unavailable you need to [[#installing-elpa][install package
+      manager]] before proceeding ahead.
+   3) If you see =org= as available package skip to step 5.
+   4) If you are here it means that org is unavailable in the GNU's
+      archives. Report this discrepancy to [[mailto:emacs-orgmode@gnu.org][Orgmode mailing list.]]
 
-         #+begin_src emacs-lisp
-           (add-to-list 'package-archives '("Org-mode" . "http://orgmode.org/pkg/daily/"))
-         #+end_src
-		
-   2. Use the Emacs package manager's =M-x list-packages= to browse
-      and install the latest version.
+      In the meanwhile, you can manually download the tarball and
+      install it. Refer [[Installing%20from%20ELPA-tar][this FAQ entry]] for further information.
+   5) Press =i= to mark the package for installation
+   6) Press =x= to install
+   7) Reload Emacs
+   8) Use =M-x locate-library RET org=. If your installation is
+      successful you would something like the following:
 
-   3. If you get the following error "*Failed to download `Org-mode'
-      archive.*" in step 2, you can manually download the tarball and
-      install it. Refer [[Installing from ELPA-tar][this FAQ entry]] for more information.
+      =Library is file ~/.emacs.d/elpa/org-20110403/org.elc=
+
+#   7) If you get the following error "*Failed to download `Org-mode'
+#      archive.*" in step 2, you can manually download the tarball and
+#      install it. Refer [[Installing from ELPA-tar][this FAQ entry]] for more information.
+#
+#   8) Add Orgmode as a package archive. This can be done in two ways:
+#   9) Use =M-x customize-variable RET package-archives=
+#   10) Add the following line to your =.emacs= and reload Emacs.
+#       #+begin_src emacs-lisp
+#         (add-to-list 'package-archives '("Org-mode" . "http://orgmode.org/pkg/daily/"))
+#       #+end_src
+#
 
 ** How do I install Emacs package manager?
    :PROPERTIES:
    :CUSTOM_ID: installing-elpa
    :END:
    
-   If you are running Emacs-24 or find the command =M-x list-packages=
+   If you are running Emacs 24 or find the command =M-x list-packages=
    available you already have the package manager installed.
    
-   Steps for installing package manager:
-   1. Download the latest package manager -
-      [[http://repo.or.cz/w/emacs.git/blob_plain/HEAD:/lisp/emacs-lisp/package.el][package.el]].
+   Steps for installing package manager on emacs-23:
+   1. Download the package manager [[http://repo.or.cz/w/emacs.git/blob_plain/1a0a666f941c99882093d7bd08ced15033bc3f0c:/lisp/emacs-lisp/package.el][package.el]]
+
    2. Add the following to your =.emacs= and reload Emacs.
       #+begin_src emacs-lisp
         ;; change "~/elisp/" as appropiate
         (setq load-path (cons "~/elisp" load-path))
+        
+        ;; Add the below lines *at the end* of your .emacs. This
+        ;; ensures that packages installed with package manager
+        ;; overrides other local installation
         (require 'package)
         (package-initialize)
       #+end_src
@@ -1711,7 +1814,19 @@ Note that you could use arbitrary starting values and column formulas.
    : (setq org-table-formula-evaluate-inline nil)
 
    this will no longer happen.  You can still use formulas using the
-   commands @<tt>C-c =@</tt> and @<tt>C-u C-c =@</tt>
+   commands ~C-c =~ and ~C-u C-c =~
+
+** How can I get a vertical bar "|" inside a table field?
+   :PROPERTIES:
+   :CUSTOM_ID: table-fields-with-vertical-bar
+   :END:
+
+   You can use =\vert= to put a vertical bar inside a table field.
+   This will be converted for export.  To use it inside a word use
+   =abc\vert{}def=.  If you need something that looks like a bar in
+   the Org mode buffer, you can use the unicode character brvbar which
+   looks like this: \brvbar{}.
+
 
 ** How can I change the indentation of an entire table without fixing every line by hand?
    :PROPERTIES:
@@ -2457,6 +2572,15 @@ Yes, you can use the library "find-lisp."
 This will add all files ending in =org= in the directory "~/org"
 and all of its subdirectories to your list of agenda files.
 
+If on a *nix machine, you can also use the find utility, which can be
+faster than the find-lisp library:
+
+: (setq org-agenda-files 
+:       (mapcar 'abbreviate-file-name 
+:               (split-string 
+:                (shell-command-to-string "find ~/org -name \"*.org\"") "\n")))
+
+
 See [[http://thread.gmane.org/gmane.emacs.orgmode/8992][this thread]] on the mailing list for more information.
 
 ** Why does an item appearing at the wrong time of day in my agenda?
@@ -2559,7 +2683,7 @@ until 6 a.m.
    : &%%(org-diary) ~/path/to/some/org-file.org
    : &%%(org-diary) ~/path/to/another/org-file.org
 
-   If you now launch the calendar and press @<tt>d@</tt> to display a
+   If you now launch the calendar and press ~d~ to display a
    diary, the headlines of entries containing a timestamp, date range,
    schedule, or deadline referring to the selected date will be listed.
    Just like Org-mode's agenda view, the diary for /today/ contains
@@ -2581,7 +2705,7 @@ until 6 a.m.
    :CUSTOM_ID: automatic-reminders
    :END:
 
-  See [[http://article.gmane.org/gmane.emacs.orgmode/5271][this post]] by N. Dokos on the list. See also Russell Adams's hack in [[file:org-hacks.org::*Org%20Agenda%20%2B%20Appt%20%2B%20Zenity][org-hacks]].
+  See [[http://article.gmane.org/gmane.emacs.orgmode/5271][this post]] by N. Dokos on the list. See also Russell Adams's hack in [[file:org-hacks.org::#agenda-appt-zenity][org-hacks]].
 ** How can I make =appt= notice my Org appointments?
    :PROPERTIES:
    :CUSTOM_ID: appt-notice-my-Org-appointments
@@ -2685,6 +2809,18 @@ follows:
 The function above schedules an appointment for every Monday (1)
 between February 16 and April 20, 2009, except for ISO week 10 (March
 1 to March 7).
+
+If you would prefer not to place the timestamp in the headline, you
+can use the following format:
+
+#+begin_src org
+  ,** Class 
+  ,%%(org-diary-class 2 16 2009 4 20 2009 1 10) 7:00pm-9:00pm Class
+  
+#+end_src
+
+In this case, the string following the sexp will be displayed in the
+agenda.
 
 The function org-diary-class has the following format:
 
@@ -3519,12 +3655,12 @@ and you could use `http' addresses just as well.
    :END:
 
 There are two approaches:
-- Use the development version of Org->Odt exporter
+- Use the native Org->Odt exporter
 
-  A native Org to OpenDocumentText exporter is in the works. The
-  exporter is currently not part of Orgmode repository.  See the
-  following [[http://lists.gnu.org/archive/html/emacs-orgmode/2011-01/msg01210.html][Announcement]] on the mailing list for further details.
-  
+  See the following [[http://lists.gnu.org/archive/html/emacs-orgmode/2011-03/msg01319.html][Announcement]] on the mailing list for further
+  details. Refer [[http://lists.gnu.org/archive/html/emacs-orgmode/2011-03/msg01345.html][this article]] for instructions on checking out the
+  exporter.
+
   At the moment, the exporter supports the following most commonly
   used features of Org
   - Various Character Styles
@@ -3537,8 +3673,8 @@ There are two approaches:
   - Fuzzy, Dedicated and Radio Targets and Links
   - Tables
   - Footnotes
+  - Outline Numbering and Table Of Contents
   - Special markups for elements like TODOs, Timestamps and Tags
-
 
 - Use existing exporters 
 

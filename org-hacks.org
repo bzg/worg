@@ -105,7 +105,7 @@ and with a modified algorithm to determine which characters to escape
 and how.
 
 As a side effect this modified behaviour might break existing links if
-they contain a sequence of characters that look like a percent esage
+they contain a sequence of characters that look like a percent escape
 (e.g. =[0-9A-Fa-f]{2}=) but are in fact not a percent escape.
 
 The function below can be used to perform a preliminary check for such
@@ -338,70 +338,77 @@ will be transposed as
 (Note that horizontal lines disappeared.)
 
 *** Times computation
+    :PROPERTIES:
+    :CUSTOM_ID: time-computation
+    :END:
 **** Manipulate hours/minutes/seconds in table formulas
 
-Martin Halder [[http://article.gmane.org/gmane.emacs.orgmode/39487][wanted]] to "generate a simple table with time format "hh:mm"
-and auto calculate daily sum".  He [[http://article.gmane.org/gmane.emacs.orgmode/39519][ended up]] with these functions, which can
-be useful:
+Both Bastien and Martin Halder have posted code ([[http://article.gmane.org/gmane.emacs.orgmode/39519][Bastien's code]] and
+[[http://article.gmane.org/gmane.emacs.orgmode/39519][Martin's code]]) for interpreting =dd:dd= or =dd:dd:dd= strings (where
+"=d=" is any digit) as time values in Org-mode table formula.  These
+functions have now been wrapped up into a =with-time= macro which can
+be used in table formula to translate table cell values to and from
+numerical values for algebraic manipulation.
 
-#+begin_src emacs-lisp
-(defun my-sec (arg)
-  (if (string-match org-timer-re arg)
-      (org-timer-hms-to-secs arg)
-    (org-timer-hms-to-secs (concat arg ":00"))))
+Here is the code implementing this macro.
+#+begin_src emacs-lisp :results silent
+  (defun org-time-string-to-seconds (s)
+    "Convert a string HH:MM:SS to a number of seconds."
+    (cond
+     ((and (stringp s)
+           (string-match "\\([0-9]+\\):\\([0-9]+\\):\\([0-9]+\\)" s))
+      (let ((hour (string-to-number (match-string 1 s)))
+            (min (string-to-number (match-string 2 s)))
+            (sec (string-to-number (match-string 3 s))))
+        (+ (* hour 3600) (* min 60) sec)))
+     ((and (stringp s)
+           (string-match "\\([0-9]+\\):\\([0-9]+\\)" s))
+      (let ((min (string-to-number (match-string 1 s)))
+            (sec (string-to-number (match-string 2 s))))
+        (+ (* min 60) sec)))
+     ((stringp s) (string-to-number s))
+     (t s)))
 
-(defun my-hms (s)
-  (let (m h)
-    (setq s (abs s)
-          m (/ s 60) s (- s (* 60 m))
-          h (/ m 60) m (- m (* 60 h)))
-    (format "%d:%02d" h m)))
+  (defun org-time-seconds-to-string (secs)
+    "Convert a number of seconds to a time string."
+    (cond ((>= secs 3600) (format-seconds "%h:%.2m:%.2s" secs))
+          ((>= secs 60) (format-seconds "%m:%.2s" secs))
+          (t (format-seconds "%s" secs))))
 
-(defun my-ihms (s)
-  (let (m h)
-    (setq s (/ (* s 10000) 3600)
-          s (abs s)
-          m (/ s 100) s (- s (* 100 m))
-          h (/ m 100) m (- m (* 100 h)))
-    (format "%d.%02d" h m)))
+  (defmacro with-time (time-output-p &rest exprs)
+    "Evaluate an org-table formula, converting all fields that look
+  like time data to integer seconds.  If TIME-OUTPUT-P then return
+  the result as a time value."
+    (list
+     (if time-output-p 'org-time-seconds-to-string 'identity)
+     (cons 'progn
+           (mapcar
+            (lambda (expr)
+              `,(cons (car expr)
+                      (mapcar
+                       (lambda (el)
+                         (if (listp el)
+                             (list 'with-time nil el)
+                           (org-time-string-to-seconds el)))
+                       (cdr expr))))
+            `,@exprs))))
 #+end_src
 
-Using this function, you can create a table like this one:
+Which allows the following forms of table manipulation such as adding
+and subtracting time values.
+: | Date             | Start | Lunch |  Back |   End |  Sum |
+: |------------------+-------+-------+-------+-------+------|
+: | [2011-03-01 Tue] |  8:00 | 12:00 | 12:30 | 18:15 | 9:45 |
+: #+TBLFM: $6='(with-time t (+ (- $5 $4) (- $3 $2)))
 
-: | Date             | Start | Lunch |  Back |   End |  Sum |  Ind |
-: |------------------+-------+-------+-------+-------+------+------|
-: | [2011-03-01 Tue] |  8:00 | 12:00 | 12:30 | 18:15 | 9:45 | 9.75 |
-: #+TBLFM: $6='(my-hms (+ (- (my-sec $5) (my-sec $4)) (- (my-sec $3) (my-sec $2))))::$7='(my-ihms (+ (- (my-sec $5) (my-sec $4)) (- (my-sec $3) (my-sec $2))))
-
-**** Subtracting durations in seconds
-
-#+begin_src emacs-lisp
-(defun org-hh:mm:ss-string-to-seconds (s)
-  "Convert a string HH:MM:SS to a number of seconds."
-  (when (string-match "\\([0-9]+\\):\\([0-9]+\\):\\([0-9]+\\)" s)
-    (let ((hour (string-to-number (match-string 1 s)))
-	  (min (string-to-number (match-string 2 s)))
-	  (sec (string-to-number (match-string 3 s))))
-      (+ (* hour 3600) (* min 60) sec))))
-
-(defun org-subtract-hh:mm:ss-time (t1 t2)
-  "Substract two hh:mm:ss time values."
-  (let* ((sec (- (org-hh:mm:ss-string-to-seconds t2)
-		 (org-hh:mm:ss-string-to-seconds t1)))
-	 (hour (floor (/ sec 3600)))
-	 (min (floor (/ (- sec (* 3600 hour)) 60)))
-	 (secs (round (- sec (* 3600 hour) (* 60 min)))))
-    (format "%.2d:%.2d:%.2d" hour min secs)))
-#+end_src
-
-With these function, you can subtract durations in a table like this:
-
-: | Part  |    Begin |      End | Duration |
-: |-------+----------+----------+----------|
-: | One   | 00:00:00 | 00:01:11 | 00:01:11 |
-: | Two   | 00:01:12 | 00:02:00 | 00:00:48 |
-: | Three | 00:02:05 | 00:16:06 | 00:14:01 |
-: #+TBLFM: $4='(org-subtract-hh:mm:ss-time $2 $3)
+and dividing time values by integers
+: |  time | miles | minutes/mile |
+: |-------+-------+--------------|
+: | 34:43 |   2.9 |        11:58 |
+: | 32:15 |  2.77 |        11:38 |
+: | 33:56 |   3.0 |        11:18 |
+: | 52:22 |  4.62 |        11:20 |
+: #+TBLFM: $3='(with-time t (/ $1 $2))
 
 *** Dates computation
 
@@ -442,6 +449,59 @@ in
 and Chris Randle's original musings are at
 
     http://article.gmane.org/gmane.emacs.orgmode/6536/
+
+*** Hex computation
+As with [[#time-computation][Times computation]], the following code allows Computation with
+Hex values in Org-mode tables using the =with-hex= macro.
+
+Here is the code implementing this macro.
+#+begin_src emacs-lisp
+  (defun org-hex-strip-lead (str)
+    (if (and (> (length str) 2) (string= (substring str 0 2) "0x"))
+        (substring str 2) str))
+  
+  (defun org-hex-to-hex (int)
+    (format "0x%x" int))
+  
+  (defun org-hex-to-dec (str)
+    (cond
+     ((and (stringp str)
+           (string-match "\\([0-9a-f]+\\)" (setf str (org-hex-strip-lead str))))
+      (let ((out 0))
+        (mapc
+         (lambda (ch)
+           (setf out (+ (* out 16)
+                        (if (and (>= ch 48) (<= ch 57)) (- ch 48) (- ch 87)))))
+         (coerce (match-string 1 str) 'list))
+        out))
+     ((stringp str) (string-to-number str))
+     (t str)))
+  
+  (defmacro with-hex (hex-output-p &rest exprs)
+    "Evaluate an org-table formula, converting all fields that look
+      like hexadecimal to decimal integers.  If HEX-OUTPUT-P then
+      return the result as a hex value."
+    (list
+     (if hex-output-p 'org-hex-to-hex 'identity)
+     (cons 'progn
+           (mapcar
+            (lambda (expr)
+              `,(cons (car expr)
+                      (mapcar (lambda (el)
+                                (if (listp el)
+                                    (list 'with-hex nil el)
+                                  (org-hex-to-dec el)))
+                              (cdr expr))))
+            `,@exprs))))
+#+end_src
+
+Which allows the following forms of table manipulation such as adding
+and subtracting hex values.
+| 0x10 | 0x0 | 0x10 |  16 |
+| 0x20 | 0x1 | 0x21 |  33 |
+| 0x30 | 0x2 | 0x32 |  50 |
+| 0xf0 | 0xf | 0xff | 255 |
+#+TBLFM: $3='(with-hex 'hex (+ $2 $1))::$4='(with-hex nil (identity $3))
 
 *** Field coordinates in formulas (=@#= and =$#=)
 
@@ -762,10 +822,7 @@ tags found on those headings:
       ad-do-it
       (with-current-buffer (find-file-noselect (org-extract-archive-file))
         (save-excursion
-          (catch 'break
-            (while t
-              (when (= 1 (org-up-heading-safe))
-                (throw 'break t))))
+          (while (org-up-heading-safe))
           (org-set-tags-to tags)))))
 #+end_src
 
@@ -920,6 +977,25 @@ agenda view will group tasks by that property prior to searching.
         (setq ad-return-value text))
     ad-do-it))
 (ad-activate 'org-finalize-agenda-entries)
+#+end_src
+*** A way to tag a task so that when clocking-out user is prompted to take a note.
+    Thanks to Richard Riley (see [[http://permalink.gmane.org/gmane.emacs.orgmode/40896][this post on the mailing list]]).
+
+A small hook run when clocking out of a task that prompts for a note
+when the tag "=clockout_note=" is found in a headline. It uses the tag
+("=clockout_note=") so inheritance can also be used...
+
+#+begin_src emacs-lisp
+  (defun rgr/check-for-clock-out-note()
+        (interactive)
+        (save-excursion 
+          (org-back-to-heading)
+          (let ((tags (org-get-tags)))
+            (and tags (message "tags: %s " tags)
+                 (when (member "clocknote" tags)
+                   (org-add-note))))))
+   
+  (add-hook 'org-clock-out-hook 'rgr/check-for-clock-out-note)
 #+end_src
 *** Dynamically adjust tag position
 Here is a bit of code that allows you to have the tags always
@@ -1983,8 +2059,10 @@ http://article.gmane.org/gmane.emacs.orgmode/5276
 #+END_SRC
 
 ** Org Agenda + Appt + Zenity
-
-Russell Adams posted this setup [[http://article.gmane.org/gmane.emacs.orgmode/5806][on the list]].  It make sure your agenda
+#+BEGIN_HTML
+<a name="agenda-appt-zenity"></a>
+#+END_HTML
+Russell Adams posted this setup [[http://article.gmane.org/gmane.emacs.orgmode/5806][on the list]].  It makes sure your agenda
 appointments are known by Emacs, and it displays warnings in a [[http://live.gnome.org/Zenity][zenity]]
 popup window.
 
