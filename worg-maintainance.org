@@ -30,7 +30,7 @@ sections in Worg.
 - [Adopt a directory/page here]
 
 * Worg doesn't publish correctly - what to do?
-
+  
 ** What need to be taken care of?
 
 /Do we have to avoid certain constructs in the Org files to avoid the bug
@@ -63,3 +63,26 @@ Here is how I tracked down the problem if it helps :
 
 Quick long and a bit too manual - but effective.
 #+end_quote
+* Preventing publishing errors
+
+Locally export any document you edit as HTML (C-c C-e H) prior to
+committing it to Worg and ensure the export process doesn't fail.  This
+will be more reliable if you're running the latest version of Org.
+
+You may also want to check the formatting in a browser before committing
+your change (C-c C-e b).
+
+* Troubleshooting publishing errors
+
+If you notice Worg isn't updating, visit
+http://orgmode.org/worg/publishing.txt and look for the export error
+near the bottom to find the file where publishing stopped.  Locally
+update to the latest version of Org, open that file, and try reproducing
+the export error (C-c C-e H).  If it's not obvious where the problem is,
+look at the most recent changes to the file in question:
+
+: cd Worg
+: git log -p org-quotes.org
+
+Try reverting some of those changes and then re-test exporting (C-c
+C-e H).
