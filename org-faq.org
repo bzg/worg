@@ -53,7 +53,7 @@ following:
 
  - Check for features from within emacs.
 
-   - Emacs has a wonderful built help system.
+   - Emacs has a wonderful built-in help system.
 
    - You can browse (and change) most customization options by typing
      =M-x org-customize=.
@@ -1298,6 +1298,79 @@ You can add the following to your =.emacs=:
   :PROPERTIES:
   :CUSTOM_ID: Outline
   :END:
+** Can I close an outline section without starting a new section?
+   :PROPERTIES:
+   :CUSTOM_ID: closing-outline-sections
+   :END:
+
+Can I have nested, closed outline sections, similar to xml? This
+question comes up quite frequently on the mailing list. 
+
+See the following threads:
+
+  - http://permalink.gmane.org/gmane.emacs.orgmode/40182
+  - http://permalink.gmane.org/gmane.emacs.orgmode/36719
+  - http://permalink.gmane.org/gmane.emacs.orgmode/24092
+  - http://permalink.gmane.org/gmane.emacs.orgmode/12425
+
+The desired behavior looks something like this:
+
+#+begin_src org
+  ,* Section one
+  
+  ,Some text
+  
+  ,** Subsection one
+  
+  ,Some text
+  
+  ,** Subsection two
+  
+  ,Some text
+  
+  ,# end Subsection Two
+  
+  ,Continue text in section one.
+#+end_src
+
+The short answer is no. Org-mode adheres to the cascading logic of
+outlines, in which a section is closed only by another section that
+occupies an equal or greater level.
+
+Here are some workarounds:
+
+1. You can use inline tasks to create non-folding subsections. See the
+   documentation in org-inlinetask.el, which is part of the org-mode
+   distribution.
+2. You can create a temporary heading, such as "** Continue main
+   section" and then remove it when you are ready to export.
+
+** Can I add a TODO to a list item?
+   :PROPERTIES:
+   :CUSTOM_ID: list-item-as-todo
+   :END:
+
+No. When generating agenda views, org-mode treats only headlines as
+TODO items. 
+
+You can, however, use a status cookie together with checkboxes to
+monitor your progress on a series of subtasks:
+
+#+begin_src org
+  ,** TODO Big task [1/3]
+  
+  ,   - [X] Subtask 1
+  ,   - [ ] Subtask 2
+  ,   - [ ] Subtask 3
+#+end_src
+
+If you would like to embed a TODO within text without treating it as
+an outline heading, you can use inline tasks. Simply add...
+
+: (require 'org-inlinetask) 
+
+...to your =.emacs= and then type C-c C-x C-t to insert an inline task.
+
 ** Can I have two windows on the same Org-mode file, with different outline visibilities?
    :PROPERTIES:
    :CUSTOM_ID: indirect-buffers
