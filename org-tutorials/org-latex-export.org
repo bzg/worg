@@ -219,13 +219,17 @@ like this in =.emacs=:
 
 Alternatively, export classes can be defined on a per-file basis in a
 source code block that is evaluated prior to LaTeX export.  This is
-perhaps the most flexible way to set up LaTeX export.  Here is an
-example:
+perhaps the most flexible way to set up LaTeX export.  Since the
+=add-to-list= is a globally side-effecting action, this
+example only calls it if it would add a LaTeX class that isn't
+already on the =org-export-latex-classes= list:
 
 #+begin_example 
   #+source: setup
-  #+begin_src emacs-lisp :results silent
-    (add-to-list 'org-export-latex-classes
+  #+begin_src emacs-lisp :results silent :exports none
+ (unless (find "per-file-class" org-export-latex-classes :key 'car
+           :test 'equal)
+   (add-to-list 'org-export-latex-classes
             '("per-file-class"
                "\\documentclass{scrartcl}
                [NO-DEFAULT-PACKAGES]
