@@ -328,9 +328,24 @@ system and that it works correctly before adding this code to your
  
 #+source: texi2dvi
 #+begin_src emacs-lisp :exports code
-(setq org-latex-to-pdf-process
-   '("texi2dvi -p -b -c -V %f"))
+(setq org-latex-to-pdf-process '("texi2dvi --pdf --clean --verbose --batch %f"))
 #+end_src
+
+Note that =makeindex= and =bibtex= require a bit more effort to work
+in this way because of path name issues.  Nick Dokos suggested
+this fix, which specifies a path to one or more BibTeX =.bib= files: 
+
+#+begin_example 
+  ,#+begin_src sh :exports none
+    BIBINPUTS=/path/to/bib/:$BIBINPUTS
+    export BIBINPUTS
+  ,#+end_src
+#+end_example
+
+If you have system-wide bibliography and index files, then it might be
+useful to modify =BIBINPUTS= in =.profile= or similar.  The code
+example above uses Babel to set the variable on a per-file basis.
+
 
 * Exporting Parts of an Org-mode Buffer
 Tags can be used to select which parts of an Org-mode buffer are sent
