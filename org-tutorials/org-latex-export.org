@@ -267,23 +267,45 @@ to modify it.  Packages not included on the default packages list that
 the user needs consistently can be added to
 =org-export-latex-packages-alist=.
 
+If you want to specify particular packages, either in addition to
+or in place of those used by Org-mode, then you can either place them
+in a custom class definition, where they can be used by any Org-mode
+document, or you can add them to the Org-mode document directly so
+their effect is local to the Org-mode buffer.
+
+An example custom class definition that adds the =graphicx= package
+might look like this in =.emacs=:
+
+#+source: custom-class-definition
+#+begin_src emacs-lisp :exports code
+  (add-to-list 'org-export-latex-classes
+               '("per-file-class"
+                 "\\documentclass{scrartcl}
+                   \\usepackage{graphicx} 
+              [NO-DEFAULT-PACKAGES]
+              [NO-PACKAGES]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+
 Packages needed for a particular file can be specified by inserting a
 line like this in the Org-mode buffer:
 #+begin_src org :exports code
   ,#+LATEX_HEADER: \usepackage{xyz}
 #+end_src
 
-If you are using an export class that specifies
-=[NO-DEFAULT-PACKAGES]= then you will almost certainly need to specify
-packages in the =#+LATEX_HEADER=.  Doing things this way has the
-advantage that LaTeX packages that are highly configurable can be
-tailored for a particular use.  Perhaps the best example among the
-packages in =org-export-latex-default-packages-alist= is =hyperref=,
-which has an elaborate list of keyval options.  PDF output destined
-for interactive use might load =hyperref= with options to distinguish
-links with attractive colors, for instance.  This might be achieved
-with following lines, which load the =xcolor= package[fn:4] and then
-use named colors to distinguish external blue links from internal red
+One reason for specifying LaTeX packages in the Org-mode buffer is
+that highly configurable packages can be tailored for a particular
+use.  Perhaps the best example among the packages in
+=org-export-latex-default-packages-alist= is =hyperref=, which has an
+elaborate list of keyval options.  PDF output destined for interactive
+use might load =hyperref= with options to distinguish links with
+attractive colors, for instance.  This might be achieved with
+following lines, which load the =xcolor= package[fn:4] and then use
+named colors to distinguish external blue links from internal red
 links:
 
 #+source: hyperref-header
