@@ -61,7 +61,7 @@
 (add-to-list 'org-babel-tangle-lang-exts '("template" . "tmp"))
 
 ;; optionally declare default header arguments for this language
-(defvar org-babel-default-header-args:templare '())
+(defvar org-babel-default-header-args:template '())
 
 ;; This function expands the body of a source code block by doing
 ;; things like prepending argument definitions to the body, it should
