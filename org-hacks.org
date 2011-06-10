@@ -177,7 +177,7 @@ commands here.
 (setq org-use-speed-commands t)
 (add-to-list 'org-speed-commands-user
              '("n" ded/org-show-next-heading-tidily))
-(add-to-list 'org-speed-commands-user 
+(add-to-list 'org-speed-commands-user
              '("p" ded/org-show-previous-heading-tidily))
 #+end_src
 
@@ -195,7 +195,7 @@ buffer.
       (org-back-to-heading)
       (if (looking-at org-complex-heading-regexp)
           (match-string 4))))
-  
+
   (add-hook 'org-mode-hook
             (lambda ()
               (make-variable-buffer-local 'add-log-current-defun-function)
@@ -309,10 +309,10 @@ This function by Juan Pechiar will transpose a table:
 (defun org-transpose-table-at-point ()
   "Transpose orgmode table at point, eliminate hlines"
   (interactive)
-  (let ((contents 
+  (let ((contents
 	 (apply #'mapcar* #'list
 		;; remove 'hline from list
-		(remove-if-not 'listp  
+		(remove-if-not 'listp
 			       ;; signals error if not table
 			       (org-table-to-lisp)))))
     (delete-region (org-table-begin) (org-table-end))
@@ -459,10 +459,10 @@ Here is the code implementing this macro.
   (defun org-hex-strip-lead (str)
     (if (and (> (length str) 2) (string= (substring str 0 2) "0x"))
         (substring str 2) str))
-  
+
   (defun org-hex-to-hex (int)
     (format "0x%x" int))
-  
+
   (defun org-hex-to-dec (str)
     (cond
      ((and (stringp str)
@@ -476,7 +476,7 @@ Here is the code implementing this macro.
         out))
      ((stringp str) (string-to-number str))
      (t str)))
-  
+
   (defmacro with-hex (hex-output-p &rest exprs)
     "Evaluate an org-table formula, converting all fields that look
       like hexadecimal to decimal integers.  If HEX-OUTPUT-P then
@@ -601,7 +601,7 @@ where /i/ is the current time and /a/ is the length of the preceding period.
 
 *** Customize the size of the frame for remember
 (Note: this hack is likely out of date due to the development of
-[[org-capture]].) 
+[[org-capture]].)
 
 #FIXME: gmane link?
 On emacs-orgmode, Ryan C. Thompson suggested this:
@@ -706,7 +706,7 @@ of its arguments."
          ((looking-at org-bracket-link-analytic-regexp)
           (when (match-string-no-properties 5)
             (let ((desc (match-string-no-properties 5)))
-              (save-match-data 
+              (save-match-data
                 (incf wc (length (remove "" (org-split-string
                                              desc "\\W")))))))
           (goto-char (match-end 0)))
@@ -767,7 +767,7 @@ defadvice:
 
 #+begin_src emacs-lisp
 (defadvice org-archive-subtree (around my-org-archive-subtree activate)
-  (let ((org-archive-location 
+  (let ((org-archive-location
          (if (save-excursion (org-back-to-heading)
                              (> (org-outline-level) 1))
              (concat (car (split-string org-archive-location "::"))
@@ -805,14 +805,14 @@ tags found on those headings:
     (let ((tags (org-entry-get nil "ALLTAGS" 'selective))
           (ltags (org-entry-get nil "TAGS")))
       (mapc (lambda (tag)
-              (setq tags 
+              (setq tags
                     (replace-regexp-in-string (concat tag ":") "" tags)))
             (append org-file-tags (when ltags (split-string ltags ":" t))))
       (if (string= ":" tags) nil tags)))
-  
+
   (defadvice org-archive-subtree (around my-org-archive-subtree-low-level activate)
     (let ((tags (my-org-inherited-no-file-tags))
-          (org-archive-location 
+          (org-archive-location
            (if (save-excursion (org-back-to-heading)
                                (> (org-outline-level) 1))
                (concat (car (split-string org-archive-location "::"))
@@ -988,13 +988,13 @@ when the tag "=clockout_note=" is found in a headline. It uses the tag
 #+begin_src emacs-lisp
   (defun rgr/check-for-clock-out-note()
         (interactive)
-        (save-excursion 
+        (save-excursion
           (org-back-to-heading)
           (let ((tags (org-get-tags)))
             (and tags (message "tags: %s " tags)
                  (when (member "clocknote" tags)
                    (org-add-note))))))
-   
+
   (add-hook 'org-clock-out-hook 'rgr/check-for-clock-out-note)
 #+end_src
 *** Dynamically adjust tag position
@@ -1065,7 +1065,7 @@ changed.
                                   (setq org-agenda-tags-column (- (window-width)))))
 
 ; between invoking org-refile and displaying the prompt (which
-; triggers window-configuration-change-hook) tags might adjust, 
+; triggers window-configuration-change-hook) tags might adjust,
 ; which invalidates the org-refile cache
 (defadvice org-refile (around org-refile-disable-adjust-tags)
   "Disable dynamically adjusting tags"
@@ -1093,13 +1093,13 @@ EXT is a list of the extensions of files to be included."
                  ext
                (list ext)))
         files)
-    (mapc 
+    (mapc
      (lambda (x)
-       (mapc 
+       (mapc
         (lambda (y)
-          (setq files 
-                (append files 
-                        (file-expand-wildcards 
+          (setq files
+                (append files
+                        (file-expand-wildcards
                          (concat (file-name-as-directory x) "*" y)))))
         ext))
      dirs)
@@ -1121,7 +1121,7 @@ EXT is a list of the extensions of files to be included."
 
 (defun my-org-set-agenda-files ()
   (interactive)
-  (setq org-agenda-files (my-org-list-files 
+  (setq org-agenda-files (my-org-list-files
                           my-org-agenda-directories
                           my-org-agenda-extensions)))
 
@@ -1165,8 +1165,8 @@ a subset of files based on filetags:
   "Restrict org agenda files only to those containing filetag."
   (interactive)
   (let* ((tagslist (my-org-get-all-filetags))
-         (ftag (or tag 
-                   (completing-read "Tag: " 
+         (ftag (or tag
+                   (completing-read "Tag: "
                                     (mapcar 'car tagslist)))))
     (org-agenda-remove-restriction-lock 'noupdate)
     (put 'org-agenda-files 'org-restrict (cdr (assoc ftag tagslist)))
@@ -1192,7 +1192,7 @@ a subset of files based on filetags:
   "Get list of filetags for current buffer"
   (let ((ftags org-file-tags)
         x)
-    (mapcar 
+    (mapcar
      (lambda (x)
        (org-substring-no-properties x))
      ftags)))
@@ -1592,7 +1592,7 @@ useful. Basically what it does is that if I don't touch my Emacs for 5
 minutes, it displays the current agenda. This keeps my tasks "always
 in mind" whenever I come back to Emacs after doing something else,
 whereas before I had a tendency to forget that it was there.
-#+end_quote  
+#+end_quote
 
   - [[http://mid.gmane.org/55590EA7-C744-44E5-909F-755F0BBE452D@gmail.com][John Wiegley: Displaying your Org agenda after idle time]]
 
@@ -1619,7 +1619,7 @@ whereas before I had a tendency to forget that it was there.
   ;;  (unless (get-buffer-window buf)
   ;;    (org-agenda-goto-calendar)))
   )
-  
+
 (run-with-idle-timer 300 t 'jump-to-org-agenda)
 #+end_src
 
@@ -2153,12 +2153,12 @@ Matt Lundin suggests this:
 
 #+begin_src emacs-lisp
   (defun my-org-grep (search &optional context)
-    "Search for word in org files. 
+    "Search for word in org files.
 
 Prefix argument determines number of lines."
     (interactive "sSearch for: \nP")
     (let ((grep-find-ignored-files '("#*" ".#*"))
-	  (grep-template (concat "grep <X> -i -nH " 
+	  (grep-template (concat "grep <X> -i -nH "
 				 (when context
 				   (concat "-C" (number-to-string context)))
 				 " -e <R> <F>")))
@@ -2191,3 +2191,94 @@ Suggested by Russell Adams
 
 Dirk-Jan C.Binnema [[http://article.gmane.org/gmane.emacs.orgmode/27684/][provided]] code to do this.  Please check
 [[file:code/elisp/org-exchange-capture.el][org-exchange-capture.el]]
+
+
+** Audio/video file playback within org mode
+
+From Paul Sexton, 2011-06-10
+
+While learning a language, I wanted to include hyperlinks to audio files within
+my org document, and to be able to play each file by clicking on its link.
+
+I eventually discovered the variable =org-file-apps= which allows you to
+associate particular applications with particular file types.
+
+I use [[https://github.com/dbrock/bongo][Bongo]] as the Emacs interface to the media player.  EMMS is another
+actively developed media player, but setup looked too complicated at first
+glance.
+
+I use [[http://www.mplayerhq.hu/design7/news.html][MPlayer]] as the actual media player. This supports almost all audio and
+video file formats. Most importantly, it works on Windows as well as on Linux
+(VLC has a Windows port but it doesn't work with Bongo as the 'fake-tty'
+interface is not implemented on Windows.)
+
+My current setup means that clicking on a link such as
+
+: [[file:song.mp3]]
+
+adds it to the active Bongo playlist (in another buffer) and immediately
+starts playing it. Playback can be paused, fast-forwarded etc., using
+Bongo commands.
+
+When Bongo plays a file it puts some icons in the modeline that resemble the
+well-known symbols for 'play', 'stop', 'rewind' and so on, and which can be
+used to control playback using the mouse. I found these worked erratically when
+outside the actual Bongo playlist buffer, so I have instead bound some org-mode
+keys (ctrl + numpad keys) to the relevant functions.  This part of the setup is
+optional of course.
+
+I have only tested this with =.mp3= files, but it ought to work with
+video as well, as both MPlayer and Bongo claim to work with video files.
+
+The setup follows:
+
+#+BEGIN_SRC emacs-lisp
+;;; Part 1. Bongo setup
+
+(add-to-list 'load-path "/path/to/bongo"))
+(require 'bongo)
+
+(setq bongo-mplayer-program-name
+      (case system-type
+        ((windows-nt cygwin) "c:\\Program Files\\MPlayer for Windows\\MPlayer.exe")
+        (t "mplayer")))
+
+(setq bongo-enabled-backends '(mplayer))
+
+;;; Part 2. Org setup
+
+(defvar av-file-regex
+  (concat "\\." (regexp-opt
+                 (append bongo-audio-file-name-extensions
+                         bongo-video-file-name-extensions)) "$"))
+
+(add-to-list 'org-file-apps
+             (cons av-file-regex '(org-play-media-file file)))
+
+(defun org-play-media-file (filename)
+  (with-bongo-buffer
+    (bongo-insert-file filename)
+    (backward-char)
+    (bongo-play)))
+
+;;; Part 3. Keybindings to allow control of playback within Org buffer
+;;; (optional)
+
+;; Numpad Ctrl-0: pause/resume
+(define-key org-mode-map (kbd "<C-kp-0>") 'bongo-pause/resume)
+(define-key org-mode-map (kbd "<C-kp-insert>") 'bongo-pause/resume)
+;; Numpad Ctrl-.: stop current track, or restart from beginning if stopped
+(define-key org-mode-map (kbd "<C-kp-decimal>") 'bongo-start/stop)
+(define-key org-mode-map (kbd "<C-kp-delete>") 'bongo-start/stop)
+;; Numpad Ctrl-PgUp, Ctrl-PgDn: raise/lower volume
+(define-key org-mode-map (kbd "<C-kp-prior>") 'bongo-volume-raise)
+(define-key org-mode-map (kbd "<C-kp-next>") 'bongo-volume-lower)
+(define-key org-mode-map (kbd "<C-kp-9>") 'bongo-volume-raise)
+(define-key org-mode-map (kbd "<C-kp-3>") 'bongo-volume-lower)
+;; Numpad Ctrl-left, Ctrl-right: skip back/forward 10 seconds
+(define-key org-mode-map (kbd "<C-kp-left>") 'bongo-seek-backward-10)
+(define-key org-mode-map (kbd "<C-kp-right>") 'bongo-seek-forward-10)
+(define-key org-mode-map (kbd "<C-kp-4>") 'bongo-seek-backward-10)
+(define-key org-mode-map (kbd "<C-kp-6>") 'bongo-seek-forward-10)
+#+END_SRC
+
