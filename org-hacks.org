@@ -1495,6 +1495,29 @@ This was suggested by Carsten in reply to David Abrahams:
     (call-interactively 'org-agenda-schedule)))
 #+end_example
 
+** Exporting org files
+*** Use placement option to specify table fontsize
+
+The keyword ~placement~ can be used to specify placement options to
+floating environments (like =\begin{figure}= and =\begin{table}=}) in
+LaTeX export. One can take advantage of this to pass a fontsize
+different from the rest of the document by putting something like
+=\footnotesize= right after the placement options.
+
+For example during LaTeX export using the ~#+ATTR_LaTeX:~ line below,
+exports the associated floating environment as shown in the block
+after that.
+
+#+begin_src org
+  ,#+ATTR_LaTeX: placement=[<options>]\footnotesize
+#+end_src
+
+#+begin_src latex
+\begin{table}[<options>]\footnotesize
+...
+\end{table}
+#+end_src
+
 * Hacking Org: Working with Org-mode and other Emacs Packages.
 ** org-remember-anything
 
