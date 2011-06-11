@@ -2195,90 +2195,12 @@ Dirk-Jan C.Binnema [[http://article.gmane.org/gmane.emacs.orgmode/27684/][provid
 
 ** Audio/video file playback within org mode
 
-From Paul Sexton, 2011-06-10
+Paul Sexton provided code that makes =file:= links to audio or video files
+(MP3, WAV, OGG, AVI, MPG, et cetera) play those files using the [[https://github.com/dbrock/bongo][Bongo]] Emacs
+media player library. The user can pause, skip forward and backward in the
+track, and so on from without leaving Emacs. Links can also contain a time
+after a double colon -- when this is present, playback will begin at that
+position in the track.
 
-While learning a language, I wanted to include hyperlinks to audio files within
-my org document, and to be able to play each file by clicking on its link.
-
-I eventually discovered the variable =org-file-apps= which allows you to
-associate particular applications with particular file types.
-
-I use [[https://github.com/dbrock/bongo][Bongo]] as the Emacs interface to the media player.  EMMS is another
-actively developed media player, but setup looked too complicated at first
-glance.
-
-I use [[http://www.mplayerhq.hu/design7/news.html][MPlayer]] as the actual media player. This supports almost all audio and
-video file formats. Most importantly, it works on Windows as well as on Linux
-(VLC has a Windows port but it doesn't work with Bongo as the 'fake-tty'
-interface is not implemented on Windows.)
-
-My current setup means that clicking on a link such as
-
-: [[file:song.mp3]]
-
-adds it to the active Bongo playlist (in another buffer) and immediately
-starts playing it. Playback can be paused, fast-forwarded etc., using
-Bongo commands.
-
-When Bongo plays a file it puts some icons in the modeline that resemble the
-well-known symbols for 'play', 'stop', 'rewind' and so on, and which can be
-used to control playback using the mouse. I found these worked erratically when
-outside the actual Bongo playlist buffer, so I have instead bound some org-mode
-keys (ctrl + numpad keys) to the relevant functions.  This part of the setup is
-optional of course.
-
-I have only tested this with =.mp3= files, but it ought to work with
-video as well, as both MPlayer and Bongo claim to work with video files.
-
-The setup follows:
-
-#+BEGIN_SRC emacs-lisp
-;;; Part 1. Bongo setup
-
-(add-to-list 'load-path "/path/to/bongo"))
-(require 'bongo)
-
-(setq bongo-mplayer-program-name
-      (case system-type
-        ((windows-nt cygwin) "c:\\Program Files\\MPlayer for Windows\\MPlayer.exe")
-        (t "mplayer")))
-
-(setq bongo-enabled-backends '(mplayer))
-
-;;; Part 2. Org setup
-
-(defvar av-file-regex
-  (concat "\\." (regexp-opt
-                 (append bongo-audio-file-name-extensions
-                         bongo-video-file-name-extensions)) "$"))
-
-(add-to-list 'org-file-apps
-             (cons av-file-regex '(org-play-media-file file)))
-
-(defun org-play-media-file (filename)
-  (with-bongo-buffer
-    (bongo-insert-file filename)
-    (backward-char)
-    (bongo-play)))
-
-;;; Part 3. Keybindings to allow control of playback within Org buffer
-;;; (optional)
-
-;; Numpad Ctrl-0: pause/resume
-(define-key org-mode-map (kbd "<C-kp-0>") 'bongo-pause/resume)
-(define-key org-mode-map (kbd "<C-kp-insert>") 'bongo-pause/resume)
-;; Numpad Ctrl-.: stop current track, or restart from beginning if stopped
-(define-key org-mode-map (kbd "<C-kp-decimal>") 'bongo-start/stop)
-(define-key org-mode-map (kbd "<C-kp-delete>") 'bongo-start/stop)
-;; Numpad Ctrl-PgUp, Ctrl-PgDn: raise/lower volume
-(define-key org-mode-map (kbd "<C-kp-prior>") 'bongo-volume-raise)
-(define-key org-mode-map (kbd "<C-kp-next>") 'bongo-volume-lower)
-(define-key org-mode-map (kbd "<C-kp-9>") 'bongo-volume-raise)
-(define-key org-mode-map (kbd "<C-kp-3>") 'bongo-volume-lower)
-;; Numpad Ctrl-left, Ctrl-right: skip back/forward 10 seconds
-(define-key org-mode-map (kbd "<C-kp-left>") 'bongo-seek-backward-10)
-(define-key org-mode-map (kbd "<C-kp-right>") 'bongo-seek-forward-10)
-(define-key org-mode-map (kbd "<C-kp-4>") 'bongo-seek-backward-10)
-(define-key org-mode-map (kbd "<C-kp-6>") 'bongo-seek-forward-10)
-#+END_SRC
+See the file [[file:code/elisp/org-player.el][org-player.el]]
 
