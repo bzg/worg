@@ -1496,21 +1496,26 @@ This was suggested by Carsten in reply to David Abrahams:
 #+end_example
 
 ** Exporting org files
-*** Use placement option to specify table fontsize
+*** Specifying LaTeX commands to floating environments
 
 The keyword ~placement~ can be used to specify placement options to
 floating environments (like =\begin{figure}= and =\begin{table}=}) in
-LaTeX export. One can take advantage of this to pass a fontsize
-different from the rest of the document by putting something like
-=\footnotesize= right after the placement options.
+LaTeX export. Org passes along everything passed in options as long as
+there are no spaces. One can take advantage of this to pass other
+LaTeX commands and have their scope limited to the floating
+environment.
 
-For example during LaTeX export using the ~#+ATTR_LaTeX:~ line below,
-exports the associated floating environment as shown in the block
-after that.
+For example one can set the fontsize of a table different from the
+default normal size by putting something like =\footnotesize= right
+after the placement options. During LaTeX export using the
+~#+ATTR_LaTeX:~ line below:
 
 #+begin_src org
   ,#+ATTR_LaTeX: placement=[<options>]\footnotesize
 #+end_src
+
+exports the associated floating environment as shown in the following
+block.
 
 #+begin_src latex
 \begin{table}[<options>]\footnotesize
