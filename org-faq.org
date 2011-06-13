@@ -711,7 +711,7 @@ for details.
 
    - For tables there is =orgtbl-mode= which implements the table
      editor as a minor mode. (To enable, type =M-x orgtbl-mode=)
-   - For ordered lists there is =orgstuct-mode= which allows for easy
+   - For ordered lists there is =orgstruct-mode= which allows for easy
      list editing as a minor mode. (To enable, type =M-x
      orgstruct-mode=)
 
@@ -3875,6 +3875,48 @@ might want to use another version and install MathJax on your own server.
 
 You can also get [[http://www.mathjax.org/resources/docs/?installation.html][MathJax from git or svn]] -- in this case, be careful not to
 forget to unzip the fonts.zip archive in the mathjax directory.
+
+* Tips and Tricks
+** Problems with LaTeX macros with #+latex or #+begin_latex
+  :PROPERTIES:
+  :CUSTOM_ID: Problems-with-LaTeX-macros-with-#+latex-or-#+begin_latex
+  :END:
+Org's LaTeX exporter has a difficult job on its hands and even though
+it does a great job most of the time, there are times when it falls
+short. One situation that has arisen a few times in the past is when a
+macro definition or use includes an opening brace, but the
+corresponding closing brace is on a different line. That has caused
+LaTeX compilation problems or mysterious excisions of content - see
+for example the following two threads in the mailing list:
+
+ - http://thread.gmane.org/gmane.emacs.orgmode/39308
+   
+ - http://thread.gmane.org/gmane.emacs.orgmode/42196
+
+In both cases, the exporter was getting confused by the opening brace
+which did not have a corresponding closing brace on the same
+line. Although the first of these cases is fixed in current Org, there
+might be more such cases or there might be a regression which causes
+the incorrect behavior again. While waiting for a fix, it's worth
+trying out the simple workaround of including a fake closing brace on
+the same line as the opening brace but *commenting it out* so that
+LaTeX never sees it.  That is often enough to make the exporter behave
+properly. In other words, to take one of the examples above, instead
+of writing
+
+: #+latex: \custommacro {
+: ...
+: #+latex: }
+
+use the following idiom instead:
+
+: #+latex: \custommacro { % hide the closing brace in a LaTeX comment }
+: ...
+: #+latex: }
+
+I emphasize that this is a workaround, not a fix: if you do run into such
+a case and the workaround fixes it, at least you can continue working, but
+please submit a bug report so that it can be fixed properly.
 
 * COMMENT Function to create =CUSTOM_ID=
 
