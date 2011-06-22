@@ -757,6 +757,33 @@ of its arguments."
                      (if mark-active "region" "buffer")))))
 #+end_src
 
+*** Using M-up and M-down to transpose paragraphs
+
+From Paul Sexton: By default, if used within ordinary paragraphs in
+org mode, =M-up= and =M-down= transpose *lines* (not sentences).  The
+following code makes these keys transpose paragraphs, keeping the
+point at the start of the moved paragraph. Behavior in tables and
+headings is unaffected. It would be easy to modify this to transpose
+sentences.
+
+#+begin_src emacs-lisp
+(defun org-transpose-paragraphs (arg)
+ (interactive)
+ (when (and (not (or (org-at-table-p) (org-on-heading-p) (org-at-item-p)))
+            (thing-at-point 'sentence))
+   (transpose-paragraphs arg)
+   (backward-paragraph)
+   (re-search-forward "[[:graph:]]")
+   (goto-char (match-beginning 0))
+   t))
+
+(add-to-list 'org-metaup-hook 
+ (lambda () (interactive) (org-transpose-paragraphs -1)))
+(add-to-list 'org-metadown-hook 
+ (lambda () (interactive) (org-transpose-paragraphs 1)))
+#+end_src
+
+
 ** Archiving Content in Org-Mode
 *** Preserve top level headings when archiving to a file
 - Matt Lundin
