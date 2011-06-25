@@ -1024,32 +1024,59 @@ command that works inside the table environment can be passed in this
 way.
 
 * Exporting Lists
+LaTeX typically sets lists as displayed material, outside of normal
+paragraphs.  The three LaTeX list environments --- =itemize=,
+=enumerate=, and =description= --- are all supported by Org-mode.
+Additionally, Org-mode includes code to typeset its checkboxes.
+
+** Vertical White Space
 In standard LaTeX, lists are set with a lot of vertical white space
-and it is sometimes nicer to set them more compactly.  This is
+and it is sometimes nicer to set them more compactly.  This can be
 accomplished with the =paralist= package.
 
 : #+LaTeX_HEADER: \usepackage{paralist}
 
-Then you can redefine the standard LaTeX list environments with their
+You can redefine the standard LaTeX list environments with their
 compact =paralist= equivalents:
 
 : #+LaTeX_HEADER: \let\itemize\compactitem
 : #+LaTeX_HEADER: \let\description\compactdesc
 : #+LaTeX_HEADER: \let\enumerate\compactenum  
 
+With these settings, all the lists in the Org-mode document will be
+exported in compact form.
+
+** Set Enumerated Lists in a Paragraph
+
 The =paralist= package has a facility for setting lists in paragraphs,
 rather than displayed separately.  Typically the lists in a paragraph
 are enumerated and it is possible to set Org-mode's enumerated lists
 in paragraph, while displaying itemized and description lists.
 
+: #+LaTeX_HEADER: \let\itemize\compactitem
+: #+LaTeX_HEADER: \let\description\compactdesc
 : #+LaTeX_HEADER: \let\enumerate\inparaenum
 
-Alternatively, you can specify how to enumerate the list.  These two
-examples use lowercase Roman numerals in parentheses and lowercase
-letters in parentheses.
+
+** Specify the Enumerator
+With the =paralist= package you can also specify how to enumerate the
+list.  These two examples use lowercase Roman numerals in parentheses
+and lowercase letters in parentheses, either of which might be used
+when an enumerated list is set in a paragraph.
 
 : #+LaTeX_HEADER: \renewenvironment{enumerate}{\begin{inparaenum}[(i)]}{\end{inparaenum}}
 : #+LaTeX_HEADER: \renewenvironment{enumerate}{\begin{inparaenum}[(a)]}{\end{inparaenum}}
+
+** Checkboxes
+Checkboxes aren't supported natively in LaTeX, so Org-mode rolls its
+own.  The variable =org-export-latex-list-parameters= controls how
+this is done.  Skip Collins and Nick Dokos discussed how to modify
+these parameters.  Their discussion resulted in a proposal for better
+looking checkboxes.
+
+: #LATEX_HEADER: \setbox0=\hbox{\large$\square$}
+
+: #+BIND: org-export-latex-list-parameters (:cbon "[{\\parbox[][][c]{\\wd0}{\\large$\\boxtimes$}}]" :cboff "[{\\parbox[][][c]{\\wd0}{\\large$\\square$}}]")
 
 * Fonts
 # <<font-section>>
