@@ -933,7 +933,7 @@ exporter currently supports a well-rounded subset of these:
 Because the various tabular envionments don't break across pages, they
 are typically "floated" by wrapping them in a =table= environment, or
 for a table that spans columns in a multi-column page layout, a
-=table*= environment.  LaTeX will the float the typeset table to an
+=table*= environment.  LaTeX will "float" the typeset table to an
 appropriate place in the output, ensuring that the table doesn't run
 off the end of the page (unless it is taller than the text height).
 Note that the LaTeX environments responsible for handling the
@@ -986,6 +986,42 @@ When you export the file to LaTeX, this code block is expanded in a
 =#+results:= block and wrapped in =#+BEGIN_LaTeX= ... =#+END_LaTeX=.
 If the table has column heads, then the rule beneath them should be
 finer than the rules at the top and bottom of the table.
+
+** Changing font size
+Tables often benefit from a smaller font size than the body text of a
+document.  A discussion on the Org-mode list yielded two solutions,
+one of which makes a setting for all the tables in the Org-mode
+document and another that is used on individual tables.
+
+The first solution, offered by Nick Dokos, uses a LaTeX style file,
+illustrated here with =scripttab.sty=.  This style file sets all the
+tables in the document with the same size font.  The command
+=\scriptsize= yields a very small font; the particular size is
+determined by the font size of =\normalsize=.  Note that =\scriptsize=
+can be replaced by another legal LaTeX font size, such as
+=\footnotesize= or =\small=.
+
+#+source: scripttab
+#+begin_src latex :exports code
+\makeatletter
+\def \@floatboxreset {%
+        \reset@font
+        \scriptsize %\footnotesize %\small
+        \@setminipage
+}
+\makeatother
+#+end_src
+
+Put =scriptab.sty= where LaTeX can find it and then add this line to
+the Org-mode file:
+
+: #+LaTeX_HEADER: \usepackage{scripttab}
+
+A second approach, which sets the font size for an individual table
+with the =#+ATTR_LaTeX= line, was proposed by Suvayu Ali. This solution is
+documented on [[http://orgmode.org/worg/org-hacks.html#sec-1-6-1][Org ad hoc code, quick hacks and workarounds]].  Any LaTeX
+command that works inside the table environment can be passed in this
+way.
 
 * Exporting Lists
 In standard LaTeX, lists are set with a lot of vertical white space
