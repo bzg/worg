@@ -1613,6 +1613,20 @@ You can also set values for each of these in your =.emacs= file:
 : (set-face-foreground 'org-todo "firebrick2")
 : (set-face-foreground 'org-done "forestgreen")
 
+** Can I use a arbitrary character in a TODO keyword?
+
+Yes, provided you add it to the "word" syntax in Emacs.
+
+For example, to add the =\u25b6= and the =\u25b8= chars, just add this to
+your Emacs configuration:
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook
+   (lambda ()
+     (modify-syntax-entry (string-to-char "\u25b6") "w")
+     (modify-syntax-entry (string-to-char "\u25b8") "w")))
+#+end_src
+
 * Hyperlinks
   :PROPERTIES:
   :CUSTOM_ID: Hyperlinks
