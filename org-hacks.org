@@ -138,10 +138,7 @@ in old Org's list of known percent escapes.
             (goto-char end))))))
 #+end_src
 
-** Enhancing the Org experience
-*** Speed Commands
-Speed commands are described [[http://orgmode.org/manual/Speed-keys.html#Speed-keys][here]] in the manual. Add your own speed
-commands here.
+** Structure Movement and Editing 
 *** Show next/prev heading tidily
 - Dan Davison
   These close the current heading and open the next/previous heading.
@@ -181,6 +178,70 @@ commands here.
              '("p" ded/org-show-previous-heading-tidily))
 #+end_src
 
+*** Promote all items in subtree
+- Matt Lundin
+
+This function will promote all items in a subtree. Since I use
+subtrees primarily to organize projects, the function is somewhat
+unimaginatively called my-org-un-project:
+
+#+begin_src emacs-lisp
+(defun my-org-un-project ()
+  (interactive)
+  (org-map-entries 'org-do-promote "LEVEL>1" 'tree)
+  (org-cycle t))
+#+end_src
+
+*** Turn a heading into an Org link
+    :PROPERTIES:
+    :CUSTOM_ID: heading-to-link
+    :END:
+
+From David Maus:
+
+#+begin_src emacs-lisp
+  (defun dmj:turn-headline-into-org-mode-link ()
+    "Replace word at point by an Org mode link."
+    (interactive)
+    (when (org-at-heading-p)
+      (let ((hl-text (nth 4 (org-heading-components))))
+        (unless (or (null hl-text)
+                    (org-string-match-p "^[ \t]*:[^:]+:$" hl-text))
+          (beginning-of-line)
+          (search-forward hl-text (point-at-eol))
+          (replace-string
+           hl-text
+           (format "[[file:%s.org][%s]]"
+                   (org-link-escape hl-text)
+                   (org-link-escape hl-text '((?\] . "%5D") (?\[ . "%5B"))))
+           nil (- (point) (length hl-text)) (point))))))
+#+end_src
+
+*** Using M-up and M-down to transpose paragraphs
+
+From Paul Sexton: By default, if used within ordinary paragraphs in
+org mode, =M-up= and =M-down= transpose *lines* (not sentences).  The
+following code makes these keys transpose paragraphs, keeping the
+point at the start of the moved paragraph. Behavior in tables and
+headings is unaffected. It would be easy to modify this to transpose
+sentences.
+
+#+begin_src emacs-lisp
+(defun org-transpose-paragraphs (arg)
+ (interactive)
+ (when (and (not (or (org-at-table-p) (org-on-heading-p) (org-at-item-p)))
+            (thing-at-point 'sentence))
+   (transpose-paragraphs arg)
+   (backward-paragraph)
+   (re-search-forward "[[:graph:]]")
+   (goto-char (match-beginning 0))
+   t))
+
+(add-to-list 'org-metaup-hook 
+ (lambda () (interactive) (org-transpose-paragraphs -1)))
+(add-to-list 'org-metadown-hook 
+ (lambda () (interactive) (org-transpose-paragraphs 1)))
+#+end_src
 *** Changelog support for org headers
 -- James TD Smith
 
@@ -299,9 +360,102 @@ nil if before the first headline."
                 do (org-do-promote))))
         t))))
 #+END_SRC
-*** Org table
 
-**** Transpose tables (Juan Pechiar)
+*** Count words in an Org buffer
+#FIXME: Does not fit too well under Structure. Any idea where to put it?
+Paul Sexton [[http://article.gmane.org/gmane.emacs.orgmode/38014][posted]] this function to count words in an Org buffer:
+
+#+begin_src emacs-lisp
+(defun org-word-count (beg end
+                           &optional count-latex-macro-args?
+                           count-footnotes?)
+  "Report the number of words in the Org mode buffer or selected region.
+Ignores:
+- comments
+- tables
+- source code blocks (#+BEGIN_SRC ... #+END_SRC, and inline blocks)
+- hyperlinks (but does count words in hyperlink descriptions)
+- tags, priorities, and TODO keywords in headers
+- sections tagged as 'not for export'.
+
+The text of footnote definitions is ignored, unless the optional argument
+COUNT-FOOTNOTES? is non-nil.
+
+If the optional argument COUNT-LATEX-MACRO-ARGS? is non-nil, the word count
+includes LaTeX macro arguments (the material between {curly braces}).
+Otherwise, and by default, every LaTeX macro counts as 1 word regardless
+of its arguments."
+  (interactive "r")
+  (unless mark-active
+    (setf beg (point-min)
+	  end (point-max)))
+  (let ((wc 0)
+	(latex-macro-regexp "\\\\[A-Za-z]+\\(\\[[^]]*\\]\\|\\){\\([^}]*\\)}"))
+    (save-excursion
+      (goto-char beg)
+      (while (< (point) end)
+        (cond
+         ;; Ignore comments.
+         ((or (org-in-commented-line) (org-at-table-p))
+          nil)
+         ;; Ignore hyperlinks. But if link has a description, count
+         ;; the words within the description.
+         ((looking-at org-bracket-link-analytic-regexp)
+          (when (match-string-no-properties 5)
+            (let ((desc (match-string-no-properties 5)))
+              (save-match-data
+                (incf wc (length (remove "" (org-split-string
+                                             desc "\\W")))))))
+          (goto-char (match-end 0)))
+         ((looking-at org-any-link-re)
+          (goto-char (match-end 0)))
+         ;; Ignore source code blocks.
+         ((org-in-regexps-block-p "^#\\+BEGIN_SRC\\W" "^#\\+END_SRC\\W")
+          nil)
+         ;; Ignore inline source blocks, counting them as 1 word.
+         ((save-excursion
+            (backward-char)
+            (looking-at org-babel-inline-src-block-regexp))
+          (goto-char (match-end 0))
+          (setf wc (+ 2 wc)))
+         ;; Count latex macros as 1 word, ignoring their arguments.
+         ((save-excursion
+            (backward-char)
+            (looking-at latex-macro-regexp))
+          (goto-char (if count-latex-macro-args?
+                         (match-beginning 2)
+                       (match-end 0)))
+          (setf wc (+ 2 wc)))
+         ;; Ignore footnotes.
+         ((and (not count-footnotes?)
+               (or (org-footnote-at-definition-p)
+                   (org-footnote-at-reference-p)))
+          nil)
+         (t
+          (let ((contexts (org-context)))
+            (cond
+             ;; Ignore tags and TODO keywords, etc.
+             ((or (assoc :todo-keyword contexts)
+                  (assoc :priority contexts)
+                  (assoc :keyword contexts)
+                  (assoc :checkbox contexts))
+              nil)
+             ;; Ignore sections marked with tags that are
+             ;; excluded from export.
+             ((assoc :tags contexts)
+              (if (intersection (org-get-tags-at) org-export-exclude-tags
+                                :test 'equal)
+                  (org-forward-same-level 1)
+                nil))
+             (t
+              (incf wc))))))
+        (re-search-forward "\\w+\\W*")))
+    (message (format "%d words in %s." wc
+                     (if mark-active "region" "buffer")))))
+#+end_src
+
+** Org Table
+*** Transpose tables (Juan Pechiar)
 
 This function by Juan Pechiar will transpose a table:
 
@@ -337,11 +491,7 @@ will be transposed as
 
 (Note that horizontal lines disappeared.)
 
-*** Times computation
-    :PROPERTIES:
-    :CUSTOM_ID: time-computation
-    :END:
-**** Manipulate hours/minutes/seconds in table formulas
+*** Manipulate hours/minutes/seconds in table formulas
 
 Both Bastien and Martin Halder have posted code ([[http://article.gmane.org/gmane.emacs.orgmode/39519][Bastien's code]] and
 [[http://article.gmane.org/gmane.emacs.orgmode/39519][Martin's code]]) for interpreting =dd:dd= or =dd:dd:dd= strings (where
@@ -412,18 +562,10 @@ and dividing time values by integers
 
 *** Dates computation
 
-**** Question ([[http://article.gmane.org/gmane.emacs.orgmode/15692][Xin Shi]])
+Xin Shi [[http://article.gmane.org/gmane.emacs.orgmode/15692][asked]] for a way to calculate the duration of 
+dates stored in an org table.
 
-I have a table in org which stores the date, I'm wondering if there is
-any function to calculate the duration? For example:
-
-| Start Date |   End Date | Duration |
-|------------+------------+----------|
-| 2004.08.07 | 2005.07.08 |          |
-
-I tried to use B&-C&, but failed ...
-
-**** Answer ([[http://article.gmane.org/gmane.emacs.orgmode/15694][Nick Dokos]])
+Nick Dokos [[http://article.gmane.org/gmane.emacs.orgmode/15694][suggested]]:
 
 Try the following:
 
@@ -451,7 +593,8 @@ and Chris Randle's original musings are at
     http://article.gmane.org/gmane.emacs.orgmode/6536/
 
 *** Hex computation
-As with [[#time-computation][Times computation]], the following code allows Computation with
+
+As with Times computation, the following code allows Computation with
 Hex values in Org-mode tables using the =with-hex= macro.
 
 Here is the code implementing this macro.
@@ -599,6 +742,7 @@ which is the Emacs Calc implementation of the equation
 
 where /i/ is the current time and /a/ is the length of the preceding period.
 
+** Capture and Remember
 *** Customize the size of the frame for remember
 (Note: this hack is likely out of date due to the development of
 [[org-capture]].)
@@ -628,161 +772,34 @@ parameters for the remember frame:
 
 Setting remember-frame-alist to =((width . 80) (height . 15)))= give a
 reasonable size for the frame.
-*** Promote all items in subtree
-- Matt Lundin
+** Handling Links
+*** [[#heading-to-link][Turn a heading into an org link]] 
+*** Quickaccess to the link part of hyperlinks
+Christian Moe [[http://permalink.gmane.org/gmane.emacs.orgmode/43122][asked]], if there is a simpler way to copy the link part
+of an org hyperling other than to use `C-c C-l C-a C-k C-g', 
+which is indeed kind of cumbersome.
 
-This function will promote all items in a subtree. Since I use
-subtrees primarily to organize projects, the function is somewhat
-unimaginatively called my-org-un-project:
+The thread offered [[http://permalink.gmane.org/gmane.emacs.orgmode/43606][two ways]]:
 
+Using a [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Keyboard-Macros.html][keyboard macro]]:
 #+begin_src emacs-lisp
-(defun my-org-un-project ()
+(fset 'getlink
+      (lambda (&optional arg) 
+        "Keyboard macro." 
+        (interactive "p") 
+        (kmacro-exec-ring-item (quote ("\C-c\C-l\C-a\C-k\C-g" 0 "%d")) arg)))
+#+end_src
+
+or a function: 
+#+begin_src emacs-lisp
+(defun my-org-extract-link ()
+  "Extract the link location at point and put it on the killring."
   (interactive)
-  (org-map-entries 'org-do-promote "LEVEL>1" 'tree)
-  (org-cycle t))
+  (when (org-in-regexp org-bracket-link-regexp 1)
+    (kill-new (org-link-unescape (org-match-string-no-properties 1)))))
 #+end_src
 
-*** Turn a heading into an Org link
-
-From David Maus:
-
-#+begin_src emacs-lisp
-  (defun dmj:turn-headline-into-org-mode-link ()
-    "Replace word at point by an Org mode link."
-    (interactive)
-    (when (org-at-heading-p)
-      (let ((hl-text (nth 4 (org-heading-components))))
-        (unless (or (null hl-text)
-                    (org-string-match-p "^[ \t]*:[^:]+:$" hl-text))
-          (beginning-of-line)
-          (search-forward hl-text (point-at-eol))
-          (replace-string
-           hl-text
-           (format "[[file:%s.org][%s]]"
-                   (org-link-escape hl-text)
-                   (org-link-escape hl-text '((?\] . "%5D") (?\[ . "%5B"))))
-           nil (- (point) (length hl-text)) (point))))))
-#+end_src
-
-*** Count words in an Org buffer
-
-Paul Sexton [[http://article.gmane.org/gmane.emacs.orgmode/38014][posted]] this function to count words in an Org buffer:
-
-#+begin_src emacs-lisp
-(defun org-word-count (beg end
-                           &optional count-latex-macro-args?
-                           count-footnotes?)
-  "Report the number of words in the Org mode buffer or selected region.
-Ignores:
-- comments
-- tables
-- source code blocks (#+BEGIN_SRC ... #+END_SRC, and inline blocks)
-- hyperlinks (but does count words in hyperlink descriptions)
-- tags, priorities, and TODO keywords in headers
-- sections tagged as 'not for export'.
-
-The text of footnote definitions is ignored, unless the optional argument
-COUNT-FOOTNOTES? is non-nil.
-
-If the optional argument COUNT-LATEX-MACRO-ARGS? is non-nil, the word count
-includes LaTeX macro arguments (the material between {curly braces}).
-Otherwise, and by default, every LaTeX macro counts as 1 word regardless
-of its arguments."
-  (interactive "r")
-  (unless mark-active
-    (setf beg (point-min)
-	  end (point-max)))
-  (let ((wc 0)
-	(latex-macro-regexp "\\\\[A-Za-z]+\\(\\[[^]]*\\]\\|\\){\\([^}]*\\)}"))
-    (save-excursion
-      (goto-char beg)
-      (while (< (point) end)
-        (cond
-         ;; Ignore comments.
-         ((or (org-in-commented-line) (org-at-table-p))
-          nil)
-         ;; Ignore hyperlinks. But if link has a description, count
-         ;; the words within the description.
-         ((looking-at org-bracket-link-analytic-regexp)
-          (when (match-string-no-properties 5)
-            (let ((desc (match-string-no-properties 5)))
-              (save-match-data
-                (incf wc (length (remove "" (org-split-string
-                                             desc "\\W")))))))
-          (goto-char (match-end 0)))
-         ((looking-at org-any-link-re)
-          (goto-char (match-end 0)))
-         ;; Ignore source code blocks.
-         ((org-in-regexps-block-p "^#\\+BEGIN_SRC\\W" "^#\\+END_SRC\\W")
-          nil)
-         ;; Ignore inline source blocks, counting them as 1 word.
-         ((save-excursion
-            (backward-char)
-            (looking-at org-babel-inline-src-block-regexp))
-          (goto-char (match-end 0))
-          (setf wc (+ 2 wc)))
-         ;; Count latex macros as 1 word, ignoring their arguments.
-         ((save-excursion
-            (backward-char)
-            (looking-at latex-macro-regexp))
-          (goto-char (if count-latex-macro-args?
-                         (match-beginning 2)
-                       (match-end 0)))
-          (setf wc (+ 2 wc)))
-         ;; Ignore footnotes.
-         ((and (not count-footnotes?)
-               (or (org-footnote-at-definition-p)
-                   (org-footnote-at-reference-p)))
-          nil)
-         (t
-          (let ((contexts (org-context)))
-            (cond
-             ;; Ignore tags and TODO keywords, etc.
-             ((or (assoc :todo-keyword contexts)
-                  (assoc :priority contexts)
-                  (assoc :keyword contexts)
-                  (assoc :checkbox contexts))
-              nil)
-             ;; Ignore sections marked with tags that are
-             ;; excluded from export.
-             ((assoc :tags contexts)
-              (if (intersection (org-get-tags-at) org-export-exclude-tags
-                                :test 'equal)
-                  (org-forward-same-level 1)
-                nil))
-             (t
-              (incf wc))))))
-        (re-search-forward "\\w+\\W*")))
-    (message (format "%d words in %s." wc
-                     (if mark-active "region" "buffer")))))
-#+end_src
-
-*** Using M-up and M-down to transpose paragraphs
-
-From Paul Sexton: By default, if used within ordinary paragraphs in
-org mode, =M-up= and =M-down= transpose *lines* (not sentences).  The
-following code makes these keys transpose paragraphs, keeping the
-point at the start of the moved paragraph. Behavior in tables and
-headings is unaffected. It would be easy to modify this to transpose
-sentences.
-
-#+begin_src emacs-lisp
-(defun org-transpose-paragraphs (arg)
- (interactive)
- (when (and (not (or (org-at-table-p) (org-on-heading-p) (org-at-item-p)))
-            (thing-at-point 'sentence))
-   (transpose-paragraphs arg)
-   (backward-paragraph)
-   (re-search-forward "[[:graph:]]")
-   (goto-char (match-beginning 0))
-   t))
-
-(add-to-list 'org-metaup-hook 
- (lambda () (interactive) (org-transpose-paragraphs -1)))
-(add-to-list 'org-metadown-hook 
- (lambda () (interactive) (org-transpose-paragraphs 1)))
-#+end_src
-
+They put the link destination on the killring and can be easily bound to a key.
 
 ** Archiving Content in Org-Mode
 *** Preserve top level headings when archiving to a file
@@ -2246,7 +2263,6 @@ Suggested by Russell Adams
 
 Dirk-Jan C.Binnema [[http://article.gmane.org/gmane.emacs.orgmode/27684/][provided]] code to do this.  Please check
 [[file:code/elisp/org-exchange-capture.el][org-exchange-capture.el]]
-
 
 ** Audio/video file playback within org mode
 
