@@ -3749,27 +3749,28 @@ and you could use `http' addresses just as well.
    :CUSTOM_ID: convert-to-open-office
    :END:
 
-There are two approaches:
-- Use the native Org->Odt exporter
+Orgmode exports natively to =OpenDocument= format using =org-odt=
+module. 
 
-  The OpenDocumentText exporter is distributed as =org-odt= package
-  and can be installed using the Emacs package manager. The URL for
-  the archive is as shown below.
+The key bindings for export are =C-c C-e o= and =C-c C-e O=. 
 
-  See [[http://repo.or.cz/w/org-mode/org-jambu.git/blob_plain/HEAD:/packages/README.html][Release Notes]] for more information on this package.
+If you don't see =OpenDocumentText= as an option under =C-c C-e= you
+need to upgrade to =Org-mode 7.6= by one of the following means:
 
-#+begin_example
-,----[ C-h v package-archives RET ]
-| package-archives is a variable defined in `package.el'.
-| Its value is
-| (("gnu" . "http://elpa.gnu.org/packages/")
-|  ("org-odt" . "http://repo.or.cz/w/org-mode/org-jambu.git/blob_plain/HEAD:/packages/"))
-| 
-| Original value was 
-| (("gnu" . "http://elpa.gnu.org/packages/"))
-| 
-`----
-#+end_example
+1. Install org-7.6 using a distribution .zip or .tar.gz file, or
+   through Git. Then do the following:
+   1. Add =contrib/lisp= to the load-path in your =.emacs=
+     #+begin_src emacs-lisp
+       ;; modify org-root-dir as needed
+       (add-to-list 'load-path "org-root-dir/contrib/lisp") 
+    #+end_src
+   2. Do =M-x customize-variable RET org-modules RET= and enable the
+      =odt= option
+
+2. Upgrade to (atleast) the =Emacs-24.1 pretest= version. Install
+   =org-odt= package using =M-x list-packages=.
+
+#+begin_comment
 
 - Use existing exporters
 
@@ -3794,6 +3795,26 @@ There are two approaches:
 	- run =mk4ht oolatex file.tex=
 
 See [[http://permalink.gmane.org/gmane.emacs.orgmode/31168][this thread]] for further details.
+#+end_comment
+
+** I cannot open an exported =*.odt= file in LibreOffice because it is corrupt. What do I do?
+   :PROPERTIES:
+   :CUSTOM_ID: debugging-org-odt
+   :END:
+
+Typically the corruption of =odt= file happens when the XML emitted by
+Org is not well-formed according to =OpenDocument schema=.
+
+If you encounter corruption issues please identify the root cause as
+below:
+
+1. Switch to =*.odt= buffer =(C-x b whatever.odt)=
+2. Open the =content.xml= file - =(Hit RET on content.xml)=
+3. Do a =C-u C-c C-n= - =(M-x rng-first-error)=
+4. Note the error message, the XML markup at the point of error and
+   the surrounding context.
+5. Create a minimal org file that reproduces the error in =step 4=.
+6. Post a bug-report to =emacs-orgmode@gnu.org=
 
 * Backup
 
