@@ -12,7 +12,8 @@
 #+EXPORT_SELECT_TAGS: export
 #+EXPORT_EXCLUDE_TAGS: noexport
 #+LINK_UP:   
-#+LINK_HOME:
+#+LINK_HOME: 
+
 * Start up
 Org-mode LaTeX export is easy.  Place the following code in your
 .emacs and you're ready to go.
@@ -675,10 +676,10 @@ possible for the user to alter this behavior relatively easily.
 
 #+source: format-no-toc
 #+begin_src emacs-lisp :exports code
-  (defun org-export-latex-no-toc (depth)
-      (when depth
-        (format "\\setcounter{tocdepth}{%s}\n\\tableofcontents\n\\vspace*{1cm}\n"
-                depth)))
+(defun org-export-latex-no-toc (depth)  
+    (when depth
+      (format "%% Org-mode is exporting headings to %s levels.\n"
+              depth)))
   (setq org-export-latex-format-toc-function 'org-export-latex-no-toc)
 #+end_src
 
