@@ -91,7 +91,7 @@ issue.
 
 [[file:index.org][{Back to Worg's index}]]
 
-* New Issues [0/7]                                                           :new:
+* New Issues [0/6]                                                           :new:
 
 ** IDEA Re: Managing appts with org-mode, diary
 :LOGBOOK:
@@ -126,23 +126,6 @@ implemented or if it could be done without huge amounts of work.
 :END:
 
     - Gmane :: [[http://mid.gmane.org/877hdh2m7a%2Efsf%40univie%2Eac%2Eat][org-git-link does not support locational information within file]]
-
-** WAITING Org cause Emacs to hang
-:LOGBOOK:
-- State "WAITING"    from "NEW"        [2011-03-06 So 19:39]
-:END:
-  [2011-03-06 So]
-:PROPERTIES:
-:ID: mid:AANLkTik%3DaJ%3Dp1r%3D1H2v%2DRADMTKVmCgS%2BRgzTwH%2DqL%2B6z%40mail%2Egmail%2Ecom
-:END:
-
-    - Gmane :: [[http://mid.gmane.org/AANLkTik%3DaJ%3Dp1r%3D1H2v%2DRADMTKVmCgS%2BRgzTwH%2DqL%2B6z%40mail%2Egmail%2Ecom][Org cause Emacs to hang]]
-
-Possible fix is in
-
-=git://github.com/ngz/org-mode-lists.git indent-patch-no-timer=
-
-Wait for feedback if this patch fixes the problem.
 
 ** NEW org-crypt.el security problem (From: Milan Zamazal)
   [2011-03-20 So]
@@ -911,19 +894,6 @@ would be to ignore the issue and live with it.
 Thanks for doublechecking. I now tested it again, and this only happens when 
 used in a shell (i.e. in a KDE Konsole) where the point does not blink. 
 #+end_quote
-*** WAITING (O) (dev) org-indent-mode patch                                :Patch:
-:LOGBOOK:
-- State "WAITING"    from "WISH"       [2011-07-16 sam. 12:15]
-- State "WISH"       from "WISH"       [2011-07-16 sam. 12:15]
-- State "WISH"       from "NEW"        [2011-03-20 So 18:28]
-:END:
-  [2011-03-20 So]
-:PROPERTIES:
-:ID: mid:87ipvnng95%2Efsf%40gmail%2Ecom
-:END:
-
-    - Gmane :: [[http://mid.gmane.org/87ipvnng95%2Efsf%40gmail%2Ecom][(O) (dev) org-indent-mode patch]]
-
 *** DECLINED Effort columnview: Show total in different column
   [2010-09-26 So]
 :PROPERTIES:
@@ -3240,6 +3210,62 @@ org-metaup/-down in lists.
 :END:
 
     - Gmane :: [[http://mid.gmane.org/loom%2E20110308T173520%2D481%40post%2Egmane%2Eorg][(O) goto does not accept remote references for local targets]]
+*** IDEA Rewrite of org-indent-mode                                        :Patch:
+:LOGBOOK:
+- State "IDEA"       from "WAITING"    [2011-07-17 dim. 10:20]
+- State "WAITING"    from "WISH"       [2011-07-16 sam. 12:15]
+- State "WISH"       from "WISH"       [2011-07-16 sam. 12:15]
+- State "WISH"       from "NEW"        [2011-03-20 So 18:28]
+:END:
+  [2011-03-20 So]
+:PROPERTIES:
+:ID: mid:87ipvnng95%2Efsf%40gmail%2Ecom
+:END:
+
+    - Gmane :: [[http://mid.gmane.org/87ipvnng95%2Efsf%40gmail%2Ecom][(O) (dev) org-indent-mode patch]]
+
+
+    - ngz :: this branch is an attempt to remove idle timer in
+             indent-mode and to make it compatible with
+             visual-line-mode.  Though, it suffers from a long
+             initialization time (walking each line of the buffer to
+             add text-properties).
+             
+             The idea is to set =line-prefix= property to the level of
+             the current headline and =wrap-prefix= to the indentation
+             of the beginning of the line.  These properties are
+             modified at each text modification (hook) on the modified
+             area only (so, this part is quick).
+             
+             I will continue to maintain compatibility of this branch
+             with master, but I won't have time to improve it anytime
+             soon.  I still think it's an interesting starting point
+             to improve org-indent-mode.
+             
+Source : =git://github.com/ngz/org-mode-lists.git indent-patch-no-timer=
+*** BUG Org cause Emacs to hang
+:LOGBOOK:
+- State "BUG"        from "WAITING"    [2011-07-17 dim. 11:04]
+- State "WAITING"    from "NEW"        [2011-03-06 So 19:39]
+:END:
+  [2011-03-06 So]
+:PROPERTIES:
+:ID: mid:AANLkTik%3DaJ%3Dp1r%3D1H2v%2DRADMTKVmCgS%2BRgzTwH%2DqL%2B6z%40mail%2Egmail%2Ecom
+:END:
+
+    - Gmane :: [[http://mid.gmane.org/AANLkTik%3DaJ%3Dp1r%3D1H2v%2DRADMTKVmCgS%2BRgzTwH%2DqL%2B6z%40mail%2Egmail%2Ecom][Org cause Emacs to hang]]
+
+Possible fix is in
+
+=git://github.com/ngz/org-mode-lists.git indent-patch-no-timer=
+
+Wait for feedback if this patch fixes the problem.
+
+    - ngz :: this branch isn't satisfactory enough (too slow on
+             opening files).  Thus, I re-open the bug.
+             
+             See [[#mid:87ipvnng95%2Efsf%40gmail%2Ecom]] for more
+             information.
 ** Tables
 
 *** WISH Row formulas
