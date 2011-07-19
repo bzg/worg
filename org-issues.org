@@ -338,24 +338,6 @@ that's worth considering a bug, but it's certainly surprising behavior.
 :END:
 
     - Gmane :: [[http://mid.gmane.org/8039qpkd70%2Efsf%40missioncriticalit%2Ecom][Agenda with CLOCK items over more than one day]]
-*** BUG Strange bug, request for more info
-  [2010-05-26 Mi]
-  :PROPERTIES:
-  :ID: mid:87iq6bjsas%2Efsf%40gollum%2Eintra%2Enorang%2Eca
-  :END:
-
-    - Gmane :: [[http://mid.gmane.org/87iq6bjsas.fsf%40gollum.intra.norang.ca][Re: Strange bug, request for more info]]
-
-#+BEGIN_QUOTE
-The bug happens when being in the agenda and trying to goto or show
-the origin location of an agenda entry by pressing SPC or RET.
-John reports that sometimes (for him several times a day),
-the other window shows a completely different location.
-The most weird part of it is that going back to the agenda buffer
-and then trying the exact same command again, everything works
-fine!  This is driving me crazy, and I'd love to find and fix
-this problem.
-#+END_QUOTE
 *** BUG Rescheduling an item works properly only if SCHEDULED is after the heading
   [2010-06-13 So]
   :PROPERTIES:
@@ -363,43 +345,23 @@ this problem.
   :END:
 
     - Gmane :: [[http://mid.gmane.org/loom%2E20100611T075155%2D670%40post%2Egmane%2Eorg][Rescheduling an item works properly only if SCHEDULED is after the heading]]
-*** BUG PATCH:  Fix for agenda problems                                                      :Patch:
-:LOGBOOK:
-- State "BUG"        from "NEW"        [2010-08-15 So 16:30]
-:END:
-  [2010-07-31 Sa]
-:PROPERTIES:
-:ID: mid:4C520CF2%2E6060802%40sift%2Einfo
-:END:
 
-    - Gmane :: [[http://mid.gmane.org/4C520CF2%2E6060802%40sift%2Einfo][PATCH:  Fix for agenda problems]]
-
-**** More problems with Mobile Org agenda writing                                           :Mobile:
-  [2010-07-31 Sa]
-:PROPERTIES:
-:ID: mid:4C518DA3%2E4000908%40sift%2Einfo
-:END:
-
-    - Gmane :: [[http://mid.gmane.org/4C518DA3%2E4000908%40sift%2Einfo][More problems with Mobile Org agenda writing]]
-
-**** Mobile-org crash --- same error?                                                       :Mobile:
-  [2010-07-29 Do]
-:PROPERTIES:
-:ID: mid:loom%2E20100728T182542%2D959%40post%2Egmane%2Eorg
-:END:
-
-    - Gmane :: [[http://mid.gmane.org/loom%2E20100728T182542%2D959%40post%2Egmane%2Eorg][Mobile-org crash --- same error?]]
-
-*** BUG Lisp error: (wrong-type-argument stringp nil)
-:LOGBOOK:
-- State "BUG"        from "NEW"        [2010-10-26 Di 21:03]
-:END:
-  [2010-10-17 So]
-:PROPERTIES:
-:ID: mid:80iq16rvi0%2Efsf%40mundaneum%2Ecom
-:END:
-
-    - Gmane :: [[http://mid.gmane.org/80iq16rvi0%2Efsf%40mundaneum%2Ecom][Lisp error: (wrong-type-argument stringp nil)]]
+    - ngz :: Still confirmed on [2011-07-18 lun.]
+             
+             The manual should specify that SCHEDULED and DEADLINE
+             keywords are to be put on the line just after the
+             headline.
+             
+             We can also make C-c C-s replace the already defined
+             SCHEDULED or DEADLINE keyword, if it can find it.
+             
+             Moreover, we should remove
+             `org-insert-labeled-timestamps-at-point'. This variable
+             is error-prone, and more than often let-bound to nil
+             (i.e. from the agenda).
+             
+             Eventually, I think we should slowly move them to
+             standard properties (in the PROPERTIES drawer).
 
 *** WISH org-agenda-follow-narrowed ?
 :LOGBOOK:
@@ -505,6 +467,9 @@ note is entered with the state change string.
 :END:
 
     - Gmane :: [[http://mid.gmane.org/AANLkTi%3Dx%2DCmPeByLynS1sT%2BK0A6hrbJiRo5nTEmwLGs8%40mail%2Egmail%2Ecom][org-write-agenda failure]]
+
+    - ngz :: confirmed on Org-mode version 7.6 (release_7.6.93.gd243)
+             [2011-07-18 lun.]
 
 *** WISH Feature request: another Org file for anniversary entries                                                                                                                                                               :Patch:
 :LOGBOOK:
@@ -762,6 +727,9 @@ when realigning the table you'll get an "args out of range" error inside
 the text-properties-related code in `org-table-align' (provided the
 width declaration actually does cause the text to be clipped).
 #+end_quote
+
+  - ngz :: is it fixable ? Org tables are not meant to handle
+           variable-width fonts anyway. [2011-07-18 lun.]
 
 *** INCONSISTENCY (PATCH) Markup on same line as text                                                                                                                                                                            :Patch:
 :LOGBOOK:
@@ -2644,31 +2612,6 @@ org-export-blocks.
 :END:
 
     - Gmane :: [[http://mid.gmane.org/AANLkTik6ftb%2Dbjtk3pTP1gKWh%5Fjyde%3D5Sz6pyPUs7pwb%40mail%2Egmail%2Ecom][saving property values when archiving]]
-
-*** BUG org-indent fails to play nicely with org-inlinetask
-  [2010-06-13 So]
-  :PROPERTIES:
-  :ID: mid:AANLkTil3cSVy2SjQK0%5Fu0JcakAV7mYjQaZVtBpr7nX3I%40mail%2Egmail%2Ecom
-  :END:
-
-    - Gmane :: [[http://mid.gmane.org/AANLkTil3cSVy2SjQK0%5Fu0JcakAV7mYjQaZVtBpr7nX3I%40mail%2Egmail%2Ecom][Two bugs in org-indent (plus a fix to correct one of them)]]
-
-#+BEGIN_QUOTE
-   1) It destroys the special fontification of the inline task's
-      leading stars, even if org-indent-mode-turns-on-hiding-stars is
-      set to nil
-
-   2) Any text after an inline task's END statement is soft-indented
-      as though it were part of the inline task, whereas the
-      indentation should ideally return to what it was before the
-      inline task. Of course, this is also a problem when org-indent
-      is turned off, if you try to automatically hard-indent using
-      TAB. However, in that case you can adjust by hand the
-      indentation of the first line after the inline task, and then
-      all the following lines will indent correctly. With org-indent
-      the problem is much worse since there is no way of adjusting the
-      soft indents by hand.
-#+END_QUOTE
 *** BUG gnuplot with errorbars in org-mode
 :LOGBOOK:
 - State "BUG"        from "NEW"        [2010-07-25 So 16:58]
@@ -17375,4 +17318,123 @@ org-metaup/-down in lists.
     - Gmane :: [[http://mid.gmane.org/63B79D2B%2D9483%2D481F%2DB7AB%2D88BEA753D5C8%40gmail%2Ecom][MathJax is now the default for HTML math]]
 
     - ngz :: it is in manual since a long time. [2011-07-17 dim.]
+
+** DONE org-indent fails to play nicely with org-inlinetask
+    CLOSED: [2011-07-18 lun. 10:53]
+    :LOGBOOK:
+    - State "DONE"       from "BUG"        [2011-07-18 lun. 10:53]
+    :END:
+  [2010-06-13 So]
+  :PROPERTIES:
+  :ID: mid:AANLkTil3cSVy2SjQK0%5Fu0JcakAV7mYjQaZVtBpr7nX3I%40mail%2Egmail%2Ecom
+  :ARCHIVE_TIME: 2011-07-18 lun. 10:53
+  :ARCHIVE_FILE: ~/.emacs.d/devel/Worg/org-issues.org
+  :ARCHIVE_OLPATH: Development Tasks/Miscellaneous Stuff
+  :ARCHIVE_CATEGORY: worg
+  :ARCHIVE_TODO: DONE
+  :END:
+
+    - Gmane :: [[http://mid.gmane.org/AANLkTil3cSVy2SjQK0%5Fu0JcakAV7mYjQaZVtBpr7nX3I%40mail%2Egmail%2Ecom][Two bugs in org-indent (plus a fix to correct one of them)]]
+
+#+BEGIN_QUOTE
+   1) It destroys the special fontification of the inline task's
+      leading stars, even if org-indent-mode-turns-on-hiding-stars is
+      set to nil
+
+   2) Any text after an inline task's END statement is soft-indented
+      as though it were part of the inline task, whereas the
+      indentation should ideally return to what it was before the
+      inline task. Of course, this is also a problem when org-indent
+      is turned off, if you try to automatically hard-indent using
+      TAB. However, in that case you can adjust by hand the
+      indentation of the first line after the inline task, and then
+      all the following lines will indent correctly. With org-indent
+      the problem is much worse since there is no way of adjusting the
+      soft indents by hand.
+#+END_QUOTE
+
+** CLOSED Lisp error: (wrong-type-argument stringp nil)
+    CLOSED: [2011-07-18 lun. 10:56]
+:LOGBOOK:
+- State "CLOSED"     from "BUG"        [2011-07-18 lun. 10:56]
+- State "BUG"        from "NEW"        [2010-10-26 Di 21:03]
+:END:
+  [2010-10-17 So]
+:PROPERTIES:
+:ID: mid:80iq16rvi0%2Efsf%40mundaneum%2Ecom
+:ARCHIVE_TIME: 2011-07-18 lun. 10:57
+:ARCHIVE_FILE: ~/.emacs.d/devel/Worg/org-issues.org
+:ARCHIVE_OLPATH: Development Tasks/Agenda issues
+:ARCHIVE_CATEGORY: worg
+:ARCHIVE_TODO: CLOSED
+:END:
+
+    - Gmane :: [[http://mid.gmane.org/80iq16rvi0%2Efsf%40mundaneum%2Ecom][Lisp error: (wrong-type-argument stringp nil)]]
+    - ngz :: no further information to work on since 39 weeks. Case
+             probably closed.
+** CLOSED Strange bug, request for more info
+    CLOSED: [2011-07-18 lun. 11:01]
+    :LOGBOOK:
+    - State "CLOSED"     from "BUG"        [2011-07-18 lun. 11:01]
+    :END:
+  [2010-05-26 Mi]
+  :PROPERTIES:
+  :ID: mid:87iq6bjsas%2Efsf%40gollum%2Eintra%2Enorang%2Eca
+  :ARCHIVE_TIME: 2011-07-18 lun. 11:01
+  :ARCHIVE_FILE: ~/.emacs.d/devel/Worg/org-issues.org
+  :ARCHIVE_OLPATH: Development Tasks/Agenda issues
+  :ARCHIVE_CATEGORY: worg
+  :ARCHIVE_TODO: CLOSED
+  :END:
+
+    - Gmane :: [[http://mid.gmane.org/87iq6bjsas.fsf%40gollum.intra.norang.ca][Re: Strange bug, request for more info]]
+
+    - ngz :: very old bug, probably fixed now according to the last
+             post in the thread.
+
+#+BEGIN_QUOTE
+The bug happens when being in the agenda and trying to goto or show
+the origin location of an agenda entry by pressing SPC or RET.
+John reports that sometimes (for him several times a day),
+the other window shows a completely different location.
+The most weird part of it is that going back to the agenda buffer
+and then trying the exact same command again, everything works
+fine!  This is driving me crazy, and I'd love to find and fix
+this problem.
+#+END_QUOTE
+** CLOSED PATCH:  Fix for agenda problems                                  :Patch:
+    CLOSED: [2011-07-18 lun. 11:14]
+:LOGBOOK:
+- State "CLOSED"     from "BUG"        [2011-07-18 lun. 11:14]
+- State "BUG"        from "NEW"        [2010-08-15 So 16:30]
+:END:
+  [2010-07-31 Sa]
+:PROPERTIES:
+:ID: mid:4C520CF2%2E6060802%40sift%2Einfo
+:ARCHIVE_TIME: 2011-07-18 lun. 11:14
+:ARCHIVE_FILE: ~/.emacs.d/devel/Worg/org-issues.org
+:ARCHIVE_OLPATH: Development Tasks/Agenda issues
+:ARCHIVE_CATEGORY: worg
+:ARCHIVE_TODO: CLOSED
+:END:
+
+    - Gmane :: [[http://mid.gmane.org/4C520CF2%2E6060802%40sift%2Einfo][PATCH:  Fix for agenda problems]]
+
+    - ngz :: probably applied, and function has changed since then.
+
+*** More problems with Mobile Org agenda writing                          :Mobile:
+  [2010-07-31 Sa]
+:PROPERTIES:
+:ID: mid:4C518DA3%2E4000908%40sift%2Einfo
+:END:
+
+    - Gmane :: [[http://mid.gmane.org/4C518DA3%2E4000908%40sift%2Einfo][More problems with Mobile Org agenda writing]]
+
+*** Mobile-org crash --- same error?                                      :Mobile:
+  [2010-07-29 Do]
+:PROPERTIES:
+:ID: mid:loom%2E20100728T182542%2D959%40post%2Egmane%2Eorg
+:END:
+
+    - Gmane :: [[http://mid.gmane.org/loom%2E20100728T182542%2D959%40post%2Egmane%2Eorg][Mobile-org crash --- same error?]]
 
