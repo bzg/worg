@@ -582,73 +582,16 @@ Figures.  In addition, many styles require that figure captions end
 with a period; the caption passed to the List of Figures should not
 end in a period.
  
-The Org-mode =#+CAPTION:= macro will handle an optional argument with
-the following patch, which initializes the existing =shortn= variable
-and then passes it into the caption in the two cases where it is
-absent (it is already passed to the third case).
+The Org-mode =#+CAPTION:= macro handles an optional argument.
 
-#+BEGIN_example
-diff --git a/lisp/org-exp.el b/lisp/org-exp.el
-index 2ed989e..5606f6f 100644
---- a/lisp/org-exp.el
-+++ b/lisp/org-exp.el
-@@ -1870,7 +1870,7 @@ table line.  If it is a link, add it to the line containing the link."
- 				   'org-label label))
- 	(if label (push (cons label label) target-alist))
- 	(goto-char end)
--	(setq cap nil attr nil label nil)))))
-+	(setq cap nil shortn nil attr nil label nil)))))
-   target-alist)
- 
- (defun org-export-remove-comment-blocks-and-subtrees ()
-diff --git a/lisp/org-latex.el b/lisp/org-latex.el
-index e7307ef..e605c35 100644
---- a/lisp/org-latex.el
-+++ b/lisp/org-latex.el
-@@ -2199,12 +2199,12 @@ The conversion is made depending of STRING-BEFORE and STRING-AFTER."
- 	   (multicolumnp "\\begin{figure*}%placement
- \\centering
- \\includegraphics[%attr]{%path}
--\\caption{%labelcmd%caption}
-+\\caption%shortn{%labelcmd%caption}
- \\end{figure*}")
- 	   (floatp "\\begin{figure}%placement
- \\centering
- \\includegraphics[%attr]{%path}
--\\caption{%labelcmd%caption}
-+\\caption%shortn{%labelcmd%caption}
- \\end{figure}")
- 	   (t "\\includegraphics[%attr]{%path}")))
- 
--- 
-1.7.1
-#+END_example
+This construct:
 
+: #+CAPTION: [Short caption]{Long caption.}
 
-Another option is to use =#+LATEX:= and just write the
-=\caption[...]{...}= directly.  This works well for LaTeX export, but
-it does nothing for HTML.
+exports: 
 
-Another option is to use a link that establishes a caption that works
-with both LaTeX and html and can be used to mark blocks that Org-mode
-doesn't recognize by default.  Note that you currently have to enter
-these links by hand and not with the usual =org-insert-link= function,
-which doesn't allow spaces in the =PATH= argument.
+: \caption[Short caption]{Long caption.}
 
-#+source: define-caption-link
-#+begin_src emacs-lisp :exports code
-  (org-add-link-type
-   "caption" nil
-   (lambda (path desc format)
-     (cond
-      ((eq format 'html)
-       (format "<span class=\"caption\">%s</span>" desc))
-      ((eq format 'latex)
-       (format "\\caption[%s]{%s}" path desc)))))  
-#+end_src
-
-Here is an example of its use:
-: [[caption:A caption in the List of Figures][A caption for a figure.]]
 * Styling the Frontmatter
 The Org-mode LaTeX exporter requires configuration to gain full access
 to the LaTeX frontmatter formatting capacity.
