@@ -1269,11 +1269,11 @@ used in the social sciences can be selected:
 
 : #+LaTeX_HEADER: \usepackage[style=authordate]{biblatex}
 
-Or a footnote style:
+Or a footnote style used in the humanities:
 
 : #+LaTeX_HEADER: \usepackage[style=verbose]{biblatex}
 
-** Natbib citations
+** Biblatex support for natbib citations
 
 Biblatex supports the various citation commands implemented by
 [[latex:package][natbib]].
@@ -1314,8 +1314,8 @@ get org-mode to open bibtex entries do the following:
 Now you can insert ebib links in your documents like this:
 =[ebib:Jones1998][some paper title]=. Opening this link should now
 result in ebib starting, loading your default bibtex database, and
-highlighting the bibtex entry Jones1998. Alternatively, if you already
-have started ebib, then opening the link will get you to the bibtex
+highlighting the bibtex entry Jones1998. Alternatively, if you have
+already started ebib, then opening the link will get you to the bibtex
 entry in your opened ebib database.
 
 *** Natbib citation commands
@@ -1429,69 +1429,246 @@ includes a description.
 #+end_src
 
 
-*** Biblatex citation commands                                     :noexport:
-The following six link types are defined for the standard biblatex
-citation commands.
+*** Standard biblatex citation commands
 
-#+source: define-cite-link
-#+begin_src emacs-lisp :exports code
+The standard biblatex citation commands have the following syntax: 
+\command[⟨prenote⟩][⟨postnote⟩]{⟨keys⟩}
+
+They have been implemented by parsing the description part of the link
+on a semicolon, so that, e.g.,
+=[[cite:foo][postnote;prenote]]= becomes
+=\cite[prenote][postnote]{foo}=.  Note that =[[cite:foo]]= and
+=[[cite:foo][;]]= are functionally equivalent.  
+ 
+#+source: define-standard-biblatex-commands
+#+begin_src emacs-lisp :noweb yes :results silent :exports code
+  <<define-biblatex-cite-link>>
+  <<define-biblatex-cap-cite-link>>
+  <<define-biblatex-parencite-link>>
+  <<define-biblatex-cap-parencite-link>>
+  <<define-biblatex-footcite-link>>
+  <<define-biblatex-footcitetext-link>>
+
+#+end_src
+
+#+source: define-biblatex-cite-link
+#+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "cite" 'ebib
    (lambda (path desc format)
      (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
       ((eq format 'latex)
-       (format "\\cite[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "cite:" desc)))
+           (format "\\cite{%s}" path)
+         (format "\\cite[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-parencite-link
-#+begin_src emacs-lisp :exports code
-  (org-add-link-type 
-   "parencite" 'ebib
-   (lambda (path desc format)
-     (cond
-      ((eq format 'latex)
-       (format "\\parencite[%s]{%s}" desc path)))))
-#+end_src
-
-#+source: define-footcite-link
-#+begin_src emacs-lisp :exports code
-  (org-add-link-type 
-   "footcite" 'ebib
-   (lambda (path desc format)
-     (cond
-      ((eq format 'latex)
-       (format "\\footcite[%s]{%s}" desc path)))))
-#+end_src
-
-
-#+source: define-cap-cite-link
-#+begin_src emacs-lisp :exports code
+#+source: define-biblatex-cap-cite-link
+#+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "Cite" 'ebib
    (lambda (path desc format)
      (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
       ((eq format 'latex)
-       (format "\\Cite[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "Cite:" desc)))
+           (format "\\Cite{%s}" path)
+         (format "\\Cite[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-cap-parencite-link
-#+begin_src emacs-lisp :exports code
+#+source: define-biblatex-parencite-link
+#+begin_src emacs-lisp :results silent :exports code
+  (org-add-link-type 
+   "parencite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "parencite:" desc)))
+           (format "\\parencite{%s}" path)
+         (format "\\parencite[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
+#+end_src
+
+#+source: define-biblatex-cap-parencite-link
+#+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "Parencite" 'ebib
    (lambda (path desc format)
      (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
       ((eq format 'latex)
-       (format "\\Parencite[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "Parencite:" desc)))
+           (format "\\Parencite{%s}" path)
+         (format "\\Parencite[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-cap-footcite-link
-#+begin_src emacs-lisp :exports code
+#+source: define-biblatex-footcite-link
+#+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
-   "Footcite" 'ebib
+   "footcite" 'ebib
    (lambda (path desc format)
      (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
       ((eq format 'latex)
-       (format "\\Footcite[%s]{%s}" desc path)))))
+       (if (or (not desc) (equal 0 (search "footcite:" desc)))
+           (format "\\footcite{%s}" path)
+         (format "\\footcite[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
+#+end_src
+
+#+source: define-biblatex-footcitetext-link
+#+begin_src emacs-lisp :results silent :exports code
+  (org-add-link-type 
+   "footcitetext" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "footcitetext:" desc)))
+           (format "\\footcitetext{%s}" path)
+         (format "\\footcitetext[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
+#+end_src
+
+*** Style-specific biblatex commands
+
+These commands can only be used by some of the citation styles that
+ship with biblatex.
+
+#+source: define-style-specific-biblatex-commands
+#+begin_src emacs-lisp :noweb yes :results silent :exports code
+  <<define-biblatex-textcite-link>>
+  <<define-biblatex-cap-textcite-link>>
+  <<define-biblatex-smartcite-link>>
+  <<define-biblatex-cap-smartcite-link>>
+  <<define-biblatex-citestar-link>>
+  <<define-biblatex-parencitestar-link>>
+  <<define-biblatex-supercite-link>>
+#+end_src
+
+#+source: define-biblatex-textcite-link
+#+begin_src emacs-lisp :results silent :exports code
+  (org-add-link-type 
+   "textcite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "textcite:" desc)))
+           (format "\\textcite{%s}" path)
+         (format "\\textcite[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
+#+end_src
+
+#+source: define-biblatex-cap-textcite-link
+#+begin_src emacs-lisp :results silent :exports code
+  (org-add-link-type 
+   "Textcite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "Textcite:" desc)))
+           (format "\\Textcite{%s}" path)
+         (format "\\Textcite[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
+#+end_src
+
+#+source: define-biblatex-smartcite-link
+#+begin_src emacs-lisp :results silent :exports code
+  (org-add-link-type 
+   "smartcite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "smartcite:" desc)))
+           (format "\\smartcite{%s}" path)
+         (format "\\smartcite[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
+#+end_src
+
+#+source: define-biblatex-cap-smartcite-link
+#+begin_src emacs-lisp :results silent :exports code
+  (org-add-link-type 
+   "Smartcite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "Smartcite:" desc)))
+           (format "\\Smartcite{%s}" path)
+         (format "\\Smartcite[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
+#+end_src
+
+#+source: define-biblatex-citestar-link
+#+begin_src emacs-lisp :results silent :exports code
+  (org-add-link-type 
+   "cite*" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "cite*:" desc)))
+           (format "\\cite*{%s}" path)
+         (format "\\cite*[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
+#+end_src
+
+#+source: define-biblatex-parencitestar-link
+#+begin_src emacs-lisp :results silent :exports code
+  (org-add-link-type 
+   "parencite*" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
+      ((eq format 'latex)
+       (if (or (not desc) (equal 0 (search "parencite*:" desc)))
+           (format "\\parencite*{%s}" path)
+         (format "\\parencite*[%s][%s]{%s}"
+                 (cadr (split-string desc ";"))
+                 (car (split-string desc ";"))  path))))))
+#+end_src
+
+#+source: define-biblatex-supercite-link
+#+begin_src emacs-lisp :results silent :exports code
+  (org-add-link-type 
+   "supercite" 'ebib
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "(<cite>%s</cite>)" path))
+      ((eq format 'latex)
+       (format "\\cite*{%s}" path)))))
 #+end_src
 
 
