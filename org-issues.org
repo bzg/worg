@@ -657,30 +657,6 @@ width declaration actually does cause the text to be clipped).
   - ngz :: is it fixable ? Org tables are not meant to handle
            variable-width fonts anyway. [2011-07-18 lun.]
 
-*** INCONSISTENCY Linum-mode + org-indent-mode gives strange graphical refresh bugs (7.4 (release_7.4.41.g96c70))
-:LOGBOOK:
-- State "INCONSISTENCY" from "NEW"        [2011-01-23 So 14:51]
-:END:
-  [2011-01-23 So]
-:PROPERTIES:
-:ID: mid:4D2E981C%2E2050607%40gmail%2Ecom
-:END:
-
-    - Gmane :: [[http://mid.gmane.org/4D2E981C%2E2050607%40gmail%2Ecom][Bug: Linum-mode + org-indent-mode gives strange graphical refresh bugs (7.4 (release_7.4.41.g96c70))]]
-
-#+begin_quote cite=[[http://thread.gmane.org/gmane.emacs.orgmode/36063][Re: Bug: Linum-mode + org-indent-mode gives strange graphical refresh bugs (7.4 (release_7.4.41.g96c70)]]
-Org-mode used line-profix properties to add indentation, and
-linum mode uses before-string properties of overlays to add
-line numbers.  Both these features add text at display time,
-but apparently not in an entirely predictable way.  I have no
-idea it it is possible to make both work without any gliches.
-If anything, this would be a bug report to Emacs, I think.
-
-The "other issue" is an artefact of Org using an idle time
-to update indentation properties.  Here my suggestion
-would be to ignore the issue and live with it.
-#+end_quote
-
 *** WISH Tab/S-Tab cycling behavior: how to include #+begin_src and #+results blocks
 :LOGBOOK:
 - State "WISH"       from "NEW"        [2011-01-23 So 14:55]
@@ -2197,9 +2173,7 @@ the coords to be replaced with a link to the image.
   :END:
 
     - Gmane :: [[http://mid.gmane.org/loom%2E20100617T213846%2D275%40post%2Egmane%2Eorg][Estimate ranges in column view]]
-*** WISH Provide customization variable for formula that calculates indentation level
 
-    - Gmane :: [[http://mid.gmane.org/AANLkTil3cSVy2SjQK0%5Fu0JcakAV7mYjQaZVtBpr7nX3I%40mail%2Egmail%2Ecom][Two bugs in org-indent (plus a fix to correct one of them)]]
 *** WISH Provide property API function to append to a property
   [2010-06-27 So]
   :PROPERTIES:
@@ -2771,11 +2745,11 @@ end up with *lots* of stored links, which makes this a real struggle.
 :END:
 
     - Gmane :: [[http://mid.gmane.org/loom%2E20110308T173520%2D481%40post%2Egmane%2Eorg][(O) goto does not accept remote references for local targets]]
-*** IDEA Rewrite of org-indent-mode                                        :Patch:
+*** WAITING Rewrite of org-indent-mode                                   :Patch:
 :LOGBOOK:
+- State "WAITING"    from "WISH"       [2011-07-21 jeu. 17:23]
 - State "IDEA"       from "WAITING"    [2011-07-17 dim. 10:20]
 - State "WAITING"    from "WISH"       [2011-07-16 sam. 12:15]
-- State "WISH"       from "WISH"       [2011-07-16 sam. 12:15]
 - State "WISH"       from "NEW"        [2011-03-20 So 18:28]
 :END:
   [2011-03-20 So]
@@ -2797,15 +2771,17 @@ end up with *lots* of stored links, which makes this a real struggle.
              of the beginning of the line.  These properties are
              modified at each text modification (hook) on the modified
              area only (so, this part is quick).
-             
-             I will continue to maintain compatibility of this branch
-             with master, but I won't have time to improve it anytime
-             soon.  I still think it's an interesting starting point
-             to improve org-indent-mode.
+
+    - ngz :: I've implemented an asynchronous initialization. It needs
+             testing, though.
              
 Source : =git://github.com/ngz/org-mode-lists.git indent-patch-no-timer=
-*** BUG Org cause Emacs to hang
+
+The rewrite would fix the following bugs:
+
+**** WAITING Org cause Emacs to hang
 :LOGBOOK:
+- State "WAITING"    from "BUG"        [2011-07-21 jeu. 17:24]
 - State "BUG"        from "WAITING"    [2011-07-17 dim. 11:04]
 - State "WAITING"    from "NEW"        [2011-03-06 So 19:39]
 :END:
@@ -2827,8 +2803,9 @@ Wait for feedback if this patch fixes the problem.
              
              See [[id:mid:87ipvnng95%252Efsf%2540gmail%252Ecom][* Rewrite of org-indent-mode]] for more information.
 
-*** WISH Org-indent-mode (lack of) support for plain list
+**** WAITING Org-indent-mode (lack of) support for plain list
 :LOGBOOK:
+- State "WAITING"    from "WISH"       [2011-07-21 jeu. 17:24]
 - State "WISH"       from "NEW"        [2010-08-08 So 15:01]
 :END:
   [2010-08-01 So]
@@ -2839,7 +2816,39 @@ Wait for feedback if this patch fixes the problem.
     - Gmane :: [[http://mid.gmane.org/1280607738%2E12710%2E11%2Ecamel%40rigel][Org-indent-mode (lack of) support for plain list]]
                
     -  ngz :: see [[id:mid:87ipvnng95%252Efsf%2540gmail%252Ecom][* Rewrite of org-indent-mode]] for a working solution
-              (but not adequate on other points)
+
+**** WAITING Linum-mode + org-indent-mode gives strange graphical refresh bugs (7.4 (release_7.4.41.g96c70))
+:LOGBOOK:
+- State "WAITING"    from "INCONSISTENCY" [2011-07-21 jeu. 17:24]
+- State "INCONSISTENCY" from "NEW"        [2011-01-23 So 14:51]
+:END:
+  [2011-01-23 So]
+:PROPERTIES:
+:ID: mid:4D2E981C%2E2050607%40gmail%2Ecom
+:END:
+
+    - Gmane :: [[http://mid.gmane.org/4D2E981C%2E2050607%40gmail%2Ecom][Bug: Linum-mode + org-indent-mode gives strange graphical refresh bugs (7.4 (release_7.4.41.g96c70))]]
+
+#+begin_quote cite=[[http://thread.gmane.org/gmane.emacs.orgmode/36063][Re: Bug: Linum-mode + org-indent-mode gives strange graphical refresh bugs (7.4 (release_7.4.41.g96c70)]]
+Org-mode used line-profix properties to add indentation, and
+linum mode uses before-string properties of overlays to add
+line numbers.  Both these features add text at display time,
+but apparently not in an entirely predictable way.  I have no
+idea it it is possible to make both work without any gliches.
+If anything, this would be a bug report to Emacs, I think.
+
+The "other issue" is an artefact of Org using an idle time
+to update indentation properties.  Here my suggestion
+would be to ignore the issue and live with it.
+#+end_quote
+
+**** WAITING Provide customization variable for formula that calculates indentation level
+:LOGBOOK:
+     - State "WAITING"    from "WISH"       [2011-07-21 jeu. 17:25]
+     :END:
+
+     - Gmane :: [[http://mid.gmane.org/AANLkTil3cSVy2SjQK0%5Fu0JcakAV7mYjQaZVtBpr7nX3I%40mail%2Egmail%2Ecom][Two bugs in org-indent (plus a fix to correct one of them)]]
+
 
 ** Tables
 
