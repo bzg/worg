@@ -1533,6 +1533,25 @@ This was suggested by Carsten in reply to David Abrahams:
     (call-interactively 'org-agenda-schedule)))
 #+end_example
 
+*** Mark subtree DONE along with all subheadings
+
+Bernt Hansen [[http://permalink.gmane.org/gmane.emacs.orgmode/44693][suggested]] this command:
+
+#+begin_src emacs-lisp
+(defun bh/mark-subtree-done ()
+  (interactive)
+  (org-mark-subtree)
+  (let ((limit (point)))
+    (save-excursion
+      (exchange-point-and-mark)
+      (while (> (point) limit)
+	(org-todo "DONE")
+	(outline-previous-visible-heading 1))
+      (org-todo "DONE"))))
+#+end_src
+
+Then M-x bh/mark-subtree-done.
+
 ** Exporting org files
 *** Specifying LaTeX commands to floating environments
 
