@@ -3823,16 +3823,23 @@ customize =exec-path= to include the installation directory.
 Typically the corruption of =odt= file happens when the XML emitted by
 Org is not well-formed according to =OpenDocument schema=.
 
-If you encounter corruption issues please identify the root cause as
-below:
+If you encounter corruption issues please identify the root cause
+using one of the methods described below:
 
-1. Switch to =*.odt= buffer =(C-x b whatever.odt)=
-2. Open the =content.xml= file - =(Hit RET on content.xml)=
-3. Do a =C-u C-c C-n= - =(M-x rng-first-error)=
-4. Note the error message, the XML markup at the point of error and
-   the surrounding context.
-5. Create a minimal org file that reproduces the error in =step 4=.
-6. Post a bug-report to =emacs-orgmode@gnu.org=
+- Use an Online validator
+  - Pass the exported document through the [[http://tools.services.openoffice.org/odfvalidator/][ODF Validator]] and note down
+    the errors.
+
+- Use Emacs' in-built validator
+  1. Switch to =*.odt= buffer =(C-x b whatever.odt)=
+  2. Open the =content.xml= file - =(Hit RET on content.xml)=
+  3. Do a =C-u C-c C-n= - =(M-x rng-first-error)=
+  4. Note the error message, the XML markup at the point of error and
+     the surrounding context.
+
+Once you have identified the error
+1. Create a minimal org file that reproduces the error.
+2. Post a bug-report to =emacs-orgmode@gnu.org=.
 
 * Backup
 
