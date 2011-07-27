@@ -1,4 +1,5 @@
-YUI=~/bin/yuicompressor-2.4.2.jar
+#YUI=~/bin/yuicompressor-2.4.2.jar
+YUI=/usr/share/java/yuicompressor-2.4.6.jar
 
 MINIFY_OTPIONS=	 --preserve-semi --line-break 80
 
