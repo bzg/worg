@@ -356,6 +356,50 @@ options.
       reduces the size of the repository and speeds up data access to
       the objects.
 
+** How do I update the info manual pages to the latest org-mode version?
+   :PROPERTIES:
+   :CUSTOM_ID: update-info-manual-to-latest
+   :END:
+
+   Since org-mode already ships with Emacs, a rather common problem
+   among users is "How do I update the info documentation to the
+   latest version of org-mode?". There are three ways to achieve this:
+
+   1. You can set the =INFOPATH= environment variable in your login
+      script like this:
+
+      #+begin_src shell-script :eval no
+        # ~/.bash_profile
+        export INFOPATH=/path/to/org-mode/info:$INFOPATH
+        ...
+      #+end_src
+
+      =/path/to/org-mode/info= is wherever you install org-mode.
+
+   2. You can achieve the same with elisp like this:
+
+      #+begin_src emacs-lisp :eval no
+        ;; Info directory
+        (add-to-list 'Info-default-directory-list
+                     (expand-file-name "/path/to/org-mode/info"))
+      #+end_src
+
+   3. You can also specify this in the Makefile while installing
+      org-mode like this:
+
+      #+begin_src makefile-gmake :eval no
+        # Where local software is found
+        prefix=/path/to/emacs-root
+        ...
+        # Where info files go.
+        infodir = $(prefix)/share/info
+      #+end_src
+
+      After you install org-mode with =make install=, you can now
+      install the new info files with =make install-info=. Note that
+      this method _overwrites_ the old org-mode info files that is
+      distributed with your version of GNU Emacs.
+
 ** How can I keep local changes and still track Org mode development?
    :PROPERTIES:
    :CUSTOM_ID: keeping-local-changes-current-with-Org-mode-development

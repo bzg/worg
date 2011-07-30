@@ -47,7 +47,36 @@ particular it shows how to implement the following:
    - The sibling also gets the same TRIGGER property
      =chain-siblings-scheduled=, so the chain can continue.
 
-3) If the TRIGGER property contains any other words like
+3) If the TRIGGER property contains the string
+   =chain-find-next(KEYWORD[,OPTIONS])=, then switching that entry
+   to DONE do the following:
+   - All siblings are of the entry are collected into a temporary
+     list and then filtered and sorted according to =OPTIONS=
+   - The first sibling on the list is changed into =KEYWORD= state
+   - The sibling also gets the same TRIGGER property
+     =chain-find-next=, so the chain can continue.
+     
+   OPTIONS should be a comma separated string without spaces, and can
+   contain following options:
+   
+   - =from-top= the candidate list is all of the siblings in the
+     current subtree
+   - =from-bottom= candidate list are all siblings from bottom up
+   - =from-current= candidate list are all siblings from current item
+     until end of subtree, then wrapped around from first sibling
+   - =no-wrap= candidate list are siblings from current one down
+   - =todo-only= Only consider siblings that have a todo keyword
+   - =todo-and-done-only= Same as above but also include done items.
+   - =priority-up=   sort by highest priority
+   - =priority-down= sort by lowest priority
+   - =effort-up=     sort by highest effort
+   - =effort-down=   sort by lowest effort
+
+   There is also customizable variable =org-depend-find-next-options=
+   that contains default options if none are specified. Its default
+   value is =from-current,todo-only,priority-up=
+
+4) If the TRIGGER property contains any other words like
    =XYZ(KEYWORD)=, these are treated as entry IDs with keywords.
    That means, Org-mode will search for an entry with the ID property
    XYZ and switch that entry to KEYWORD as well.
@@ -113,4 +142,45 @@ OK, here is the example.
 ,   :PROPERTIES:
 ,     :ID: XYZ-is-my-id
 ,   :END:
+#+end_src
+
+* Advanced Triggerring Example
+
+In advanced example we will add a hook to automatically insert
+=chain-find-next= TRIGGER when entry is changed to NEXT and 
+automatically remove it otherwise.
+
+First evaluate the following lisp code:
+
+#+begin_src emacs-lisp
+(defun mm/org-insert-trigger ()
+  "Automatically insert chain-find-next trigger when entry becomes NEXT"
+  (cond ((equal state "NEXT")
+         (unless org-depend-doing-chain-find-next
+           (org-set-property "TRIGGER" "chain-find-next(NEXT,from-current,priority-up,effort-down)")))
+        ((not (member state org-done-keywords))
+         (org-delete-property "TRIGGER"))))
+
+(add-hook 'org-after-todo-state-change-hook 'mm/org-insert-trigger)
+#+end_src
+
+Now in the following org file, try changing item TODO state to
+NEXT. You should see properties drawer appear with the TRIGGER
+property inside.
+
+Try marking the NEXT item DONE. The next item should automatically 
+become NEXT. 
+
+Change priority of one of the items to =[#A]=, then mark the NEXT item
+DONE. The highest priority item will automatically become NEXT.
+
+#+begin_src org
+#+TYP_TODO: TODO NEXT | DONE
+
+,* Auto-NEXT example
+,** TODO Make me NEXT, then mark me DONE
+,** TODO Second item
+,** TODO Third item
+,** Plain item
+,** TODO Change my priority
 #+end_src
