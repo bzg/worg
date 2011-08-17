@@ -746,7 +746,7 @@ var org_html_manager = {
 
     // Move the title into the first visible section.
     // TODO: show title above everything if FIXED_TOC !!!
-      t.TITLE = t.PREA.getElementsByTagName("h1")[0];
+    t.TITLE = document.getElementsByClassName("title")[0];
     if(t.INNER_TITLE && !t.FIXED_TOC && t.VIEW != t.SLIDE_VIEW) {
       t.INNER_TITLE = t.TITLE.cloneNode(true);
       /* TODO: this is still based on wrong behaviour of browsers (same id for two elements)
