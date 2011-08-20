@@ -1192,12 +1192,60 @@ headline exactly for this to work.
 
 * Bibliography
 # <<bibliography section>>
+
+LaTeX has its own bibliography management system based on the BibTeX
+software.  The BibTeX software uses an external database of
+bibliographic entries identified by keys.  The user passes the
+bibliographic key to any one of several citation commands at an
+appropriate place in the text and BibTeX replaces it in the output
+with a formatted in-text citation.  It also compiles and typesets a
+list of cited works, ensuring that every work cited in the text
+appears in the list, and that every work that appears in the list is
+cited in the text.
+
+In its standard configuration Org-mode uses the BibTeX software.
+Citation commands can be inserted directly into the Org-mode file,
+e.g.,
+
+: \cite{dominick_10}
+
+and the list of cited works inserted at an appropriate place, e.g.,
+
+: \bibliographystyle{plain}
+: \bibliography{my-bib-db}
+
+where =my-bib-db= is the name of an external bibliographic database,
+and =plain= is a BibTeX style.
+
+In-text citations can be entered by hand, but in practice it quickly
+becomes cumbersome to remember bibliographic keys and to type them
+correctly.  Authors writing in LaTeX typically use the RefTeX
+software, originally written by Carsten Dominick, to select the
+bibliographic key from the external database and to insert it into the
+text with a citation command.  RefTeX can also be used to insert
+citations into the Org-mode document, as detailed in [[http://orgmode.org/worg/org-faq.html#using-reftex-in-org-mode][this FAQ.]]
+
+The =natbib= package extends BibTeX with several convenient in-text
+citation commands.  The commands all start with =cite= and end with
+one or more letters that indicate a style.  The most commonly used
+commands are:
+  1. [[latex:progstruct][citep]] for parenthetical citations, e.g., (Jones, 1958);
+  2. [[latex:progstruct][citet]] for textual citations, e.g., Jones (1958);
+  3. [[latex:progstruct][citealt]] for textual citations without parentheses, e.g. Jones 1958.
+There are starred versions of most commands that will output the full
+author lists rather than use the abbreviation =et. al.=
+
+To use =natbib= place this line in the Org-mode file:
+
+: LATEX_HEADER: \usepackage{natbib}
+
+
+** Biblatex
+
 The [[latex:package][biblatex]] package, which recently emerged from beta status, offers
 support for the full range of citation styles, including the numeric
 styles favored by scientists, the author-date styles used by social
-scientists, and the footnote styles popular in the humanities.  Thanks
-to work by Ali Tofigh and Joost Kremers, it is possible to manage
-citations using the [[http://ebib.sourceforge.net/][ebib]] program for managing BibTeX databases.
+scientists, and the footnote styles popular in the humanities.
 
 You'll need two additions to the LaTeX preamble, one to load biblatex
 and the other to specify the =*.bib= files that hold the BibTeX
@@ -1218,23 +1266,21 @@ Or a footnote style used in the humanities:
 
 : #+LaTeX_HEADER: \usepackage[style=verbose]{biblatex}
 
-** Biblatex support for natbib citations
 
 Biblatex supports the various citation commands implemented by
 [[latex:package][natbib]].
 
 : #+LaTeX_HEADER: \usepackage[natbib]{biblatex}
 
-The commands all start with =cite= and end with one or more letters
-that indicate a style.  The most commonly used commands are:
-  1. [[latex:progstruct][citep]] for parenthetical citations, e.g., (Jones, 1958);
-  2. [[latex:progstruct][citet]] for textual citations, e.g., Jones (1958);
-  3. [[latex:progstruct][citealt]] for textual citations without parentheses, e.g. Jones 1958.
-There are starred versions of most commands that will output the full
-author lists rather than use the abbreviation =et. al.=
+The list of cited works can be placed in the document by adding this
+line to the appropriate place in the Org-mode file:
+
+: \printbibliography
 
 ** Using Ebib and Extended Link Syntax
 
+Thanks to work by Ali Tofigh and Joost Kremers, it is possible to
+manage citations using the [[http://ebib.sourceforge.net/][ebib]] program for managing BibTeX databases.
 Using ebib with Org-mode was the idea of Ali Tofigh, who sent this
 message to the Org-mode list:
 
