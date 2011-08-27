@@ -148,10 +148,12 @@ YAML Front Matter must be the first thing in the file, with
 no blank lines above the Front Matter Section. A typical Front Matter
 Section would look like:
 
+#+begin_example
 ---
 layout: default
 title: My Page Title.
 ---
+#+end_example
 
 So you should ensure that any Front Matter directives come first in
 your org file.
@@ -164,7 +166,7 @@ in your page. See the Jekyll [[http://wiki.github.com/mojombo/jekyll/yaml-front-
 
 Below is a short extract from one of my org files showing my setup:
 
-#+BEGIN_EXAMPLE
+#+BEGIN_EXAMPLE org
 #+STARTUP: showall indent
 #+STARTUP: hidestars
 #+BEGIN_HTML
@@ -230,7 +232,6 @@ folders like:
 
 #+BEGIN_EXAMPLE
 _posts/org/jekyll/howto.html
-
 #+END_EXAMPLE
 
 This would assign your post to the "org" and "jekyll" categories.
@@ -247,17 +248,19 @@ categories:
 Most blogs show the latest posts on their front page. The example
 below shows the title and an excerpt for the five latest posts:
 
-#+BEGIN_EXAMPLE
+#+BEGIN_EXAMPLE html
 <ul class="posts">
 {% for post in site.posts limit: 5 %}
   <div class="post_info">
-    <li><a href="{{ post.url }}">{{ post.title }}</a> <span>({{ post.date | date:"%Y-%m-%d" }})</span></li>
+    <li>
+	    <a href="{{ post.url }}">{{ post.title }}</a>
+	    <span>({{ post.date | date:"%Y-%m-%d" }})</span>
+    </li>
     </br> <em>{{ post.excerpt }} </em>
     </div>
   {% endfor %}
 </ul>
 #+END_EXAMPLE
-
 
 ** Creating Archive Pages
 You will probably only want to display a limited number of blog posts
@@ -265,42 +268,41 @@ on your front page. However, you will also want to make older pages
 available. You can create a simple list of all blog posts using the
 following markup:
 
-#+BEGIN-EXAMPLE
-        <ul>
-          {% for post in site.posts %}
-            <li>
-              <a href="{{ post.url }}" title="{{ post.title }}">
-                <span class="date">
-                  <span class="day">{{ post.date | date: '%d' }}</span> 
-                  <span class="month"><abbr>{{ post.date | date: '%b' }}</abbr></span>
-                  <span class="year">{{ post.date | date: '%Y' }}</span>
-                </span>
-                <span class="title">{{ post.title }}</span>
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-+END_EXAMPLE
+#+begin_example html
+<ul>
+  {% for post in site.posts %}
+  <li>
+    <a href="{{ post.url }}" title="{{ post.title }}">
+      <span class="date">
+        <span class="day">{{ post.date | date: '%d' }}</span>
+        <span class="month"><abbr>{{ post.date | date: '%b' }}</abbr></span>
+        <span class="year">{{ post.date | date: '%Y' }}</span>
+      </span>
+      <span class="title">{{ post.title }}</span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+#+end_example
 
 * Inserting Image
 You will probably want to insert some images into your blog posts. I
 use the following method:
 
-#+BEGIN_EXAMPLE
+#+BEGIN_EXAMPLE html
 <img src ="/images/skiddaw.jpg"
-"alt"="John and Ella on Skiddaw" align ="left" width="300"
-height="250" title="John and Ella on Skiddaw" class="img"</img>
+"alt"="John and Ella on Skiddaw" align="left" width="300" height="250"
+title="John and Ella on Skiddaw" class="img"</img>
 #+END_EXAMPLE
 
 Note that the class attribute refers to the class used to style the
 image tag in your css. My css contains:
 
-#+BEGIN_EXAMPLE
+#+BEGIN_EXAMPLE css
 img {
     margin: 15px;
     border: 1px solid blue;
 }
-
 #+END_EXAMPLE
 
 Note that if you wish to have some space between your image and the
@@ -315,7 +317,7 @@ right of the text is shown below.
 
 In your .org file use the following html to embed the picture:
 
-#+BEGIN_EXAMPLE
+#+BEGIN_EXAMPLE html
 <div class="photofloatr">
   <p><img src="myphoto.jpg" width="300"
     height="150" alt="My Mug Shot"></p>
@@ -325,7 +327,7 @@ In your .org file use the following html to embed the picture:
 
 Now you need to add some information to your style sheet:
 
-#+BEGIN_EXAMPLE
+#+BEGIN_EXAMPLE css
 div.photofloatr {
     float: right;
     border: thin silver solid;
@@ -354,11 +356,14 @@ markup.
 I use this to format my page excerpts, which I include in my org files
 Front Matter markup. So in my sites index.html I have:
 
-#+BEGIN-EXAMPLE
-    <li><a href="{{ post.url }}">{{ post.title }}</a> <span>({{ post.date | date:"%Y-%m-%d" }})</span></li>
-    </br> <em>{{ post.excerpt | textilize}} </em>
-
-#+END-EXAMPLE
+#+begin_example html
+<li>
+  <a href="{{ post.url }}">{{ post.title }}</a>
+  <span>({{ post.date | date:"%Y-%m-%d" }})</span>
+</li>
+</br>
+<em>{{ post.excerpt | textilize}}</em>
+#+end_example
 
 This lets me use textile markup in my page excerpts, which are defined
 in my page's YAML Front Matter section.
