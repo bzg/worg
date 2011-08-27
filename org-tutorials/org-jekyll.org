@@ -31,17 +31,17 @@ Publishing your site with org and Jekyll involves three steps:
 - run Jekyll to convert your html pages exported from org into your
   final site.
 
-By default Jekyll produces its output in the _site directory of
+By default Jekyll produces its output in the =_site= directory of
 Jekyll's working directory. This is a self contained version of your
-site, which can be deployed to your web server. The files in _site are
+site, which can be deployed to your web server. The files in =_site= are
 completely self contained, so all you need to do is to copy them to
 your web server. Methods include using ftp, rsync or a git post commit
 hook. You can configure where Jekyll puts its published files in
-_config.yml.
+=_config.yml=.
 
-Essentially, I am using org to produce everything between the <body>
+Essentially, I am using org to produce everything between the =<body>=
 tags on the page and Jekyll to produce the rest. Note that you can
-easily embed html content in your org pages using the +BEGIN_HTML tag.
+easily embed html content in your org pages using the =+BEGIN_HTML= tag.
 
 * Install Jekyll
 
@@ -49,15 +49,15 @@ Installation is described at the [[http://github.com/mojombo/jekyll][Jekyll]] we
 
 * Project Directory Structure
 Jekyll expects a certain directory structure. In the example below my
-Jekyll project is in a directory called "jekyll". Blog posts are in
-"_posts" and the layout templates in "_layouts". The "_includes"
+Jekyll project is in a directory called =jekyll=. Blog posts are in
+=_posts= and the layout templates in =_layouts=. The =_includes=
 directory is for files containing code you want to include in other
 pages e.g. a header or sidebar.
 
-The file _config.yml is a YAML file that contains Jekyll's
+The file =_config.yml= is a YAML file that contains Jekyll's
 configuration for the site.
 
-In addition to the "_posts" directory you can create other directories
+In addition to the =_posts= directory you can create other directories
 to hold different non blog parts of your site.
 
 #+BEGIN_EXAMPLE
@@ -92,9 +92,10 @@ The fundamentals of publishing html are described on [[http://orgmode.org/worg/o
 assuming that you have a basic working org publishing setup. By
 default org produces complete web pages. However, as I am using Jekyll
 I am only really interested in the section of the page between the
-<body> tags, as Jekyll produces the rest. Most things in org are
+=<body>= tags, as Jekyll produces the rest. Most things in org are
 configurable and it's possible to tell org to export only the bits of
-the page between the <body> tags. Here is the relevant section of my .emacs:
+the page between the =<body>= tags. Here is the relevant section of my 
+=.emacs= file:
 
 #+BEGIN_SRC emacs-lisp
 (setq org-publish-project-alist
@@ -127,7 +128,7 @@ the page between the <body> tags. Here is the relevant section of my .emacs:
 ))
 #+END_SRC
 
-To export my site I just run "C-c e X ian".
+To export my site I just run =C-c e X ian=.
 
 You need to set the destination of your exported files to your Jekyll
 project directory. Assuming you have set up your org directory
@@ -139,8 +140,8 @@ When you run Jekyll it processes the source files for your site and
 any files with YAML Front Matter are subject to special processing. The
 Front Matter is used to tell Jekyll how to format your page.
 
-Bear in mind that Jekyll doesn't process your .org files, but the
-.html files produced by exporting. So when writing an org file it
+Bear in mind that Jekyll doesn't process your =.org= files, but the
+=.html= files produced by exporting. So when writing an org file it
 should be formatted in such a way that when exported it produces html
 suitable for processing by Jekyll.
 
@@ -158,10 +159,10 @@ title: My Page Title.
 So you should ensure that any Front Matter directives come first in
 your org file.
 
-Note that the three hyphens "---" are part of the markup and are
-required. The layout tag tells Jekyll which layout from its _layouts
+Note that the three hyphens =---= are part of the markup and are
+required. The layout tag tells Jekyll which layout from its =_layouts=
 directory should be used to format your page. You can include any
-other keys in the Front Matter section (e.g. title:), which you can use
+other keys in the Front Matter section (e.g. =title:=), which you can use
 in your page. See the Jekyll [[http://wiki.github.com/mojombo/jekyll/yaml-front-matter][wiki]] for more details on Front Matter.
 
 Below is a short extract from one of my org files showing my setup:
@@ -179,16 +180,16 @@ excerpt: An unplanned bivouac on Ben Nevis.
 It was early January when six of us travelled up to ....
 #+END_EXAMPLE
 
-The Front Matter section is wrapped in #+BEGIN_HTML so it is exported
+The Front Matter section is wrapped in =#+BEGIN_HTML= so it is exported
 literally to the final html file. You may need to upgrade your org
 version as older versions produced two blank lines before the Front
 Matter section when exported. You can define your own Front Matter keys and use
 them within your generated page. In the above example I use the
 "excerpt" key to display "teasers" for a blog post.
 
-Note that the current git version of org removes the first "---" if the
+Note that the current git version of org removes the first =---= if the
 directory containing the file start with an underscore. The workaround
-is to start your file with "---" in both the first two lines.
+is to start your file with =---= in both the first two lines.
 
 Carsten has also provided two hooks that are run after exporting is
 complete, which can also be used to tidy up the output:
@@ -200,13 +201,13 @@ org-publish-after-export-hook   (when going through org-publish)
 
 Once you have exported your org project to html it's simply a matter
 of running jekyll to produce the final output. By default Jekyll puts
-its output in the _site directory of your project, but you can
-customize this in your _config.yml file.
+its output in the =_site= directory of your project, but you can
+customize this in your =_config.yml= file.
 
 * Blogging with Jekyll and Org
 
 Jekyll has built in support for blogging. Anything you place in the
-_posts directory of your Jekyll project is considered as a blog
+=_posts= directory of your Jekyll project is considered as a blog
 post. However, the file names of your posts must adhere to the
 following format:
 
@@ -215,9 +216,9 @@ yyyy-mm-dd-post_name.html
 #+END_EXAMPLE
 
 To write a post just create a new file with the correct filename in
-your org/_posts directory. You may find that Yasnippet is useful for
+your =org/_posts= directory. You may find that Yasnippet is useful for
 inserting Front Matter and other directives in your org file. When you
-have finished just run C-c e X project_name to export your org project
+have finished just run =C-c e X= project_name to export your org project
 as html and then run jekyll to generate your site.
 
 You can use Jekyll's [[http://wiki.github.com/mojombo/jekyll/template-data][template]] markup to decide how your blog posts are
@@ -234,7 +235,7 @@ folders like:
 _posts/org/jekyll/howto.html
 #+END_EXAMPLE
 
-This would assign your post to the "org" and "jekyll" categories.
+This would assign your post to the /org/ and /jekyll/ categories.
 
 or by using YAML markup in your org file:
 
@@ -343,7 +344,7 @@ div.photofloatr p {
 }
 #+END_EXAMPLE
 
-A third method, which I haven't tried myself, is to use the jQuery EXIF
+A third method, which I haven't tried myself, is to use the /jQuery EXIF/
 plugin to extract the caption from the image EXIF data and use
 Javascript to display it. See [[http://www.nihilogic.dk/labs/exif/][here]] for  more details.
 
