@@ -896,7 +896,7 @@ discourages the use of vertical rules; they are superfluous in an
 otherwise well-designed table.
 
 The LaTeX exporter currently uses rules of the same width everywhere
-in a table.  It is possible to get book quality tables
+in a table.  It is possible to get book quality tables.
 
 The following steps assume that the =org-babel-load-languages=
 variable has an entry =(latex . t)= and that functions in the Library
@@ -923,7 +923,7 @@ Finally, create a LaTeX source block something like this:
 :   \footnotesize
 :   \caption{A table to test booktabs}
 :   \label{tab:test-table}
-:   <<booktabs(table=test-table,align="lrl",env="tabular")>>  
+:   <<booktabs(table=test-table,align="lrX",env="tabularx")>>  
 :   \end{table}
 :  #+end_src
 
@@ -932,9 +932,61 @@ When you export the file to LaTeX, this code block is expanded in a
 If the table has column heads, then the rule beneath them should be
 finer than the rules at the top and bottom of the table.
 
+** Notes in tables
+
+In a better world, the LaTeX =footnote= command would work inside a
+=tabular= environment, setting the notes at the end of the table. The
+current situation is described in the
+[[http://www.tex.ac.uk/cgi-bin/texfaq2html?label%3Dfootintab][TeX
+FAQ]].  A manual solution is possible, and can be implemented in
+Org-mode as follows.
+
+First, define a counter that uses table note marks (asterisk, dagger,
+pilcrow, etc.) and a command to use it.  Here is an example:
+
+: #+LaTeX_HEADER: \newcounter{my@fn}
+: #+LaTeX_HEADER: \newcommand{\fn}[1]{\setcounter{my@fn}{#1}\textsuperscript{\fnsymbol{my@fn}}}
+
+Then use a LaTeX source block that calls =booktabs-notes= from the
+Library of Babel.
+
+: #+begin_src latex :exports results :results latex
+:   \begin{table}[htb!]
+:     \centering
+:     \footnotesize
+:     \caption{The table caption without Org-mode markup}
+:     \label{tab:dates}
+:     <<booktabs-notes(table=dates,notes=dates-fn,lspace=t,align="rcr",env="tabular")>>  
+:   \end{table}
+: #+end_src
+
+This works like =booktabs= (see [[Table%20Rules][Table Rules]]),
+except it accepts a second Org-mode table that contains the table
+notes.  Remember that both of these Org-mode tables are sent to
+=orgtbl-to-generic= so Org-mode markup within them won't give the
+results you might expect.  Instead, the table entries use LaTeX
+markup. 
+
+: #+tblname: dates
+: | One\fn{1} | Two\fn{2} | Three\fn{3} |
+: |-----------+------------+-------------|
+: | A         | B          | C           |
+: | D         | E          | F           |
+
+: #+tblname: dates-fn
+: | \multicolumn{3}{l}{\fn{1} A table note.}               |
+: | \multicolumn{3}{l}{\fn{2} Another table note.}         |
+: | \multicolumn{3}{l}{\fn{3} The \emph{last} table note.} |
+
+
+There is also a switch, =lspace=, which if set non-nil calls the
+=addlinespace= command from the =booktabs= package after the
+=bottomrule= that separates the table body from the notes.
+
 ** Changing font size
 Tables often benefit from a smaller font size than the body text of a
-document.  A discussion on the Org-mode list yielded two solutions,
+document.  However, Org-mode doesn't offer a way to change the font
+size in a table.  A discussion on the Org-mode list yielded two solutions,
 one of which makes a setting for all the tables in the Org-mode
 document and another that is used on individual tables.
 
@@ -942,9 +994,9 @@ The first solution, offered by Nick Dokos, uses a LaTeX style file,
 illustrated here with =scripttab.sty=.  This style file sets all the
 tables in the document with the same size font.  The command
 =\scriptsize= yields a very small font; the particular size is
-determined by the font size of =\normalsize=.  Note that =\scriptsize=
-can be replaced by another legal LaTeX font size, such as
-=\footnotesize= or =\small=.
+determined in LaTeX by the font size of =\normalsize=.  Note that
+=\scriptsize= can be replaced by another legal LaTeX font size, such
+as =\footnotesize= or =\small=.
 
 #+source: scripttab
 #+begin_src latex :exports code
@@ -963,10 +1015,11 @@ the Org-mode file:
 : #+LaTeX_HEADER: \usepackage{scripttab}
 
 A second approach, which sets the font size for an individual table
-with the =#+ATTR_LaTeX= line, was proposed by Suvayu Ali. This solution is
-documented on [[http://orgmode.org/worg/org-hacks.html#latex-command-for-floats][Org ad hoc code, quick hacks and workarounds]]. Any LaTeX
-command that works inside the table environment can be passed in this
-way.
+with the =#+ATTR_LaTeX= line, was proposed by Suvayu Ali. This
+solution is documented on
+[[http://orgmode.org/worg/org-hacks.html#latex-command-for-floats][Org
+ad hoc code, quick hacks and workarounds]]. Any LaTeX command that
+works inside the table environment can be passed in this way.
 
 * Exporting Lists
 LaTeX typically sets lists as displayed material, outside of normal
