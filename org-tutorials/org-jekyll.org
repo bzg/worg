@@ -3,8 +3,9 @@
 #+EMAIL: ian@manor-farm.org
 #+LANGUAGE: en
 #+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:nil -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
-#+STARTUP:    hidestars 
+#+STARTUP:    hidestars
 
+[[file:index.org][{Back to Worg's index}]]
 
 * Introduction
 [[http://wiki.github.com/mojombo/jekyll][Jekyll]] is a static web site generator written in Ruby. It can
@@ -24,11 +25,11 @@ over the final appearance of your site.
 
 Publishing your site with org and Jekyll involves three steps:
 
-- write your page content using org.
+1) write your page content using org.
 
-- use org to export your pages to html in the Jekyll project directory.
+2) use org to export your pages to html in the Jekyll project directory.
 
-- run Jekyll to convert your html pages exported from org into your
+3) run Jekyll to convert your html pages exported from org into your
   final site.
 
 By default Jekyll produces its output in the =_site= directory of
@@ -79,7 +80,6 @@ to hold different non blog parts of your site.
 `    -- index.html
 #+END_EXAMPLE
 
-
 You should setup the directory structure of your org files to mirror
 that of the Jekyll project. Then when you export your org files as
 html the files will end up in the correct place in your Jekyll
@@ -88,7 +88,8 @@ directory about the Jekyll project directory to make sure that Jekyll
 doesn't consider .org files to be part of its project.
 
 * Configuring org html Export
-The fundamentals of publishing html are described on [[http://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html][worg]]. I am
+The fundamentals of publishing html are described in the
+[[http://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html][HTML publishing tutorial]] on worg. I am
 assuming that you have a basic working org publishing setup. By
 default org produces complete web pages. However, as I am using Jekyll
 I am only really interested in the section of the page between the
@@ -206,7 +207,7 @@ customize this in your =_config.yml= file.
 
 * Blogging with Jekyll and Org
 
-Jekyll has built in support for blogging. Anything you place in the
+Jekyll has built-in support for blogging. Anything you place in the
 =_posts= directory of your Jekyll project is considered as a blog
 post. However, the file names of your posts must adhere to the
 following format:
@@ -226,7 +227,7 @@ displayed. On the Jekyll [[http://wiki.github.com/mojombo/jekyll/sites][sites]] 
 listed, so you can study how other people use the markup to create
 their blog. You can also view my site http://www.ian-barton.com and
 see a snapshot of the source at
-http://github.com/geekinthesticks/ianbarton .
+http://github.com/geekinthesticks/ianbarton.
 
 You can assign categories to your posts either by placing posts inside
 folders like:
@@ -292,7 +293,7 @@ use the following method:
 
 #+BEGIN_EXAMPLE html
 <img src ="/images/skiddaw.jpg"
-"alt"="John and Ella on Skiddaw" align="left" width="300" height="250"
+alt="John and Ella on Skiddaw" align="left" width="300" height="250"
 title="John and Ella on Skiddaw" class="img"</img>
 #+END_EXAMPLE
 
@@ -316,7 +317,7 @@ to provide an easy way to display image captions. I decided to use the
 method described [[http://www.w3.org/Style/Examples/007/figures][here]]. An example from of floating a picture to the
 right of the text is shown below.
 
-In your .org file use the following html to embed the picture:
+In your =.org= file use the following html to embed the picture:
 
 #+BEGIN_EXAMPLE html
 <div class="photofloatr">
@@ -346,7 +347,7 @@ div.photofloatr p {
 
 A third method, which I haven't tried myself, is to use the /jQuery EXIF/
 plugin to extract the caption from the image EXIF data and use
-Javascript to display it. See [[http://www.nihilogic.dk/labs/exif/][here]] for  more details.
+Javascript to display it. See [[http://www.nihilogic.dk/labs/exif/][here]] for more details.
 
 * Using Text Markup in Front Matte
 By default text in the Front Matter part of your file isn't processed
@@ -374,16 +375,19 @@ Jekyll is amenable to using version control systems. If you follow my
 suggested directory structure you can create a git repo to your top
 level directory. You can then create a post-commit script that runs
 the org html export and then runs Jekyll to generate your site.
+
 * HappyBlogger's Jekyll Modification
 Bjørn Arild Mæland has created some modifications to Jekyll to
 provide some pre-processing to org files to allow for better
 integration with Jekyll. You can find his code on [[http://github.com/bmaland/happyblogger][github]].
+
 * Another example of Org-mode/Jekyll usage
 The on-line documentation for [[file:../org-contrib/babel/index.org][Org-babel]] development is published on
 [[http://github.com][github]] which uses jekyll.  The following code is used to publish one
 blog post for every subheading of the first to top-level headings of a
 org file which tracks Org-babel development.  The results can be seen
 [[http://eschulte.github.com/babel-dev/][here]], and the code used to create this site is available [[http://github.com/eschulte/babel-dev/][here]].
+
 #+begin_src emacs-lisp
   (save-excursion
     ;; map over all tasks entries
@@ -435,9 +439,11 @@ org file which tracks Org-babel development.  The results can be seen
 #+end_src
 
 * Other Blog Solutions for org
+
 ** Blorgit
 [[http://orgmode.org/worg/blorgit.html][Blorgit]] uses org mode for markup and runs on the Sinatra mini
 framework. It is amenable to using git for posting and maintenance.
+
 ** ikiwiki
 [[http://ikiwiki.info/][ikiwiki]] is a web site compiler written in Perl. In many ways it is
 similar to Jekyll, but has closer integration with version control
