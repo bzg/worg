@@ -859,6 +859,31 @@ When this example is exported, both source code blocks are typeset
 without any semantic markup, which would be specified by element,
 rather than with a style as with the minted package.
 * Exporting Tables
+There are several ways to prepare a table in Org-mode for export to
+LaTeX.  Perhaps the easiest is to supply the Org-mode table with a
+caption and a label:
+
+: #+CAPTION: [Short caption]{Long caption}
+: #+LABEL: tab:my-table
+
+This has the great advantage of exporting cleanly to HTML, ASCII, and
+other backends, but the amount of control over the results is somewhat
+limited. 
+
+At the other extreme, you can create an arbitrarily complex LaTeX
+table and wrap it in =#+BEGIN_LATEX:= ... =#+END_LATEX:=.  This will
+give you complete control over the LaTeX export, but leave you high
+and dry for export to other backends and deprive you of the pleasure
+of building a table with the facilities provided by Org-mode.
+
+A middle ground passes one or more Org-mode tables to a Babel source
+block, which uses =orgtbl-to-generic= to set the table.  Currently,
+the entries in the Library of Babel convert only to LaTeX.  This
+approach lets you compose tables in Org-mode but currently requires
+entries in the table to be marked up with LaTeX, rather than Org-mode
+conventions.
+
+** How LaTeX typesets tables
 LaTeX divides table handling into two parts: typesetting the actual
 table, and placing the table on the page along with a caption and
 cross-reference information.
