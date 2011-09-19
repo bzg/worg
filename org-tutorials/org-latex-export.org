@@ -370,7 +370,9 @@ example above uses Babel to set the variable on a per-file basis.
 
 An alternative to the default TeX engine is [[http://scripts.sil.org/cms/scripts/page.php?site_id%3Dnrsi&id%3Dxetex][XeTeX]], which merges TeX
 with Unicode and modern font technologies.  The Emacs-Fu blog has an
-[[http://emacs-fu.blogspot.com/2011/04/nice-looking-pdfs-with-org-mode-and.html][example XeTeX setup for Org-mode]].
+[[http://emacs-fu.blogspot.com/2011/04/nice-looking-pdfs-with-org-mode-and.html][example XeTeX setup for Org-mode]].  There is also an entry in the
+Org-Mode FAQ entitled [[http://orgmode.org/worg/org-faq.html#using-xelatex-for-pdf-export][How can I use XeLaTeX for LaTeX export instead
+of pdfLaTeX?]]
 
 * Exporting Parts of an Org-mode Buffer
 Tags can be used to select which parts of an Org-mode buffer are sent
@@ -857,6 +859,31 @@ When this example is exported, both source code blocks are typeset
 without any semantic markup, which would be specified by element,
 rather than with a style as with the minted package.
 * Exporting Tables
+There are several ways to prepare a table in Org-mode for export to
+LaTeX.  Perhaps the easiest is to supply the Org-mode table with a
+caption and a label:
+
+: #+CAPTION: [Short caption]{Long caption}
+: #+LABEL: tab:my-table
+
+This has the great advantage of exporting cleanly to HTML, ASCII, and
+other backends, but the amount of control over the results is somewhat
+limited. 
+
+At the other extreme, you can create an arbitrarily complex LaTeX
+table and wrap it in =#+BEGIN_LATEX:= ... =#+END_LATEX:=.  This will
+give you complete control over the LaTeX export, but leave you high
+and dry for export to other backends and deprive you of the pleasure
+of building a table with the facilities provided by Org-mode.
+
+A middle ground passes one or more Org-mode tables to a Babel source
+block, which uses =orgtbl-to-generic= to set the table.  Currently,
+the entries in the Library of Babel convert only to LaTeX.  This
+approach lets you compose tables in Org-mode but currently requires
+entries in the table to be marked up with LaTeX, rather than Org-mode
+conventions.
+
+** How LaTeX typesets tables
 LaTeX divides table handling into two parts: typesetting the actual
 table, and placing the table on the page along with a caption and
 cross-reference information.
@@ -894,7 +921,7 @@ discourages the use of vertical rules; they are superfluous in an
 otherwise well-designed table.
 
 The LaTeX exporter currently uses rules of the same width everywhere
-in a table.  It is possible to get book quality tables
+in a table.  It is possible to get book quality tables.
 
 The following steps assume that the =org-babel-load-languages=
 variable has an entry =(latex . t)= and that functions in the Library
@@ -921,7 +948,7 @@ Finally, create a LaTeX source block something like this:
 :   \footnotesize
 :   \caption{A table to test booktabs}
 :   \label{tab:test-table}
-:   <<booktabs(table=test-table,align="lrl",env="tabular")>>  
+:   <<booktabs(table=test-table,align="lrX",env="tabularx")>>  
 :   \end{table}
 :  #+end_src
 
@@ -930,9 +957,61 @@ When you export the file to LaTeX, this code block is expanded in a
 If the table has column heads, then the rule beneath them should be
 finer than the rules at the top and bottom of the table.
 
+** Notes in tables
+
+In a better world, the LaTeX =footnote= command would work inside a
+=tabular= environment, setting the notes at the end of the table. The
+current situation is described in the
+[[http://www.tex.ac.uk/cgi-bin/texfaq2html?label%3Dfootintab][TeX
+FAQ]].  A manual solution is possible, and can be implemented in
+Org-mode as follows.
+
+First, define a counter that uses table note marks (asterisk, dagger,
+pilcrow, etc.) and a command to use it.  Here is an example:
+
+: #+LaTeX_HEADER: \newcounter{my@fn}
+: #+LaTeX_HEADER: \newcommand{\fn}[1]{\setcounter{my@fn}{#1}\textsuperscript{\fnsymbol{my@fn}}}
+
+Then use a LaTeX source block that calls =booktabs-notes= from the
+Library of Babel.
+
+: #+begin_src latex :exports results :results latex
+:   \begin{table}[htb!]
+:     \centering
+:     \footnotesize
+:     \caption{The table caption without Org-mode markup}
+:     \label{tab:dates}
+:     <<booktabs-notes(table=dates,notes=dates-fn,lspace=t,align="rcr",env="tabular")>>  
+:   \end{table}
+: #+end_src
+
+This works like =booktabs= (see [[Table%20Rules][Table Rules]]),
+except it accepts a second Org-mode table that contains the table
+notes.  Remember that both of these Org-mode tables are sent to
+=orgtbl-to-generic= so Org-mode markup within them won't give the
+results you might expect.  Instead, the table entries use LaTeX
+markup. 
+
+: #+tblname: dates
+: | One\fn{1} | Two\fn{2} | Three\fn{3} |
+: |-----------+------------+-------------|
+: | A         | B          | C           |
+: | D         | E          | F           |
+
+: #+tblname: dates-fn
+: | \multicolumn{3}{l}{\fn{1} A table note.}               |
+: | \multicolumn{3}{l}{\fn{2} Another table note.}         |
+: | \multicolumn{3}{l}{\fn{3} The \emph{last} table note.} |
+
+
+There is also a switch, =lspace=, which if set non-nil calls the
+=addlinespace= command from the =booktabs= package after the
+=bottomrule= that separates the table body from the notes.
+
 ** Changing font size
 Tables often benefit from a smaller font size than the body text of a
-document.  A discussion on the Org-mode list yielded two solutions,
+document.  However, Org-mode doesn't offer a way to change the font
+size in a table.  A discussion on the Org-mode list yielded two solutions,
 one of which makes a setting for all the tables in the Org-mode
 document and another that is used on individual tables.
 
@@ -940,9 +1019,9 @@ The first solution, offered by Nick Dokos, uses a LaTeX style file,
 illustrated here with =scripttab.sty=.  This style file sets all the
 tables in the document with the same size font.  The command
 =\scriptsize= yields a very small font; the particular size is
-determined by the font size of =\normalsize=.  Note that =\scriptsize=
-can be replaced by another legal LaTeX font size, such as
-=\footnotesize= or =\small=.
+determined in LaTeX by the font size of =\normalsize=.  Note that
+=\scriptsize= can be replaced by another legal LaTeX font size, such
+as =\footnotesize= or =\small=.
 
 #+source: scripttab
 #+begin_src latex :exports code
@@ -961,10 +1040,11 @@ the Org-mode file:
 : #+LaTeX_HEADER: \usepackage{scripttab}
 
 A second approach, which sets the font size for an individual table
-with the =#+ATTR_LaTeX= line, was proposed by Suvayu Ali. This solution is
-documented on [[http://orgmode.org/worg/org-hacks.html#latex-command-for-floats][Org ad hoc code, quick hacks and workarounds]]. Any LaTeX
-command that works inside the table environment can be passed in this
-way.
+with the =#+ATTR_LaTeX= line, was proposed by Suvayu Ali. This
+solution is documented on
+[[http://orgmode.org/worg/org-hacks.html#latex-command-for-floats][Org
+ad hoc code, quick hacks and workarounds]]. Any LaTeX command that
+works inside the table environment can be passed in this way.
 
 * Exporting Lists
 LaTeX typically sets lists as displayed material, outside of normal
@@ -1190,12 +1270,61 @@ headline exactly for this to work.
 
 * Bibliography
 # <<bibliography section>>
+
+LaTeX has its own bibliography management system based on the BibTeX
+software.  The BibTeX software uses an external database of
+bibliographic entries identified by keys.  The user passes the
+bibliographic key to any one of several citation commands at an
+appropriate place in the text and BibTeX replaces it in the output
+with a formatted in-text citation.  It also compiles and typesets a
+list of cited works, ensuring that every work cited in the text
+appears in the list, and that every work that appears in the list is
+cited in the text.
+
+In its standard configuration Org-mode uses the BibTeX software.
+Citation commands can be inserted directly into the Org-mode file,
+e.g.,
+
+: \cite{dominick_10}
+
+and the list of cited works inserted at an appropriate place, e.g.,
+
+: \bibliographystyle{plain}
+: \bibliography{my-bib-db}
+
+where =my-bib-db= is the name of an external bibliographic database,
+and =plain= is a BibTeX style.
+
+In-text citations can be entered by hand, but in practice it quickly
+becomes cumbersome to remember bibliographic keys and to type them
+correctly.  Authors writing in LaTeX typically use the RefTeX
+software, originally written by Carsten Dominick, to select the
+bibliographic key from the external database and to insert it into the
+text with a citation command.  RefTeX can also be used to insert
+citations into the Org-mode document, as detailed in [[http://orgmode.org/worg/org-faq.html#using-reftex-in-org-mode][this FAQ.]]  A more
+detailed setup that associates reading notes with BibTeX
+bibliographic entries is described in this [[http://article.gmane.org/gmane.emacs.orgmode/2406/match%3Dbibliography][post to the Org-mode list.]]
+
+The =natbib= package extends BibTeX with several convenient in-text
+citation commands.  The commands all start with =cite= and end with
+one or more letters that indicate a style.  The most commonly used
+commands are:
+  1. =\citep= for parenthetical citations, e.g., (Jones, 1958);
+  2. =\citet= for textual citations, e.g., Jones (1958);
+  3. =\citealt= for textual citations without parentheses, e.g. Jones 1958.
+There are starred versions of most commands that will output the full
+author lists rather than use the abbreviation =et. al.=
+
+To use =natbib= place this line in the Org-mode file:
+
+: LATEX_HEADER: \usepackage{natbib}
+
+** Biblatex
+
 The [[latex:package][biblatex]] package, which recently emerged from beta status, offers
 support for the full range of citation styles, including the numeric
 styles favored by scientists, the author-date styles used by social
-scientists, and the footnote styles popular in the humanities.  Thanks
-to work by Ali Tofigh and Joost Kremers, it is possible to manage
-citations using the [[http://ebib.sourceforge.net/][ebib]] program for managing BibTeX databases.
+scientists, and the footnote styles popular in the humanities.
 
 You'll need two additions to the LaTeX preamble, one to load biblatex
 and the other to specify the =*.bib= files that hold the BibTeX
@@ -1216,23 +1345,21 @@ Or a footnote style used in the humanities:
 
 : #+LaTeX_HEADER: \usepackage[style=verbose]{biblatex}
 
-** Biblatex support for natbib citations
 
 Biblatex supports the various citation commands implemented by
 [[latex:package][natbib]].
 
 : #+LaTeX_HEADER: \usepackage[natbib]{biblatex}
 
-The commands all start with =cite= and end with one or more letters
-that indicate a style.  The most commonly used commands are:
-  1. [[latex:progstruct][citep]] for parenthetical citations, e.g., (Jones, 1958);
-  2. [[latex:progstruct][citet]] for textual citations, e.g., Jones (1958);
-  3. [[latex:progstruct][citealt]] for textual citations without parentheses, e.g. Jones 1958.
-There are starred versions of most commands that will output the full
-author lists rather than use the abbreviation =et. al.=
+The list of cited works can be placed in the document by adding this
+line to the appropriate place in the Org-mode file:
+
+: \printbibliography
 
 ** Using Ebib and Extended Link Syntax
 
+Thanks to work by Ali Tofigh and Joost Kremers, it is possible to
+manage citations using the [[http://ebib.sourceforge.net/][ebib]] program for managing BibTeX databases.
 Using ebib with Org-mode was the idea of Ali Tofigh, who sent this
 message to the Org-mode list:
 
@@ -1613,7 +1740,6 @@ ship with biblatex.
       ((eq format 'latex)
        (format "\\cite*{%s}" path)))))
 #+end_src
-
 
 * Footnotes
 

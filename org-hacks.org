@@ -1111,6 +1111,28 @@ changed.
     ad-do-it))
 (ad-activate 'org-refile)
 #+end_src
+*** Use an "attach" link type to open files without worrying about their location
+
+-- Darlan Cavalcante Moreira
+
+In the setup part in my org-files I put:
+
+#+begin_src org
+  ,#+LINK: attach elisp:(org-open-file (org-attach-expand "%s"))
+#+end_src org
+
+Now I can use the "attach" link type, but org will ask me if I want to
+allow executing the elisp code.  To avoid this you can even set
+org-confirm-elisp-link-function to nil (I don't like this because it allows
+any elisp code in links) or you can set org-confirm-elisp-link-not-regexp
+appropriately.
+
+In my case I use
+
+: (setq org-confirm-elisp-link-not-regexp "org-open-file")
+
+This works very well.
+
 ** Org Agenda and Task Management
 *** Make it easier to set org-agenda-files from multiple directories
 - Matt Lundin
@@ -1596,6 +1618,34 @@ workaround, one can use the following:
   ,#+LATEX: }
 #+end_src
 
+*** Styling code sections with CSS
+
+Code sections (marked with =#+begin_src= and =#+end_src=) are exported
+to HTML using =<pre>= tags, and assigned CSS classes by their content
+type.  For example, Perl content will have an opening tag like
+=<pre class="src src-perl">=.  You can use those classes to add styling
+to the output, such as here where a small language tag is added at the
+top of each kind of code box:
+
+#+begin_src lisp
+(setq org-export-html-style
+ "<style type=\"text/css\">
+    <!--/*--><![CDATA[/*><!--*/
+      .src             { background-color: #F5FFF5; position: relative; overflow: visible; }
+      .src:before      { position: absolute; top: -15px; background: #ffffff; padding: 1px; border: 1px solid #000000; font-size: small; }
+      .src-sh:before   { content: 'sh'; }
+      .src-bash:before { content: 'sh'; }
+      .src-R:before    { content: 'R'; }
+      .src-perl:before { content: 'Perl'; }
+      .src-sql:before  { content: 'SQL'; }
+      .example         { background-color: #FFF5F5; }
+    /*]]>*/-->
+ </style>")
+#+end_src
+
+Additionally, we use color to distinguish code output (the =.example=
+class) from input (all the =.src-*= classes).
+
 * Hacking Org: Working with Org-mode and other Emacs Packages.
 ** org-remember-anything
 
@@ -1630,7 +1680,7 @@ Fix a problem with saveplace.el putting you back in a folded position:
 #+end_src
 
 ** Using ido-completing-read to find attachments
--- Matt Lundin
+-- Matt Lundin.
 
 Org-attach is great for quickly linking files to a project. But if you
 use org-attach extensively you might find yourself wanting to browse
