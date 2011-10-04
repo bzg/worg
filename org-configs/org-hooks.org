@@ -29,6 +29,11 @@ Defined in: /org.el/
 #+begin_example
     Hook that is run after org.el has been loaded.
 #+end_example
+** =org-log-buffer-setup-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook that is run after an Org log buffer is created.
+#+end_example
 ** =org-pre-cycle-hook=
 Defined in: /org.el/
 #+begin_example
@@ -371,34 +376,8 @@ Defined in: /org.el/
     
     (defvar org-agenda-headline-snapshot-before-repeat)
     
-    (defun org-todo (&optional arg)
-      "Change the TODO state of an item.
-    The state of an item is given by a keyword at the start of the heading,
-    like
-         *** TODO Write paper
-         *** DONE Call mom
-    
-    The different keywords are specified in the variable `org-todo-keywords'.
-    By default the available states are \"TODO\" and \"DONE\".
-    So for this example: when the item starts with TODO, it is changed to DONE.
-    When it starts with DONE, the DONE is removed.  And when neither TODO nor
-    DONE are present, add TODO at the beginning of the heading.
-    
-    With \\[universal-argument] prefix arg, use completion to determine the new \
-    state.
-    With numeric prefix arg, switch to that state.
-    With a double \\[universal-argument] prefix, switch to the next set of TODO \
-    keywords (nextset).
-    With a triple \\[universal-argument] prefix, circumvent any state blocking.
-    
-    For calling through lisp, arg is also interpreted in the following way:
-    'none             -> empty state
-    \"\"(empty string)  -> switch to empty state
-    'done             -> switch to DONE
-    'nextset          -> switch to the next set of keywords
-    'previousset      -> switch to the previous set of keywords
-    \"WAITING\"         -> switch to the specified keyword, but only if it
-                         really is a member of `org-todo-keywords'.
+    (defun org-current-effective-time ()
+      "Return current time adjusted for `org-extend-today-until' variable
 #+end_example
 ** =org-after-todo-statistics-hook=
 Defined in: /org.el/
@@ -436,6 +415,17 @@ Defined in: /org.el/
     Each hook function should accept two arguments, the name of the property
     and the new value.
 #+end_example
+** =org-property-set-functions=
+Defined in: /org.el/
+#+begin_example
+    Property set function alist.
+    Each entry should have the following format:
+    
+     (PROPERTY . READ-FUNCTION)
+    
+    The read function will be called with the same argument as
+    `org-completing-read'.
+#+end_example
 ** =org-property-allowed-value-functions=
 Defined in: /org.el/
 #+begin_example
@@ -458,22 +448,41 @@ Defined in: /org.el/
     which is also a `self-insert-command' from the global map.
     
     Within the hook, examine the cursor position and the command key
-    and return nil or a valid handler as appropriate. Handler could
+    and return nil or a valid handler as appropriate.  Handler could
     be one of an interactive command, a function, or a form.
     
     Set `org-use-speed-commands' to non-nil value to enable this
-    hook. The default setting is `org-speed-command-default-hook'.
+    hook.  The default setting is `org-speed-command-default-hook'.
 #+end_example
 ** =org-ctrl-c-ctrl-c-hook=
 Defined in: /org.el/
 #+begin_example
-    Hook for functions attaching themselves to  `C-c C-c'.
-    This can be used to add additional functionality to the C-c C-c key which
-    executes context-dependent commands.
-    Each function will be called with no arguments.  The function must check
-    if the context is appropriate for it to act.  If yes, it should do its
-    thing and then return a non-nil value.  If the context is wrong,
-    just do nothing and return nil.
+    Hook for functions attaching themselves to `C-c C-c'.
+    
+    This can be used to add additional functionality to the C-c C-c
+    key which executes context-dependent commands.  This hook is run
+    before any other test, while `org-ctrl-c-ctrl-c-final-hook' is
+    run after the last test.
+    
+    Each function will be called with no arguments.  The function
+    must check if the context is appropriate for it to act.  If yes,
+    it should do its thing and then return a non-nil value.  If the
+    context is wrong, just do nothing and return nil.
+#+end_example
+** =org-ctrl-c-ctrl-c-final-hook=
+Defined in: /org.el/
+#+begin_example
+    Hook for functions attaching themselves to `C-c C-c'.
+    
+    This can be used to add additional functionality to the C-c C-c
+    key which executes context-dependent commands.  This hook is run
+    after any other test, while `org-ctrl-c-ctrl-c-hook' is run
+    before the first test.
+    
+    Each function will be called with no arguments.  The function
+    must check if the context is appropriate for it to act.  If yes,
+    it should do its thing and then return a non-nil value.  If the
+    context is wrong, just do nothing and return nil.
 #+end_example
 ** =org-tab-first-hook=
 Defined in: /org.el/
@@ -627,6 +636,22 @@ Defined in: /org-agenda.el/
     Hook run in temporary buffer before writing it to an export file.
     A useful function is `org-agenda-add-entry-text'.
 #+end_example
+** =org-agenda-skip-function=
+Defined in: /org-agenda.el/
+#+begin_example
+    Function to be called at each match during agenda construction.
+    If this function returns nil, the current match should not be skipped.
+    If the function decided to skip an agenda match, is must return the
+    buffer position from which the search should be continued.
+    This may also be a Lisp form, which will be evaluated.
+    
+    This variable will be applied to every agenda match, including
+    tags/property searches and TODO lists.  So try to make the test function
+    do its checking as efficiently as possible.  To implement a skipping
+    condition just for specific agenda commands, use the variable
+    `org-agenda-skip-function' which can be set in the options section
+    of custom agenda commands.
+#+end_example
 ** =org-finalize-agenda-hook=
 Defined in: /org-agenda.el/
 #+begin_example
@@ -662,6 +687,19 @@ Defined in: /org-agenda.el/
     all tags will be considered, so that this function will only ever see
     the lower-case version of all tags.
 #+end_example
+** =org-agenda-bulk-custom-functions=
+Defined in: /org-agenda.el/
+#+begin_example
+    Alist of characters and custom functions for bulk actions.
+    For example, this value makes those two functions available:
+    
+      '((?R set-category)
+        (?C bulk-cut))
+    
+    With selected entries in an agenda buffer, `B R' will call
+    the custom function `set-category' on the selected entries.
+    Note that functions in this alist don't need to be quoted.
+#+end_example
 ** =org-agenda-mode-hook=
 Defined in: /org-agenda.el/
 #+begin_example
@@ -676,9 +714,11 @@ Defined in: /org-agenda.el/
     should be continued.
     This may also be a Lisp form, it will be evaluated.
     Never set this variable using `setq' or so, because then it will apply
-    to all future agenda commands.  Instead, bind it with `let' to scope
-    it dynamically into the agenda-constructing command.  A good way to set
-    it is through options in `org-agenda-custom-commands'.
+    to all future agenda commands.  If you do want a global skipping condition,
+    use the option `org-agenda-skip-function-global' instead.
+    The correct usage for `org-agenda-skip-function' is to bind it with
+    `let' to scope it dynamically into the agenda-constructing command.
+    A good way to set it is through options in `org-agenda-custom-commands'.
 #+end_example
 ** =org-agenda-cleanup-fancy-diary-hook=
 Defined in: /org-agenda.el/
@@ -721,8 +761,14 @@ Defined in: /org-ascii.el/
 ** =org-capture-before-finalize-hook=
 Defined in: /org-capture.el/
 #+begin_example
-    Hook that is run right before a remember process is finalized.
-    The remember buffer is still current when this hook runs.
+    Hook that is run right before a capture process is finalized.
+    The capture buffer is still current when this hook runs.
+#+end_example
+** =org-capture-after-finalize-hook=
+Defined in: /org-capture.el/
+#+begin_example
+    Hook that is run right after a capture process is finalized.
+      Suitable for window cleanup
 #+end_example
 ** =org-capture-mode-hook=
 Defined in: /org-capture.el/
@@ -764,6 +810,11 @@ Defined in: /org-clock.el/
 #+begin_example
     Hook run when selecting the currently clocked-in entry.
 #+end_example
+** =org-clock-before-select-task-hook=
+Defined in: /org-clock.el/
+#+begin_example
+    Hook called in task selection just before prompting the user.
+#+end_example
 ** =org-ctags-open-link-functions=
 Defined in: /org-ctags.el/
 #+begin_example
@@ -792,7 +843,7 @@ Defined in: /org-exp.el/
     Hook for preprocessing an export buffer.
     Pretty much the first thing when exporting is running this hook.
     Point will be in a temporary buffer that contains a copy of
-    the original buffer, or of the section that is being export.
+    the original buffer, or of the section that is being exported.
     All the other hooks in the org-export-preprocess... category
     also work in that temporary buffer, already modified by various
     stages of the processing.
@@ -865,10 +916,10 @@ Defined in: /org-exp.el/
 Defined in: /org-exp.el/
 #+begin_example
     Function to be called to format the contents of a drawer.
-    The function must accept three parameters:
+    The function must accept two parameters:
       NAME     the drawer name, like \"PROPERTIES\"
       CONTENT  the content of the drawer.
-      BACKEND  one of the symbols html, docbook, latex, ascii, xoxo
+    You can check the export backend through `org-export-current-backend'.
     The function should return the text to be inserted into the buffer.
     If this is nil, `org-export-format-drawer' is used as a default.
 #+end_example
@@ -1060,6 +1111,11 @@ Defined in: /org-timer.el/
 #+begin_example
     Hook run before relative timer is paused.
 #+end_example
+** =org-timer-continue-hook=
+Defined in: /org-timer.el/
+#+begin_example
+    Hook run after relative timer is continued.
+#+end_example
 ** =org-timer-set-hook=
 Defined in: /org-timer.el/
 #+begin_example
@@ -1080,6 +1136,25 @@ Defined in: /org-xoxo.el/
 #+begin_example
     Hook run after XOXO export, in the new buffer.
 #+end_example
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 * Examples for using hooks
