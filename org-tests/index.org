@@ -15,18 +15,125 @@
 [[file:../index.org][{Back to Worg's index}]]
 
 
-Org-mode has grown a big and feature rich application. Help is always needed and
-highly appreciated. If you're not a lisp programmer, you still might help to
-prevent regressions and greatly improve the stability of Org-mode.
+* Why test?
 
-This page is meant to provide help with this kind of helping. We hope to provide
-all the information needed here, and hope to create tests for non-programmers
-too.
+Org-mode has grown into a popular large and feature-rich application,
+on which development often happens at a great pace. Indeed, feature
+requests posted on the [[file:org-mailing-list.org][Org mailing list]] are frequently developed and
+published within hours of the request. 
 
-Currently we are in a very early planning phase, so will find only what we
-_want_ to do. If you're not a worger yet, you may as well post ideas or code to
-the great [[file:org-mailing-list.org][Org mailing list]].
+The down-side of such rapid development is that on some occasions, one
+of the many patches, features, or [[http://en.wikipedia.org/wiki/Code_refactoring][refactorings]] being applied to the
+code-base may unintentionally cause unexpected behavior within
+Org-mode. This is known as a [[http://en.wikipedia.org/wiki/Software_regression][software regression]]. The larger and more
+complex Org-mode becomes, the more you may expect to see such software
+regressions.
 
+One concern with introducing software regressions is that the
+regression may not be immediately obvious to users. Indeed it can be
+hours, days, or even months before an Org-mode user moves to export an
+important schedule, when "bang" - the regression has reared its ugly
+head.
+
+The solution to avoiding software regressions? [[http://en.wikipedia.org/wiki/Regression_testing][Regression Testing!]]
+With a regression test suite the developer can run the tests prior to
+committing their change, to ensure their additions do not break the
+regression tests.
+
+Of course a regression test suite is only as good as the number of
+regression tests within it, and this is where Org-mode users can help.
+
+* Running the current test suite
+
+So long as you are on an up-to-date release of Org-mode you may run
+the tests on your local setup. To update Org-mode check out the 
+[[http://orgmode.org/worg/org-faq.html][org FAQ page]]. Note, the test suite will run on versions of Emacs back
+to version 22.
+
+A pre-requisite for running the tests is the [[http://www.emacswiki.org/emacs/ErtTestLibrary][ERT test library]]. This
+may be obtained easily as follows.
+
+** Emacs-22 / Emacs-23
+
+In Emacs-22 and Emacs-23 you will need to download the test files
+_ert.el_ and _ert-x.el_ to your testing directory. This may be
+accomplished with the following commands entered on the command line.
+
+#+example
+cd /path/to/org-mode/testing
+curl -O https://github.com/mirrors/emacs/raw/master/lisp/emacs-lisp/ert.el
+curl -O https://github.com/mirrors/emacs/raw/master/lisp/emacs-lisp/ert-x.el
+#+end_example
+
+Alternatively you may download the files within your browser.
+
+ - browse to [[https://github.com/mirrors/emacs/tree/master/lisp/emacs-lisp][github.com/mirrors/emacs/lisp/emacs-lisp]]
+ - right click ert.el link and select _download linked file_ (or
+   equivalent) and save to org-mode/testing/ert.el
+ - right click ert-x.el link and select _download linked file_ (or
+   equivalent) and save to org-mode/testing/ert-x.el
+
+Thats it - you may now run the tests.
+
+** Emacs-24
+
+Emacs-24 includes ERT, so nothing to do.
+
+** Run tests from the command line
+
+To run the tests from the command line (without loading your personal
+configurations) use the following commands (Note, if you have more
+than one version of Emacs on your system, you may need to include the
+full path to the required Emacs executable).
+
+#+example
+cd /path/to/org-mode/testing
+Emacs -Q -batch -l org-test.el -eval "(setq org-confirm-babel-evaluate nil)" -f org-test-run-batch-tests'
+#+end_example
+
+** Run tests from within Emacs
+
+To run the tests from within Emacs itself.
+
+#+example
+M-x load-file RET /path/to/org-mode/testing/org-test.el
+M-x org-test-run-all-tests
+#+end_example
+
+* Can I write tests?
+
+Most certainly! Even if you're not a lisp programmer, you may still
+help prevent regressions and greatly improve the stability of
+Org-mode. In fact, thanks to the growing number of test-macros that
+are available you can write regression tests with very minimal lisp
+knowledge, and you are also likely to greatly improve your knowledge
+of lisp as a result. And the more tests you write, the more confident
+you may be that your personal use of the many Org-mode features
+available has not been affected by regression.
+
+And of course, any help toward improving the Org-mode test-suite is
+highly appreciated.
+
+* Preparing to write tests
+
+Coming soon...
+
+* Tutorial
+
+To come...
+
+* Testing Utilities
+
+Several useful utilities exist to make the practice of writing tests
+even easier. These are available from the Org-mode repository as a
+seperate git sub-module. Assuming you have cloned Org-mode using git,
+you may install these extra utilities with the following git commands.
+
+#+example
+cd /path/to/org-mode
+git submodule init
+git submodule update
+#+end_example
 
 * Aims
 
@@ -80,25 +187,6 @@ could copy and paste to do the following
     between them.  That way different people who  run the same test on different
     hosts can get the same result.
 
-** Testing tools
-
-Many of the above questions (how to we setup and tear down tests, and
-how can we make and check assertions) will depend heavily on the
-chosen testing tool.  Two options posited to the list so far are...
-
-- ERT :: (from http://github.com/ohler/ert/tree/master/ert.el) ert is
-         a tool for automated testing, reporting results, as well as
-         debugging errors
-- EmacsLispExpectations :: (from
-     http://www.emacswiki.org/cgi-bin/emacs/EmacsLispExpectations) is
-     a minimalist elisp testing framework based on 
-
-Both of these elisp files have been included in the =tools= directory
-inside this directory.
-
-I've never used EmacsLispExpectations, so I can't make any reasonable
-judgment between the two, perhaps if someone can implement some tests
-in both we could come to some sort of agreement.
 
 *** ERT Example
 
@@ -106,14 +194,6 @@ I implemented a toy test of org's html export facility using ert.el.
 See [[file:ert-publish-test.el]] for the implementation.  To run the test
 open up org-publish-test.el, and =M-x eval-buffer=.  This should load
 ert, and run the simple html export test.
-
-* Clipboard
-
-Running a minimal emacs should suppress custom config files:
-: emacs -q -l yourtest.el
-
-Getting a list of all variables (incomplete):
-: grep -r defvar lisp/*.el
 
 * COMMENT buffer dictionary
 
