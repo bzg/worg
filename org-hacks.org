@@ -1575,6 +1575,28 @@ Bernt Hansen [[http://permalink.gmane.org/gmane.emacs.orgmode/44693][suggested]]
 Then M-x bh/mark-subtree-done.
 
 ** Exporting org files
+*** Export Org to Org and handle includes.
+
+Nick Dokos came up with this useful function:
+
+#+begin_src emacs-lisp
+(defun org-to-org-handle-includes ()
+  "Copy the contents of the current buffer to OUTFILE,
+recursively processing #+INCLUDEs."
+  (let* ((s (buffer-string))
+	 (fname (buffer-file-name))
+	 (ofname (format "%s.I.org" (file-name-sans-extension fname))))
+    (setq result
+	  (with-temp-buffer
+	    (insert s)
+	    (org-export-handle-include-files-recurse)
+	    (buffer-string)))
+    (find-file ofname)
+    (delete-region (point-min) (point-max))
+    (insert result)
+    (save-buffer)))
+#+end_src
+
 *** Specifying LaTeX commands to floating environments
     :PROPERTIES:
     :CUSTOM_ID: latex-command-for-floats
