@@ -2185,6 +2185,81 @@ Try this tool by Wes Hardaker:
 
 http://www.hardakers.net/code/bbdb-to-org-contacts/
 
+** Calculating date differences - how to write a simple elisp function
+
+Alexander Wingård asked how to calculate the number of days between a
+time stamp in his org file and today (see
+http://thread.gmane.org/gmane.emacs.orgmode/46881).  Although the
+resulting answer is probably not of general interest, the method might
+be useful to a budding Elisp programmer.
+
+Alexander started from an already existing org function,
+=org-evaluate-time-range=.  When this function is called in the context
+of a time range (two time stamps separated by "=--="), it calculates the
+number of days between the two dates and outputs the result in Emacs's
+echo area. What he wanted was a similar function that, when called from
+the context of a single time stamp, would calculate the number of days
+between the date in the time stamp and today. The result should go to
+the same place: Emacs's echo area.
+
+The solution presented in the mail thread is as follows:
+
+#+begin_src emacs-lisp
+(defun aw/org-evaluate-time-range (&optional to-buffer)
+  (interactive)
+  (if (org-at-date-range-p t)
+      (org-evaluate-time-range to-buffer)
+    ;; otherwise, make a time range in a temp buffer and run o-e-t-r there
+    (let ((headline (buffer-substring (point-at-bol) (point-at-eol))))
+      (with-temp-buffer
+	(insert headline)
+	(goto-char (point-at-bol))
+	(re-search-forward org-ts-regexp (point-at-eol) t)
+	(if (not (org-at-timestamp-p t))
+	    (error "No timestamp here"))
+	(goto-char (match-beginning 0))
+	(org-insert-time-stamp (current-time) nil nil)
+	(insert "--")
+	(org-evaluate-time-range to-buffer)))))
+#+end_src
+
+The function assumes that point is on some line with some time stamp
+(or a date range) in it. Note that =org-evaluate-time-range= does not care
+whether the first date is earlier than the second: it will always output
+the number of days between the earlier date and the later date.
+
+As stated before, the function itself is of limited interest (although
+it satisfied Alexander's need).The *method* used might be of wider
+interest however, so here is a short explanation.
+
+The idea is that we want =org-evaluate-time-range= to do all the
+heavy lifting, but that function requires that it be in a date-range
+context. So the function first checks whether it's in a date range
+context already: if so, it calls =org-evaluate-time-range= directly
+to do the work. The trick now is to arrange things so we can call this
+same function in the case where we do *not* have a date range
+context. In that case, we manufacture one: we create a temporary
+buffer, copy the line with the purported time stamp to the temp
+buffer, find the time stamp (signal an error if no time stamp is
+found) and insert a new time stamp with the current time before the
+existing time stamp, followed by "=--=": voilà, we now have a time range
+on which we can apply our old friend =org-evaluate-time-range= to
+produce the answer. Because of the above-mentioned property
+of =org-evaluate-time-range=, it does not matter if the existing
+time stamp is earlier or later than the current time: the correct
+number of days is output.
+
+Note that at the end of the call to =with-temp-buffer=, the temporary
+buffer goes away.  It was just used as a scratch pad for the function
+to do some figuring.
+
+The idea of using a temp buffer as a scratch pad has wide
+applicability in Emacs programming. The rest of the work is knowing
+enough about facilities provided by Emacs (e.g. regexp searching) and
+by Org (e.g. checking for time stamps and generating a time stamp) so
+that you don't reinvent the wheel, and impedance-matching between the
+various pieces.
+
 * Hacking Org: Working with Org-mode and External Programs.
 
 
