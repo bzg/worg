@@ -2261,15 +2261,6 @@ that you don't reinvent the wheel, and impedance-matching between the
 various pieces.
 
 * Hacking Org: Working with Org-mode and External Programs.
-
-
-
-: I've [...] created some procmail and shell glue that takes emails and
-: inserts them into an org-file so that I can capture stuff on the go using
-: the email program.
-
-That's [[http://tychoish.com/code/org-mail/][here]].
-
 ** Use Org-mode with Screen [Andrew Hyatt]
 
 "The general idea is that you start a task in which all the work will
@@ -2497,6 +2488,63 @@ http://turingmachine.org/hacking/org-mode/
 ** Script (thru procmail) to output emails to an Org file
 
 Tycho Garen sent [[http://comments.gmane.org/gmane.emacs.orgmode/44773][this]]:
+
+: I've [...] created some procmail and shell glue that takes emails and
+: inserts them into an org-file so that I can capture stuff on the go using
+: the email program.
+
+Everything is documented [[http://tychoish.com/code/org-mail/][here]].
+
+** Meaningful diff for org files in a git repository
+
+Since most diff utilities are primarily meant for source code, it is
+difficult to read diffs of text files like ~.org~ files easily. If you
+version your org directory with a SCM like git you will know what I
+mean. However for git, there is a way around. You can use
+=gitattributes= to define a custom diff driver for org files. Then a
+regular expression can be used to configure how the diff driver
+recognises a "function".
+
+Put the following in your =<org_dir>/.gitattributes=.
+: *.org	diff=org
+Then put the following lines in =<org_dir>/.git/config=
+: [diff "org"]
+: 	xfuncname = "^(\\*+ [a-zA-Z0-9]+.+)$"
+
+This will let you see diffs for org files with each hunk identified by
+the unmodified headline closest to the changes. After the
+configuration a diff should look something like the example below.
+
+#+begin_example
+diff --git a/org-hacks.org b/org-hacks.org
+index a0672ea..92a08f7 100644
+--- a/org-hacks.org
++++ b/org-hacks.org
+@@ -2495,6 +2495,22 @@ ** Script (thru procmail) to output emails to an Org file
+ 
+ Everything is documented [[http://tychoish.com/code/org-mail/][here]].
+ 
++** Meaningful diff for org files in a git repository
++
++Since most diff utilities are primarily meant for source code, it is
++difficult to read diffs of text files like ~.org~ files easily. If you
++version your org directory with a SCM like git you will know what I
++mean. However for git, there is a way around. You can use
++=gitattributes= to define a custom diff driver for org files. Then a
++regular expression can be used to configure how the diff driver
++recognises a "function".
++
++Put the following in your =<org_dir>/.gitattributes=.
++: *.org	diff=org
++Then put the following lines in =<org_dir>/.git/config=
++: [diff "org"]
++: 	xfuncname = "^(\\*+ [a-zA-Z0-9]+.+)$"
++
+ * Musings
+ 
+ ** Cooking?  Brewing?
+#+end_example
+
 * Musings
 
 ** Cooking?  Brewing?
