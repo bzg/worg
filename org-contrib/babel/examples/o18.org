@@ -17,7 +17,7 @@
 #+SEQ_TODO: TODO(t) STARTED(s)  | DONE(d) REJECTED(r) REFTEX
   
 * LaTeX preamble
-#+srcname: latex-preamble
+#+name: latex-preamble
 #+begin_src latex :tangle o18_ao.tex
     \documentclass[times,glossaries]{tsdarticle}
     
@@ -61,7 +61,7 @@
 #+end_src
 
 * Introduction
-#+srcname: latex-intro
+#+name: latex-intro
 #+begin_src latex  :tangle o18_ao.tex
 
   The age of the O18 site has been an important datum in Hawaiian
@@ -106,7 +106,7 @@
 #+end_src
 * O18 in regional context [2/2]
 ** DONE Regional context
-#+srcname: regional-context
+#+name: regional-context
 #+begin_src latex  :tangle o18_ao.tex
   \section{The O18 Site}
   \label{sec:O18-site}
@@ -148,7 +148,7 @@
 #+end_src
 
 ** DONE Stratigraphy
-#+srcname: stratigraphy
+#+name: stratigraphy
 #+begin_src latex  :tangle o18_ao.tex
   Excavations for cultural resources management carried out at sites on
   the plain provide data for a model of regional cultural stratigraphy.
@@ -231,7 +231,7 @@
   - 95% hpd 100--509
 ** DONE Age of O18
 
-#+srcname: O18-age
+#+name: O18-age
 #+begin_src latex  :tangle o18_ao.tex 
   \section{Age Determinations and Analysis}
   \label{sec:age-determinations}
@@ -335,7 +335,7 @@
 #+end_src
   
 ** DONE Calibration
-#+srcname: calibration
+#+name: calibration
 #+begin_src latex  :tangle o18_ao.tex
   A Bayesian model of O18 stratigraphy relates each of the dated samples
   to the calendric ages represented by the two primary cultural
@@ -472,7 +472,7 @@
 #+end_src latex
 
 ** DONE Age summary
-#+srcname: age-summary
+#+name: age-summary
 #+begin_src latex  :tangle no
   In summary, the chronology of Site O18 as estimated by \rc\ dates on
   short-lived materials within a Bayesian model appears to begin
@@ -490,7 +490,7 @@
 
 ** DONE Regional data
 
-#+srcname: regional-data
+#+name: regional-data
 #+begin_src latex  :tangle o18_ao.tex
   \section{O18 in Regional Perspective}
   \label{sec:regional-perspective}
@@ -660,7 +660,7 @@
    - alpha 4856, 67% 620-521 BP, 1360--1429 AD
 
 
-#+srcname: regional-analysis-1
+#+name: regional-analysis-1
 #+begin_src latex  :tangle o18_ao.tex
   Based on the current dating evidence, sites 50--80--15--4851 and
   --4853 and 50--80--11--4856 and --4857 were all established after O18.
@@ -723,7 +723,7 @@ than 50--80--11--4856 is 0.88.
   \label{fig:initial-use}
 \end{figure}
 #+END_LaTeX
-#+srcname: regional-analysis-2
+#+name: regional-analysis-2
 #+begin_src latex :tangle o18_ao.tex     
   Another way to look at the site establishment estimates is relative to
   the establishment of O18.  All of the
@@ -754,7 +754,7 @@ than 50--80--11--4856 is 0.88.
          \label{fig:site-establishment} \end{figure}
 #+end_src
 * Conclusion [4/4]
-#+srcname: conclusion
+#+name: conclusion
 #+begin_src latex  :tangle o18_ao.tex 
   \section{Summary and Conclusion}
   \label{sec:conclusion}
@@ -781,7 +781,7 @@ than 50--80--11--4856 is 0.88.
         settlements in Waimanalo that pre-dated O18
     - [ ] Results differ by timing and by the fact that events of
       interest are estimated directly.
-#+srcname: prehistory
+#+name: prehistory
 #+begin_src latex  :tangle o18_ao.tex 
   Seven new \rc\ age determinations on short-lived materials yield a
   chronology for O18 that differs from previous estimates.  The
@@ -903,7 +903,7 @@ than 50--80--11--4856 is 0.88.
     - The Layer III shell dates are all relatively young and a change
       in calibration likely won't affect the estimated establishment
       date
-#+srcname: evaluation
+#+name: evaluation
 #+begin_src latex 
   The incorporation into the Bayesian calibration of a stratigraphic
   model of traditional Hawaiian sites on the Waim\={a}nalo Plain,
@@ -949,9 +949,9 @@ than 50--80--11--4856 is 0.88.
     - It is possible to use dates with large standard deviations: they
       don't mean much, but there is no intrinsic reason to discard what
       little information they might hold.
-#+srcname: hygiene
+#+name: hygiene
 #+begin_src latex 
-      
+foo      
 #+end_src
 
 ** REJECTED There are no known old sites
@@ -959,12 +959,12 @@ than 50--80--11--4856 is 0.88.
        establishment for O18
      - H1 is late, cite Dye NZJA
      - Halawa Dune is late, too.
-#+srcname: hawaii
+#+name: hawaii
 #+begin_src latex 
-       
+foo       
 #+end_src
 * LaTeX postamble
-#+srcname: latex-ending
+#+name: latex-ending
 #+begin_src latex :tangle o18_ao.tex
 % Comment or uncomment as needed
 % style=altlist another possibility
@@ -992,10 +992,12 @@ than 50--80--11--4856 is 0.88.
    - A kludge
    - Put all the csv file names in a table, then edit the table for
      input to the R function
-#+srcname: thetas()
-#+begin_src shell
+#+name: thetas
+#+begin_src sh
 cd r && ls *.csv
 #+End_src
+
+#+results:
 
 #+results: thetas
 | alpha-2.csv                |
@@ -1011,7 +1013,7 @@ cd r && ls *.csv
 - need to add cbind() an identifier that can be used to label the plot
   and to segregate the plots
 
-#+srcname: dated-events(files = thetas)
+#+name: dated-events(files = thetas)
 #+begin_src R :session :file output_dated_events.png
   library(ggplot2)  
   make.plot.file <- function(x, y)
@@ -1036,7 +1038,7 @@ cd r && ls *.csv
 #+results: dated-events
 [[file:output_dated_events.png]]
 
-#+srcname: single-date(x = "alpha-4856.csv")
+#+name: single-date(x = "alpha-4856.csv")
 #+begin_src R :session
   afile <- paste("r/",x,sep="")
   anobject <- strsplit(x,".",fixed=TRUE)[[1]][1]
@@ -1056,7 +1058,7 @@ cd r && ls *.csv
    - The shell source shows all the csv files
    - Edit the results table to select the files to use as input to the
      plotting routine
-#+srcname: intervals 
+#+name: intervals 
 #+begin_src sh
 cd r && ls *.csv
 #+end_src
@@ -1067,7 +1069,7 @@ cd r && ls *.csv
 | alpha-4856-and-alpha-3.csv |
 | alpha-4857-and-alpha-3.csv |
 
-#+srcname: interval-estimates(files = intervals)
+#+name: interval-estimates(files = intervals)
 #+begin_src R :session :file output_intervals.png
   library(ggplot2)
   
@@ -1096,7 +1098,7 @@ cd r && ls *.csv
 
 ** Regional date graph
    - Hard code a complex graphic
-#+srcname: r-regional-data
+#+name: r-regional-data
 #+begin_src R :session
   library(ggplot2)
   load(".RData")
@@ -1131,7 +1133,7 @@ cd r && ls *.csv
 | methods   |
 | base      |
 
-#+srcname: r-regional-plot
+#+name: r-regional-plot
 #+begin_src R :session
   alpha_plot <- ggplot(alpha_gg, aes(x=1950 + cal.BP, y=Posterior.probability))
   pdf(file="alpha-regional.pdf", height=3.75, width=7.5)
@@ -1161,7 +1163,7 @@ cd r && ls *.csv
 #+end_src
 * REJECTED Post-mortem on earlier data [2/2]
 ** DONE Post mortem data
-#+srcname: post-mortem-data
+#+name: post-mortem-data
 #+begin_src latex
   \section{Post-mortem on the Early Dates}
   \label{sec:post-mortem}
@@ -1236,7 +1238,7 @@ cd r && ls *.csv
 #+end_src
 
 ** DONE Post mortem results
-#+srcname: post-mortem-results
+#+name: post-mortem-results
 #+begin_src latex
   The Bayesian calibration of the early age determinations yields layer
   boundaries that correspond fairly closely to those proposed by
