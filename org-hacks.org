@@ -697,22 +697,14 @@ After recalculation this will end up with the transposed copy:
 : | 2007 | 701 | 702 | 703 |
 : | 2008 | 801 | 802 | 803 |
 : | 2009 | 901 | 902 | 903 |
-: #+TBLFM: $1 = remote(FOO, @$#$@#) :: $2 = remote(FOO, @$#$@#) :: $3 = remote(FOO, @$#$@#) :: $4 = remote(FOO, @$#$@#)
+: #+TBLFM: @<$1..@>$4 = remote(FOO, @$#$@#)
 
-The formulas simply exchange row and column numbers by taking
+The formula simply exchanges row and column numbers by taking
 - the absolute remote row number =@$#= from the current column number =$#=
 - the absolute remote column number =$@#= from the current row number =@#=
 
 Possible field formulas from the remote table will have to be transferred
-manually.  Since there are no row formulas yet there is no need to transfer
-column formulas to row formulas or vice versa.
-
--- Note added 2011-11-12 Sat
-
-Now that org allows ranges on the LHS of table formulas, the multiple formulas
-can be condensed down to a single formula:
-
-: #+TBLFM: @1$1..@>$> = remote(FOO, @$#$@#)
+manually.
 
 Note however that this is bound to be slow for large tables. See the discussion
 in the [[http://thread.gmane.org/gmane.emacs.orgmode/22610/focus=23662][mailing list]].
@@ -732,17 +724,15 @@ during the period of the preceding =1=, =2=, =3= or =4= years:
 : | 2007 |    14 | 0.167 | 0.183 |       |       |
 : | 2008 |    16 | 0.143 | 0.155 | 0.170 |       |
 : | 2009 |    18 | 0.125 | 0.134 | 0.145 | 0.158 |
-: #+TBLFM: $3=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3::$4=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3::$5=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3::$6=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")); f3
+: #+TBLFM: @I$3..@>$6=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")) +.0; f-3
 
-The formula is the same for each column =$3= through =$6=.  This can easily
-be seen with the great formula editor invoked by C-c ' on the
-table. The important part of the formula without the field blanking is:
+The important part of the formula without the field blanking is:
 
 : ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1
 
 which is the Emacs Calc implementation of the equation
 
-/AvgChange(i, a) = (quote[i] / quote[i - a]) ^ 1 / n - 1/
+/AvgChange(i, a) = (quote[i] / quote[i - a]) ^ (1 / a) - 1/
 
 where /i/ is the current time and /a/ is the length of the preceding period.
 
