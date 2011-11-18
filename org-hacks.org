@@ -455,7 +455,10 @@ of its arguments."
 #+end_src
 
 ** Org Table
-*** Transpose tables (Juan Pechiar)
+*** Transpose table
+    :PROPERTIES:
+    :CUSTOM_ID: transpose-table
+    :END:
 
 This function by Juan Pechiar will transpose a table:
 
@@ -490,6 +493,20 @@ will be transposed as
 : | 5 | d | h |
 
 (Note that horizontal lines disappeared.)
+
+There are also other solutions:
+- with org-babel and Emacs Lisp: provided by Thomas S. Dye in the mailing
+  list, see
+  [[http://thread.gmane.org/gmane.emacs.orgmode/23809/focus=23815][gmane]]
+  or
+  [[http://lists.gnu.org/archive/html/emacs-orgmode/2010-04/msg00239.html][gnu]]
+- with org-babel and R: provided by Dan Davison in the mailing list (old
+  =#+TBLR:= syntax), see
+  [[http://thread.gmane.org/gmane.emacs.orgmode/10159/focus=10159][gmane]]
+  or
+  [[http://lists.gnu.org/archive/html/emacs-orgmode/2008-12/msg00454.html][gnu]]
+- with field coordinates in formulas (=@#= and =$#=): see
+  [[file:org-hacks.org::#field-coordinates-in-formulas-transpose-table][Worg]].
 
 *** Manipulate hours/minutes/seconds in table formulas
 
@@ -641,31 +658,46 @@ and subtracting hex values.
 #+TBLFM: $3='(with-hex 'hex (+ $2 $1))::$4='(with-hex nil (identity $3))
 
 *** Field coordinates in formulas (=@#= and =$#=)
+    :PROPERTIES:
+    :CUSTOM_ID: field-coordinates-in-formulas
+    :END:
 
 -- Michael Brand
 
-Following are some use cases that can be implemented with the
-_field coordinates in formulas_ described in the corresponding
-chapter in the [[http://orgmode.org/manual/References.html#References][Org manual]], available since =org-version= 6.35.
+Following are some use cases that can be implemented with the “field
+coordinates in formulas” described in the corresponding chapter in the
+[[http://orgmode.org/manual/References.html#References][Org manual]].
 
 **** Copy a column from a remote table into a column
+     :PROPERTIES:
+     :CUSTOM_ID: field-coordinates-in-formulas-copy-col-to-col
+     :END:
 
 current column =$3= = remote column =$2=:
 : #+TBLFM: $3 = remote(FOO, @@#$2)
 
 **** Copy a row from a remote table transposed into a column
+     :PROPERTIES:
+     :CUSTOM_ID: field-coordinates-in-formulas-copy-row-to-col
+     :END:
 
 current column =$1= = transposed remote row =@1=:
 : #+TBLFM: $1 = remote(FOO, @$#$@#)
 
-**** Transpose a table
+**** Transpose table
+     :PROPERTIES:
+     :CUSTOM_ID: field-coordinates-in-formulas-transpose-table
+     :END:
 
 -- Michael Brand
 
-This is more like a demonstration of using _field coordinates in formulas_
-to [[http://en.wikipedia.org/wiki/Transpose][transpose]] a table or to do it without using org-babel.  The efficient
-and simple solution for this with the help of org-babel and Emacs Lisp has
-been provided by Thomas S. Dye on the [[http://thread.gmane.org/gmane.emacs.orgmode/23809/focus=23815][mailing list]].
+This is more like a demonstration of using “field coordinates in formulas”
+and is bound to be slow for large tables. See the discussion in the mailing
+list on
+[[http://thread.gmane.org/gmane.emacs.orgmode/22610/focus=23662][gmane]] or
+[[http://lists.gnu.org/archive/html/emacs-orgmode/2010-04/msg00086.html][gnu]].
+For more efficient solutions see
+[[file:org-hacks.org::#transpose-table][Worg]].
 
 To transpose this 4x7 table
 
@@ -687,8 +719,8 @@ also the column header) and yet empty:
 : |   |   |   |   |
 : |   |   |   |   |
 
-Then add the =TBLFM= below with the same formula repeated for each column.
-After recalculation this will end up with the transposed copy:
+Then add the =TBLFM= line below.  After recalculation this will end up with
+the transposed copy:
 
 : | year | min | avg | max |
 : | 2004 | 401 | 402 | 403 |
@@ -697,17 +729,14 @@ After recalculation this will end up with the transposed copy:
 : | 2007 | 701 | 702 | 703 |
 : | 2008 | 801 | 802 | 803 |
 : | 2009 | 901 | 902 | 903 |
-: #+TBLFM: @<$1..@>$4 = remote(FOO, @$#$@#)
+: #+TBLFM: @<$<..@>$> = remote(FOO, @$#$@#)
 
 The formula simply exchanges row and column numbers by taking
 - the absolute remote row number =@$#= from the current column number =$#=
 - the absolute remote column number =$@#= from the current row number =@#=
 
-Possible field formulas from the remote table will have to be transferred
+Formulas to be taken over from the remote table will have to be transformed
 manually.
-
-Note however that this is bound to be slow for large tables. See the discussion
-in the [[http://thread.gmane.org/gmane.emacs.orgmode/22610/focus=23662][mailing list]].
 
 **** Dynamic variation of ranges
 
@@ -724,7 +753,7 @@ during the period of the preceding =1=, =2=, =3= or =4= years:
 : | 2007 |    14 | 0.167 | 0.183 |       |       |
 : | 2008 |    16 | 0.143 | 0.155 | 0.170 |       |
 : | 2009 |    18 | 0.125 | 0.134 | 0.145 | 0.158 |
-: #+TBLFM: @I$3..@>$6=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")) +.0; f-3
+: #+TBLFM: @I$3..@>$>=if(@# >= $#, ($2 / subscr(@-I$2..@+I$2, @# + 1 - $#)) ^ (1 / ($# - 2)) - 1, string("")) +.0; f-3
 
 The important part of the formula without the field blanking is:
 
