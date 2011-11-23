@@ -765,6 +765,146 @@ which is the Emacs Calc implementation of the equation
 
 where /i/ is the current time and /a/ is the length of the preceding period.
 
+*** Change the column sequence in one row only
+    :PROPERTIES:
+    :CUSTOM_ID: column-sequence-in-row
+    :END:
+
+-- Michael Brand
+
+The functions below can be used to change the column sequence in one row
+only, without affecting the other rows above and below like with M-<left> or
+M-<right> (org-table-move-column). Please see the docstring of the functions
+for more explanations. Below is one example per function, with this original
+table as the starting point for each example:
+: | a | b | c  | d  |
+: | e | 9 | 10 | 11 |
+: | f | g | h  | i  |
+
+**** Move in row left
+
+1) place point at "10" in original table
+2) result of M-x my-org-table-move-column-in-row-left
+: | a | b  | c | d  |
+: | e | 10 | 9 | 11 |
+: | f | g  | h | i  |
+
+**** Move in row right
+
+1) place point at "9" in original table
+2) result of M-x my-org-table-move-column-in-row-right
+: | a | b  | c | d  |
+: | e | 10 | 9 | 11 |
+: | f | g  | h | i  |
+
+**** Rotate in row left
+
+1) place point at "9" in original table
+2) result of M-x my-org-table-rotate-column-in-row-left
+: | a | b  | c  | d |
+: | e | 10 | 11 | 9 |
+: | f | g  | h  | i |
+
+**** Rotate in row right
+
+1) place point at "9" in original table
+2) result of M-x my-org-table-rotate-column-in-row-right
+: | a | b  | c | d  |
+: | e | 11 | 9 | 10 |
+: | f | g  | h | i  |
+
+**** The functions
+
+#+BEGIN_SRC emacs-lisp
+(defun my-org-table-move-column-in-row-right ()
+  "Move column to the right, limited to the current row."
+  (interactive)
+  (my-org-table-move-column-in-row nil))
+(defun my-org-table-move-column-in-row-left ()
+  "Move column to the left, limited to the current row."
+  (interactive)
+  (my-org-table-move-column-in-row 'left))
+
+(defun my-org-table-move-column-in-row (&optional left)
+  "Move the current column to the right, limited to the current row.
+With arg LEFT, move to the left.  For repeated invocation the point follows
+the value and changes to the target colum.  Does not fix formulas."
+  ;; derived from `org-table-move-column'
+  (interactive "P")
+  (if (not (org-at-table-p))
+      (error "Not at a table"))
+  (org-table-find-dataline)
+  (org-table-check-inside-data-field)
+  (let* ((col (org-table-current-column))
+         (col1 (if left (1- col) col))
+         ;; Current cursor position
+         (colpos (if left (1- col) (1+ col))))
+    (if (and left (= col 1))
+        (error "Cannot move column further left"))
+    (if (and (not left) (looking-at "[^|\n]*|[^|\n]*$"))
+        (error "Cannot move column further right"))
+    (org-table-goto-column col1 t)
+    (and (looking-at "|\\([^|\n]+\\)|\\([^|\n]+\\)|")
+         (replace-match "|\\2|\\1|"))
+    (org-table-goto-column colpos)
+    (org-table-align)))
+
+(defun my-org-table-rotate-column-in-row-right ()
+  "Rotate column to the right, limited to the current row."
+  (interactive)
+  (my-org-table-rotate-column-in-row nil))
+(defun my-org-table-rotate-column-in-row-left ()
+  "Rotate column to the left, limited to the current row."
+  (interactive)
+  (my-org-table-rotate-column-in-row 'left))
+
+(defun my-org-table-rotate-column-in-row (&optional left)
+  "Rotate the current column to the right, limited to the current row.
+With arg LEFT, rotate to the left.  The boundaries of the rotation range are
+the current and the most right column for both directions.  For repeated
+invocation the point stays on the current column.  Does not fix formulas."
+  ;; derived from `org-table-move-column'
+  (interactive "P")
+  (if (not (org-at-table-p))
+      (error "Not at a table"))
+  (org-table-find-dataline)
+  (org-table-check-inside-data-field)
+  (let ((col (org-table-current-column)))
+    (org-table-goto-column col t)
+    (and (looking-at (if left
+                         "|\\([^|\n]+\\)|\\([^\n]+\\)|$"
+                       "|\\([^\n]+\\)|\\([^|\n]+\\)|$"))
+         (replace-match "|\\2|\\1|"))
+    (org-table-goto-column col)
+    (org-table-align)))
+#+END_SRC
+
+**** Key bindings
+
+As hack I have this in an Org buffer to change temporarily to the desired
+behavior with C-c C-c on one of the three snippets:
+: - move in row:
+:   #+begin_src emacs-lisp :results silent
+:     (org-defkey org-mode-map [(meta left)]
+:                 'my-org-table-move-column-in-row-left)
+:     (org-defkey org-mode-map [(meta right)]
+:                 'my-org-table-move-column-in-row-right)
+:   #+end_src
+:
+: - rotate in row:
+:   #+begin_src emacs-lisp :results silent
+:     (org-defkey org-mode-map [(meta left)]
+:                 'my-org-table-rotate-column-in-row-left)
+:     (org-defkey org-mode-map [(meta right)]
+:                 'my-org-table-rotate-column-in-row-right)
+:   #+end_src
+:
+: - back to original:
+:   #+begin_src emacs-lisp :results silent
+:     (org-defkey org-mode-map [(meta left)]  'org-metaleft)
+:     (org-defkey org-mode-map [(meta right)] 'org-metaright)
+:   #+end_src
+
 ** Capture and Remember
 *** Customize the size of the frame for remember
 (Note: this hack is likely out of date due to the development of
