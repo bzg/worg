@@ -134,7 +134,7 @@
 ;;
 
 ;;; Code:
-(defcustom org-issue-issue-file "~/code/org-mode/Worg/org-issues.org"
+(defcustom org-issue-issue-file "~/code/org-mode/worg/org-issues.org"
   "Path to Org mode's issue file."
   :type 'file
   :group 'org-issue)
