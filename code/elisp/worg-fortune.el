@@ -29,30 +29,55 @@
 ;; (worg-write-fortune-file "~/install/git/worg/org-quotes.org"
 ;;                          "/srv/http/org-mode/fortunes" 120)
 ;; 
-;; Example: Quotes (max 120 characters) in a custom format:
-;;
-;;(worg-write-fortune-file "~/install/git/worg/org-quotes.org"
-;;                          "/srv/http/org-mode/fortunes" 120
-;;                          "quotes=\"%s\"" "\n")
+;; This is the function that is used to create the javascript
+;; code on http://orgmode.org that inserts a random quote:
+;; 
+;; (worg-write-fortune-file 
+;;  "~/install/git/worg/org-quotes.org" 
+;;  "/srv/http/org-mode/org-quote.js"
+;;  120 
+;;  "r_text[%d] = \"%s\";" "\n"
+;;  'worg-fortune-insert-javascript-pre
+;;  'worg-fortune-insert-javascript-post)
 ;; 
 ;;; Code:
 
+;; List where to store the fortune strings
 (defvar worg-fortune nil)
 
-(defun worg-write-fortune-file (src dest limit &optional fmt sep)
+;; Counter that can also be used in preamble or postamble
+(defvar worg-fortune-cnt 0)
+
+(defun worg-write-fortune-file (src dest limit &optional fmt sep pre post)
   "Collect fortunes from SRC file and write them to DEST file.
-LIMIT is the maximum size of a fortune to be added.  Optional
-fourth argument FMT is a format to apply to the inserted quote, 
-and optional fifth argument SEP is the separator to use."
+LIMIT is the maximum size of a fortune to be added.
+
+Optional fourth argument FMT is a format to apply to the inserted
+quote, and optional fifth argument SEP is the separator to use.
+For now, the format should contain both %d and %s format strings,
+in this order.
+
+PRE and POST are a preambule and a postamble to the fortune file.
+They can be either a string or a function which will be applied
+in the DEST buffer."
   (find-file src)
+  (setq worg-fortune nil worg-fortune-cnt 0)
   (worg-collect-fortune-from-buffer)
   (find-file dest)
   (erase-buffer)
+  ;; Insert preamble
+  (cond ((functionp pre) (funcall pre))
+	((stringp pre) (insert pre)))
+  ;; insert fortune strings
   (let (f)
     (while (setq f (pop worg-fortune))
       (when (< (length f) limit)
-	(insert (format (or fmt "%s") f))
-	(insert (or sep "\n%\n")))))
+	(insert (if fmt (format fmt worg-fortune-cnt f) f))
+	(insert (or sep "\n%\n"))
+	(setq worg-fortune-cnt (1+ worg-fortune-cnt)))))
+  ;; Insert postamble
+  (cond ((functionp post) (funcall post))
+	((stringp post) (insert post)))
   (write-file dest))
 
 (defun worg-collect-fortune-from-buffer nil
@@ -73,9 +98,8 @@ and optional fifth argument SEP is the separator to use."
 (defun worg-fortune-cleanup (fortune)
   "Clean up HTML and Org elements in FORTUNE."
   (setq fortune (replace-regexp-in-string "@<[^>]+>" "" fortune)
-	fortune (replace-regexp-in-string "\\\\" "" fortune)
+	fortune (replace-regexp-in-string "\\\\" "" fortune))
 	;; fortune (replace-regexp-in-string "\n" " " fortune)
-	)
   (with-temp-buffer
     (insert fortune)
     (goto-char (point-min))
@@ -91,6 +115,14 @@ and optional fifth argument SEP is the separator to use."
       (replace-match ""))
     (setq fortune (buffer-string))))
 
+(defun worg-fortune-insert-javascript-pre ()
+  (goto-char (point-min))
+  (insert "var r_text = new Array ();\n"))
+
+(defun worg-fortune-insert-javascript-post ()
+  (goto-char (point-max))
+  (insert (format "var i = Math.floor(%d*Math.random())\n" 
+		  worg-fortune-cnt)
+	  "document.write(r_text[i]);"))
+
 (provide 'worg-fortune)
-
-
