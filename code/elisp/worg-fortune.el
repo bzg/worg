@@ -35,7 +35,7 @@
 ;; (worg-write-fortune-file 
 ;;  "~/install/git/worg/org-quotes.org" 
 ;;  "/srv/http/org-mode/org-quote.js"
-;;  120 
+;;  130
 ;;  "r_text[%d] = \"%s\";" "\n"
 ;;  'worg-fortune-insert-javascript-pre
 ;;  'worg-fortune-insert-javascript-post)
@@ -99,7 +99,6 @@ in the DEST buffer."
   "Clean up HTML and Org elements in FORTUNE."
   (setq fortune (replace-regexp-in-string "@<[^>]+>" "" fortune)
 	fortune (replace-regexp-in-string "\\\\" "" fortune))
-	;; fortune (replace-regexp-in-string "\n" " " fortune)
   (with-temp-buffer
     (insert fortune)
     (goto-char (point-min))
@@ -109,10 +108,10 @@ in the DEST buffer."
     (beginning-of-line)
     (when (looking-at "^ +")
       (replace-match ""))
-    (insert "  -- ")
+    (insert " -- ")
     (goto-char (point-min))
     (while (re-search-forward "\n" nil t)
-      (replace-match ""))
+      (replace-match " "))
     (setq fortune (buffer-string))))
 
 (defun worg-fortune-insert-javascript-pre ()
@@ -126,3 +125,4 @@ in the DEST buffer."
 	  "document.write(r_text[i]);"))
 
 (provide 'worg-fortune)
+
