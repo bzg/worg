@@ -60,25 +60,26 @@ in this order.
 PRE and POST are a preambule and a postamble to the fortune file.
 They can be either a string or a function which will be applied
 in the DEST buffer."
-  (find-file src)
-  (setq worg-fortune nil worg-fortune-cnt 0)
-  (worg-collect-fortune-from-buffer)
-  (find-file dest)
-  (erase-buffer)
-  ;; Insert preamble
-  (cond ((functionp pre) (funcall pre))
-	((stringp pre) (insert pre)))
-  ;; insert fortune strings
-  (let (f)
-    (while (setq f (pop worg-fortune))
-      (when (< (length f) limit)
-	(insert (if fmt (format fmt worg-fortune-cnt f) f))
-	(insert (or sep "\n%\n"))
-	(setq worg-fortune-cnt (1+ worg-fortune-cnt)))))
-  ;; Insert postamble
-  (cond ((functionp post) (funcall post))
-	((stringp post) (insert post)))
-  (write-file dest))
+  (save-window-excursion
+    (find-file src)
+    (setq worg-fortune nil worg-fortune-cnt 0)
+    (worg-collect-fortune-from-buffer)
+    (find-file dest)
+    (erase-buffer)
+    ;; Insert preamble
+    (cond ((functionp pre) (funcall pre))
+	  ((stringp pre) (insert pre)))
+    ;; insert fortune strings
+    (let (f)
+      (while (setq f (pop worg-fortune))
+	(when (< (length f) limit)
+	  (insert (if fmt (format fmt worg-fortune-cnt f) f))
+	  (insert (or sep "\n%\n"))
+	  (setq worg-fortune-cnt (1+ worg-fortune-cnt)))))
+    ;; Insert postamble
+    (cond ((functionp post) (funcall post))
+	  ((stringp post) (insert post)))
+    (write-file dest)))
 
 (defun worg-collect-fortune-from-buffer nil
   "Collect a buffer's fortunes into `worg-fortune'."
