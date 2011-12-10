@@ -4,59 +4,67 @@
 #+LANGUAGE:  en
 #+OPTIONS:   H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:nil skip:t d:nil tags:not-in-toc
 
+
 * Introduction
   :PROPERTIES:
   :ID:       68EE02FB-4F09-4BDC-8577-AD4F60DE1B1B
   :END:
 
-Org-mode is a highly customizable package.  It currently contains
-close to 400 customization variables that can be changed to tweak
-every detail, and more than 260 are known to be actually used out
-there.
+#+index: Customization!Introduction
 
-However, as a beginner you do not care about this kind of flexibility.
-On this page, we have a list of five settings that you might want to
-try first in order to personalize your system.
+Org-mode is a highly customizable package.  It currently contains close to
+400 customization variables that can be changed to tweak every detail, and
+more than 260 are known to be actually used out there.
 
-Once you are done with that, we also have a list of some 40 variables
-that are [[http://orgmode.org/worg/org-configs/org-customization-survey.php][changed by many users]].
+However, as a beginner you do not care about this kind of flexibility.  On
+this page, we have a list of five settings that you might want to try first
+in order to personalize your system.
 
+Once you are done with that, we also have a list of some 40 variables that
+are [[http://orgmode.org/worg/org-configs/org-customization-survey.php][changed by many users]].
 
 * The Basics
 
+#+index: Customization!Basics
+
 ** Minimal customization
 
-The minimal customization needed to use Org-mode is -- *Nothing at
-all!* \par Org-mode works out of the box, and besides the steps described
-in the manual to [[http://orgmode.org/manual/Activation.html#Activation][activate]] it, /nothing is needed at all/.  Just open a
-/.org/ file, press =C-c [= to tell org that this is a file you want to
-use in your agenda, and start putting your life into plain text.
+#+index: Customization!Minimal
+
+The minimal customization needed to use Org-mode is -- *Nothing at all!*
+\par Org-mode works out of the box, and besides the steps described in the
+manual to [[http://orgmode.org/manual/Activation.html#Activation][activate]] it, /nothing is needed at all/.  Just open a /.org/
+file, press =C-c [= to tell org that this is a file you want to use in your
+agenda, and start putting your life into plain text.
 
 OK, for completeness, let's just repeat what is needed to activate
 Org-mode in files with /.org/ extension, and a few important key
 assignments.
 
 #+begin_src emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-font-lock-mode 1)
+  (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-font-lock-mode 1)
 #+end_src
 
 ** Five small steps toward a personalized system
-
+   
 *** One: More TODO keywords
 
+#+index: Todo Keywords
+
 Define the TODO states you find useful and single letters for fast
-selection.  Customize the variable =org-todo-keywords= or simply do
-this right in the file with[fn:1:press =C-c C-c= in the line after
-changing it]:
+selection.  Customize the variable =org-todo-keywords= or simply do this
+right in the file with[fn:1:press =C-c C-c= in the line after changing it]:
 
 #+begin_src org
-,#+TODO: TODO(t) STARTED(s) WAITING(w) | DONE(d) CANCELED(c)
+  ,#+TODO: TODO(t) STARTED(s) WAITING(w) | DONE(d) CANCELED(c)
 #+end_src
 
 *** Two: Which tags do you use most?
+
+#+index: Tag
 
 You can always add tags freely and by hand, but if you configure the
 most important ones along with fast-access keys, life will be better.
@@ -68,6 +76,8 @@ file with[fn:1]
 #+end_src
 
 *** Three: Which files are relevant for the agenda?
+
+#+index: Agenda
 
 When Org compiles agenda views like the the agenda for the current
 week (=C-c a a=) or the global TODO list (=C-c a t=), it checks all
@@ -88,14 +98,17 @@ as well.
 
 *** Five: Capture ideas with predefined templates
 
+#+index: Capture
+
 Use /remember/ to quickly capture ideas, tasks, and notes.  Add
+
 #+begin_src emacs-lisp
 (org-remember-insinuate)
 #+end_src
-to your setup and populate[fn:3: =M-x customize-variable RET
-org-remember-templates RET=] the variable =org-remember-templates=
-with templates and target locations.
 
+to your setup and populate[fn:3: M-x customize-variable RET
+org-remember-templates RET] the variable =org-remember-templates= with
+templates and target locations.
 
 * Pretend to be a power-user
 
@@ -106,12 +119,18 @@ frequently in the [[http://orgmode.org/worg/org-configs/org-customization-survey
 
 *** Basic setup
 
+#+index: Directory
+#+index: Agenda!Files
+#+index: Startup
+#+index: Archive!Location
+
 Here are a few things about basic setup that many people change.
 
 - org-directory :: Where are my Org files typically located?  Org
      acutally uses this variable only under rare circumstances, like
      when filing remember notes in an interactive way and prompting
      you for an Org file to put the note into.
+		   
 
 - org-agenda-files :: Which [[http://orgmode.org/manual/Agenda-files.html#Agenda-files][files]] do I want to be checked for entries
      when compiling my agenda?  Many people do not customize this one,
@@ -125,6 +144,13 @@ Here are a few things about basic setup that many people change.
 - org-archive-location :: When [[http://orgmode.org/manual/Archiving.html#Archiving][archiving]] an entry, where will it go?
 
 *** Editing behavior and appearance
+
+#+index: Appearance
+#+index: Follow links
+#+index: Completion
+#+index: Ido
+#+index: Levels
+#+index: Blank
 
 Besides being an organizer, Org-mode is also a text mode for writing
 and taking notes.  The following variables that influence basic
@@ -159,6 +185,11 @@ customized:
 
 *** The TODO keywords
 
+#+index: Todo Keywords
+#+index: Todo Keywords!Faces
+#+index: Todo Keywords!Dependencies
+#+index: Checkbox
+
 - org-todo-keywords :: Which [[http://orgmode.org/manual/TODO-extensions.html#TODO-extensions][TODO keywords]] should be used?  Also you
      can define keys for [[http://orgmode.org/manual/Fast-access-to-TODO-states.html#Fast-access-to-TODO-states][fast access]] here.  Very many people use this,
      or define the keywords with a =#+TODO:= setting in the buffer.
@@ -174,6 +205,8 @@ customized:
 
 *** Tags
 
+#+index: Tag
+
 - org-tag-alist :: Which [[http://orgmode.org/manual/Tags.html#Tags][tags]] should be available?  Note that tags
      besides the configured ones can be used, but for the important
      ones you can define keys for [[http://orgmode.org/manual/Setting-tags.html#Setting-tags][fast access]] here.
@@ -186,11 +219,18 @@ customized:
 
 *** Progress logging
 
+#+index: Progress!Logging
+#+index: Logging
+
 - org-log-done :: Do you want to [[http://orgmode.org/manual/Progress-logging.html#Progress-logging][capture]] time stamps and/or notes when
      TODO state changes, in particular when a task is DONE?  A simple
      setting that many use is =(setq org-log-done 'time)=.
 
 *** Remember and Refile
+
+#+index: Remember
+#+index: Capture
+#+index: Refile
 
 - org-reverse-note-order :: When adding new entries (or tasks) to a
      list, do I want the entry to be first or last in the list?
@@ -216,6 +256,8 @@ location to the correct project.
      targets. Headline only, or the path along the outline hierarchy?
 
 *** Agenda Views
+
+#+index: Agenda!Views
 
 - org-agenda-start-on-weekday :: Should the [[http://orgmode.org/manual/Weekly_002fdaily-agenda.html#Weekly_002fdaily-agenda][agenda]] start on Monday, or
      better today?
@@ -270,6 +312,9 @@ tasks in the agenda anyway.
 
 *** Export/Publishing setup
 
+#+index: Export
+#+index: Publish!Setup
+
 - org-export-with-LaTeX-fragments :: Should [[http://orgmode.org/manual/LaTeX-fragments.html#LaTeX-fragments][LaTeX fragments]] be
      converted to inline images for HTML output?
 
@@ -279,13 +324,11 @@ tasks in the agenda anyway.
 - org-publish-project-alist :: Set up projects that allow many files
      to be exported and [[http://orgmode.org/manual/Publishing.html#Publishing][published]] with a single command.
 
-
 * Become a true power user
 
-If you want to become a true power user, [[http://thread.gmane.org/gmane.emacs.orgmode/10804][see]] for yourself what
-some users do.  The Emacs customization system[fn:5:=M-x
-org-customize RET=] organizes all variables into a structure that can
-be used to easily [[http://orgmode.org/worg/org-tutorials/org-customize.html][find the one particular option]] you might be looking
-for.  Also, the [[http://orgmode.org/manual/][Org-mode manual]] and the [[http://orgmode.org/worg/org-faq.html][FAQ]] mention many variables in
-the appropriate context.
+If you want to become a true power user, [[http://thread.gmane.org/gmane.emacs.orgmode/10804][see]] for yourself what some users
+do.  The Emacs customization system[fn:5:=M-x org-customize RET=] organizes
+all variables into a structure that can be used to easily [[http://orgmode.org/worg/org-tutorials/org-customize.html][find the one
+particular option]] you might be looking for.  Also, the [[http://orgmode.org/manual/][Org-mode manual]] and
+the [[http://orgmode.org/worg/org-faq.html][FAQ]] mention many variables in the appropriate context.
 

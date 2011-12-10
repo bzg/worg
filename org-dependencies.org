@@ -3,6 +3,8 @@
 
 * Dependencies
 
+#+index: Dependencies
+
 Certain parts of org-mode have dependencies on external packages. This
 file documents these dependencies. Many sections are placeholders,
 waiting for input. If you can, please contribute. If you think that
@@ -17,45 +19,49 @@ the job. Thanks!
 Version: Org-mode version 7.01trans (release_7.01h.224.gf6c09)
 
 ** TODO Exporting in general.
+
 Anything here?
 
 ** STARTED LaTeX export.
+
 The LaTeX class is selected using the construct
 
-:#+LaTeX_CLASS: <class>
+: #+LaTeX_CLASS: <class>
 
-org-latex predefines the treatment of the following LaTeX classes
-article, report, book, beamer - or you can roll your own. And
-you can, of course, customize the treatment to your heart's content.
-This assumes a standard LaTeX install.
+org-latex predefines the treatment of the following LaTeX classes article,
+report, book, beamer - or you can roll your own. And you can, of course,
+customize the treatment to your heart's content.  This assumes a standard
+LaTeX install.
 
-On Linux/Mac OSX/BSD, the TeXlive distribution is recommended.
-On Windows, most people prefer  MikTeX.
+On Linux/Mac OSX/BSD, the TeXlive distribution is recommended.  On Windows,
+most people prefer MikTeX.
 
 ** Where to get packages
-The best way to get these packages is by using the package manager
-that comes with your operating system. These generally contain many
-useful LaTeX packages.
 
-If that is not possible, then you can get individual LaTeX packages
-from the CTAN sites (see [[http://www.tex.ac.uk/cgi-bin/texfaq2html?label=archives][CTAN archives]] for more information), but the
-installation process is less straightforward (but more portable):
-generally speaking, a LaTeX package comes in two files: a .ins file
-and a .dtx file (usually packed in a zip or tgz archive). Processing
-the .ins file through latex separates out the code from the .dtx file
-and produces the pieces that need to be installed on your system, but
-then it is up to you to figure out where to copy these files on your
-system for TeX and friends to find them. Processing the .dtx file
-directly through latex produces the documentation of the package:
+The best way to get these packages is by using the package manager that
+comes with your operating system. These generally contain many useful LaTeX
+packages.
+
+If that is not possible, then you can get individual LaTeX packages from
+the CTAN sites (see [[http://www.tex.ac.uk/cgi-bin/texfaq2html?label=archives][CTAN archives]] for more information), but the
+installation process is less straightforward (but more portable): generally
+speaking, a LaTeX package comes in two files: a .ins file and a .dtx file
+(usually packed in a zip or tgz archive). Processing the .ins file through
+latex separates out the code from the .dtx file and produces the pieces
+that need to be installed on your system, but then it is up to you to
+figure out where to copy these files on your system for TeX and friends to
+find them. Processing the .dtx file directly through latex produces the
+documentation of the package:
 
     - latex foo.ins -> foo.sty, etc.
     - pdflatex foo.dtx -> foo.pdf
 
-Many questions are answered by the [[http://www.tex.ac.uk/cgi-bin/texfaq2html?introduction=yes][TeX FAQ]] site, although the
-search capability is fairly primitive by today's standards: you
-will have to search a bit more diligently.
+Many questions are answered by the [[http://www.tex.ac.uk/cgi-bin/texfaq2html?introduction=yes][TeX FAQ]] site, although the search
+capability is fairly primitive by today's standards: you will have to
+search a bit more diligently.
 
 *** STARTED article, book, report
+
 The LaTeX packages included by default are as follows:
 
 | LaTeX package | Ubuntu container package  | Options | Comments                          |
@@ -76,8 +82,6 @@ The LaTeX packages included by default are as follows:
 | amssymb       | texlive-base              |         | Math symbols                      |
 | hyperref      | texlive-latex-base        |         |                                   |
 
-
-
 *** TODO beamer
 *** STARTED Symbols
 
@@ -90,39 +94,37 @@ by basic LaTeX, but some require the presence of extra packages.
 | =\EUR=      | \EUR                     | marvosym      | texlive-fonts-recommended |
 | =\euro=     | \euro                    | eurosym       | texlive-fonts-recommended |
 
-Note that marvosym is now included as part of the default setup so you
-do not need to include the package explicitly.
+Note that marvosym is now included as part of the default setup so you do
+not need to include the package explicitly.
 
 ** STARTED PDF export.
 
 PDF export goes through LaTeX export first, so all the LaTeX dependencies
 apply here as well.
 
-Certain PDF viewers have been reported to produce more or less
-unreadable files if Adobe Type3 fonts are used in the document.
-Evince has been identified as one of those. One way around this
-problem is to not use Type3 fonts. Another is to use a viewer that
-does not mistreat Type 3 fonts.
+Certain PDF viewers have been reported to produce more or less unreadable
+files if Adobe Type3 fonts are used in the document.  Evince has been
+identified as one of those. One way around this problem is to not use Type3
+fonts. Another is to use a viewer that does not mistreat Type 3 fonts.
 
 You can find more information about this problem in the TeX FAQ:
 
 To find out whether a document uses Type3 fonts, open it with Acrobat
-Reader/Evince, select Properties from the File menu and then select
-the Fonts tab; alternatively, use the pdffonts program (part of the
-xpdf-reader package) from the command line.
+Reader/Evince, select Properties from the File menu and then select the
+Fonts tab; alternatively, use the pdffonts program (part of the xpdf-reader
+package) from the command line.
 
 It is probably impossible to get rid of Type3 fonts completely
-(particularly if you are using special symbols or languages that
-don't use the Latin alphabet: in such cases, font availability is more
-limited and you just might not be able to find Type1 fonts to do the
-job).
+(particularly if you are using special symbols or languages that don't use
+the Latin alphabet: in such cases, font availability is more limited and
+you just might not be able to find Type1 fonts to do the job).
 
-For standard latin-alphabet languages that use the Computer
-Modern fonts (including small variations e.g. Polish and Czech), you
-*can* find Type1 versions: (XXX-needs fixing) the texlive-fonts-extra package (on
-Ubuntu/Debian) e.g. includes the AMS CM fonts which work well.
-Similar packages exist for other Linux distributions and probably
-for other operating systems as well.
+For standard latin-alphabet languages that use the Computer Modern fonts
+(including small variations e.g. Polish and Czech), you *can* find Type1
+versions: (XXX-needs fixing) the texlive-fonts-extra package (on
+Ubuntu/Debian) e.g. includes the AMS CM fonts which work well.  Similar
+packages exist for other Linux distributions and probably for other
+operating systems as well.
 
 | Type1 font      | LaTeX package | Ubuntu container package |
 |-----------------+---------------+--------------------------|
@@ -133,9 +135,10 @@ for other operating systems as well.
 
 ** TODO DocBook export.
 
-
 ** STARTED HTML export.
+
 *** STARTED Exporting LaTeX fragments as images.
+
 LaTeX fragments can be exported as images for inclusion into HTML
 documents. For example, complicated mathematical expressions can be
 dealt with this way. This is done by creating a LaTeX file that
@@ -144,9 +147,9 @@ file and then processing it through dvipng. So, in addition to LaTeX,
 you will need dvipng: on Ubuntu, this is available in the "dvipng"
 package.
 
-The LaTeX file contains a somewhat different list of LaTeX packages.
-Note that this is the default list, determined by the value of the
-variable ``org-format-latex-header''.
+The LaTeX file contains a somewhat different list of LaTeX packages.  Note
+that this is the default list, determined by the value of the variable
+``org-format-latex-header''.
 
 | LaTeX package | Ubuntu container package | Options  |
 |---------------+--------------------------+----------|
@@ -156,6 +159,6 @@ variable ``org-format-latex-header''.
 | latexsym      | texlive-latex-base       |          |
 | eucal         | texlive-base             | mathscr  |
 
-** TODO org-plot.
+** TODO org-plot
 
-** TODO org-babel.
+** TODO org-babel
