@@ -472,53 +472,16 @@ of its arguments."
     :CUSTOM_ID: transpose-table
     :END:
 
-This function by Juan Pechiar will transpose a table:
+Since Org 7.8, you can use =org-table-transpose-table-at-point= (which
+see.)  There are also other solutions:
 
-#+begin_src emacs-lisp
-(defun org-transpose-table-at-point ()
-  "Transpose orgmode table at point, eliminate hlines"
-  (interactive)
-  (let ((contents
-	 (apply #'mapcar* #'list
-		;; remove 'hline from list
-		(remove-if-not 'listp
-			       ;; signals error if not table
-			       (org-table-to-lisp)))))
-    (delete-region (org-table-begin) (org-table-end))
-    (insert (mapconcat (lambda(x) (concat "| " (mapconcat 'identity x " | " ) "  |\n" ))
-		       contents ""))
-    (org-table-align)))
-#+end_src
-
-So a table like
-
-: | 1 | 2 | 4 | 5 |
-: |---+---+---+---|
-: | a | b | c | d |
-: | e | f | g | h |
-
-will be transposed as
-
-: | 1 | a | e |
-: | 2 | b | f |
-: | 4 | c | g |
-: | 5 | d | h |
-
-(Note that horizontal lines disappeared.)
-
-There are also other solutions:
 - with org-babel and Emacs Lisp: provided by Thomas S. Dye in the mailing
-  list, see
-  [[http://thread.gmane.org/gmane.emacs.orgmode/23809/focus=23815][gmane]]
-  or
-  [[http://lists.gnu.org/archive/html/emacs-orgmode/2010-04/msg00239.html][gnu]]
+  list, see [[http://thread.gmane.org/gmane.emacs.orgmode/23809/focus=23815][gmane]] or [[http://lists.gnu.org/archive/html/emacs-orgmode/2010-04/msg00239.html][gnu]]
+
 - with org-babel and R: provided by Dan Davison in the mailing list (old
-  =#+TBLR:= syntax), see
-  [[http://thread.gmane.org/gmane.emacs.orgmode/10159/focus=10159][gmane]]
-  or
-  [[http://lists.gnu.org/archive/html/emacs-orgmode/2008-12/msg00454.html][gnu]]
-- with field coordinates in formulas (=@#= and =$#=): see
-  [[file:org-hacks.org::#field-coordinates-in-formulas-transpose-table][Worg]].
+  =#+TBLR:= syntax), see [[http://thread.gmane.org/gmane.emacs.orgmode/10159/focus=10159][gmane]] or [[http://lists.gnu.org/archive/html/emacs-orgmode/2008-12/msg00454.html][gnu]]
+
+- with field coordinates in formulas (=@#= and =$#=): see [[file:org-hacks.org::#field-coordinates-in-formulas-transpose-table][Worg]].
 
 *** Manipulate hours/minutes/seconds in table formulas
 #+index: Table!hours-minutes-seconds
