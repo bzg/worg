@@ -24,7 +24,7 @@ workaround. Go crazy.
     :CUSTOM_ID: compiling-org-without-make
     :END:
 
-#+index: Compilation
+#+index: Compilation!without make
 
 This file is the result of  [[http://article.gmane.org/gmane.emacs.orgmode/15264][one of our discussions]] on the mailing list.
 Enhancements welcome.
@@ -78,6 +78,8 @@ the autoloads file `org-install.el' then. If `t', compile the sources, too.")
 #+END_SRC
 *** Reload Org
 
+#+index: Initialization!Reload
+
 As of Org version 6.23b (released Sunday Feb 22, 2009) there is a new
 function to reload org files.
 
@@ -101,7 +103,7 @@ To switch back to the compiled version just reload again with
 :PROPERTIES:
 :CUSTOM_ID: check-old-link-escapes
 :END:
-
+#+index: Link!Escape
 Starting with version 7.5 Org uses [[http://en.wikipedia.org/wiki/Percent-encoding][percent escaping]] more consistently
 and with a modified algorithm to determine which characters to escape
 and how.
@@ -142,6 +144,8 @@ in old Org's list of known percent escapes.
 
 ** Structure Movement and Editing 
 *** Show next/prev heading tidily
+
+#+index: Navigation!Heading
 - Dan Davison
   These close the current heading and open the next/previous heading.
 
@@ -181,6 +185,7 @@ in old Org's list of known percent escapes.
 #+end_src
 
 *** Promote all items in subtree
+#+index: Structure Editing!Promote
 - Matt Lundin
 
 This function will promote all items in a subtree. Since I use
@@ -198,7 +203,8 @@ unimaginatively called my-org-un-project:
     :PROPERTIES:
     :CUSTOM_ID: heading-to-link
     :END:
-
+#+index: Structure Editing!Heading
+#+index: Link!Turn a heading into a
 From David Maus:
 
 #+begin_src emacs-lisp
@@ -220,6 +226,7 @@ From David Maus:
 #+end_src
 
 *** Using M-up and M-down to transpose paragraphs
+#+index: Structure Editing!paragraphs
 
 From Paul Sexton: By default, if used within ordinary paragraphs in
 org mode, =M-up= and =M-down= transpose *lines* (not sentences).  The
@@ -245,6 +252,7 @@ sentences.
  (lambda () (interactive) (org-transpose-paragraphs 1)))
 #+end_src
 *** Changelog support for org headers
+#+index: Structure Editing!Heading
 -- James TD Smith
 
 Put the following in your =.emacs=, and =C-x 4 a= and other functions which
@@ -266,6 +274,7 @@ buffer.
 #+END_SRC
 
 *** Different org-cycle-level behavior
+#+index: Cycling!behavior
 -- Ryan Thompson
 
 In recent org versions, when your point (cursor) is at the end of an
@@ -458,6 +467,7 @@ of its arguments."
 
 ** Org Table
 *** Transpose table
+#+index: Table!Calculation
     :PROPERTIES:
     :CUSTOM_ID: transpose-table
     :END:
@@ -511,7 +521,7 @@ There are also other solutions:
   [[file:org-hacks.org::#field-coordinates-in-formulas-transpose-table][Worg]].
 
 *** Manipulate hours/minutes/seconds in table formulas
-
+#+index: Table!hours-minutes-seconds
 Both Bastien and Martin Halder have posted code ([[http://article.gmane.org/gmane.emacs.orgmode/39519][Bastien's code]] and
 [[http://article.gmane.org/gmane.emacs.orgmode/39519][Martin's code]]) for interpreting =dd:dd= or =dd:dd:dd= strings (where
 "=d=" is any digit) as time values in Org-mode table formula.  These
@@ -588,7 +598,7 @@ Elisp formulas) to compute time durations.  For example:
 : #+TBLFM: @2$3=$1+$2;T
 
 *** Dates computation
-
+#+index: Table!dates
 Xin Shi [[http://article.gmane.org/gmane.emacs.orgmode/15692][asked]] for a way to calculate the duration of 
 dates stored in an org table.
 
@@ -606,7 +616,7 @@ above).  The problem that this last article pointed out was solved in [[http://a
 post]] and Chris Randle's original musings are [[http://article.gmane.org/gmane.emacs.orgmode/6536/][here]].
 
 *** Hex computation
-
+#+index: Table!Calculation
 As with Times computation, the following code allows Computation with
 Hex values in Org-mode tables using the =with-hex= macro.
 
@@ -663,7 +673,7 @@ and subtracting hex values.
     :PROPERTIES:
     :CUSTOM_ID: field-coordinates-in-formulas
     :END:
-
+#+index: Table!Field Coordinates
 -- Michael Brand
 
 Following are some use cases that can be implemented with the “field
@@ -768,6 +778,7 @@ which is the Emacs Calc implementation of the equation
 where /i/ is the current time and /a/ is the length of the preceding period.
 
 *** Change the column sequence in one row only
+#+index: Table!Editing
     :PROPERTIES:
     :CUSTOM_ID: column-sequence-in-row
     :END:
@@ -909,6 +920,8 @@ behavior with C-c C-c on one of the three snippets:
 
 ** Capture and Remember
 *** Customize the size of the frame for remember
+#+index: Remember!frame
+#+index: Customization!remember
 (Note: this hack is likely out of date due to the development of
 [[org-capture]].)
 
@@ -940,6 +953,7 @@ reasonable size for the frame.
 ** Handling Links
 *** [[#heading-to-link][Turn a heading into an org link]] 
 *** Quickaccess to the link part of hyperlinks
+#+index: Link!Referent
 Christian Moe [[http://permalink.gmane.org/gmane.emacs.orgmode/43122][asked]], if there is a simpler way to copy the link part
 of an org hyperling other than to use `C-c C-l C-a C-k C-g', 
 which is indeed kind of cumbersome.
@@ -968,6 +982,7 @@ They put the link destination on the killring and can be easily bound to a key.
 
 ** Archiving Content in Org-Mode
 *** Preserve top level headings when archiving to a file
+#+index: Archiving!Preserve top level headings
 - Matt Lundin
 
 To preserve (somewhat) the integrity of your archive structure while
@@ -1036,7 +1051,7 @@ tags found on those headings:
 #+end_src
 
 *** Archive in a date tree
-
+#+index: Archiving!date tree
 Posted to Org-mode mailing list by Osamu Okano [2010-04-21 Wed].
 
 (Make sure org-datetree.el is loaded for this to work.)
@@ -1075,7 +1090,7 @@ Posted to Org-mode mailing list by Osamu Okano [2010-04-21 Wed].
 #+end_src
 
 *** Add inherited tags to archived entries
-
+#+index: Archiving!Add inherited tags
 To make =org-archive-subtree= keep inherited tags, Osamu OKANO suggests to
 advise the function like this:
 
@@ -1088,6 +1103,7 @@ advise the function like this:
 
 ** Using and Managing Org-Metadata
 *** Remove redundant tags of headlines
+#+index: Tag!Remove redundant
 -- David Maus
 
 A small function that processes all headlines in current buffer and
@@ -1116,7 +1132,7 @@ headline or the #+FILETAGS: statement.
 #+END_SRC
 
 *** Remove empty property drawers
-
+#+index: Drawer!Empty
 David Maus proposed this:
 
 #+begin_src emacs-lisp
@@ -1133,7 +1149,7 @@ David Maus proposed this:
 #+end_src
 
 *** Group task list by a property
-
+#+index: Agenda!Group task list
 This advice allows you to group a task list in Org-Mode.  To use it,
 set the variable =org-agenda-group-by-property= to the name of a
 property in the option list for a TODO or TAGS search.  The resulting
@@ -1188,6 +1204,8 @@ agenda view will group tasks by that property prior to searching.
 (ad-activate 'org-finalize-agenda-entries)
 #+end_src
 *** A way to tag a task so that when clocking-out user is prompted to take a note.
+#+index: Tag!Clock
+#+index: Clock!Tag
     Thanks to Richard Riley (see [[http://permalink.gmane.org/gmane.emacs.orgmode/40896][this post on the mailing list]]).
 
 A small hook run when clocking out of a task that prompts for a note
@@ -1207,6 +1225,7 @@ when the tag "=clockout_note=" is found in a headline. It uses the tag
   (add-hook 'org-clock-out-hook 'rgr/check-for-clock-out-note)
 #+end_src
 *** Dynamically adjust tag position
+#+index: Tag!position
 Here is a bit of code that allows you to have the tags always
 right-adjusted in the buffer.
 
@@ -1283,7 +1302,7 @@ changed.
 (ad-activate 'org-refile)
 #+end_src
 *** Use an "attach" link type to open files without worrying about their location
-
+#+index: Link!Attach
 -- Darlan Cavalcante Moreira
 
 In the setup part in my org-files I put:
@@ -1306,6 +1325,7 @@ This works very well.
 
 ** Org Agenda and Task Management
 *** Make it easier to set org-agenda-files from multiple directories
+#+index: Agenda!Files
 - Matt Lundin
 
 #+begin_src emacs-lisp
@@ -1372,6 +1392,7 @@ directories and extensions to generate different lists of agenda
 files.
 
 *** Restrict org-agenda-files by filetag
+#+index: Agenda!Files
   :PROPERTIES:
   :CUSTOM_ID: set-agenda-files-by-filetag
   :END:
@@ -1436,7 +1457,7 @@ containing the filetag. To release the restriction, type C-c C-x >
 (org-agenda-remove-restriction-lock).
 
 *** Highlight the agenda line under cursor
-
+#+index: Agenda!Highlight
 This is useful to make sure what task you are operating on.
 
 #+BEGIN_SRC emacs-lisp
@@ -1457,8 +1478,8 @@ Under XEmacs:
                     (:background "white" :foreground "black")))))
 #+END_SRC
 
-*** Split horizontally for agenda
-
+*** Split frame horizontally for agenda
+#+index: Agenda!frame
 If you would like to split the frame into two side-by-side windows when
 displaying the agenda, try this hack from Jan Rehders, which uses the
 `toggle-window-split' from
@@ -1473,7 +1494,8 @@ http://www.emacswiki.org/cgi-bin/wiki/ToggleWindowSplit
 #+END_SRC
 
 *** Automatically add an appointment when clocking in a task
-
+#+index: Clock!Automatically add an appointment when clocking in a task
+#+index: Appointment!Automatically add an appointment when clocking in a task
 #+BEGIN_SRC emacs-lisp
 ;; Make sure you have a sensible value for `appt-message-warning-time'
 (defvar bzg-org-clock-in-appt-delay 100
@@ -1544,11 +1566,12 @@ And here is the advice for =org-clock-out= (=C-c C-x C-o=)
 agenda buffer with the advice above will bring an error.
 
 *** Using external programs for appointments reminders
-
+#+index: Appointment!reminders
 Read this rich [[http://comments.gmane.org/gmane.emacs.orgmode/46641][thread]] from the org-mode list.
 
-*** Remove time grid lines that are in an appointment
-
+*** Remove from agenda time grid lines that are in an appointment
+#+index: Agenda!time grid
+#+index: Appointment!Remove from agenda time grid lines
 The agenda shows lines for the time grid.  Some people think that
 these lines are a distraction when there are appointments at those
 times.  You can get rid of the lines which coincide exactly with the
@@ -1596,7 +1619,8 @@ appointment:
     ad-do-it))
 (ad-activate 'org-agenda-add-time-grid-maybe)
 #+end_src
-*** Disable vc for Org mode agenda files
+*** Disable version control for Org mode agenda files
+#+index: Agenda!Files
 -- David Maus
 
 Even if you use Git to track your agenda files you might not need
@@ -1613,6 +1637,9 @@ vc-mode to be enabled for these files.
 #+end_src
 
 *** Easy customization of TODO colors
+#+index: Customization!Todo keywords
+#+index: Todo keywords!Customization
+
 -- Ryan C. Thompson
 
 Here is some code I came up with some code to make it easier to
@@ -1671,7 +1698,8 @@ If KWD is a number, get the corresponding match group."
 #+END_SRC
 
 *** Add an effort estimate on the fly when clocking in
-
+#+index: Effort estimate!Add when clocking in
+#+index: Clock!Effort estimate
 You can use =org-clock-in-prepare-hook= to add an effort estimate.
 This way you can easily have a "tea-timer" for your tasks when they
 don't already have an effort estimate.
@@ -1706,7 +1734,7 @@ Or you can use a default effort for such a timer:
 #+end_src
 
 *** Refresh the agenda view regurally
-
+#+index: Agenda view!Refresh
 Hack sent by Kiwon Um:
 
 #+begin_src emacs-lisp
@@ -1720,7 +1748,7 @@ Hack sent by Kiwon Um:
 #+end_src
 
 *** Reschedule agenda items to today with a single command
-
+#+index: Agenda!Reschedule
 This was suggested by Carsten in reply to David Abrahams:
 
 #+begin_example emacs-lisp
@@ -1731,7 +1759,7 @@ This was suggested by Carsten in reply to David Abrahams:
 #+end_example
 
 *** Mark subtree DONE along with all subheadings
-
+#+index: Subtree!subheadings
 Bernt Hansen [[http://permalink.gmane.org/gmane.emacs.orgmode/44693][suggested]] this command:
 
 #+begin_src emacs-lisp
