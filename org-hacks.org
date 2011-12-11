@@ -1733,7 +1733,51 @@ Or you can use a default effort for such a timer:
     (org-set-property "Effort" org-clock-default-effort)))
 #+end_src
 
-*** Refresh the agenda view regurally
+*** Use idle timer for automatic agenda views
+#+index: Agenda view!Refresh
+From John Wiegley's mailing list post (March 18, 2010):
+
+#+begin_quote
+I have the following snippet in my .emacs file, which I find very
+useful. Basically what it does is that if I don't touch my Emacs for 5
+minutes, it displays the current agenda. This keeps my tasks "always
+in mind" whenever I come back to Emacs after doing something else,
+whereas before I had a tendency to forget that it was there.
+#+end_quote
+
+  - [[http://mid.gmane.org/55590EA7-C744-44E5-909F-755F0BBE452D@gmail.com][John Wiegley: Displaying your Org agenda after idle time]]
+
+#+begin_src emacs-lisp
+(defun jump-to-org-agenda ()
+  (interactive)
+  (let ((buf (get-buffer "*Org Agenda*"))
+        wind)
+    (if buf
+        (if (setq wind (get-buffer-window buf))
+            (select-window wind)
+          (if (called-interactively-p)
+              (progn
+                (select-window (display-buffer buf t t))
+                (org-fit-window-to-buffer)
+                ;; (org-agenda-redo)
+                )
+            (with-selected-window (display-buffer buf)
+              (org-fit-window-to-buffer)
+              ;; (org-agenda-redo)
+              )))
+      (call-interactively 'org-agenda-list)))
+  ;;(let ((buf (get-buffer "*Calendar*")))
+  ;;  (unless (get-buffer-window buf)
+  ;;    (org-agenda-goto-calendar)))
+  )
+
+(run-with-idle-timer 300 t 'jump-to-org-agenda)
+#+end_src
+
+#+results:
+: [nil 0 300 0 t jump-to-org-agenda nil idle]
+
+*** Refresh the agenda view regularly
 #+index: Agenda view!Refresh
 Hack sent by Kiwon Um:
 
@@ -1779,7 +1823,7 @@ Then M-x bh/mark-subtree-done.
 
 ** Exporting org files
 *** Export Org to Org and handle includes.
-
+#+index: Export!handle includes
 Nick Dokos came up with this useful function:
 
 #+begin_src emacs-lisp
@@ -1805,6 +1849,7 @@ recursively processing #+INCLUDEs."
     :CUSTOM_ID: latex-command-for-floats
     :END:
 
+#+index: Export!LaTeX
 The keyword ~placement~ can be used to specify placement options to
 floating environments (like =\begin{figure}= and =\begin{table}=}) in
 LaTeX export. Org passes along everything passed in options as long as
@@ -1845,6 +1890,8 @@ workaround, one can use the following:
 
 *** Styling code sections with CSS
 
+#+index: HTML!Styling code sections with CSS
+
 Code sections (marked with =#+begin_src= and =#+end_src=) are exported
 to HTML using =<pre>= tags, and assigned CSS classes by their content
 type.  For example, Perl content will have an opening tag like
@@ -1873,6 +1920,8 @@ class) from input (all the =.src-*= classes).
 
 * Hacking Org: Working with Org-mode and other Emacs Packages.
 ** org-remember-anything
+
+#+index: Remember!Anything
 
 [[http://www.emacswiki.org/cgi-bin/wiki/Anything][Anything]] users may find the snippet below interesting:
 
@@ -1905,6 +1954,9 @@ Fix a problem with =saveplace.el= putting you back in a folded position:
 #+end_src
 
 ** Using ido-completing-read to find attachments
+
+#+index: Attachment!ido completion
+
 -- Matt Lundin.
 
 Org-attach is great for quickly linking files to a project. But if you
@@ -1955,52 +2007,8 @@ To browse your org attachments using ido fuzzy matching and/or the
 completion buffer, invoke ido-find-file as usual (=C-x C-f=) and then
 press =C-;=.
 
-** Use idle timer for automatic agenda views
-
-From John Wiegley's mailing list post (March 18, 2010):
-
-#+begin_quote
-I have the following snippet in my .emacs file, which I find very
-useful. Basically what it does is that if I don't touch my Emacs for 5
-minutes, it displays the current agenda. This keeps my tasks "always
-in mind" whenever I come back to Emacs after doing something else,
-whereas before I had a tendency to forget that it was there.
-#+end_quote
-
-  - [[http://mid.gmane.org/55590EA7-C744-44E5-909F-755F0BBE452D@gmail.com][John Wiegley: Displaying your Org agenda after idle time]]
-
-#+begin_src emacs-lisp
-(defun jump-to-org-agenda ()
-  (interactive)
-  (let ((buf (get-buffer "*Org Agenda*"))
-        wind)
-    (if buf
-        (if (setq wind (get-buffer-window buf))
-            (select-window wind)
-          (if (called-interactively-p)
-              (progn
-                (select-window (display-buffer buf t t))
-                (org-fit-window-to-buffer)
-                ;; (org-agenda-redo)
-                )
-            (with-selected-window (display-buffer buf)
-              (org-fit-window-to-buffer)
-              ;; (org-agenda-redo)
-              )))
-      (call-interactively 'org-agenda-list)))
-  ;;(let ((buf (get-buffer "*Calendar*")))
-  ;;  (unless (get-buffer-window buf)
-  ;;    (org-agenda-goto-calendar)))
-  )
-
-(run-with-idle-timer 300 t 'jump-to-org-agenda)
-#+end_src
-
-#+results:
-: [nil 0 300 0 t jump-to-org-agenda nil idle]
-
 ** Link to Gnus messages by Message-Id
-
+#+index: Link!Gnus message by Message-Id
 In a [[http://thread.gmane.org/gmane.emacs.orgmode/8860][recent thread]] on the Org-Mode mailing list, there was some
 discussion about linking to Gnus messages without encoding the folder
 name in the link.  The following code hooks in to the store-link
@@ -2090,8 +2098,8 @@ it is a cons of 'gnus and the select (type and name).")
      (org-add-link-type "mid" 'mde-org-gnus-open-message-link)))
 #+end_src
 
-** Store link upon sending a message in Gnus
-
+** Store link to a message when sending in Gnus
+#+index: Link!Store link to a message when sending in Gnus
 Ulf Stegemann came up with this solution (see his [[http://www.mail-archive.com/emacs-orgmode@gnu.org/msg33278.html][original message]]):
 
 #+begin_src emacs-lisp
@@ -2314,6 +2322,7 @@ The whole magic lies in the special strings that mark a HTML
 attachment.  So you might just have to find out what these special
 strings are in message-mode and modify the functions accordingly.
 ** Add sunrise/sunset times to the agenda.
+#+index: Agenda!Diary s-expressions
   -- Nick Dokos
 
 The diary package provides the function =diary-sunrise-sunset= which can be used
@@ -2379,12 +2388,14 @@ The thread on the mailing list that started this can be found [[http://thread.gm
 In comparison to the version posted on the mailing list, this one
 gets rid of the timezone information.
 ** Export BBDB contacts to org-contacts.el
-
+#+index: Address Book!BBDB to org-contacts
 Try this tool by Wes Hardaker:
 
 http://www.hardakers.net/code/bbdb-to-org-contacts/
 
 ** Calculating date differences - how to write a simple elisp function
+#+index: Timestamp!date calculations
+#+index: Elisp!technique
 
 Alexander Wingård asked how to calculate the number of days between a
 time stamp in his org file and today (see
@@ -2461,7 +2472,7 @@ various pieces.
 
 * Hacking Org: Working with Org-mode and External Programs.
 ** Use Org-mode with Screen [Andrew Hyatt]
-
+#+index: Link!to screen session
 "The general idea is that you start a task in which all the work will
 take place in a shell.  This usually is not a leaf-task for me, but
 usually the parent of a leaf task.  From a task in your org-file, M-x
@@ -2513,6 +2524,8 @@ http://article.gmane.org/gmane.emacs.orgmode/5276
 #+END_SRC
 
 ** Org Agenda + Appt + Zenity
+#+index: Appointment!reminders
+#+index: Appt!Zenity
 #+BEGIN_HTML
 <a name="agenda-appt-zenity"></a>
 #+END_HTML
@@ -2554,19 +2567,21 @@ popup window.
 #+END_SRC
 
 ** Org-Mode + gnome-osd
-
+#+index: Appointment!reminders
+#+index: Appt!gnome-osd
 Richard Riley uses gnome-osd in interaction with Org-Mode to display
 appointments.  You can look at the code on the [[http://www.emacswiki.org/emacs-en/OrgMode-OSD][emacswiki]].
 
 ** remind2org
-
+#+index: Agenda!Views
+#+index: Agenda!and Remind (external program)
 From Detlef Steuer
 
 http://article.gmane.org/gmane.emacs.orgmode/5073
 
 #+BEGIN_QUOTE
 Remind (http://www.roaringpenguin.com/products/remind) is a very powerful
-command line calendaring program. Its features superseed the possibilities
+command line calendaring program. Its features supersede the possibilities
 of orgmode in the area of date specifying, so that I want to use it
 combined with orgmode.
 
@@ -2577,7 +2592,7 @@ future. :-)
 #+END_QUOTE
 
 ** Useful webjumps for conkeror
-
+#+index: Shortcuts!conkeror
 If you are using the [[http://conkeror.org][conkeror browser]], maybe you want to put this into
 your =~/.conkerorrc= file:
 
@@ -2590,6 +2605,7 @@ It creates two [[http://conkeror.org/Webjumps][webjumps]] for easily searching t
 Org-mode mailing list.
 
 ** Use MathJax for HTML export without requiring JavaScript
+#+index: Export!MathJax
 As of 2010-08-14, MathJax is the default method used to export math to HTML.
 
 If you like the results but do not want JavaScript in the exported pages,
@@ -2602,7 +2618,7 @@ export process (configurable per file with a "#+StaticMathJax:" line).
 
 Read README.org and the comments in org-static-mathjax.el for usage instructions.
 ** Search Org files using lgrep
-
+#+index: search!lgrep
 Matt Lundin suggests this:
 
 #+begin_src emacs-lisp
@@ -2622,7 +2638,7 @@ Prefix argument determines number of lines."
 #+end_src
 
 ** Automatic screenshot insertion
-
+#+index: Link!screenshot
 Suggested by Russell Adams
 
 #+begin_src emacs-lisp
@@ -2642,12 +2658,12 @@ Suggested by Russell Adams
 #+end_src
 
 ** Capture invitations/appointments from MS Exchange emails
-
+#+index: Appointment!MS Exchange
 Dirk-Jan C.Binnema [[http://article.gmane.org/gmane.emacs.orgmode/27684/][provided]] code to do this.  Please check
 [[file:code/elisp/org-exchange-capture.el][org-exchange-capture.el]]
 
 ** Audio/video file playback within org mode
-
+#+index: Link!audio/video
 Paul Sexton provided code that makes =file:= links to audio or video files
 (MP3, WAV, OGG, AVI, MPG, et cetera) play those files using the [[https://github.com/dbrock/bongo][Bongo]] Emacs
 media player library. The user can pause, skip forward and backward in the
@@ -2658,7 +2674,7 @@ position in the track.
 See the file [[file:code/elisp/org-player.el][org-player.el]]
 
 ** Under X11 Keep a window with the current agenda items at all time
-
+#+index: Agenda!dedicated window
 I struggle to keep (in emacs) a window with the agenda at all times.
 For a long time I have wanted a sticky window that keeps this
 information, and then use my window manager to place it and remove its
@@ -2685,7 +2701,7 @@ http://turingmachine.org/hacking/org-mode/
 --daniel german
 
 ** Script (thru procmail) to output emails to an Org file
-
+#+index: Conversion!email to org file
 Tycho Garen sent [[http://comments.gmane.org/gmane.emacs.orgmode/44773][this]]:
 
 : I've [...] created some procmail and shell glue that takes emails and
@@ -2695,7 +2711,7 @@ Tycho Garen sent [[http://comments.gmane.org/gmane.emacs.orgmode/44773][this]]:
 Everything is documented [[http://tychoish.com/code/org-mail/][here]].
 
 ** Meaningful diff for org files in a git repository
-
+#+index: git!diff org files
 Since most diff utilities are primarily meant for source code, it is
 difficult to read diffs of text files like ~.org~ files easily. If you
 version your org directory with a SCM like git you will know what I
@@ -2747,7 +2763,8 @@ index a0672ea..92a08f7 100644
 * Musings
 
 ** Cooking?  Brewing?
-
+#+index: beer!brewing
+#+index: cooking!conversions
 See [[http://article.gmane.org/gmane.emacs.orgmode/44981][this message]] from Erik Hetzner:
 
 It currently does metric/english conversion, and a few other tricks.
