@@ -34,7 +34,7 @@ use it, enable Ledger support.  Check the [[http://orgmode.org/worg/org-contrib/
 Worg]] for instructions on how to achieve this but I currently do this
 directly as follows:
 
-#+srcname: babel-language-setup
+#+name: babel-language-setup
 #+begin_src emacs-lisp 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -86,7 +86,7 @@ within an org file is to use a single source block to record all
 Ledger entries.  The following is an example source block:
 
 #+begin_example
-,#+srcname: allinone
+,#+name: allinone
 ,#+begin_src ledger
 2010/01/01 * Starting balance
   assets:bank:savings  £1300.00
@@ -163,7 +163,7 @@ these into /expenses/ and /income/, as follows:
     to later must have the =:noweb yes= babel header argument specified.
 
 #+begin_example
-,#+srcname: income
+,#+name: income
 #+begin_src ledger :noweb yes
 2010/01/01 * Starting balance
   assets:bank:savings  £1300.00
@@ -190,7 +190,7 @@ these into /expenses/ and /income/, as follows:
     but could have been done individually.
 
 #+begin_example
-,#+srcname: expenses
+,#+name: expenses
 #+begin_src ledger :noweb yes
 2010/07/23 Rent
   expenses:rent  £500.00
@@ -219,7 +219,7 @@ these into /expenses/ and /income/, as follows:
       to by the =<<income>>= and =<<expenses>>== lines.
 
 #+begin_example
-,#+srcname: balance
+,#+name: balance
 #+begin_src ledger :cmdline bal :noweb yes
 <<income>>
 <<expenses>>
@@ -264,7 +264,7 @@ to tell Ledger to include sub-accounts in the report.
       if all the entries are correct).
 
 #+begin_example
-,#+srcname: monthlyregister
+,#+name: monthlyregister
 ,#+begin_src ledger :cmdline -M reg :noweb yes
 <<income>>
 <<expenses>>
@@ -288,7 +288,7 @@ these are increasing (or decreasing!).  In this case, the final column
 will be the running total of the =assets= in our ledger.
 
 #+begin_example
-,#+srcname: monthlyassetsregister
+,#+name: monthlyassetsregister
 ,#+begin_src ledger :cmdline -M reg assets :noweb yes
 <<income>>
 <<expenses>>

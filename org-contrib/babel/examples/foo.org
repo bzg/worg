@@ -63,7 +63,7 @@ plain old text interspersed with "code blocks" which are plain old R.
 
 Plots get a little more complicated.  First we make something to plot
 (simulated regression data).
-#+source: reg
+#+name: reg
 #+begin_src R :results output :exports both
   n <- 50
   x <- seq(1, n)
@@ -79,7 +79,7 @@ Plots get a little more complicated.  First we make something to plot
 you want to see what the actual code chunk was).
 
 Figure \ref{fig:one} (p. \pageref{fig:one}) is produced by the following code
-#+srcname: fig1plot
+#+name: fig1plot
 #+begin_src R :exports code
   plot(x, y)
   abline(out1)
@@ -87,7 +87,7 @@ Figure \ref{fig:one} (p. \pageref{fig:one}) is produced by the following code
 Note that =x=, =y=, and =out1= are remembered from the preceding code
 chunk.  We don't have to regenerate them.  All code chunks are part of
 one R "session".
-#+source: fig1
+#+name: fig1
 #+begin_src R :exports results :noweb yes :file fig1.pdf
   <<fig1plot>>
 #+end_src
@@ -100,16 +100,16 @@ one R "session".
 
 Now this was a little tricky.  We did this with two code chunks,
 one visible and one invisible.  First we did
-: #+srcname: fig1plot
+: #+name: fig1plot
 : #+begin_src R :exports code :file fig1plot.pdf
 :   plot(x, y)
 :   abline(out1)
 : #+end_src
 where the =:exports code= indicates that only the return value (not
-code) should be exported and the =#+srcname: fig1plot= gives the code
+code) should be exported and the =#+name: fig1plot= gives the code
 block a name (to be used later).  And "later" is almost immediate.
 Next we did
-: #+source: fig1
+: #+name: fig1
 : #+begin_src R :exports results :noweb yes :file fig1.pdf
 :   <<fig1plot>>
 : #+end_src
@@ -135,7 +135,7 @@ than others.  Note the following virtues
   least by the R in the text).
 - No messing around with sizing or rotations.  It just works!
 
-#+source: fig2
+#+name: fig2
 #+begin_src R :exports results :file fig2.pdf
   out3 <- lm(y ~ x + I(x^2) + I(x^3))
   plot(x, y)
@@ -145,7 +145,7 @@ than others.  Note the following virtues
 Note that if you don't care to show the R code to make the figure, it
 is simpler still.  Figure \ref{fig:two} shows another plot.  What I
 actually typed in =foo.org= was
-: #+srcname: fig2
+: #+name: fig2
 : #+begin_src R :exports results :file fig2.pdf
 :   out3 <- lm(y ~ x + I(x^2) + I(x^3))
 :   plot(x, y)
@@ -203,7 +203,7 @@ Look at =foo.org= for details.)
   dim(foo)
 #+end_src
 
-#+source: foo-as-matrix
+#+name: foo-as-matrix
 #+begin_src R :exports both :results output
   foo <- as.matrix(foo)
   foo
