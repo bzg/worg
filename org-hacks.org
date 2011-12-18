@@ -760,34 +760,34 @@ table as the starting point for each example:
 **** Move in row left
 
 1) place point at "10" in original table
-2) result of M-x my-org-table-move-column-in-row-left
-: | a | b  | c | d  |
-: | e | 10 | 9 | 11 |
-: | f | g  | h | i  |
+2) result of M-x my-org-table-move-column-in-row-left:
+   : | a | b  | c | d  |
+   : | e | 10 | 9 | 11 |
+   : | f | g  | h | i  |
 
 **** Move in row right
 
 1) place point at "9" in original table
-2) result of M-x my-org-table-move-column-in-row-right
-: | a | b  | c | d  |
-: | e | 10 | 9 | 11 |
-: | f | g  | h | i  |
+2) result of M-x my-org-table-move-column-in-row-right:
+   : | a | b  | c | d  |
+   : | e | 10 | 9 | 11 |
+   : | f | g  | h | i  |
 
 **** Rotate in row left
 
 1) place point at "9" in original table
-2) result of M-x my-org-table-rotate-column-in-row-left
-: | a | b  | c  | d |
-: | e | 10 | 11 | 9 |
-: | f | g  | h  | i |
+2) result of M-x my-org-table-rotate-column-in-row-left:
+   : | a | b  | c  | d |
+   : | e | 10 | 11 | 9 |
+   : | f | g  | h  | i |
 
 **** Rotate in row right
 
 1) place point at "9" in original table
-2) result of M-x my-org-table-rotate-column-in-row-right
-: | a | b  | c | d  |
-: | e | 11 | 9 | 10 |
-: | f | g  | h | i  |
+2) result of M-x my-org-table-rotate-column-in-row-right:
+   : | a | b  | c | d  |
+   : | e | 11 | 9 | 10 |
+   : | f | g  | h | i  |
 
 **** The functions
 
@@ -865,6 +865,8 @@ behavior with C-c C-c on one of the three snippets:
 :                 'my-org-table-move-column-in-row-left)
 :     (org-defkey org-mode-map [(meta right)]
 :                 'my-org-table-move-column-in-row-right)
+:     (org-defkey org-mode-map [(left)]  'org-table-previous-field)
+:     (org-defkey org-mode-map [(right)] 'org-table-next-field)
 :   #+end_src
 :
 : - rotate in row:
@@ -873,13 +875,35 @@ behavior with C-c C-c on one of the three snippets:
 :                 'my-org-table-rotate-column-in-row-left)
 :     (org-defkey org-mode-map [(meta right)]
 :                 'my-org-table-rotate-column-in-row-right)
+:     (org-defkey org-mode-map [(left)]  'org-table-previous-field)
+:     (org-defkey org-mode-map [(right)] 'org-table-next-field)
 :   #+end_src
 :
 : - back to original:
 :   #+begin_src emacs-lisp :results silent
 :     (org-defkey org-mode-map [(meta left)]  'org-metaleft)
 :     (org-defkey org-mode-map [(meta right)] 'org-metaright)
+:     (org-defkey org-mode-map [(left)]  'backward-char)
+:     (org-defkey org-mode-map [(right)] 'forward-char)
 :   #+end_src
+
+**** reasons why this is not put into the Org core
+
+I consider this as only a hack for several reasons:
+- Generalization:  The existing org-table-move-column function could be
+  enhanced with additional optional parameters to incorporate these
+  functionalities and could be used as the only function for better
+  maintainability.  Now it's only a copy/paste hack of several similar
+  functions with simple modifications.
+- Bindings:  Should be convenient for repetition like M-<right>.  What
+  should be bound where, what has to be left unbound?
+- Does not fix formulas.  Could be resolved for field formulas but
+  most probably not for column or range formulas and this can lead
+  to confusion.  AFAIK all "official" table manipulations fix formulas.
+- Completeness:  Not all variations and combinations are covered yet
+  - left-right, up-down
+  - move, rotate with range to end, rotate with range to begin
+  - whole column/row, only in-row/in-column
 
 ** Capture and Remember
 *** Customize the size of the frame for remember
