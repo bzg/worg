@@ -1328,6 +1328,28 @@ should fix the problem
 : make clean
 : make
 
+In some cases, bits and pieces of org are loaded from various places (previous
+installs, the built-in install of org that came with whatever emacs version you have)
+and things get very confused. In all cases, cleaning up every last bit of org installation
+from everywhere and reinstalling org from git should restore sanity. See also the [[id:facac2a6-3526-450d-ac42-8d36b16c6bab][next question]].
+
+** I use starter-kit and I get an error =(void-function org-pop-to-buffer-same-window)=
+   :PROPERTIES:
+   :ID:       facac2a6-3526-450d-ac42-8d36b16c6bab
+   :END:
+This is a particular instance of the [[#invalid-function-error][previous question]] but with some twists and turns,
+and a solution culled from various postings on the mailing list.
+
+starter-kit loads the site-file version of org (the one that came with
+your emacs install).  Then when you load your init file, the local
+version is added to the front of load-path, so it looks as if things
+are originating there, but the damage is already done: you have a
+"frankenstein" org.
+
+One possible solution is to add (package-initialize) to the primary init.el
+before starter-kit gets going. This will pick up the local install so
+that the built-in version never enters to muddy the picture.
+
 * Faces and highlighting
   :PROPERTIES:
   :CUSTOM_ID: Faces
