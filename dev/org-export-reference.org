@@ -9,9 +9,6 @@
 #+PRIORITIES: A C B
 #+CATEGORY:   worg
 
-# This file is the default header for new Org files in Worg.  Feel free
-# to tailor it to your needs.
-
 [[file:../index.org][{Back to Worg's index}]]
 
 This document is aimed at back-end developers for the generic export
@@ -638,6 +635,23 @@ and [[#toolbox][tools]] provided by the exporter.
                       character or paragraph's end (integer).
    - ~:raw-value~ :: Uninterpreted contents (string).
 
+** Section
+
+   Greater element.
+
+   - ~:begin~ :: Buffer position at beginning the first non-blank line
+                 after either previous headline or beginning of
+                 buffer (integer).
+   - ~:contents-begin~ :: Buffer position at beginning the first
+        non-blank line after either previous headline or beginning of
+        buffer (integer).
+   - ~:contents-end~ :: Buffer position at beginning of first line
+        after last non-blank line before next headline (integer).
+   - ~:end~ :: Buffer position at beginning of next headline or end of
+               buffer (integer).
+   - ~:post-blank~ :: Number of blank lines between =:contents-end= and
+                      =:end= positions.
+
 ** Special Block
 
    Greater element.
@@ -821,8 +835,8 @@ and [[#toolbox][tools]] provided by the exporter.
   :END:
 
   This is the full list of properties available during transcode
-  process, with their category (~option~, ~persistent~ or ~local~) and
-  their value type.
+  process, with their category (~option~, ~tree~ or ~local~) and their
+  value type.
 
 ** ~:author~
 
@@ -835,19 +849,8 @@ and [[#toolbox][tools]] provided by the exporter.
 
    Current back-end used for transcoding.
 
-   - category :: persistent
+   - category :: tree
    - type :: symbol
-
-** ~:code-refs~
-   :PROPERTIES:
-   :CUSTOM_ID: code-refs
-   :END:
-
-   Association list between reference name and real labels in source
-   code.  It is used to properly resolve links inside source blocks.
-
-   - category :: persistent
-   - type :: alist (INT-OR-STRING . STRING)
 
 ** ~:creator~
 
@@ -893,33 +896,25 @@ and [[#toolbox][tools]] provided by the exporter.
    definitions from oblivion – i.e. when the parse tree comes from
    a part of the original buffer –, it isn't meant for direct use in
    a back-end.  To retrieve a definition relative to a reference, use
-   `org-export-get-footnote-definition' instead.
+   [[#get-footnote-definition][~org-export-get-footnote-definition~]] instead.
 
    - category :: option
    - type :: alist (STRING . LIST)
 
-** ~:footnote-seen-labels~
-
-   List of already transcoded footnote labels.  It is used to know
-   when a reference appears for the first time –
-   cf. [[#footnote-first-reference-p][~org-export-footnote-first-reference-p~]].
-
-   - category :: persistent
-   - type :: list of strings
-
 ** ~:genealogy~
 
-   List of current element's parents types.
+   Flat list of current object or element's parents from closest to
+   farthest, along with their contents.
 
    - category :: local
-   - type :: list of symbols
+   - type :: list of elements and objects
 
 ** ~:headline-alist~
 
    Alist between headlines raw name and their boundaries.  It is used
    to resolve /fuzzy/ links – cf. [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
 
-   - category :: persistent
+   - category :: tree
    - type :: alist (STRING INTEGER INTEGER)
 
 ** ~:headline-levels~
@@ -939,7 +934,7 @@ and [[#toolbox][tools]] provided by the exporter.
    Alist between headlines' beginning position and their numbering, as
    a list of numbers – cf. [[#get-headline-number][~org-export-get-headline-number~]].
 
-   - category :: persistent
+   - category :: tree
    - type :: alist (INTEGER . LIST)
 
 ** ~:headline-offset~
@@ -949,7 +944,7 @@ and [[#toolbox][tools]] provided by the exporter.
    should be considered as level 1 —
    cf. [[#get-relative-level][~org-export-get-relative-level~]].
 
-   - category :: persistent
+   - category :: tree
    - type :: integer
 
 ** ~:included-files~
@@ -960,15 +955,6 @@ and [[#toolbox][tools]] provided by the exporter.
 
    - category :: local
    - type :: list of strings
-
-** ~:inherited-properties~
-
-   Properties of the headline ancestors of the current element or
-   object.  Those from the closest headline have precedence over the
-   others.
-
-   - category :: local
-   - type :: plist
 
 ** ~:keywords~
 
@@ -984,26 +970,12 @@ and [[#toolbox][tools]] provided by the exporter.
    - category :: option
    - type :: string
 
-** ~:parent-properties~
-
-   Properties of the parent element.
-
-   - category :: local
-   - type :: plist
-
 ** ~:parse-tree~
 
    Whole parse tree, available at any time during transcoding.
 
    - category :: global
    - type :: list (as returned by ~org-element-parse-buffer~)
-
-** ~:point-max~
-
-   Last ending position in the parse tree.
-
-   - category :: global
-   - type :: integer
 
 ** ~:preserve-breaks~
 
@@ -1051,7 +1023,7 @@ and [[#toolbox][tools]] provided by the exporter.
    used to partly resolve "fuzzy" links —
    cf. [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
 
-   - category :: persistent
+   - category :: tree
    - type :: list of strings
 
 ** ~:time-stamp-file~
@@ -1060,17 +1032,6 @@ and [[#toolbox][tools]] provided by the exporter.
 
    - category :: option
    - type :: symbol (nil, t)
-
-** ~:total-loc~
-   :PROPERTIES:
-   :CUSTOM_ID: total-loc
-   :END:
-
-   Contains total lines of code accumulated by source blocks with the
-   "+n" option so far.
-
-   - category :: persistent
-   - type :: integer
 
 ** ~:use-select-tags~
    :PROPERTIES:
@@ -1081,7 +1042,7 @@ and [[#toolbox][tools]] provided by the exporter.
    Thus, any headline without one will be filtered out.  See
    [[#select-tags][~:select-tags~]].
 
-   - category :: persistent
+   - category :: tree
    - type :: interger or nil
 
 ** ~:with-archived-trees~
@@ -1290,7 +1251,8 @@ and [[#toolbox][tools]] provided by the exporter.
    :CUSTOM_ID: collect-listings
    :END:
 
-   Return a list of all exportable source blocks in parse tree.
+   Return a list of all exportable source blocks with a caption or
+   a name in parse tree.
 
    Used to build a table of listings.
 
@@ -1301,7 +1263,8 @@ and [[#toolbox][tools]] provided by the exporter.
    :CUSTOM_ID: collect-tables
    :END:
 
-   Return a list of all exportable tables in parse tree.
+   Return a list of all exportable tables with a caption or a name in
+   parse tree.
 
    Used to build a table of tables.
 
@@ -1347,8 +1310,7 @@ and [[#toolbox][tools]] provided by the exporter.
 
    Return an appropriate format string for code reference links.
 
-   See also: [[#solidify-link-text][~org-export-solidify-link-text~]],
-   [[#inline-image-p][~org-export-inline-image-p~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
+   See also: [[#resolve-coderef][~org-export-resolve-coderef~]].
 
 ** ~org-export-get-footnote-definition~
    :PROPERTIES:
@@ -1381,9 +1343,20 @@ and [[#toolbox][tools]] provided by the exporter.
    :CUSTOM_ID: get-headline-number
    :END:
 
-   Return the section number of an headline, as a list.
+   Return the section number of an headline, as a list of integers.
 
    See also: [[#number-to-roman][~org-export-number-to-roman~]].
+
+** ~org-export-get-next-element~
+   :PROPERTIES:
+   :CUSTOM_ID: get-next-element
+   :END:
+
+   Return element (resp. object or string) after an element
+   (resp. object), or nil.
+
+   See also: [[#get-previous-element][~org-export-get-previous-element~]],
+   [[#get-parent-headline][~org-export-get-parent-headline~]].
 
 ** ~org-export-get-ordinal~
 
@@ -1392,6 +1365,28 @@ and [[#toolbox][tools]] provided by the exporter.
    This isn't appropriate for footnotes references, whose sequence
    isn't always linear.  In that case, use
    [[#get-footnote-number][~org-export-get-footnote-number~]] instead.
+
+** ~org-export-get-parent-headline~
+   :PROPERTIES:
+   :CUSTOM_ID: #get-parent-headline
+   :END:
+
+   Return the headline containing provided element or object, if any.
+   Return nil otherwise.
+
+   See also: [[#get-previous-element][~org-export-get-previous-element~]],
+   [[#get-next-element][~org-export-get-next-element~]].
+
+** ~org-export-get-previous-element~
+   :PROPERTIES:
+   :CUSTOM_ID: get-previous-element
+   :END:
+
+   Return element (resp. object or string) before an element
+   (resp. object), or nil.
+
+   See also: [[#get-next-element][~org-export-get-next-element~]],
+   [[#get-parent-headline][~org-export-get-parent-headline~]].
 
 ** ~org-export-get-relative-level~
    :PROPERTIES:
@@ -1408,8 +1403,10 @@ and [[#toolbox][tools]] provided by the exporter.
 ** ~org-export-handle-code~
 
    Update line numbering and clean references in source code, when
-   appropriate.  Also update global lines of code count – [[#total-loc][~:total-loc~]]
-   property – and code references /alist/ – [[#code-refs][~:code-refs~]] property.
+   appropriate.  It can also add text properties to format source code
+   only after some processing.
+
+   See also: [[#resolve-coderef][~org-export-resolve-coderef~]].
 
 ** ~org-export-included-files~
 
@@ -1431,7 +1428,6 @@ and [[#toolbox][tools]] provided by the exporter.
    :CUSTOM_ID: last-sibling-p
    :END:
 
-
    Non-nil if an headline is the last of its siblings.
 
    Used to know when to close a list if headline's relative level is
@@ -1439,6 +1435,7 @@ and [[#toolbox][tools]] provided by the exporter.
 
    See also: [[#get-relative-level][~org-export-get-relative-level~]],
    [[#number-to-roman][~org-export-number-to-roman~]], [[#first-sibling-p][~org-export-first-sibling-p~]].
+
 ** ~org-export-number-to-roman~
    :PROPERTIES:
    :CUSTOM_ID: number-to-roman
@@ -1449,17 +1446,41 @@ and [[#toolbox][tools]] provided by the exporter.
 
    See also: [[#get-headline-number][~org-export-get-headline-number~]].
 
+** ~org-export-resolve-coderef~
+   :PROPERTIES:
+   :CUSTOM_ID: resolve-coderef
+   :END:
+
+   Search for a code reference within ~src-block~ and ~example-block~
+   elements.  Return corresponding –possibly accumulated— line number,
+   or reference itself, depending on container's switches.
+
+   See also : [[#get-coderef-format][~org-export-get-coderef-format~]],
+   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
+
 ** ~org-export-resolve-fuzzy-link~
    :PROPERTIES:
    :CUSTOM_ID: resolve-fuzzy-link
    :END:
 
    Search destination of a fuzzy link — i.e. it has a ~fuzzy~ ~:type~
-   attribute – within the parsed tree, and return an appropriate
-   unique identifier when found, or nil.
+   attribute – within the parsed tree, and return that element,
+   object, or nil.
 
-   See also: [[#solidify-link-text][~org-export-solidify-link-text~]],
-   [[#get-coderef-format][~org-export-get-coderef-format~]], [[#inline-image-p][~org-export-inline-image-p~]].
+   See also: [[#resolve-coderef][~org-export-resolve-coderef~]],
+   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#solidify-link-text][~org-export-solidify-link-text~]].
+
+** ~org-export-resolve-id-link~
+   :PROPERTIES:
+   :CUSTOM_ID: resolve-id-link
+   :END:
+
+   Search headline targetted by an id link — i.e. it has a ~id~ or
+   ~custom-id~ ~:type~ attribute – within the parse tree.  Return that
+   headline, or nil.
+
+   See also : [[#resolve-coderef][~org-export-resolve-coderef~]],
+   [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#solidify-link-text][~org-export-solidify-link-text~]].
 
 ** ~org-export-solidify-link-text~
    :PROPERTIES:
@@ -1471,17 +1492,17 @@ and [[#toolbox][tools]] provided by the exporter.
 
    Used to turn targets names into safer versions for links.
 
-   See also: [[#get-coderef-format][~org-export-get-coderef-format~]],
-   [[#inline-image-p][~org-export-inline-image-p~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
+   See also: [[#inline-image-p][~org-export-inline-image-p~]],
+   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
 
 ** ~org-export-table-format-info~
    :PROPERTIES:
    :CUSTOM_ID: table-format-info
    :END:
 
-   Extract formatting information (alignment, column groups and
-   presence of a special column) from a raw table and return it as
-   a property list.
+   Extract formatting information (alignment, column groups, presence
+   of a special column, explicit width of columns and row groups) from
+   a raw table and return it as a property list.
 
    See also: [[#clean-table][~org-export-clean-table~]].
 
