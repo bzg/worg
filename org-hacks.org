@@ -2697,6 +2697,140 @@ Tycho Garen sent [[http://comments.gmane.org/gmane.emacs.orgmode/44773][this]]:
 
 Everything is documented [[http://tychoish.com/code/org-mail/][here]].
 
+** hidestarsfile: "hidestars" for file
+   :PROPERTIES:
+   :CUSTOM_ID: hidestarsfile
+   :END:
+#+index: Conversion!hidestarsfile
+
+Using hooks for file find and for file save I implemented hidestarsfile: On
+the fly and inspired by hidestars (a cleaner outline view:
+http://orgmode.org/manual/Clean-view.html )
+- remove the leading stars from all headings when writing a buffer to the
+  file
+- reinsert the leading stars when reading a file into the buffer
+
+Following is an example of the _file content_ first with leading stars as
+usual and below without leading stars through "#+STARTUP: odd hidestars
+hidestarsfile":
+
+#+BEGIN_SRC org
+  ,#+STARTUP: odd hidestars
+  ,[...]
+  ,***** TODO section
+  ,******* subsection
+  ,********* subsubsec
+  ,          - bla bla
+  ,***** section
+  ,      - bla bla
+  ,******* subsection
+#+END_SRC
+
+#+BEGIN_SRC org
+  ,#+STARTUP: odd hidestars hidestarsfile
+  ,[...]
+  ,    * TODO section
+  ,      * subsection
+  ,        * subsubsec
+  ,          - bla bla
+  ,    * section
+  ,      - bla bla
+  ,      * subsection
+#+END_SRC
+
+The latter is convenient for better human readability when an Org file,
+additionally to Emacs, is read with a file viewer or, for smaller edits,
+with an editor not capable of the Org file format. To change the format for
+the current file simply add or remove the keyword hidestarsfile in the
+STARTUP line.
+
+hidestarsfile is just a hack and can not become part of the Org core:
+- An Org file with hidestarsfile can not contain list items with a star as
+  bullet due to the syntax conflict at read time.
+- An Org file with hidestarsfile can almost not be edited with an Org mode
+  without added functionality of hidestarsfile as long as the file is not
+  converted back.
+
+I am still uncertain about if this could be made Org-mode-specific to cover
+more use cases: When switching between Org mode and another major mode like
+Fundamental mode it would remove and reinsert the leading stars in the
+buffer itself, not only in the file. The current state is that it only
+reinserts the leading stars in the buffer and only removes them in the file.
+It does this regardless of the major mode, assuming that not-Org-files don't
+contain the "^#\+STARTUP:" hidestarsfile keywords. This is a simplification
+but I think it also helps to ensure better that it is less prone to the
+error of loosing track if it should now remove or reinsert and whether to
+mark not-modified. The org-mode-hook is called also when following a link
+and sometimes (source blocks?) more than once when just opening a file. I
+guess that this tracking could be even harder for leaving Org mode.
+
+#+BEGIN_SRC emacs-lisp
+  ;; don't match e. g. first word on line that is bold
+  (defconst my-heading-re "\\(\\*\\)\\( \\|$\\)")
+
+  (defun my-org-hidestarsfile-p ()
+    "Check whether there is a STARTUP line with hidestarsfile."
+    (save-excursion
+      (beginning-of-buffer)
+      (re-search-forward "^#\\+STARTUP:.*\\bhidestarsfile\\b" nil t)))
+
+  (defun my-org-hidestarsfile-read ()
+    "In headings replace leading ' ' with '*'.
+  Add this together with my-org-hidestarsfile-write to the hooks
+  `find-file-hook', `before-save-hook' and `after-save-hook'."
+    (when (my-org-hidestarsfile-p)
+      (assert (not (buffer-modified-p)))
+      (let ((p (point)))  ; not a save-excursion due to error text
+        (beginning-of-buffer)
+        (when (re-search-forward (concat "^\\*+" my-heading-re) nil t)
+          (goto-char (match-beginning 0))
+          (error "ERR: read: syntax conflict at point"))
+        (beginning-of-buffer)
+        (while (re-search-forward (concat "^ +" my-heading-re) nil t)
+          (goto-char (match-beginning 0))
+          (while (< (point) (match-beginning 1))
+            (insert ?*)
+            (delete-char 1)))
+        (goto-char p))
+      ;; The changes to the buffer until here are not regarded by
+      ;; ediff-files because the first call to diff is made with the
+      ;; files directly. Only ediff-update-diffs or ediff-buffers writes
+      ;; the buffers to temp files and then calls diff with them.
+      ;; Workarounds:
+      ;; - after ediff-files first do a "!" (ediff-update-diffs) in the
+      ;;   "*Ediff Control Panel*"
+      ;; - instead of using ediff-files first open the files and then
+      ;;   run ediff-buffers (better for e. g. a script that takes
+      ;;   two files as arguments and uses "emacs --eval")
+      (not-modified)))
+
+  (defun my-org-hidestarsfile-write ()
+    "In headings replace leading '*' with ' '.
+  Add this together with my-org-hidestarsfile-read to the hooks
+  `find-file-hook', `before-save-hook' and `after-save-hook'."
+    (when (and (my-org-hidestarsfile-p)
+               (buffer-modified-p))
+      (let ((p (point)))  ; not a save-excursion due to error text
+        (beginning-of-buffer)
+        (when (re-search-forward (concat "^ +" my-heading-re) nil t)
+          (goto-char (match-beginning 0))
+          (error "ERR: write: syntax conflict at point"))
+        (beginning-of-buffer)
+        (while (re-search-forward (concat "^\\*+" my-heading-re) nil t)
+          (goto-char (match-beginning 0))
+          (while (< (point) (match-beginning 1))
+            (insert ?\ )
+            (delete-char 1)))
+        (goto-char p)))
+    nil)  ;; for the hook
+
+  (add-hook   'find-file-hook 'my-org-hidestarsfile-read)
+  (add-hook 'before-save-hook 'my-org-hidestarsfile-write)
+  (add-hook  'after-save-hook 'my-org-hidestarsfile-read)
+#+END_SRC
+
+Michael Brand
+
 ** Meaningful diff for org files in a git repository
 #+index: git!diff org files
 Since most diff utilities are primarily meant for source code, it is
