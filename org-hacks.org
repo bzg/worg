@@ -1808,6 +1808,52 @@ Bernt Hansen [[http://permalink.gmane.org/gmane.emacs.orgmode/44693][suggested]]
 
 Then M-x bh/mark-subtree-done.
 
+*** Mark heading done when all checkboxes are checked.
+    :PROPERTIES:
+    :CUSTOM_ID: mark-done-when-all-checkboxes-checked
+    :END:
+
+#+index: Checkbox
+
+An item consists of a list with checkboxes.  When all of the
+checkboxes are checked, the item should be considered complete and its
+TODO state should be automatically changed to DONE. The code below
+does that. This version is slightly enhanced over the one in the
+mailing list (see
+http://thread.gmane.org/gmane.emacs.orgmode/42715/focus=42721) to
+reset the state back to TODO if a checkbox is unchecked.
+
+Note that the code requires that a checkbox statistics cookie (the [/]
+or [%] thingie in the headline - see the [[http://orgmode.org/manual/Checkboxes.html#Checkboxes][Checkboxes]] section in the
+manual) be present in order for it to work. Note also that it is too
+dumb to figure out whether the item has a TODO state in the first
+place: if there is a statistics cookie, a TODO/DONE state will be
+added willy-nilly any time that the statistics cookie is changed.
+
+#+begin_src emacs-lisp
+  ;; see http://thread.gmane.org/gmane.emacs.orgmode/42715
+  (eval-after-load 'org-list
+    '(add-hook 'org-checkbox-statistics-hook (function ndk/checkbox-list-complete)))
+  
+  (defun ndk/checkbox-list-complete ()
+    (save-excursion
+      (org-back-to-heading t)
+      (let ((beg (point)) end)
+        (end-of-line)
+        (setq end (point))
+        (goto-char beg)
+        (if (re-search-forward "\\[\\([0-9]*%\\)\\]\\|\\[\\([0-9]*\\)/\\([0-9]*\\)\\]" end t)
+              (if (match-end 1)
+                  (if (equal (match-string 1) "100%")
+                      ;; all done - do the state change
+                      (org-todo 'done)
+                    (org-todo 'todo))
+                (if (and (> (match-end 2) (match-beginning 2))
+                         (equal (match-string 2) (match-string 3)))
+                    (org-todo 'done)
+                  (org-todo 'todo)))))))
+#+end_src
+
 ** Exporting org files
 *** Export Org to Org and handle includes.
 #+index: Export!handle includes
@@ -2511,6 +2557,10 @@ http://article.gmane.org/gmane.emacs.orgmode/5276
 #+END_SRC
 
 ** Org Agenda + Appt + Zenity
+    :PROPERTIES:
+    :CUSTOM_ID: org-agenda-appt-zenity
+    :END:
+
 #+index: Appointment!reminders
 #+index: Appt!Zenity
 #+BEGIN_HTML

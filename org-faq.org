@@ -1796,41 +1796,7 @@ This has arisen a couple of time
 (e.g. http://thread.gmane.org/gmane.emacs.orgmode/42715 and
 http://thread.gmane.org/gmane.emacs.orgmode/47363) in the mailing list.
 
-An item consists of a list with checkboxes.  When all of the checkboxes are
-checked, the item should be considered complete and its TODO state should
-be automatically changed to DONE. The code below does that. This version is
-slightly enhanced over the one in the mailing list to reset the state back
-to TODO if a checkbox is unchecked.
-
-Note that the code requires that a checkbox statistics cookie (the [/]
-or [%] thingie in the headline) be present in order for it to
-work. Note also that it is too dumb to figure out whether the item has
-a TODO state in the first place: if there is a statistics cookie, a
-TODO/DONE state will be added willy-nilly any time that the statistics
-cookie is changed.
-
-#+begin_src emacs-lisp
-  ;; see http://thread.gmane.org/gmane.emacs.orgmode/42715
-  (add-to-list 'org-checkbox-statistics-hook (function ndk/checkbox-list-complete))
-  
-  (defun ndk/checkbox-list-complete ()
-    (save-excursion
-      (org-back-to-heading t)
-      (let ((beg (point)) end)
-        (end-of-line)
-        (setq end (point))
-        (goto-char beg)
-        (if (re-search-forward "\\[\\([0-9]*%\\)\\]\\|\\[\\([0-9]*\\)/\\([0-9]*\\)\\]" end t)
-              (if (match-end 1)
-                  (if (equal (match-string 1) "100%")
-                      ;; all done - do the state change
-                      (org-todo 'done)
-                    (org-todo 'todo))
-                (if (and (> (match-end 2) (match-beginning 2))
-                         (equal (match-string 2) (match-string 3)))
-                    (org-todo 'done)
-                  (org-todo 'todo)))))))
-#+end_src
+There is an [[http://orgmode.org/worg/org-hacks.html#mark-done-when-all-checkboxes-checked][org-hack]] that describes a possible solution.
 
 * Hyperlinks
   :PROPERTIES:
@@ -3083,7 +3049,7 @@ setting will cause the current day to extend until 6 a.m.
 #+index: Reminders
 
   See [[http://article.gmane.org/gmane.emacs.orgmode/5271][this post]] by N. Dokos on the list. See also Russell Adams's hack in
-  [[file:org-hacks.org::#agenda-appt-zenity][org-hacks]].
+  [[http://orgmode/org/worg/org-hacks.org#org-agenda-appt-zenity][org-hacks]].
 
 ** How can I make =appt= notice my Org appointments?
    :PROPERTIES:
