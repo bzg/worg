@@ -1802,11 +1802,12 @@ be automatically changed to DONE. The code below does that. This version is
 slightly enhanced over the one in the mailing list to reset the state back
 to TODO if a checkbox is unchecked.
 
-Note that the code requires that a checkbox statistics cookie be present in
-order for it to work. Note also that it is too dumb to figure out whether
-the item has a TODO state in the first place: if there is a statistics
-cookie, a TODO/DONE state will be added willy-nilly any time that the
-statistics cookie is changed.
+Note that the code requires that a checkbox statistics cookie (the [/]
+or [%] thingie in the headline) be present in order for it to
+work. Note also that it is too dumb to figure out whether the item has
+a TODO state in the first place: if there is a statistics cookie, a
+TODO/DONE state will be added willy-nilly any time that the statistics
+cookie is changed.
 
 #+begin_src emacs-lisp
   ;; see http://thread.gmane.org/gmane.emacs.orgmode/42715
@@ -1828,7 +1829,7 @@ statistics cookie is changed.
                 (if (and (> (match-end 2) (match-beginning 2))
                          (equal (match-string 2) (match-string 3)))
                     (org-todo 'done)
-                  (org-todo 'todo))))))))
+                  (org-todo 'todo)))))))
 #+end_src
 
 * Hyperlinks
