@@ -1,0 +1,156 @@
+#+TITLE:How to Use Emacs Org-Babel Mode to Write Literate Programming Document in R Language 
+#+AUTHOR: Feiming Chen
+#+EMAIL: fullname at yahoo
+#+BABEL: :session *R* :cache yes :results output graphics :exports both :tangle yes 
+
+* Introduction
+
+We introduce the use of emacs org-babel model in this document.  Emacs
+Org-Babel mode is a literate programming tool (aka. active document), which
+can embed multiple programming languages, inlcuding R, in one document.
+Another popular literate programming tool for statisticians is the Sweave
+document, which can embed only R code.
+
+First we clarify the following terminologies:
+
+- [[http://www.gnu.org/software/emacs/][Emacs]] :: The extensible, customizable, self-documenting real-time
+           display editor.
+
+- [[http://www.gnu.org/software/emacs/][Org-mode]] :: An Emacs Mode for keeping notes, maintaining ToDo lists,
+              doing project planning, and authoring with a fast and
+              effective plain-text system.
+
+- [[http://orgmode.org/worg/org-contrib/babel/][Babel]] :: It is Org-mode's ability to execute source code within
+           Org-mode documents.
+
+* How to Use
+
+** Installation
+
+(August 5, 2011) =Babel= is available after Org-mode version 7.0, while
+Emacs version 23.2.1 still only has Org-mode version 6.33x.  Thus you need
+to update Org-mode (currenly at version 7.7) from [[http://orgmode.org][Org Home Page]].  You can
+use Emacs Package Manager to install Org-mode easily following [[http://orgmode.org/worg/org-faq.html#installing-via-elpa][this
+instruction. ]]
+
+** Keyboard Shortcuts
+
+To write a code block in a =.org= file, you can simple type =<s=
+followed by TAB key.  Then a skeleton like the following is
+automatically inserted:
+
+#+begin_example
+#+begin_src 
+
+#+end_src
+#+end_example
+
+All you need to do next is type a single letter =R= in the header and
+begin typing R code:
+
+#+begin_example
+#+begin_src R
+  ## Edit Your R Code Here.
+  x <- rnorm(100)
+  summary(x)
+#+end_src
+#+end_example
+
+I recommend you to edit R code in [[http://ess.r-project.org/][ESS]] (Emacs Speaks Statistics) mode by
+typing =C-c '= (i.e. C-c and single quote) within the code block, which
+brings up a separate window with ESS enabled. After editing, you can type
+=C-c '= again to return to the main file buffer.
+
+Once you finish writing the code, you can execute them immediately by
+pressing =C-c C-c= and see the R output being inserted into the document.
+Alternatively, you can press =C-c C-o= to see the R output in a separate
+window.
+
+To generate (export to) HTML document, press =C-c C-e b=.  Note other
+document options are available upon pressing =C-c C-e=.
+
+** Emacs Customization Settings
+
+The Org-Babel mode can be customized through the emacs menu item "Org",
+which can be saved to your ".emacs" file for future use. Some useful
+Org-Babel settings for statisticians are:
+
+#+begin_example
+(custom-set-variables
+ '(org-babel-load-languages (quote ((emacs-lisp . t) (R . t))))
+ '(org-confirm-babel-evaluate nil))
+#+end_example
+
+which specifies =R= language to be loaded and R code to be evaluated
+without prompt.
+
+I also specify a "skeleton" in my ".emacs" file so as to start writing
+Org file quickly:
+
+#+begin_example
+(define-skeleton org-skeleton
+  "Header info for a emacs-org file."
+  "Title: "
+  "#+TITLE:" str " \n"
+  "#+AUTHOR: Your Name\n"
+  "#+email: your-email@server.com\n"
+  "#+INFOJS_OPT: \n"
+  "#+BABEL: :session *R* :cache yes :results output graphics :exports both :tangle yes \n"
+  "-----"
+ )
+(global-set-key [C-S-f4] 'org-skeleton)
+#+end_example
+
+where
+
+- The =#+INFOJS_OPT= option will generat a HTML document that is
+  foldable and follows the style of =GNU/INFO= document.
+- The =:session *R*= option makes sure all the R code is run in the
+  same session so objects generated in one code block can be accessed
+  from other code blocks.
+- the =:cache yes= option is used to avoid re-evaluating unchanged
+  code blocks.  This can save significant time when you revise a
+  document with a lot of R code frequently. 
+- The =:results output graphics :exports both= option will put both
+  the R code and its text and graphics output in the generated
+  document.
+- The =:tangle yes= option allows the document to be "tangled" to
+  generate pure code file.  The short-cut key for tangling is =C-c C-v
+  t=, which generates a =.R= file with all the R code extracted. 
+- Note the "-----" string will generate a horizontal line in HTML
+  file. 
+- Finally, a hotkey =C-S-f4= (while pressing Ctrl and Shift keys,
+  press F4 key) is assigned to invoke this skeleton quickly. 
+
+** A Complete Example
+
+We use the following file =test-for-how-to-use-Org-Babel-for-R.org= as an
+example file.
+
+#+INCLUDE: "test-for-how-to-use-Org-Babel-for-R.org" example
+
+# The exported HTML file is shown as [[file:test.html][test.html]].
+
+** Caveats
+
+- Keep the code block indented correctly. Otherwise the graph will not
+  be embedded in the HTML export file.
+- Always have the contents and plots under a section heading to avoid
+  certain exporting errors.
+- It makes things easier if the working directory in *R* session
+  buffer is the same as the directory of the .org file that
+  you are writing.  In this way, the plot files can easily be found. 
+- The macro option (=#+MACRO:=) cannot be used to save the typing
+  of header options for code blocks.  For example, it does NOT work if
+  you try to use
+
+  #+begin_example
+  #+MACRO: p  :file $1.png :width 1000 :height 800
+  #+end_example
+
+  to shorten the header to
+
+  #+begin_example
+  #+begin_src R {{{p(plot)}}}
+  #+end_example
+  
