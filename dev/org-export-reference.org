@@ -24,8 +24,9 @@ and [[#toolbox][tools]] provided by the exporter.
   :CUSTOM_ID: attributes
   :END:
 
-  Element attributes are accessed with ~org-element-get-property~
-  function.
+  Element attributes are accessed with ~org-element-property~
+  function.  Other accessors relative to elements are
+  ~org-element-type~ and ~org-element-contents~.
 
   In addition to these properties, each element can optionally get
   some more from affiliated keywords, namely: ~:attr_ascii~,
@@ -901,14 +902,6 @@ and [[#toolbox][tools]] provided by the exporter.
    - category :: option
    - type :: alist (STRING . LIST)
 
-** ~:genealogy~
-
-   Flat list of current object or element's parents from closest to
-   farthest, along with their contents.
-
-   - category :: local
-   - type :: list of elements and objects
-
 ** ~:headline-levels~
    :PROPERTIES:
    :CUSTOM_ID: headline-levels
@@ -938,6 +931,14 @@ and [[#toolbox][tools]] provided by the exporter.
 
    - category :: tree
    - type :: integer
+
+** ~:ignore-list~
+
+   List of elements and objects that will be unconditionally ignored
+   during export.
+
+   - category :: option
+   - type :: list of elements
 
 ** ~:input-file~
 
@@ -1157,6 +1158,93 @@ and [[#toolbox][tools]] provided by the exporter.
    - category :: option
    - type :: symbol (nil, t)
 
+* The Filter System
+  :PROPERTIES:
+  :CUSTOM_ID: filter-system
+  :END:
+
+  Filters sets are lists of functions.  They allow to pre-process
+  parse tree before export and to post-process output of each
+  transcoded object or element.
+
+  Each function in a set must accept three arguments: a string (or
+  a parse tree as a special case), a symbol representing the current
+  back-end, and the communication channel, as a plist.
+
+  From the developer side, filters sets can be installed in the
+  process with the help of ~org-BACKEND-filters-alist~ variable.  Each
+  association has a key among the following symbols and a function or
+  a list of functions as value:
+
+  - ~:filter-babel-call~
+  - ~:filter-center-block~
+  - ~:filter-comment~
+  - ~:filter-comment-block~
+  - ~:filter-drawer~
+  - ~:filter-dynamic-block~
+  - ~:filter-emphasis~
+  - ~:filter-entity~
+  - ~:filter-example-block~
+  - ~:filter-export-block~
+  - ~:filter-export-snippet~
+  - ~:filter-final-output~
+  - ~:filter-fixed-width~
+  - ~:filter-footnote-definition~
+  - ~:filter-footnote-reference~
+  - ~:filter-headline~
+  - ~:filter-horizontal-rule~
+  - ~:filter-inline-babel-call~
+  - ~:filter-inline-src-block~
+  - ~:filter-inlinetask~
+  - ~:filter-item~
+  - ~:filter-keyword~
+  - ~:filter-latex-environment~
+  - ~:filter-latex-fragment~
+  - ~:filter-line-break~
+  - ~:filter-link~
+  - ~:filter-macro~
+  - ~:filter-paragraph~
+  - ~:filter-parse-tree~
+  - ~:filter-plain-list~
+  - ~:filter-plain-text~
+  - ~:filter-property-drawer~
+  - ~:filter-quote-block~
+  - ~:filter-quote-section~
+  - ~:filter-radio-target~
+  - ~:filter-section~
+  - ~:filter-special-block~
+  - ~:filter-src-block~
+  - ~:filter-statistics-cookie~
+  - ~:filter-subscript~
+  - ~:filter-superscript~
+  - ~:filter-table~
+  - ~:filter-target~
+  - ~:filter-time-stamp~
+  - ~:filter-verbatim~
+  - ~:filter-verse-block~
+
+
+  For example, =e-ascii= back-end implements a filter that makes sure
+  sections end with two blank lines:
+
+  #+BEGIN_SRC emacs-lisp
+  (defun org-e-ascii-filter-section-blank-lines (headline back-end info)
+    "Filter controlling number of blank lines after a section."
+    (if (not (eq back-end 'e-ascii)) headline
+      (let ((blanks (make-string 2 ?\n)))
+        (replace-regexp-in-string "\n\\(?:\n[ \t]*\\)*\\'" blanks headline))))
+  #+END_SRC
+
+  The filter is then installed with the following:
+
+  #+BEGIN_SRC emacs-lisp
+  (defconst org-e-ascii-filters-alist
+    '((:filter-headline . org-e-ascii-filter-section-blank-lines)
+      (:filter-section . org-e-ascii-filter-section-blank-lines))
+    "Alist between filters keywords and back-end specific filters.
+  See `org-export-filters-alist' for more information.")
+  #+END_SRC
+
 * The Toolbox
   :PROPERTIES:
   :CUSTOM_ID: toolbox
@@ -1314,6 +1402,19 @@ and [[#toolbox][tools]] provided by the exporter.
    [[#footnote-first-reference-p][~org-export-footnote-first-reference-p~]],
    [[#get-footnote-definition][~org-export-get-footnote-definition~]].
 
+** ~org-export-get-genealogy~
+   :PROPERTIES:
+   :CUSTOM_ID: get-genealogy
+   :END:
+
+   Return flat list of current object or element's parents from
+   closest to farthest, along with their contents.
+
+   See also: [[#get-next-element][~org-export-get-next-element]], [[#get-parent][~org-export-get-parent]],
+   [[#get-parent-headline][~org-export-get-parent-headline~]],
+   [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
+   [[#get-previous-element][~org-export-get-previous-element~]].
+
 ** ~org-export-get-headline-number~
    :PROPERTIES:
    :CUSTOM_ID: get-headline-number
@@ -1331,27 +1432,84 @@ and [[#toolbox][tools]] provided by the exporter.
    Return element (resp. object or string) after an element
    (resp. object), or nil.
 
-   See also: [[#get-previous-element][~org-export-get-previous-element~]],
-   [[#get-parent-headline][~org-export-get-parent-headline~]].
+   See also: [[#get-genealogy][~org-export-get-genealogy~]], [[#get-parent][~org-export-get-parent]],
+   [[#get-parent-headline][~org-export-get-parent-headline~]],
+   [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
+   [[#get-previous-element][~org-export-get-previous-element~]].
 
 ** ~org-export-get-ordinal~
+   :PROPERTIES:
+   :CUSTOM_ID: get-ordinal
+   :END:
 
-   Associate a sequence number to any object or element.
+   Associate a sequence number to any object or element.  It is meant
+   to be used to build captions.
 
-   This isn't appropriate for footnotes references, whose sequence
-   isn't always linear.  In that case, use
-   [[#get-footnote-number][~org-export-get-footnote-number~]] instead.
+   Also, It could be applied on a fuzzy link's destination, since such
+   links are expected to be replaced with the sequence number of their
+   destination, provided they have no description.
+
+   Taken from =e-ascii= back-end, the following example shows how
+   fuzzy links could be handled :
+
+   #+BEGIN_SRC emacs-lisp :exports code
+   (let ((type (org-element-property :type link)))
+     (cond
+      ...
+      ;; Do not apply a special syntax on fuzzy links pointing to targets.
+      ((string= type "fuzzy")
+       (let ((destination (org-export-resolve-fuzzy-link link info)))
+         ;; Ignore invisible "#+target: path".
+         (unless (eq (org-element-type destination) 'keyword)
+           ;; If link has a description, use it.
+           (if (org-string-nw-p desc) desc
+             (when destination
+               (let ((number (org-export-get-ordinal destination info)))
+                 (when number
+                   (if (atom number) (number-to-string number)
+                     (mapconcat 'number-to-string number ".")))))))))
+      ...))
+   #+END_SRC
+
+   See also : [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link]]
+
+** ~org-export-get-parent~
+   :PROPERTIES:
+   :CUSTOM_ID: get-parent
+   :END:
+
+   Return closest element containing current element or object, if
+   any.  Return nil otherwise.
+
+   See also: [[#get-genealogy][~org-export-get-genealogy~]],
+   [[#get-next-element][~org-export-get-next-element~]], [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
+   [[#get-parent-headline][~org-export-get-parent-headline~]],
+   [[#get-previous-element][~org-export-get-previous-element~]].
 
 ** ~org-export-get-parent-headline~
    :PROPERTIES:
-   :CUSTOM_ID: #get-parent-headline
+   :CUSTOM_ID: get-parent-headline
    :END:
 
    Return the headline containing provided element or object, if any.
    Return nil otherwise.
 
-   See also: [[#get-previous-element][~org-export-get-previous-element~]],
-   [[#get-next-element][~org-export-get-next-element~]].
+   See also: [[#get-genealogy][~org-export-get-genealogy~]],
+   [[#get-next-element][~org-export-get-next-element~]], [[#get-parent][~org-export-get-parent]],
+   [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
+   [[#get-previous-element][~org-export-get-previous-element~]].
+
+** ~org-export-get-parent-paragraph~
+   :PROPERTIES:
+   :CUSTOM_ID: get-parent-paragraph
+   :END:
+
+   Return the paragraph containing provided object, if any.  Return
+   nil otherwise.
+
+   See also: [[#get-genealogy][~org-export-get-genealogy~]], [[#get-parent][~org-export-get-parent~]],
+   [[#get-parent-headline][~org-export-get-parent-headline~]],
+   [[#get-previous-element][~org-export-get-previous-element~]], [[#get-next-element][~org-export-get-next-element~]].
 
 ** ~org-export-get-previous-element~
    :PROPERTIES:
@@ -1361,8 +1519,10 @@ and [[#toolbox][tools]] provided by the exporter.
    Return element (resp. object or string) before an element
    (resp. object), or nil.
 
-   See also: [[#get-next-element][~org-export-get-next-element~]],
-   [[#get-parent-headline][~org-export-get-parent-headline~]].
+   See also: [[#get-genealogy][~org-export-get-genealogy~]],
+   [[#get-next-element][~org-export-get-next-element~]], [[#get-parent][~org-export-get-parent]],
+   [[#get-parent-headline][~org-export-get-parent-headline~]],
+   [[#get-parent-paragraph][~org-export-get-parent-paragraph~]].
 
 ** ~org-export-get-relative-level~
    :PROPERTIES:
@@ -1390,7 +1550,8 @@ and [[#toolbox][tools]] provided by the exporter.
    :END:
 
    Non-nil when the link provided should be considered as an inline
-   image.
+   image.  It also accepts an optional set of rules in order to tweak
+   the definition of an inline image.
 
    See also: [[#solidify-link-text][~org-export-solidify-link-text~]],
    [[#get-coderef-format][~org-export-get-coderef-format~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
@@ -1439,7 +1600,7 @@ and [[#toolbox][tools]] provided by the exporter.
    attribute – within the parsed tree, and return that element,
    object, or nil.
 
-   See also: [[#resolve-coderef][~org-export-resolve-coderef~]],
+   See also: [[#get-ordinal][~org-export-get-ordinal~]], [[#resolve-coderef][~org-export-resolve-coderef~]],
    [[#resolve-id-link][~org-export-resolve-id-link~]], [[#solidify-link-text][~org-export-solidify-link-text~]].
 
 ** ~org-export-resolve-id-link~
