@@ -512,10 +512,27 @@ and [[#toolbox][tools]] provided by the exporter.
      - ~coderef~ :: Line in some source code,
      - ~custom-id~ :: Specific headline's custom-id,
      - ~file~ :: External file,
-     - ~fuzzy~ :: Target or an headline in the current parse tree,
+     - ~fuzzy~ :: Target, target keyword, a named element or an
+                  headline in the current parse tree,
      - ~id~ :: Specific headline's id,
-     - ~radio~ :: Radio-target,
+     - ~radio~ :: Radio-target.
      It can also be any ~org-link-types~ element.
+
+
+   Notes relative to export:
+
+   - A fuzzy link leading to a target keyword should be ignored during
+     export: it's an invisible target.
+   - A fuzzy link with no description should display the
+     cross-reference number of its target.  This number can be:
+     - If link's destination is a target object within a footnote, it
+       will be footnote's number.
+     - If link's destination is a target object in a list, it will be
+       an item number.
+     - If link leads to a named element, it will be the sequence number
+       of that element among named elements of the same type.
+     - Otherwise, it will be the number of the headline containing
+       link's destination.
 
 ** Macro
 
@@ -779,7 +796,13 @@ and [[#toolbox][tools]] provided by the exporter.
    - ~:post-blank~ :: Number of white spaces between last
                       /greater-than/ closing sign and next non-blank
                       character or paragraph's end (integer).
-   - ~:raw-value~ :: Uninterpreted contents (string).
+   - ~:value~ :: Target's ID (string).
+
+
+   Notes relatives to export:
+
+   - Target should become an anchor, if back-end permits it.
+   - Target's ID shouldn't be visible on export.
 
 ** Time Stamp
 
@@ -1422,7 +1445,8 @@ and [[#toolbox][tools]] provided by the exporter.
 
    Return the section number of an headline, as a list of integers.
 
-   See also: [[#number-to-roman][~org-export-number-to-roman~]].
+   See also: [[#headline-numbered-p][~org-export-headline-numbered-p~]],
+   [[#number-to-roman][~org-export-number-to-roman~]].
 
 ** ~org-export-get-next-element~
    :PROPERTIES:
@@ -1533,8 +1557,9 @@ and [[#toolbox][tools]] provided by the exporter.
    the parsed tree.  It is meant to be used over ~:level~ headline's
    property.
 
-   See also: [[#get-headline-number][~org-export-get-headline-number~]],
-   [[#first-sibling-p][~org-export-first-sibling-p~]], [[#last-sibling-p][~org-export-last-sibling-p~]].
+   See also:[[#first-sibling-p][~org-export-first-sibling-p~]],
+    [[#get-headline-number][~org-export-get-headline-number~]],[[#headline-numbered-p][~org-export-headline-numbered-p~]],
+    [[#last-sibling-p][~org-export-last-sibling-p~]].
 
 ** ~org-export-handle-code~
 
@@ -1543,6 +1568,16 @@ and [[#toolbox][tools]] provided by the exporter.
    only after some processing.
 
    See also: [[#resolve-coderef][~org-export-resolve-coderef~]].
+
+** ~org-export-headline-numbered-p~
+   :PROPERTIES:
+   :CUSTOM_ID: headline-numbered-p
+   :END:
+
+   Non nil when a given headline should be numbered.
+
+   See also: [[#get-headline-number][~org-export-get-headline-number~]],
+   [[#get-relative-level][~org-export-get-relative-level~]].
 
 ** ~org-export-inline-image-p~
    :PROPERTIES:
