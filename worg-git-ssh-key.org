@@ -1,9 +1,9 @@
+#+TITLE:      Creating a SSH-key for a new user
+#+AUTHOR:     Worg people
+#+EMAIL:      mdl AT imapmail DOT org
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
-#+TITLE:      Creating a SSH-key for a new user in repo.or.cz
-#+AUTHOR:     Worg people
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c)
-#+EMAIL:      mdl AT imapmail DOT org
 #+LANGUAGE:   en
 #+PRIORITIES: A C B
 #+CATEGORY:   worg
@@ -11,10 +11,13 @@
 
 [[file:index.org][{Back to Worg's index}]]
 
-To [[http://repo.or.cz/reguser.cgi][register]] in http://repo.or.cz/ you need to have a SSH key. What's
-that and how can you create one?
+To push commits to the Worg repository at http://orgmode.org/w/worg.git you
+need to have a SSH key. What's that and how can you create one?
 
 * Public and private keys
+
+#+index: Public key
+#+index: Private key
 
 A /public key/ is like a door lock, and a /private key/ is like the
 key. =Repo.or.cz= is asking you for the /public key/, that means, they
@@ -36,7 +39,9 @@ you must have the /public key/ *and* know the password).
 
 So: *use a passphrase* for more security.
 
-* Steps to create your private and public keys for repo.or.cz
+* Steps to create your private and public keys
+
+#+index: ssh-keygen
 
 1. Run =ssh-keygen= with no parameters. If you want to change the
    encryption algorithm used, see [[*RSA or DSA][the section below]].
@@ -54,47 +59,55 @@ So: *use a passphrase* for more security.
 
  - =id_rsa.pub=: that's your new /public key/. You can distribute it.
 
- - You will also see a /fingerprint/ (like
-   =31:c0:5a:92:70:5e:91=... etc).
+ - You will also see a /fingerprint/ (like =31:c0:5a:92:70:5e:91=... etc).
 
 5. Look at the public key. If you don't like the user name which appears
    at the end, re-run =ssh-keygen -C "comment that you want" =
 
-6. Copy and paste the /public/ key (the contents of =id_rsa.pub=) in the
-   text box in http://repo.or.cz/reguser.cgi
-
-7. In "/login/", write the user name you want to have in this server
-
-8. Write also your e-mail
-
-9. Click the button "/Register/"
-
-10. Now you must ask the administrator to give you "push"-access: to
-    allow you to upload contents to the project.
-
-11. If you chose a user name for repo.or.cz that is different than
-    your login name, you might adjust the ssh client to use the
-    user name for repo.or.cz name when connecting.
-
-    This can be done by putting two lines like these in the file
-    .ssh/config:
-
-    #+begin_src conf
-      Host repo.or.cz
-           User <user at repo.or.cz>
-    #+end_src
-
 * RSA or DSA?
 
-You can decide if at the key creation you want to use the algorithm RSA
-or the algorithm DSA.
+#+index: RSA
+#+index: DSA
+
+You can decide if at the key creation you want to use the algorithm RSA or
+the algorithm DSA.
 
 If you know which one you like, you're lucky; use it!
 
 If not, decide one; both will work.
 
-By default, =ssh-keygen= uses RSA, but you can use =ssh-keygen -t dsa=
-to use DSA.
+By default, =ssh-keygen= uses RSA, but you can use =ssh-keygen -t dsa= to
+use DSA.
+
+* Appendice: How to use this key to create an account on =repo.or.cz=?
+
+*Note*: this section was useful when worg.git was hosted on =repo.or.cz=
+instead of =orgmode.org=, before december 2011.  We leave it here, so that
+it is useful for other project than Worg.
+
+1. Copy and paste the /public/ key (the contents of =id_rsa.pub=) in the
+   text box in http://repo.or.cz/reguser.cgi
+
+2. In "/login/", write the user name you want to have in this server
+
+3. Write also your e-mail
+
+4. Click the button "/Register/"
+
+5. Now you must ask the administrator to give you "push"-access: to
+   allow you to upload contents to the project.
+
+6. If you chose a user name for =repo.or.cz= that is different than your
+   login name, you might adjust the ssh client to use the user name for
+   =repo.or.cz= name when connecting.
+
+   This can be done by putting two lines like these in the file
+   =.ssh/config=:
+
+   #+begin_src conf
+     Host repo.or.cz
+          User <user at repo.or.cz>
+   #+end_src
 
 # ----------------------------
 #

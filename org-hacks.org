@@ -20,9 +20,11 @@ workaround. Go crazy.
 * Hacking Org: Working within Org-mode.
 ** Building and Managing Org
 *** Compiling Org without make
-:PROPERTIES:
-:CUSTOM_ID: compiling-org-without-make
-:END:
+    :PROPERTIES:
+    :CUSTOM_ID: compiling-org-without-make
+    :END:
+
+#+index: Compilation!without make
 
 This file is the result of  [[http://article.gmane.org/gmane.emacs.orgmode/15264][one of our discussions]] on the mailing list.
 Enhancements welcome.
@@ -76,6 +78,8 @@ the autoloads file `org-install.el' then. If `t', compile the sources, too.")
 #+END_SRC
 *** Reload Org
 
+#+index: Initialization!Reload
+
 As of Org version 6.23b (released Sunday Feb 22, 2009) there is a new
 function to reload org files.
 
@@ -99,7 +103,7 @@ To switch back to the compiled version just reload again with
 :PROPERTIES:
 :CUSTOM_ID: check-old-link-escapes
 :END:
-
+#+index: Link!Escape
 Starting with version 7.5 Org uses [[http://en.wikipedia.org/wiki/Percent-encoding][percent escaping]] more consistently
 and with a modified algorithm to determine which characters to escape
 and how.
@@ -140,6 +144,8 @@ in old Org's list of known percent escapes.
 
 ** Structure Movement and Editing 
 *** Show next/prev heading tidily
+
+#+index: Navigation!Heading
 - Dan Davison
   These close the current heading and open the next/previous heading.
 
@@ -179,6 +185,7 @@ in old Org's list of known percent escapes.
 #+end_src
 
 *** Promote all items in subtree
+#+index: Structure Editing!Promote
 - Matt Lundin
 
 This function will promote all items in a subtree. Since I use
@@ -196,7 +203,8 @@ unimaginatively called my-org-un-project:
     :PROPERTIES:
     :CUSTOM_ID: heading-to-link
     :END:
-
+#+index: Structure Editing!Heading
+#+index: Link!Turn a heading into a
 From David Maus:
 
 #+begin_src emacs-lisp
@@ -218,6 +226,7 @@ From David Maus:
 #+end_src
 
 *** Using M-up and M-down to transpose paragraphs
+#+index: Structure Editing!paragraphs
 
 From Paul Sexton: By default, if used within ordinary paragraphs in
 org mode, =M-up= and =M-down= transpose *lines* (not sentences).  The
@@ -243,6 +252,7 @@ sentences.
  (lambda () (interactive) (org-transpose-paragraphs 1)))
 #+end_src
 *** Changelog support for org headers
+#+index: Structure Editing!Heading
 -- James TD Smith
 
 Put the following in your =.emacs=, and =C-x 4 a= and other functions which
@@ -264,6 +274,7 @@ buffer.
 #+END_SRC
 
 *** Different org-cycle-level behavior
+#+index: Cycling!behavior
 -- Ryan Thompson
 
 In recent org versions, when your point (cursor) is at the end of an
@@ -456,60 +467,24 @@ of its arguments."
 
 ** Org Table
 *** Transpose table
+#+index: Table!Calculation
     :PROPERTIES:
     :CUSTOM_ID: transpose-table
     :END:
 
-This function by Juan Pechiar will transpose a table:
+Since Org 7.8, you can use =org-table-transpose-table-at-point= (which
+see.)  There are also other solutions:
 
-#+begin_src emacs-lisp
-(defun org-transpose-table-at-point ()
-  "Transpose orgmode table at point, eliminate hlines"
-  (interactive)
-  (let ((contents
-	 (apply #'mapcar* #'list
-		;; remove 'hline from list
-		(remove-if-not 'listp
-			       ;; signals error if not table
-			       (org-table-to-lisp)))))
-    (delete-region (org-table-begin) (org-table-end))
-    (insert (mapconcat (lambda(x) (concat "| " (mapconcat 'identity x " | " ) "  |\n" ))
-		       contents ""))
-    (org-table-align)))
-#+end_src
-
-So a table like
-
-: | 1 | 2 | 4 | 5 |
-: |---+---+---+---|
-: | a | b | c | d |
-: | e | f | g | h |
-
-will be transposed as
-
-: | 1 | a | e |
-: | 2 | b | f |
-: | 4 | c | g |
-: | 5 | d | h |
-
-(Note that horizontal lines disappeared.)
-
-There are also other solutions:
 - with org-babel and Emacs Lisp: provided by Thomas S. Dye in the mailing
-  list, see
-  [[http://thread.gmane.org/gmane.emacs.orgmode/23809/focus=23815][gmane]]
-  or
-  [[http://lists.gnu.org/archive/html/emacs-orgmode/2010-04/msg00239.html][gnu]]
+  list, see [[http://thread.gmane.org/gmane.emacs.orgmode/23809/focus=23815][gmane]] or [[http://lists.gnu.org/archive/html/emacs-orgmode/2010-04/msg00239.html][gnu]]
+
 - with org-babel and R: provided by Dan Davison in the mailing list (old
-  =#+TBLR:= syntax), see
-  [[http://thread.gmane.org/gmane.emacs.orgmode/10159/focus=10159][gmane]]
-  or
-  [[http://lists.gnu.org/archive/html/emacs-orgmode/2008-12/msg00454.html][gnu]]
-- with field coordinates in formulas (=@#= and =$#=): see
-  [[file:org-hacks.org::#field-coordinates-in-formulas-transpose-table][Worg]].
+  =#+TBLR:= syntax), see [[http://thread.gmane.org/gmane.emacs.orgmode/10159/focus=10159][gmane]] or [[http://lists.gnu.org/archive/html/emacs-orgmode/2008-12/msg00454.html][gnu]]
+
+- with field coordinates in formulas (=@#= and =$#=): see [[file:org-hacks.org::#field-coordinates-in-formulas-transpose-table][Worg]].
 
 *** Manipulate hours/minutes/seconds in table formulas
-
+#+index: Table!hours-minutes-seconds
 Both Bastien and Martin Halder have posted code ([[http://article.gmane.org/gmane.emacs.orgmode/39519][Bastien's code]] and
 [[http://article.gmane.org/gmane.emacs.orgmode/39519][Martin's code]]) for interpreting =dd:dd= or =dd:dd:dd= strings (where
 "=d=" is any digit) as time values in Org-mode table formula.  These
@@ -586,7 +561,7 @@ Elisp formulas) to compute time durations.  For example:
 : #+TBLFM: @2$3=$1+$2;T
 
 *** Dates computation
-
+#+index: Table!dates
 Xin Shi [[http://article.gmane.org/gmane.emacs.orgmode/15692][asked]] for a way to calculate the duration of 
 dates stored in an org table.
 
@@ -604,7 +579,7 @@ above).  The problem that this last article pointed out was solved in [[http://a
 post]] and Chris Randle's original musings are [[http://article.gmane.org/gmane.emacs.orgmode/6536/][here]].
 
 *** Hex computation
-
+#+index: Table!Calculation
 As with Times computation, the following code allows Computation with
 Hex values in Org-mode tables using the =with-hex= macro.
 
@@ -661,7 +636,7 @@ and subtracting hex values.
     :PROPERTIES:
     :CUSTOM_ID: field-coordinates-in-formulas
     :END:
-
+#+index: Table!Field Coordinates
 -- Michael Brand
 
 Following are some use cases that can be implemented with the “field
@@ -766,6 +741,7 @@ which is the Emacs Calc implementation of the equation
 where /i/ is the current time and /a/ is the length of the preceding period.
 
 *** Change the column sequence in one row only
+#+index: Table!Editing
     :PROPERTIES:
     :CUSTOM_ID: column-sequence-in-row
     :END:
@@ -784,34 +760,34 @@ table as the starting point for each example:
 **** Move in row left
 
 1) place point at "10" in original table
-2) result of M-x my-org-table-move-column-in-row-left
-: | a | b  | c | d  |
-: | e | 10 | 9 | 11 |
-: | f | g  | h | i  |
+2) result of M-x my-org-table-move-column-in-row-left:
+   : | a | b  | c | d  |
+   : | e | 10 | 9 | 11 |
+   : | f | g  | h | i  |
 
 **** Move in row right
 
 1) place point at "9" in original table
-2) result of M-x my-org-table-move-column-in-row-right
-: | a | b  | c | d  |
-: | e | 10 | 9 | 11 |
-: | f | g  | h | i  |
+2) result of M-x my-org-table-move-column-in-row-right:
+   : | a | b  | c | d  |
+   : | e | 10 | 9 | 11 |
+   : | f | g  | h | i  |
 
 **** Rotate in row left
 
 1) place point at "9" in original table
-2) result of M-x my-org-table-rotate-column-in-row-left
-: | a | b  | c  | d |
-: | e | 10 | 11 | 9 |
-: | f | g  | h  | i |
+2) result of M-x my-org-table-rotate-column-in-row-left:
+   : | a | b  | c  | d |
+   : | e | 10 | 11 | 9 |
+   : | f | g  | h  | i |
 
 **** Rotate in row right
 
 1) place point at "9" in original table
-2) result of M-x my-org-table-rotate-column-in-row-right
-: | a | b  | c | d  |
-: | e | 11 | 9 | 10 |
-: | f | g  | h | i  |
+2) result of M-x my-org-table-rotate-column-in-row-right:
+   : | a | b  | c | d  |
+   : | e | 11 | 9 | 10 |
+   : | f | g  | h | i  |
 
 **** The functions
 
@@ -889,6 +865,8 @@ behavior with C-c C-c on one of the three snippets:
 :                 'my-org-table-move-column-in-row-left)
 :     (org-defkey org-mode-map [(meta right)]
 :                 'my-org-table-move-column-in-row-right)
+:     (org-defkey org-mode-map [(left)]  'org-table-previous-field)
+:     (org-defkey org-mode-map [(right)] 'org-table-next-field)
 :   #+end_src
 :
 : - rotate in row:
@@ -897,16 +875,40 @@ behavior with C-c C-c on one of the three snippets:
 :                 'my-org-table-rotate-column-in-row-left)
 :     (org-defkey org-mode-map [(meta right)]
 :                 'my-org-table-rotate-column-in-row-right)
+:     (org-defkey org-mode-map [(left)]  'org-table-previous-field)
+:     (org-defkey org-mode-map [(right)] 'org-table-next-field)
 :   #+end_src
 :
 : - back to original:
 :   #+begin_src emacs-lisp :results silent
 :     (org-defkey org-mode-map [(meta left)]  'org-metaleft)
 :     (org-defkey org-mode-map [(meta right)] 'org-metaright)
+:     (org-defkey org-mode-map [(left)]  'backward-char)
+:     (org-defkey org-mode-map [(right)] 'forward-char)
 :   #+end_src
+
+**** reasons why this is not put into the Org core
+
+I consider this as only a hack for several reasons:
+- Generalization:  The existing org-table-move-column function could be
+  enhanced with additional optional parameters to incorporate these
+  functionalities and could be used as the only function for better
+  maintainability.  Now it's only a copy/paste hack of several similar
+  functions with simple modifications.
+- Bindings:  Should be convenient for repetition like M-<right>.  What
+  should be bound where, what has to be left unbound?
+- Does not fix formulas.  Could be resolved for field formulas but
+  most probably not for column or range formulas and this can lead
+  to confusion.  AFAIK all "official" table manipulations fix formulas.
+- Completeness:  Not all variations and combinations are covered yet
+  - left-right, up-down
+  - move, rotate with range to end, rotate with range to begin
+  - whole column/row, only in-row/in-column
 
 ** Capture and Remember
 *** Customize the size of the frame for remember
+#+index: Remember!frame
+#+index: Customization!remember
 (Note: this hack is likely out of date due to the development of
 [[org-capture]].)
 
@@ -938,6 +940,7 @@ reasonable size for the frame.
 ** Handling Links
 *** [[#heading-to-link][Turn a heading into an org link]] 
 *** Quickaccess to the link part of hyperlinks
+#+index: Link!Referent
 Christian Moe [[http://permalink.gmane.org/gmane.emacs.orgmode/43122][asked]], if there is a simpler way to copy the link part
 of an org hyperling other than to use `C-c C-l C-a C-k C-g', 
 which is indeed kind of cumbersome.
@@ -966,6 +969,7 @@ They put the link destination on the killring and can be easily bound to a key.
 
 ** Archiving Content in Org-Mode
 *** Preserve top level headings when archiving to a file
+#+index: Archiving!Preserve top level headings
 - Matt Lundin
 
 To preserve (somewhat) the integrity of your archive structure while
@@ -1034,7 +1038,7 @@ tags found on those headings:
 #+end_src
 
 *** Archive in a date tree
-
+#+index: Archiving!date tree
 Posted to Org-mode mailing list by Osamu Okano [2010-04-21 Wed].
 
 (Make sure org-datetree.el is loaded for this to work.)
@@ -1073,7 +1077,7 @@ Posted to Org-mode mailing list by Osamu Okano [2010-04-21 Wed].
 #+end_src
 
 *** Add inherited tags to archived entries
-
+#+index: Archiving!Add inherited tags
 To make =org-archive-subtree= keep inherited tags, Osamu OKANO suggests to
 advise the function like this:
 
@@ -1086,6 +1090,7 @@ advise the function like this:
 
 ** Using and Managing Org-Metadata
 *** Remove redundant tags of headlines
+#+index: Tag!Remove redundant
 -- David Maus
 
 A small function that processes all headlines in current buffer and
@@ -1114,7 +1119,7 @@ headline or the #+FILETAGS: statement.
 #+END_SRC
 
 *** Remove empty property drawers
-
+#+index: Drawer!Empty
 David Maus proposed this:
 
 #+begin_src emacs-lisp
@@ -1131,7 +1136,7 @@ David Maus proposed this:
 #+end_src
 
 *** Group task list by a property
-
+#+index: Agenda!Group task list
 This advice allows you to group a task list in Org-Mode.  To use it,
 set the variable =org-agenda-group-by-property= to the name of a
 property in the option list for a TODO or TAGS search.  The resulting
@@ -1186,6 +1191,8 @@ agenda view will group tasks by that property prior to searching.
 (ad-activate 'org-finalize-agenda-entries)
 #+end_src
 *** A way to tag a task so that when clocking-out user is prompted to take a note.
+#+index: Tag!Clock
+#+index: Clock!Tag
     Thanks to Richard Riley (see [[http://permalink.gmane.org/gmane.emacs.orgmode/40896][this post on the mailing list]]).
 
 A small hook run when clocking out of a task that prompts for a note
@@ -1205,6 +1212,7 @@ when the tag "=clockout_note=" is found in a headline. It uses the tag
   (add-hook 'org-clock-out-hook 'rgr/check-for-clock-out-note)
 #+end_src
 *** Dynamically adjust tag position
+#+index: Tag!position
 Here is a bit of code that allows you to have the tags always
 right-adjusted in the buffer.
 
@@ -1281,7 +1289,7 @@ changed.
 (ad-activate 'org-refile)
 #+end_src
 *** Use an "attach" link type to open files without worrying about their location
-
+#+index: Link!Attach
 -- Darlan Cavalcante Moreira
 
 In the setup part in my org-files I put:
@@ -1304,6 +1312,7 @@ This works very well.
 
 ** Org Agenda and Task Management
 *** Make it easier to set org-agenda-files from multiple directories
+#+index: Agenda!Files
 - Matt Lundin
 
 #+begin_src emacs-lisp
@@ -1370,6 +1379,7 @@ directories and extensions to generate different lists of agenda
 files.
 
 *** Restrict org-agenda-files by filetag
+#+index: Agenda!Files
   :PROPERTIES:
   :CUSTOM_ID: set-agenda-files-by-filetag
   :END:
@@ -1434,7 +1444,7 @@ containing the filetag. To release the restriction, type C-c C-x >
 (org-agenda-remove-restriction-lock).
 
 *** Highlight the agenda line under cursor
-
+#+index: Agenda!Highlight
 This is useful to make sure what task you are operating on.
 
 #+BEGIN_SRC emacs-lisp
@@ -1455,8 +1465,8 @@ Under XEmacs:
                     (:background "white" :foreground "black")))))
 #+END_SRC
 
-*** Split horizontally for agenda
-
+*** Split frame horizontally for agenda
+#+index: Agenda!frame
 If you would like to split the frame into two side-by-side windows when
 displaying the agenda, try this hack from Jan Rehders, which uses the
 `toggle-window-split' from
@@ -1471,7 +1481,8 @@ http://www.emacswiki.org/cgi-bin/wiki/ToggleWindowSplit
 #+END_SRC
 
 *** Automatically add an appointment when clocking in a task
-
+#+index: Clock!Automatically add an appointment when clocking in a task
+#+index: Appointment!Automatically add an appointment when clocking in a task
 #+BEGIN_SRC emacs-lisp
 ;; Make sure you have a sensible value for `appt-message-warning-time'
 (defvar bzg-org-clock-in-appt-delay 100
@@ -1542,11 +1553,12 @@ And here is the advice for =org-clock-out= (=C-c C-x C-o=)
 agenda buffer with the advice above will bring an error.
 
 *** Using external programs for appointments reminders
-
+#+index: Appointment!reminders
 Read this rich [[http://comments.gmane.org/gmane.emacs.orgmode/46641][thread]] from the org-mode list.
 
-*** Remove time grid lines that are in an appointment
-
+*** Remove from agenda time grid lines that are in an appointment
+#+index: Agenda!time grid
+#+index: Appointment!Remove from agenda time grid lines
 The agenda shows lines for the time grid.  Some people think that
 these lines are a distraction when there are appointments at those
 times.  You can get rid of the lines which coincide exactly with the
@@ -1594,7 +1606,8 @@ appointment:
     ad-do-it))
 (ad-activate 'org-agenda-add-time-grid-maybe)
 #+end_src
-*** Disable vc for Org mode agenda files
+*** Disable version control for Org mode agenda files
+#+index: Agenda!Files
 -- David Maus
 
 Even if you use Git to track your agenda files you might not need
@@ -1611,6 +1624,9 @@ vc-mode to be enabled for these files.
 #+end_src
 
 *** Easy customization of TODO colors
+#+index: Customization!Todo keywords
+#+index: Todo keywords!Customization
+
 -- Ryan C. Thompson
 
 Here is some code I came up with some code to make it easier to
@@ -1669,7 +1685,8 @@ If KWD is a number, get the corresponding match group."
 #+END_SRC
 
 *** Add an effort estimate on the fly when clocking in
-
+#+index: Effort estimate!Add when clocking in
+#+index: Clock!Effort estimate
 You can use =org-clock-in-prepare-hook= to add an effort estimate.
 This way you can easily have a "tea-timer" for your tasks when they
 don't already have an effort estimate.
@@ -1703,8 +1720,52 @@ Or you can use a default effort for such a timer:
     (org-set-property "Effort" org-clock-default-effort)))
 #+end_src
 
-*** Refresh the agenda view regurally
+*** Use idle timer for automatic agenda views
+#+index: Agenda view!Refresh
+From John Wiegley's mailing list post (March 18, 2010):
 
+#+begin_quote
+I have the following snippet in my .emacs file, which I find very
+useful. Basically what it does is that if I don't touch my Emacs for 5
+minutes, it displays the current agenda. This keeps my tasks "always
+in mind" whenever I come back to Emacs after doing something else,
+whereas before I had a tendency to forget that it was there.
+#+end_quote
+
+  - [[http://mid.gmane.org/55590EA7-C744-44E5-909F-755F0BBE452D@gmail.com][John Wiegley: Displaying your Org agenda after idle time]]
+
+#+begin_src emacs-lisp
+(defun jump-to-org-agenda ()
+  (interactive)
+  (let ((buf (get-buffer "*Org Agenda*"))
+        wind)
+    (if buf
+        (if (setq wind (get-buffer-window buf))
+            (select-window wind)
+          (if (called-interactively-p)
+              (progn
+                (select-window (display-buffer buf t t))
+                (org-fit-window-to-buffer)
+                ;; (org-agenda-redo)
+                )
+            (with-selected-window (display-buffer buf)
+              (org-fit-window-to-buffer)
+              ;; (org-agenda-redo)
+              )))
+      (call-interactively 'org-agenda-list)))
+  ;;(let ((buf (get-buffer "*Calendar*")))
+  ;;  (unless (get-buffer-window buf)
+  ;;    (org-agenda-goto-calendar)))
+  )
+
+(run-with-idle-timer 300 t 'jump-to-org-agenda)
+#+end_src
+
+#+results:
+: [nil 0 300 0 t jump-to-org-agenda nil idle]
+
+*** Refresh the agenda view regularly
+#+index: Agenda view!Refresh
 Hack sent by Kiwon Um:
 
 #+begin_src emacs-lisp
@@ -1718,7 +1779,7 @@ Hack sent by Kiwon Um:
 #+end_src
 
 *** Reschedule agenda items to today with a single command
-
+#+index: Agenda!Reschedule
 This was suggested by Carsten in reply to David Abrahams:
 
 #+begin_example emacs-lisp
@@ -1729,7 +1790,7 @@ This was suggested by Carsten in reply to David Abrahams:
 #+end_example
 
 *** Mark subtree DONE along with all subheadings
-
+#+index: Subtree!subheadings
 Bernt Hansen [[http://permalink.gmane.org/gmane.emacs.orgmode/44693][suggested]] this command:
 
 #+begin_src emacs-lisp
@@ -1747,9 +1808,55 @@ Bernt Hansen [[http://permalink.gmane.org/gmane.emacs.orgmode/44693][suggested]]
 
 Then M-x bh/mark-subtree-done.
 
+*** Mark heading done when all checkboxes are checked.
+    :PROPERTIES:
+    :CUSTOM_ID: mark-done-when-all-checkboxes-checked
+    :END:
+
+#+index: Checkbox
+
+An item consists of a list with checkboxes.  When all of the
+checkboxes are checked, the item should be considered complete and its
+TODO state should be automatically changed to DONE. The code below
+does that. This version is slightly enhanced over the one in the
+mailing list (see
+http://thread.gmane.org/gmane.emacs.orgmode/42715/focus=42721) to
+reset the state back to TODO if a checkbox is unchecked.
+
+Note that the code requires that a checkbox statistics cookie (the [/]
+or [%] thingie in the headline - see the [[http://orgmode.org/manual/Checkboxes.html#Checkboxes][Checkboxes]] section in the
+manual) be present in order for it to work. Note also that it is too
+dumb to figure out whether the item has a TODO state in the first
+place: if there is a statistics cookie, a TODO/DONE state will be
+added willy-nilly any time that the statistics cookie is changed.
+
+#+begin_src emacs-lisp
+  ;; see http://thread.gmane.org/gmane.emacs.orgmode/42715
+  (eval-after-load 'org-list
+    '(add-hook 'org-checkbox-statistics-hook (function ndk/checkbox-list-complete)))
+  
+  (defun ndk/checkbox-list-complete ()
+    (save-excursion
+      (org-back-to-heading t)
+      (let ((beg (point)) end)
+        (end-of-line)
+        (setq end (point))
+        (goto-char beg)
+        (if (re-search-forward "\\[\\([0-9]*%\\)\\]\\|\\[\\([0-9]*\\)/\\([0-9]*\\)\\]" end t)
+              (if (match-end 1)
+                  (if (equal (match-string 1) "100%")
+                      ;; all done - do the state change
+                      (org-todo 'done)
+                    (org-todo 'todo))
+                (if (and (> (match-end 2) (match-beginning 2))
+                         (equal (match-string 2) (match-string 3)))
+                    (org-todo 'done)
+                  (org-todo 'todo)))))))
+#+end_src
+
 ** Exporting org files
 *** Export Org to Org and handle includes.
-
+#+index: Export!handle includes
 Nick Dokos came up with this useful function:
 
 #+begin_src emacs-lisp
@@ -1775,6 +1882,7 @@ recursively processing #+INCLUDEs."
     :CUSTOM_ID: latex-command-for-floats
     :END:
 
+#+index: Export!LaTeX
 The keyword ~placement~ can be used to specify placement options to
 floating environments (like =\begin{figure}= and =\begin{table}=}) in
 LaTeX export. Org passes along everything passed in options as long as
@@ -1815,6 +1923,8 @@ workaround, one can use the following:
 
 *** Styling code sections with CSS
 
+#+index: HTML!Styling code sections with CSS
+
 Code sections (marked with =#+begin_src= and =#+end_src=) are exported
 to HTML using =<pre>= tags, and assigned CSS classes by their content
 type.  For example, Perl content will have an opening tag like
@@ -1844,6 +1954,8 @@ class) from input (all the =.src-*= classes).
 * Hacking Org: Working with Org-mode and other Emacs Packages.
 ** org-remember-anything
 
+#+index: Remember!Anything
+
 [[http://www.emacswiki.org/cgi-bin/wiki/Anything][Anything]] users may find the snippet below interesting:
 
 #+BEGIN_SRC emacs-lisp
@@ -1863,7 +1975,7 @@ remember templates, so that you are out of keys to assign those to.
 
 ** Org-mode and saveplace.el
 
-Fix a problem with saveplace.el putting you back in a folded position:
+Fix a problem with =saveplace.el= putting you back in a folded position:
 
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook
@@ -1875,6 +1987,9 @@ Fix a problem with saveplace.el putting you back in a folded position:
 #+end_src
 
 ** Using ido-completing-read to find attachments
+
+#+index: Attachment!ido completion
+
 -- Matt Lundin.
 
 Org-attach is great for quickly linking files to a project. But if you
@@ -1925,52 +2040,8 @@ To browse your org attachments using ido fuzzy matching and/or the
 completion buffer, invoke ido-find-file as usual (=C-x C-f=) and then
 press =C-;=.
 
-** Use idle timer for automatic agenda views
-
-From John Wiegley's mailing list post (March 18, 2010):
-
-#+begin_quote
-I have the following snippet in my .emacs file, which I find very
-useful. Basically what it does is that if I don't touch my Emacs for 5
-minutes, it displays the current agenda. This keeps my tasks "always
-in mind" whenever I come back to Emacs after doing something else,
-whereas before I had a tendency to forget that it was there.
-#+end_quote
-
-  - [[http://mid.gmane.org/55590EA7-C744-44E5-909F-755F0BBE452D@gmail.com][John Wiegley: Displaying your Org agenda after idle time]]
-
-#+begin_src emacs-lisp
-(defun jump-to-org-agenda ()
-  (interactive)
-  (let ((buf (get-buffer "*Org Agenda*"))
-        wind)
-    (if buf
-        (if (setq wind (get-buffer-window buf))
-            (select-window wind)
-          (if (called-interactively-p)
-              (progn
-                (select-window (display-buffer buf t t))
-                (org-fit-window-to-buffer)
-                ;; (org-agenda-redo)
-                )
-            (with-selected-window (display-buffer buf)
-              (org-fit-window-to-buffer)
-              ;; (org-agenda-redo)
-              )))
-      (call-interactively 'org-agenda-list)))
-  ;;(let ((buf (get-buffer "*Calendar*")))
-  ;;  (unless (get-buffer-window buf)
-  ;;    (org-agenda-goto-calendar)))
-  )
-
-(run-with-idle-timer 300 t 'jump-to-org-agenda)
-#+end_src
-
-#+results:
-: [nil 0 300 0 t jump-to-org-agenda nil idle]
-
 ** Link to Gnus messages by Message-Id
-
+#+index: Link!Gnus message by Message-Id
 In a [[http://thread.gmane.org/gmane.emacs.orgmode/8860][recent thread]] on the Org-Mode mailing list, there was some
 discussion about linking to Gnus messages without encoding the folder
 name in the link.  The following code hooks in to the store-link
@@ -2060,8 +2131,8 @@ it is a cons of 'gnus and the select (type and name).")
      (org-add-link-type "mid" 'mde-org-gnus-open-message-link)))
 #+end_src
 
-** Store link upon sending a message in Gnus
-
+** Store link to a message when sending in Gnus
+#+index: Link!Store link to a message when sending in Gnus
 Ulf Stegemann came up with this solution (see his [[http://www.mail-archive.com/emacs-orgmode@gnu.org/msg33278.html][original message]]):
 
 #+begin_src emacs-lisp
@@ -2284,6 +2355,7 @@ The whole magic lies in the special strings that mark a HTML
 attachment.  So you might just have to find out what these special
 strings are in message-mode and modify the functions accordingly.
 ** Add sunrise/sunset times to the agenda.
+#+index: Agenda!Diary s-expressions
   -- Nick Dokos
 
 The diary package provides the function =diary-sunrise-sunset= which can be used
@@ -2349,12 +2421,14 @@ The thread on the mailing list that started this can be found [[http://thread.gm
 In comparison to the version posted on the mailing list, this one
 gets rid of the timezone information.
 ** Export BBDB contacts to org-contacts.el
-
+#+index: Address Book!BBDB to org-contacts
 Try this tool by Wes Hardaker:
 
 http://www.hardakers.net/code/bbdb-to-org-contacts/
 
 ** Calculating date differences - how to write a simple elisp function
+#+index: Timestamp!date calculations
+#+index: Elisp!technique
 
 Alexander Wingård asked how to calculate the number of days between a
 time stamp in his org file and today (see
@@ -2431,7 +2505,7 @@ various pieces.
 
 * Hacking Org: Working with Org-mode and External Programs.
 ** Use Org-mode with Screen [Andrew Hyatt]
-
+#+index: Link!to screen session
 "The general idea is that you start a task in which all the work will
 take place in a shell.  This usually is not a leaf-task for me, but
 usually the parent of a leaf task.  From a task in your org-file, M-x
@@ -2483,6 +2557,12 @@ http://article.gmane.org/gmane.emacs.orgmode/5276
 #+END_SRC
 
 ** Org Agenda + Appt + Zenity
+    :PROPERTIES:
+    :CUSTOM_ID: org-agenda-appt-zenity
+    :END:
+
+#+index: Appointment!reminders
+#+index: Appt!Zenity
 #+BEGIN_HTML
 <a name="agenda-appt-zenity"></a>
 #+END_HTML
@@ -2524,19 +2604,21 @@ popup window.
 #+END_SRC
 
 ** Org-Mode + gnome-osd
-
+#+index: Appointment!reminders
+#+index: Appt!gnome-osd
 Richard Riley uses gnome-osd in interaction with Org-Mode to display
 appointments.  You can look at the code on the [[http://www.emacswiki.org/emacs-en/OrgMode-OSD][emacswiki]].
 
 ** remind2org
-
+#+index: Agenda!Views
+#+index: Agenda!and Remind (external program)
 From Detlef Steuer
 
 http://article.gmane.org/gmane.emacs.orgmode/5073
 
 #+BEGIN_QUOTE
 Remind (http://www.roaringpenguin.com/products/remind) is a very powerful
-command line calendaring program. Its features superseed the possibilities
+command line calendaring program. Its features supersede the possibilities
 of orgmode in the area of date specifying, so that I want to use it
 combined with orgmode.
 
@@ -2547,7 +2629,7 @@ future. :-)
 #+END_QUOTE
 
 ** Useful webjumps for conkeror
-
+#+index: Shortcuts!conkeror
 If you are using the [[http://conkeror.org][conkeror browser]], maybe you want to put this into
 your =~/.conkerorrc= file:
 
@@ -2560,6 +2642,7 @@ It creates two [[http://conkeror.org/Webjumps][webjumps]] for easily searching t
 Org-mode mailing list.
 
 ** Use MathJax for HTML export without requiring JavaScript
+#+index: Export!MathJax
 As of 2010-08-14, MathJax is the default method used to export math to HTML.
 
 If you like the results but do not want JavaScript in the exported pages,
@@ -2572,7 +2655,7 @@ export process (configurable per file with a "#+StaticMathJax:" line).
 
 Read README.org and the comments in org-static-mathjax.el for usage instructions.
 ** Search Org files using lgrep
-
+#+index: search!lgrep
 Matt Lundin suggests this:
 
 #+begin_src emacs-lisp
@@ -2592,7 +2675,7 @@ Prefix argument determines number of lines."
 #+end_src
 
 ** Automatic screenshot insertion
-
+#+index: Link!screenshot
 Suggested by Russell Adams
 
 #+begin_src emacs-lisp
@@ -2612,12 +2695,12 @@ Suggested by Russell Adams
 #+end_src
 
 ** Capture invitations/appointments from MS Exchange emails
-
+#+index: Appointment!MS Exchange
 Dirk-Jan C.Binnema [[http://article.gmane.org/gmane.emacs.orgmode/27684/][provided]] code to do this.  Please check
 [[file:code/elisp/org-exchange-capture.el][org-exchange-capture.el]]
 
 ** Audio/video file playback within org mode
-
+#+index: Link!audio/video
 Paul Sexton provided code that makes =file:= links to audio or video files
 (MP3, WAV, OGG, AVI, MPG, et cetera) play those files using the [[https://github.com/dbrock/bongo][Bongo]] Emacs
 media player library. The user can pause, skip forward and backward in the
@@ -2628,7 +2711,7 @@ position in the track.
 See the file [[file:code/elisp/org-player.el][org-player.el]]
 
 ** Under X11 Keep a window with the current agenda items at all time
-
+#+index: Agenda!dedicated window
 I struggle to keep (in emacs) a window with the agenda at all times.
 For a long time I have wanted a sticky window that keeps this
 information, and then use my window manager to place it and remove its
@@ -2655,7 +2738,7 @@ http://turingmachine.org/hacking/org-mode/
 --daniel german
 
 ** Script (thru procmail) to output emails to an Org file
-
+#+index: Conversion!email to org file
 Tycho Garen sent [[http://comments.gmane.org/gmane.emacs.orgmode/44773][this]]:
 
 : I've [...] created some procmail and shell glue that takes emails and
@@ -2664,8 +2747,252 @@ Tycho Garen sent [[http://comments.gmane.org/gmane.emacs.orgmode/44773][this]]:
 
 Everything is documented [[http://tychoish.com/code/org-mail/][here]].
 
-** Meaningful diff for org files in a git repository
+** fileconversion
+   :PROPERTIES:
+   :CUSTOM_ID: fileconversion
+   :END:
+#+index: Conversion!fileconversion
 
+Using hooks and on the fly
+- when writing a buffer to the file replace the stars from headings with a
+  file char
+- when reading a file into the buffer replace the file chars with stars for
+  headings
+
+To change to save an Org file in one of the formats or back just add or
+remove the keyword in the STARTUP line and save.
+
+Now you can also change to Fundamental mode to see how the file looks like
+on the level of the file, go back to Org mode, reenter Org mode or change to
+any other major mode and the conversion gets done whenever necessary.
+
+*** the format hidestarsfile
+    :PROPERTIES:
+    :CUSTOM_ID: hidestarsfile
+    :END:
+#+index: Conversion!fileconversion hidestarsfile
+
+This is like "a cleaner outline view":
+http://orgmode.org/manual/Clean-view.html
+
+Example of the _file content_ first with leading stars as usual and below
+without leading stars through "#+STARTUP: odd hidestars hidestarsfile":
+
+#+BEGIN_EXAMPLE
+  #+STARTUP: odd hidestars
+  [...]
+  ***** TODO section
+  ******* subsection
+  ********* subsubsec
+            - bla bla
+  ***** section
+        - bla bla
+  ******* subsection
+#+END_EXAMPLE
+
+#+BEGIN_EXAMPLE
+  #+STARTUP: odd hidestars hidestarsfile
+  [...]
+      * TODO section
+        * subsection
+          * subsubsec
+            - bla bla
+      * section
+        - bla bla
+        * subsection
+#+END_EXAMPLE
+
+The latter is convenient for better human readability when an Org file,
+additionally to Emacs, is read with a file viewer or, for smaller edits,
+with an editor not capable of the Org file format.
+
+hidestarsfile is a hack and can not become part of the Org core:
+- An Org file with hidestarsfile can not contain list items with a star as
+  bullet due to the syntax conflict at read time.
+- An Org file with hidestarsfile can almost not be edited with an Org mode
+  without added functionality of hidestarsfile as long as the file is not
+  converted back.
+
+*** the format markdownstarsfile
+    :PROPERTIES:
+    :CUSTOM_ID: markdownstarsfile
+    :END:
+#+index: Conversion!fileconversion markdownstarsfile
+
+For "oddeven" you can use markdownstarsfile to be readable or even basically
+editable with Markdown (does not make much sense with "odd", see
+org-convert-to-odd-levels and org-convert-to-oddeven-levels for how to
+convert).
+
+Example of the _file content_:
+
+#+BEGIN_EXAMPLE
+  #+STARTUP: oddeven markdownstarsfile
+  # section level 1 with Org or Markdown numbered list
+    1. item
+  ## section level 2 with Org or Markdown unordered list
+     - item
+  ### section level 3 with Org or Markdown unordered list
+      + item
+  #### section level 4 with Org or Markdown unordered list
+       * item (avoid this type to be compatible with Org hidestarsfile)
+#+END_EXAMPLE
+
+An Org file with markdownstarsfile can not contain code comment lines
+prefixed with "#", even not when within source blocks.
+
+*** emacs-lisp code
+    :PROPERTIES:
+    :CUSTOM_ID: fileconversion-code
+    :END:
+#+index: Conversion!fileconversion emacs-lisp code
+
+#+BEGIN_SRC emacs-lisp
+  ;; - fileconversion version 0.2
+  ;; - DISCLAIMER: Make a backup of your Org files before using
+  ;;   my-org-fileconv-*.
+  ;; - supported formats: hidestarsfile, markdownstarsfile
+
+  ;; design summary: fileconversion is a round robin of two states
+  ;; linked by two actions:
+  ;; - the level is "file" (encoded): my-org-fileconv-level-org-p is nil
+  ;; - replace file char with '*': my-org-fileconv-decode
+  ;; - the level is "Org" (decoded): my-org-fileconv-level-org-p is t
+  ;; - replace '*' with file char: my-org-fileconv-encode
+
+  (defvar my-org-fileconv-level-org-p nil
+    "Whether level of buffer is Org or only file.
+  nil means the level is file (encoded), non-nil means the level is Org
+  (decoded).")
+  (make-variable-buffer-local 'my-org-fileconv-level-org-p)
+  ;; survive a change of major mode that does kill-all-local-variables,
+  ;; e. g. reentering Org mode through “C-c C-c” on a STARTUP line
+  (put 'my-org-fileconv-level-org-p 'permanent-local t)
+
+  (add-hook 'org-mode-hook 'my-org-fileconv-init
+            ;; append to hook to have a chance that the last message
+            ;; left over in the minibuffer is from this function
+            t
+            nil)  ; global
+
+  (defun my-org-fileconv-init ()
+    (interactive)
+    (message (concat "INF: my-org-fileconv-init, buffer: "
+                     (buffer-name)))
+    (my-org-fileconv-decode)
+    ;; the hooks will be lost as needed at the moment when the major
+    ;; mode is changed, not permanent-local
+    (add-hook 'change-major-mode-hook 'my-org-fileconv-encode nil
+              t)   ; limit hook change local to buffer
+    (add-hook 'before-save-hook 'my-org-fileconv-encode nil
+              t)   ; limit hook change local to buffer
+    (add-hook 'after-save-hook 'my-org-fileconv-decode nil
+              t))  ; limit hook change local to buffer
+
+  (defun my-org-fileconv-re ()
+    "Check whether there is a STARTUP line for fileconversion.
+  If found then return the expressions required for the conversion."
+    (save-excursion
+      (beginning-of-buffer)
+      (let (re-list (count 0))
+        (while (re-search-forward "^#\\+STARTUP:" nil t)
+          (when (string-match-p "\\bhidestarsfile\\b"
+                                (thing-at-point 'line))
+            ;; exclude e. g.:
+            ;; - line starting with star for bold emphasis
+            ;; - line of stars to underline section title in loosely
+            ;;   quoted ASCII style (star at end of line)
+            (setq re-list '("\\(\\* \\)"  ; common-re
+                            ?\ ))         ; file-char
+            (setq count (1+ count)))
+          (when (string-match-p "\\bmarkdownstarsfile\\b"
+                                (thing-at-point 'line))
+            ;; exclude e. g.:
+            ;; - #STARTUP:
+            (setq re-list '("\\( \\)"  ; common-re
+                            ?#))       ; file-char
+            (setq count (1+ count))))
+        (when (> count 1)
+          (error "ERR: more than one fileconversion found"))
+        re-list)))
+
+  (defun my-org-fileconv-decode ()
+    "In headings replace file char with '*'."
+    (let ((re-list (my-org-fileconv-re)))
+      (when (and re-list (not my-org-fileconv-level-org-p))
+        ;; no `save-excursion' to be able to keep point in case of error
+        (let* ((common-re (nth 0 re-list))
+               (file-char (nth 1 re-list))
+               (file-re   (concat "^" (string file-char) "+" common-re))
+               (org-re    (concat "^\\*+" common-re))
+               len
+               (p         (point))
+               (mod-p     (buffer-modified-p)))
+          (beginning-of-buffer)
+          (when (re-search-forward org-re nil t)
+            (goto-char (match-beginning 0))
+            (org-reveal)
+            (error
+             "ERR: my-org-fileconv-decode syntax conflict at point"))
+          (beginning-of-buffer)
+          (while (re-search-forward file-re nil t)
+            (goto-char (match-beginning 0))
+            ;; faster than lisp call of ins and del for each single char
+            (setq len (- (match-beginning 1) (match-beginning 0)))
+            (insert-char ?* len)
+            (delete-char len))
+          (goto-char p)
+          ;; notes for ediff when only one file has fileconversion:
+          ;; - The changes to the buffer with fileconversion until here
+          ;;   are not regarded by ediff-files because the first call to
+          ;;   diff is made with the bare files directly. Only
+          ;;   ediff-update-diffs and ediff-buffers write the decoded
+          ;;   buffers to temp files and then call diff with them.
+          ;; - Workarounds (choose one):
+          ;;   - after ediff-files first do a "!" (ediff-update-diffs)
+          ;;     in the "*Ediff Control Panel*"
+          ;;   - instead of using ediff-files first open the files and
+          ;;     then run ediff-buffers (better for e. g. a script that
+          ;;     takes two files as arguments and uses "emacs --eval")
+          (when (not mod-p) (not-modified)))))
+    ;; the level is Org most of all when no fileconversion is in effect
+    (setq my-org-fileconv-level-org-p t))
+
+  (defun my-org-fileconv-encode ()
+    "In headings replace '*' with file char."
+    (let ((re-list (my-org-fileconv-re)))
+      (when (and re-list my-org-fileconv-level-org-p)
+        ;; no `save-excursion' to be able to keep point in case of error
+        (let* ((common-re (nth 0 re-list))
+               (file-char (nth 1 re-list))
+               (file-re   (concat "^" (string file-char) "+" common-re))
+               (org-re    (concat "^\\*+" common-re))
+               len
+               (p         (point))
+               (mod-p     (buffer-modified-p)))
+          (beginning-of-buffer)
+          (when (re-search-forward file-re nil t)
+            (goto-char (match-beginning 0))
+            (org-reveal)
+            (error
+             "ERR: my-org-fileconv-encode syntax conflict at point"))
+          (beginning-of-buffer)
+          (while (re-search-forward org-re nil t)
+            (goto-char (match-beginning 0))
+            ;; faster than lisp call of ins and del for each single char
+            (setq len (- (match-beginning 1) (match-beginning 0)))
+            (insert-char file-char len)
+            (delete-char len))
+          (goto-char p)
+          (when (not mod-p) (not-modified))
+          (setq my-org-fileconv-level-org-p nil))))
+    nil)  ;; for the hook
+#+END_SRC
+
+Michael Brand
+
+** Meaningful diff for org files in a git repository
+#+index: git!diff org files
 Since most diff utilities are primarily meant for source code, it is
 difficult to read diffs of text files like ~.org~ files easily. If you
 version your org directory with a SCM like git you will know what I
@@ -2717,7 +3044,8 @@ index a0672ea..92a08f7 100644
 * Musings
 
 ** Cooking?  Brewing?
-
+#+index: beer!brewing
+#+index: cooking!conversions
 See [[http://article.gmane.org/gmane.emacs.orgmode/44981][this message]] from Erik Hetzner:
 
 It currently does metric/english conversion, and a few other tricks.

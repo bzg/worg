@@ -19,7 +19,7 @@ Check an Org-mode environment.
  buffer both safe and useful.
 
 * Instructions
-  - Download the file [[http://repo.or.cz/w/Worg.git/blob_plain/HEAD:/org-contrib/babel/examples/org-check.org][org-check.org]]
+  - Download the file [[http://orgmode.org/w/?p%3Dworg.git%3Ba%3Dblob_plain%3Bf%3Dorg-contrib/babel/examples/org-check.org%3Bh%3Dc6e25782c8fa781990d28676052af6006099cf96%3Bhb%3DHEAD][org-check.org]]
   - Calculate the table by putting point in the table and pressing =C-u C-c *=
   - Check the =results= column
     - if you see all "pass" results, then your environment passes
@@ -318,7 +318,7 @@ Check an Org-mode environment.
 ** HTML export
 * Commands
 ** Org stuff
-#+srcname: org-library
+#+name: org-library
 #+begin_src emacs-lisp :results silent
   (let (
         (x (locate-library "org"))
@@ -327,34 +327,42 @@ Check an Org-mode environment.
     )
 #+end_src
 
-#+srcname: org-version
+#+name: org-version
 #+begin_src emacs-lisp :results silent
 (if (null org-version) "fail" org-version)  
 #+end_src
 
-** Package loaded
-#+srcname: pkg-loaded(x)
+** COMMENT Package loaded
+
+FIXME: fix error "variable "pkg-loaded" in block "transpose-elisp" must be
+assigned a default value"
+
+#+name: pkg-loaded(x)
 #+begin_src emacs-lisp :results silent
   (if (featurep x) "pass" "fail")
 #+end_src
 
-** Babel languages
+** COMMENT Babel languages
+
+FIXME: "variable "chk-babel-lang" in block "transpose-elisp" must be
+assigned a default value"
+
    - Checks if a language can be tangled by Org-babel
-#+srcname: chk-babel-lang(x)
+#+name: chk-babel-lang(x)
 #+begin_src emacs-lisp :results silent
   (let ((z  (mapcar #'(lambda (y)
                 (first y)) org-babel-tangle-langs )
   )) (if (member x z) "pass" "fail") )
 #+end_src
 
-** Check external commands
-#+srcname: chk-ext-cmd(x)
+** COMMENT Check external commands
+#+name: chk-ext-cmd(x)
 #+begin_src emacs-lisp :results silent
     (if (org-check-external-command x "" t) "pass" "fail") 
 #+end_src
 
 ** Export LaTeX classes
-#+srcname: chk-ltx-cls
+#+name: chk-ltx-cls
 #+begin_src emacs-lisp :results silent
   (if (null org-export-latex-classes) "fail" "pass")
 #+end_src
@@ -364,7 +372,7 @@ Check an Org-mode environment.
    - This is typically a call to the LaTeX engine
    - If =fail= is returned, then the variable =org-latex-to-pdf-process=
      needs to be set
-#+srcname: chk-latex-engine
+#+name: chk-latex-engine
 #+begin_src emacs-lisp :results silent
   (require 'org-latex)
   (if  (null org-latex-to-pdf-process) "fail" (substring (first org-latex-to-pdf-process) 0 (string-match "\\ " (first org-latex-to-pdf-process))) )
@@ -376,7 +384,7 @@ Check an Org-mode environment.
    - Returns =fail= if  =chk-latex-engine= returns =fail=
    - If =fail= is returned, then the variable =exec-path= probably
      needs to have the path to the LaTeX engine
-#+srcname: chk-engine-cmd
+#+name: chk-engine-cmd
 #+begin_src emacs-lisp :var x=chk-latex-engine :results silent
   (if (string-equal x "fail") x (if (org-check-external-command x "" t)
   "pass" "fail"))
@@ -389,20 +397,24 @@ Check an Org-mode environment.
         - [[elisp:(progn (describe-variable 'org-export-icalendar-combine-agenda-files) (other-window 1))][org-export-icalendar-combine-agenda-files]]
         - others?
    - It is [[http://orgmode.org/manual/Agenda-files.html#Agenda-files][easy to set]]
-#+srcname: chk-agenda-files
+#+name: chk-agenda-files
 #+begin_src emacs-lisp :results silent
   (if (null org-agenda-files)
       "consider setting [[* org-agenda-files][org-agenda-files]]"
     "pass")
 #+end_src
 
-** Check System Command   
+** COMMENT Check System Command   
+
+FIXME: "variable "chk-sys-cmd" in block "transpose-elisp" must be assigned
+a default value"
+
    - Check if x is present on the system path
    - If =fail= is returned, ensure that the executable is found on
      your system, then check that =$PATH= holds a path to the
      executable
 
-#+srcname: chk-sys-cmd(x)
+#+name: chk-sys-cmd(x)
 #+begin_src sh :results silent
     if which $x > /dev/null;
     then echo pass;
@@ -414,13 +426,13 @@ Check an Org-mode environment.
 ** =check-latex-scale=
 Report the scale setting for inline images.  Default is 1.0.
 
-#+srcname: chk-latex-scale
+#+name: chk-latex-scale
 #+begin_src emacs-lisp :results silent
   (plist-get org-format-latex-options :scale)
 #+end_src
 * Learning Lisp (slowly)                                           :noexport:
 ** Check LaTeX packages
-#+srcname: chk-kpse
+#+name: chk-kpse
 #+begin_src sh :results silent
   if which kpsewhich > /dev/null;
   then echo pass;
@@ -428,7 +440,7 @@ Report the scale setting for inline images.  Default is 1.0.
   fi
 #+end_src
 
-#+srcname: chk-ltx-pkg
+#+name: chk-ltx-pkg
 #+begin_src emacs-lisp :var x=chk-kpse() 
   (if (string-equal x "pass") 
     (let* ((z (org-splice-latex-header org-format-latex-header
@@ -457,11 +469,11 @@ Many thanks to the following people for their generous help:
    - which is used in the shell scripts td wrote to check for latex
      and dvipng commands at the system level
 ** Source
-#+srcname: copy-to-worg
+#+name: copy-to-worg
 #+begin_src sh :exports none :results output
-  cd ~/org/Worg/
+  cd ~/org/worg/
   git pull
-  cp ~/org/org-check/org-check.org  ~/org/Worg/org-contrib/babel/examples/org-check.org
+  cp ~/org/org-check/org-check.org  ~/org/worg/org-contrib/babel/examples/org-check.org
   git add org-contrib/babel/examples/org-check.org
   git commit -m "Additions to org-check.org"
   git push

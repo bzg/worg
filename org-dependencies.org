@@ -3,6 +3,8 @@
 
 * Dependencies
 
+#+index: Dependencies
+
 Certain parts of org-mode have dependencies on external packages. This
 file documents these dependencies. Many sections are placeholders,
 waiting for input. If you can, please contribute. If you think that
@@ -17,45 +19,54 @@ the job. Thanks!
 Version: Org-mode version 7.01trans (release_7.01h.224.gf6c09)
 
 ** TODO Exporting in general.
+
 Anything here?
 
 ** STARTED LaTeX export.
+
 The LaTeX class is selected using the construct
 
-:#+LaTeX_CLASS: <class>
+: #+LaTeX_CLASS: <class>
 
-org-latex predefines the treatment of the following LaTeX classes
-article, report, book, beamer - or you can roll your own. And
-you can, of course, customize the treatment to your heart's content.
-This assumes a standard LaTeX install.
+org-latex predefines the treatment of the following LaTeX classes article,
+report, book, beamer - or you can roll your own. And you can, of course,
+customize the treatment to your heart's content.  This assumes a standard
+LaTeX install.
 
-On Linux/Mac OSX/BSD, the TeXlive distribution is recommended.
-On Windows, most people prefer  MikTeX.
+On Linux/Mac OSX/BSD, the TeXlive distribution is recommended.  On Windows,
+most people prefer MikTeX.
 
 ** Where to get packages
-The best way to get these packages is by using the package manager
-that comes with your operating system. These generally contain many
-useful LaTeX packages.
 
-If that is not possible, then you can get individual LaTeX packages
-from the CTAN sites (see [[http://www.tex.ac.uk/cgi-bin/texfaq2html?label=archives][CTAN archives]] for more information), but the
-installation process is less straightforward (but more portable):
-generally speaking, a LaTeX package comes in two files: a .ins file
-and a .dtx file (usually packed in a zip or tgz archive). Processing
-the .ins file through latex separates out the code from the .dtx file
-and produces the pieces that need to be installed on your system, but
-then it is up to you to figure out where to copy these files on your
-system for TeX and friends to find them. Processing the .dtx file
-directly through latex produces the documentation of the package:
+The best way to get these packages is by using the package manager that
+comes with your operating system. These generally contain many useful LaTeX
+packages.
+
+If that is not possible, then you can get individual LaTeX packages from
+the CTAN sites (see [[http://www.tex.ac.uk/cgi-bin/texfaq2html?label=archives][CTAN archives]] for more information), but the
+installation process is less straightforward (but more portable): generally
+speaking, a LaTeX package comes in two files: a .ins file and a .dtx file
+(usually packed in a zip or tgz archive). Processing the .ins file through
+latex separates out the code from the .dtx file and produces the pieces
+that need to be installed on your system, but then it is up to you to
+figure out where to copy these files on your system for TeX and friends to
+find them. The command ``kpsewhich'' is useful here: learn to use it well.
+
+Processing the .dtx file directly through latex produces the
+documentation of the package:
 
     - latex foo.ins -> foo.sty, etc.
     - pdflatex foo.dtx -> foo.pdf
 
-Many questions are answered by the [[http://www.tex.ac.uk/cgi-bin/texfaq2html?introduction=yes][TeX FAQ]] site, although the
-search capability is fairly primitive by today's standards: you
-will have to search a bit more diligently.
+Those too can be installed in standard places, so that the command ``texdoc''
+can find and display them.
 
-*** STARTED article, book, report
+Many questions are answered by the [[http://www.tex.ac.uk/cgi-bin/texfaq2html?introduction=yes][TeX FAQ]] site, although the search
+capability is fairly primitive by today's standards: you will have to
+search a bit more diligently.
+
+*** DONE Standard classes: article, book, report, beamer
+
 The LaTeX packages included by default are as follows:
 
 | LaTeX package | Ubuntu container package  | Options | Comments                          |
@@ -68,7 +79,6 @@ The LaTeX packages included by default are as follows:
 | float         | texlive-latex-recommended |         | floating environments             |
 | wrapfig       | texlive-latex-extra       |         | text wrapping around figures      |
 | soul          | texlive-latex-extra       |         | Underline/strike through          |
-| t1enc         | texlive-latex-base        |         | Obsolete - remove?                |
 | textcomp      | texlive-latex-base        |         | Misc text symbols                 |
 | marvosym      | texlive-fonts-recommended |         | Euro symbol                       |
 | wasysym       | texlive-fonts-recommended |         | Misc symbols                      |
@@ -76,53 +86,202 @@ The LaTeX packages included by default are as follows:
 | amssymb       | texlive-base              |         | Math symbols                      |
 | hyperref      | texlive-latex-base        |         |                                   |
 
+*** STARTED Code blocks
+By default, code blocks are rendered as verbatim blocks on export.
+LaTeX has a couple of packages that produce pleasanter output: one is
+the ``listings'' package and the other is the ``minted'' package.
+Which package is used is determined by the value of the variable
+org-export-latex-listings: nil means the default verbatim block
+export, 'minted means the minted package and any non-nil value other
+than 'minted means the listings package.
+
+The default setting does not have any additional dependencies. 
+
+**** Listings package
+
+On Ubuntu, listings.sty is part of the texlive-latex-recommended package.
+If you want to use color names, you will need color.sty, part of the
+texlive-latex-base Ubuntu package.
+
+The setup is straightforward - add this to your .emacs (or equivalent):
+
+#+BEGIN_SRC emacs-lisp :exports code :results none
+   (require 'org-latex)
+
+   (setq org-export-latex-listings t)
+   (add-to-list 'org-export-latex-packages-alist '("" "listings"))
+   (add-to-list 'org-export-latex-packages-alist '("" "color"))
+#+END_SRC
+
+**** Minted package
+
+Minted is an externally provided package. It consists of a couple of
+pieces: minted.sty provides the latex interface. It calls on an
+external python program called ``pygmentize'' to do the heavy
+lifting. See the [[*Special%20note%20about%20TeX%20and%20external%20programs][Special note about TeX and external programs]].
+
+The minted.sty package can be downloaded from CTAN:
+
+  http://mirror.ctan.org/macros/latex/contrib/minted.zip
+
+See [[*Where%20to%20get%20packages][Where to get packages]] for instructions.
+
+The pygmentize library can be downloaded from
+
+  http://pygments.org
+
+and there is documentation about installation as well.
 
 
-*** TODO beamer
+
+**** Special note about TeX and external programs
+
+Some packages (e.g. minted.sty) try to execute an external program in
+order to accomplish their goal, by using the so-called \textbackslash =write18=
+construct. This is normally *prohibited* for security reasons. There
+are various ways to allow it, some more convenient or more secure than
+others.
+
+If you use e.g. pdflatex from the command line, then in order to allow
+such external program execution, you just add the command-line option
+--shell-escape:
+
+#+BEGIN_SRC sh
+  pdflatex --shell-escape myfile.tex
+#+END_SRC
+
+If you are exporting from org to latex and processing directly to pdf,
+then this mechanism can be implemented by customizing
+org-latex-to-pdf-process, which is a list of commands to execute.  By
+default, this list consists of three repetitions of a basic pdflatex
+command, so you need to modify each of the three instances to add the
+--shell-escape option. NB: the three repetitions are supposed to
+ensure that all the references in a basic tex file will be
+resolved. This heuristic works most of the time, but not all the time.
+
+A more flexible approach consists of using the texi2dvi program, which
+analyzes logs in order to figure out what it needs to do: if the log
+contains complaints about undefined references, then texi2dvi will
+call pdflatex (or whatever) again in order to resolve them. In
+addition, texi2dvi is smart enough to invoke bibtex and
+texindex/makeindex if necessary, something that you would have to
+specify explicitly if you don't use texi2dvi. So why not use texi2dvi
+by default?
+
+One problem is that the currently [2012-02-21 Tue] available version
+on most OSes suffers from an obscure egrep bug, one that causes
+mysterious failures (unless you've seen the error before).
+
+If you want to take matters into your own hands, by all means fix
+texi2dvi in your setup and use it. The bug is on line 1713 - change
+it from 
+
+#+BEGIN_SRC sh
+  echo "$command_line_filename" | $EGREP '^(/|[A-z]:/)' >&6 \
+#+END_SRC
+
+to
+
+#+BEGIN_SRC sh
+  echo "$command_line_filename" | $EGREP '^(/|[A-Za-z]:/)' >&6 \
+#+END_SRC
+
+The observant reader will note that the regexps are *not* equivalent,
+but in practice that does not matter unless you have DOS drives named
+with one of the characters in the ASCII charset that falls between
+``Z'' and ``a''. If you do have drives named like this, you have more
+immediate problems than getting org to work on your machine.
+
+OK, let's assume you fixed your version of texi2dvi. How do you use
+it? Just set
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-latex-to-pdf-process "texi2dvi --pdf %f")
+#+END_SRC
+
+Wait a minute: where do I put the --shell-escape option? That's the
+second problem with texi2dvi. The best way I know to have texi2dvi
+call pdflatex with the --shell-escape option is to define the env
+variable
+
+#+BEGIN_SRC sh
+  PDFLATEX="pdflatex --shell-escape"
+  export PDFLATEX
+#+END_SRC
+
+in your .profile, .bash_profile, .login or whatever init file your
+login shell uses. Emacs will inherit this env variable and its value
+and when org invokes texi2dvi (which used $PDFLATEX internally),
+everything will work out. Another method (which is probably preferred
+by the security-conscious) is to leave it undefined. If pdflatex does
+not end up executing external programs, there is no problem. If it does,
+you'll get an error, so you say
+
+#+BEGIN_SRC emacs-lisp
+  (setenv "PDFLATEX" "pdflatex --shell-escape")
+#+END_SRC
+
+to your emacs and everything will work as before. The only problem is
+that the error is usually well hidden, so you'll have to dig to find it.
+For example, trying to export this file to PDF with PDFLATEX undefined,
+gives me the following error:
+
+  =PDF file /home/nick/src/emacs/org/Worg/org-dependencies.pdf was not produced=
+
+But if I export to latex and try it from the command line:
+
+#+BEGIN_SRC sh
+pdflatex org-dependencies.tex
+#+END_SRC
+
+the error is clear:
+
+  =! Package minted Error: You must invoke LaTeX with the -shell-escape flag.=
+
+
 *** STARTED Symbols
 
 LaTeX syntax can be used to introduce many special symbols into a
-document (e.g. mathematical symbols). Most of these symbols are defined
-by basic LaTeX, but some require the presence of extra packages.
+document (e.g. mathematical symbols). Most of these symbols are
+defined by basic LaTeX, but some require the presence of extra
+packages.
 
 | LaTeX macro | Rendered Symbol (approx) | LaTeX package | Ubuntu container package  |
 |-------------+--------------------------+---------------+---------------------------|
 | =\EUR=      | \EUR                     | marvosym      | texlive-fonts-recommended |
 | =\euro=     | \euro                    | eurosym       | texlive-fonts-recommended |
 
-Note that marvosym is now included as part of the default setup so you
-do not need to include the package explicitly.
+Note that marvosym is now included as part of the default setup so you do
+not need to include the package explicitly.
 
 ** STARTED PDF export.
 
 PDF export goes through LaTeX export first, so all the LaTeX dependencies
 apply here as well.
 
-Certain PDF viewers have been reported to produce more or less
-unreadable files if Adobe Type3 fonts are used in the document.
-Evince has been identified as one of those. One way around this
-problem is to not use Type3 fonts. Another is to use a viewer that
-does not mistreat Type 3 fonts.
+Certain PDF viewers have been reported to produce more or less unreadable
+files if Adobe Type3 fonts are used in the document.  Evince has been
+identified as one of those. One way around this problem is to not use Type3
+fonts. Another is to use a viewer that does not mistreat Type 3 fonts.
 
 You can find more information about this problem in the TeX FAQ:
 
 To find out whether a document uses Type3 fonts, open it with Acrobat
-Reader/Evince, select Properties from the File menu and then select
-the Fonts tab; alternatively, use the pdffonts program (part of the
-xpdf-reader package) from the command line.
+Reader/Evince, select Properties from the File menu and then select the
+Fonts tab; alternatively, use the pdffonts program (part of the xpdf-reader
+package) from the command line.
 
 It is probably impossible to get rid of Type3 fonts completely
-(particularly if you are using special symbols or languages that
-don't use the Latin alphabet: in such cases, font availability is more
-limited and you just might not be able to find Type1 fonts to do the
-job).
+(particularly if you are using special symbols or languages that don't use
+the Latin alphabet: in such cases, font availability is more limited and
+you just might not be able to find Type1 fonts to do the job).
 
-For standard latin-alphabet languages that use the Computer
-Modern fonts (including small variations e.g. Polish and Czech), you
-*can* find Type1 versions: (XXX-needs fixing) the texlive-fonts-extra package (on
-Ubuntu/Debian) e.g. includes the AMS CM fonts which work well.
-Similar packages exist for other Linux distributions and probably
-for other operating systems as well.
+For standard latin-alphabet languages that use the Computer Modern fonts
+(including small variations e.g. Polish and Czech), you *can* find Type1
+versions: (XXX-needs fixing) the texlive-fonts-extra package (on
+Ubuntu/Debian) e.g. includes the AMS CM fonts which work well.  Similar
+packages exist for other Linux distributions and probably for other
+operating systems as well.
 
 | Type1 font      | LaTeX package | Ubuntu container package |
 |-----------------+---------------+--------------------------|
@@ -133,9 +292,10 @@ for other operating systems as well.
 
 ** TODO DocBook export.
 
-
 ** STARTED HTML export.
+
 *** STARTED Exporting LaTeX fragments as images.
+
 LaTeX fragments can be exported as images for inclusion into HTML
 documents. For example, complicated mathematical expressions can be
 dealt with this way. This is done by creating a LaTeX file that
@@ -144,9 +304,9 @@ file and then processing it through dvipng. So, in addition to LaTeX,
 you will need dvipng: on Ubuntu, this is available in the "dvipng"
 package.
 
-The LaTeX file contains a somewhat different list of LaTeX packages.
-Note that this is the default list, determined by the value of the
-variable ``org-format-latex-header''.
+The LaTeX file contains a somewhat different list of LaTeX packages.  Note
+that this is the default list, determined by the value of the variable
+``org-format-latex-header''.
 
 | LaTeX package | Ubuntu container package | Options  |
 |---------------+--------------------------+----------|
@@ -156,6 +316,9 @@ variable ``org-format-latex-header''.
 | latexsym      | texlive-latex-base       |          |
 | eucal         | texlive-base             | mathscr  |
 
-** TODO org-plot.
+** TODO org-plot
 
-** TODO org-babel.
+** STARTED org-babel
+
+For evaluating code blocks in some language, you need at the very
+least, the interpreter for the language.

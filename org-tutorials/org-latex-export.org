@@ -225,7 +225,7 @@ example only calls it if it would add a LaTeX class that isn't
 already on the =org-export-latex-classes= list:
 
 #+begin_example 
-  #+source: setup
+  #+name: setup
   #+begin_src emacs-lisp :results silent :exports none
  (unless (find "per-file-class" org-export-latex-classes :key 'car
            :test 'equal)
@@ -276,7 +276,7 @@ their effect is local to the Org-mode buffer.
 An example custom class definition that adds the =graphicx= package
 might look like this in =.emacs=:
 
-#+source: custom-class-definition
+#+name: custom-class-definition
 #+begin_src emacs-lisp :exports code
   (add-to-list 'org-export-latex-classes
                '("per-file-class"
@@ -308,7 +308,7 @@ following lines, which load the =xcolor= package[fn:4] and then use
 named colors to distinguish external blue links from internal red
 links:
 
-#+source: hyperref-header
+#+name: hyperref-header
 #+begin_src org :exports code
   ,  #+LATEX_HEADER: \usepackage[hyperref,x11names]{xcolor}
   ,  #+LATEX_HEADER: \usepackage[colorlinks=true,urlcolor=SteelBlue4,linkcolor=Firebrick4]{hyperref}
@@ -318,7 +318,7 @@ In addition, you can pick up the encoding used in the Org-mode buffer and pass
 this information on to LaTeX by loading the =inputenc= package as
 follows:
 
-#+source: inputenc
+#+name: inputenc
 #+begin_src org :exports code
   #+LATEX_HEADER: \usepackage[AUTO]{inputenc}
 #+end_src
@@ -348,7 +348,7 @@ file.  Note that you should check that =texi2dvi= is installed on your
 system and that it works correctly before adding this code to your
 =.emacs=. 
  
-#+source: texi2dvi
+#+name: texi2dvi
 #+begin_src emacs-lisp :exports code
 (setq org-latex-to-pdf-process '("texi2dvi --pdf --clean --verbose --batch %f"))
 #+end_src
@@ -539,10 +539,10 @@ explore the possibilities of the contributed [[file:../contrib/org-exp-blocks][o
 An example of block-level markup for a results block that will be
 typeset with a shaded background:
 
-: LaTeX_HEADER: \usepackage{framed}
-: LaTeX_HEADER: \usepackage{xcolor}
-: LaTeX_HEADER: \definecolor{shadecolor}{gray}{.95}
-: LaTeX_HEADER: \newenvironment{results}{\begin{shaded}}{\end{shaded}}
+: #+LaTeX_HEADER: \usepackage{framed}
+: #+LaTeX_HEADER: \usepackage{xcolor}
+: #+LaTeX_HEADER: \definecolor{shadecolor}{gray}{.95}
+: #+LaTeX_HEADER: \newenvironment{results}{\begin{shaded}}{\end{shaded}}
 
 
 ** Inline Markup
@@ -556,7 +556,7 @@ to make the Org-mode LaTeX exporter conform to the semantic markup
 defined in arbitrary style files.  Org-mode will even complete your
 new link type!
 
-#+source: semantic-markup
+#+name: semantic-markup
 #+begin_src emacs-lisp :exports code
   (org-add-link-type
    "latex" nil
@@ -570,8 +570,8 @@ new link type!
 
 Two examples of LaTeX commands for inline semantic markup:
 
-: LaTeX_HEADER: \let\progstruct=\texttt
-: LaTeX_HEADER: \newcommand{\progexample}[1]{{\ttfamily\small #1}}
+: #+LaTeX_HEADER: \let\progstruct=\texttt
+: #+LaTeX_HEADER: \newcommand{\progexample}[1]{{\ttfamily\small #1}}
 
 ** Captions
 The LaTeX caption command is typically passed two arguments: the
@@ -619,7 +619,7 @@ executive summary between the title and the table of contents.
 Fortunately, the LaTeX exporter is coded in such a way that it is
 possible for the user to alter this behavior relatively easily.
 
-#+source: format-no-toc
+#+name: format-no-toc
 #+begin_src emacs-lisp :exports code
 (defun org-export-latex-no-toc (depth)  
     (when depth
@@ -757,7 +757,7 @@ source code.
 , #+LaTeX_HEADER: \usemintedstyle{emacs}
 , #+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
 
-, #+source: setup-minted
+, #+name: setup-minted
 , #+begin_src emacs-lisp :exports both :results silent
      (setq org-export-latex-listings 'minted)
      (setq org-export-latex-custom-lang-environments
@@ -774,7 +774,7 @@ source code.
              "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 , #+end_src
 
-, #+source: another-listing
+, #+name: another-listing
 , #+begin_src python :exports code
    x = str(y)
 , #+end_src
@@ -823,7 +823,7 @@ typeset an inline code snippet.
 , #+LaTeX_HEADER: {}
 , #+LaTeX_HEADER: \newcommand{\python}[1]{\lstset{language={Python},basicstyle={\ttfamily\small}}\lstinline{#1}}
 
-, #+source: setup-listings
+, #+name: setup-listings
 , #+begin_src emacs-lisp :exports both :results silent
   (setq org-export-latex-listings 'listings)
   (setq org-export-latex-custom-lang-environments
@@ -847,7 +847,7 @@ typeset an inline code snippet.
        (format "\\%s{%s}" path desc)))))
 , #+end_src
 
-, #+source: another-listing
+, #+name: another-listing
 , #+begin_src python :exports code
   x = str(y)
 , #+end_src
@@ -941,7 +941,7 @@ somewhere the LaTeX exporter won't see, perhaps in a sub-tree tagged with
 
 Finally, create a LaTeX source block something like this:
 
-: #+source: tabularx-export
+: #+name: tabularx-export
 : #+begin_src latex :exports results :results latex
 :   \begin{table}[htb!]
 :   \centering
@@ -1023,7 +1023,7 @@ determined in LaTeX by the font size of =\normalsize=.  Note that
 =\scriptsize= can be replaced by another legal LaTeX font size, such
 as =\footnotesize= or =\small=.
 
-#+source: scripttab
+#+name: scripttab
 #+begin_src latex :exports code
 \makeatletter
 \def \@floatboxreset {%
@@ -1394,7 +1394,7 @@ the LaTeX exporter.  The following link types insert the natbib
 citation commands, using an optional command if the citation link
 includes a description.
 
-#+source: define-citep-link
+#+name: define-citep-link
 #+begin_src emacs-lisp :results silent
   (org-add-link-type 
    "citep" 'ebib
@@ -1407,7 +1407,7 @@ includes a description.
 )))))
 #+end_src
 
-#+source: define-citet-link
+#+name: define-citet-link
 #+begin_src emacs-lisp :results silent
   (org-add-link-type 
    "citet" 'ebib
@@ -1420,7 +1420,7 @@ includes a description.
 )))))
 #+end_src
 
-#+source: define-citealt-link
+#+name: define-citealt-link
 #+begin_src emacs-lisp :results silent
   (org-add-link-type 
    "citealt" 'ebib
@@ -1433,7 +1433,7 @@ includes a description.
 )))))
 #+end_src
 
-#+source: define-citealp-link
+#+name: define-citealp-link
 #+begin_src emacs-lisp 
   (org-add-link-type 
    "citealp" 'ebib
@@ -1446,7 +1446,7 @@ includes a description.
          )))))
 #+end_src
 
-#+source: define-citealtstar-link
+#+name: define-citealtstar-link
 #+begin_src emacs-lisp 
   (org-add-link-type 
    "citealt*" 'ebib
@@ -1459,7 +1459,7 @@ includes a description.
          )))))
 #+end_src
 
-#+source: define-citealpstar-link
+#+name: define-citealpstar-link
 #+begin_src emacs-lisp 
   (org-add-link-type 
    "citealp*" 'ebib
@@ -1472,7 +1472,7 @@ includes a description.
          )))))
 #+end_src
 
-#+source: define-citepstar-link
+#+name: define-citepstar-link
 #+begin_src emacs-lisp 
   (org-add-link-type 
    "citep*" 'ebib
@@ -1485,7 +1485,7 @@ includes a description.
          )))))
 #+end_src
 
-#+source: define-citetstar-link
+#+name: define-citetstar-link
 #+begin_src emacs-lisp 
   (org-add-link-type 
    "citet*" 'ebib
@@ -1510,7 +1510,7 @@ on a semicolon, so that, e.g.,
 =\cite[prenote][postnote]{foo}=.  Note that =[[cite:foo]]= and
 =[[cite:foo][;]]= are functionally equivalent.  
  
-#+source: define-standard-biblatex-commands
+#+name: define-standard-biblatex-commands
 #+begin_src emacs-lisp :noweb yes :results silent :exports code
   <<define-biblatex-cite-link>>
   <<define-biblatex-cap-cite-link>>
@@ -1521,7 +1521,7 @@ on a semicolon, so that, e.g.,
 
 #+end_src
 
-#+source: define-biblatex-cite-link
+#+name: define-biblatex-cite-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "cite" 'ebib
@@ -1537,7 +1537,7 @@ on a semicolon, so that, e.g.,
                  (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-biblatex-cap-cite-link
+#+name: define-biblatex-cap-cite-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "Cite" 'ebib
@@ -1553,7 +1553,7 @@ on a semicolon, so that, e.g.,
                  (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-biblatex-parencite-link
+#+name: define-biblatex-parencite-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "parencite" 'ebib
@@ -1569,7 +1569,7 @@ on a semicolon, so that, e.g.,
                  (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-biblatex-cap-parencite-link
+#+name: define-biblatex-cap-parencite-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "Parencite" 'ebib
@@ -1585,7 +1585,7 @@ on a semicolon, so that, e.g.,
                  (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-biblatex-footcite-link
+#+name: define-biblatex-footcite-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "footcite" 'ebib
@@ -1601,7 +1601,7 @@ on a semicolon, so that, e.g.,
                  (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-biblatex-footcitetext-link
+#+name: define-biblatex-footcitetext-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "footcitetext" 'ebib
@@ -1622,7 +1622,7 @@ on a semicolon, so that, e.g.,
 These commands can only be used by some of the citation styles that
 ship with biblatex.
 
-#+source: define-style-specific-biblatex-commands
+#+name: define-style-specific-biblatex-commands
 #+begin_src emacs-lisp :noweb yes :results silent :exports code
   <<define-biblatex-textcite-link>>
   <<define-biblatex-cap-textcite-link>>
@@ -1633,7 +1633,7 @@ ship with biblatex.
   <<define-biblatex-supercite-link>>
 #+end_src
 
-#+source: define-biblatex-textcite-link
+#+name: define-biblatex-textcite-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "textcite" 'ebib
@@ -1649,7 +1649,7 @@ ship with biblatex.
                  (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-biblatex-cap-textcite-link
+#+name: define-biblatex-cap-textcite-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "Textcite" 'ebib
@@ -1665,7 +1665,7 @@ ship with biblatex.
                  (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-biblatex-smartcite-link
+#+name: define-biblatex-smartcite-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "smartcite" 'ebib
@@ -1681,7 +1681,7 @@ ship with biblatex.
                  (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-biblatex-cap-smartcite-link
+#+name: define-biblatex-cap-smartcite-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "Smartcite" 'ebib
@@ -1697,7 +1697,7 @@ ship with biblatex.
                  (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-biblatex-citestar-link
+#+name: define-biblatex-citestar-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "cite*" 'ebib
@@ -1713,7 +1713,7 @@ ship with biblatex.
                  (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-biblatex-parencitestar-link
+#+name: define-biblatex-parencitestar-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "parencite*" 'ebib
@@ -1729,7 +1729,7 @@ ship with biblatex.
                  (car (split-string desc ";"))  path))))))
 #+end_src
 
-#+source: define-biblatex-supercite-link
+#+name: define-biblatex-supercite-link
 #+begin_src emacs-lisp :results silent :exports code
   (org-add-link-type 
    "supercite" 'ebib

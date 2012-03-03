@@ -61,7 +61,7 @@
   generations. We'll make the population larger (N=1000) but still
   start off with 60% red individuals.
 
-#+source: simpledrift(N=1000, X1=600, ngens=100)
+#+name: simpledrift(N=1000, X1=600, ngens=100)
 #+begin_src R :file simpledrift.png :exports both :results graphics
   p <- numeric(ngens)
   p[1] <- X1/N
@@ -104,7 +104,7 @@
 
   To run the simulation:
 
-#+source: drift(N=1000, X1=600, nreps=10, ngens=100)
+#+name: drift(N=1000, X1=600, nreps=10, ngens=100)
 #+begin_src R :session t :file repdrift.png :exports both :results graphics
   p <- drift.faster(N, X1, ngens, nreps)
   matplot(p, type="l", ylim=c(0,1), lty=1)
@@ -113,7 +113,7 @@
   And let's quickly see how much of a speed difference the vectorisation
   makes.
 
-#+source: compare-times(N=1000, X1=600, nreps=1000, ngens=100)
+#+name: compare-times(N=1000, X1=600, nreps=1000, ngens=100)
 #+begin_src R :session t :colnames t :results output :exports both
   functions <- c(drift.slow=drift.slow, drift.faster=drift.faster)
   times <- sapply(functions, function(f) as.numeric(system.time(f(N, X1, ngens, nreps))[1]))

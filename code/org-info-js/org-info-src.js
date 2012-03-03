@@ -259,7 +259,7 @@ OrgNode.prototype.setLinkClass = function (on)
 
 /**
  * This one is called onclick() to toggle the folding state of the node.
- * This one sets it's parent dirty, since node is folded individually. Hence the
+ * This one sets its parent dirty, since node is folded individually. Hence the
  * next folding of parent has to collapse all.
  * @param show_childrens_folders Boolean. This is only used for the special way
  * of toggling of the ROOT element. If true, prevents this OrgNode from showing

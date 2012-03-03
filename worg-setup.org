@@ -9,30 +9,21 @@
 #+CATEGORY:   worg
 #+OPTIONS:    H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
 
-* How Worg publishes itself as a website?
+* How does Worg publish itself as a website?
 
   The server behind http://orgmode.org website takes care of publishing
   Worg into =HTML=.
 
 ** How long does it take for a change to be published?
 
-   Export happens in two steps: the first step is to pull Worg
-   repository on the server (this is cron'ed every 20 minutes, starting
-   at 00:00), the second one is to publish the last version of Worg on
-   the website (cron'ed every 20 minutes, starting at 00:10).
-
-   So for example, if you push a change in Worg at 00:37, this will be
-   pulled on the server at 00:40 and will appear on the website at
-   00:50.
+The changes should be available immediately following your =git push=.
 
 ** There is a problem.  Can I check the export output?
 
-   The output of both cron jobs are readable here:
-  
-   - http://orgmode.org/worg/pulling.txt
-   - http://orgmode.org/worg/publishing.txt
-
-   Unmodified files are skipped during the process of exporting.
+As soon as you push a commit to the worg git repository on the org
+server, the publishing process is triggered.  You should see the
+output of the publishing process in your terminal.  If there's a
+problem, you should see the error in this output.
 
 ** Looks like file XXX breaks the export.  What can I do?
 
@@ -43,6 +34,7 @@
    problem.
 
 ** Where are the "raw" .org files kept?
+
 In addition to publishing the html versions of the .org files Worg's
 git repository, the raw source .org files are also put in
 [[http://orgmode.org/worg/sources]]. It is nice to make the .org file
@@ -108,9 +100,9 @@ version. To do this, simply link to the file in the worg sources directory:
      export PATH=$PATH:/home/you/bin/
 
      # go to the place where you pull Worg
-     cd /home/you/git/Worg/;
+     cd /home/you/git/worg/;
 
-     # pull Worg
+     # pull worg
      /home/you/bin/git-pull
      #+END_SRC
 

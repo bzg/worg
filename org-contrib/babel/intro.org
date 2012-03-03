@@ -11,29 +11,6 @@
 #+LINK_UP:  index.php
 #+LINK_HOME: http://orgmode.org/worg
 
-#+begin_html
-  <div id="subtitle" style="float: center; text-align: center;">
-    <p>executable code blocks in org-mode</p>
-  </div>
-  <div id="logo" style="float: left; text-align: center; max-width: 340px; font-size: 8pt; margin-left: 1em;">
-    <p>
-      <img src="../../images/babel/tower-of-babel.png"  alt="Tower of Babel"/>
-      <div id="attr" style="margin: -0.5em;">
-        The Tower of Babel by
-        <a href="http://commons.wikimedia.org/wiki/Pieter_Brueghel_the_Elder" title="">
-          <b>Pieter Brueghel the Elder</b>
-        </a>
-      </div>
-      <p>
-        And the Lord said, Behold, the people is one, and they have all
-        one language; and this they begin to do; and now nothing will be
-        restrained from them, which they have imagined to do. Genesis
-        11:1-9
-      </p>
-    </p>
-  </div>
-#+end_html
-  
 * Improving this document					   :noexport:
 ** DONE Document slice indexing of tables
 ** DONE Document synonymous alternatives
@@ -112,7 +89,7 @@ woefully out of date.
 your example, the filename is created in python. I suggest doing it
 slightly differently, something like this.
 
-#+srcname: fileoutput
+#+name: fileoutput
 #+begin_src python :file outfile.txt
  def savetofile(result, filename):
      with open(filename, 'w') as f:
@@ -208,9 +185,11 @@ may have further ideas / views here.
   If you have a working Emacs installation, then getting started with
   Babel is a simple process.
 
-  1) It is strongly recommended that you update to the latest version
-     of Org-mode by [[file:../../org-faq.org::keeping-current-with-Org-mode-development][keeping current with Org-mode development]].  As of
-     Org-mode 7.0, Babel is included as part of Org-mode.
+  1) If you are running Emacs24 a current version of Org-mode with
+     Babel is already available by default.  Otherwise, it is strongly
+     recommended that you update to the latest version of Org-mode by
+     [[file:../../org-faq.org::keeping-current-with-Org-mode-development][keeping current with Org-mode development]].  As of Org-mode 7.0,
+     Babel is included as part of Org-mode.
 
   2) Optionally activate the subset of languages that you will want
      to execute with Babel.  See [[file:languages.org::#configure][Configure active languages]]
@@ -218,7 +197,8 @@ may have further ideas / views here.
      can be skipped for now and all =emacs-lisp= examples will still
      work as expected.
 
-  3) Evaluate your modified .emacs.
+  3) If you have made any changes don't forget to evaluate your
+     modified .emacs.
 
 * Code Blocks
     :PROPERTIES:
@@ -428,7 +408,7 @@ the last statement and nothing else.
      Consider the result of evaluating this code block with
      scripting mode.
 
-#+srcname: name
+#+name: name
 #+begin_src python :results output
 import time
 print("Hello, today's date is %s" % time.ctime())
@@ -482,13 +462,13 @@ value, =(2 + 2)=, 4 does not appear in the results.
      First let's look at a very simple example. The following source
      code block defines a function, using python, that squares its argument.
 
-#+srcname: square(x=0)
+#+name: square(x=0)
 #+begin_src python
 return x*x
 #+end_src
 
 In the Org-mode file, the function looks like this:
-: #+source: square(x)
+: #+name: square(x)
 : #+begin_src python
 : return x*x
 : #+end_src
@@ -523,7 +503,7 @@ The table looks like this in the Org-mode buffer:
 : | 2 | 4 | 6 | 8 | 10 | 12 | 14 | 16 | 18 | 20 |
 
 The [[http://www.gnu.org/software/emacs/manual/elisp.html][Emacs Lisp]] source code:
-#+srcname: fibonacci-seq(fib-inputs=fibonacci-inputs)
+#+name: fibonacci-seq(fib-inputs=fibonacci-inputs)
 #+begin_src emacs-lisp
   (defun fibonacci (n)
     (if (or (= n 0) (= n 1))
@@ -535,7 +515,7 @@ The [[http://www.gnu.org/software/emacs/manual/elisp.html][Emacs Lisp]] source c
 #+end_src
 
 In the Org-mode buffer the function looks like this:
-: #+srcname: fibonacci-seq(fib-inputs=fibonacci-inputs)
+: #+name: fibonacci-seq(fib-inputs=fibonacci-inputs)
 : #+begin_src emacs-lisp
 :   (defun fibonacci (n)
 :     (if (or (= n 0) (= n 1))
@@ -590,7 +570,7 @@ The data are kept in a table:
 | password | abc123   |
 
 The code block refers to the data table:
-#+srcname: setup-my-account
+#+name: setup-my-account
 #+begin_src emacs-lisp :rownames yes :var data=user-data
   (setq my-special-username (first (first data)))
   (setq my-special-password (first (second data)))
@@ -624,7 +604,7 @@ For example, let's take some system diagnostics in the shell and graph them with
    sizes. Babel automatically converts the output into an Org-mode
    table.
    
-: #+srcname: directories
+: #+name: directories
 : #+begin_src sh :results replace
 :   cd ~ && du -sc * |grep -v total
 : #+end_src
@@ -652,13 +632,13 @@ For example, let's take some system diagnostics in the shell and graph them with
    of the previous code block to obtain the data.
 
 In the Org-mode file: 
-: #+srcname: directory-pie-chart(dirs = directories)
+: #+name: directory-pie-chart(dirs = directories)
 : #+begin_src R :session R-pie-example :file ../../images/babel/dirs.png
 :   pie(dirs[,1], labels = dirs[,2])
 : #+end_src
 
 HTML export of code:
-#+srcname: directory-pie-chart(dirs=directories)
+#+name: directory-pie-chart(dirs=directories)
 #+begin_src R :session R-pie-example :file ../../images/babel/dirs.png
   pie(dirs[,1], labels = dirs[,2])
 #+end_src
@@ -686,7 +666,7 @@ average value of a few numbers. First, let's make some data. The
 following source block creates an Org-mode table filled with five random
 numbers between 0 and 1.
 
-: #+srcname: tbl-example-data()
+: #+name: tbl-example-data()
 : #+begin_src R 
 : runif(n=5, min=0, max=1)
 : #+end_src
@@ -701,13 +681,13 @@ numbers between 0 and 1.
 Now we define a source block to calculate the mean.
 
 In the Org-mode file:
-: #+srcname: R-mean(x)
+: #+name: R-mean(x)
 : #+begin_src R 
 : mean(x)
 : #+end_src
 
 HTML export of code:
-#+srcname: R-mean(x=0)
+#+name: R-mean(x=0)
 #+begin_src R 
 mean(x)
 #+end_src
@@ -780,75 +760,75 @@ HTML export of code:
 
 In the Org-mode file:
 
-: #+srcname: basic-elisp(n)
+: #+name: basic-elisp(n)
 : #+begin_src emacs-lisp
 : (* 2 n)
 : #+end_src
 
 HTML export of code:
 
-#+srcname: basic-elisp(n=0)
+#+name: basic-elisp(n=0)
 #+begin_src emacs-lisp
   (* 2 n)
 #+end_src
 
 In the Org-mode file:
-: #+srcname: basic-shell
+: #+name: basic-shell
 : #+begin_src sh :results silent
 : expr 1 + 5
 : #+end_src
 
 HTML export of code:
-#+srcname: basic-shell
+#+name: basic-shell
 #+begin_src sh :results silent
   expr 1 + 5
 #+end_src
 
 In the Org-mode file:
-: #+srcname: date-simple
+: #+name: date-simple
 : #+begin_src sh :results silent
 : date
 : #+end_src
 
 HTML export of code:
-#+srcname: date-simple
+#+name: date-simple
 #+begin_src sh :results silent
   date
 #+end_src
 
 In the Org-mode file:
-: #+srcname: basic-ruby
+: #+name: basic-ruby
 : #+begin_src ruby :results silent
 : "org-babel"
 : #+end_src
 
 HTML export of code:
-#+srcname: basic-ruby
+#+name: basic-ruby
 #+begin_src ruby :results silent
   "org-babel"
 #+end_src
 
 In the Org-mode file
-: #+srcname: basic-python
+: #+name: basic-python
 : #+begin_src python :results silent
 : 'hello world'
 : #+end_src
 
 HTML export of code:
-#+srcname: basic-python
+#+name: basic-python
 #+begin_src python :results silent
   'hello world'
 #+end_src
 
 In the Org-mode file:
-: #+srcname: basic-R
+: #+name: basic-R
 : #+begin_src R :results silent
 : b <- 9
 : b + 4
 : #+end_src
 
 HTML export of code:
-#+srcname: basic-R
+#+name: basic-R
 #+begin_src R :results silent
   b <- 9
   b + 4
@@ -889,7 +869,7 @@ HTML export of code:
   Org-mode file using the =org-babel-lob-ingest= (bound to =C-c C-v
   l=).
 
-  #+srcname: add-file-to-lob
+  #+name: add-file-to-lob
   #+begin_src emacs-lisp 
   (org-babel-lob-ingest "path/to/file.org")
   #+end_src
@@ -955,25 +935,25 @@ included in the source code file by the third code block, which
 does have a =tangle= header argument.
 
 In the Org-mode file:
-: #+srcname: hello-world-prefix
+: #+name: hello-world-prefix
 : #+begin_src sh :exports none
 :   echo "/-----------------------------------------------------------\\"
 : #+end_src
 
 HTML export of code:
-#+srcname: hello-world-prefix
+#+name: hello-world-prefix
 #+begin_src sh :exports none
   echo "/-----------------------------------------------------------\\"
 #+end_src
 
 In the Org-mode file
-: #+srcname: hello-world-postfix
+: #+name: hello-world-postfix
 : #+begin_src sh :exports none
 :   echo "\-----------------------------------------------------------/"
 : #+end_src
 
 HTML export of code:
-#+srcname: hello-world-postfix
+#+name: hello-world-postfix
 #+begin_src sh :exports none
   echo "\-----------------------------------------------------------/"
 #+end_src
@@ -986,7 +966,7 @@ code blocks.  These references will be expanded during tangling
 to include them in the output file as well.
 
 In the Org-mode file:
-: #+srcname: hello-world
+: #+name: hello-world
 : #+begin_src sh :tangle hello :exports none :noweb yes
 :   <<hello-world-prefix>>
 :   echo "|                       hello world                         |"
@@ -994,7 +974,7 @@ In the Org-mode file:
 : #+end_src
 
 HTML export of code:
-#+srcname: hello-world
+#+name: hello-world
 #+begin_src sh :tangle hello.sh :exports none :noweb yes
   <<hello-world-prefix>>
   echo "|                       hello world                         |"
@@ -1005,7 +985,7 @@ HTML export of code:
 Calling =org-babel-tangle= will result in the following shell source
 code being written to the =hello.sh= file:
 
-#+srcname: hello-world-output
+#+name: hello-world-output
 #+begin_src sh 
 #!/usr/bin/env sh
 
@@ -1076,7 +1056,7 @@ For a simple example of usage, follow these 5 steps:
    #+end_src
 3) place the following code block in a file called =init.el= in your Emacs
    initialization directory (=~/.emacs.d=).
-   #+srcname: emacs-init
+   #+name: emacs-init
    #+begin_src emacs-lisp 
      ;;; init.el --- Where all the magic begins
      ;;

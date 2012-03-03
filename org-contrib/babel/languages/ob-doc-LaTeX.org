@@ -2,256 +2,345 @@
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
-#+TITLE:      LaTeX Code Blocks in Babel
+#+TITLE:      LaTeX Source Code Blocks in Org Mode
 #+AUTHOR:     Tom Dye
-#+EMAIL:      tsd at tsdye dot com
+#+EMAIL:      tsd [at] tsdye [dot] com
 #+LANGUAGE:   en
 #+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
-#+BABEL: :exports code
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
 
+#+name: banner
 #+begin_html
   <div id="subtitle" style="float: center; text-align: center;">
   <p>
-  Babel support for LaTeX
+  Org Mode support for <a href="http://www.tug.org/">LaTeX</a>
+  Source Code Blocks
   </p>
   <p>
+  <a href="http://www.tug.org/">
+  <img src="images/latex-logo-for-banner.png"/>
+  </a>
+  </p>
   </div>
 #+end_html
 
-* Notes                                                            :noexport:
-** Queries
-** Comments
-* Requirements and Enhancements
-** [[http://www.gnu.org/software/auctex/][AucTeX]]
-   Strongly recommended for editing .tex files.  Add the following
-   line to .emacs:
-       
+#+BEGIN_SRC latex :file latex-logo.png :buffer yes
+\LaTeX
+#+END_SRC
+
+#+RESULTS[32c48c151ab8d684ca94cdac40ada3df69e5057e]:
+#+BEGIN_LaTeX
+[[file:latex-logo.png]]
+#+END_LaTeX
+
+
+
+* Template Checklist [13/13]                                       :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Specify [[Org%20Mode%20Configuration][Org Mode Configuration]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result%20Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+LaTeX is a document markup language and a document preparation system
+for the TeX typesetting program.  The TeX program was developed by
+Donald Knuth at Stanford University to typeset complex mathematics.
+LaTeX is an extensible set of TeX macros designed to ease preparation
+of documents such as letters, articles, reports, and books.  The
+current version is LaTeX2e.  An ambitious update, LaTeX3, has been in
+the works for some time.
+
+Org Mode is able to export LaTeX directly.[fn:1]  LaTeX code
+embedded in an Org Mode file (not within source code blocks) is
+exported correctly to a number of the export backends.[fn:2] 
+
+LaTeX source code blocks can be used to tangle a LaTeX source file, or
+to create bitmap images or pdf snippets of arbitrary LaTeX code.
+Typically, this latter use involves mathematics, but it conceivably
+extends to any TeX output.[fn:3] The LaTeX logo at the top of this
+page is a bitmap image generated from a simple LaTeX source code
+block.  The complex example provided by [[Andreas%20Leha][Andreas
+Leha]], below, uses the TikZ package to create a graphics image.
+
+* Requirements and Setup
+In order to use LaTeX source code blocks to their full capacity, a
+working LaTeX installation is required.[fn:4] LaTeX systems are
+distributed widely through various channels and one should be
+available for your computer system.  A good place to find one is the
+[[http://www.tug.org][TeX Users Group]].
+
+Once LaTeX is installed and is working correctly, you will need to tell
+Emacs where to find the various LaTeX executable files.  The location
+of these files is likely distribution dependent: my MacTeX
+distribution places them in the =/usr/texbin= subdirectory.
+Accordingly, I have this in =.emacs=:
+
+#+begin_src emacs-lisp :exports code
+    (setq exec-path (append exec-path '("/usr/texbin")))
+#+end_src
+
+Org Mode can generate
+[[http://www.w3.org/Press/PNG-fact.html][Portable Network Graphics]]
+(png) bitmaps from LaTeX source code blocks, which it does with the
+=dvipng= program that comes with most LaTeX distributions.  If you
+want to generate bitmaps in other file formats, then you will need to
+install [[http://www.imagemagick.org/script/index.php][ImageMagick]],
+a software suite to create, edit, compose or convert bitmap images.
+Ensure that the ImageMagick executables are installed somewhere on the
+Emacs =exec-path=.
+
+If you plan to edit LaTeX source code blocks separately, with =C-c= ',
+or want to control the size of pdf snippets, then it is highly
+recommended that [[http://www.gnu.org/software/auctex/][AucTeX]] be
+installed, as well.  AucTeX is an extensible package for writing and
+formatting TeX files.  Assuming that AucTeX is installed properly, the
+following line in =.emacs= will ensure that AucTeX is loaded.
+
 #+begin_src emacs-lisp 
 (load "auctex.el" nil t t)
 #+end_src
 
-** [[http://www.gnu.org/software/auctex/reftex.html][RefTeX]]
-    This cross-reference, bibliography, glossary, and index manager is
-    indispensable.  Add the following line to .emacs:
+Also highly recommended is
+[[http://www.gnu.org/software/auctex/reftex.html][RefTeX]], a
+cross-reference, bibliography, glossary, and index manager initially
+written by the creator of Org Mode, Carsten Dominik.  Add the
+following line to =.emacs=:
+
 #+begin_src emacs-lisp 
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex) 
 #+end_src
 
-*** Recommended RefTeX Setting
-     - It can be helpful to name a default bibliography when editing
-       source code in Babel.  Add the following lines, edited to
-       conform to your setup, to .emacs:
+Finally, you'll need to ensure that =org-babel-load-languages=
+includes an entry for LaTeX.  Typically, =org-babel-load-languages=
+will contain many entries.  The example below omits other languages.
 
-
-#+begin_src emacs-lisp 
-  (setq reftex-default-bibliography
-        (quote
-         ("default.bib" "other-default.bib")))       
-#+end_src
-
-*** Enhanced RefTeX Support
-  - You can give RefTeX access to information in other LaTeX code
-    blocks with the following code
-
-  - Add the following lines to your .emacs (adapted from  Kevin Brubeck Unhammer's [[http://www.mfasold.net/blog/2009/02/using-emacs-org-mode-to-draft-papers/][Reftex Setup]])
-#+begin_src emacs-lisp
-  (defun org-mode-article-modes ()
-    (reftex-mode t)
-    (and (buffer-file-name)
-         (file-exists-p (buffer-file-name))
-         (reftex-parse-all)))
-  
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (if (member "REFTEX" org-todo-keywords-1)
-                  (org-mode-article-modes))))
-#+end_src
-
-  - Add the following line to the top of an org-mode file that
-    contains LaTeX code blocks
-#+begin_src latex
-    #+TODO: REFTEX
-#+end_src
-
-  - When you open an org-mode file with this line, RefTeX will prompt
-    for the master .tex file
-
-* Configuration in Babel
-** Activate LaTeX Evaluation
-  - Add the commented line to .emacs
 #+begin_src emacs-lisp :tangle yes
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((R . t)
-     (ditaa . t)
-     (dot . t)
-     (emacs-lisp . t)
-     (gnuplot . nil)
-     (haskell . nil)
-     (latex . t) ; this is the entry to activate LaTeX
-     (ocaml . nil)
-     (perl . t)
-     (python . t)
-     (ruby . t)
-     (screen . nil)
-     (sh . t)
-     (sql . nil)
-     (sqlite . nil)))
+   '((latex . t)))
 #+end_src
 
-* Language-specific Conventions
-  - Babel returns raw LaTeX code on evaluation, unless a =:file=
-    header argument is present
-  - The default value for the =:exports= header argument is
-    =results=[fn:1] 
-  - The default value for the =:results= header argument is =latex=
-* Header Arguments
-  - Babel's LaTeX support uses the =:file= and =:buffer= header
-    arguments in language-specific ways  
-  - It adds these header arguments: =:pdfheight=, =:pdfwidth=,
-    =:packages=, =:fit=, and =:border=
+* Org Mode Features for LaTeX Source Code Blocks
+** Header Arguments
+LaTeX source code blocks set default values for two standard header
+arguments.  In addition, several LaTeX-specific header arguments are
+defined to control creation of bitmap images and pdf snippets.
+ 
+*** LaTeX-specific Default Values
+The LaTeX-specific default value of the
+[[http://orgmode.org/manual/results.html#results][=:results= header
+argument]] is "latex", which wraps the results in a =#+BEGIN_LaTeX
+... #+END_LaTeX= block.
 
-** Language Specific Header Arguments
-- The =:file= header argument accepts a file name ending in =.png= or
-  =.pdf=
-- When =:file FILENAME.png= is set, =:buffer no= specifies that buffer
-  colors won't be used in the =.png= file
-- When =:file FILENAME.pdf= is set, =:pdfheight= and =:pdfwidth=
-  header arguments can be used to specify the size of the pdf image in
-  LaTeX lengths, e.g., =1in=, =6em=, =48pt=, etc.
-- The =:packages= header argument can be passed an assoc-list that
-  temporarily adds one or more packages to
-  =org-export-latex-packages-alist=
-- =:fit= will use the LaTeX [[http://www.ctan.org/tex-archive/macros/latex/contrib/preview/][preview]] package for neatly fitting the
-  size of the generated pdf file to the size of the figure or text
-  resulting from the code block.  This is only useful when a =.pdf=
-  file type is in use.
-- the results of the =:fit= header argument mentioned above may seem
-  too tight.  The =:border= header argument is exactly like =:fit=
-  only it takes an argument specifying the size of border to place
-  around the image (e.g. =:border 1em=)
-- the height and width of the generated =.pdf= file can also be
-  specified manually using the =:pdfheight= and =:pdfwidth= header
-  arguments, which take LaTeX length arguments (e.g. =:pdfwidth 3in=)
-- LaTeX source code blocks do not support the =:session= header
-  argument
+The LaTeX-specific default value of the
+[[http://orgmode.org/manual/exports.html#exports][=:exports= header
+argument]] is "results".
 
-** Examples of Use
-*** Display the LaTeX logo in the Emacs buffer
+*** LaTeX-specific Header Arguments
 
-: #+begin_src latex :file latex-logo.png
-:   \LaTeX
+The standard [[http://orgmode.org/manual/file.html#file][=:file= header
+argument]] associated with a LaTeX source code block by itself can
+take the name of either a Portable Network Graphics (png) or a
+Portable Document Format (pdf) file.  File names for other bitmap file
+types can be supplied in conjunction with the =:imagemagick= header
+argument, described below.
+
+The =:buffer= header argument is a LaTeX-specific header argument that
+takes the values =yes= or =no=.  It is consulted when a bitmap image
+has been requested using the =:file= header argument.  If =:buffer
+yes=, the default, then Org Mode consults the values of
+=org-format-latex-options= and passes these to the =dvipng= program.
+If =:buffer no=, then Org Mode takes background and foreground colors
+from the Emacs buffer.
+
+Several LaTeX-specfic header arguments control production of pdf
+snippets.  The LaTeX-specific =:headers= header argument takes a Lisp
+list that specifies entries for the LaTeX preamble,
+e.g., '("\\usepackage{tikz}").  The =:fit= header argument invokes the
+[[http://www.ctan.org/tex-archive/macros/latex/contrib/preview][LaTeX
+preview package]], which is developed and distributed along with
+AucTeX.  The =:border= header argument takes a
+[[http://en.wikibooks.org/wiki/LaTeX/Useful_Measurement_Macros#Length_.27macros.27][LaTeX
+length]], which should be greater than =0.50001bp=, or half a usual
+PostScript point.  This can be used to make pdf pages larger than they
+are by default.  The header arguments =:pdfheight= and =:pdfwidth= set
+the dimensions of the pdf page.  They can be passed a valid LaTeX length.
+
+Andreas Leha added the ability to produce bitmaps in formats other
+than png, using the LaTeX-specific =:imagemagick= header argument.
+Quoting Andreas' notice sent to the Org Mode list[fn:5]
+
+
+LaTeX source blocks now have three new options:
+- =:imagemagick= ::
+  When not nil the source block is processed to pdf and the pdf is
+  converted with ImageMagick to whatever is given as =:file=.
+  Thus, the format is not limited to png.
+- =:iminoptions= ::
+  This is passed to ImageMagick before the pdf file.
+- =:imoutoptions= ::
+  This is passed to ImageMagick before the output file.
+
+     
+** Sessions
+LaTeX does not support sessions.
+
+** Result Types
+ The default result type is =latex=, which wraps the results in a
+=#+BEGIN_LaTeX ... #+END_LaTeX= block.
+** Other
+LaTeX source code blocks are a special case because their
+functionality largely overlaps with the export facilities in Org
+Mode.  
+
+* Examples of Use
+
+** "Hello World"
+
+At its simplest, Org Mode evaluation of LaTeX source code blocks with
+=C-c C-c= wraps the results in a =#+BEGIN_LaTeX ... #+END_LaTeX=
+block.
+
+: #+name: hello-world
+: #+BEGIN_SRC latex
+: \LaTeX
+: #+END_SRC
+
+: #+RESULTS: hello-world
+: #+BEGIN_LaTeX
+: \LaTeX
+: #+END_LaTeX
+
+** Andreas Leha
+This complex example was posted to the Org Mode list by Andreas Leha.
+It depends on a working installation of the R statistical
+software.[fn:6] The code makes use of R sessions to preserve state
+between R source code blocks.
+
+The first source code block loads the
+[[http://www.texample.net/tikz/resources/][TikZ package]], which
+defines a language to produce vector graphics from a
+geometric/algebraic description.
+
+#+begin_src R :session :exports code :results silent
+  library("tikzDevice")
+#+end_src
+
+A simple plot is generated and output as LaTeX code by the TikZ
+device in R.
+
+#+name: test_plot
+#+begin_src R :session :exports code :results output latex
+  tikz(console=TRUE, width=4, height=4)
+  plot(rnorm(100), rnorm(100))
+  dummy <- dev.off()
+#+end_src
+
+The LaTeX output of this R code is processed by a LaTeX source code
+block, using Org Mode's noweb syntax.  Note the various =#+header:=
+lines and their settings, which serve to configure ImageMagick.  In
+this case, a png file is being produced outside the usual Org Mode
+path through =dvipng=.  Note that the header presented here has been
+simplified somewhat.  Interested readers might want to review Andreas'
+original post.
+
+: #+name: test_plot_png
+: #+header: :exports results :file test.png 
+: #+header: :imagemagick yes :iminoptions -density 600 :imoutoptions -geometry 400 
+: #+header: :fit yes :noweb yes :headers '("\\usepackage{tikz}")
+: #+begin_src latex :exports results :file test.png 
+:   <<test_plot()>>
 : #+end_src
 
-#+begin_src latex :file latex-logo.png :exports none
-  \LaTeX
-#+end_src
 
-*** Generate a complex figure
-This example uses the excellent [[http://sourceforge.net/projects/pgf/][pgf/tikz]] package
-: #+begin_src latex :file fsa.pdf :packages '(("" "tikz")) :border 1em
-:   % Define block styles
-:   \usetikzlibrary{shapes,arrows}
-:   \tikzstyle{astate} = [circle, draw, text centered, font=\footnotesize, fill=blue!25]
-:   \tikzstyle{rstate} = [circle, draw, text centered, font=\footnotesize, fill=red!25]
+With this header, the LaTeX output of the TikZ device in R yields a
+graph of the random number generation.
+
+#+Caption: Results of evaluating a LaTeX source code block.
+#+RESULTS: test_plot_png
+[[file:images/test.png]]
+
+If the header is changed so the results are not written to a file,
+then the LaTeX code generated by the TikZ device is written to the Org
+Mode buffer.  The results shown below have been shortened somewhat for
+illustrative purposes.
+
+: #+name: test_plot_tikz
+: #+begin_src latex :noweb yes :exports results
+:   <<test_plot()>>
+: #+end_src
+
+#+RESULTS: test_plot_tikz
+: #+BEGIN_LaTeX
+: % Created by tikzDevice version 0.6.2 on 2012-02-08 21:28:07
+: % !TEX encoding = UTF-8 Unicode
+: \begin{tikzpicture}[x=1pt,y=1pt]
+: \definecolor[named]{drawColor}{rgb}{0.00,0.00,0.00}
+: \definecolor[named]{fillColor}{rgb}{1.00,1.00,1.00}
+: \fill[color=fillColor,fill opacity=0.00,] (0,0) rectangle (289.08,289.08);
+: \begin{scope}
+: \path[clip] ( 49.20, 61.20) rectangle (263.88,239.88);
+: \definecolor[named]{drawColor}{rgb}{0.00,0.00,0.00}
+: \draw[color=drawColor,line cap=round,line join=round,fill opacity=0.00,] (184.34, 99.14) circle (  2.25);
+:
+: ...
+:
+: \draw[color=drawColor,line cap=round,line join=round,fill opacity=0.00,] (143.44,134.70) circle (  2.25);
+: \end{scope}
+: \begin{scope}
+: \path[clip] (  0.00,  0.00) rectangle (289.08,289.08);
+: \definecolor[named]{drawColor}{rgb}{0.00,0.00,0.00}
+:
+: \draw[color=drawColor,line cap=round,line join=round,fill opacity=0.00,] ( 75.29, 61.20) -- (250.80, 61.20);
+:
+: \draw[color=drawColor,line cap=round,line join=round,fill opacity=0.00,] ( 49.20, 61.20) --
+:	(263.88, 61.20) --
+:	(263.88,239.88) --
+:	( 49.20,239.88) --
+:	( 49.20, 61.20);
+: \end{scope}
+: \begin{scope}
+: \path[clip] (  0.00,  0.00) rectangle (289.08,289.08);
+: \definecolor[named]{drawColor}{rgb}{0.00,0.00,0.00}
 : 
-:   \begin{tikzpicture}[->,>=stealth', shorten >=1pt, auto, node distance=2.8cm, semithick]
-:     \node [astate] (1) at (0,0) {1};
-:     \node [astate] (2) at (1,0) {2};
-:     \node [rstate] (3) at (2,0) {3};
-:     \path (1) edge [bend left] node {b} (2)
-:           (2) edge node {b} (3)
-:           (2) edge [bend left] node {a} (1)
-:           (3) edge [loop above] node {(a, b)} (3);
-:   \end{tikzpicture}
-: #+end_src
-
-* Common Idioms
-
-  - Org-mode can export its outline structure to LaTeX, yielding a
-    serviceable document independent of Babel, see the [[http://orgmode.org/worg/org-tutorials/org-latex-export.html][LaTeX export tutorial]]
-
-** Creating and Including Graphics
-   - This example creates a graph in R, then inserts it into a LaTeX
-     clode block with a noweb reference
-
-: #+srcname: r-complete-weight-histogram
-: #+begin_src R :session adze :file r/adze_wt_log.pdf
-:     adze.wt <- ggplot(whole.adze, aes(x = weight))
-:     adze.wt + geom_histogram() + scale_x_log10()
-:     ggsave(file = "adze_wt_log.pdf", width = 5, height = 3)
-: #+end_src
-
-: #+begin_src latex :tangle graphics-document.tex
-:   \begin{figure}[htb!]
-:     \centering
-:     \includegraphics[width=5in]{<<r-complete-weight-histogram()>>}
-:     \caption[Weight of complete adzes]{Weight of complete adzes on a
-:       logarithmic scale.}
-:     \label{fig:complete-weight}
-:   \end{figure}
-: #+end_src
+: \node[color=drawColor,anchor=base,inner sep=0pt, outer sep=0pt, scale=  1.00] at (156.54, 13.20) {rnorm(100)};
+:
+: \node[rotate= 90.00,color=drawColor,anchor=base,inner sep=0pt, outer sep=0pt, scale=  1.00] at ( 13.20,150.54) {rnorm(100)};
+: \end{scope}
+: \end{tikzpicture}
+: #+END_LaTeX
 
 
-
-** Passing an Org-mode table to a LaTeX code block
-
-Tables are difficult to set in type.  This was true when lead type was
-set manually and it is still true with a sophisticated type-setting
-engine like LaTeX.  One way to make a LaTeX table is to write it out
-using an Org-mode table and then "export" the table into the LaTeX
-code block using the function =orgtbl-to-generic=.
-
-This Emacs lisp function, slightly modified from one written by Eric
-Schulte, inserts an Org-mode table into a LaTeX code block.  It
-depends on the [[http://www.ctan.org/tex-archive/macros/latex/contrib/booktabs/][LaTeX booktabs package]], which draws horizontal rules of
-appropriate widths at the top and bottom of a table, as well as within
-the table.
-
-: #+srcname: booktabs-2
-: #+begin_src emacs-lisp :var table='((:head) hline (:body))
-: (flet ((to-tab (tab)
-:                (orgtbl-to-generic
-:                 (mapcar (lambda (lis)
-:                           (if (listp lis)
-:                               (mapcar (lambda (el)
-:                                         (if (stringp el)
-:                                             el
-:                                           (format "%S" el))) lis)
-:                             lis)) tab)
-:                 (list :lend " \\\\" :sep " & " :hline "\\hline"))))
-:   (org-fill-template
-:    "
-: \\toprule
-: %table
-: \\bottomrule\n"
-:    (list
-:     (cons "table"
-:           ;; only use \midrule if it looks like there are column headers
-:           (if (equal 'hline (second table))
-:               (concat (to-tab (list (first table)))
-:                       "\n\\midrule\n"
-:                       (to-tab (cddr table)))
-:             (to-tab table))))))
-: #+end_src
-
-The function can be called using noweb syntax, like this:
-
-: #+begin_src latex :noweb yes
-:  \begin{table}[htb!]
-:    \centering
-:    \caption{A test table}
-:    \label{tab:test}
-:    \begin{tabular}{rl}
-:      <<booktabs-2(table=months)>>
-:    \end{tabular}
-:  \end{table}
-: #+end_src
-
-
+** Latex Options                                                   :noexport:
+#+LATEX_HEADER: \usepackage{tikz}
 * Footnotes
 
-[fn:1] *Note:* The default value of the =:exports= header argument
-    alters the expected behavior of Org-mode export to HTML and LaTeX.
-    LaTeX code blocks will require an explicit =:exports code= header
-    argument to export as described in the Org-mode manual.
+[fn:1] See
+  http://orgmode.org/manual/LaTeX-and-PDF-export.html#LaTeX-and-PDF-export
+  for LaTeX export instructions.
+
+[fn:2] See http://orgmode.org/manual/Embedded-LaTeX.html#Embedded-LaTeX.
+
+[fn:3] See http://www.tug.org/texshowcase/ for a showcase of TeX examples.
+
+[fn:4] You can tangle a LaTeX file without a working LaTeX
+  installation, but it won't be possible to compile this file.
+
+[fn:5] See http://lists.gnu.org/archive/html/emacs-orgmode/2011-02/msg01297.html.
+
+[fn:6] See [[http://orgmode.org/worg/org-contrib/babel/languages/ob-doc-R.html]]
+
