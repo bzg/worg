@@ -241,43 +241,6 @@ In addition to ess-eval-line-and-step, there are several other ESS
 functions with names beginning ess-eval-*. They evaluate lines and
 regions in different ways; it's worth looking at their descriptions
 (C-h f).
-
-** LaTeX code from R
-This example summarises a linear regression fit. Usually the Org Mode
-user should not have to be involved in LaTeX code generation, because
-this is the responsibility of Org Mode's LaTeX export engine. In this
-example, neither the printed representation, nor the value of
-=summary(lm(y ~ x))= is tabular, and it would therefore require some
-work to get the information in to an Org Mode table. However, the
-=xtable= package can be used to output a LaTeX table. Using =:results
-latex= as a header argument to the R source code block ensures that
-this is returned as a LaTeX block in the Org Mode buffer and thus can be
-included correctly in LaTex-based export targets.
-
-#+begin_src R :results output latex
-library(xtable)
-x <- rnorm(100)
-y <- x + rnorm(100)
-xtable(summary(lm(y ~ x)))
-#+end_src
-
-#+results:
-#+BEGIN_LaTeX
-% latex table generated in R 2.9.2 by xtable 1.5-5 package
-% Wed Dec  9 17:17:53 2009
-\begin{table}[ht]
-\begin{center}
-\begin{tabular}{rrrrr}
-  \hline
- & Estimate & Std. Error & t value & Pr($>$$|$t$|$) \\ 
-  \hline
-(Intercept) & -0.0743 & 0.0969 & -0.77 & 0.4454 \\ 
-  x & 1.0707 & 0.0923 & 11.60 & 0.0000 \\ 
-   \hline
-\end{tabular}
-\end{center}
-\end{table}
-#+END_LaTeX
 ** Org Mode Output from R
 David Hajage's [[http://cran.r-project.org/web/packages/ascii/index.html][ascii]] R package creates appropriate plain text
 representations of many R objects. It features an option to specify
@@ -352,6 +315,17 @@ of the source code block.
 :   - Chi-squared approximation may be incorrect
 : #+END_ORG
 
+The results in this case are exported as a nested list structure:
+#+results:
+#+BEGIN_ORG
+- Number of cases in table: 4 
+- Number of factors: 2 
+- Test for independence of all factors:
+  - Chisq = 12, df = 9, p-value = 0.2133
+  - Chi-squared approximation may be incorrect
+#+END_ORG
+
+
 The =caption=, =header=, and =include.colnames= options are useful.
 
 
@@ -372,6 +346,15 @@ The =caption=, =header=, and =include.colnames= options are useful.
 : | 0.03 | 0.28 | 0.52 | 0.74 | 1.00 |
 : #+END_ORG
 
+The output exported to HTML can be quite nice.
+
+#+RESULTS:
+#+BEGIN_ORG
+#+CAPTION: Quantiles of 100 random numbers
+| 0%   | 25%  | 50%  | 75%  | 100% |
+|------+------+------+------+------|
+| 0.03 | 0.28 | 0.52 | 0.74 | 1.00 |
+#+END_ORG
 
 ** Graphics Produced by ggplot2
 
@@ -391,6 +374,43 @@ file specified in the =:file= header argument.
   ,#+results:
   [[file:r/adze_edge_angle.png]]
 #+end_example
+
+** LaTeX code from R
+This example summarises a linear regression fit. Usually the Org Mode
+user should not have to be involved in LaTeX code generation, because
+this is the responsibility of Org Mode's LaTeX export engine. In this
+example, neither the printed representation, nor the value of
+=summary(lm(y ~ x))= is tabular, and it would therefore require some
+work to get the information in to an Org Mode table. However, the
+=xtable= package can be used to output a LaTeX table. Using =:results
+latex= as a header argument to the R source code block ensures that
+this is returned as a LaTeX block in the Org Mode buffer and thus can be
+included correctly in LaTex-based export targets.
+
+: #+begin_src R :results output latex
+: library(xtable)
+: x <- rnorm(100)
+: y <- x + rnorm(100)
+: xtable(summary(lm(y ~ x)))
+: #+end_src
+
+: #+results:
+: #+BEGIN_LaTeX
+: % latex table generated in R 2.9.2 by xtable 1.5-5 package
+: % Wed Dec  9 17:17:53 2009
+: \begin{table}[ht]
+: \begin{center}
+: \begin{tabular}{rrrrr}
+:   \hline
+:  & Estimate & Std. Error & t value & Pr($>$$|$t$|$) \\ 
+:   \hline
+: (Intercept) & -0.0743 & 0.0969 & -0.77 & 0.4454 \\ 
+:   x & 1.0707 & 0.0923 & 11.60 & 0.0000 \\ 
+:    \hline
+: \end{tabular}
+: \end{center}
+: \end{table}
+: #+END_LaTeX
 
 ** =ess-switch-to-end-of-ESS=
  When in an Org Mode R code edit buffer with an associated R session,
