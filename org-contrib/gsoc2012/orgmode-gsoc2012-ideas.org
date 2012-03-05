@@ -119,9 +119,48 @@ possible.
      Adding support for handling output written to STDERR [Mentor: Eric
     Schulte]
 
-*** ANOTHER TOPIC
-**** MORE PROJECT IDEAS
-**** MORE PROJECT IDEAS
+*** Using Org Mode for collaborative programs
+**** Git merge tool for Org files
+
+This project idea is about writing a git merge driver for Org mode
+files, in the way [[http://git.savannah.gnu.org/gitweb/?p%3Dgnulib.git%3Ba%3Dblob%3Bf%3Dlib/git-merge-changelog.c][git-merge-changelog]] does this for GNU style
+ChangeLog files?
+
+One of the obstacle for using Org-mode for collaborative programs is
+that many operations add or remove text from the beginning or end of a
+file, or which add or remove a subnode from an outline tree. These are
+operations that confuse the git merger, in particular if two people
+have added something to a file, or removed/added sequential sibling
+nodes.
+
+I believe that this could be solved with a dedicated merge driver that
+understands the integrity of an outline (sub)tree, and that knows that
+the sequence of two new subtrees added by different people does not
+matter.
+
+The idea for this is actually (I believe) from Brian Gough who asked
+me about it at FOSDEM. I have now also run into this problem and would
+really find it great if such a merge driver could be written. [Mentor:
+Carsten Dominik (?)]
+
+
+**** Org Mode specific diff and change tracking
+
+There are interesting ideas with regards to change tracking within
+OpenDocument files that might be adapted to Org Mode, see
+[[http://wiki.documentfoundation.org/Track_changes#Google_Summer_of_Code_2009:_Improve_Writer.27s_compare_function][_Improve_Writer.27s_compare_function]] [[http://gsoc-tzvetelina.blogspot.in/][gsoc-tzvetelina]] and
+http://gsoc-tzvetelina.blogspot.in/. 
+
+In the above blog, the author is talking about paragraphs as a unit
+and makes a note of the algorithms he uses to narrow down the
+paragraphs of interest. as a unit. I think in Org's context, outline
+could (also) be considered as a unit.
+
+There has been done some [[http://www.seas.upenn.edu/~harmony/][related work]] in the past already.
+
+We also worked on a synchronizing algorithm that mixed diff3 with our
+tree synchronizer. [Mentor: Alan Schmitt (?)]
+
 
 
 
