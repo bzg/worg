@@ -1,0 +1,197 @@
+#+OPTIONS:    H:4 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Google Summer of Code 2012
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tj[at]data-driven[dot]de
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ./index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode ideas for GNU's application to  <a href="http://www.google-melange.com/gsoc/homepage/google/gsoc2012">GSoC 2012</a>
+  </p>
+  <p>
+  <a href="http://www.google-melange.com/gsoc/homepage/google/gsoc2012"/>
+<img src="../../images/gsoc/DSCI0279_60pc.png"  alt="Beach, Books
+  and Beer"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+
+* Org Mode GSoC 2012 Ideas Page
+**  What is an Ideas list?
+Here is some info from Google about a typical GSoC ideas page:
+
+#+BEGIN_QUOTE
+"An Ideas list should be a list of suggested student projects. This
+list is meant to introduce contributors to your project's needs and to
+provide inspiration to would-be student applicants. It is useful to
+classify each idea as specifically as possible, e.g. "must know
+Python" or "easier project; good for a student with more limited
+experience with C++." If your organization plans to provide an
+application template, it would be good to include it on your Ideas
+list.
+
+Keep in mind that your Ideas list should be a starting point for
+student applications; we've heard from past mentoring organization
+participants that some of their best student projects are those that
+greatly expanded on a proposed idea or were blue-sky proposals not
+mentioned on the Ideas list at all. A link to a bug tracker for your
+open source organization is NOT an ideas list."
+#+END_QUOTE
+
+(quoted from the official [[http://www.google-melange.com/gsoc/homepage/google/gsoc2012][GSoC 2012]] home page)
+
+
+** Org Mode project ideas for GSoC 2012
+*** Org Babel
+**** Real webprogramming with Org Mode and PicoLisp
+[[http://picolisp.com/5000/!wiki?home][
+PicoLisp]] is one out of many [[http://orgmode.org/worg/org-contrib/babel/languages.html][Org Babel languages]], but may be special in
+the sense that it does not only contribute to the static
+webpublishing capacities, but may introduce dynamic webprogramming on
+top of a real database into Org Mode. 
+
+Real interactive webprogramming frequently involves a (SQL) database
+like MySQL, a programming language like PHP or Python to build a MVC
+(Model-View-Controller) application on top of the database, a web
+framework for that programming language to make the programmers life
+easier (e.g. Django for Python), and a persistence layer that abstract
+away the conceptual mismatch between the SQL database and the (mostly)
+object-oriented application. Sometimes, a WYSIWYG html editor like MS
+Frontpage is invovled too, when webdesigners design the UI of the
+application. 
+
+Such an application needs user input (via <form> or <input> elements
+in the html pages) and needs to adapt dynamically to the users actions
+and queries by updating either the whole page or only parts of it
+(Javascript). For each user, a session is needed to keep track of the
+state of the application during his/her visit. 
+
+This kind of dynamic webprogramming can't be done with Org Mode.
+Typical webpages made with Org Mode are static in nature, even if they
+update their content frequently with some cron jobs on the server.
+There is no interaction with the user. 
+
+Considering the web stack for dynamic web apps described
+above, Org Mode really functions as a kind of 'Frontpage on steroids'
+for highly skilled academics. The project idea is to let PicoLisp
+replace all the other elements of the webstack and combine Org Mode
+and PicoLisp into an entirely Lisp-based framework for dynamic web
+programming. 
+
+In the PicoLisp application framework, UI and database are unified.
+Database objects are first class members of the language, and the UI
+elements act directly on this object-oriented lisp database (that is
+fast and scalable). No external SQL storage is needed, no persistence
+layer between the relational world of the DB and the object-oriented
+world of the application, and no glue code (controller) that connects
+the view to the model. 
+
+By merging PicoLisp's framework for rapid web-application development
+with Org Modes framework for rapid (web-) content production via Org
+Babel, new kinds of websites produced with Org Mode should become
+possible. 
+
+**** "Notebook" like console interface on top of Org Mode/ Babel
+   Implementing a multi-programming-language "notebook" like console
+  interface build on top of Org-mode and Babel (with both Emacs and
+  HTML interfaces) [Mentor: Eric Schulte]
+**** Asynchronous code block execution for Org Babel
+    Adding support for asynchronous code block execution [Mentor: Eric
+    Schulte]
+**** Piping results between Babel code blocks
+  Adding support for piping results between code blocks allowing many
+  blocks to run concurrently (probably best combined with asynchronous
+  execution) [Mentor: Eric Schulte]
+  
+**** Handling Babel code block output written to STDERR
+     Adding support for handling output written to STDERR [Mentor: Eric
+    Schulte]
+
+**** Make table work more user-friendly 
+
+I would love to see work on making table work easy for non-programers;
+that is perhaps making babel 'easier' to use for common task.
+
+For text table I often have tasks that should be applied to say
+every other row.  Recently, for example I needed to apply
+\multiolumn{1}{l}{\1} to every cell of every other row.
+
+The latex function of Hmisc and xtable does a nice job of making
+'programable' changes tables easy.
+
+**** Make Org (Babel) more Knitr-like 
+
+There is a new package Knitr, a Sweave replacement. It does a nice
+work of working perfectly out of the box. For example inline-number
+expressions are formatted to a limited number of sign, it is very easy
+to use tikz-device (for R), which ensures consistent fonts.
+Code-blocks are automatically nicely formatted etc.
+
+I would be interesting if Org could be made more dwim in this manner
+(for many languages).
+
+*** Using Org Mode for collaborative programs
+**** Git merge tool for Org files
+
+This project idea is about writing a git merge driver for Org mode
+files, in the way [[http://git.savannah.gnu.org/gitweb/?p%3Dgnulib.git%3Ba%3Dblob%3Bf%3Dlib/git-merge-changelog.c][git-merge-changelog]] does this for GNU style
+ChangeLog files?
+
+One of the obstacle for using Org-mode for collaborative programs is
+that many operations add or remove text from the beginning or end of a
+file, or which add or remove a subnode from an outline tree. These are
+operations that confuse the git merger, in particular if two people
+have added something to a file, or removed/added sequential sibling
+nodes.
+
+I believe that this could be solved with a dedicated merge driver that
+understands the integrity of an outline (sub)tree, and that knows that
+the sequence of two new subtrees added by different people does not
+matter.
+
+The idea for this is actually (I believe) from Brian Gough who asked
+me about it at FOSDEM. I have now also run into this problem and would
+really find it great if such a merge driver could be written. [Mentor:
+Carsten Dominik (?)]
+
+
+**** Org Mode specific diff and change tracking
+
+There are interesting ideas with regards to change tracking within
+OpenDocument files that might be adapted to Org Mode, see
+[[http://wiki.documentfoundation.org/Track_changes#Google_Summer_of_Code_2009:_Improve_Writer.27s_compare_function][_Improve_Writer.27s_compare_function ]]and [[http://gsoc-tzvetelina.blogspot.in/][gsoc-tzvetelina]].
+
+In the above blog, the author is talking about paragraphs as a unit
+and makes a note of the algorithms he uses to narrow down the
+paragraphs of interest. as a unit. I think in Org's context, outline
+could (also) be considered as a unit.
+
+There has been done some [[http://www.seas.upenn.edu/~harmony/][related work]] in the past already.
+
+We also worked on a synchronizing algorithm that mixed diff3 with our
+tree synchronizer. [Mentor: Alan Schmitt (?)]
+
+
+
+
+
+*** Miscancelous 
+**** Better item handling 
+At the moment it is hard to change lists.  Often I need inline items
+and interrupted  list.  This is hard to do with Org at the moment.
+
+
+
+ 
