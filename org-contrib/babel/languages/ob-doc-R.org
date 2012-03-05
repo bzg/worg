@@ -331,20 +331,47 @@ In R:
 #+end_example
 
 
- From Org-babel:
-#+begin_src R :results output org
-  library(ascii)
-  options(asciiType="org")
-  ascii(summary(table(1:4, 1:4)))
-#+end_src
+The Org Mode source code block specifies =:results org= so the output
+is wrapped in =#+BEGIN_ORG= ... =#+END_ORG=.  This way, arbitrary
+output can be included and easily replaced on subsequent evaluations
+of the source code block.
 
-#+results:
-Loading required package: proto
-- Number of cases in table: 4 
-- Number of factors: 2 
-- Test for independence of all factors:
-  - Chisq = 12, df = 9, p-value = 0.2133
-  - Chi-squared approximation may be incorrect
+
+: #+begin_src R :results output org
+:   library(ascii)
+:   options(asciiType="org")
+:   ascii(summary(table(1:4, 1:4)))
+: #+end_src
+:
+: #+results:
+: #+BEGIN_ORG
+: - Number of cases in table: 4 
+: - Number of factors: 2 
+: - Test for independence of all factors:
+:   - Chisq = 12, df = 9, p-value = 0.2133
+:   - Chi-squared approximation may be incorrect
+: #+END_ORG
+
+The =caption=, =header=, and =include.colnames= options are useful.
+
+
+: #+BEGIN_SRC R :results output org
+:  library(ascii)
+:  a <- runif(100)
+:  c <- "Quantiles of 100 random numbers"
+:  b <- ascii(quantile(a),header=T,include.colnames=T,caption=c)
+:  print(b,type="org")
+:  rm(a,b,c)
+: #+END_SRC
+:
+: #+RESULTS:
+: #+BEGIN_ORG
+: #+CAPTION: Quantiles of 100 random numbers
+: | 0%   | 25%  | 50%  | 75%  | 100% |
+: |------+------+------+------+------|
+: | 0.03 | 0.28 | 0.52 | 0.74 | 1.00 |
+: #+END_ORG
+
 
 ** Graphics Produced by ggplot2
 
