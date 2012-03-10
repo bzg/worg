@@ -187,11 +187,30 @@ and [[#toolbox][tools]] provided by the exporter.
                closing line or at buffer's end (integer).
    - ~:hiddenp~ :: Non-nil if block is hidden (symbol:
                    ~org-hide-block~, nil).
+   - ~:label-fmt~ :: Format string used to write labels in current
+                     block, if different from
+                     ~org-coderef-label-format~ (string or nil).
+   - ~:language~ :: Language of the code in the block, if specified
+                    (string or nil).
+   - ~:number-lines~ :: Non-nil if code lines should be numbered.
+        A ~new~ value starts numbering from 1 wheareas ~continued~
+        resume numbering from previous numbered block (symbol: ~new~,
+        ~continued~ or nil).
    - ~:options~ :: Block's options located on the block's opening line
                    (string).
+   - ~:parameters~ :: Optional header arguments (string or nil).
    - ~:post-blank~ :: Number of blank lines between block's closing
                       line and next non-blank line or buffer's end
                       (integer).
+   - ~:preserve-indent~ :: Non-nil when indentation within the block
+        mustn't be modified upon export (boolean).
+   - ~:retain-labels~ :: Non-nil if labels should be kept visible upon
+        export (boolean).
+   - ~:switches~ :: Optional switches for code block export (string or
+                    nil).
+   - ~:use-labels~ :: Non-nil if links to labels contained in the
+                      block should display the label instead of the
+                      line number (boolean).
    - ~:value~ :: Contents (string).
 
 ** Export Block
@@ -702,14 +721,28 @@ and [[#toolbox][tools]] provided by the exporter.
                block's closing line or at buffer's end (integer).
    - ~:hiddenp~ :: Non-nil if block is hidden (symbol:
                    ~org-hide-block~ nil).
+   - ~:label-fmt~ :: Format string used to write labels in current
+                     block, if different from
+                     ~org-coderef-label-format~ (string or nil).
    - ~:language~ :: Language of the code in the block, if specified
                     (string or nil).
+   - ~:number-lines~ :: Non-nil if code lines should be numbered.
+        A ~new~ value starts numbering from 1 wheareas ~continued~
+        resume numbering from previous numbered block (symbol: ~new~,
+        ~continued~ or nil).
    - ~:parameters~ :: Optional header arguments (string or nil).
    - ~:post-blank~ :: Number of blank lines between block's closing
                       line and next non-blank line or buffer's end
                       (integer).
+   - ~:preserve-indent~ :: Non-nil when indentation within the block
+        mustn't be modified upon export (boolean).
+   - ~:retain-labels~ :: Non-nil if labels should be kept visible upon
+        export (boolean).
    - ~:switches~ :: Optional switches for code block export (string or
                     nil).
+   - ~:use-labels~ :: Non-nil if links to labels contained in the
+                      block should display the label instead of the
+                      line number (boolean).
    - ~:value~ :: Source code (string).
 
 ** Statistics Cookie
@@ -782,14 +815,10 @@ and [[#toolbox][tools]] provided by the exporter.
 
 ** Target
 
-   Recursive object.
+   Object.
 
    - ~:begin~ :: Buffer position before first /less-than/ opening sign
                  (integer).
-   - ~:contents-begin~ :: Buffer position after last /less-than/
-        opening sign (integer).
-   - ~:contents-end~ :: Buffer position before first /greater-than/
-        closing sign (integer).
    - ~:end~ :: Buffer position before first non-blank character after
                last /greater-than/ closing sign, or at paragraph's end
                (integer).
@@ -1375,6 +1404,31 @@ and [[#toolbox][tools]] provided by the exporter.
    See also: [[#get-relative-level][~org-export-get-relative-level~]],
    [[#number-to-roman][~org-export-number-to-roman~]], [[#last-sibling-p][~org-export-last-sibling-p~]].
 
+** ~org-export-format-code~
+   :PROPERTIES:
+   :CUSTOM_ID: format-code
+   :END:
+
+   Helper function to format source code.  It applies a given function
+   on each line of the code, passing current line number and
+   associated code reference label, if any, as arguments.
+
+   See also: [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]],
+   [[#unravel-code][~org-export-unravel-code~]].
+
+** ~org-export-format-code-default~
+   :PROPERTIES:
+   :CUSTOM_ID: format-code-default
+   :END:
+
+   Return contents of a =src-block= or =example-block= element in
+   a format suited for raw text or verbatim output.  More
+   specifically, it takes care of line numbering and labels
+   integration depending of element's switches, but no formatting is
+   otherwise applied to source code.
+
+   See also: [[#format-code][~org-export-format-code~]], [[#unravel-code][~org-export-unravel-code~]].
+
 ** ~org-export-footnote-first-reference-p~
    :PROPERTIES:
    :CUSTOM_ID: footnote-first-reference-p
@@ -1448,6 +1502,21 @@ and [[#toolbox][tools]] provided by the exporter.
    See also: [[#headline-numbered-p][~org-export-headline-numbered-p~]],
    [[#number-to-roman][~org-export-number-to-roman~]].
 
+** ~org-export-get-loc~
+   :PROPERTIES:
+   :CUSTOM_ID: get-loc
+   :END:
+
+   Return count of accumulated lines of code from previous
+   line-numbered =example-block= and =src-block= elements, according
+   to current element's switches.
+
+   In other words, the first line of code in the current block is
+   supposed to be numbered as the returned value plus one, assuming
+   its ~:number-lines~ properties is non-nil.
+
+   See also: [[#format-code][~org-export-format-code~]], [[#unravel-code][~org-export-unravel-code~]].
+
 ** ~org-export-get-next-element~
    :PROPERTIES:
    :CUSTOM_ID: get-next-element
@@ -1469,7 +1538,7 @@ and [[#toolbox][tools]] provided by the exporter.
    Associate a sequence number to any object or element.  It is meant
    to be used to build captions.
 
-   Also, It could be applied on a fuzzy link's destination, since such
+   Also, it could be applied on a fuzzy link's destination, since such
    links are expected to be replaced with the sequence number of their
    destination, provided they have no description.
 
@@ -1483,7 +1552,7 @@ and [[#toolbox][tools]] provided by the exporter.
       ;; Do not apply a special syntax on fuzzy links pointing to targets.
       ((string= type "fuzzy")
        (let ((destination (org-export-resolve-fuzzy-link link info)))
-         ;; Ignore invisible "#+target: path".
+         ;; Ignore invisible "#+TARGET: path".
          (unless (eq (org-element-type destination) 'keyword)
            ;; If link has a description, use it.
            (if (org-string-nw-p desc) desc
@@ -1561,14 +1630,6 @@ and [[#toolbox][tools]] provided by the exporter.
     [[#get-headline-number][~org-export-get-headline-number~]],[[#headline-numbered-p][~org-export-headline-numbered-p~]],
     [[#last-sibling-p][~org-export-last-sibling-p~]].
 
-** ~org-export-handle-code~
-
-   Update line numbering and clean references in source code, when
-   appropriate.  It can also add text properties to format source code
-   only after some processing.
-
-   See also: [[#resolve-coderef][~org-export-resolve-coderef~]].
-
 ** ~org-export-headline-numbered-p~
    :PROPERTIES:
    :CUSTOM_ID: headline-numbered-p
@@ -1620,8 +1681,8 @@ and [[#toolbox][tools]] provided by the exporter.
    :END:
 
    Search for a code reference within ~src-block~ and ~example-block~
-   elements.  Return corresponding –possibly accumulated— line number,
-   or reference itself, depending on container's switches.
+   elements.  Return corresponding --possibly accumulated-- line
+   number, or reference itself, depending on container's switches.
 
    See also : [[#get-coderef-format][~org-export-get-coderef-format~]],
    [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
@@ -1649,6 +1710,22 @@ and [[#toolbox][tools]] provided by the exporter.
 
    See also : [[#resolve-coderef][~org-export-resolve-coderef~]],
    [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#solidify-link-text][~org-export-solidify-link-text~]].
+
+** ~org-export-unravel-code~
+   :PROPERTIES:
+   :CUSTOM_ID: unravel-code
+   :END:
+
+   Clean source code from an =example-block= or a =src-block= element
+   and extract code references out of it.
+
+   Its purpose is to allow to transform raw source code first and then
+   integrate line numbers or references back into the final output.
+   That final task can be achieved with the help of
+   ~org-export-format-code~ function.
+
+   See also: [[#format-code][~org-export-format-code~]],
+   [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]].
 
 ** ~org-export-solidify-link-text~
    :PROPERTIES:
