@@ -1,0 +1,217 @@
+#+OPTIONS:    H:4 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Google Summer of Code 2012
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tj[at]data-driven[dot]de
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ./index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode ideas for GNU's application to  <a href="http://www.google-melange.com/gsoc/homepage/google/gsoc2012">GSoC 2012</a>
+  </p>
+  <p>
+  <a href="http://www.google-melange.com/gsoc/homepage/google/gsoc2012"/>
+<img src="../../images/gsoc/DSCI0279_60pc.png"  alt="Beach, Books
+  and Beer"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+
+* Org Mode GSoC 2012 Ideas Page
+** Real webprogramming with Org Mode and PicoLisp
+*Project Description:*
+[[http://picolisp.com/5000/!wiki?home][PicoLisp]] is one out of many [[http://orgmode.org/worg/org-contrib/babel/languages.html][Org Babel languages]], but may be special in
+the sense that it does not only contribute to the static
+webpublishing capacities, but may introduce dynamic webprogramming on
+top of a real database into Org Mode. 
+
+Real interactive webprogramming frequently involves a (SQL) database
+like MySQL, a programming language like PHP or Python to build a MVC
+(Model-View-Controller) application on top of the database, a web
+framework for that programming language to make the programmers life
+easier (e.g. Django for Python), and a persistence layer that abstract
+away the conceptual mismatch between the SQL database and the (mostly)
+object-oriented application. Sometimes, a WYSIWYG html editor like MS
+Frontpage is invovled too, when webdesigners design the UI of the
+application. 
+
+Such an application needs user input (via <form> or <input> elements
+in the html pages) and needs to adapt dynamically to the users actions
+and queries by updating either the whole page or only parts of it
+(Javascript). For each user, a session is needed to keep track of the
+state of the application during his/her visit. 
+
+This kind of dynamic webprogramming can't be done with Org Mode.
+Typical webpages made with Org Mode are static in nature, even if they
+update their content frequently with some cron jobs on the server.
+There is no interaction with the user. 
+
+Considering the web stack for dynamic web apps described
+above, Org Mode really functions as a kind of 'Frontpage on steroids'
+for highly skilled academics. The project idea is to let PicoLisp
+replace all the other elements of the webstack and combine Org Mode
+and PicoLisp into an entirely Lisp-based framework for dynamic web
+programming. 
+
+In the PicoLisp application framework, UI and database are unified.
+Database objects are first class members of the language, and the UI
+elements act directly on this object-oriented lisp database (that is
+fast and scalable). No external SQL storage is needed, no persistence
+layer between the relational world of the DB and the object-oriented
+world of the application, and no glue code (controller) that connects
+the view to the model. 
+
+By merging PicoLisp's framework for rapid web-application development
+with Org Modes framework for rapid (web-) content production via Org
+Babel, new kinds of websites produced with Org Mode should become
+possible.
+
+*Difficulty:*
+Medium
+
+*Requirements:*
+Elisp, PicoLisp
+
+*Recommended:* 
+Knowledge about the inner workings of Org-babel and the
+PicoLisp application programming framework, some experience with Git.
+
+*Mentors:*
+Bastien Guerry, Eric Schulte
+
+** Git merge tool for Org files
+*Project Description:*
+This project idea is about writing a git merge driver for Org mode
+files, in the way [[http://git.savannah.gnu.org/gitweb/?p%3Dgnulib.git%3Ba%3Dblob%3Bf%3Dlib/git-merge-changelog.c][git-merge-changelog]] does this for GNU style
+ChangeLog files?
+
+One of the obstacle for using Org-mode for collaborative programs is
+that many operations add or remove text from the beginning or end of a
+file, or which add or remove a subnode from an outline tree. These are
+operations that confuse the git merger, in particular if two people
+have added something to a file, or removed/added sequential sibling
+nodes.
+
+I believe that this could be solved with a dedicated merge driver that
+understands the integrity of an outline (sub)tree, and that knows that
+the sequence of two new subtrees added by different people does not
+matter.
+
+The idea for this is actually (I believe) from Brian Gough who asked
+me about it at FOSDEM. I have now also run into this problem and would
+really find it great if such a merge driver could be written. 
+
+*Difficulty:*
+Hard
+
+*Requirements:*
+Git, Elisp, C
+
+*Recommended:* 
+Good understanding of Git and the structure of Org-mode files. 
+
+*Mentors:*
+Carsten Dominik
+
+** Implement an Elisp backend for Ragel 
+*Project Description:*
+Ragel http://www.complang.org/ragel/ is a tool
+that integrates regular expressions and state machines under one
+umbrella. It has backends currently for C, C++, Objective-C, D, Java
+and Ruby. Programming an Elisp backend would be a manageable task for
+a GSoC project.
+
+After that org-mode code might become half as long and twice as
+fast - at least those sections that are heavily regex oriented.
+
+*Difficulty:*
+Medium
+
+*Requirements:*
+Elisp, RegExp
+
+*Recommended:* 
+Familiarity with Org-mode, regular expressions and state machines.
+
+*Mentors:*
+Bastien Guerry, Rustom Mody
+
+
+** "Notebook" like console interface on top of Org Mode/ Babel
+*Project Description:*
+Implementing a multi-programming-language "notebook" like console
+interface build on top of Org-mode and Babel (with both Emacs and
+HTML interfaces).
+
+*Difficulty:*
+Medium
+
+*Requirements:*
+Elisp, HTML
+
+*Recommended:* 
+Familiarity with Org-mode and Babel
+
+*Mentors:*
+Eric Schulte
+
+** Asynchronous code block execution for Org Babel
+*Project Description:*
+Adding support for asynchronous code block execution.
+
+*Difficulty:*
+Medium
+
+*Requirements:*
+Elisp, C
+
+*Recommended:* 
+Good understanding of Org Babel and the GNU/Linux process model.
+
+*Mentors:*
+Eric Schulte
+
+** Piping results between Babel code blocks
+*Project Description:*
+Adding support for piping results between code blocks allowing many
+blocks to run concurrently (probably best combined with asynchronous
+execution).
+
+*Difficulty:*
+Medium
+
+*Requirements:*
+Elisp, C
+
+*Recommended:* 
+Good understanding of Org Babel and the GNU/Linux process model.
+
+*Mentors:*
+Eric Schulte
+
+** Handling Babel code block output written to STDERR
+*Project Description:*
+Adding support for handling output written to STDERR.
+
+*Difficulty:*
+Medium
+
+*Requirements:*
+Elisp
+
+*Recommended:* 
+Familiarity with Org Babel and GNU/Linux.
+
+*Mentors:*
+Eric Schulte

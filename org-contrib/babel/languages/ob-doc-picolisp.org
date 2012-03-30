@@ -1,0 +1,411 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      PicoLisp Source Code Blocks in Org Mode
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tj[at]data-driven[dot]de
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="http://picolisp.com/5000/!wiki?home/">PicoLisp</a>
+  </p>
+  <p>
+  <a href="http://picolisp.com/5000/!wiki?home/">
+  <img src="http://picolisp.com/5000/wiki/logo.png"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* Template Checklist [12/12]                                       :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result%20Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+** Brief description of PicoLisp
+  PicoLisp is a minimal and pure Lisp dialect created by Alexander
+  Burger. First of all, PicoLisp is a virtual machine architecture,
+  and then a programming language. It is the result of a language
+  design study, trying to answer the question "What is a minimal but
+  useful architecture for a virtual machine?"
+  
+  However, PicoLisp is no academic exercise in language design. It has
+  been used in several commercial and research programming projects
+  since 1988. Its internal structures are simple enough, allowing an
+  experienced programmer always to fully understand what's going on
+  under the hood, and its language features, efficiency and
+  extensibility make it suitable for almost any practical programming
+  task. Some of the outstanding features of PicoLisp are:
+  
+- Integrated Database :: Database functionality is built into the core
+  of the language. PicoLisp is a database query and manipulation
+  language.
+
+  Database entities are first class objects. They are called
+  "external symbols", because they are automatically fetched from
+  database files when accessed, but otherwise behave like normal
+  symbols.
+
+  This fetching from external files is completely transparent, the
+  symbols "are just there", and there is no need (or even a
+  function) to read or write them explicitly. Pilog (a built-in
+  Prolog engine) is used as a query language.
+
+  It is possible with PicoLisp to build large multi-user databases,
+  distributed across many machines or in a cloud. Such a database
+  system can be optimally fine-tuned, because all its levels are
+  under the developer's control.
+
+- Equivalence of Code and Data :: This is actually a feature of Lisp in
+  general. However, PicoLisp really lives it. It makes it easy to write
+  things like the HTML, PostScript or TeX libraries, exploring a syntax
+  of nested function calls. This results in very succinct and precisely
+  expressed programs.
+
+  For a closer explanation, see the article [[http://picolisp.com/5000/!wiki?EquivalenceCodeData][The Equivalence of Code
+  and Data]]. 
+  
+- Expressiveness :: PicoLisp is a very expressive language. Programs are
+  often much shorter and concise than equivalent programs written in
+  other languages.
+
+  Examples of various programming tasks and their solutions can be
+  found at [[http://rosettacode.org/wiki/Category:PicoLisp][Rosettacode]].
+  
+- Efficiency :: PicoLisp uses (at least when compared to other Lisps)
+  very little memory, on disk as well as in memory (heap space).
+
+  For example, the installation size in the OpenWRT distribution is
+  only 575 kB (uncompressed), where the statically linked
+  interpreter with 296 kB takes the largest part. Yet, it includes
+  the full runtime system with interpreter, database, HTTP server,
+  XHTML and JavaScript application framework, watchdog, and the
+  debugger, PostScript and XML libraries.
+
+  PicoLisp has no compiler, everything starts up very quickly, and
+  code dynamically loaded at runtime (e.g. GUI pages) is
+  immediately ready. Yet, the interpreter is quite fast, usually
+  three times a fast as Python, for example.
+
+** Range of typical uses within Org Mode
+   At first sight, it might not be obvious why Org Mode users should
+   use anything else but Emacs Lisp when writing lisp code blocks. But
+   Picolisp offers at least two features that make it a valuable Org
+   Babel language: its object-oriented database, and its highly
+   efficient framework for interactive web-applications.
+
+* Requirements and Setup
+** Installation and configuration of PicoLisp software
+   PicoLisp can be downloaded from this [[http://software-lab.de/down.html][download page]]. There is a
+   32-bit version written in C, and a 64-bit version written in
+   assembler. Some GNU/Linux distributions ship with PicoLisp
+   packages, so you might be able to use your package manager for
+   installation. A pure Java version (Ersatz PicoLisp) and a minimal
+   version (Mini PicoLisp) are available too.
+
+   Detailed and comprehensive installation instructions can be found
+   in the [[http://software-lab.de/INSTALL][INSTALL]] file.
+   
+** Emacs configuration
+   The original author of PicoLisp, Alexander Burger, does all his
+   programming work using xterm and vi. PicoLisp is really living
+   the old Unix tradition of simplicity and minimalism.
+
+   However, there are no editor-wars going on in the PicoLisp
+   community. Several PicoLisp programmers are Emacs users and
+   contributed to Emacs to enable it as PicoLisp editor.
+   
+   After installing PicoLisp, you find the elisp files that constitute
+   the Emacs picolisp-mode in the directory /picolisp/lib/el/. There
+   is a picolisp.el and an inferior-picolisp.el as well as a paredit
+   patch.
+
+   There is another file called tsm.el. It makes PicoLisp's
+   transient symbols appear in a special way in the source code,
+   reminding the programmer that they look like Strings and are used
+   as Strings, but are not really Strings but just (transient)
+   Symbols.
+
+   The README file in the same directory gives the necesary
+   instructions for configuring the PicoLisp mode for Emacs. Since it
+   is not very long, I cite it here:
+
+   #+BEGIN_SRC emacs-lisp
+     ;; In order to get the picolisp-mode working correctly you have to
+     ;; add the following expressions to your .emacs and adapt them 
+     ;; according to your set-up: 
+     
+     (add-to-list 'load-path "<path-to>/picoLisp/lib/el")
+     (load "tsm.el") ;; Picolisp TransientSymbolsMarkup (*Tsm)
+     (autoload 'run-picolisp "inferior-picolisp")
+     (autoload 'picolisp-mode "picolisp" "Major mode for editing
+      Picolisp." t)
+     ;; pil is more modern than plmod
+     (setq picolisp-program-name "<path-to>/picoLisp/plmod") 
+     
+     ;; If you have also SLIME installed, it will suck all possible lisp
+     ;; extensions up (greedy bastard). 
+     ;; So in order to get the correct file-association for picolisp 
+     ;; files you'll have to also add this:
+     
+     (add-to-list 'auto-mode-alist '("\\.l$" . picolisp-mode))
+     
+     ;; If you want, you can add a few hooks for convenience:
+     
+     (add-hook 'picolisp-mode-hook
+        (lambda ()
+           (paredit-mode +1) ;; Loads paredit mode automatically
+           (tsm-mode) ;; Enables TSM
+           (define-key picolisp-mode-map (kbd "RET") 'newline-and-indent)
+           (define-key picolisp-mode-map (kbd "C-h") 'paredit-backward-delete) ) )
+     
+     
+     ;; By the way, don't forget to patch your paredit.el (v21) with the
+     ;;  patch provided to get a smoother editing. 
+   #+END_SRC
+
+
+** Org-mode configuration (org-babel-do-load-languages)
+   The ob-picolisp.el file is part of Emacs now. To activate PicoLisp
+   as an org-babel language, simply add (picolisp . t) to the
+   org-babel-do-load-languages function in your Emacs configuration
+   file, like shown below: 
+
+   #+BEGIN_SRC emacs-lisp
+     ;; activating picolisp as org babel language
+     (org-babel-do-load-languages
+      'org-babel-load-languages (quote ((emacs-lisp . t)
+                                         (picolisp . t)
+                                         (R . t)
+                                         (python . t))))
+   #+END_SRC
+
+* Org Mode Features for PicoLisp Source Code Blocks
+** Sessions
+*** Support or not
+    ob-picolisp supports external evaluation as well as session-based
+    evaluation of PicoLisp source blocks. 
+*** Typical use for sessions
+    Sessions preserve state, therefore the use of sessions in PicoLisp
+    just like in Emacs Lisp makes sense whenever the computations rely
+    on changing state. 
+** Header Arguments and Result Types
+*** Language-specific default values
+    Depending on the kind of table data you work with, it might be
+    convenient to set the following default header argument:
+
+    #+BEGIN_SRC emacs-lisp
+      ;; optionally declare default header arguments for this language
+      (defvar org-babel-default-header-args:picolisp
+        '((:colnames . "no"))
+        "Default arguments for evaluating a picolisp source block.")
+    #+END_SRC
+    
+*** Language-specific header arguments
+    There are no language specific header arguments for PicoLisp.     
+
+*** Combinations of header-args and result types
+   Many combinations of header arguments and result types are
+   supported by ob-picolisp. Like always in combinatorics, the number
+   of possible combinations increases rapidly when there are several
+   factors with several levels each that can be freely combined.
+
+   The following table shows combinations of header arguments and
+   result types that might make sense for a language like PicoLisp.
+   Many (but nor all) of them have been tried successfully with
+   ob-picolisp source blocks. 
+
+    #+tblname: header-args-combinations
+    | evaluation | collection | type              |
+    | (:session) | (:results) | (:results)        |
+    |------------+------------+-------------------|
+    | external   | value      | table (vector)    |
+    |            |            | scalar (verbatim) |
+    |            |            | file              |
+    |            |            | raw (org)         |
+    |            |            | html              |
+    |            |            | latex             |
+    |            |            | code              |
+    |            |            | pp                |
+    |            | output     | table (vector)    |
+    |            |            | scalar (verbatim) |
+    |            |            | file              |
+    |            |            | raw (org)         |
+    |            |            | html              |
+    |            |            | latex             |
+    |            |            | code              |
+    |            |            | pp                |
+    | session    | value      | table (vector)    |
+    |            |            | scalar (verbatim) |
+    |            |            | file              |
+    |            |            | raw (org)         |
+    |            |            | html              |
+    |            |            | latex             |
+    |            |            | code              |
+    |            |            | pp                |
+    |            | output     | table (vector)    |
+    |            |            | scalar (verbatim) |
+    |            |            | file              |
+    |            |            | raw (org)         |
+    |            |            | html              |
+    |            |            | latex             |
+    |            |            | code              |
+    |            |            | pp                |
+
+     
+    More special header arguments and their possible values are
+    summarized in the next table:
+   
+    #+tblname: other-header-args
+    
+    | header-arg |          | values  |          |         |
+    |------------+----------+---------+----------+---------|
+    | :results   | silent   | replace | append   | prepend |
+    | (handling) |          |         |          |         |
+    | :exports   | code     | results | both     | none    |
+    | :comments  | yes      | (no?)   |          |         |
+    | :noweb     | no       | yes     |          |         |
+    | :tangle    | yes      | no      | filename |         |
+    | :no-expand |          |         |          |         |
+    | :file      |          |         |          |         |
+    | :dir       |          |         |          |         |
+    | :cache     | no       | yes     |          |         |
+    | :var       | x=y      |         |          |         |
+    | :hlines    | no       | yes     |          |         |
+    | :colnames  | nil      | no      | yes      |         |
+    | :rownames  | no       | yes     |          |         |
+    | :shebang   | "string" |         |          |         |
+    | :eval      | never    | query   |          |         |
+
+
+** Other
+*** Differences from other supported languages
+    PicoLisp as an Org Babel language works quite similar like its
+close relatives Emacs Lisp and Scheme, for example.
+
+However, there is one characteristic that really sets it aparts from
+other supported languages: PicoLisp is not only a language, it _is_ a
+(object-oriented) database and a web-framework. Unlike other
+languages, that _have_ (external) frameworks and database drivers,
+these features are deeply integrated inside the PicoLisp application
+server framework. 
+
+As Alexander Burger describes it in [[http://software-lab.de/dbui.html][A Unifying
+Language for Database And User Interface Development]]:
+
+#+BEGIN_QUOTE
+: Databases and user interfaces are separate
+: worlds: Existing class libraries are concerned about
+: visual effects and event handling, but not about
+: application logic and database maintenance. It is the
+: programmer's responsibility to write glue code that
+: displays data in corresponding GUI fields, detects
+: modifications by the user, validates them, writes changes
+: back to the database, and does other housekeeping.
+:                  
+: [PicoLisp is] a language and programming
+: environment that closes [this] semantic gap, by unifying
+: database and user interface into a single application
+: server framework.
+#+END_QUOTE
+
+* Examples of Use
+** Hello World!
+The [[http://software-lab.de/doc/tut.html][PicoLisp Tutorial]] has two versions of the notorious "Hello World"
+function, one without arguments, the other with one argument:
+
+#+BEGIN_SRC picolisp :exports both :results output
+  # no arguments
+  (de hello-no-args ()
+     (prinl "Hello World"))
+  
+  (hello-no-args)
+#+END_SRC
+
+#+BEGIN_SRC picolisp :exports both :results output
+  # with one argument
+  (de hello-one-arg (X)
+     (prinl "Hello " X) )
+  
+  (hello-one-arg "Argument")
+#+END_SRC
+
+** Common uses
+   PicoLisp can be used, just like Emacs Lisp, as an efficient
+   scripting language inside of Org Mode documents. Due to its smart
+   and powerfull abstractions, much can be achieved in a few lines of
+   code.
+
+   From a PicoLisp programmer's point of view, the integration of the
+   language into Org Babel might be usefull for literate programming
+   (e.g. writing well documented PicoLisp libraries or PicoLisp
+   related papers) or for convenient database report building (making
+   use of Org Mode's multi-language environment and export
+   facilities).
+
+   From an Org Mode user's and/or Emacs Lisp programmer's point of
+   view, two use cases might be of special interest:
+
+   - use PicoLisp as a _real_ (object-oriented) database replacement
+     for things like bbdb and eieio, i.e. as a tool for
+     object-oriented lisp programming that can handle _big_ (even
+     replicated) databases, offers a powerfull prolog-based query
+     language (Pilog) and _speed_ (see [[http://picolisp.com/5000/!wiki?NeedForSpeed][The Need for Speed]]).
+   - use the PicoLisp application server framework to enable
+     interactive web-development with Org Mode, i.e. combine the
+     static html-export facilities of Org Mode with PicoLisp's ability
+     to produce html-forms that communicate directly with an
+     underlying PicoLisp database. 
+
+  These two use cases are still a bit theoretical, some investigation
+  and experimentation has to be done that hopefully lead to the
+  production of related tutorials on Worg in the future.
+   
+** Links to tutorials and other resources
+Although not all aspects of PicoLisp are documented and the (often
+surprinsingly short) source code must be used as ultimate reference in
+some cases, there are many interesting and well written documents
+available.
+
+The one-stop-shop for everything with regards to PicoLisp is the
+[[http://picolisp.com/5000/!wiki?home][PicoLisp Wiki]]. There is a [[mailto:picolisp@software-lab.de?subject%3DSubscribe][PicoLisp Mailing List]] too, as well as an IRC
+channel (#picolisp). 
+
+For programmers who want to learn more about PicoLisp, I would suggest
+to first read Paul Graham's essay [[http://paulgraham.com/hundred.html][The Hundred-Year Language]], to get
+the general idea what PicoLisp is all about. Then, a [[http://software-lab.de/radical.pdf][A Radical Approach
+to Application Development (PDF)]] and [[http://software-lab.de/dbui.html][A Unifying Language for Database
+And User Interface Development]] are the next logical steps to learn
+more about the philosophy behind PicoLisp.
+
+The [[http://software-lab.de/doc/ref.html][PicoLisp Reference]] and the [[http://software-lab.de/doc/tut.html][PicoLisp Tutorial]] are the main
+references when it comes to 'hands on' experience with the language.
+Henrik Sarvell's introduction [[http://www.prodevtips.com/2008/03/28/pico-lisp/]["At a First Glance"]] is a very helpfull
+beginners guide too. 
+
+The [[http://software-lab.de/doc/app.html][PicoLisp Application Development]] guide explains in great detail,
+how amazingly easy and efficient web-programming with PicoLisp can be.
+There is much more information available, just have a look at the
+PicoLisp wiki yourself.
+
