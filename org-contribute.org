@@ -20,7 +20,7 @@ Every contribution to Org is very welcome.  Here is a list of areas where
 your contribution will be useful:
 
 - you can submit *bug reports* -- Before sending a bug report, make sure
-  you have read this section of Org's manual: [[http://orgmode.org/org.html#Feedback][Feedback]]  You can also read
+  you have read this section of Org's manual: [[http://orgmode.org/org.html#Feedback][Feedback]] You can also read
   this great text: "[[http://www.chiark.greenend.org.uk/~sgtatham/bugs.html][How to Send Bug Reports Effectively]]"
 
 - you can submit *feature requests* -- Org is already mature, but new ideas
@@ -95,8 +95,12 @@ coding conventions]] described in Emacs manual.
 
 Org-mode is developed using /git/ as the version control system.  Git
 provides an amazing framework to collaborate on a project.  Git can be used
-to make patches and send them via email -- this is perfectly fine for minor
-changes.
+to make patches and send them via email -- this is perfectly fine for major
+and minor changes.
+
+When sending a patch (either using =git diff= or =git format-patch=) please
+*always add a properly formatted Emacs ChangeLog entry*.  See [[id:c526dfd7-2b0c-4b66-9deb-6e442e48708c][this section]]
+for details on how to create such a ChangeLog.
 
 ** Patches get caught on patchwork
 
@@ -118,7 +122,40 @@ reformat it (although there are plenty of places further down the line
 where that can happen, unfortunately). If you attach the patch, then
 reformatting is not a problem.
 
-** Sending quick fixes
+** Sending commits
+
+For every patch you send, we suggest to use =git format-patch=.
+
+This is easy for small patches and more consequent ones.  Sometimes, you
+might even want to work in several steps and send each commit separately.
+Here is the suggested workflow:
+
+#+begin_quote
+:   ~$ git pull                 # make sure your repo is up to date
+:   ~$ git branch my-changes    # create a new branch from master
+:   ~$ git checkout my-changes  # switch to this new branch
+
+  ... make some changes (1) ...
+
+:   ~$ git commit -m "This is change (1)"  # Commit your change
+
+  ... make another change (2) ...
+
+:   ~$ git commit -m "This is change (2)"  # Commit your change
+:   ~$ git format-patch master             # Creates two patches
+
+  ... Then two patches for your two commits are ready to be sent to the
+  list and detected by the patchwork server.
+#+end_quote
+
+Write useful commit messages: please provide 1) a reason for it in your
+email and 2) a ChangeLog entry in the commit message (see [[id:c526dfd7-2b0c-4b66-9deb-6e442e48708c][this section]] on
+how to format a ChangeLog entry.)
+
+** Sending quick fixes for testing purpose
+
+If you want to send a quick fix that needs to be further tested by other
+people (before you submit a real patch), here is how you can do:
 
 #+begin_quote
   This command will make a patch between the staging area (in your
@@ -136,32 +173,9 @@ reformatting is not a problem.
   subject, and description of what you fixed or changed.
 #+end_quote
 
-** Sending commits
-
-For more significant changes, you might want to work in several steps and
-send each commit separately.  Here is the suggested workflow
-
-#+begin_quote
-:   ~$ git pull                 # make sure your repo is up to date
-:   ~$ git branch my-changes    # create a new branch
-:   ~$ git checkout my-changes  # switch to this new branch
-
-  ... make some changes (1) ...
-
-:   ~$ git commit -m "This is change (1)"  # Commit your change
-
-  ... make another change (2) ...
-
-:   ~$ git commit -m "This is change (2)"  # Commit your change
-:   ~$ git format-patch master             # Creates two patches
-
-  ... Then two patches for your two commits are ready to be sent to the
-  list and detected by the patchwork server.
-#+end_quote
-
-Write useful commit messages: unless your change is very small, please
-provide 1) a reason for it in your email and 2) a ChangeLog entry in the
-commit message.
+Note that small patches sent like this still need to have a ChangeLog entry
+to be applied.  If your patch looks good to you, it's always better to send
+a patch through =git format-patch=.
 
 ** Sharing changes from a public branch
 
@@ -217,6 +231,9 @@ through public branches of your repository clone.
    : git push REMOTE :NEWTOPIC
 
 * Commit messages and ChangeLog entries
+  :PROPERTIES:
+  :ID:       c526dfd7-2b0c-4b66-9deb-6e442e48708c
+  :END:
 
 We have decided to no longer keep a ChangeLog file to record changes to
 individual functions.  In a modern version control system like git,
