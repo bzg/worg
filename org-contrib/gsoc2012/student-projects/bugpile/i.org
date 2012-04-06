@@ -1,0 +1,308 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      iOrg 
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tj[at]data-driven[dot]de
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  A Web-Framework based on <a href="http://orgmode.org/">Org-mode</a> and
+                                <a href="http://picolisp.com/5000/!wiki?home/">PicoLisp</a>
+  </p>
+  <p>
+  <a href="http://picolisp.com/5000/!wiki?home/">
+  <img src="http://picolisp.com/5000/wiki/logo.png"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* Introduction
+** iOrg - just another Webframework?
+iOrg - the name stands for /interactive Org/ - merges the efficient
+and highly customizable combination /Org-mode/Git/ for (static web-)
+content production and management with the rapid (dynamic web-)
+application programming framework of PicoLisp.
+
+Org-mode files are plain text. They are produced with GNU Emacs, a
+powerfull editor and favorite tool of many mouse-avoiding pro-hackers
+who constantly strive for one goal - higher productivity. In the
+Org-mode community, [[Http://git-scm.com/][Git]] is used for version control and
+collaborative team work. Just like Emacs, Git is another pro-tool
+build around simple but intelligent concepts that enable authors and
+programmers to be highly productive even in complex settings.
+
+With Org-mode (and Git) its easy and fun to produce static websites
+like [[http://orgmode.org/worg/][Worg]], the Org-mode community site. Static doesn't mean that the
+content of Worg does not change, there are frequent commits and
+changes by members of the Org community with write access to Worg. But
+the site is static in nature, i.e. no interaction with the user is
+possible. 
+
+Enters [[http://picolisp.com/5000/!wiki?home][PicoLisp]] - a minimal and quite fascinating Lisp dialect
+characterised by two outstanding features: PicoLisp is not only a
+language, it is a database and a webframework too.
+
+Real interactive webprogramming frequently involves a (SQL) database
+like MySQL, a programming language like PHP or Python to build a MVC
+(Model-View-Controller) application on top of the database, a web
+framework for that programming language to make the programmers life
+easier (e.g. Django for Python), and a persistence layer that abstracts
+away the conceptual mismatch between the SQL database and the (mostly)
+object-oriented application. 
+
+In the PicoLisp application framework, UI and database are unified.
+Database objects are first class members of the language, and the UI
+elements act directly on this object-oriented lisp database (that is
+fast and scalable). No external SQL storage is needed, no persistence
+layer between the relational world of the DB and the object-oriented
+world of the application, and no glue code (controller) that connects
+the view to the model. In other words - PicoLisp replaces the complete
+webstack. 
+
+Thus, iOrg is based on three tools that are 'best in class' in
+their respective domains when it comes to productivity, flexibility
+and power. And merging these tools into one framework is greatly
+facilitated by the fact that its about communication between Lisps
+(Emacs Lisp and PicoLisp), i.e. two programming languages centered
+around lists. It is even possible to intermingle PicoLisp code blocks
+and Emacs Lisp code blocks in the same Org file.   
+
+iOrg will benefit /programmers/ because
+- they can write the whole web-application in Lisp
+- they can produce sophisticated web-content in plain text files under
+  version control
+- they can boost their productivity by writing significantly less code
+  with the most efficient tools available
+- they can work with only a few tools that have an extraordinary small
+  fingerprint
+
+
+iOrg will benefit /normal users/ because
+- PicoLisp web-applications are very responsive, each field reacts
+  directly on user action (and not only when the 'send button' is
+  pressed)
+- the backbutton works in PicoLisp applications 
+
+iOrg will benefit /power users/ because
+- PicoLisp applications are fully functional in text-browsers
+- Pilog (the Prolog implementation in PicoLisp used as database query
+  language) is more powerfull than SQL and enables complex database
+  queries
+- iOrg applications are predestined for an alternative UI, that is not
+  web-based but rather an Emacs mode custommade for the needs of
+  keyboard oriented Emacs power users (similar to [[http://philjackson.github.com/magit/magit.html][Magit]], the Emacs
+  mode for Git)
+
+* The Components of iOrg
+** Org-mode - your life in plain text
+Org is a GNU Emacs mode for keeping notes, maintaining TODO lists,
+and doing project planning with a fast and effective plain-text
+system. It is also an authoring and publishing system. Org has
+developed over the years into a kind of Office Suite for Emacs users
+(many of whose consider Emacs as an Operation System rather than a
+text editor).
+
+Org Babel, the multilanguage environment for literate programming
+integrated in Org Mode, is of special importance for iOrg. It
+enables Programmers to seamlessly glue together Org-mode and PicoLisp
+code (as well as code-blocks from many other languages). Eric Schulte
+and his co-authors describe Org Babel in the [[http://www.jstatsoft.org/v46/i03][Journal of
+Statistical Software:]]
+
+#+BEGIN_QUOTE
+: We present a new computing environment for authoring
+: mixed natural and computer language documents. In 
+: this environment a single hierarchically-organized
+: plain text source file may contain a variety of 
+: elements such as code in arbitrary programming
+: languages, raw data, links to external resources,
+: project management data, working notes, and text
+: for publication. Code fragments may be executed
+: in situ with graphical, numerical and textual output
+: captured or linked in the file. Export to LATEX,
+: HTML, LATEX beamer, DocBook and other formats permits
+: working reports, presentations and manuscripts for
+: publication to be generated from the file. In
+: addition, functioning pure code files can be
+: automatically extracted from the file. This
+: environment is implemented as an extension to
+: the Emacs text editor and provides a rich set of
+: features for authoring both prose and code, as well
+: as sophisticated project management capabilities.
+#+END_QUOTE
+
+In iOrg, the easy export to HTML of mixed natural and computer language
+documents is one of the key features of the framework. 
+
+** Git - a fast Version Control System
+Git is distributed version control system focused on speed,
+effectivity and real-world usability on large projects. Its
+[[http://git-scm.com/about][highlights]] include:
+
+- Distributed development :: Like most other modern version control
+  systems, Git gives each developer a local copy of the entire
+  development history, and changes are copied from one such
+  repository to another. These changes are imported as additional
+  development branches, and can be merged in the same way as a
+  locally developed branch. Repositories can be easily accessed
+  via the efficient Git protocol (optionally wrapped in ssh for
+  authentication and security) or simply using HTTP - you can
+  publish your repository anywhere without any special webserver
+  configuration required.
+- Strong support for non-linear development :: Git supports rapid
+  and convenient branching and merging, and includes powerful
+  tools for visualizing and navigating a non-linear development
+  history.
+- Efficient handling of large projects :: Git is very fast and
+  scales well even when working with large projects and long
+  histories. It is commonly an order of magnitude faster than
+  most other version control systems, and several orders of
+  magnitude faster on some operations. It also uses an extremely
+  efficient packed format for long-term revision storage that
+  currently tops any other open source version control system.
+- Cryptographic authentication of history :: The Git history is
+  stored in such a way that the name of a particular revision (a
+  "commit" in Git terms) depends upon the complete development
+  history leading up to that commit. Once it is published, it is
+  not possible to change the old versions without it being
+  noticed. Also, tags can be cryptographically signed.
+- Toolkit design :: Following the Unix tradition, Git is a
+  collection of many small tools written in C, and a number of
+  scripts that provide convenient wrappers. Git provides tools
+  for both easy human usage and easy scripting to perform new
+  clever operations.
+
+** PicoLisp - the Scalpel of Programming
+ PicoLisp is a minimal and pure Lisp dialect created by Alexander
+ Burger. First of all, PicoLisp is a virtual machine architecture, and
+ then a programming language. It is the result of a language design
+ study, trying to answer the question "What is a minimal but useful
+ architecture for a virtual machine?"
+
+ But PicoLisp is not only a language, it _is_ a (object-oriented)
+ database and a web-framework too. Unlike other languages, that
+ _have_ (external) frameworks and database drivers, these features
+ are deeply integrated inside the PicoLisp application server
+ framework.
+
+ As Alexander Burger describes it in [[http://software-lab.de/dbui.html][A Unifying
+ Language for Database And User Interface Development]]:
+
+ #+BEGIN_QUOTE
+ : Databases and user interfaces are separate
+ : worlds: Existing class libraries are concerned about
+ : visual effects and event handling, but not about
+ : application logic and database maintenance. It is the
+ : programmer's responsibility to write glue code that
+ : displays data in corresponding GUI fields, detects
+ : modifications by the user, validates them, writes changes
+ : back to the database, and does other housekeeping.
+ :                  
+ : [PicoLisp is] a language and programming
+ : environment that closes [this] semantic gap, by unifying
+ : database and user interface into a single application
+ : server framework.
+ #+END_QUOTE
+
+* The Architecture of iOrg
+
+The following Graph shows the different components of iOrg and their connections:
+
+#+begin_src dot :file iorg-arch.png :cmdline -Kdot -Tpng
+  digraph G {
+    size="8,6"
+    ratio=expand
+    edge [dir=both]
+    orgmode [shape=box, label="Org-mode"]
+
+    subgraph cluster_picolisp {
+      label="PicoLisp"
+      color=purple
+      subgraph {
+      database [style=filled, fillcolor=lightgrey, shape=box]
+      }
+      edge[style=dotted, dir=none]
+      edge [style=line, dir=both]
+      database -> gui
+      orgbabel -> database
+      orgbabel -> gui
+    }
+
+   
+    orgmode -> orgbabel [constraint=false]
+    git [shape=box, label="Git"]
+    database -> git
+    orgmode -> git
+  
+    subgraph cluster_iOrgclients {
+      color=blue
+      label="iOrg Clients"
+      rankdir=LR
+      labelloc=b
+      gui -> webbrowser
+      database -> emacsmode 
+    }
+  }
+  
+#+end_src
+
+#+RESULTS:
+[[file:iorg-arch.png]]
+
+Org-mode produces all the static web-content, that is
+version-controlled by Git. Git is directly connected to the PicoLisp
+database via hooks. Via orgbabel, PicoLisp forms and buttons are
+inserted in the html exported by Org-mode (gui), that communicate with
+the PicoLisp database(server) and send the results to the
+webbrowser-client. The PicoLisp database(server) is directly conected to the
+emacsmode-client.
+
+
+* Bugpile - developing a Bugtracker in iOrg
+A bugtracker is well suited as an example project for iOrg. 
+
+First of all, the Org-mode project needs a bugtracker, and given the
+characteristics of Org-mode, it seems only natural that it should be
+implemented in Org-mode itself.
+
+Furthermore, a bugtracker is an application that needs to serve
+powerusers (those who find, report and fix the bugs) as well as normal
+users (those who occasionally report a bug or feature request and need
+to search a bug database once in a while). For the Emacs powerusers,
+an Emacs mode as interface to the bug-database seems appropriate, that
+makes working with Bugpile as convenient as working with Git using the
+Emacs mode Magit. For the normal users, a comfortable web-interface is
+necesary that makes it easy to write reports/requests and search the
+database.
+
+A bugtracker is a highly interactive application that must be easy to
+use - otherwise people avoid using it. It needs a database with a
+powerfull query language, and the characteristics of a wiki. These are
+requirements that fit well with iOrgs characteristics. 
+
+The name /Bugpile/ was chosen because an ever growing pile of bugs will
+be stored in the applications database. However, the word /pile/ can
+be decomposed into /pil/ and /e/, i.e. the command PicoLisp is started
+with (=./pil=) and the alias often used for Emacs (like in elisp). 
+
+A logo for Bugpile might look like this:
+ 
+#+BEGIN_QUOTE
+:  _\o/_
+:  /(_)\
+: BUG PILE
+#+END_QUOTE
+
+The design and implementation of Bugpile will be used throughout this
+document to demonstrate and evaluate web application programming with
+iOrg.
