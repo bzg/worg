@@ -465,6 +465,41 @@ of its arguments."
                      (if mark-active "region" "buffer")))))
 #+end_src
 
+*** Check for misplaced SCHEDULED and DEADLINE cookies
+
+The =SCHEDULED= and =DEADLINE= cookies should be used on the line *right
+below* the headline -- like this:
+
+#+begin_src org
+  ,* A headline
+  ,  SCHEDULED: <2012-04-09 lun.>
+#+end_src
+
+This is what =org-scheduled= and =org-deadline= (and other similar
+commands) do.  And the manual explicitely tell people to stick to this
+format (see the section "8.3.1 Inserting deadlines or schedules").
+
+If you think you might have subtrees with misplaced =SCHEDULED= and
+=DEADLINE= cookies, this command lets you check the current buffer:
+
+#+begin_src emacs-lisp
+(defun org-check-misformatted-subtree ()
+  "Check misformatted entries in the current buffer."
+  (interactive)
+  (show-all)
+  (org-map-entries
+   (lambda ()
+     (move-beginning-of-line 2)
+     (if (or (and (org-get-scheduled-time (point))
+		  (not (looking-at (concat "^.*" org-scheduled-regexp))))
+	     (and (org-get-deadline-time (point))
+		  (not (looking-at (concat "^.*" org-deadline-regexp)))))
+	 (when (y-or-n-p "Fix this subtree? ")
+	   (message "Call the function again when you're done fixing this subtree.")
+	   (recursive-edit))
+       (message "All subtrees checked.")))))
+#+end_src
+
 ** Org Table
 *** Transpose table
 #+index: Table!Calculation
