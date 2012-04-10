@@ -489,15 +489,16 @@ If you think you might have subtrees with misplaced =SCHEDULED= and
   (show-all)
   (org-map-entries
    (lambda ()
-     (move-beginning-of-line 2)
-     (if (or (and (org-get-scheduled-time (point))
-		  (not (looking-at (concat "^.*" org-scheduled-regexp))))
-	     (and (org-get-deadline-time (point))
-		  (not (looking-at (concat "^.*" org-deadline-regexp)))))
-	 (when (y-or-n-p "Fix this subtree? ")
-	   (message "Call the function again when you're done fixing this subtree.")
-	   (recursive-edit))
-       (message "All subtrees checked.")))))
+     (when (and (move-beginning-of-line 2)
+		(not (looking-at org-heading-regexp)))
+       (if (or (and (org-get-scheduled-time (point))
+		    (not (looking-at (concat "^.*" org-scheduled-regexp))))
+	       (and (org-get-deadline-time (point))
+		    (not (looking-at (concat "^.*" org-deadline-regexp)))))
+	   (when (y-or-n-p "Fix this subtree? ")
+	     (message "Call the function again when you're done fixing this subtree.")
+	     (recursive-edit))
+	 (message "All subtrees checked."))))))
 #+end_src
 
 ** Org Table
