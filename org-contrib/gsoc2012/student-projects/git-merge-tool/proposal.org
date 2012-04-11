@@ -1,0 +1,244 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org-Mode Merge Tool
+#+AUTHOR:     Andrew Young
+#+EMAIL:      youngar17 at gmail dot com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+# #+LINK_UP:  http://orgmode.org/worg/org-faq.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+/Proposal created  April 6 2012/
+
+* Emacs-Orgmode Git merge tool for Org Files
+
+*Short description:*
+The purpose of the project is to create a specialized Git merge driver
+for plain text Org-Mode formatted files. A merge driver is a program
+which will combine two versions of a file based off of a common
+ancestor into a single file, marking conflicting changes within. A
+specialized merge driver for Org-Mode files will be able to leverage
+the structure to understand the effects of modifications on the
+integrity of sections. The merge driver will solidify Org-Mode as a
+tool for collaborative work.
+
+** Contact Information
+- Andrew Young
+- youngar17 at gmail dot com
+- on freenode irc #org-mode, Pwyl
+
+** The name of the project
+Emacs-orgmode - Git merge tool for Org Files
+
+The original idea can be found  on the Org-Mode GSoC 2012 ideas page,
+[[http://orgmode.org/worg/org-contrib/gsoc2012/orgmode-gsoc2012-ideas.html][here]].
+
+** Summary
+Org mode is an extension to the emacs text editor that adds organizer
+functionality. Orgmode is implemented as an emacs major mode, written
+in ELisp, making it available on all platforms Emacs is. One of the
+key benefits of Org-Mode is that it uses human readable plain-text
+files, meaning the format will always be free and never proprietary.
+
+The project is to create an extension to Org-Mode which will act as a
+merge driver for Org-Mode files. A merge driver is a program which
+will combine two versions of a file based off of a common ancestor
+into a single file, marking conflicting changes within. A specialized
+merge driver for Org-Mode files will be able to leverage the file
+structure to understand the effects of modifications on the integrity
+of sections.
+
+The main use of a merge driver is for use in collaborative writing,
+and it will be compatible with Git, Mercurial, and Bazaar. The merge
+driver will solidify Org-Mode as a tool for collaborative work.
+
+** Benefits
+By completing this project, it will extend the uses and capabilities
+of Org-Mode. This tool will allow people to easily use Org-Mode in
+collaborative projects, and combine conflicting versions of a file
+into a single file.
+
+Software developers will now be able to use Org-Mode with their
+projects, allowing them to create documentation and notes in the same
+repository as their code, and allow Org-Mode to become an integral
+part of the software development process.  Bringing Org-Mode's utility
+to software-development projects will boost any programmer's
+productivity.
+
+The sucessful completion of this project will bring all the advantages
+of version control software to Org-Mode users in any
+environment. Version control software will enable simple backing up,
+tracking, and visitation of previous versions of Org-Mode files.
+
+This project will increase the potential userbase of Org-Mode, which
+will help promote GNU Software and the Free Software
+Foundation. Aswell, GNU will benefit from this project by having
+access to quality code which could be used as a basis for more merge
+drivers.
+
+** Deliverables
+The main deliverable for this project is the source code for a merge
+driver which specializes in merging Org-Mode files. The merge driver
+should be able to leverage the structure of Org-Mode files to merge
+files without conflicts.
+
+Documentation will also be created which explains how to install the
+merge driver, and set it up for use in version controlled
+projects. This documentation will added in the official Org-Mode
+documentation, available at the project webpage. Code documentation,
+which explains methodology and contribution information, will be
+located at the project page. The project webpage will be hosted on
+Worg, a section of the Org-Mode webpage.
+
+I do not expect this project to require any contributions or changes
+to Org-Mode's codebase. If contributions are neccessary, I will create
+Git-patches and submit them to the developers.  For a more detailed
+list of what will be done, please see section 'Project Plan' below.
+
+** Plan
+My mentor will be able to track my progress through repository
+commits, milestone progress, and personal progress
+communications. Midterm evaluations can be conducted by evaluating the
+quality of the code I have produced and my progress towards creating
+the end product.
+
+My final school exam is April 23, and I will begin working on this
+project immediately. The GSoC Schedule indicates students begin coding
+May 21, but I will start working before that. There are no periods
+over the course of this project where I expect to not be available to
+work.
+
+** Project Plan
+The creation of supporting documentation and testing for each project
+step are included as part of that step, and so there is no dedicated
+stage for documenting and testing.
+
+*** Introductory Period 
+(April 23 – May 21)
+
+During this period I will review previous art, and become fully
+familiar with OrgMode files and any addons and plugins which may
+influence my work (Babel, MobileOrg, etc.). This includes research
+into object representation, and command language representation. A
+quick proof of concept be created. The project page, code repository,
+and other framework will be created.
+
+*** Org-Mode Data Representation 
+(May 22 - 27)
+
+The deliverable for this part of the project is to create a
+representation of org-mode files, and a data manipulation language for
+working with them. The completness and thoroughness of this
+deliverable is to be decided according to the determined potential
+usefullness to other users. The data representation may vary greatly
+with the language used. Fundamental to this stage will be the use of
+org-element.el, which is a parser and interface for Org-Mode data.
+
+*** Org-Mode File Processor Parser 
+(May 28 - 31) 
+
+The deliverable for this stage is a program (algorithm) which will
+turn an Org-Mode file into a set of objects and relationships. The
+parser will create objects using the OrgMode Data Representation
+above.
+
+*** Create Basic Modification Guesser 
+(June 1 - 15) 
+
+This stage will create a list of modification actions which a user
+might perform on an OrgMode file. The deliverable will be a
+modification guesser which tries to create a list of
+modifications. The modifications actually detected at this stage will
+be very basic. This step should lay the ground work for defining more
+modification types, and advanced detection methods.
+
+*** Create Modification Merger 
+(June 16 – June 30) 
+
+The deliverable for this stage is a program which takes a list of
+object modifications and objects, and combines them together. This
+step will combine all modification actions into a single file. It will
+generate conflicts for unmergable modifications.
+
+*** Enhance Modification Guesser 
+(July 1 – July 16) 
+
+This is the really complicated stage of the whole project. At this
+stage, the modification guesser will be enhanced to be able to
+recognize a greater amount of modifications. For example, and 'remove'
+and 'add' action of an identical heading may be recognized as a 'move'
+action. The modification merger will have to be modified to properly
+handle new modification types. At this stage, the modification guesser
+will only mark modifications it is sure of.
+
+*** Further Modification Guesser Enhancements
+(July 16 – July 29)
+
+At this stage, the modification guesser will be extended to use fuzzy
+logic to guess at modifications. For example, calculate the
+probability that a tree is just a modified version of another tree,
+and if probable enough, add the modification (if not probable they
+will be considered seperate 'add's and 'remove's possibly causing a
+conflict in the final merge).
+
+*** Further Enhancements
+(July 30 – August 5)
+
+ This stage will include all optional features thought up as the
+project progresses. It could include Emacs mode that generates a
+modification list, so the merger program does not have to guess at the
+modifications, or the automatic use of IDs created by MobileOrg to
+recognize nodes.
+
+*** Project Finish
+(August 6 - 13)
+
+This stage will be for final review and testing. It is expected during
+this stage to make an official release. This stage is meant to handle
+all finishing touches needed for a release.
+
+The project should end seven days before August 20, which is the day
+of “Firm Pencils Down”.
+
+** Communication
+During my work on this project, I will be active on the IRC
+chanel #org-mode, and in the Org-Mode developers mailing list. I think
+that it would be a good idea to have weekly meetings to discuss
+current progress and diffculties. Both email and IRC are my preferred
+ways of contact, although I can be reached by phone, on Skype, and
+gabber. I am willing to use any other forms of communication which my
+mentor thinks will help. If neccessary, I can change my sleeping cycle
+if my mentor lives in a different time zone (I am well practiced at
+living with odd sleeping times).
+
+My code will be made publicly available. If my mentor has no
+preference for where the source code is kept, I will use GitHub or
+Google Code services to host a repository. All documentation will be
+publicly available at the project webpage or in the official Org-Mode
+documentation, as outlined above.
+
+** Qualifications
+This project immediately stood out to me when i saw it. I regularly
+use Git to host personal projects with my friends, and use Org-Mode to
+organize myself and these projects. I have personally experienced the
+problem which this project is trying to solve. I find the concept of
+parsing text files into data structures interesting, as well as the
+mechanics behind 3-way merges, and fuzzy string matching.
+
+When the project is finished, I will be happy to maintain it. This
+would mean fixing bugs, keeping it compatable with the current version
+of Org-Mode, and lastly adding new features.
+
+I am a level 4 year Software Engineering and Management student at
+McMaster University (Hamilton Ontario, Canada). I have never worked on
+free software before, or any large public projects, but have always
+wanted to.
+
+This project will require knowledge of diff merging, Org-Mode file
+structure and use, command representation (for listing file
+modifications), fuzzy logic and probability. Of these things, I will
+need to make sure my knowledge of Org-Mode file structure is complete,
+learn fuzzy logic and string matching.

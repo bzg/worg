@@ -1,0 +1,102 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Header arguments and result types in Org Babel
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tj[at]data-driven[dot]de
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+# #+name: banner
+# #+begin_html
+#   <div id="subtitle" style="float: center; text-align: center;">
+#   <p>
+#   Org Mode support for <a href="http://picolisp.com/5000/!wiki?home/">PicoLisp</a>
+#   </p>
+#   <p>
+#   <a href="http://picolisp.com/5000/!wiki?home/">
+#   <img src="http://picolisp.com/5000/wiki/logo.png"/>
+#   </a>
+#   </p>
+#   </div>
+# #+end_html
+
+
+* Common combinations of header-args and result types
+   Many combinations of header arguments and result types are
+   supported by Org Babel. Individual languages may even define
+   special header args. Like always in combinatorics, the number
+   of possible combinations increases rapidly when there are several
+   factors with several levels each that can be freely combined.
+
+   The following table shows combinations of header arguments and
+   result types that might be considered reasonable for many
+   programming languages.
+
+    #+tblname: header-args-combinations
+    | evaluation | collection | type              |
+    | (:session) | (:results) | (:results)        |
+    |------------+------------+-------------------|
+    | external   | value      | table (vector)    |
+    |            |            | scalar (verbatim) |
+    |            |            | file              |
+    |            |            | raw (org)         |
+    |            |            | html              |
+    |            |            | latex             |
+    |            |            | code              |
+    |            |            | pp                |
+    |            | output     | table (vector)    |
+    |            |            | scalar (verbatim) |
+    |            |            | file              |
+    |            |            | raw (org)         |
+    |            |            | html              |
+    |            |            | latex             |
+    |            |            | code              |
+    |            |            | pp                |
+    | session    | value      | table (vector)    |
+    |            |            | scalar (verbatim) |
+    |            |            | file              |
+    |            |            | raw (org)         |
+    |            |            | html              |
+    |            |            | latex             |
+    |            |            | code              |
+    |            |            | pp                |
+    |            | output     | table (vector)    |
+    |            |            | scalar (verbatim) |
+    |            |            | file              |
+    |            |            | raw (org)         |
+    |            |            | html              |
+    |            |            | latex             |
+    |            |            | code              |
+    |            |            | pp                |
+
+     
+    More special header arguments and their possible values are
+    summarized in the next table:
+   
+    #+tblname: other-header-args
+    
+    | header-arg |          | values  |          |         |
+    |------------+----------+---------+----------+---------|
+    | :results   | silent   | replace | append   | prepend |
+    | (handling) |          |         |          |         |
+    | :exports   | code     | results | both     | none    |
+    | :comments  | yes      | (no?)   |          |         |
+    | :noweb     | no       | yes     |          |         |
+    | :tangle    | yes      | no      | filename |         |
+    | :no-expand |          |         |          |         |
+    | :file      |          |         |          |         |
+    | :dir       |          |         |          |         |
+    | :cache     | no       | yes     |          |         |
+    | :var       | x=y      |         |          |         |
+    | :hlines    | no       | yes     |          |         |
+    | :colnames  | nil      | no      | yes      |         |
+    | :rownames  | no       | yes     |          |         |
+    | :shebang   | "string" |         |          |         |
+    | :eval      | never    | query   |          |         |
+
+
