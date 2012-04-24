@@ -26,28 +26,29 @@
 #   </div>
 # #+end_html
 
-/iOrg -- interactive web framework built on top of Org-mode/
+/A framework for dynamic webprogramming with GNU Emacs Org-mode/
 
 * Introduction
-This is a sketch of a pure Org-mode and Emacs web framework with
-persistence and versioning through dVCs.
+  :PROPERTIES:
+  :CUSTOM_ID: intro
+  :END:
 
-The page ends with quick descriptions of a framework and a specific
-application both of which makes use of these components.  There are
-two choices for the development process:
+iOrg is a pure Org-mode and Emacs web framework with
+persistence and versioning through dVCs. It aims at extending
+Org-modes static webpublishing capacities with dynamcic components
+(like html forms and buttons that allow user interaction) and database
+functionality (storing and querying state). 
 
-  - first work on the framework and then tackle a particular
-    application
-  - start with a concrete goal (the particular application) and then
-    abstract out the framework as part of the engineering process
+The web framework abstracts away all of the boilerplate required for
+its [[id:lang-tools][components]] to work together, allowing application builders the
+freedom to focus on the logic of their particular applications.
 
-Probably the most pragmatic approach is to start with some
-considerations about the general architecture of the framework and
-then quickly move on to the concrete goal. Otherwise, many of the more
-theoretical considerations of the first phase might become obsolete
-when deeper insights are gained during the work on the concrete goal.
 
 * Languages and tools
+  :PROPERTIES:
+  :CUSTOM_ID: lang-tools
+  :END:
+
 | Emacs Lisp  | server side                                      |
 | Java Script | client side                                      |
 | Elnode      | web server, handles get and post requests        |
@@ -76,14 +77,104 @@ when deeper insights are gained during the work on the concrete goal.
 :                        json or raw HTML          |                                                       |
 :                                                  +-------------------------------------------------------+
 
-* Two Use cases
+* The Example Application
+  :PROPERTIES:
+  :CUSTOM_ID: ex-app
+  :END:
+** Bugpile
+   :PROPERTIES:
+   :CUSTOM_ID: bugpile
+   :END:
+A bug tracker (bugpile) is used as an example application for iOrg
+which provides an interactive web interface and bug reports stored in
+Org-mode files. A 'lightweight--version' of a systematic software
+engineering approach is used for the development of bugpile, that can
+be used as a guide for developing web applications with iOrg.
+** About Bugtrackers
+   :PROPERTIES:
+   :CUSTOM_ID: bugtrackers
+   :END:
+*** Why bugtrackers matter
+    :PROPERTIES:
+    :CUSTOM_ID: bugtr-matter
+    :END:
+
+The following quote from [[http://www.joelonsoftware.com/articles/fog0000000043.html][Joel Spolsky]] emphases the importance of
+bugtrackers for good software development:
+
+#+BEGIN_QUOTE
+: Do you have a bug database?
+: 
+: I don't care what you say. If you are developing code, even on a team
+: of one, without an organized database listing all known bugs in the
+: code, you are going to ship low quality code. Lots of programmers
+: think they can hold the bug list in their heads. Nonsense. I can't
+: remember more than two or three bugs at a time, and the next morning,
+: or in the rush of shipping, they are forgotten. You absolutely have to
+: keep track of bugs formally.
+: 
+: Bug databases can be complicated or simple. A minimal useful bug
+: database must include the following data for every bug:
+: 
+:   - complete steps to reproduce the bug
+:   - expected behavior
+:   - observed (buggy) behavior
+:   - who it's assigned to
+:   - whether it has been fixed or not
+: 
+: If the complexity of bug tracking software is the only thing stopping
+: you from tracking your bugs, just make a simple 5 column table with
+: these crucial fields and start using it.
+#+END_QUOTE
+
+*** Elements of a good bug report
+    :PROPERTIES:
+    :CUSTOM_ID: elem-bug-report
+    :END:
+
+Again citing [[http://www.joelonsoftware.com/articles/fog0000000029.html][Joel Spolsky]], here are the three fundamental elements of
+a good bug report:
+
+#+BEGIN_QUOTE
+: It's pretty easy to remember the rule for a good bug report. Every
+: good bug report needs exactly three things.
+: 
+:  1. Steps to reproduce,
+:  2. What you expected to see, and
+:  3. What you saw instead.
+#+END_QUOTE
+
+# ** The design of bugtrackers
+
+** Popular free bugtrackers
+   :PROPERTIES:
+   :CUSTOM_ID: free-bug-tracker
+   :END:
+From the many free bugtrackers available, two have been of special
+importance as inspiration and reference for the bugpile project:
+
+- bugzilla :: a feature-rich, established and well documented
+              [[http://www.bugzilla.org/][bugtracker]].
+- flyspray :: an uncomplicated, web-based [[http://flyspray.org/][bug tracking system]], used
+              by ArchLinux.
+
+
+* Requirements Analysis
+  :PROPERTIES:
+  :CUSTOM_ID: req-analysis
+  :END:
+** Use Cases in textual form
+   :PROPERTIES:
+   :CUSTOM_ID: use-case-txt
+   :END:
+*** Two Use cases                                                  :noexport:
 Here are some use cases demonstrating how the pieces all play
 together, that should shed light on the couplings displayed above.
 
-** Change the state of a bug from TODO to DONE
+**** Change the state of a bug from TODO to DONE
 First lets assume that we have a list of bugs stored in an Org-mode
 document on the file system.  Each bug will be represented by a
-headline with some meta-data stored in the properties, e.g.,
+headline with some meta-data sto-------red in the properties, e.g.,
 
 #+begin_src org
   ,* bugs
@@ -131,7 +222,7 @@ which sends it as a response to the async JS request.  On the browser
 side the subtree holding this subtree is replaced with the new HTML
 (in which the state is marked as DONE).
 
-** View a previous version of a wiki page
+**** View a previous version of a wiki page
 A user browses to a wiki page.  The corresponding page is rendered by
 Org-mode to HTML and is wrapped in a wiki-specific template either by
 the Org-mode publishing system or by elnode or by some combination of
@@ -150,17 +241,79 @@ function which checks out a version of the file at that ID, hands this
 file to Org-mode which exports it to HTML, which is then handed to
 elnode and served to the user.
 
-* Framework
-Build a web framework which is able to abstract away all of the
-boilerplate required for these components to work together allowing
-application builders the freedom to focus on the logic of their
-particular applications.
+-------------
+# This would also require specifying the format of these
+# Org-mode files (e.g., what properties do bugs have), and writing elisp
+# functions which could be used outside of the framework e.g., for
+# searching and sorting bug reports.
 
-* Bugpile
-Build a bug tracker leveraging these three components which provides
-an interactive web interface bug reports stored in Org-mode files.
-This would also require specifying the format of these Org-mode files
-(e.g., what properties do bugs have), and writing elisp functions
-which could be used outside of the framework e.g., for searching and
-sorting bug reports.
+** Integrated UML Modelling of Use Cases and UI
+   :PROPERTIES:
+   :CUSTOM_ID: uml-modelling
+   :END:
+** Use Case Models
+   :PROPERTIES:
+   :CUSTOM_ID: use-case-models
+   :END:
+** System Activities
+   :PROPERTIES:
+   :CUSTOM_ID: syst-activities
+   :END:
+** Domain Class Model
+   :PROPERTIES:
+   :CUSTOM_ID: domain-class-model
+   :END:
+* Software Specification
+  :PROPERTIES:
+  :CUSTOM_ID: softw-spec
+  :END:
+** Transforming Requirements into Specifications
+   :PROPERTIES:
+   :CUSTOM_ID: trans-req-into-spec
+   :END:
+* Software Architecture
+  :PROPERTIES:
+  :CUSTOM_ID: softw-arch
+  :END:
+** Modified 5-Layer Architecture
+   :PROPERTIES:
+   :CUSTOM_ID: 5-layer-arch
+   :END:
+* Application Design
+  :PROPERTIES:
+  :CUSTOM_ID: appl-design
+  :END:
+** Locally Refining the Software Architecture
+   :PROPERTIES:
+   :CUSTOM_ID: loc-ref-softw-arch
+   :END:
+** Class Model
+   :PROPERTIES:
+   :CUSTOM_ID: class-model
+   :END:
+Based on the assumption that an Org-mode file can be modeled as a kind
+of class hierarchy with inheritance and instantiation, a class model
+can be developed for the application. With the file itself (loosly)
+interpreted as a kind of abstract root class that can not be
+instantiated but has global attributes, and the tree nodes (loosly)
+interpreted as class definitions that can be instantiated (several
+nodes of the same type at the same tree level) and inherited from
+(subnodes), object-oriented design techniques can be applied to
+Org-mode files. Of course the similarities only go so far, and do
+exist only on the conceptual level. The implementation in Emacs Lisp
+is based on functions and (e.g.) lists as data stores that are in no
+way encapsulated into formal classes that are part of the language
+core.
+** Refining the Logic
+   :PROPERTIES:
+   :CUSTOM_ID: refine-logic
+   :END:
+* Implementation
+  :PROPERTIES:
+  :CUSTOM_ID: implementation
+  :END:
+* Verification
+  :PROPERTIES:
+  :CUSTOM_ID: verification
+  :END:
 
