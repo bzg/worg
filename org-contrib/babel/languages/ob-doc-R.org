@@ -176,7 +176,6 @@ devices.  They include:
   ,#+end_src
 #+end_src
 
-
 ** Sessions
 Sessions are fully supported by R source code blocks.  They can be
 used as one way to preserve state accessed by several source code
@@ -219,6 +218,18 @@ When using R to produce graphical displays, you will typically set
 the grammar of graphics in R]], then you will need to set =:results
 output graphics=.
 
+** Limitations
+Values assigned with the =:var= header argument are read into R with
+the =read.table= function, which is configured to expect that all rows
+have equal length.  Note that it is possible that other source code
+blocks will return values in which the lengths of rows are not equal.
+If these are assigned to a variable in an R source code block, then R
+will report an error and the value of the variable will be =nil=.
+
+There are two workarounds: 
+  - Fill empty cells with empty strings so that all rows have the same length
+  - Write the results to the Org mode buffer, manually change the
+    name, and pass this table to the R source code block, instead.
 * Examples of Use
 ** Debugging
    This section contains some tips on how to proceed if your R code is
@@ -351,7 +362,7 @@ The output exported to HTML can be quite nice.
 #+RESULTS:
 #+BEGIN_ORG
 #+CAPTION: Quantiles of 100 random numbers
-| 0%   | 25%  | 50%  | 75%  | 100% |
+|   0% |  25% |  50% |  75% | 100% |
 |------+------+------+------+------|
 | 0.03 | 0.28 | 0.52 | 0.74 | 1.00 |
 #+END_ORG
