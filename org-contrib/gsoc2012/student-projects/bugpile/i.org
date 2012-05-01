@@ -205,7 +205,7 @@ in the solution space, which can then be implemented.
 |                    | <30>                           |
 | *use case*         | edit user details              |
 | *actors*           | user                           |
-| *precondition*     | user is registered and logged in |
+| *precondition*     | user is logged in              |
 | *main flow*        | user selects 'edit user details' option, modifies some information, and stores the modified information |
 | *alternative flow* | user selects the 'edit user details' option first, and then the 'delete user' option |
 | *postcondition*    | user deleted or valid authentication data stored in the system |
@@ -660,20 +660,6 @@ storing form data.
     :CUSTOM_ID: register-as-user-uml-roa
     :END: 
 
-# #+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/register-as-user-uml-roa.png 
-#   title Register as User
-#   note right: <<precondition>> -- \n<<postcondition>> user credentials stored
-#   (*) -->  "<<UA>>\nSelect 'register' option"
-#   --> "<<UA>>\nSubmit entered credentials"
-#   if "credentials valid?                                   " then
-#     -down-> [  true]  (*)
-#   else
-#     -right-> [  false] if "" then
-#            -up-> "<<UA>>\nSubmit entered credentials"
-#         endif
-#   endif
-# #+end_src
-
 #+srcname register-as-user-uml-roa
 #+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/register-as-user-uml-roa.png 
     title Register as User <roa>
@@ -701,7 +687,7 @@ storing form data.
 #+srcname edit-user-details-uml-roa
 #+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/edit-user-details-uml-roa.png 
   title Edit User Details <roa>
-  note right: <<precondition>> user is registered AND logged in\n<<postcondition>> user deleted OR credentials stored
+  note right: <<precondition>> user is logged in\n<<postcondition>> user deleted OR credentials stored
   (*) --> "<<UA>>\nSelect 'edit user details' option"
   note right: <<scene>>\n<<button/link>>\nedit user
   if "delete user?                   " then
@@ -724,25 +710,23 @@ storing form data.
     :CUSTOM_ID: login-uml-roa
     :END: 
 
-# |                    | <30>                           |
-# | *use case*         | login                          |
-# | *actors*           | user                           |
-# | *precondition*     | user is registered             |
-# | *main flow*        | user selects the 'log in' option and enters his credentials |
-# | *alternative flow* | --                             |
-# | *postcondition*    | user is logged in              |
 
+#+srcname login-uml-roa
 #+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/login-uml-roa.png 
-  title Register as User
-  note right: <<precondition>> -- \n<<postcondition>> user credentials stored
-  (*) -->  "<<UA>>\nSelect register option"
-  --> "<<UA>>\nSubmit entered credentials"
-  if "credentials valid?                                   " then
-    --> [  true]  (*)
+  title Login <roa>
+  note right: <<precondition>> user is registered
+  (*) --> "<<UA>>\nSelect 'login' option"
+  note right: <<scene>>\n<<button/link>>\nlogin
+  if "                                              credentials valid?" then
+    --> [  true] (*)
   else
-    ---> [  false] "<<UA>>\nSubmit entered credentials"
+    ---> [  false] "<<UA>>\nSelect 'login' option"
   endif
 #+end_src
+
+#+results:
+[[file:../../../../images/gsoc/2012/bugpile/login-uml-roa.png]]
+
 
 
 *** Logout
@@ -758,17 +742,18 @@ storing form data.
 # | *alternative flow* | --                             |
 # | *postcondition*    | user is logged out             |
 
+
+#+srcname logout-uml-roa
 #+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/logout-uml-roa.png 
-  title Register as User
-  note right: <<precondition>> -- \n<<postcondition>> user credentials stored
-  (*) -->  "<<UA>>\nSelect register option"
-  --> "<<UA>>\nSubmit entered credentials"
-  if "credentials valid?                                   " then
-    --> [  true]  (*)
-  else
-    ---> [  false] "<<UA>>\nSubmit entered credentials"
-  endif
+  title Logout <roa>
+  note right: <<precondition>> user is logged in
+  (*) --> "<<UA>>\nSelect 'logout' option"
+  note right: <<scene>>\n<<button/link>>\nlogout
+  --> (*)
 #+end_src
+
+#+results:
+[[file:../../../../images/gsoc/2012/bugpile/logout-uml-roa.png]]
 
 
 *** Create project
