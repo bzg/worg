@@ -631,16 +631,16 @@ elnode and served to the user.
 UML activity diagrams are well suited for modelling complex activities
 with several alternative flows. Based on the [[id:use-case-txt][textual descriptions]] we
 develop one diagram for each use case. While the meaning of the
-diagrams should be self-explanatory (in fact, their main /razon d'/
-/etre/ is easy communication with non-technical users), there are some
-abbreviations and symbols that require explanation:
+diagrams should be self-explanatory (in fact, their main /razon
+d'etre/ is easy communication with non-technical users), there are
+some abbreviations and symbols that require explanation:
 
-| *<roa>*   | requirements oriented activity |
-| *<<UA>>*  | User Activity                  |
-| *<<UD>>*  | User Decision                  |
-| *<<SA>>*  | (complex) System Activity      |
-| *<<SD>>*  | System Decision                |
-| *<<UC>>*  | Use Case                       |
+| <roa>     | requirements oriented activity |
+| <<UA>>    | User Activity                  |
+| <<UD>>    | User Decision                  |
+| <<SA>>    | (complex) System Activity      |
+| <<SD>>    | System Decision                |
+| <<UC>>    | Use Case                       |
 | *⋔*       | (pitchfork) sub-activity       |
 | <<scene>> | basic elements of web UI       |
 
@@ -676,15 +676,17 @@ storing form data.
 
 #+srcname register-as-user-uml-roa
 #+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/register-as-user-uml-roa.png 
-  title Register as User <roa>
-  note right: <<precondition>> -- \n<<postcondition>> user credentials stored
-  (*) -->  "<<UA>>\nSelect 'register' option"
-  --> "<<UA>>\nSubmit entered credentials"
-  if "credentials valid?                                   " then
-    --> [  true]  (*)
-  else
-    ---> [  false] "<<UA>>\nSubmit entered credentials"
-  endif
+    title Register as User <roa>
+    note right: <<precondition>> -- \n<<postcondition>> user credentials stored
+    (*) -->  "<<UA>>\nSelect 'register' option"
+      note right: <<scene>>\n<<button/link>>\nregister
+      --> "<<UA>>\nSubmit entered credentials"
+      note right: <<scene>>\n<<input attributes>>\n username, email\n<<button/link>>\nsubmit
+      if "credentials valid?                                   " then
+      --> [  true]  (*)
+    else
+      ---> [  false] "<<UA>>\nSubmit entered credentials"
+    endif
 #+end_src
 
 #+results:
@@ -701,11 +703,14 @@ storing form data.
   title Edit User Details <roa>
   note right: <<precondition>> user is registered AND logged in\n<<postcondition>> user deleted OR credentials stored
   (*) --> "<<UA>>\nSelect 'edit user details' option"
+  note right: <<scene>>\n<<button/link>>\nedit user
   if "delete user?                   " then
     --> [true] "<<UA>>\nDelete user"
+    note bottom: <<scene>>\n<<button/link>>\ndelete user
     --> (*)
   else
     --> [false] "<<UA>>\nSubmit modified credentials"
+        note bottom: <<scene>>\n<<input attributes>>\n username, email\n<<button/link>>\nsubmit
     --> (*)
   endif
 #+end_src
