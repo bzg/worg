@@ -205,9 +205,9 @@ in the solution space, which can then be implemented.
 |                    | <30>                           |
 | *use case*         | edit user details              |
 | *actors*           | user                           |
-| *precondition*     | user is registered             |
-| *main flow*        | user logs in, selects 'edit user details' option, modifies some information, and stores the modified information |
-| *alternative flow* | user logs in, selects the 'edit user details' option first, and then the 'delete user' option |
+| *precondition*     | user is registered and logged in |
+| *main flow*        | user selects 'edit user details' option, modifies some information, and stores the modified information |
+| *alternative flow* | user selects the 'edit user details' option first, and then the 'delete user' option |
 | *postcondition*    | user deleted or valid authentication data stored in the system |
 
 *** Login
@@ -628,6 +628,9 @@ elnode and served to the user.
    :CUSTOM_ID: req-oriented-act-uml
    :END:      
 
+/note: use =C-x 8 RET pitchfork= -- type 'pit' then TAB for completion -- to/
+/enter the ⋔ character with Emacs (⋔ is used to mark subactivities)/
+
 *** Register as user
     :PROPERTIES:
     :CUSTOM_ID: register-as-user-uml-roa
@@ -636,7 +639,7 @@ elnode and served to the user.
 # #+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/register-as-user-uml-roa.png 
 #   title Register as User
 #   note right: <<precondition>> -- \n<<postcondition>> user credentials stored
-#   (*) -->  "<<UA>>\nSelect register option"
+#   (*) -->  "<<UA>>\nSelect 'register' option"
 #   --> "<<UA>>\nSubmit entered credentials"
 #   if "credentials valid?                                   " then
 #     -down-> [  true]  (*)
@@ -647,10 +650,11 @@ elnode and served to the user.
 #   endif
 # #+end_src
 
+#+srcname register-as-user-uml-roa
 #+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/register-as-user-uml-roa.png 
-  title Register as User
+  title Register as User <roa>
   note right: <<precondition>> -- \n<<postcondition>> user credentials stored
-  (*) -->  "<<UA>>\nSelect register option"
+  (*) -->  "<<UA>>\nSelect 'register' option"
   --> "<<UA>>\nSubmit entered credentials"
   if "credentials valid?                                   " then
     --> [  true]  (*)
@@ -668,24 +672,17 @@ elnode and served to the user.
     :CUSTOM_ID: edit-user-details-uml-roa
     :END: 
 
-# |                    | <30>                           |
-# | *use case*         | edit user details              |
-# | *actors*           | user                           |
-# | *precondition*     | user is registered             |
-# | *main flow*        | user logs in, selects 'edit user details' option, modifies some information, and stores the modified information |
-# | *alternative flow* | user logs in, selects the 'edit user details' option first, and then the 'delete user' option |
-# | *postcondition*    | user deleted or valid authentication data stored in the system |
-
+#+srcname edit-user-details-uml-roa
 #+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/edit-user-details-uml-roa.png 
-  title Edit User Details
-  note right: <<precondition>> user is registered  \n<<postcondition>>
-  user deleted | credentials stored
-  (*) -->  "<<UA>>\nSelect register option"
-  --> "<<UA>>\nSubmit entered credentials"
-  if "credentials valid?                                   " then
-    --> [  true]  (*)
+  title Edit User Details <roa>
+  note right: <<precondition>> user is registered AND logged in\n<<postcondition>> user deleted OR credentials stored
+  (*) --> "<<UA>>\nSelect 'edit user details' option"
+  if "delete user?                   " then
+    --> [true] "<<UA>>\nDelete user"
+    --> (*)
   else
-    ---> [  false] "<<UA>>\nSubmit entered credentials"
+    --> [false] "<<UA>>\nSubmit modified credentials"
+    --> (*)
   endif
 #+end_src
 
