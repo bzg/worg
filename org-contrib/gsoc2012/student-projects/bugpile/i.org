@@ -633,15 +633,6 @@ elnode and served to the user.
     :CUSTOM_ID: register-as-user-uml-roa
     :END: 
 
-# |                    | <30>                           |
-# | *use case*         | register as user               |
-# | *actors*           | user                           |
-# | *precondition*     | --                             |
-# | *main flow*        | user selects the 'registration' option and enters 'username' (that might be a real name) and 'email' |
-# | *alternative flow* | --                             |
-# | *postcondition*    | user authentication data permanently stored in the system |
-
-
 # #+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/register-as-user-uml-roa.png 
 #   title Register as User
 #   note right: <<precondition>> -- \n<<postcondition>> user credentials stored
@@ -685,6 +676,23 @@ elnode and served to the user.
 # | *alternative flow* | user logs in, selects the 'edit user details' option first, and then the 'delete user' option |
 # | *postcondition*    | user deleted or valid authentication data stored in the system |
 
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/edit-user-details-uml-roa.png 
+  title Edit User Details
+  note right: <<precondition>> user is registered  \n<<postcondition>>
+  user deleted | credentials stored
+  (*) -->  "<<UA>>\nSelect register option"
+  --> "<<UA>>\nSubmit entered credentials"
+  if "credentials valid?                                   " then
+    --> [  true]  (*)
+  else
+    ---> [  false] "<<UA>>\nSubmit entered credentials"
+  endif
+#+end_src
+
+#+results:
+[[file:../../../../images/gsoc/2012/bugpile/edit-user-details-uml-roa.png]]
+
+
 *** Login
     :PROPERTIES:
     :CUSTOM_ID: login-uml-roa
@@ -698,6 +706,19 @@ elnode and served to the user.
 # | *alternative flow* | --                             |
 # | *postcondition*    | user is logged in              |
 
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/login-uml-roa.png 
+  title Register as User
+  note right: <<precondition>> -- \n<<postcondition>> user credentials stored
+  (*) -->  "<<UA>>\nSelect register option"
+  --> "<<UA>>\nSubmit entered credentials"
+  if "credentials valid?                                   " then
+    --> [  true]  (*)
+  else
+    ---> [  false] "<<UA>>\nSubmit entered credentials"
+  endif
+#+end_src
+
+
 *** Logout
     :PROPERTIES:
     :CUSTOM_ID: logout-uml-roa
@@ -710,6 +731,19 @@ elnode and served to the user.
 # | *main flow*        | user selects logout option     |
 # | *alternative flow* | --                             |
 # | *postcondition*    | user is logged out             |
+
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/logout-uml-roa.png 
+  title Register as User
+  note right: <<precondition>> -- \n<<postcondition>> user credentials stored
+  (*) -->  "<<UA>>\nSelect register option"
+  --> "<<UA>>\nSubmit entered credentials"
+  if "credentials valid?                                   " then
+    --> [  true]  (*)
+  else
+    ---> [  false] "<<UA>>\nSubmit entered credentials"
+  endif
+#+end_src
+
 
 *** Create project
     :PROPERTIES:
