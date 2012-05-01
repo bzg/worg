@@ -620,6 +620,7 @@ elnode and served to the user.
 ** Integrated UML Modelling of Use Cases and UI
    :PROPERTIES:
    :CUSTOM_ID: use-cases-uml
+   :exports:  both
    :END:      
 
 *** Requirements Oriented UML Activity Diagrams (ROA)
@@ -641,12 +642,30 @@ elnode and served to the user.
 # | *postcondition*    | user authentication data permanently stored in the system |
 
 
-#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/register-as-user-uml-roa.png :exports both
+# #+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/register-as-user-uml-roa.png 
+#   title Register as User
+#   note right: <<precondition>> -- \n<<postcondition>> user credentials stored
+#   (*) -->  "<<UA>>\nSelect register option"
+#   --> "<<UA>>\nSubmit entered credentials"
+#   if "credentials valid?                                   " then
+#     -down-> [  true]  (*)
+#   else
+#     -right-> [  false] if "" then
+#            -up-> "<<UA>>\nSubmit entered credentials"
+#         endif
+#   endif
+# #+end_src
+
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/register-as-user-uml-roa.png 
   title Register as User
   note right: <<precondition>> -- \n<<postcondition>> user credentials stored
-  (*)--> "<<UA>>\nSelect register option"
-  --> "next step"
-  --> (*)
+  (*) -->  "<<UA>>\nSelect register option"
+  --> "<<UA>>\nSubmit entered credentials"
+  if "credentials valid?                                   " then
+    --> [  true]  (*)
+  else
+    ---> [  false] "<<UA>>\nSubmit entered credentials"
+  endif
 #+end_src
 
 #+results:
