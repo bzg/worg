@@ -44,6 +44,18 @@ and [[#toolbox][tools]] provided by the exporter.
                 by ~ob-babel-lob-get-info~ (string).
    - ~:post-blank~ :: Number of blank lines between keyword and next
                       non-blank line or buffer's end (integer).
+** Bold
+
+   Recursive object.
+
+   - ~:begin~ :: Buffer position before opening star (integer).
+   - ~:contents-begin~ :: Buffer position after opening star (integer).
+   - ~:contents-end~ :: Buffer position before closing star (integer).
+   - ~:end~ :: Buffer position before first non-blank character after
+               closing star or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing star and
+                      next non-blank character or paragraph's end
+                      (integer).
 
 ** Center Block
 
@@ -64,6 +76,35 @@ and [[#toolbox][tools]] provided by the exporter.
    - ~:post-blank~ :: Number of blank lines between block's closing
                       line and next non-blank line or buffer's end
                       (integer).
+
+** Clock
+
+   Element.
+
+   - ~:status~ :: Status of current clock (symbol: ~closed~ or
+                  ~running~).
+   - ~:value~ :: Timestamp associated to clock keyword (string).
+   - ~:time~ :: Clock duration for a closed clock, or nil (string or
+                nil).
+   - ~:post-blank~ :: Number of blank lines between the line after the
+                      clock element and the first non-blank line or
+                      buffer's end (integer).
+   - ~:begin~ :: Buffer position at the beginning of the line
+                 (integer).
+   - ~:end~ :: Buffer position at the beginning of the next line
+               (integer).
+
+** Code
+
+   Object.
+
+   - ~:begin~ :: Buffer position before opening tilde (integer).
+   - ~:end~ :: Buffer position before first non-blank character after
+               closing tilde or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing tilde and
+                      next non-blank character or paragraph's end
+                      (integer).
+   - ~:value~ :: Contents (string).
 
 ** Comment
 
@@ -136,20 +177,6 @@ and [[#toolbox][tools]] provided by the exporter.
                    ~org-hide-block~, nil).
    - ~:post-blank~ :: Number of blank lines between block's closing
                       line and next non-blank line or buffer's end
-                      (integer).
-
-** Emphasis
-
-   Recursive object.
-
-   - ~:begin~ :: Buffer position before opening marker (integer).
-   - ~:contents-begin~ :: Buffer position after opening marker (integer).
-   - ~:contents-end~ :: Buffer position before closing marker (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               closing marker or paragraph's end (integer).
-   - ~:marker~ :: Marker used (string).
-   - ~:post-blank~ :: Number of white spaces between closing marker
-                      and next non-blank character or paragraph's end
                       (integer).
 
 ** Entity
@@ -341,7 +368,7 @@ and [[#toolbox][tools]] provided by the exporter.
    - ~:scheduled~ :: Headline's SCHEDULED reference, if any (string or
                      nil).
    - ~:tags~ :: Headline's tags, if any, without the archive
-                tag. (string or nil).
+                tag. (list of strings).
    - ~:timestamp~ :: Headline's TIMESTAMP reference, if any (string or
                      nil).
    - ~:title~ :: Parsed headline's text, without the stars and the
@@ -425,7 +452,7 @@ and [[#toolbox][tools]] provided by the exporter.
                      tags (string).
    - ~:scheduled~ :: Inlinetask's SCHEDULED reference, if any (string
                      or nil).
-   - ~:tags~ :: Inlinetask's tags, if any (string or nil).
+   - ~:tags~ :: Inlinetask's tags, if any (list of strings).
    - ~:timestamp~ :: Inlinetask's TIMESTAMP reference, if any (string
                      or nil).
    - ~:title~ :: Parsed inlinetask's text, without the stars and the
@@ -434,6 +461,20 @@ and [[#toolbox][tools]] provided by the exporter.
         nil).
    - ~:todo-type~ :: Type of inlinetask's TODO keyword, if any
                      (symbol: ~done~, ~todo~).
+
+** Italic
+
+   Recursive object.
+
+   - ~:begin~ :: Buffer position before opening slash (integer).
+   - ~:contents-begin~ :: Buffer position after opening slash
+        (integer).
+   - ~:contents-end~ :: Buffer position before closing slash (integer).
+   - ~:end~ :: Buffer position before first non-blank character after
+               closing slash or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing slash and
+                      next non-blank character or paragraph's end
+                      (integer).
 
 ** Item
 
@@ -606,6 +647,24 @@ and [[#toolbox][tools]] provided by the exporter.
    - ~:type~ :: List's type (symbol: ~descriptive~, ~ordered~,
                 ~unordered~).
 
+** Planning
+
+   Element.
+
+   - ~:begin~ :: Buffer position at the beginning of the line
+                 (integer).
+   - ~:closed~ :: Timestamp associated to closed keyword, if any
+                  (string or nil).
+   - ~:deadline~ :: Timestamp associated to deadline keyword, if any
+                    (string or nil).
+   - ~:end~ :: Buffer position at the beginning of the line after
+               planning element (integer).
+   - ~:post-blank~ :: Number of blank lines between the line after the
+                      planning element and the next non-blank line or
+                      buffer's end (integer).
+   - ~:scheduled~ :: Timestamp associated to scheduled keyword, if any
+                     (string or nil).
+
 ** Property Drawer
 
    Element.
@@ -758,6 +817,20 @@ and [[#toolbox][tools]] provided by the exporter.
                       paragraph's end (integer).
    - ~:value~ :: Full cookie (string).
 
+** Strike Through
+
+   Recursive object.
+
+   - ~:begin~ :: Buffer position before opening plus sign (integer).
+   - ~:contents-begin~ :: Buffer position after opening plus sign
+        (integer).
+   - ~:contents-end~ :: Buffer position before closing plus sign
+        (integer).
+   - ~:end~ :: Buffer position before first non-blank character after
+               closing plus sign or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing plus sign
+                      and next non-blank character or paragraph's end
+                      (integer).
 ** Subscript
 
    Recursive object.
@@ -798,20 +871,52 @@ and [[#toolbox][tools]] provided by the exporter.
 
 ** Table
 
-   Element.
+   Greater element.
 
    - ~:begin~ :: Buffer position at beginning of first affiliated
                  keyword, if any, at beginning of table's first line
                  otherwise (integer).
    - ~:end~ :: Buffer position at beginning of first non-blank line
-               after table's last line or at buffer's end.
+               after table's last line or at buffer's end (integer).
+   - ~:contents-begin~ :: For an ~org~ table, buffer position at
+        beginning of the first table's line, ignoring affiliated
+        keywords, nil otherwise (integer or nil).
+   - ~:contents-end~ :: For an ~org~ table, buffer position at
+        beginning of the first line after table's last line or at
+        buffer's end, nil otherwise (integer or nil).
    - ~:post-blank~ :: Number of blank lines between table's last line
                       and next non-blank line or buffer's end.
-   - ~:raw-table~ :: Table as it appears in original Org buffer
-                     (string).
    - ~:tblfm~ :: Formulas associated to the table, if any (string or
                  nil).
    - ~:type~ :: Table's origin (symbol: ~table.el~, ~org~).
+   - ~:value~ :: Raw ~table.el~ table or nil (string or nil).
+
+** Table Cell
+
+   Recursive object.
+
+   - ~:begin~ :: Buffer position after the opening vertical bar
+                 (integer).
+   - ~:end~ :: Buffer position after the closing vertical bar
+               (integer).
+   - ~:contents-begin~ :: Buffer position at the first non-whitespace
+        character after the vertical bar (integer).
+   - ~:contents-end~ :: Buffer position after the closest
+        non-whitespace character before the next vertical bar
+        (integer).
+
+** Table Row
+
+   Element.
+
+   - ~:begin~ :: Buffer position at beginning of the line (integer).
+   - ~:end~ :: Buffer position at beginning of the first line after
+               the row, or at buffer's end (integer).
+   - ~:contents-begin~ :: Buffer position after the first vertical
+        line (integer or nil).
+   - ~:contents-end~ :: Buffer position after the last vertical line
+        (integer).
+   - ~:type~ :: Row's type (symbol: ~standard~, ~rule~).
 
 ** Target
 
@@ -833,35 +938,45 @@ and [[#toolbox][tools]] provided by the exporter.
    - Target should become an anchor, if back-end permits it.
    - Target's ID shouldn't be visible on export.
 
-** Time Stamp
+** Timestamp
 
    Object.
 
-   - ~:appt-type~ :: Time-stamp keyword's type, if any (symbol:
-                     ~closed~, ~deadline~, ~scheduled~, nil).
-   - ~:begin~ :: Buffer position at beginning of time-stamp's keyword,
-                 if any, or at opening /less-than/ sign (integer).
+   - ~:begin~ :: Buffer position at opening /less-than/ sign
+                 (integer).
    - ~:end~ :: Buffer position at first non-blank character after
                closing /greater-than/ sign, or at paragraph's end
                (integer).
    - ~:post-blank~ :: Number of white spaces between closing
                       /greater-than/ sign and next non-blank character
                       or paragraph's end (integer).
-   - ~:type~ :: Type of time-stamp (symbol: ~active~, ~active-range~,
+   - ~:type~ :: Type of timestamp (symbol: ~active~, ~active-range~,
                 ~diary~, ~inactive~, ~inactive-range~).
-   - ~:value~ :: Full time-stamp, with any keyword stripped (string).
+   - ~:value~ :: Full time-stamp (string).
 
+** Underline
+
+   Recursive object.
+
+   - ~:begin~ :: Buffer position before opening underscore (integer).
+   - ~:contents-begin~ :: Buffer position after opening underscore (integer).
+   - ~:contents-end~ :: Buffer position before closing underscore
+        (integer).
+   - ~:end~ :: Buffer position before first non-blank character after
+               closing underscore or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing
+                      underscore and next non-blank character or
+                      paragraph's end (integer).
 ** Verbatim
 
    Object.
 
-   - ~:begin~ :: Buffer position before opening marker (integer).
+   - ~:begin~ :: Buffer position before opening equal sign (integer).
    - ~:end~ :: Buffer position before first non-blank character after
-               closing marker or paragraph's end (integer).
-   - ~:marker~ :: Marker used (string).
-   - ~:post-blank~ :: Number of white spaces between closing marker
-                      and next non-blank character or paragraph's end
-                      (integer).
+               closing equal sign or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing equal
+                      sign and next non-blank character or paragraph's
+                      end (integer).
    - ~:value~ :: Contents (string).
 
 ** Verse Block
@@ -874,13 +989,14 @@ and [[#toolbox][tools]] provided by the exporter.
    - ~:end~ :: Buffer position at beginning of the first non-blank
                line after block's closing line or at buffer's end
                (integer).
-   - ~:hiddenp~ :: Non-nil if block is hidden (symbol:
-                   ~org-hide-block~, nil).
+   - ~:contents-begin~ :: Buffer position at beginning of the first
+        line after block's opening string (integer).
+   - ~:contents-end~ :: Buffer position at the beginning of block's
+        closing line (integer).
+   - ~:hiddenp~ :: Non-nil if block is hidden (boolean).
    - ~:post-blank~ :: Number of blank lines between block's closing
                       line and next non-blank line or buffer's end
                       (integer).
-   - ~:raw-value~ :: Raw contents (string).
-   - ~:value~ :: Parsed contents (secondary string).
 
 * The Communication Channel
   :PROPERTIES:
@@ -1090,9 +1206,16 @@ and [[#toolbox][tools]] provided by the exporter.
    - category :: option
    - type :: symbol (nil, t)
 
+** ~:with-clocks~
+
+   Non-nil means clock keywords should be exported.
+
+   - category :: option
+   - type :: symbol (nil, t)
+
 ** ~:with-creator~
 
-   Non-nild means a creation sentence should be inserted at the end of
+   Non-nil means a creation sentence should be inserted at the end of
    the transcoded string.  If the value is ~comment~, it should be
    commented.
 
@@ -1132,6 +1255,13 @@ and [[#toolbox][tools]] provided by the exporter.
 ** ~:with-footnotes~
 
    Non-nil if transcoder should interpret footnotes.
+
+   - category :: option
+   - type :: symbol (nil, t)
+
+** ~:with-plannings~
+
+   Non-nil means transcoding should include planning info.
 
    - category :: option
    - type :: symbol (nil, t)
@@ -1189,11 +1319,12 @@ and [[#toolbox][tools]] provided by the exporter.
 
 ** ~:with-timestamps~
 
-   Non-nil means transcoding should include time stamps and associated
-   keywords.  Otherwise, completely remove them.
+   Non-nil means transcoding should include time stamps.  Special
+   value ~active~ (resp. ~inactive~) ask to export only active
+   (resp. inactive) timestamps.  Otherwise, completely remove them.
 
    - category :: option
-   - type :: symbol: (t, nil)
+   - type :: symbol: (~active~, ~inactive~, t, nil)
 
 ** ~:with-toc~
 
@@ -1229,12 +1360,14 @@ and [[#toolbox][tools]] provided by the exporter.
   a list of functions as value:
 
   - ~:filter-babel-call~
+  - ~:filter-bold~
   - ~:filter-center-block~
+  - ~:filter-clock~
+  - ~:filter-code~
   - ~:filter-comment~
   - ~:filter-comment-block~
   - ~:filter-drawer~
   - ~:filter-dynamic-block~
-  - ~:filter-emphasis~
   - ~:filter-entity~
   - ~:filter-example-block~
   - ~:filter-export-block~
@@ -1248,6 +1381,7 @@ and [[#toolbox][tools]] provided by the exporter.
   - ~:filter-inline-babel-call~
   - ~:filter-inline-src-block~
   - ~:filter-inlinetask~
+  - ~:filter-italic~
   - ~:filter-item~
   - ~:filter-keyword~
   - ~:filter-latex-environment~
@@ -1259,6 +1393,7 @@ and [[#toolbox][tools]] provided by the exporter.
   - ~:filter-parse-tree~
   - ~:filter-plain-list~
   - ~:filter-plain-text~
+  - ~:filter-planning~
   - ~:filter-property-drawer~
   - ~:filter-quote-block~
   - ~:filter-quote-section~
@@ -1266,12 +1401,16 @@ and [[#toolbox][tools]] provided by the exporter.
   - ~:filter-section~
   - ~:filter-special-block~
   - ~:filter-src-block~
+  - ~:filter-strike-through~
   - ~:filter-statistics-cookie~
   - ~:filter-subscript~
   - ~:filter-superscript~
   - ~:filter-table~
+  - ~:filter-table-cell~
+  - ~:filter-table-row~
   - ~:filter-target~
-  - ~:filter-time-stamp~
+  - ~:filter-timestamp~
+  - ~:filter-underline~
   - ~:filter-verbatim~
   - ~:filter-verse-block~
 
@@ -1309,15 +1448,6 @@ and [[#toolbox][tools]] provided by the exporter.
   Many of them are high-level access to properties from the
   communication channel.  As such, they should be preferred to
   straight access to communication channel, when possible.
-
-** ~org-export-clean-table~
-   :PROPERTIES:
-   :CUSTOM_ID: clean-table
-   :END:
-
-   Clean a raw table from any Org table-specific syntax.
-
-   See also: [[#table-format-info][~org-export-table-format-info~]].
 
 ** ~org-export-collect-figures~
    :PROPERTIES:
@@ -1739,16 +1869,4 @@ and [[#toolbox][tools]] provided by the exporter.
 
    See also: [[#inline-image-p][~org-export-inline-image-p~]],
    [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
-
-** ~org-export-table-format-info~
-   :PROPERTIES:
-   :CUSTOM_ID: table-format-info
-   :END:
-
-   Extract formatting information (alignment, column groups, presence
-   of a special column, explicit width of columns and row groups) from
-   a raw table and return it as a property list.
-
-   See also: [[#clean-table][~org-export-clean-table~]].
-
 
