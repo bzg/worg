@@ -342,29 +342,33 @@ in the solution space, which can then be implemented.
 | *alternative flow* | -- |
 | *postcondition*    | -- |
 
-*** Add user to assignees
+*** Search users
     :PROPERTIES:
-    :CUSTOM_ID: add-user-assignees-txt
+    :CUSTOM_ID: search-users-txt
     :END: 
 
-| *use case*         |    |
-| *actors*           |    |
-| *precondition*     | -- |
-| *main flow*        |    |
-| *alternative flow* | -- |
-| *postcondition*    | -- |
+|                    | <30>                           |
+| *use case*         | search users                   |
+| *actors*           | admin                          |
+| *precondition*     | admin is logged in             |
+| *main flow*        | admin selects 'search users' option |
+| *alternative flow* | --                             |
+| *postcondition*    | admin sees registered users    |
 
-*** Remove user from assignees
+*** Take action on selected users
     :PROPERTIES:
-    :CUSTOM_ID: remove-user-assignees-txt
+    :CUSTOM_ID: take-action-users-txt
     :END: 
 
-| *use case*         |    |
-| *actors*           |    |
-| *precondition*     | -- |
-| *main flow*        |    |
-| *alternative flow* | -- |
-| *postcondition*    | -- |
+/e.g. add user(s) to assignees, remove user(s) from assignees/
+
+|                    | <30>                           |
+| *use case*         | take action on selected users  |
+| *actors*           | admin                          |
+| *precondition*     | admin is logged in AND at least one registered user |
+| *main flow*        | admin selects users and the action to take on them |
+| *alternative flow* | --                             |
+| *postcondition*    | action was applied to selected users |
 
 *** Assign task
     :PROPERTIES:
@@ -464,8 +468,10 @@ in the solution space, which can then be implemented.
 
 *** Take action on selected tasks
     :PROPERTIES:
-    :CUSTOM_ID: take-action-txt
+    :CUSTOM_ID: take-action-tasks-txt
     :END: 
+
+/e.g. 'add/remove user to notification list', 'add/remove reminder'/
 
 | *use case*         |    |
 | *actors*           |    |
@@ -474,53 +480,7 @@ in the solution space, which can then be implemented.
 | *alternative flow* | -- |
 | *postcondition*    | -- |
 
-*** Add user to notification list
-    :PROPERTIES:
-    :CUSTOM_ID: add-user-notification-list-txt
-    :END: 
 
-| *use case*         |    |
-| *actors*           |    |
-| *precondition*     | -- |
-| *main flow*        |    |
-| *alternative flow* | -- |
-| *postcondition*    | -- |
-
-*** Remove user from notification list
-    :PROPERTIES:
-    :CUSTOM_ID: remove-user-notification-list-txt
-    :END: 
-
-| *use case*         |    |
-| *actors*           |    |
-| *precondition*     | -- |
-| *main flow*        |    |
-| *alternative flow* | -- |
-| *postcondition*    | -- |
-
-*** Add reminder
-    :PROPERTIES:
-    :CUSTOM_ID: add-reminder-txt
-    :END: 
-
-| *use case*         |    |
-| *actors*           |    |
-| *precondition*     | -- |
-| *main flow*        |    |
-| *alternative flow* | -- |
-| *postcondition*    | -- |
-
-*** Remove reminder
-    :PROPERTIES:
-    :CUSTOM_ID: remove-reminder-txt
-    :END: 
-
-| *use case*         |    |
-| *actors*           |    |
-| *precondition*     | -- |
-| *main flow*        |    |
-| *alternative flow* | -- |
-| *postcondition*    | -- |
 
 *** Search event log 
     :PROPERTIES:
@@ -754,6 +714,45 @@ storing form data.
 [[file:../../../../images/gsoc/2012/bugpile/logout-uml-roa.png]]
 
 
+*** Search users
+    :PROPERTIES:
+    :CUSTOM_ID: search-users-uml-roa
+    :END: 
+
+#+srcname search-users--uml-roa
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/search-users-uml-roa.png 
+  title Search Users<roa>
+  note right: <<precondition>> admin is logged in
+  (*) --> "<<UA>>\nSelect 'search users' option"
+  note right: <<scene>>\n<<button/link>>\nsearch users
+  --> "<<UA>>\nDefine search criteria"
+  note right: <<scene>>\n<<input attributes>>\nusername, email, task \n<<button/link>>\nsearch
+  --> (*)
+#+end_src
+
+#+results:
+[[file:../../../../images/gsoc/2012/bugpile/search-users-uml-roa.png]]
+
+
+
+*** Take action on selected users
+    :PROPERTIES:
+    :CUSTOM_ID: take-action-select-users-uml-roa
+    :END: 
+
+#+srcname take-action-select-users-uml-roa
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/take-action-select-users-uml-roa.png 
+  title Take action on selected user<roa>
+  note right: <<precondition>> admin is logged in\n<<postcondition>>action on user performed
+  (*) --> "<<UA>>\nSearch users ⋔" 
+  --> "<<UA>>\nTake action on selected users"
+  note right: <<scene>>\n<<button/link>>>>\nsubmit
+  --> (*)
+#+end_src
+
+#+results:
+[[file:../../../../images/gsoc/2012/bugpile/take-action-select-users-uml-roa.png]]
+
 *** Create project
     :PROPERTIES:
     :CUSTOM_ID: create-project-uml-roa
@@ -808,18 +807,6 @@ storing form data.
     :END: 
 
 
-*** Add user to assignees
-    :PROPERTIES:
-    :CUSTOM_ID: add-user-assignees-uml-roa
-    :END: 
-
-
-*** Remove user from assignees
-    :PROPERTIES:
-    :CUSTOM_ID: remove-user-assignees-uml-roa
-    :END: 
-
-
 *** Assign task
     :PROPERTIES:
     :CUSTOM_ID: assign-task-uml-roa
@@ -870,31 +857,7 @@ storing form data.
 
 *** Take action on selected tasks
     :PROPERTIES:
-    :CUSTOM_ID: take-action-uml-roa
-    :END: 
-
-
-*** Add user to notification list
-    :PROPERTIES:
-    :CUSTOM_ID: add-user-notification-list-uml-roa
-    :END: 
-
-
-*** Remove user from notification list
-    :PROPERTIES:
-    :CUSTOM_ID: remove-user-notification-list-uml-roa
-    :END: 
-
-
-*** Add reminder
-    :PROPERTIES:
-    :CUSTOM_ID: add-reminder-uml-roa
-    :END: 
-
-
-*** Remove reminder
-    :PROPERTIES:
-    :CUSTOM_ID: remove-reminder-uml-roa
+    :CUSTOM_ID: take-action-select-tasks-uml-roa
     :END: 
 
 
@@ -969,6 +932,206 @@ storing form data.
    :PROPERTIES:
    :CUSTOM_ID: trans-req-into-spec
    :END:
+*** Software Oriented UML Activity Diagrams (SOA)
+   :PROPERTIES:
+   :CUSTOM_ID: req-oriented-act-uml
+   :END:      
+
+We used UML activity diagrams in the requirements analysis to model
+the real world system from the user's point of view. Now, the
+[[id:req-oriented-act-uml][requirements oriented activitiy diagrams (roa)]] have to be transformed
+into a software specification that forms the basis for the design of a
+software system. We call the tranformed diagrams /software oriented/
+/activity diagrams/. The transformation rule is easy and the whole
+transformation process might well be implemented as a non-interactive
+function:
+
+#+begin_quote
+*Transformation Rule*
+
+Each edge from a vertex with a user action has its endpoint in a
+vertex with a system action. 
+#+end_quote
+
+This reflects the typical behaviour of interactive systems, where
+every user action is followed by a system reaction. The reason to not
+include these /system (re-)action vertices/ in the activity diagrams
+from the start is to keep the diagrams simple and focussed on the
+user's point of view. After all, the requirement analysis is about
+communicating with non-technical end users (or, in one-man-projects,
+about the programmer taking on the role of the non-technical end
+user).
+
+For convenience, we repeat the explanation of abbreviations and
+symbols used in the /activity diagrams/ here, but there is really only
+one new abbreviation involved: /<soa>/ for /software oriented
+activity/: 
+
+| <soa>     | software oriented activity |
+| <<UA>>    | User Activity              |
+| <<UD>>    | User Decision              |
+| <<SA>>    | (complex) System Activity  |
+| <<SD>>    | System Decision            |
+| <<UC>>    | Use Case                   |
+| *⋔*       | (pitchfork) sub-activity   |
+| <<scene>> | basic elements of web UI   |
+
+
+note: we make no attempt to conform to [[http://www.omg.org/spec/][formal uml specifications]]
+since we want to keep things simple and our text-based drawing tool/
+[[http://plantuml.sourceforge.net/][PlantUML]] does have its limitations.
+
+*** Register as user
+    :PROPERTIES:
+    :CUSTOM_ID: register-as-user-uml-soa
+    :END: 
+
+#+srcname register-as-user-uml-soa
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/register-as-user-uml-soa.png 
+    title Register as User <soa>
+    note right: <<precondition>> -- \n<<postcondition>> user credentials stored
+    (*) -->  "<<UA>>\nSelect 'register' option"
+      note right: <<scene>>\n<<button/link>>\nregister
+      --> "<<SA>>\nShow register formular"
+      --> "<<UA>>\nSubmit entered credentials"
+      note right: <<scene>>\n<<input attributes>>\n username, email\n<<button/link>>\nsubmit
+      --> "<<SA>>\nValidate entered credentials"
+      if "credentials valid?                                   " then
+      --> [  true] "<<SA>>\nStore entered credentials"
+      -->  (*)
+    else
+      ---> [  false] "<<UA>>\nSubmit entered credentials"
+    endif
+#+end_src
+
+#+results:
+[[file:../../../../images/gsoc/2012/bugpile/register-as-user-uml-soa.png]]
+
+*** Edit user details
+    :PROPERTIES:
+    :CUSTOM_ID: edit-user-details-uml-soa
+    :END: 
+
+#+srcname edit-user-details-uml-soa
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/edit-user-details-uml-soa.png 
+  title Edit User Details <soa>
+  note right: <<precondition>> user is logged in\n<<postcondition>> user deleted OR credentials stored
+  (*) --> "<<UA>>\nSelect 'edit user details' option"
+  note right: <<scene>>\n<<button/link>>\nedit user
+  --> "<<SA>>\nShow 'edit user details' form"
+  if "delete user?                   " then
+    --> [true] "<<UA>>\nDelete user"
+    note bottom: <<scene>>\n<<button/link>>\ndelete user
+    --> "<<SA>>\nFlag user as deleted"
+    --> (*)
+  else
+    --> [false] "<<UA>>\nSubmit modified credentials"
+        note bottom: <<scene>>\n<<input attributes>>\n username, email\n<<button/link>>\nsubmit
+      --> "<<SA>>\nValidate modified credentials"
+      if "credentials valid?                                   " then
+      --> [  true] "<<SA>>\nStore modified credentials"
+      -->  (*)
+     else
+      ---> [  false] "<<UA>>\nSubmit modified credentials"
+     endif
+    --> (*)
+  endif
+#+end_src
+
+#+results:
+[[file:../../../../images/gsoc/2012/bugpile/edit-user-details-uml-soa.png]]
+
+*** Login
+    :PROPERTIES:
+    :CUSTOM_ID: login-uml-soa
+    :END: 
+
+
+#+srcname login-uml-soa
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/login-uml-soa.png 
+  title Login <soa>
+  note right: <<precondition>> user is registered
+  (*) --> "<<UA>>\nSelect 'login' option"
+  note right: <<scene>>\n<<button/link>>\nlogin
+  --> "<<SA>>\nValidate credentials" 
+     if "                                                 credentials valid?" then
+       --> [  true] "<<SA>>\nLogin user" 
+       --> (*)
+     else
+       ---> [  false] "<<UA>>\nSelect 'login' option"
+     endif
+#+end_src
+
+#+results:
+[[file:../../../../images/gsoc/2012/bugpile/login-uml-soa.png]]
+
+*** Logout
+    :PROPERTIES:
+    :CUSTOM_ID: logout-uml-soa
+    :END: 
+
+
+#+srcname logout-uml-soa
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/logout-uml-soa.png 
+  title Logout <soa>
+  note right: <<precondition>> user is logged in
+  (*) --> "<<UA>>\nSelect 'logout' option"
+  note right: <<scene>>\n<<button/link>>\nlogout
+  --> "<<SA>>\nLogout user"
+  --> (*)
+#+end_src
+
+#+results:
+[[file:../../../../images/gsoc/2012/bugpile/logout-uml-soa.png]]
+
+
+
+
+
+
+*** Search users
+    :PROPERTIES:
+    :CUSTOM_ID: search-users-uml-soa
+    :END: 
+
+#+srcname search-users--uml-soa
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/search-users-uml-soa.png 
+  title Search Users<soa>
+  note right: <<precondition>> admin is logged in
+  (*) --> "<<UA>>\nSelect 'search users' option"
+  note right: <<scene>>\n<<button/link>>\nsearch users
+  --> "<<SA>>\nShow user search form"
+  --> "<<UA>>\nDefine user search criteria"
+  note right: <<scene>>\n<<input attributes>>\nusername, email, task \n<<button/link>>\nsearch
+  --> "<<SA>>\nShow queried users"
+  --> (*)
+#+end_src
+
+#+results:
+[[file:../../../../images/gsoc/2012/bugpile/search-users-uml-soa.png]]
+
+
+
+*** Take action on selected users
+    :PROPERTIES:
+    :CUSTOM_ID: take-action-select-users-uml-soa
+    :END: 
+
+#+srcname take-action-select-users-uml-soa
+#+begin_src plantuml :file ../../../../images/gsoc/2012/bugpile/take-action-select-users-uml-soa.png 
+  title Take action on selected users<soa>
+  note right: <<precondition>> admin is logged in
+  (*) --> "<<UC>>\nSearch users ⋔" 
+  --> "<<UA>>\nTake action on selected users"
+  note right: <<scene>>\n<<button/link>>>>\nsubmit
+  --> "<<SA>>\nPerform action on selected users"
+  --> (*)
+#+end_src
+
+#+results:
+[[file:../../../../images/gsoc/2012/bugpile/take-action-select-users-uml-soa.png]]
+
+
 * Software Architecture
   :PROPERTIES:
   :CUSTOM_ID: softw-arch
