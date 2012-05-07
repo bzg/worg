@@ -1,0 +1,62 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+
+* Org-Archive API Functions
+** org-archive-all-done =&optional tag=
+
+Archive sublevels of the current tree without open TODO items.
+If the cursor is not on a headline, try all level 1 trees.  If
+it is on a headline, try all direct children.
+When =tag= is non-nil, don't move trees, but mark them with the ARCHIVE tag.
+
+
+** org-archive-set-tag  
+
+Set the ARCHIVE tag.
+
+
+** org-archive-subtree =&optional find-done=
+
+Move the current subtree to the archive.
+The archive can be a certain top-level heading in the current file, or in
+a different file.  The tree will be moved to that location, the subtree
+heading be marked DONE, and the current time will be added.
+
+When called with prefix argument =find-done=, find whole trees without any
+open TODO items and archive them (after getting confirmation from the user).
+If the cursor is not at a headline when this command is called, try all level
+1 trees.  If the cursor is on a headline, only try the direct children of
+this heading.
+
+
+** org-archive-subtree-default  
+
+Archive the current subtree with the default command.
+This command is set with the variable /org-archive-default-command/.
+
+
+** org-archive-subtree-default-with-confirmation  
+
+Archive the current subtree with the default command.
+This command is set with the variable /org-archive-default-command/.
+
+
+** org-archive-to-archive-sibling  
+
+Archive the current heading by moving it under the archive sibling.
+The archive sibling is a sibling of the heading with the heading name
+/org-archive-sibling-heading/ and an /org-archive-tag/ tag.  If this
+sibling does not exist, it will be created at the end of the subtree.
+
+
