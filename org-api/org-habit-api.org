@@ -1,0 +1,78 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Habit API functions (org-habit.el)
+** org-habit-build-graph =habit starting current ending=
+
+Build a graph for the given =habit=, from =starting= to =ending=.
+=current= gives the current time between =starting= and =ending=, for
+the purpose of drawing the graph.  It need not be the actual
+current time.
+
+
+** org-habit-get-faces =habit &optional now-days scheduled-days donep=
+
+Return faces for =habit= relative to =now-days= and =scheduled-days=.
+=now-days= defaults to the current time's days-past-the-epoch if nil.
+=scheduled-days= defaults to the habit's actual scheduled days if nil.
+
+Habits are assigned colors on the following basis:
+#+begin_src emacs-lisp
+  Blue      Task is before the scheduled date.
+  Green     Task is on or after scheduled date, but before the
+#+end_src
+	    end of the schedule's repeat period.
+#+begin_src emacs-lisp
+  Yellow    If the task has a deadline, then it is after schedule's
+#+end_src
+	    repeat period, but before the deadline.
+#+begin_src emacs-lisp
+  Orange    The task has reached the deadline day, or if there is
+#+end_src
+	    no deadline, the end of the schedule's repeat period.
+#+begin_src emacs-lisp
+  Red       The task has gone beyond the deadline day or the
+#+end_src
+	    schedule's repeat period.
+
+
+** org-habit-get-priority =habit &optional moment=
+
+Determine the relative priority of a habit.
+This must take into account not just urgency, but consistency as well.
+
+
+** org-habit-insert-consistency-graphs =&optional line=
+
+Insert consistency graph for any habitual tasks.
+
+
+** org-habit-parse-todo =&optional pom=
+
+Parse the TODO surrounding point for its habit-related data.
+Returns a list with the following elements:
+
+#+begin_src emacs-lisp
+  0: Scheduled date for the habit (may be in the past)
+  1: ".+"-style repeater for the schedule, in days
+  2: Optional deadline (nil if not present)
+  3: If deadline, the repeater for the deadline, otherwise nil
+  4: A list of all the past dates this todo was mark closed
+#+end_src
+
+This list represents a "habit" for the rest of this module.
+
+
+** org-habit-toggle-habits  
+
+Toggle display of habits in an agenda buffer.

@@ -1,0 +1,51 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Mac-Message API functions (org-mac-message.el)
+** org-mac-message-get-links =&optional select-or-flag=
+
+Create links to the messages currently selected or flagged in Mail.app.
+This will use AppleScript to get the message-id and the subject of the
+messages in Mail.app and make a link out of it.
+When =select-or-flag= is "s", get the selected messages (this is also
+the default).  When =select-or-flag= is "f", get the flagged messages.
+The Org-syntax text will be pushed to the kill ring, and also returned.
+
+
+** org-mac-message-insert-flagged =org-buffer org-heading=
+
+Asks for an org buffer and a heading within it, and replace message links.
+If heading exists, delete all message:// links within heading's first
+level.  If heading doesn't exist, create it at point-max.  Insert
+list of message:// links to flagged mail after heading.
+
+
+** org-mac-message-insert-link  
+
+Insert a link to the messages currently selected in Mail.app.
+This will use AppleScript to get the message-id and the subject of the
+active mail in Mail.app and make a link out of it.
+
+
+** org-mac-message-insert-selected  
+
+Insert a link to the messages currently selected in Mail.app.
+This will use AppleScript to get the message-id and the subject of the
+active mail in Mail.app and make a link out of it.
+
+
+** org-mac-message-open =message-id=
+
+Visit the message with the given =message-id=.
+This will use the command /open/ with the message URL.
+

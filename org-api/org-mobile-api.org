@@ -1,0 +1,167 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Mobile API functions (org-mobile.el)
+** org-mobile-apply =&optional beg end=
+
+Apply all change requests in the current buffer.
+If =beg= and =end= are given, only do this in that region.
+
+
+** org-mobile-bodies-same-p =a b=
+
+Compare if =a= and =b= are visually equal strings.
+We first remove leading and trailing white space from the entire strings.
+Then we split the strings into lines and remove leading/trailing whitespace
+from each line.  Then we compare.
+=a= and =b= must be strings or nil.
+
+
+** org-mobile-check-setup  
+
+Check if org-mobile-directory has been set up.
+
+
+** org-mobile-cleanup-encryption-tempfile  
+
+Remove the encryption tempfile if it exists.
+
+
+** org-mobile-copy-agenda-files  
+
+Copy all agenda files to the stage or WebDAV directory.
+
+
+** org-mobile-create-index-file  
+
+Write the index file in the WebDAV directory.
+
+
+** org-mobile-create-sumo-agenda  
+
+Create a file that contains all custom agenda views.
+
+
+** org-mobile-decrypt-file =infile outfile=
+
+Decrypt =infile= to =outfile=, using /org-mobile-encryption-password/.
+
+
+** org-mobile-edit =what old new=
+
+Edit item =what= in the current entry by replacing =old= with =new=.
+=what= can be "heading", "todo", "tags", "priority", or "body".
+The edit only takes place if the current value is equal (except for
+white space) the =old=.  If this is so, =old= will be replace by =new=
+and the command will return t.  If something goes wrong, a string will
+be returned that indicates what went wrong.
+
+
+** org-mobile-encrypt-and-move =infile outfile=
+
+Encrypt =infile= locally to =infile=_enc, then move it to =outfile=.
+We do this in two steps so that remote paths will work, even if the
+encryption program does not understand them.
+
+
+** org-mobile-encrypt-file =infile outfile=
+
+Encrypt =infile= to =outfile=, using /org-mobile-encryption-password/.
+
+
+** org-mobile-files-alist  
+
+Expand the list in /org-mobile-files/ to a list of existing files.
+Also exclude files matching /org-mobile-files-exclude-regexp/.
+
+
+** org-mobile-move-capture  
+
+Move the contents of the capture file to the inbox file.
+Return a marker to the location where the new content has been added.
+If nothing new has been added, return nil.
+
+
+** org-mobile-pull  
+
+Pull the contents of /org-mobile-capture-file/ and integrate them.
+Apply all flagged actions, flag entries to be flagged and then call an
+agenda view showing the flagged items.
+
+
+** org-mobile-push  
+
+Push the current state of Org affairs to the WebDAV directory.
+This will create the index file, copy all agenda files there, and also
+create all custom agenda views, for upload to the mobile phone.
+
+
+** org-mobile-smart-read  
+
+Parse the entry at point for shortcuts and expand them.
+These shortcuts are meant for fast and easy typing on the limited
+keyboards of a mobile device.  Below we show a list of the shortcuts
+currently implemented.
+
+The entry is expected to contain an inactive time stamp indicating when
+the entry was created.  When setting dates and
+times (for example for deadlines), the time strings are interpreted
+relative to that creation date.
+Abbreviations are expected to take up entire lines, just because it is so
+easy to type RET on a mobile device.  Abbreviations start with one or two
+letters, followed immediately by a dot and then additional information.
+Generally the entire shortcut line is removed after action have been taken.
+Time stamps will be constructed using /org-read-date/.  So for example a
+line "dd. 2tue" will set a deadline on the second Tuesday after the
+creation date.
+
+Here are the shortcuts currently implemented:
+
+dd. string             set deadline
+ss. string             set scheduling
+tt. string             set time tamp, here.
+ti. string             set inactive time
+
+tg. tag1 tag2 tag3     set all these tags, change case where necessary
+td. kwd                set this todo keyword, change case where necessary
+
+FIXME: Hmmm, not sure if we can make his work against the
+auto-correction feature.  Needs a bit more thinking.  So this function
+is currently a noop.
+
+
+** org-mobile-sumo-agenda-command  
+
+Return an agenda custom command that comprises all custom commands.
+
+
+** org-mobile-tags-same-p =list1 list2=
+
+Are the two tag lists the same?
+
+
+** org-mobile-timestamp-buffer =buf=
+
+Time stamp buffer =buf=, just to make sure its checksum will change.
+
+
+** org-mobile-update-checksum-for-capture-file =buffer-string=
+
+Find the checksum line and modify it to match =buffer-string=.
+
+
+** org-mobile-write-checksums  
+
+Create checksums for all files in /org-mobile-directory/.
+The table of checksums is written to the file mobile-checksums.
+

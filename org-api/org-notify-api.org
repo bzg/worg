@@ -1,0 +1,155 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Notify API functions (org-notify.el)
+** org-notify =notification &optional play-sound=
+
+Send a =notification= and maybe =play-sound=.
+
+
+** org-notify-action-ding =plist=
+
+Make noise.
+
+
+** org-notify-action-email =plist=
+
+Send email to user.
+
+
+** org-notify-action-message =plist=
+
+Print a message.
+
+
+** org-notify-action-notify =plist=
+
+Pop up a notification window.
+
+
+** org-notify-action-notify/window =plist=
+
+For a graphics display, pop up a notification window, for a text
+terminal an emacs window.
+
+
+** org-notify-action-window =plist=
+
+Pop up a window, mostly copied from /appt-disp-window/.
+
+
+** org-notify-add =name &rest params=
+
+Add a new notification type. The =name= can be used in Org-mode property
+/notify/. If =name= is /default/, the notification type applies for todo items
+without the /notify/ property. This file predefines such a default
+notification type.
+
+Each element of =params= is a list with parameters for a given time
+distance to the deadline. This distance must increase from one element to
+the next.
+List of possible parameters:
+#+begin_src emacs-lisp
+  :time      Time distance to deadline, when this type of notification shall
+             start. It's a string: an integral value (positive or negative)
+             followed by a unit (s, m, h, d, w, M).
+  :actions   A function or a list of functions to be called to notify the
+             user. Instead of a function name, you can also supply a suffix
+             of one of the various predefined `org-notify-action-xxx'
+             functions.
+  :period    Optional: can be used to repeat the actions periodically. Same
+             format as :time.
+  :duration  Some actions use this parameter to specify the duration of the
+             notification. It's an integral number in seconds.
+  :audible   Overwrite the value of `org-notify-audible' for this action.
+#+end_src
+
+For the actions, you can use your own functions or some of the predefined
+ones, whose names are prefixed with /org-notify-action-/.
+
+
+** org-notify-body-text =plist=
+
+Make human readable string for remaining time to deadline.
+
+
+** org-notify-delete-window =buffer=
+
+Delete the notification window.
+
+
+** org-notify-make-todo =heading &rest ignored=
+
+Create one todo item.
+
+
+** org-notify-maybe-too-late =diff period heading=
+
+Print waring message, when notified significantly later than defined by
+=period=.
+
+
+** org-notify-on-action =plist key=
+
+User wants to see action.
+
+
+** org-notify-on-action-button =button=
+
+User wants to see action after button activation.
+
+
+** org-notify-on-action-notify =id key=
+
+User wants to see action after mouse-click in notify window.
+
+
+** org-notify-on-close =id reason=
+
+Notification window has been closed.
+
+
+** org-notify-process  
+
+Process the todo-list, and possibly notify user about upcoming or
+forgotten tasks.
+
+
+** org-notify-select-highest-window  
+
+Select the highest window on the frame, that is not is not an
+org-notify window. Mostly copied from /appt-select-lowest-window/.
+
+
+** org-notify-start =&optional secs=
+
+Start the notification daemon. If =secs= is positive, it's the
+period in seconds for processing the notifications of one
+org-agenda file, and if negative, notifications will be checked
+only when emacs is idle for -=secs= seconds. The default value for
+=secs= is 20.
+
+
+** org-notify-stop  
+
+Stop the notification daemon.
+
+
+** org-notify-string->seconds =str=
+
+Convert time string =str= to number of seconds.
+
+
+** org-notify-todo-list  
+
+Create the todo-list for one org-agenda file.

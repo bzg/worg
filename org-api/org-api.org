@@ -11,8 +11,160 @@
 #+LINK_HOME:  http://orgmode.org/worg/
 #+EXPORT_EXCLUDE_TAGS: noexport
 
+* Org API functions (org.el)
+** org-2ft =s=
 
-* Org-Agenda API Functions (org-agenda.el)
+Convert =s= to a floating point time.
+If =s= is already a number, just return it.  If it is a string, parse
+it as a time string and apply /float-time/ to it.  If =s= is nil, just return 0.
+
+
+** org-activate-angle-links =limit=
+
+Run through the buffer and add overlays to links.
+
+
+** org-activate-bracket-links =limit=
+
+Run through the buffer and add overlays to bracketed links.
+
+
+** org-activate-dates =limit=
+
+Run through the buffer and add overlays to dates.
+
+
+** org-activate-footnote-links =limit=
+
+Run through the buffer and add overlays to footnotes.
+
+
+** org-activate-mark  
+
+Activate the mark.
+
+
+** org-activate-plain-links =limit=
+
+Run through the buffer and add overlays to links.
+
+
+** org-activate-target-links =limit=
+
+Run through the buffer and add overlays to target matches.
+
+
+** org-adaptive-fill-function  
+
+Return a fill prefix for org-mode files.
+
+
+** org-add-agenda-custom-command =entry=
+
+Replace or add a command in /org-agenda-custom-commands/.
+This is mostly for hacking and trying a new command - once the command
+works you probably want to add it to /org-agenda-custom-commands/ for good.
+
+
+** org-add-archive-files =files=
+
+Splice the archive files into the list of files.
+This implies visiting all these files and finding out what the
+archive file is.
+
+
+** org-add-hook =hook function &optional append local=
+
+Add-hook, compatible with both Emacsen.
+
+
+** org-add-link-props =&rest plist=
+
+Add these properties to the link property list.
+
+
+** org-add-link-type =type &optional follow export=
+
+Add =type= to the list of /org-link-types/.
+Re-compute all regular expressions depending on /org-link-types/
+
+=follow= and =export= are two functions.
+
+=follow= should take the link path as the single argument and do whatever
+is necessary to follow the link, for example find a file or display
+a mail message.
+
+=export= should format the link path for export to one of the export formats.
+It should be a function accepting three arguments:
+
+#+begin_src emacs-lisp
+  path    the path of the link, the text after the prefix (like "http:")
+  desc    the description of the link, if any, or a description added by
+          org-export-normalize-links if there is none
+  format  the export format, a symbol like `html' or `latex' or `ascii'..
+#+end_src
+
+The function may use the FORMAT information to return different values
+depending on the format.  The return value will be put literally into
+the exported file.  If the return value is nil, this means Org should
+do what it normally does with links which do not have =export= defined.
+
+Org-mode has a built-in default for exporting links.  If you are happy with
+this default, there is no need to define an export function for the link
+type.  For a simple example of an export function, see /org-bbdb.el/.
+
+
+** org-add-log-note =&optional purpose=
+
+Pop up a window for taking a note, and add this note later at point.
+
+
+** org-add-log-setup =&optional purpose state prev-state findpos how extra=
+
+Set up the post command hook to take a note.
+If this is about to TODO state change, the new state is expected in =state=.
+When =findpos= is non-nil, find the correct position for the note in
+the current entry.  If not, assume that it can be inserted at point.
+=how= is an indicator what kind of note should be created.
+=extra= is additional text that will be inserted into the notes buffer.
+
+
+** org-add-note  
+
+Add a note to the current entry.
+This is done in the same way as adding a state change note.
+
+
+** org-add-planning-info =what &optional time &rest remove=
+
+Insert new timestamp with keyword in the line directly after the headline.
+=what= indicates what kind of time stamp to add.  =time= indicates the time to use.
+If non is given, the user is prompted for a date.
+=remove= indicates what kind of entries to remove.  An old =what= entry will also
+be removed.
+
+
+** org-add-props =string plist &rest props=
+
+Add text properties to entire string, from beginning to end.
+=plist= may be a list of properties, =props= are individual properties and values
+that will be added to =plist=.  Returns the string that was modified.
+
+
+** org-advertized-archive-subtree =&optional find-done=
+
+Move the current subtree to the archive.
+The archive can be a certain top-level heading in the current file, or in
+a different file.  The tree will be moved to that location, the subtree
+heading be marked DONE, and the current time will be added.
+
+When called with prefix argument =find-done=, find whole trees without any
+open TODO items and archive them (after getting confirmation from the user).
+If the cursor is not at a headline when this command is called, try all level
+1 trees.  If the cursor is on a headline, only try the direct children of
+this heading.
+
+
 ** org-agenda =&optional arg keys restriction=
 
 Dispatch agenda commands to collect entries to the agenda buffer.
@@ -22,18 +174,27 @@ on to the selected command.  The default selections are:
 a     Call /org-agenda-list/ to display the agenda for current day or week.
 t     Call /org-todo-list/ to display the global todo list.
 T     Call /org-todo-list/ to display the global todo list, select only
+#+begin_src emacs-lisp
       entries with a specific TODO keyword (the user gets a prompt).
+#+end_src
 m     Call /org-tags-view/ to display headlines with tags matching
+#+begin_src emacs-lisp
       a condition  (the user is prompted for the condition).
+#+end_src
 M     Like /m/, but select only TODO entries, no ordinary headlines.
 L     Create a timeline for the current buffer.
 e     Export views to associated files.
 s     Search entries for keywords.
 /     Multi occur across all agenda files and also files listed
+#+begin_src emacs-lisp
       in /org-agenda-text-search-extra-files/.
+#+end_src
 <     Restrict agenda commands to buffer, subtree, or region.
+#+begin_src emacs-lisp
       Press several times to get the desired effect.
+#+end_src
 >     Remove a previous restriction.
+#     List "stuck" projects.
 !     Configure what "stuck" means.
 C     Configure custom agenda commands.
 
@@ -789,4 +950,3 @@ SPC             org-agenda-show-and-scroll-up
 !               org-agenda-toggle-deadlines
 $               org-agenda-archive
 %               org-agenda-bulk-mark-regexp
-

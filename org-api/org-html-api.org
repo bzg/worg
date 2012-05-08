@@ -1,0 +1,100 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-HTML API functions (org-html.el)
+** org-html-cvt-org-as-html =opt-plist type path=
+
+Convert an org filename to an equivalent html filename.
+If =type= is not file, just return /nil/.
+See variable /org-export-html-link-org-files-as-html/
+
+
+** org-html-do-expand =s=
+
+Apply all active conversions to translate special A=s=CII to HTML.
+
+
+** org-html-expand =string=
+
+Prepare =string= for HTML export.  Apply all active conversions.
+If there are links in the string, don't modify these.  If =string=
+is nil, return nil.
+
+
+** org-html-expand-for-ascii =line=
+
+Handle quoted HTML for ASCII export.
+
+
+** org-html-expand-for-generic =line=
+
+Handle quoted HTML for ASCII export.
+
+
+** org-html-export-list-line =org-line pos struct prevs=
+
+Insert list syntax in export buffer. Return =org-line=, maybe modified.
+
+=pos= is the item position or org-line position the org-line had before
+modifications to buffer. =struct= is the list structure. =prevs= is
+the alist of previous items.
+
+
+** org-html-handle-links =org-line opt-plist=
+
+Return =org-line= with markup of Org mode links.
+=opt-plist= is the export options list.
+
+
+** org-html-handle-time-stamps =s=
+
+Format time stamps in string =s=, or remove them.
+
+
+** org-html-level-close =level max-outline-level=
+
+Terminate one level in HTML export.
+
+
+** org-html-level-start =level title umax with-toc head-count &optional opt-plist=
+
+Insert a new level in HTML export.
+When =title= is nil, just close all open levels.
+
+
+** org-html-make-link =opt-plist type path fragment desc attr may-inline-p=
+
+Make an HTML link.
+=opt-plist= is an options list.
+=type= is the device-type of the link (THIS://foo.html).
+=path= is the path of the link (http://THIS#location).
+=fragment= is the fragment part of the link, if any (foo.html#THIS).
+=desc= is the link description, if any.
+=attr= is a string of other attributes of the "a" element.
+=may-inline-p= allows inlining it as an image.
+
+
+** org-html-protect =s=
+
+Convert characters to HTML equivalent.
+Possible conversions are set in /org-export-html-protect-char-alist/.
+
+
+** org-html-should-inline-p =filename descp=
+
+Return non-nil if link =filename= should be inlined.
+The decision to inline the =filename= link is based on the current
+settings.  =descp= is the boolean of whether there was a link
+description.  See variables /org-export-html-inline-images/ and
+/org-export-html-inline-image-extensions/.
+
