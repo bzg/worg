@@ -1881,7 +1881,8 @@ by the exporter.
    number, or reference itself, depending on container's switches.
 
    See also : [[#get-coderef-format][~org-export-get-coderef-format~]],
-   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
+   [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#resolve-id-link][~org-export-resolve-id-link~]],
+   [[#resolve-radio-link][~org-export-resolve-radio-link~]].
 
 ** ~org-export-resolve-fuzzy-link~
    :PROPERTIES:
@@ -1893,19 +1894,52 @@ by the exporter.
    object, or nil.
 
    See also: [[#get-ordinal][~org-export-get-ordinal~]], [[#resolve-coderef][~org-export-resolve-coderef~]],
-   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#solidify-link-text][~org-export-solidify-link-text~]].
+   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-radio-link][~org-export-resolve-radio-link~]],
+   [[#solidify-link-text][~org-export-solidify-link-text~]].
 
 ** ~org-export-resolve-id-link~
    :PROPERTIES:
    :CUSTOM_ID: resolve-id-link
    :END:
 
-   Search headline targetted by an id link — i.e. it has a ~id~ or
-   ~custom-id~ ~:type~ attribute – within the parse tree.  Return that
-   headline, or nil.
+   Search headline targetted by an id link --- i.e. it has a ~id~ or
+   ~custom-id~ ~:type~ attribute --- within the parse tree.  Return
+   that headline, or nil.
 
    See also : [[#resolve-coderef][~org-export-resolve-coderef~]],
-   [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#solidify-link-text][~org-export-solidify-link-text~]].
+   [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#resolve-radio-link][~org-export-resolve-radio-link~]],
+   [[#solidify-link-text][~org-export-solidify-link-text~]].
+
+** ~org-export-resolve-radio-link~
+   :PROPERTIES:
+   :CUSTOM_ID: resolve-radio-link
+   :END:
+
+   Return first radio target object matching a radio link --- that is
+   with a ~radio~ ~:type~ attribute --- in the parse tree, or nil.
+
+   Typically, target's contents are exported through ~org-export-data~
+   and used as link description, as in the following excerpt from
+   =org-e-latex.el=:
+
+   #+BEGIN_SRC emacs-lisp
+   (defun org-e-latex-link (link desc info)
+     (let* ((type (org-element-property :type link))
+            ...)
+       (cond
+        ...
+        ((string= type "radio")
+         (let ((destination (org-export-resolve-radio-link link info)))
+           (when destination
+             (format "\\hyperref[%s]{%s}"
+                     (org-export-solidify-link-text path)
+                     (org-export-data (org-element-contents destination) info)))))
+        ...)))
+   #+END_SRC
+
+   See also : [[#resolve-coderef][~org-export-resolve-coderef~]],
+   [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#resolve-id-link][~org-export-resolve-id-link~]],
+   [[#solidify-link-text][~org-export-solidify-link-text~]].
 
 ** ~org-export-unravel-code~
    :PROPERTIES:
@@ -1934,5 +1968,6 @@ by the exporter.
    Used to turn targets names into safer versions for links.
 
    See also: [[#inline-image-p][~org-export-inline-image-p~]],
-   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
+   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]],
+   [[#resolve-radio-link][~org-export-resolve-radio-link~]].
 
