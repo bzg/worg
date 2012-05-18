@@ -1,0 +1,42 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-MKS API functions (org-mks.el)
+** org-mks =table title &optional prompt specials=
+
+Select a member of an alist with multiple keys.
+=table= is the alist which should contain entries where the car is a string.
+There should be two types of entries.
+
+1. prefix descriptions like ("a" "Description")
+#+begin_src emacs-lisp
+   This indicates that /a/ is a prefix key for multi-letter selection, and
+   that there are entries following with keys like "ab", "ax"...
+#+end_src
+
+2. Selectable members must have more than two elements, with the first
+#+begin_src emacs-lisp
+   being the string of keys that lead to selecting it, and the second a
+   short description string of the item.
+#+end_src
+
+The command will then make a temporary buffer listing all entries
+that can be selected with a single key, and all the single key
+prefixes.  When you press the key for a single-letter entry, it is selected.
+When you press a prefix key, the commands (and maybe further prefixes)
+under this key will be shown and offered for selection.
+
+=title= will be placed over the selection in the temporary buffer,
+=prompt= will be used when prompting for a key.  SPECIAL is an alist with
+also ("key" "description") entries.  When one of these is selection,
+only the bare key is returned.

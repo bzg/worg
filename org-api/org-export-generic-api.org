@@ -1,0 +1,74 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Export-Generic API functions (org-export-generic.el)
+** org-export-generic =arg=
+
+Export the outline as generic output.
+If there is an active region, export only the region.
+The prefix =arg= specifies how many levels of the outline should become
+underlined headlines.  The default is 3.
+
+
+** org-export-generic-check-section =type &optional prefix suffix=
+
+checks to see if type is already in use, or we're switching parts
+If we're switching, then insert a potentially previously remembered
+suffix, and insert the current prefix immediately and then save the
+suffix a later change time.
+
+
+** org-export-generic-emph-format =format-varname string protect=
+
+Return a string that results from applying the markup indicated by
+=format-varname= to =string=.
+
+
+** org-export-generic-fontify =string=
+
+Convert fontification according to generic rules.
+
+
+** org-export-generic-format =export-plist prop &optional len n reverse=
+
+converts a property specification to a string given types of properties
+
+The =export-plist= should be defined as the lookup plist.
+The =prop= should be the property name to search for in it.
+=len= is set to the length of multi-characters strings to generate (or 0)
+=n= is the tree depth
+=reverse= means to reverse the list if the plist match is a list
+#+begin_src emacs-lisp
+ 
+#+end_src
+
+
+
+** org-export-generic-header =header export-plist prefixprop formatprop postfixprop &optional n reverse=
+
+convert a header to an output string given formatting property names
+
+
+** org-export-generic-preprocess =parameters=
+
+Do extra work for ASCII export
+
+
+** org-export-generic-push-links =link-buffer=
+
+Push out links in the buffer.
+
+
+** org-export-generic-wrap =line where=
+
+Wrap =line= at or before =where=.

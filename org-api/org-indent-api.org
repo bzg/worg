@@ -1,0 +1,141 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Indent API functions (org-indent.el)
+** org-indent-add-properties =beg end &optional delay=
+
+Add indentation properties between =beg= and =end=.
+
+When =delay= is non-nil, it must be a time value.  In that case,
+the process is asynchronous and can be interrupted, either by
+user request, or after =delay=.  This is done by throwing the
+/interrupt/ tag along with the buffer position where the process
+stopped.
+
+
+** org-indent-block  
+
+Indent the block at point.
+
+
+** org-indent-drawer  
+
+Indent the drawer at point.
+
+
+** org-indent-indent-buffer  
+
+Add indentation properties to the accessible part of the buffer.
+
+
+** org-indent-initialize  
+
+Initialize the indentation strings.
+
+
+** org-indent-initialize-agent  
+
+Start or resume current buffer initialization.
+Only buffers in /org-indent-agentized-buffers/ trigger an action.
+When no more buffer is being watched, the agent suppress itself.
+
+
+** org-indent-initialize-buffer =buffer delay=
+
+Set virtual indentation for the buffer =buffer=, asynchronously.
+Give hand to other idle processes if it takes longer than =delay=,
+a time value.
+
+
+** org-indent-item  
+
+Indent a local list item, but not its children.
+If a region is active, all items inside will be moved.
+
+
+** org-indent-item-tree  
+
+Indent a local list item including its children.
+If a region is active, all items inside will be moved.
+
+
+** org-indent-line-function  
+
+Indent line depending on context.
+
+
+** org-indent-line-to =column=
+
+Work around a bug with extents with invisibility in XEmacs.
+
+
+** org-indent-mode =&optional arg=
+
+When active, indent text according to outline structure.
+
+Internally this works by adding /line-prefix/ and /wrap-prefix/
+properties, after each buffer modification, on the modified zone.
+
+The process is synchronous.  Though, initial indentation of
+buffer, which can take a few seconds on large buffers, is done
+during idle time.
+
+
+** org-indent-notify-modified-headline =beg end=
+
+Set /org-indent-modified-headline-flag/ depending on context.
+
+=beg= and =end= are the positions of the beginning and end of the
+range of deleted text.
+
+This function is meant to be called by /before-change-functions/.
+Flag will be non-nil if command is going to modify or delete an
+headline.
+
+
+** org-indent-refresh-maybe =beg end dummy=
+
+Refresh indentation properties in an adequate portion of buffer.
+=beg= and =end= are the positions of the beginning and end of the
+range of inserted text.  =dummy= is an unused argument.
+
+This function is meant to be called by /after-change-functions/.
+
+
+** org-indent-remove-properties =beg end=
+
+Remove indentations between =beg= and =end=.
+
+
+** org-indent-remove-properties-from-string =string=
+
+Remove indentation properties from =string=.
+
+
+** org-indent-set-line-properties =l w h=
+
+Set prefix properties on current line an move to next one.
+
+Prefix properties /line-prefix/ and /wrap-prefix/ in current line
+are set to, respectively, length =l= and =w=.
+
+If =h= is non-nil, /line-prefix/ will be starred.  If =h= is
+/inline/, the first star will have /org-warning/ face.
+
+Assume point is at beginning of line.
+
+
+** org-indent-to-column =column &optional minimum buffer=
+
+Work around a bug with extents with invisibility in XEmacs.
+

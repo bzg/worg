@@ -1,0 +1,116 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Remember API functions (org-remember.el)
+** org-remember =&optional goto org-force-remember-template-char=
+
+Call /remember/.  If this is already a remember buffer, re-apply template.
+If there is an active region, make sure remember uses it as initial content
+of the remember buffer.
+
+When called interactively with a C-u prefix argument =goto=, don't remember
+anything, just go to the file/headline where the selected template usually
+stores its notes.  With a double prefix argument C-u C-u, go to the last
+note stored by remember.
+
+Lisp programs can set =org-force-remember-template-char= to a character
+associated with a template in /org-remember-templates/.
+
+
+** org-remember-annotation  
+
+Return a link to the current location as an annotation for remember.el.
+If you are using Org-mode files as target for data storage with
+remember.el, then the annotations should include a link compatible with the
+conventions in Org-mode.  This function returns such a link.
+
+
+** org-remember-apply-template =&optional use-char skip-interactive=
+
+Initialize *remember* buffer with template, invoke /org-mode/.
+This function should be placed into /remember-mode-hook/ and in fact requires
+to be run from that hook to function properly.
+
+
+** org-remember-finalize  
+
+Finalize the remember process.
+
+
+** org-remember-finish-immediately  
+
+File remember note immediately.
+This should be run in /post-command-hook/ and will remove itself
+from that hook.
+
+
+** org-remember-goto-last-stored  
+
+Go to the location where the last remember note was stored.
+
+
+** org-remember-handler  
+
+Store stuff from remember.el into an org file.
+When the template has specified a file and a headline, the entry is filed
+there, or in the location defined by /org-default-notes-file/ and
+/org-remember-default-headline/.
+
+If no defaults have been defined, or if the current prefix argument
+is 1 (using C-1 C-c C-c to exit remember), an interactive
+process is used to select the target location.
+
+When the prefix is 0 (i.e. when remember is exited with C-0 C-c C-c),
+the entry is filed to the same location as the previous note.
+
+When the prefix is 2 (i.e. when remember is exited with C-2 C-c C-c),
+the entry is filed as a subentry of the entry where the clock is
+currently running.
+
+When C-u has been used as prefix argument, the
+note is stored and Emacs moves point to the new location of the
+note, so that editing can be continued there (similar to
+inserting "%&" into the template).
+
+Before storing the note, the function ensures that the text has an
+org-mode-style headline, i.e. a first line that starts with
+a "*".  If not, a headline is constructed from the current date and
+some additional data.
+
+If the variable /org-adapt-indentation/ is non-nil, the entire text is
+also indented so that it starts in the same column as the headline
+(i.e. after the stars).
+
+See also the variable /org-reverse-note-order/.
+
+
+** org-remember-insinuate  
+
+Setup remember.el for use with Org-mode.
+
+
+** org-remember-kill  
+
+Abort the current remember process.
+
+
+** org-remember-mode =&optional arg=
+
+Minor mode for special key bindings in a remember buffer.
+
+
+** org-remember-visit-immediately  
+
+File remember note immediately.
+This should be run in /post-command-hook/ and will remove itself
+from that hook.

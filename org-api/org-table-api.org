@@ -1,0 +1,858 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Table API functions (org-table.el)
+** org-table-add-rectangle-overlay =beg end &optional face=
+
+Add a new overlay.
+
+
+** org-table-align  
+
+Align the table at point by aligning all vertical bars.
+
+
+** org-table-begin =&optional table-type=
+
+Find the beginning of the table and return its position.
+With argument =table-type=, go to the beginning of a table.el-type table.
+
+
+** org-table-beginning-of-field =&optional n=
+
+Move to the end of the current table field.
+If already at or after the end, move to the end of the next table field.
+With numeric argument =n=, move =n=-1 fields forward first.
+
+
+** org-table-blank-field  
+
+Blank the current table field or active region.
+
+
+** org-table-check-inside-data-field =&optional noerror=
+
+Is point inside a table data field?
+I.e. not on a hline or before the first or after the last column?
+This actually throws an error, so it aborts the current command.
+
+
+** org-table-clean-before-export =lines &optional maybe-quoted=
+
+Check if the table has a marking column.
+If yes remove the column and the special lines.
+
+
+** org-table-clean-line =s=
+
+Convert a table line =s= into a string with only "|" and space.
+In particular, this does handle wide and invisible characters.
+
+
+** org-table-cleanup-narrow-column-properties  
+
+Remove all properties related to narrow-column invisibility.
+
+
+** org-table-colgroup-line-p =line=
+
+Is this a table line colgroup information?
+
+
+** org-table-convert  
+
+Convert from /org-mode/ table to table.el and back.
+Obviously, this only works within limits.  When an Org-mode table is
+converted to table.el, all horizontal separator lines get lost, because
+table.el uses these as cell boundaries and has no notion of horizontal lines.
+A table.el table can be converted to an Org-mode table only if it does not
+do row or column spanning.  Multiline cells will become multiple cells.
+Beware, Org-mode does not test if the table can be successfully converted - it
+blindly applies a recipe that works for simple tables.
+
+
+** org-table-convert-refs-to-an =s=
+
+Convert spreadsheet references from to @7$28 to AB7.
+Works for single references, but also for entire formulas and even the
+full TBLFM line.
+
+
+** org-table-convert-refs-to-rc =s=
+
+Convert spreadsheet references from A7 to @7$28.
+Works for single references, but also for entire formulas and even the
+full TBLFM line.
+
+
+** org-table-convert-region =beg0 end0 &optional separator=
+
+Convert region to a table.
+The region goes from =beg0= to =end0=, but these borders will be moved
+slightly, to make sure a beginning of line in the first line is included.
+
+=separator= specifies the field separator in the lines.  It can have the
+following values:
+
+'(4)     Use the comma as a field separator
+'(16)    Use a TAB as field separator
+integer  When a number, use that many spaces as field separator
+nil      When nil, the command tries to be smart and figure out the
+#+begin_src emacs-lisp
+         separator in the following way:
+         - when each line contains a TAB, assume TAB-separated material
+         - when each line contains a comma, assume CSV material
+         - else, assume one or more SPACE characters as separator.
+#+end_src
+
+
+
+** org-table-cookie-line-p =line=
+
+Is this a table line with only alignment/width cookies?
+
+
+** org-table-copy-down =n=
+
+Copy a field down in the current column.
+If the field at the cursor is empty, copy into it the content of
+the nearest non-empty field above.  With argument =n=, use the =n=th
+non-empty field.  If the current field is not empty, it is copied
+down to the next row, and the cursor is moved with it.
+Therefore, repeating this command causes the column to be filled
+row-by-row.
+If the variable /org-table-copy-increment/ is non-nil and the
+field is an integer or a timestamp, it will be incremented while
+copying.  In the case of a timestamp, increment by one day.
+
+
+** org-table-copy-region =beg end &optional cut=
+
+Copy rectangular region in table to clipboard.
+A special clipboard is used which can only be accessed
+with /org-table-paste-rectangle/.
+
+
+** org-table-create =&optional size=
+
+Query for a size and insert a table skeleton.
+=size= is a string Columns x Rows like for example "3x2".
+
+
+** org-table-create-or-convert-from-region =arg=
+
+Convert region to table, or create an empty table.
+If there is an active region, convert it to a table, using the function
+/org-table-convert-region/.  See the documentation of that function
+to learn how the prefix argument is interpreted to determine the field
+separator.
+If there is no such region, create an empty table with /org-table-create/.
+
+
+** org-table-create-with-table.el  
+
+Use the table.el package to insert a new table.
+If there is already a table at point, convert between Org-mode tables
+and table.el tables.
+
+
+** org-table-current-column  
+
+Find out which column we are in.
+
+
+** org-table-current-dline  
+
+Find out what table data line we are in.
+Only data lines count for this.
+
+
+** org-table-current-field-formula =&optional key noerror=
+
+Return the formula active for the current field.
+Assumes that specials are in place.
+If =key= is given, return the key to this formula.
+Otherwise return the formula preceded with "=" or ":=".
+
+
+** org-table-current-line  
+
+Return the index of the current data line.
+
+
+** org-table-cut-region =beg end=
+
+Copy region in table to the clipboard and blank all relevant fields.
+If there is no active region, use just the field at point.
+
+
+** org-table-delete-column  
+
+Delete a column from the table.
+
+
+** org-table-edit-field =arg=
+
+Edit table field in a different window.
+This is mainly useful for fields that contain hidden parts.
+When called with a C-u prefix, just make the full field visible so that
+it can be edited in place.
+
+
+** org-table-edit-formulas  
+
+Edit the formulas of the current table in a separate buffer.
+
+
+** org-table-end =&optional table-type=
+
+Find the end of the table and return its position.
+With argument =table-type=, go to the end of a table.el-type table.
+
+
+** org-table-end-of-field =&optional n=
+
+Move to the beginning of the current table field.
+If already at or before the beginning, move to the beginning of the
+previous field.
+With numeric argument =n=, move =n=-1 fields backward first.
+
+
+** org-table-eval-formula =&optional arg equation suppress-align suppress-const suppress-store suppress-analysis=
+
+Replace the table field value at the cursor by the result of a calculation.
+
+This function makes use of Dave Gillespie's Calc package, in my view the
+most exciting program ever written for GNU Emacs.  So you need to have Calc
+installed in order to use this function.
+
+In a table, this command replaces the value in the current field with the
+result of a formula.  It also installs the formula as the "current" column
+formula, by storing it in a special line below the table.  When called
+with a /C-u/ prefix, the current field must be a named field, and the
+formula is installed as valid in only this specific field.
+
+When called with two /C-u/ prefixes, insert the active equation
+for the field back into the current field, so that it can be
+edited there.  This is useful in order to use M-x org-table-show-reference
+to check the referenced fields.
+
+When called, the command first prompts for a formula, which is read in
+the minibuffer.  Previously entered formulas are available through the
+history list, and the last used formula is offered as a default.
+These stored formulas are adapted correctly when moving, inserting, or
+deleting columns with the corresponding commands.
+
+The formula can be any algebraic expression understood by the Calc package.
+For details, see the Org-mode manual.
+
+This function can also be called from Lisp programs and offers
+additional arguments: =equation= can be the formula to apply.  If this
+argument is given, the user will not be prompted.  =suppress-align= is
+used to speed-up recursive calls by by-passing unnecessary aligns.
+=suppress-const= suppresses the interpretation of constants in the
+formula, assuming that this has been done already outside the function.
+=suppress-store= means the formula should not be stored, either because
+it is already stored, or because it is a modified equation that should
+not overwrite the stored one.
+
+
+** org-table-expand-lhs-ranges =equations=
+
+Expand list of formulas.
+If some of the RHS in the formulas are ranges or a row reference, expand
+them to individual field equations for each field.
+
+
+** org-table-export =&optional file format=
+
+Export table to a file, with configurable format.
+Such a file can be imported into a spreadsheet program like Excel.
+=file= can be the output file name.  If not given, it will be taken from
+a TABLE_EXPORT_=file= property in the current entry or higher up in the
+hierarchy, or the user will be prompted for a file name.
+=format= can be an export format, of the same kind as it used when
+/orgtbl-mode/ sends a table in a different format.  The default format can
+be found in the variable /org-table-export-default-format/, but the function
+first checks if there is an export format specified in a TABLE_EXPORT_=format=
+property, locally or anywhere up in the hierarchy.
+
+
+** org-table-fedit-abort  
+
+Abort editing formulas, without installing the changes.
+
+
+** org-table-fedit-convert-buffer =function=
+
+Convert all references in this buffer, using =function=.
+
+
+** org-table-fedit-finish =&optional arg=
+
+Parse the buffer for formula definitions and install them.
+With prefix =arg=, apply the new formulas to the table.
+
+
+** org-table-fedit-line-down  
+
+Move cursor one line down in the window showing the table.
+
+
+** org-table-fedit-line-up  
+
+Move cursor one line up in the window showing the table.
+
+
+** org-table-fedit-lisp-indent  
+
+Pretty-print and re-indent Lisp expressions in the Formula Editor.
+
+
+** org-table-fedit-menu =event=
+
+Org Edit Formulas Menu
+
+
+** org-table-fedit-move =command=
+
+Move the cursor in the window showing the table.
+Use =command= to do the motion, repeat if necessary to end up in a data line.
+
+
+** org-table-fedit-ref-down  
+
+Shift the reference at point one row/hline down.
+
+
+** org-table-fedit-ref-left  
+
+Shift the reference at point one field to the left.
+
+
+** org-table-fedit-ref-right  
+
+Shift the reference at point one field to the right.
+
+
+** org-table-fedit-ref-up  
+
+Shift the reference at point one row/hline up.
+
+
+** org-table-fedit-toggle-coordinates  
+
+Toggle the display of coordinates in the referenced table.
+
+
+** org-table-fedit-toggle-ref-type  
+
+Convert all references in the buffer from B3 to @3$2 and back.
+
+
+** org-table-field-info =arg=
+
+Show info about the current field, and highlight any reference at point.
+
+
+** org-table-find-dataline  
+
+Find a data line in the current table, which is needed for column commands.
+
+
+** org-table-find-row-type =table i type backwards relative n cline desc=
+
+F=i=XME: =n=eeds more documentation.
+
+
+** org-table-finish-edit-field  
+
+Finish editing a table data field.
+Remove all newline characters, insert the result into the table, realign
+the table and kill the editing buffer.
+
+
+** org-table-fix-formulas =key replace &optional limit delta remove=
+
+Modify the equations after the table structure has been edited.
+=key= is "@" or "$".  =replace= is an alist of numbers to replace.
+For all numbers larger than =limit=, shift them by =delta=.
+
+
+** org-table-follow-field-mode =&optional arg=
+
+Minor mode to make the table field editor window follow the cursor.
+When this mode is active, the field editor window will always show the
+current field.  The mode exits automatically when the cursor leaves the
+table (but see /org-table-exit-follow-field-mode-when-leaving-table/).
+
+
+** org-table-force-dataline  
+
+Make sure the cursor is in a dataline in a table.
+
+
+** org-table-formula-from-user =s=
+
+Convert a formula from user to internal representation.
+
+
+** org-table-formula-handle-first/last-rc =s=
+
+Replace @<, @>, $<, $> with first/last row/column of the table.
+=s=o @< and $< will always be replaced with @1 and $1, respectively.
+The advantage of these special markers are that structure editing of
+the table will not change them, while @1 and $1 will be modified
+when a line/row is swapped out of that privileged position.  =s=o for
+formulas that use a range of rows or columns, it may often be better
+to anchor the formula with "I" row markers, or to offset from the
+borders of the table using the @< @> $< $> makers.
+
+
+** org-table-formula-less-p =a b=
+
+Compare two formulas for sorting.
+
+
+** org-table-formula-substitute-names =f=
+
+Replace $const with values in string =f=.
+
+
+** org-table-formula-to-user =s=
+
+Convert a formula from internal to user representation.
+
+
+** org-table-get =line column=
+
+Get the field in table line =line=, column =column=.
+If =line= is larger than the number of data lines in the table, the function
+returns nil.  However, if =column= is too large, we will simply return an
+empty string.
+If =line= is nil, use the current line.
+If column is nil, use the current column.
+
+
+** org-table-get-constant =const=
+
+Find the value for a parameter or constant in a formula.
+Parameters get priority.
+
+
+** org-table-get-descriptor-line =desc &optional cline bline table=
+
+Analyze descriptor =desc= and retrieve the corresponding line number.
+The cursor is currently in line =cline=, the table begins in line =bline=,
+and =table= is a vector with line types.
+
+
+** org-table-get-field =&optional n replace=
+
+Return the value of the field in column =n= of current row.
+=n= defaults to current field.
+If =replace= is a string, replace field with this value.  The return value
+is always the old value.
+
+
+** org-table-get-formula =&optional equation named=
+
+Read a formula from the minibuffer, offer stored formula as default.
+When =named= is non-nil, look for a named equation.
+
+
+** org-table-get-range =desc &optional tbeg col highlight corners-only=
+
+Get a calc vector from a column, according to descriptor =desc=.
+Optional arguments =tbeg= and =col= can give the beginning of the table and
+the current column, to avoid unnecessary parsing.
+
+=highlight= means just highlight the range.
+
+When =corners-only= is set, only return the corners of the range as
+a list (line1 column1 line2 column2) where line1 and line2 are line numbers
+in the buffer and column1 and column2 are table column numbers.
+
+
+** org-table-get-remote-range =name-or-id form=
+
+Get a field value or a list of values in a range from table at ID.
+
+=name-or-id= may be the name of a table in the current file as set by
+a "#+TBLNAME:" directive.  The first table following this line
+will then be used.  Alternatively, it may be an ID referring to
+any entry, also in a different file.  In this case, the first table
+in that entry will be referenced.
+=form= is a field or range descriptor like "@2$3" or "B3" or
+"@I$2..@II$2".  All the references must be absolute, not relative.
+
+The return value is either a single string for a single field, or a
+list of the fields in the rectangle .
+
+
+** org-table-get-specials  
+
+Get the column names and local parameters for this table.
+
+
+** org-table-get-stored-formulas =&optional noerror=
+
+Return an alist with the stored formulas directly after current table.
+
+
+** org-table-goto-column =n &optional on-delim force=
+
+Move the cursor to the =n=th column in the current table line.
+With optional argument =on-delim=, stop with point before the left delimiter
+of the field.
+If there are less than =n= fields, just go to after the last delimiter.
+However, when =force= is non-nil, create new columns if necessary.
+
+
+** org-table-goto-line =N=
+
+Go to the =n=th data line in the current table.
+Return t when the line exists, nil if it does not exist.
+
+
+** org-table-highlight-rectangle =&optional beg end face=
+
+Highlight rectangular region in a table.
+
+
+** org-table-hline-and-move =&optional same-column=
+
+Insert a hline and move to the row below that line.
+
+
+** org-table-import =file arg=
+
+Import =file= as a table.
+The file is assumed to be tab-separated.  Such files can be produced by most
+spreadsheet and database applications.  If no tabs (at least one per line)
+are found, lines will be split on whitespace into fields.
+
+
+** org-table-insert-column  
+
+Insert a new column into the table.
+
+
+** org-table-insert-hline =&optional above=
+
+Insert a horizontal-line below the current line into the table.
+With prefix =above=, insert above the current line.
+
+
+** org-table-insert-row =&optional arg=
+
+Insert a new row above the current line into the table.
+With prefix =arg=, insert below the current line.
+
+
+** org-table-iterate =&optional arg=
+
+Recalculate the table until it does not change anymore.
+The maximum number of iterations is 10, but you can choose a different value
+with the prefix =arg=.
+
+
+** org-table-iterate-buffer-tables  
+
+Iterate all tables in the buffer, to converge inter-table dependencies.
+
+
+** org-table-justify-field-maybe =&optional new=
+
+Justify the current field, text to left, number to right.
+Optional argument =new= may specify text to replace the current field content.
+
+
+** org-table-kill-row  
+
+Delete the current row or horizontal line from the table.
+
+
+** org-table-line-to-dline =line &optional above=
+
+Turn a buffer line number into a data line number.
+If there is no data line in this line, return nil.
+If there is no matching dline (most likely te reference was a hline), the
+first dline below it is used.  When =above= is non-nil, the one above is used.
+
+
+** org-table-make-reference =elements keep-empty numbers lispp=
+
+Convert list =elements= to something appropriate to insert into formula.
+=keep-empty= indicated to keep empty fields, default is to skip them.
+=numbers= indicates that everything should be converted to numbers.
+=lispp= means to return something appropriate for a Lisp list.
+
+
+** org-table-map-tables =function &optional quietly=
+
+Apply =function= to the start of all tables in the buffer.
+
+
+** org-table-maybe-eval-formula  
+
+Check if the current field starts with "=" or ":=".
+If yes, store the formula and apply it.
+
+
+** org-table-maybe-recalculate-line  
+
+Recompute the current line if marked for it, and if we haven't just done it.
+
+
+** org-table-move-column =&optional left=
+
+Move the current column to the right.  With arg =left=, move to the left.
+
+
+** org-table-move-column-left  
+
+Move column to the left.
+
+
+** org-table-move-column-right  
+
+Move column to the right.
+
+
+** org-table-move-row =&optional up=
+
+Move the current table line down.  With arg =up=, move it up.
+
+
+** org-table-move-row-down  
+
+Move table row down.
+
+
+** org-table-move-row-up  
+
+Move table row up.
+
+
+** org-table-next-field  
+
+Go to the next field in the current table, creating new lines as needed.
+Before doing so, re-align the table if necessary.
+
+
+** org-table-next-row  
+
+Go to the next row (same column) in the current table.
+Before doing so, re-align the table if necessary.
+
+
+** org-table-overlay-coordinates  
+
+Add overlays to the table at point, to show row/column coordinates.
+
+
+** org-table-paste-rectangle  
+
+Paste a rectangular region into a table.
+The upper right corner ends up in the current field.  All involved fields
+will be overwritten.  If the rectangle does not fit into the present table,
+the table is enlarged as needed.  The process ignores horizontal separator
+lines.
+
+
+** org-table-previous-field  
+
+Go to the previous field in the table.
+Before doing so, re-align the table if necessary.
+
+
+** org-table-put =line column value &optional align=
+
+Put =value= into line =line=, column =column=.
+When =align= is set, also realign the table.
+
+
+** org-table-recalculate =&optional all noalign=
+
+Recalculate the current table line by applying all stored formulas.
+With prefix arg =all=, do this for all lines in the table.
+With the prefix argument =all= is /(16)/ (a double M-x universal-prefix M-x universal-prefix prefix), or if
+it is the symbol /iterate/, recompute the table until it no longer changes.
+If =noalign= is not nil, do not re-align the table after the computations
+are done.  This is typically used internally to save time, if it is
+known that the table will be realigned a little later anyway.
+
+
+** org-table-recalculate-buffer-tables  
+
+Recalculate all tables in the current buffer.
+
+
+** org-table-recognize-table.el  
+
+If there is a table.el table nearby, recognize it and move into it.
+
+
+** org-table-remove-rectangle-highlight =&rest ignore=
+
+Remove the rectangle overlays.
+
+
+** org-table-rotate-recalc-marks =&optional newchar=
+
+Rotate the recalculation mark in the first column.
+If in any row, the first field is not consistent with a mark,
+insert a new column for the markers.
+When there is an active region, change all the lines in the region,
+after prompting for the marking character.
+After each change, a message will be displayed indicating the meaning
+of the new mark.
+
+
+** org-table-shift-refpart =ref &optional decr hline=
+
+Shift a reference part =ref=.
+If =decr= is set, decrease the references row/column, else increase.
+If =hline= is set, this may be a hline reference, it certainly is not
+a translation reference.
+
+
+** org-table-show-reference =&optional local=
+
+Show the location/value of the $ expression at point.
+
+
+** org-table-sort-lines =with-case &optional sorting-type=
+
+Sort table lines according to the column at point.
+
+The position of point indicates the column to be used for
+sorting, and the range of lines is the range between the nearest
+horizontal separator lines, or the entire table of no such lines
+exist.  If point is before the first column, you will be prompted
+for the sorting column.  If there is an active region, the mark
+specifies the first line and the sorting column, while point
+should be in the last line to be included into the sorting.
+
+The command then prompts for the sorting type which can be
+alphabetically, numerically, or by time (as given in a time stamp
+in the field).  Sorting in reverse order is also possible.
+
+With prefix argument =with-case=, alphabetic sorting will be case-sensitive.
+
+If =sorting-type= is specified when this function is called from a Lisp
+program, no prompting will take place.  =sorting-type= must be a character,
+any of (?a ?A ?n ?N ?t ?T) where the capital letter indicate that sorting
+should be done in reverse order.
+
+
+** org-table-store-formulas =alist=
+
+Store the list of formulas below the current table.
+
+
+** org-table-sum =&optional beg end nlast=
+
+Sum numbers in region of current table column.
+The result will be displayed in the echo area, and will be available
+as kill to be inserted with <S-insertchar>.
+
+If there is an active region, it is interpreted as a rectangle and all
+numbers in that rectangle will be summed.  If there is no active
+region and point is located in a table column, sum all numbers in that
+column.
+
+If at least one number looks like a time HH:MM or HH:MM:SS, all other
+numbers are assumed to be times as well (in decimal hours) and the
+numbers are added as such.
+
+If =nlast= is a number, only the =nlast= fields will actually be summed.
+
+
+** org-table-time-seconds-to-string =secs &optional output-format=
+
+Convert a number of seconds to a time string.
+If =output-format= is non-nil, return a number of days, hours,
+minutes or seconds.
+
+
+** org-table-time-string-to-seconds =s=
+
+Convert a time string into numerical duration in seconds.
+=s= can be a string matching either -?HH:MM:=s==s= or -?HH:MM.
+If =s= is a string representing a number, keep this number.
+
+
+** org-table-to-lisp =&optional txt=
+
+Convert the table at point to a Lisp structure.
+The structure will be a list.  Each item is either the symbol /hline/
+for a horizontal separator line, or a list of field values as strings.
+The table is taken from the parameter =txt=, or from the buffer at point.
+
+
+** org-table-toggle-coordinate-overlays  
+
+Toggle the display of Row/Column numbers in tables.
+
+
+** org-table-toggle-formula-debugger  
+
+Toggle the formula debugger in tables.
+
+
+** org-table-transpose-table-at-point  
+
+Transpose orgmode table at point and eliminate hlines.
+So a table like
+
+| 1 | 2 | 4 | 5 |
+|---+---+---+---|
+| a | b | c | d |
+| e | f | g | h |
+
+will be transposed as
+
+| 1 | a | e |
+| 2 | b | f |
+| 4 | c | g |
+| 5 | d | h |
+
+Note that horizontal lines disappeared.
+
+
+** org-table-wrap-region =arg=
+
+Wrap several fields in a column like a paragraph.
+This is useful if you'd like to spread the contents of a field over several
+lines, in order to keep the table compact.
+
+If there is an active region, and both point and mark are in the same column,
+the text in the column is wrapped to minimum width for the given number of
+lines.  Generally, this makes the table more compact.  A prefix =arg= may be
+used to change the number of desired lines.  For example, /C-2 M-x org-table-wrap/
+formats the selected text to two lines.  If the region was longer than two
+lines, the remaining lines remain empty.  A negative prefix argument reduces
+the current number of lines by that amount.  The wrapped text is pasted back
+into the table.  If you formatted it to more lines than it was before, fields
+further down in the table get overwritten - so you might need to make space in
+the table first.
+
+If there is no region, the current field is split at the cursor position and
+the text fragment to the right of the cursor is prepended to the field one
+line down.
+
+If there is no region, but you specify a prefix =arg=, the current field gets
+blank, and the content is appended to the field above.
+

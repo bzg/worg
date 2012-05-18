@@ -1,0 +1,118 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+
+* Org-Timer API functions (org-timer.el)
+** org-timer =&optional restart no-insert-p=
+
+Insert a H:MM:SS string from the timer into the buffer.
+The first time this command is used, the timer is started.  When used with
+a C-u prefix, force restarting the timer.
+When used with a double prefix argument C-u, change all the timer string
+in the region by a fixed amount.  This can be used to recalibrate a timer
+that was not started at the correct moment.
+
+If =no-insert-p= is non-nil, return the string instead of inserting
+it in the buffer.
+
+
+** org-timer-cancel-timer  
+
+Cancel the current timer.
+
+
+** org-timer-change-times-in-region =beg end delta=
+
+Change all h:mm:ss time in region by a =delta=.
+
+
+** org-timer-fix-incomplete =hms=
+
+If hms is a H:MM:SS string with missing hour or hour and minute, fix it.
+
+
+** org-timer-hms-to-secs =hms=
+
+Convert h:mm:ss string to an integer time.
+If the string starts with a minus sign, the integer will be negative.
+
+
+** org-timer-item =&optional arg=
+
+Insert a description-type item with the current timer value.
+
+
+** org-timer-pause-or-continue =&optional stop=
+
+Pause or continue the relative timer.
+With prefix arg =stop=, stop it entirely.
+
+
+** org-timer-secs-to-hms =s=
+
+Convert integer =s= into h:mm:ss.
+If the integer is negative, the string will start with "-".
+
+
+** org-timer-set-mode-line =value=
+
+Set the mode-line display of the relative timer.
+=value= can be /on/, /off/, or /pause/.
+
+
+** org-timer-set-timer =&optional opt=
+
+Prompt for a duration and set a timer.
+
+If /org-timer-default-timer/ is not zero, suggest this value as
+the default duration for the timer.  If a timer is already set,
+prompt the user if she wants to replace it.
+
+Called with a numeric prefix argument, use this numeric value as
+the duration of the timer.
+
+Called with a /C-u/ prefix arguments, use /org-timer-default-timer/
+without prompting the user for a duration.
+
+With two /C-u/ prefix arguments, use /org-timer-default-timer/
+without prompting the user for a duration and automatically
+replace any running timer.
+
+
+** org-timer-show-remaining-time  
+
+Display the remaining time before the timer ends.
+
+
+** org-timer-start =&optional offset=
+
+Set the starting time for the relative timer to now.
+When called with prefix argument =offset=, prompt the user for an offset time,
+with the default taken from a timer stamp at point, if any.
+If =offset= is a string or an integer, it is directly taken to be the offset
+without user interaction.
+When called with a double prefix arg, all timer strings in the active
+region will be shifted by a specific amount.  You will be prompted for
+the amount, with the default to make the first timer string in
+the region 0:00:00.
+
+
+** org-timer-stop  
+
+Stop the relative timer.
+
+
+** org-timer-update-mode-line  
+
+Update the timer time in the mode line.
+

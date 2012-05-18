@@ -1,0 +1,181 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+
+* Org-Attach API Functions (org-attach.el)
+
+** org-attach  
+
+The dispatcher for attachment commands.
+Shows a list of commands and prompts for another key to execute a command.
+
+
+** org-attach-attach =file &optional visit-dir method=
+
+Move/copy/link =file= into the attachment directory of the current task.
+If =visit-dir= is non-nil, visit the directory with dired.
+=method= may be /cp/, /mv/, /ln/, or /lns/ default taken from
+/org-attach-method/.
+
+
+** org-attach-attach-cp  
+
+Attach a file by copying it.
+
+
+** org-attach-attach-ln  
+
+Attach a file by creating a hard link to it.
+Beware that this does not work on systems that do not support hard links.
+On some systems, this apparently does copy the file instead.
+
+
+** org-attach-attach-lns  
+
+Attach a file by creating a symbolic link to it.
+
+Beware that this does not work on systems that do not support symbolic links.
+On some systems, this apparently does copy the file instead.
+
+
+** org-attach-attach-mv  
+
+Attach a file by moving (renaming) it.
+
+
+** org-attach-check-absolute-path =dir=
+
+Check if we have enough information to root the attachment directory.
+When =dir= is given, check also if it is already absolute.  Otherwise,
+assume that it will be relative, and check if /org-attach-directory/ is
+absolute, or if at least the current buffer has a file name.
+Throw an error if we cannot root the directory.
+
+
+** org-attach-commit  
+
+Commit changes to git if /org-attach-directory/ is properly initialized.
+This checks for the existence of a ".git" directory in that directory.
+
+
+** org-attach-delete-all =&optional force=
+
+Delete all attachments from the current task.
+This actually deletes the entire attachment directory.
+A safer way is to open the directory in dired and delete from there.
+
+
+** org-attach-delete-one =&optional file=
+
+Delete a single attachment.
+
+
+** org-attach-dir =&optional create-if-not-exists-p=
+
+Return the directory associated with the current entry.
+This first checks for a local property ATTACH_DIR, and then for an inherited
+property ATTACH_DIR_INHERIT.  If neither exists, the default mechanism
+using the entry ID will be invoked to access the unique directory for the
+current entry.
+If the directory does not exist and =create-if-not-exists-p= is non-nil,
+the directory and (if necessary) the corresponding ID will be created.
+
+
+** org-attach-expand =file=
+
+Return the full path to the current entry's attachment file =file=.
+Basically, this adds the path to the attachment directory.
+
+
+** org-attach-expand-link =file=
+
+Return a file link pointing to the current entry's attachment file =file=.
+Basically, this adds the path to the attachment directory, and a "file:"
+prefix.
+
+
+** org-attach-file-list =dir=
+
+Return a list of files in the attachment directory.
+This ignores files starting with a ".", and files ending in "~".
+
+
+** org-attach-new =file=
+
+Create a new attachment =file= for the current task.
+The attachment is created as an Emacs buffer.
+
+
+** org-attach-open =&optional in-emacs=
+
+Open an attachment of the current task.
+If there are more than one attachment, you will be prompted for the file name.
+This command will open the file using the settings in /org-file-apps/
+and in the system-specific variants of this variable.
+If =in-emacs= is non-nil, force opening in Emacs.
+
+
+** org-attach-open-in-emacs  
+
+Open attachment, force opening in Emacs.
+See /org-attach-open/.
+
+
+** org-attach-reveal =&optional if-exists=
+
+Show the attachment directory of the current task in dired.
+
+
+** org-attach-reveal-in-emacs  
+
+Show the attachment directory of the current task.
+This will attempt to use an external program to show the directory.
+
+
+** org-attach-set-directory  
+
+Set the ATTACH_DIR property of the current entry.
+The property defines the directory that is used for attachments
+of the entry.
+
+
+** org-attach-set-inherit  
+
+Set the ATTACH_DIR_INHERIT property of the current entry.
+The property defines the directory that is used for attachments
+of the entry and any children that do not explicitly define (by setting
+the ATTACH_DIR property) their own attachment directory.
+
+
+** org-attach-store-link =file=
+
+Add a link to /org-stored-link/ when attaching a file.
+Only do this when /org-attach-store-link-p/ is non-nil.
+
+
+** org-attach-sync  
+
+Synchronize the current tasks with its attachments.
+This can be used after files have been added externally.
+
+
+** org-attach-tag =&optional off=
+
+Turn the autotag on or (if =off= is set) off.
+
+
+** org-attach-untag  
+
+Turn the autotag off.
+
+

@@ -1,0 +1,204 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Contacts API functions (org-contacts.el)
+** org-contacts =name=
+
+Create agenda view for contacts matching =name=.
+
+
+** org-contacts-anniversaries =&optional field format=
+
+Compute =field= anniversary for each contact, returning =format=.
+Default =field= value is "BIRTHDAY".
+
+Format is a string matching the following format specification:
+
+#+begin_src emacs-lisp
+  %h - Heading name
+  %l - Link to the heading
+  %y - Number of year
+  %Y - Number of year (ordinal)
+#+end_src
+
+
+
+** org-contacts-check-mail-address =mail=
+
+Add =mail= address to contact at point if it does not have it.
+
+
+** org-contacts-complete-name =&optional start=
+
+Complete text at =start= with a user name and email.
+
+
+** org-contacts-completing-read =prompt &optional predicate initial-input hist def inherit-input-method=
+
+Call /completing-read/ with contacts name as collection.
+
+
+** org-contacts-completing-read-nickname =prompt collection &optional predicate require-match initial-input hist def inherit-input-method=
+
+Like /completing-read/ but reads a nickname.
+
+
+** org-contacts-export-as-vcard =&optional name file to-buffer=
+
+Export all contacts matching =name= as VCard 3.0. It =to-buffer= is nil, the content is written to =file= or /org-contacts-vcard-file/. If =to-buffer= is non-nil, the buffer is created and the VCard is written into that buffer.
+
+
+** org-contacts-files  
+
+Return list of Org files to use for contact management.
+
+
+** org-contacts-filter =&optional name-match tags-match=
+
+Search for a contact maching =name-match= and =tags-match=.
+If both match values are nil, return all contacts.
+
+
+** org-contacts-format-email =name email=
+
+Format a mail address.
+
+
+** org-contacts-get-icon =&optional pom=
+
+Get icon for contact at =pom=.
+
+
+** org-contacts-gnus-article-from-get-marker  
+
+Return a marker for a contact based on From.
+
+
+** org-contacts-gnus-article-from-goto  
+
+Go to contact in the From address of current Gnus message.
+
+
+** org-contacts-gnus-check-mail-address  
+
+Check that contact has the current address recorded.
+This function should be called from /gnus-article-prepare-hook/.
+
+
+** org-contacts-gnus-get-name-email  
+
+Get name and email address from Gnus message.
+
+
+** org-contacts-gnus-insinuate  
+
+Add some hooks for Gnus user.
+This adds /org-contacts-gnus-check-mail-address/ and
+/org-contacts-gnus-store-last-mail/ to
+/gnus-article-prepare-hook/. It also adds a binding on /;/ in
+/gnus-summary-mode-map/ to /org-contacts-gnus-article-from-goto/
+
+
+** org-contacts-gnus-store-last-mail  
+
+Store a link between mails and contacts.
+
+This function should be called from /gnus-article-prepare-hook/.
+
+
+** org-contacts-irc-buffer =&optional pom=
+
+Get the IRC buffer associated with the entry at =pom=.
+
+
+** org-contacts-irc-number-of-unread-messages =&optional pom=
+
+Return the number of unread messages for contact at =pom=.
+
+
+** org-contacts-message-complete-function  
+
+Function used in /completion-at-point-functions/ in /message-mode/.
+
+
+** org-contacts-show-map =&optional name=
+
+Show contacts on a map. Requires google-maps-el.
+
+
+** org-contacts-template-email =&optional return-value=
+
+Try to return the contact email for a template.
+If not found return =return-value= or something that would ask the user.
+
+
+** org-contacts-template-name =&optional return-value=
+
+Try to return the contact name for a template.
+If not found return =return-value= or something that would ask the user.
+
+
+** org-contacts-template-wl-email =&optional return-value=
+
+Try to return the contact email for a template from wl.
+If not found return =return-value= or something that would ask the user.
+
+
+** org-contacts-template-wl-name =&optional return-value=
+
+Try to return the contact name for a template from wl.
+If not found return =return-value= or something that would ask the user.
+
+
+** org-contacts-vcard-encode-name =name=
+
+Try to encode =name= as VCard's N property. The N property expects FamilyName;GivenName;AdditionalNames;Prefix;Postfix.
+Org-contacts does not specify how to encode the name. So we try to do our best.
+
+
+** org-contacts-vcard-escape =str=
+
+Escape ; , and 
+#+begin_src emacs-lisp
+ in =str= for use in the VCard format.
+#+end_src
+Thanks to http://www.emacswiki.org/cgi-bin/wiki/bbdb-vcard-export.el for the regexp.
+
+
+** org-contacts-vcard-format =contact=
+
+Formats =contact= in VCard 3.0 format.
+
+
+** org-contacts-view-send-email =&optional ask=
+
+Send email to the contact at point.
+If =ask= is set, ask for the email address even if there's only one address.
+
+
+** org-contacts-view-switch-to-irc-buffer  
+
+Switch to the IRC buffer of the current contact if it has one.
+
+
+** org-contacts-wl-get-from-header-content  
+
+Retrieve the content of the /From/ header of an email.
+Works from wl-summary-mode and mime-view-mode - that is while viewing email.
+Depends on Wanderlust been loaded.
+
+
+** org-contacts-wl-get-name-email  
+
+Get name and email address from wanderlust email.
+See /org-contacts-wl-get-from-header-content/ for limitations.

@@ -1,0 +1,163 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Mouse API functions (org-mouse.el)
+** org-mouse-bolp  
+
+Return true if there only spaces, tabs, and '*' before point.
+This means, between the beginning of line and the point.
+
+
+** org-mouse-delete-timestamp  
+
+Deletes the current timestamp as well as the preceding keyword.
+SCHEDULED: or DEADLINE: or ANYTHINGLIKETHIS:
+
+
+** org-mouse-empty-line  
+
+Return non-nil iff the line contains only white space.
+
+
+** org-mouse-end-headline  
+
+Go to the end of current headline (ignoring tags).
+
+
+** org-mouse-get-priority =&optional default=
+
+Return the priority of the current headline.
+=default= is returned if no priority is given in the headline.
+
+
+** org-mouse-insert-heading  
+
+Insert a new heading, as /org-insert-heading/.
+
+If the point is at the :beginning (/org-mouse-line-position/) of the line,
+insert the new heading before the current line.  Otherwise, insert it
+after the current heading.
+
+
+** org-mouse-keyword-menu =keywords function &optional selected itemformat=
+
+A helper function.
+
+Returns a menu fragment consisting of =keywords=.  When a keyword
+is selected by the user, =function= is called with the selected
+keyword as the only argument.
+
+If =selected= is nil, then all items are normal menu items.  If
+=selected= is a function, then each item is a checkbox, which is
+enabled for a given keyword iff (funcall =selected= keyword) return
+non-nil.  If =selected= is neither nil nor a function, then the
+items are radio buttons.  A radio button is enabled for the
+keyword /equal/ to =selected=.
+
+=itemformat= governs formatting of the elements of =keywords=.  If it
+is a function, it is invoked with the keyword as the only
+argument.  If it is a string, it is interpreted as the format
+string to (format =itemformat= keyword).  If it is neither a string
+nor a function, elements of =keywords= are used directly.
+
+
+** org-mouse-keyword-replace-menu =keywords &optional group itemformat nosurround=
+
+A helper function.
+
+Returns a menu fragment consisting of =keywords=.  When a keyword
+is selected, group =group= of the current match is replaced by the
+keyword.  The method ensures that both ends of the replacement
+are separated from the rest of the text in the buffer by
+individual spaces (unless =nosurround= is non-nil).
+
+The final entry of the menu is always "None", which removes the
+match.
+
+=itemformat= governs formatting of the elements of =keywords=.  If it
+is a function, it is invoked with the keyword as the only
+argument.  If it is a string, it is interpreted as the format
+string to (format =itemformat= keyword).  If it is neither a string
+nor a function, elements of =keywords= are used directly.
+
+
+** org-mouse-line-position  
+
+Return /:beginning/ or /:middle/ or /:end/, depending on the point position.
+
+If the point is at the end of the line, return /:end/.
+If the point is separated from the beginning of the line only by white
+space and *'s (/org-mouse-bolp/), return /:beginning/.  Otherwise,
+return /:middle/.
+
+
+** org-mouse-next-heading  
+
+Go to the next heading.
+If there is none, ensure that the point is at the beginning of an empty line.
+
+
+** org-mouse-re-search-line =regexp=
+
+Search the current line for a given regular expression.
+
+
+** org-mouse-remove-match-and-spaces  
+
+Remove the match, make just one space around the point.
+
+
+** org-mouse-replace-match-and-surround =newtext &optional fixedcase literal string subexp=
+
+The same as /replace-match/, but surrounds the replacement with spaces.
+
+
+** org-mouse-set-priority =priority=
+
+Set the priority of the current headline to =priority=.
+
+
+** org-mouse-show-context-menu =event prefix=
+
+Invoke the context menu.
+
+If the value of /org-mouse-context-menu-function/ is a function, then
+this function is called.  Otherwise, the current major mode menu is used.
+
+
+** org-mouse-show-headlines  
+
+Change the visibility of the current org buffer to only show headlines.
+
+
+** org-mouse-show-overview  
+
+Change visibility of current org buffer to first-level headlines only.
+
+
+** org-mouse-tag-menu  
+
+Create the tags menu.
+
+
+** org-mouse-timestamp-today =&optional shift units=
+
+Change the timestamp into =shift= =units= in the future.
+
+For the acceptable =units=, see /org-timestamp-change/.
+
+
+** org-mouse-todo-menu =state=
+
+Create the menu with TODO keywords.
+

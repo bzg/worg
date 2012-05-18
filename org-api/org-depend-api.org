@@ -1,0 +1,54 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Depend API functions (org-depend.el)
+** org-depend-act-on-sibling =trigger-val &rest rest=
+
+Perform a set of actions on the next sibling, if it exists,
+copying the sibling spec =trigger-val= to the next sibling.
+
+
+** org-depend-block-todo =change-plist=
+
+Block turning an entry into a TODO.
+This checks for a BLOCKER property in an entry and checks
+all the entries listed there.  If any of them is not done,
+block changing the current entry into a TODO entry.  If the property contains
+the word "previous-sibling", the sibling above the current entry is checked.
+Any other words are treated as entry id's. If an entry exists with the
+this ID property, that entry is also checked.
+
+
+** org-depend-trigger-todo =change-plist=
+
+Trigger new TODO entries after the current is switched to DONE.
+This does two different kinds of triggers:
+
+- If the current entry contains a TRIGGER property that contains
+#+begin_src emacs-lisp
+  "chain-siblings(KEYWORD)", it goes to the next sibling, marks it
+  KEYWORD and also installs the "chain-sibling" trigger to continue
+  the chain.
+#+end_src
+- If the current entry contains a TRIGGER property that contains
+#+begin_src emacs-lisp
+  "chain-siblings-scheduled", we go to the next sibling and copy
+  the scheduled time from the current task, also installing the property
+  in the sibling.
+#+end_src
+- Any other word (space-separated) like XYZ(KEYWORD) in the TRIGGER
+#+begin_src emacs-lisp
+  property is seen as an entry id.  Org-mode finds the entry with the
+  corresponding ID property and switches it to the state TODO as well.
+#+end_src
+

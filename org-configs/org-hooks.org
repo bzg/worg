@@ -142,7 +142,7 @@ Defined in: /org.el/
 #+begin_example
     Hook which is run after the state of a TODO item was changed.
     The new state (a string with a TODO keyword, or nil) is available in the
-    Lisp variable `state'.
+    Lisp variable `org-state'.
 #+end_example
 ** =org-blocker-hook=
 Defined in: /org.el/
@@ -763,13 +763,20 @@ Defined in: /org-ascii.el/
 Defined in: /org-capture.el/
 #+begin_example
     Hook that is run right before a capture process is finalized.
-    The capture buffer is still current when this hook runs.
+    The capture buffer is still current when this hook runs and it is
+    widened to the entire buffer.
 #+end_example
 ** =org-capture-after-finalize-hook=
 Defined in: /org-capture.el/
 #+begin_example
     Hook that is run right after a capture process is finalized.
       Suitable for window cleanup
+#+end_example
+** =org-capture-prepare-finalize-hook=
+Defined in: /org-capture.el/
+#+begin_example
+    Hook that is run before the finalization starts.
+    The capture buffer is current and still narrowed.
 #+end_example
 ** =org-capture-mode-hook=
 Defined in: /org-capture.el/
@@ -994,7 +1001,7 @@ Defined in: /org-latex.el/
 Defined in: /org-latex.el/
 #+begin_example
     The function formatting returning the string to create the table of contents.
-    The function must take one parameter, the depth of the table of contents.
+    The function mus take one parameter, the depth of the table of contents.
 #+end_example
 ** =org-checkbox-statistics-hook=
 Defined in: /org-list.el/
@@ -1137,26 +1144,6 @@ Defined in: /org-xoxo.el/
 #+begin_example
     Hook run after XOXO export, in the new buffer.
 #+end_example
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 * Examples for using hooks
 

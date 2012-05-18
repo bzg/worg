@@ -1,0 +1,221 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Capture API functions (org-capture.el)
+** org-capture =&optional goto keys=
+
+Capture something.
+
+This will let you select a template from /org-capture-templates/, and then
+file the newly captured information.  The text is immediately inserted
+at the target location, and an indirect buffer is shown where you can
+edit it.  Pressing C-c C-c brings you back to the previous state
+of Emacs, so that you can continue your work.
+
+When called interactively with a C-u prefix argument =goto=, don't capture
+anything, just go to the file/headline where the selected template
+stores its notes.  With a double prefix argument C-u C-u, go to the last note
+stored.
+
+When called with a /C-0/ (zero) prefix, insert a template at point.
+
+Lisp programs can set =keys= to a string associated with a template in
+/org-capture-templates/.  In this case, interactive selection will be
+bypassed.
+
+
+** org-capture-bookmark-last-stored-position  
+
+Bookmark the last-captured position.
+
+
+** org-capture-empty-lines-after =&optional n=
+
+Arrange for the correct number of empty lines after the inserted string.
+Point will remain at the first line after the inserted text.
+
+
+** org-capture-empty-lines-before =&optional n=
+
+Arrange for the correct number of empty lines before the insertion point.
+Point will be after the empty lines, so insertion can directly be done.
+
+
+** org-capture-escaped-%  
+
+Check if % was escaped - if yes, unescape it now.
+
+
+** org-capture-expand-file =file=
+
+Expand functions and symbols for =file=.
+When =file= is a function, call it.  When it is a form, evaluate
+it.  When it is a variable, retrieve the value.  Return whatever we get.
+
+
+** org-capture-fill-template =&optional template initial annotation=
+
+Fill a template and return the filled template as a string.
+The template may still contain "%?" for cursor positioning.
+
+
+** org-capture-finalize =&optional stay-with-capture=
+
+Finalize the capture process.
+With prefix argument =stay-with-capture=, jump to the location of the
+captured item after finalizing.
+
+
+** org-capture-get =prop &optional local=
+
+Get properties from the capture property list /org-capture-plist/.
+When =local= is set, use the local variable /org-capture-current-plist/,
+this is necessary after initialization of the capture process,
+to avoid conflicts with other active capture processes.
+
+
+** org-capture-get-indirect-buffer =&optional buffer prefix=
+
+Make an indirect buffer for a capture process.
+Use =prefix= as a prefix for the name of the indirect buffer.
+
+
+** org-capture-get-template  
+
+Get the template from a file or a function if necessary.
+
+
+** org-capture-goto-last-stored  
+
+Go to the location where the last capture note was stored.
+
+
+** org-capture-goto-target =&optional template-key=
+
+Go to the target location of a capture template.
+The user is queried for the template.
+
+
+** org-capture-import-remember-templates  
+
+Set org-capture-templates to be similar to /org-remember-templates/.
+
+
+** org-capture-kill  
+
+Abort the current capture process.
+
+
+** org-capture-mark-kill-region =beg end=
+
+Mark the region that will have to be killed when aborting capture.
+
+
+** org-capture-member =prop &optional local=
+
+Is =prop= a property in /org-capture-plist/.
+When =local= is set, use the local variable /org-capture-current-plist/,
+this is necessary after initialization of the capture process,
+to avoid conflicts with other active capture processes.
+
+
+** org-capture-mode =&optional arg=
+
+Minor mode for special key bindings in a capture buffer.
+
+
+** org-capture-narrow =beg end=
+
+Narrow, unless configuration says not to narrow.
+
+
+** org-capture-place-entry  
+
+Place the template as a new Org entry.
+
+
+** org-capture-place-item  
+
+Place the template as a new plain list item.
+
+
+** org-capture-place-plain-text  
+
+Place the template plainly.
+If the target locator points at an Org node, place the template into
+the text of the entry, before the first child.  If not, place the
+template at the beginning or end of the file.
+Of course, if exact position has been required, just put it there.
+
+
+** org-capture-place-table-line  
+
+Place the template as a table line.
+
+
+** org-capture-place-template  
+
+Insert the template at the target location, and display the buffer.
+
+
+** org-capture-position-for-last-stored =where=
+
+Memorize the position that should later become the position of last capture.
+
+
+** org-capture-put =&rest stuff=
+
+Add properties to the capture property list /org-capture-plist/.
+
+
+** org-capture-put-target-region-and-position  
+
+Store the initial region with /org-capture-put/.
+
+
+** org-capture-refile  
+
+Finalize the current capture and then refile the entry.
+Refiling is done from the base buffer, because the indirect buffer is then
+already gone.  Any prefix argument will be passed to the refile command.
+
+
+** org-capture-select-template =&optional keys=
+
+Select a capture template.
+Lisp programs can force the template by setting =keys= to a string.
+
+
+** org-capture-set-plist =entry=
+
+Initialize the property list from the template definition.
+
+
+** org-capture-set-target-location =&optional target=
+
+Find target buffer and position and store then in the property list.
+
+
+** org-capture-steal-local-variables =buffer=
+
+Install Org-mode local variables.
+
+
+** org-capture-target-buffer =file=
+
+Get a buffer for =file=.
+
+
+** org-capture-verify-tree =tree=
+
+Throw error if =tree= is not a valid tree
