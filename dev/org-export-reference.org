@@ -12,12 +12,80 @@
 [[file:../index.org][{Back to Worg's index}]]
 
 This document is aimed at back-end developers for the generic export
-engine =org-export.el=.  It assumes a good understanding of Org syntax
-— as specified by /Org Elements/ — from the reader.
+engine =org-export.el=. It assumes a good understanding of Org
+syntax --- as specified by /Org Elements/ --- from the reader.
 
-It covers [[#attributes][attributes]] associated to each element or object type,
-properties offered by the [[#communication][communication channel]] during export process
-and [[#toolbox][tools]] provided by the exporter.
+It covers [[#back-end][back-end creation]] process, all [[#attributes][attributes]] associated to each
+element or object type, properties offered by the [[#communication][communication
+channel]] during export, the [[#filter-system][filter system]] internals and [[#toolbox][tools]] provided
+by the exporter.
+
+
+* Defining a Back-End
+
+  A back-end is defined through one mandatory variable: his
+  translation table.  Its name is always ~org-BACKEND-translate-alist~
+  where ~BACKEND~ stands for the name chosen for the back-end.  Its
+  value is an alist whose keys are elements and objects types and
+  values translator functions.
+
+  These functions should return a string without any trailing space,
+  or nil.  They must accept three arguments: the object or element
+  itself, its contents or nil when it isn't recursive and the property
+  list used as a communication channel.
+
+  Contents, when not nil, are stripped from any global indentation
+  (although the relative one is preserved).  They also always end with
+  a single newline character.
+
+  If, for a given type, no function is found, that element or object
+  type will simply be ignored, along with any blank line or white
+  space at its end.  The same will happen if the function returns the
+  nil value.  If that function returns the empty string, the type will
+  be ignored, but the blank lines or white spaces will be kept.
+
+  In addition to element and object types, one function can be
+  associated to the ~template~ symbol and another one to the
+  ~plain-text~ symbol.
+
+  The former returns the final transcoded string, and can be used to
+  add a preamble and a postamble to document's body.  It must accept
+  two arguments: the transcoded string and the property list
+  containing export options.
+
+  The latter, when defined, is to be called on every text not
+  recognized as an element or an object.  It must accept two
+  arguments: the text string and the information channel.  It is an
+  appropriate place to protect special chars relative to the back-end.
+
+  Optionally, a back-end can support specific buffer keywords and
+  ~OPTION~ keyword's items by setting ~org-BACKEND-filters-alist~
+  variable.  Refer to ~org-export-options-alist~ documentation for
+  more information about its value.
+
+  For example, =e-latex= back-end introduces three new buffer
+  keywords, and redefine ~DATE~ default value with the following
+  snippet:
+
+  #+BEGIN_SRC emacs-lisp
+    (defconst org-e-latex-options-alist
+    '((:date "DATE" nil org-e-latex-date-format t)
+      (:latex-class "LATEX_CLASS" nil org-e-latex-default-class t)
+      (:latex-class-options "LATEX_CLASS_OPTIONS" nil nil t)
+      (:latex-header-extra "LATEX_HEADER" nil nil newline)))
+  #+END_SRC
+
+  If the new back-end shares most properties with another one,
+  ~org-export-define-derived-backend~ macro can be used to simplify
+  the process.  In the example below, we implement a new back-end
+  which behaves like =e-latex= excepted for headlines and the
+  template.
+
+  #+BEGIN_SRC emacs-lisp
+  (org-export-define-derived-backend my-latex e-latex
+  :translate-alist ((headline . custom-headline-translator)
+                    (template . custom-template)))
+  #+END_SRC
 
 * Elements Attributes
   :PROPERTIES:
