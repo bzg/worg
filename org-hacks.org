@@ -2885,7 +2885,7 @@ prefixed with "#", even not when within source blocks.
 #+index: Conversion!fileconversion emacs-lisp code
 
 #+BEGIN_SRC emacs-lisp
-  ;; - fileconversion version 0.3
+  ;; - fileconversion version 0.4
   ;; - DISCLAIMER: Make a backup of your Org files before using
   ;;   my-org-fileconv-*.
   ;; - supported formats: hidestarsfile, markdownstarsfile
@@ -2936,6 +2936,7 @@ prefixed with "#", even not when within source blocks.
       (beginning-of-buffer)
       (let (re-list (count 0))
         (while (re-search-forward "^#\\+STARTUP:" nil t)
+          ;; #+STARTUP: hidestarsfile
           (when (string-match-p "\\bhidestarsfile\\b"
                                 (thing-at-point 'line))
             ;; exclude e. g.:
@@ -2945,6 +2946,7 @@ prefixed with "#", even not when within source blocks.
             (setq re-list '("\\(\\* \\)"  ; common-re
                             ?\ ))         ; file-char
             (setq count (1+ count)))
+          ;; #+STARTUP: markdownstarsfile
           (when (string-match-p "\\bmarkdownstarsfile\\b"
                                 (thing-at-point 'line))
             ;; exclude e. g.:
@@ -2966,23 +2968,25 @@ prefixed with "#", even not when within source blocks.
                (file-re   (concat "^" (string file-char) "+" common-re))
                (org-re    (concat "^\\*+" common-re))
                len
-               (p         (point))
-               (mod-p     (buffer-modified-p))
-               (undo-list buffer-undo-list))
+               (p         (point)))
           (beginning-of-buffer)
+          ;; syntax check
           (when (re-search-forward org-re nil t)
             (goto-char (match-beginning 0))
             (org-reveal)
             (error
              "ERR: my-org-fileconv-decode syntax conflict at point"))
           (beginning-of-buffer)
-          (while (re-search-forward file-re nil t)
-            (goto-char (match-beginning 0))
-            ;; faster than lisp call of ins and del for each single char
-            (setq len (- (match-beginning 1) (match-beginning 0)))
-            (insert-char ?* len)
-            (delete-char len))
-          (goto-char p)
+          ;; substitution
+          (with-silent-modifications
+            (while (re-search-forward file-re nil t)
+              (goto-char (match-beginning 0))
+              ;; faster than a lisp call of insert and delete on each
+              ;; single char
+              (setq len (- (match-beginning 1) (match-beginning 0)))
+              (insert-char ?* len)
+              (delete-char len)))
+          (goto-char p))))
 
           ;; notes for ediff when only one file has fileconversion:
           ;; - The changes to the buffer with fileconversion until here
@@ -2997,10 +3001,6 @@ prefixed with "#", even not when within source blocks.
           ;;     then run ediff-buffers (better for e. g. a script that
           ;;     takes two files as arguments and uses "emacs --eval")
 
-          (when (not mod-p) (not-modified))
-          ;; avoid jump to header with level > 1 during undo when file
-          ;; is saved before undo
-          (setq buffer-undo-list undo-list))))
     ;; the level is Org most of all when no fileconversion is in effect
     (setq my-org-fileconv-level-org-p t))
 
@@ -3014,28 +3014,25 @@ prefixed with "#", even not when within source blocks.
                (file-re   (concat "^" (string file-char) "+" common-re))
                (org-re    (concat "^\\*+" common-re))
                len
-               (p         (point))
-               (mod-p     (buffer-modified-p))
-               (undo-list buffer-undo-list))
+               (p         (point)))
           (beginning-of-buffer)
+          ;; syntax check
           (when (re-search-forward file-re nil t)
             (goto-char (match-beginning 0))
             (org-reveal)
             (error
              "ERR: my-org-fileconv-encode syntax conflict at point"))
           (beginning-of-buffer)
-          (while (re-search-forward org-re nil t)
-            (goto-char (match-beginning 0))
-            ;; faster than lisp call of ins and del for each single char
-            (setq len (- (match-beginning 1) (match-beginning 0)))
-            (insert-char file-char len)
-            (delete-char len))
+          ;; substitution
+          (with-silent-modifications
+            (while (re-search-forward org-re nil t)
+              (goto-char (match-beginning 0))
+              ;; faster than a lisp call of insert and delete on each
+              ;; single char
+              (setq len (- (match-beginning 1) (match-beginning 0)))
+              (insert-char file-char len)
+              (delete-char len)))
           (goto-char p)
-
-          (when (not mod-p) (not-modified))
-          ;; avoid jump to header with level > 1 during undo when file
-          ;; is saved before undo
-          (setq buffer-undo-list undo-list)
           (setq my-org-fileconv-level-org-p nil))))
     nil)  ;; for the hook
 #+END_SRC
