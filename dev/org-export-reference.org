@@ -12,7 +12,7 @@
 [[file:../index.org][{Back to Worg's index}]]
 
 This document is aimed at back-end developers for the generic export
-engine =org-export.el=. It assumes a good understanding of Org
+engine =org-export.el=.  It assumes a good understanding of Org
 syntax --- as specified by /Org Elements/ --- from the reader.
 
 It covers [[#back-end][back-end creation]] process, all [[#attributes][attributes]] associated to each
@@ -1854,8 +1854,23 @@ by the exporter.
    :END:
 
    Non-nil when the link provided should be considered as an inline
-   image.  It also accepts an optional set of rules in order to tweak
-   the definition of an inline image.
+   image.  Note that it always return nil when the link has
+   a description.
+
+   It accepts an optional set of rules in order to tweak the
+   definition of an inline image, which is, by default, any link
+   targetting a local file whose extension is either "png", "jpeg",
+   "jpg", "gif", "tiff", "tif", "xbm", "xpm", "pbm", "pgm" or "ppm".
+
+   A set of rules consists in an alist whose key is a type of link, as
+   a string, and whose value is a regexp matching link's path.  As an
+   example, =e-html= back-end uses the following rules:
+
+   #+BEGIN_SRC emacs-lisp
+   '(("file" . "\\.\\(jpeg\\|jpg\\|png\\|gif\\|svg\\)\\'")
+     ("http" . "\\.\\(jpeg\\|jpg\\|png\\|gif\\|svg\\)\\'")
+     ("https" . "\\.\\(jpeg\\|jpg\\|png\\|gif\\|svg\\)\\'"))
+   #+END_SRC
 
    See also: [[#solidify-link-text][~org-export-solidify-link-text~]],
    [[#get-coderef-format][~org-export-get-coderef-format~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
@@ -2005,7 +2020,7 @@ by the exporter.
    See also: [[#table-cell-alignment][~org-export-table-cell-alignment~]],
    [[#table-cell-width][~org-export-table-cell-width~]].
 
-** ~org-export-table-cell-ends~colgroup-p~
+** ~org-export-table-cell-ends-colgroup-p~
    :PROPERTIES:
    :CUSTOM_ID: table-cell-ends-colgroup-p
    :END:
@@ -2048,6 +2063,9 @@ by the exporter.
          (org-element-map
           table 'table-row
           (lambda (row)
+            ;; For each exportable row, get the cell at column COL and
+            ;; transcode its contents.  Then compare its length with
+            ;; MAX-WIDTH and keep the greater of two.
             (setq max-width
                   (max (length
                         (org-export-data
