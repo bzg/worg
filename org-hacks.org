@@ -2885,7 +2885,7 @@ prefixed with "#", even not when within source blocks.
 #+index: Conversion!fileconversion emacs-lisp code
 
 #+BEGIN_SRC emacs-lisp
-  ;; - fileconversion version 0.4
+  ;; - fileconversion version 0.5
   ;; - DISCLAIMER: Make a backup of your Org files before using
   ;;   my-org-fileconv-*.
   ;; - supported formats: hidestarsfile, markdownstarsfile
@@ -2913,21 +2913,28 @@ prefixed with "#", even not when within source blocks.
             ;; from this function will be visible as the last message in
             ;; the minibuffer
             t
-            ;; global
+            ;; hook addition global
             nil)
 
   (defun my-org-fileconv-init ()
     (interactive)
-    (message "INF: my-org-fileconv-init, buffer: %s" (buffer-name))
-    (my-org-fileconv-decode)
-    ;; the hooks are not permanent-local, this way and as needed they
-    ;; will be lost at the moment when the major mode is changed
-    (add-hook 'change-major-mode-hook 'my-org-fileconv-encode nil
-              t)   ; limit hook change local to buffer
-    (add-hook 'before-save-hook 'my-org-fileconv-encode nil
-              t)   ; limit hook change local to buffer
-    (add-hook 'after-save-hook 'my-org-fileconv-decode nil
-              t))  ; limit hook change local to buffer
+    ;; instrument only when converting really from/to an Org _file_, not
+    ;; e. g. for a temp Org buffer unrelated to a file like used e. g.
+    ;; when calling the old Org exporter
+    (when (buffer-file-name)
+      (message "INF: my-org-fileconv-init, buffer: %s" (buffer-name))
+      (my-org-fileconv-decode)
+      ;; the hooks are not permanent-local, this way and as needed they
+      ;; will disappear when the major mode of the buffer changes
+      (add-hook 'change-major-mode-hook 'my-org-fileconv-encode nil
+                ;; hook addition limited to buffer locally
+                t)
+      (add-hook 'before-save-hook 'my-org-fileconv-encode nil
+                ;; hook addition limited to buffer locally
+                t)
+      (add-hook 'after-save-hook 'my-org-fileconv-decode nil
+                ;; hook addition limited to buffer locally
+                t)))
 
   (defun my-org-fileconv-re ()
     "Check whether there is a STARTUP line for fileconversion.
