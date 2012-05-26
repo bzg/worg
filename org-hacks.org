@@ -2802,7 +2802,7 @@ Now you can also change to Fundamental mode to see how the file looks like
 on the level of the file, go back to Org mode, reenter Org mode or change to
 any other major mode and the conversion gets done whenever necessary.
 
-*** Headings Without Leading Stars (hidestarsfile)
+*** Headings Without Leading Stars (hidestarsfile and nbspstarsfile)
     :PROPERTIES:
     :CUSTOM_ID: hidestarsfile
     :END:
@@ -2844,7 +2844,11 @@ with an editor not capable of the Org file format.
 
 hidestarsfile is a hack and can not become part of the Org core:
 - An Org file with hidestarsfile can not contain list items with a star as
-  bullet due to the syntax conflict at read time.
+  bullet due to the syntax conflict at read time. Mark E. Shoulson suggested
+  to use the non-breaking space which is now implemented in fileconversion
+  as nbspstarsfile as an alternative for hidestarsfile. Although I don't
+  recommend it because an editor like typically e. g. Emacs may render the
+  non-breaking space differently from the space 0x20.
 - An Org file with hidestarsfile can almost not be edited with an Org mode
   without added functionality of hidestarsfile as long as the file is not
   converted back.
@@ -2885,7 +2889,7 @@ prefixed with "#", even not when within source blocks.
 #+index: Conversion!fileconversion emacs-lisp code
 
 #+BEGIN_SRC emacs-lisp
-  ;; - fileconversion version 0.5
+  ;; - fileconversion version 0.6
   ;; - DISCLAIMER: Make a backup of your Org files before using
   ;;   my-org-fileconv-*.
   ;; - supported formats: hidestarsfile, markdownstarsfile
@@ -2952,6 +2956,12 @@ prefixed with "#", even not when within source blocks.
             ;;   quoted ASCII style (star at end of line)
             (setq re-list '("\\(\\* \\)"  ; common-re
                             ?\ ))         ; file-char
+            (setq count (1+ count)))
+          ;; #+STARTUP: nbspstarsfile
+          (when (string-match-p "\\bnbspstarsfile\\b"
+                                (thing-at-point 'line))
+            (setq re-list '("\\(\\* \\)"  ; common-re
+                            ?\xa0))       ; file-char non-breaking space
             (setq count (1+ count)))
           ;; #+STARTUP: markdownstarsfile
           (when (string-match-p "\\bmarkdownstarsfile\\b"
