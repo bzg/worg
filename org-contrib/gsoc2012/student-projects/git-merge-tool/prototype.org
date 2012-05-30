@@ -12,28 +12,28 @@
 #+EXPORT_EXCLUDE_TAGS: noexport
 
 * Org-merge-driver Prototype
-The prototype for the org-merge-driver is finally finished, and now I
-can show you what it does.  As a recap, the program takes 2 modified
-versions of an Orgmode file and the original file, and tries to merge
-the changes into a single file.  Any changes from the two files which
-cannot be merged properly are marked as a 'conflict', with the
-standard conflict markers.
+The program takes 2 modified versions of an Orgmode file and the
+original file, and tries to merge the changes into a single file.  Any
+changes from the two files which cannot be merged properly are marked
+as a conflict, with the standard conflict markers.
 
 The prototype only deals with one type of org-mode element: headings.
 An org-mode file is parsed into a tree of headings.  All text below a
 heading but before the next heading is considered apart of the
 heading's text.  A heading is identified by the text in the title
-(first line), or by an :ID: property if it has one.  The program then
-takes the parsed trees, and matches headings from one file to another.
-While it does this, it also detects new headings, removed headings,
-and headings moved underneath a new parent.  For the prototype, I
-decided to regard headings as a un-ordered elements, so changing of
-position underneath a parent heading is not detected.  This has also
-caused problems of accidentally reordering headings under a single
-parent in the output.  This will be fixed for the final program.
+(first line), or by an :ID: property if it has one.  
+
+The program then takes the parsed trees, and matches headings from one
+file to another.  While it does this, it also detects new headings,
+removed headings, and headings moved underneath a new parent.  For the
+prototype, I decided to regard headings as a un-ordered elements, so
+changing of position underneath a parent heading is not detected.
+This has also caused problems of accidentally reordering headings
+under a single parent in the output.  This will be fixed for the final
+program.
 
 ** Example Results 1
-So here is an example run through with the program:
+Here is an example run through with the program:
 
 Ancestor:
 #+begin_src org
@@ -61,8 +61,8 @@ File2:
   ,- with some text
 #+end_src
 
-#+begin_quote
 Program Stdout:
+#+begin_quote
 ----------------
 Node Change List:
 ----------------
@@ -97,9 +97,9 @@ FILE : 1 NEW
 (:title "Sub new heading in file 1" :level 3 :parent-level 2 :id "" :text "")
 #+end_quote
 
-The stdout can be confusing.  It mostly shows what positional changes
-for the headings it has detected.  It does not, however, show changes
-to the content under a heading.
+The stdout can be confusing and misleading.  It mostly shows what
+positional changes for the headings it has detected.  It does not,
+however, show changes to the content under a heading.
 
 Merged Document:
 #+begin_src org
@@ -115,10 +115,11 @@ Merged Document:
   ,*** Sub new heading in file 1
 #+end_src
 
-As you can see, the file merged without any conflicts.  This is
-because neither file updated the same heading.  If File 1 had an
-additional top line that changed it to:
+The file merged without any conflicts.  This is because neither file
+updated the same heading.  If File 1 had an additional top line that
+changed it to:
 
+New file 1:
 #+begin_src org
   ,- conflicting text in file 1
   ,* original heading
@@ -130,7 +131,6 @@ additional top line that changed it to:
 #+end_src
 
 Then the output has a conflict, and prints:
-
 #+begin_src org
   ,<<<<<<< yours: t1-1.org
   ,- conflicting text in file 1
@@ -255,9 +255,9 @@ Merged Document:
   ,- this line added in file 2
 #+end_src
 
-As you can see in this example, the ID was used to distinguish the
-headings called 'test heading', and a heading could be moved in one
-document and content updated in another without a conflict.  An
-identical content change in two files would not result in a conflict.
-If a identical heading is added to each of the documents, then the
-merged result will have two identical headings without conflict.
+In this example, the ID was used to distinguish the headings called
+'test heading', and a heading could be moved in one document and
+content updated in another without a conflict.  An identical content
+change in two files would not have resulted in a conflict.  If a identical
+heading is added to each of the documents, then the merged result will
+have two identical headings without conflict.
