@@ -362,16 +362,16 @@ graphics=.  The following example writes the graphics output to the
 file specified in the =:file= header argument.
 
 #+begin_example
-  ,#+name: r-edge-angle-histogram
-  ,#+begin_src R :results output graphics :var x=whole-adzes :file r/adze_edge_angle.png :width 400 :height 300
+  ,#+name: r-with-ggplot2
+  ,#+begin_src R :results output graphics :var tbl=foo :file r/foo-output.png :width 400 :height 300
     library(ggplot2)
-    adze.edge.angle <- ggplot(x, aes(edge_angle))
-    adze.edge.angle + geom_histogram(aes(y=..density..)) +
-    geom_density(weight=2) + xlab("Measured cutting edge angle (degrees)")
+    res <- ggplot(tbl, aes(a_foo_var))
+    res + geom_histogram(aes(y=..density..)) +
+    geom_density(weight=2) + xlab("A foo variable")
   ,#+end_src
   
   ,#+results:
-  [[file:r/adze_edge_angle.png]]
+  [[file:r/foo-output.png]]
 #+end_example
 
 ** LaTeX code from R
