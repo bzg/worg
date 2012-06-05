@@ -19,67 +19,67 @@ workaround. Go crazy.
 
 * Hacking Org: Working within Org-mode.
 ** Building and Managing Org
-*** Compiling Org without make
+*** Generating autoloads and Compiling Org without make
     :PROPERTIES:
     :CUSTOM_ID: compiling-org-without-make
     :END:
 
 #+index: Compilation!without make
 
-NB: THIS MAY NOT WORK!!! If you have problems, you might try to run
-uncompiled, until this recipe is fixed (note added by ND [2012-06-05
-Tue]).
+  Compilation is optional, but you _must_ update the autoloads file
+  each time you update org, even when you run org uncompiled!
 
-This file is the result of  [[http://article.gmane.org/gmane.emacs.orgmode/15264][one of our discussions]] on the mailing list.
-Enhancements welcome.
+  Presumably starting with Org 7.9 (and in Git on current master
+  already) you'll find functions for creating the autoload files and
+  do byte-compilation in =UTILITIES/org-fixup.el=.  To make just the
+  autoloads file do:
+  : emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup -f org-make-autoloads
+  To make the autoloads file and byte-compile org:
+  : emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup -f org-make-autoloads-compile
+  If you are not using Git, you'll have to make fake version strings
+  first if =org-version.el= is not available:
+  : emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup \
+  : --eval 'org-make-org-version "7.8.11" "7.8.11-fake" "/path/to/odt/styles")'
 
-To use this function, adjust the variables =my/org-lisp-directory= and
-=my/org-compile-sources= to suite your needs.
+  For older org versions, use the definitions below.  To use this
+  function, adjust the variables =my/org-lisp-directory= and
+  =my/org-compile-sources= to suit your needs.  If you have
+  byte-compiled org, but want to run org uncompiled again, just remove
+  all =*.elc= files in the =lisp/= directory, set
+  =my/org-compile-sources= to =nil=.
 
 #+BEGIN_SRC emacs-lisp
-(defvar my/org-lisp-directory "~/.emacs.d/org/lisp"
-  "Directory where your org-mode files live.")
-
-(defvar my/org-compile-sources t
-  "If `nil', never compile org-sources. `my/compile-org' will only create
-the autoloads file `org-install.el' then. If `t', compile the sources, too.")
-
-;; Customize:
-(setq my/org-lisp-directory "~/.emacs.d/org/lisp")
-
-;; Customize:
-(setq  my/org-compile-sources t)
-
-(defun my/compile-org(&optional directory)
-  "Compile all *.el files that come with org-mode."
-  (interactive)
-  (setq directory (concat
-                  	(file-truename
-                    (or directory my/org-lisp-directory)) "/"))
-
-  (add-to-list 'load-path directory)
-
-  (let ((list-of-org-files (file-expand-wildcards (concat directory "*.el"))))
-
-    ;; create the org-install file
-    (require 'autoload)
-    (setq esf/org-install-file (concat directory "org-install.el"))
-    (find-file esf/org-install-file)
-    (erase-buffer)
-    (mapc (lambda (x)
-            (generate-file-autoloads x))
-          list-of-org-files)
-    (insert "\n(provide (quote org-install))\n")
-    (save-buffer)
-    (kill-buffer)
-    (byte-compile-file esf/org-install-file t)
-
-    (dolist (f list-of-org-files)
-      (if (file-exists-p (concat f "c")) ; delete compiled files
-          (delete-file (concat f "c")))
-      (if my/org-compile-sources     ; Compile, if `my/org-compile-sources' is t
-          (byte-compile-file f)))))
-#+END_SRC
+  (defvar my/org-lisp-directory "~/.emacs.d/org/lisp"
+    "Directory where your org-mode files live.")
+  
+  (defvar my/org-compile-sources t
+    "If `nil', never compile org-sources. `my/compile-org' will only create
+  the autoloads file `org-install.el' then. If `t', compile the sources, too.")
+  
+  ;; Customize:
+  (setq my/org-lisp-directory "~/.emacs.d/org/lisp")
+  
+  ;; Customize:
+  (setq  my/org-compile-sources t)
+  
+  (defun my/compile-org(&optional directory)
+    "Generate autoloads file org-install.el.  Optionally compile
+     all *.el files that come with org-mode."
+    (interactive)
+    (defun my/compile-org()
+      "Generate autoloads file org-install.el.  Optionally compile
+       all *.el files that come with org-mode."
+      (interactive)
+      (let ((dirlisp (file-name-directory my/org-lisp-directory)))
+        (add-to-list 'load-path dirlisp)
+        (require 'autoload)
+        (let ((generated-autoload-file (concat dirlisp "org-install.el")))
+          ;; create the org-install file
+          (update-directory-autoloads dirlisp)
+          (when my/org-compile-sources
+            ;; optionally byte-compile
+            (byte-recompile-directory dirlisp 0 'force)))))
+  #+END_SRC
 *** Reload Org
 
 #+index: Initialization!Reload
