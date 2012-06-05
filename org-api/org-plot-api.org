@@ -1,0 +1,71 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Plot API functions (org-plot.el)
+** org-plot-quote-timestamp-field =s=
+
+Convert field =s= from timestamp to Unix time and export to gnuplot.
+
+
+** org-plot-quote-tsv-field =s=
+
+Quote field =s= for export to gnuplot.
+
+
+** org-plot/add-options-to-plist =p options=
+
+=p=arse an =options= line and set values in the property list =p=.
+Returns the resulting property list.
+
+
+** org-plot/collect-options =&optional params=
+
+Collect options from an org-plot '#+Plot:' line.
+Accepts an optional property list =params=, to which the options
+will be added.  Returns the resulting property list.
+
+
+** org-plot/gnuplot =&optional params=
+
+Plot table using gnuplot.  Gnuplot options can be specified with =params=.
+If not given options will be taken from the +PLOT
+line directly before or after the table.
+
+
+** org-plot/gnuplot-script =data-file num-cols params &optional preface=
+
+Write a gnuplot script to =data-file= respecting the options set in =params=.
+=num-cols= controls the number of columns plotted in a 2-d plot.
+Optional argument =preface= returns only option parameters in a
+manner suitable for prepending to a user-specified script.
+
+
+** org-plot/gnuplot-to-data =table data-file params=
+
+Export =table= to =data-file= in a format readable by gnuplot.
+Pass =params= through to /orgtbl-to-generic/ when exporting =table=.
+
+
+** org-plot/gnuplot-to-grid-data =table data-file params=
+
+Export the data in =table= to =data-file= for gnuplot.
+This means in a format appropriate for grid plotting by gnuplot.
+=params= specifies which columns of =table= should be plotted as independent
+and dependant variables.
+
+
+** org-plot/goto-nearest-table  
+
+Move the point forward to the beginning of nearest table.
+Return value is the point at the beginning of the table.
+

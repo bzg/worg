@@ -1,0 +1,683 @@
+% Reference Card for Org Mode
+\def\orgversionnumber{7.8}
+\def\versionyear{2012}          % latest update
+\def\year{2012}                 % latest copyright year
+
+%**start of header
+\newcount\columnsperpage
+\newcount\letterpaper
+
+% This file can be printed with 1, 2, or 3 columns per page (see below).
+% Specify how many you want here.
+\columnsperpage=3
+
+% PDF output layout.  0 for A4, 1 for letter (US), a `l' is added for
+% a landscape layout.
+\input pdflayout.sty
+\pdflayout=(0l)
+
+% Nothing else needs to be changed below this line.
+% Copyright (C) 1987, 1993, 1996, 1997, 2001, 2002, 2003, 2004, 2005,
+%   2006, 2007, 2008, 2009  Free Software Foundation, Inc.
+
+% This file is part of GNU Emacs.
+
+% GNU Emacs is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+
+% GNU Emacs is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+
+% You should have received a copy of the GNU General Public License
+% along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
+
+% This file is intended to be processed by plain TeX (TeX82).
+%
+% The final reference card has six columns, three on each side.
+% This file can be used to produce it in any of three ways:
+% 1 column per page
+%    produces six separate pages, each of which needs to be reduced to 80%.
+%    This gives the best resolution.
+% 2 columns per page
+%    produces three already-reduced pages.
+%    You will still need to cut and paste.
+% 3 columns per page
+%    produces two pages which must be printed sideways to make a
+%    ready-to-use 8.5 x 11 inch reference card.
+%    For this you need a dvi device driver that can print sideways.
+% Which mode to use is controlled by setting \columnsperpage above.
+%
+% To compile and print this document:
+% tex refcard.tex
+% dvips -t landscape refcard.dvi
+%
+% Author:
+%  Stephen Gildea
+%  Internet: gildea@stop.mail-abuse.org
+%
+% Thanks to Paul Rubin, Bob Chassell, Len Tower, and Richard Mlynarik
+% for their many good ideas.
+
+\def\shortcopyrightnotice{\vskip 1ex plus 2 fill
+  \centerline{\small \copyright\ \year\ Free Software Foundation, Inc.
+  Permissions on back.  v\orgversionnumber}}
+
+\def\copyrightnotice{
+\vskip 1ex plus 100 fill\begingroup\small
+\centerline{Copyright \copyright\ \year\ Free Software Foundation, Inc.}
+\centerline{v\orgversionnumber{} for Org-Mode \orgversionnumber{}, \versionyear}
+\centerline{Auteur de la version anglaise : Philip Rooke}
+\centerline{Traduction en fran\c{c}ais : Isabelle Ramade, Thierry Stoehr, Vincent-Xavier Jumel}
+\centerline{Bas\'e sur le format refcard de Stephen Gildea}
+
+Permission est donn\'ee de faire des copies de ce document et de les
+distribuer \`a condition que la notice de copyright et cette note de
+permission soit conserv\'ee  sur toutes les copies.
+
+\endgroup}
+
+% make \bye not \outer so that the \def\bye in the \else clause below
+% can be scanned without complaint.
+\def\bye{\par\vfill\supereject\end}
+
+\newdimen\intercolumnskip    %horizontal space between columns
+\newbox\columna            %boxes to hold columns already built
+\newbox\columnb
+
+\def\ncolumns{\the\columnsperpage}
+
+\message{[\ncolumns\space
+  column\if 1\ncolumns\else s\fi\space per page]}
+
+\def\scaledmag#1{ scaled \magstep #1}
+
+% This multi-way format was designed by Stephen Gildea October 1986.
+% Note that the 1-column format is fontfamily-independent.
+\if 1\ncolumns            %one-column format uses normal size
+  \hsize 4in
+  \vsize 10in
+  \voffset -.7in
+  \font\titlefont=\fontname\tenbf \scaledmag3
+  \font\headingfont=\fontname\tenbf \scaledmag2
+  \font\smallfont=\fontname\sevenrm
+  \font\smallsy=\fontname\sevensy
+
+  \footline{\hss\folio}
+  \def\makefootline{\baselineskip10pt\hsize6.5in\line{\the\footline}}
+\else                %2 or 3 columns uses prereduced size
+  \if 1\the\letterpaper
+     \hsize 3.2in
+     \vsize 7.95in
+     \hoffset -.75in
+     \voffset -.745in
+  \else
+     \hsize 3.2in
+     \vsize 7.65in
+     \hoffset -.25in
+     \voffset -.745in
+  \fi
+  \font\titlefont=cmbx10 \scaledmag2
+  \font\headingfont=cmbx10 \scaledmag1
+  \font\smallfont=cmr6
+  \font\smallsy=cmsy6
+  \font\eightrm=cmr8
+  \font\eightbf=cmbx8
+  \font\eightit=cmti8
+  \font\eighttt=cmtt8
+  \font\eightmi=cmmi8
+  \font\eightsy=cmsy8
+  \textfont0=\eightrm
+  \textfont1=\eightmi
+  \textfont2=\eightsy
+  \def\rm{\eightrm}
+  \def\bf{\eightbf}
+  \def\it{\eightit}
+  \def\tt{\eighttt}
+  \if 1\the\letterpaper
+     \normalbaselineskip=.8\normalbaselineskip
+  \else
+     \normalbaselineskip=.7\normalbaselineskip
+  \fi
+  \normallineskip=.8\normallineskip
+  \normallineskiplimit=.8\normallineskiplimit
+  \normalbaselines\rm        %make definitions take effect
+
+  \if 2\ncolumns
+    \let\maxcolumn=b
+    \footline{\hss\rm\folio\hss}
+    \def\makefootline{\vskip 2in \hsize=6.86in\line{\the\footline}}
+  \else \if 3\ncolumns
+    \let\maxcolumn=c
+    \nopagenumbers
+  \else
+    \errhelp{You must set \columnsperpage equal to 1, 2, or 3.}
+    \errmessage{Illegal number of columns per page}
+  \fi\fi
+
+  \intercolumnskip=.46in
+  \def\abc{a}
+  \output={%            %see The TeXbook page 257
+      % This next line is useful when designing the layout.
+      %\immediate\write16{Column \folio\abc\space starts with \firstmark}
+      \if \maxcolumn\abc \multicolumnformat \global\def\abc{a}
+      \else\if a\abc
+    \global\setbox\columna\columnbox \global\def\abc{b}
+        %% in case we never use \columnb (two-column mode)
+        \global\setbox\columnb\hbox to -\intercolumnskip{}
+      \else
+    \global\setbox\columnb\columnbox \global\def\abc{c}\fi\fi}
+  \def\multicolumnformat{\shipout\vbox{\makeheadline
+      \hbox{\box\columna\hskip\intercolumnskip
+        \box\columnb\hskip\intercolumnskip\columnbox}
+      \makefootline}\advancepageno}
+  \def\columnbox{\leftline{\pagebody}}
+
+  \def\bye{\par\vfill\supereject
+    \if a\abc \else\null\vfill\eject\fi
+    \if a\abc \else\null\vfill\eject\fi
+    \end}
+\fi
+
+% we won't be using math mode much, so redefine some of the characters
+% we might want to talk about
+%\catcode`\^=12
+\catcode`\_=12
+
+% we also need the tilde, for file names.
+\catcode`\~=12
+
+\chardef\\=`\\
+\chardef\{=`\{
+\chardef\}=`\}
+
+\hyphenation{mini-buf-fer}
+
+\parindent 0pt
+\parskip 1ex plus .5ex minus .5ex
+
+\def\small{\smallfont\textfont2=\smallsy\baselineskip=.8\baselineskip}
+
+% newcolumn - force a new column.  Use sparingly, probably only for
+% the first column of a page, which should have a title anyway.
+\outer\def\newcolumn{\vfill\eject}
+
+% title - page title.  Argument is title text.
+\outer\def\title#1{{\titlefont\centerline{#1}}\vskip 1ex plus .5ex}
+
+% section - new major section.  Argument is section name.
+\outer\def\section#1{\par\filbreak
+  \vskip 3ex plus 2ex minus 2ex {\headingfont #1}\mark{#1}%
+  \vskip 2ex plus 1ex minus 1.5ex}
+
+\newdimen\keyindent
+
+% beginindentedkeys...endindentedkeys - key definitions will be
+% indented, but running text, typically used as headings to group
+% definitions, will not.
+\def\beginindentedkeys{\keyindent=1em}
+\def\endindentedkeys{\keyindent=0em}
+\endindentedkeys
+
+% paralign - begin paragraph containing an alignment.
+% If an \halign is entered while in vertical mode, a parskip is never
+% inserted.  Using \paralign instead of \halign solves this problem.
+\def\paralign{\vskip\parskip\halign}
+
+% \<...> - surrounds a variable name in a code example
+\def\<#1>{{\it #1\/}}
+
+% kbd - argument is characters typed literally.  Like the Texinfo command.
+\def\kbd#1{{\tt#1}\null}    %\null so not an abbrev even if period follows
+
+% beginexample...endexample - surrounds literal text, such a code example.
+% typeset in a typewriter font with line breaks preserved
+\def\beginexample{\par\leavevmode\begingroup
+  \obeylines\obeyspaces\parskip0pt\tt}
+{\obeyspaces\global\let =\ }
+\def\endexample{\endgroup}
+
+% key - definition of a key.
+% \key{description of key}{key-name}
+% prints the description left-justified, and the key-name in a \kbd
+% form near the right margin.
+\def\key#1#2{\leavevmode\hbox to \hsize{\vtop
+  {\hsize=.75\hsize\rightskip=1em
+  \hskip\keyindent\relax#1}\kbd{#2}\hfil}}
+
+\newbox\metaxbox
+\setbox\metaxbox\hbox{\kbd{M-x }}
+\newdimen\metaxwidth
+\metaxwidth=\wd\metaxbox
+
+% metax - definition of a M-x command.
+% \metax{description of command}{M-x command-name}
+% Tries to justify the beginning of the command name at the same place
+% as \key starts the key name.  (The "M-x " sticks out to the left.)
+\def\metax#1#2{\leavevmode\hbox to \hsize{\hbox to .75\hsize
+  {\hskip\keyindent\relax#1\hfil}%
+  \hskip -\metaxwidth minus 1fil
+  \kbd{#2}\hfil}}
+
+% threecol - like "key" but with two key names.
+% for example, one for doing the action backward, and one for forward.
+\def\threecol#1#2#3{\hskip\keyindent\relax#1\hfil&\kbd{#2}\hfil\quad
+  &\kbd{#3}\hfil\quad\cr}
+
+\def\noteone{{\small \hfill [1]}}
+\def\notetwo{{\small \hfill [2]}}
+
+
+%**end of header
+
+
+\title{R\'ef\'erences d'Org-Mode (1/2)}
+
+\centerline{(pour la version \orgversionnumber)}
+
+\section{Bien d\'emarrer}
+\metax{Pour lire la documentation en ligne:}{M-x org-info}
+
+\section{Changer la visibilit\'e}
+
+\key{Changer la visibilité du niveau courant}{TAB}
+\key{Changer la visibilité du buffer entier}{S-TAB}
+\key{Restaurer la visibilité en fonction des propriétés}{C-u C-u TAB}
+\metax{Montrer le fichier entier, avec tiroirs}{C-u C-u C-u TAB}
+\key{Montrer le contexte autour du curseur}{C-c C-r}
+
+\section{D\'eplacement}
+
+\key{Ent\^ete suivant/pr\'ec\'edent}{C-c C-n/p}
+\key{Ent\^ete suivant/pr\'ec\'edent, m\^eme niveau}{C-c C-f/b}
+\key{Retour \`a un ent\^ete de niveau sup\'erieur}{C-c C-u}
+\key{Sauter \`a un autre emplacement}{C-c C-j}
+\key{Liste d'\'el\'ements suivante/pr\'ec\'edent}{S-UP/DOWN\notetwo}
+
+\section{Edition de la structure}
+
+\key{Ins\'erer nouvel ent\^ete au niveau courant}{M-RET}
+\key{Ins\'erer nouvel ent\^ete apr\`es la branche}{C-RET}
+\key{Ins\'erer nouvelle entr\'ee TODO/case \`a cocher}{M-S-RET}
+\key{Ins\'erer nouvelle entr\'ee TODO/case \`a cocher apr\`es branche}{C-S-RET}
+\key{Transformer la ligne ou l'ent\^ete en item}{C-c -}
+\key{Transformer l'i\'el\'ement/la ligne en ent\^ete}{C-c *}
+\key{+/- niveau hi\'erarchique de l'ent\^ete}{M-LEFT/RIGHT}
+\metax{+/- le niveau branche courante}{M-S-LEFT/RIGHT}
+\metax{D\'eplacer branche/item vers le haut/bas}{M-S-UP/DOWN}
+\metax{Trier la branche/la zone/la liste}{C-c \^{}}
+\metax{Dupliquer la branche}{C-c C-x c}
+\metax{Supprimer/copier la branche}{C-c C-x C-w/M-w}
+\metax{Coller la branche}{C-c C-x C-y ou C-y}
+\metax{R\'eduire/\'elargir le buffer \`a la branche}{C-x n s/w}
+
+\section{Capture - Rangement - Archive}
+\key{Capturer nouvel \'el\'ement (C-u C-u = retour au pr\'ec\'edent)}{C-c c \noteone}
+\key{Ranger le sous-arbre}{C-c C-w}
+\key{Archiver sous-arbre avec la commande par d\'efaut}{C-c C-x C-a}
+\key{D\'eplacer sous-arbre dans les d'archives}{C-c C-x C-s}
+\key{Changer le tag ARCHIVE}{C-c C-x a/A}
+\key{D\'eplacer \`a l'ARCHIVE de m\^eme anc\^etre}{C-c C-x a/A}
+\key{Forcer le d\'efilement d'un arbre ARCHIVE}{C-TAB}
+
+\section{Filtrage et arbres g\'en\'er\'es \`a la vol\'ee}
+
+\key{Construire un arbre g\'en\'er\'e \`a la vol\'ee}{C-c /}
+\key{Visualiser les TODO sous forme d'arbres}{C-c / t/T}
+\key{Liste TODO globale en mode agenda}{C-c a t \noteone}
+\key{Vue chronologique du fichier org courant}{C-c a L}
+
+\section{Tableaux}
+
+{\bf Cr\'eer un tableau}
+
+%\metax{ins\'erer un nouveau tableau}{M-x org-table-create}
+\metax{Commencez \`a taper, e.g.}{|Nom|T\'el\'ephone|- TAB}
+\key{Convertir une r\'egion en tableau}{C-c |}
+\key{... s\'eparateur d'au moins 3 espaces}{C-3 C-c |}
+
+{\bf Commandes disponibles dans les tables}
+
+Les commandes suivantes fonctionnent lorsque le curseur est {\it dans
+un tableau}.  Hors des tableaux, les m\^emes raccourcis peuvent avoir
+d'autres fonctionnalit\'es.
+
+{\bf R\'e-alignement et d\'eplacement}
+
+\key{R\'e-aligner le tableau sans d\'eplacer le curseur}{C-c C-c}
+\key{R\'e-aligner le tableau en allant au prochain champ}{TAB}
+\key{Aller au champ pr\'ec\'endent}{S-TAB}
+\key{R\'e-aligner tableau en allant ligne pr\'ec\'edente}{RET}
+\key{Se d\'eplacer au d\'ebut/\`a la fin du champ}{M-a/e}
+
+{\bf \'Edition des lignes et colonnes}
+
+\key{D\'eplacer colonne \`a gauche/droite}{M-LEFT/RIGHT}
+\key{D\'etruire colonne}{M-S-LEFT}
+\key{Nouvelle colonne \`a gauche du curseur}{M-S-RIGHT}
+\key{D\'eplacer la ligne courante en haut/bas}{M-UP/DOWN}
+\key{D\'etruire la ligne en cours}{M-S-UP}
+\key{Ins\`erer nouvelle ligne dessus ligne courante}{M-S-DOWN}
+\key{Ins\`erer trait dessous ligne courante}{C-c -}
+\key{Ins\`erer trait et d\'eplacer ligne dessous}{C-c RET}
+\key{Trier les lignes en zone}{C-c \^{}}
+
+{\bf Zones}
+
+\metax{Couper/copier/coller zone rectangulaire}{C-c C-x C-w/M-w/C-y}
+%\key{Copier une zone rectangulaire}{C-c C-x M-w}
+%\key{Coller une zone rectangulaire}{C-c C-x C-y}
+\key{Ajuster paragraphes des cellules choisies}{C-c C-q}
+
+{\bf Divers}
+
+\key{Limiter la largeur des colonnes \`a \kbd{N} caract\`eres}{...| <N> |...}
+\key{\'Editer champ courant dans fen\^etre s\'epar\'ee}{C-c `}
+\key{Rendre champ courant compl\`etement visible}{C-u TAB}
+\metax{Exporter comme fichier}{M-x org-table-export}
+\metax{Importer un fichier}{M-x org-table-import}
+\key{Additionne nombres de la colonne courante}{C-c +}
+
+{\bf Tableaux cr\'e\'e avec le paquet \kbd{table.el}}
+
+\key{Ins\'erer un nouveau tableau \kbd{table.el}}{C-c ~}
+\key{Reconna\^itre un tableau  \kbd{table.el} existant}{C-c C-c}
+\key{(Org-mode $\leftrightarrow$ \kbd{table.el})}{C-c ~}
+
+{\bf Tableur}
+
+Les formules saisies dans ce champ sont ex\'ecut\'ees par \kbd{TAB},
+\kbd{RET} et \kbd{C-c C-c}.  \kbd{=} ntroduit une formle de colonne , \kbd{:=} une formle de champ.
+
+\key{Exemple : aditionne colonne 1 et colonne 2}{|=\$1+\$2      |}
+\key{... avec la sp\'ecification format printf}{|=\$1+\$2;\%.2f|}
+\key{... avec les constantes du paquet constants.el}{|=\$1/\$c/\$cm |}
+\metax{Somme de 2e \`a 3e lignes horizontales}{|:=vsum(@II..@III)|}
+\key{Appliquer la formule de colonne courante}{| = |}
+
+\key{Affecter et \'evaluer la formule de colonne}{C-c =}
+\key{Affecter et \'evaluer la formule de champ}{C-u C-c =}
+\key{R\'eappliquer \'equations \`a la ligne courante}{C-c *}
+\key{R\'eappliquer \'equations à tout le tableau}{C-u C-c *}
+\key{Parcourir tableau jusqu' \`a ce qu'il soit stable}{C-u C-u C-c *}
+\key{Rotate calculation mark through \# * ! \^ \_ \$}{C-\#}
+\key{Afficher r\'ef\'erence de ligne, colonne, formule}{C-c ?}
+\key{Basculer entre la grille et le deboggeur}{C-c \}/\{}
+
+%\newcolumn
+{\it L'\'editeur de formules}
+
+\key{\'Editer des formules dans des buffers s\'epar\'es}{C-c '}
+\key{Quitter et installer de nouvelles formules}{C-c C-c}
+\key{Sortir, installer et appliquer les nouvelles formules}{C-u C-c C-c}
+\key{Abandonner}{C-c C-q}
+\key{Changer le style des r\'ef\'erences}{C-c C-r}
+\key{Formule Lisp belle \`a imprimer}{TAB}
+\key{Compl\'eter les symboles Lisp}{M-TAB}
+\key{Changer le point de r\'ef\'erence}{S-cursor}
+\key{Changer la ligne de test pour des r\'ef\'erences de colonnes}{M-up/down}
+\key{Faire d\'efiler fen\^etre pour montrer tableau}{M-S-up/down}
+\key{Basculer la grille des coordonn\'ees du tableau}{C-c \}}
+
+\section{Liens}
+
+\key{Stocker le lien \`a l'emplacement courant}{C-c l \noteone}
+\key{Ins\'erer un lien}{C-c C-l}
+\key{Ins\'erer un lien vers un fichier}{C-u C-c C-l}
+\key{\'Editer le lien au curseur}{C-c C-l}
+
+\key{Ouvrir les liens vers des fichiers dans emacs}{C-c C-o}
+\key{...forcer \`a ouvrir dans Emacs/dans une autre fen\^etre}{C-u C-c C-o}
+\key{Ouvrir le lien en ce point}{mouse-1/2}
+\key{...forcer \`a ouvrir dans Emacs/dans une autre fen\^etre}{mouse-3}
+\key{Enregistrer une position}{C-c \%}
+\key{Revenir au(x) dernier(s) lien(s) suivi(s))}{C-c \&}
+\key{Trouver le lien suivant }{C-c C-x C-n}
+\key{Trouver le lien pr\'ec\'edent}{C-c C-x C-p}
+\key{\'Editer un extrait du code du fichier en ce point }{C-c '}
+\key{Basculer visualisation des images li\'ees}{C-c C-x C-v}
+
+\section{Travailler avec du Code (Babel)}
+
+\key{\'Executer le bloc de code au curseur}{C-c C-c}
+\key{Ouvrir les sorties du bloc au curseur}{C-c C-o}
+\key{Visualiser le bloc d\'epli\'e au curseur}{C-c C-v v}
+\key{Aller \`au bloc de code nomm\'e}{C-c C-v g}
+\key{Aller au r\'esultat nomm\'e}{C-c C-v r}
+\key{Aller au d\'ebut du bloc de code courant}{C-c C-v u}
+\key{Aller au bloc de code suivant}{C-c C-v n}
+\key{Aller au bloc de code pr\'ec\'edent}{C-c C-v p}
+\key{D\'emarque un bloc de code}{C-c C-v d}
+\key{\'Ex\'ecuter la combinaison de touche suivantes dans le buffer d'\'edition de code}{C-c C-v x}
+\key{\'Ex\'ecuter tous les blocs dans le buffer}{C-c C-v b}
+\key{\'Ex\'ecuter tous les blocs dans le sous-arbre}{C-c C-v s}
+\key{Joindre les blocs dans le fichier courant}{C-c C-v t}
+\key{Joindre les blocs dans le fichier fourni}{C-c C-v f}
+\key{Ins\'erer blocs du fichier fourni dans de Babel}{C-c C-v i}
+\key{Basculer sur la session du bloc courant}{C-c C-v z}
+\key{Charger version d\'epli\'ee du bloc dans session}{C-c C-v l}
+\key{Visualiser empreinte sha1 du bloc courant}{C-c C-v a}
+
+%% \section{La compl\'etion}
+
+%% La compl\'etion compl\`ete les mots cl\'es TODO, les options, les tags
+%% et les mots ordinaires du dictionnaire.
+
+%% \key{compl\'etion d'un mot au curseur}{M-TAB}
+
+%% \title{Org-Mode Carte de r\'ef\'erences (2/2)}
+
+%% \centerline{(for version \orgversionnumber)}
+
+\section{Tags}
+
+\key{Affecter des tags pour l'ent\^ete courant}{C-c C-q}
+\key{R\'ealigner les tags de tous les ent\^etes}{C-u C-c C-q}
+\key{Cr\'eer arbre \`a l'aide des tags recherch\'es}{C-c \\}
+\key{Afficher tags correspondant \`a celui au curseur}{C-c C-o}
+
+\newcolumn
+\title{R\'ef\'erences d'Org-Mode (2/2)}
+\centerline{(pour la version \orgversionnumber)}
+
+\section{Les TODO et les boites de v\'erification}
+
+\key{Circuler dans les diff\'erents \'etats de l'item}{C-c C-t}
+\metax{S\'electionner l'\'etat suivant/pr\'ec\'edent}{S-LEFT/RIGHT}
+%\metax{S\'electionner suivant/pr\'ec\'edent set ??}{C-S-LEFT/RIGHT}
+\key{Basculer la propri\'et\'e ORDERED}{C-c C-x o}
+\key{Visualiser les \'el\'ements TODO dans un arbre g\'en\'er\'e \`a la vol\'ee}{C-c C-v}
+\key{Visualiser un arbre g\'en\'er\'e \`a la vol\'ee \`a partir d'un arbre \`a partir du mot cl\'e TODO}{C-3 C-c C-v}
+
+\key{D\'efinir la priorit\'e de l'\'el\'ement courant }{C-c , [ABC]}
+\key{Enl\`eve le cookie de priorit\'e pour l'\'el\'ement }{C-c , SPC}
+\key{Augmenter/diminuer la priorit\'e de l'\'el\'ement}{S-UP/DOWN\notetwo}
+
+\key{Ins\'erer case \`a cocher dans une liste}{M-S-RET}
+\key{Changer cases dans zone/entr\'ee/point}{C-c C-x C-b}
+\key{Changer case \`a cocher au curseur}{C-c C-c}
+%\metax{checkbox statistics cookies: insert {\tt [/]} or {\tt [\%]}}{}
+\key{Mettre \`a jour les stats des cases (\kbd{C-u} : sur tout le fichier)}{C-c \#}
+
+\section{Propri\'et\'es et vue en colonne}
+
+\key{D\'efinir la propri\'et\'e/leffort}{C-c C-x p/e}
+\key{Commandes sp\'eciales des lignes de propri\'et\'es}{C-c C-c}
+\key{Valeur permise suivante/pr\'ec\'edente}{S-left/right}
+\key{Activer la vue en colonne}{C-c C-x C-c}
+\key{Capturer la vue en colonnes dans un bloc}{C-c C-x i}
+
+\key{Quitter la vue en colonne}{q}
+\key{Montrer la totalit\'e de la valeur}{v}
+\key{\'Editer la valeur}{e}
+\metax{Valeur permise suivante/pr\'ec\'edente}{n/p or S-left/right}
+\key{\'Editer la liste des valeurs permisest}{a}
+\key{\'Elargir/r\'etr\'ecir la colonner}{> / <}
+\key{D\'eplacer la colonne gauche/droite}{M-left/right}
+\key{Ajouter une nouvelle colonne }{M-S-right}
+\key{Supprimer la colonne courante }{M-S-left}
+
+
+\section{Horodatage}
+
+\key{Demande la date et insère horodatage}{C-c .}
+\key{Comme \kbd{C-c} mais insert la date et l'heure}{C-u C-c .}
+\key{Comme \kbd{C-c .} mais rend l'horodatage inactif}{C-c !} % FIXME
+\key{Ins\`ere horodatage de type DEADLINE}{C-c C-d}
+\key{Ins\`ere horodatage de type SCHEDULED}{C-c C-s}
+\key{G\'en\'erer un arbre avec les DEADLINES}{C-c / d}
+\key{La dur\'ee entre 2 dates}{C-c C-y}
+\metax{Change horodatage au curseur}{S-RIGHT/LEFT\notetwo}
+\key{Change ann\'ee/mois/jour au curseur}{S-UP/DOWN\notetwo}
+\key{Acc\'eder calendrier pour la date courante}{C-c >}
+\key{Ins\'erer horodatage date dans le calendrier}{C-c <}
+\key{Acc\'eder calendrier pour la date courante}{C-c C-o}
+\key{S\'electionner une date lorsque demand\'ee}{mouse-1/RET}
+%\key{... select date in calendar}{mouse-1/RET}
+%\key{... scroll calendar back/forward one month}{< / >}
+%\key{... forward/backward one day}{S-LEFT/RIGHT}
+%\key{... forward/backward one week}{S-UP/DOWN}
+%\key{... forward/backward one month}{M-S-LEFT/RIGHT}
+\key{Utiliser format personnalis\'e de dates/heures}{C-c C-x C-t}
+
+{\bf Mesurer le temps}
+
+\key{D\'emarrer le chrono sur l'\'el\'ement courant}{C-c C-x C-i}
+\key{Arr\^eter le chrono sur l'\'el\'ement courant}{C-c C-x C-o/x}
+\key{Afficher le temps total des branches}{C-c C-x C-d}
+%\key{Enl\`ever les temps affich\'es}{C-c C-c}
+\key{Ins\`erer/mettre \`a jour tableau horodatage}{C-c C-x C-r}
+
+\section{Vues de l'agenda}
+
+\key{Ajouter/d\'eplacer le fichier courant au d\'ebut de l'agenda}{C-c [}
+\key{Retirer le fichier courant de votre agenda}{C-c ]}
+\key{Parcourir la liste des fichier d'agenda}{C-'}
+\key{Applique/retire le verrou restrictif}{C-c C-x </>}
+
+\key{G\'en\'erer l'agenda pour la semaine courante}{C-c a a \noteone}
+\key{G\'en\'erer la liste globale des TODOs}{C-c a t \noteone}
+\key{G\'en\'erer la liste des TODOs pour le mot clef sp\'ecifi\'e}{C-c a T \noteone}
+\key{Afficher tags, mots-clefs TODO et propri\'et\'es}{C-c a m \noteone}
+\key{Rechercher seulement dans les entr\'ees TODOs}{C-c a M \noteone}
+\key{Trouver les projets bloqu\'es}{C-c a \# \noteone}
+\key{Affiche la chronologie du fichier org courant}{C-c a L \noteone}
+\key{Configurer les commandes personnalis\'ees}{C-c a C \noteone}
+%\key{configurer  les projets bloqu\'es}{C-c a ! \noteone}
+\key{Agenda \`a la date au curseur}{C-c C-o}
+
+{\bf Commandes disponibles dans le buffer des agenda}
+
+{\bf Visualiser le fichier Org}
+
+\key{Montrer l'emplacement r\'eel de l'\'el\'ement}{SPC/mouse-3}
+%\key{... also available with}{mouse-3}
+\key{Montrer et recentrer la fen\^etre}{L}
+\key{Aller \`a l'emplacement r\'eel dans une autre fen\^etre}{TAB/mouse-2}
+%\key{... also available with}{mouse-2}
+\key{Aller \`a l'emplacement r\'eel, en supprimante les autres fen\^etres}{RET}
+\key{Montrer la branche dans un buffer indirect, ou une «frame»}{C-c C-x b}
+\key{Activer le follow-mode}{F}
+
+{\bf Changer l'affichage}
+
+\key{Supprimer les autres fen\^etres}{o}
+\key{Visualiser le mode dispatcher}{v}
+\key{Basculer vue jour/semaine/mois/ann\'ee/def}{d w vm vy vSP}
+\key{Basculer entr\'ees quotidiennes, grille temps, habitudes}{D / G / K}
+\key{Basculer entr\'ees et rapports de temps}{E / R}
+\key{Basculer affichage des entr\'ees du logbook}{l / v l/L}
+\key{Activer inclusion des archives}{v a/A}
+\key{Rafra\^ichir le buffer de l'agenda au moindre changement}{r / g}
+\key{Filtrer par rapport \`a une tag}{/}
+\key{Sauvegarder tous les buffers org-mode}{s}
+\key{Afficher jour/semaine/... suivant/pr\'ec\'edent}{f / b}
+\key{Aller \`a aujourd'hui/une date (sp\'ecifi\'ee)}{. / j}
+
+{\bf L'\'edition \`a distance}
+
+\key{Argument num\'erique}{0-9}
+\key{Changer l'\'etat de l'\'el\'ement TODO courant}{t}
+\key{D\'etruire l'\'el\'ement et la source}{C-k}
+\key{Archiver par default}{\$ / a}
+\key{Ranger la branche}{C-c C-w}
+\key{Affecter/montrer les tags de l'ent\^ete courant}{: / T}
+\key{Affecter la propi\'et\'e d'effort (prefixe=ni\`eme)}{e}
+\key{Affecter / calculer la  priorit\'e de l'\'el\'ement courant}{, / P}
+\key{+/- la priorit\'e de l'\'el\'ement courant}{S-UP/DOWN\notetwo}
+\key{Lancer une commande d'attachement}{C-c C-a}
+\key{Pr\'evoir un d\'ebut/affecter une échéance pour cet \'el\'ement}{C-c C-s/d}
+\metax{Changer l'horodatage d'unjour de mmoins/plus}{S-LEFT/RIGHT\notetwo}
+\key{Changer l'horodatage \`a aujourd'hui}{>}
+\key{Ins\'erer nouvelle entr\'ee dans l'agenda quotidien}{i}
+\key{Lancer/stopper/annuler chrono sur l'\'el\'ement}{I / O / X}
+\key{Aller \`a l'\'element pour lequel le chrono est actif}{J}
+\key{Marquer / \^oter la marque/ \'ex\'ecuter une action de masser}{m / u / B}
+
+{\bf Divers}
+
+\key{Suivre un lien ou afficher les liens de l'entr\'ee courante}{C-c C-o}
+
+{\bf Commandes du calendrier}
+
+%\key{find agenda cursor date in calendar}{c} ?? on l'enl\`eve
+\key{G\'en\'erer l'agenda pour la date courante du curseur}{c}
+\key{Afficher les phases de la lune}{M}
+\key{Afficher les horaires de lever et coucher du soleil}{S}
+\key{Afficher les vacances}{H}
+\key{Convertir la date dans d'autres calendriers}{C}
+
+{\bf Quitter et sortir}
+
+\key{Quitter l'agenda, supprimer le buffer agenda}{q}
+\key{Sortir de l'agenda, supprime tous les buffres d'agendas}{x}
+
+\section{LaTeX et cdlatex-mode}
+
+\key{Visualiser une partie en LaTeX}{C-c C-x C-l}
+\key{Compl\'eter abr\'eviation de (cdlatex-mode)}{TAB}
+\key{Ins\'erer symboles math\'ematiques de (cdlatex-mode)}{` / '}
+\key{Ins\'erer citation en utilisant RefTeX}{C-c C-x [}
+
+\section{Export et publication}
+
+%% L'export cr\'ee des fichiers html/txt/tex dans le r\'epertoire
+%% courant.  La publication place le(s) fichier(s) r\'esultant \`a un
+%% autre endroit.
+
+\key{Menu d'export/de publication}{C-c C-e}
+
+\key{Exporter uniquement la partie visible}{C-c C-e v}
+\key{Ins\'erer le mod\`ele des options d'exportation}{C-c C-e t}
+\key{Basculer vers une largeur fixe de l'entr\'ee ou de la zone}{C-c :}
+\key{Changer pour meilleur affichage des scripts, entit\'es }{C-c C-x {\tt\char`\\}}
+
+{\bf Les commentaires ne sont pas export\'es }
+
+Les lignes d\'ebutant par \kbd{\#} et les sous-arbres d\'ebutant par COMMENT ne doivent jamais \^etre export\'es.
+
+\key{Affecter le mot-cl\'e COMMENT \`a l'entr\'ee }{C-c ;}
+
+\section{Blocs dynamiques}
+
+\key{Mettre \`a jour bloc dynamique au curseur}{C-c C-x C-u}
+\metax{Mettre \`a jour tous blocs dynamiques}{C-u C-c C-x C-u}
+
+\section{Notes}
+[1] Ceci constitue seulement une suggestion de raccourci clavier pour cette commande. Choisir votre propre touche de raccourci, comme indiqu\'e dans le fichier INSTALLATION.
+
+[2] Racourcis clavier affect\'es par {\tt org-support-shift-select} et \'egalement  {\tt org-replace-disputed-keys}.
+
+\copyrightnotice
+
+\bye
+
+% Local variables:
+% compile-command: "tex refcard"
+% End:
+
+
+

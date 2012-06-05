@@ -1,0 +1,143 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Freeming API functions (org-freemind.el)
+** org-freemind-bol-helper =matched=
+
+Helper for /org-freemind-convert-text-p/.
+=matched= is the link just matched.
+
+
+** org-freemind-check-overwrite =file interactively=
+
+Check if file =file= already exists.
+If =file= does not exists return t.
+
+If =interactively= is non-nil ask if the file should be replaced
+and return t/nil if it should/should not be replaced.
+
+Otherwise give an error say the file exists.
+
+
+** org-freemind-convert-links-from-org =org-str=
+
+Convert org links in =org-str= to freemind links and return the result.
+
+
+** org-freemind-convert-links-helper =matched=
+
+Helper for /org-freemind-convert-links-from-org/.
+=matched= is the link just matched.
+
+
+** org-freemind-convert-links-to-org =fm-str=
+
+Convert freemind links in =fm-str= to org links and return the result.
+
+
+** org-freemind-convert-text-p =text=
+
+Convert =text= to html with <p> paragraphs.
+
+
+** org-freemind-escape-str-from-org =org-str=
+
+Do some html-escaping of =org-str= and return the result.
+The characters "&<> will be escaped.
+
+
+** org-freemind-from-org-mode =org-file mm-file=
+
+Convert the /org-mode/ file =org-file= to the FreeMind file =mm-file=.
+All the nodes will be opened or closed in Freemind just as you
+have them in /org-mode/.
+
+Note that exporting to Freemind also gives you an alternative way
+to export from /org-mode/ to html.  You can create a dynamic html
+version of the your org file, by first exporting to Freemind and
+then exporting from Freemind to html.  The 'As
+XHTML (JavaScript)' version in Freemind works very well (and you
+can use a CSS stylesheet to style it).
+
+
+** org-freemind-from-org-mode-node =node-line mm-file=
+
+Convert node at line =node-line= to the FreeMind file =mm-file=.
+See /org-freemind-from-org-mode/ for more information.
+
+
+** org-freemind-from-org-sparse-tree =org-buffer mm-file=
+
+Convert visible part of buffer =org-buffer= to FreeMind file =mm-file=.
+
+
+** org-freemind-get-children =parent path=
+
+Find children node to =parent= from =path=.
+=path= should be a list of steps, where each step has the form
+
+#+begin_src emacs-lisp
+  '(NODE-NAME (ATTR-NAME . ATTR-VALUE))
+#+end_src
+
+
+
+** org-freemind-get-node-style =node-name=
+
+NOT READY YET.
+
+
+** org-freemind-get-richcontent-node-text =node=
+
+Get the node text as from the richcontent node =node=.
+
+
+** org-freemind-get-richcontent-note-text =node=
+
+Get the node text as from the richcontent note =node=.
+
+
+** org-freemind-goto-line =line=
+
+Go to line number =line=.
+
+
+** org-freemind-org-text-to-freemind-subnode/note =node-name start end drawers-regexp=
+
+Convert text part of org node to freemind subnode or note.
+Convert the text part of the org node named =node-name=. The text
+is in the current buffer between =start= and =end=. Drawers matching
+=drawers-regexp= are converted to freemind notes.
+
+
+** org-freemind-show =mm-file=
+
+Show file =mm-file= in Freemind.
+
+
+** org-freemind-symbols= =sym-a sym-b=
+
+Return t if downcased names of =sym-a= and =sym-b= are equal.
+=sym-a= and =sym-b= should be symbols.
+
+
+** org-freemind-to-org-mode =mm-file org-file=
+
+Convert FreeMind file =mm-file= to /org-mode/ file =org-file=.
+
+
+** org-freemind-unescape-str-to-org =fm-str=
+
+Do some html-unescaping of =fm-str= and return the result.
+This is the opposite of /org-freemind-escape-str-from-org/ but it
+will also unescape &#nn;.

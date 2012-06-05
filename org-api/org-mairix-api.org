@@ -1,0 +1,81 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Mairix API functions (org-mairix.el)
+** org-mairix-command-substitution =cmd search args=
+
+Substitute '%search%' and '%args% in mairix search command.
+
+
+** org-mairix-construct-link =message-id=
+
+Construct a mairix: hyperlink based on message-id.
+
+
+** org-mairix-gnus-display-results =search args=
+
+Display results of mairix search in Gnus.
+
+Note: This does not work as cleanly as I would like it to. The
+problem being that Gnus should simply reread the group cleanly,
+without remembering anything. At the moment it seems to be unable
+to do that -- so you're likely to see zombies floating around.
+
+If you can improve this, please do!
+
+
+** org-mairix-gnus-select-display-group-function-bzg  
+
+This is the classic way the org mode is using, and it seems to be
+using better for Bastien, so it may work for you.
+
+
+** org-mairix-gnus-select-display-group-function-gg  
+
+Georg's hack to select a group that gnus (falsely) believes to be
+empty to then call rebuilding of the summary. It leaves zombies of
+old searches around, though.
+
+
+** org-mairix-insert-link  
+
+Insert link from file defined by /org-mairix-link-clipboard/.
+
+
+** org-mairix-message-send-and-exit-with-link  
+
+Function that can be assigned as an alternative sending function,
+it sends the message and then stores a mairix link to it before burying
+the buffer just like 'message-send-and-exit' does.
+
+
+** org-mairix-mutt-display-results =search args=
+
+Display results of mairix search in mutt, using the command line
+defined in /org-mairix-mutt-display-command/.
+
+
+** org-mairix-open =search=
+
+Function to open mairix link.
+
+We first need to split it into its individual parts, and then
+extract the message-id to be passed on to the display function
+before call mairix, evaluate the number of matches returned, and
+make sure to only call display of mairix succeeded in matching.
+
+
+** org-mairix-store-gnus-link  
+
+Store a link to the current gnus message as a Mairix search for its
+Message ID.

@@ -1,0 +1,274 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Publish API functions (org-publish.el)
+** org-publish =project &optional force=
+
+Publish =project=.
+
+
+** org-publish-all =&optional force=
+
+Publish all projects.
+With prefix argument, remove all files in the timestamp
+directory and force publishing all files.
+
+
+** org-publish-attachment =plist filename pub-dir=
+
+Publish a file with no transformation of any kind.
+See /org-publish-org-to/ to the list of arguments.
+
+
+** org-publish-aux-preprocess  
+
+Find index entries and write them to an .orgx file.
+
+
+** org-publish-cache-ctime-of-src =filename=
+
+Get the =filename= ctime as an integer.
+
+
+** org-publish-cache-file-needs-publishing =filename &optional pub-dir pub-func=
+
+Check the timestamp of the last publishing of =filename=.
+Return /t/, if the file needs publishing.  The function also
+checks if any included files have been more recently published,
+so that the file including them will be republished as well.
+
+
+** org-publish-cache-get =key=
+
+Return the value stored in /org-publish-cache/ for key =key=.
+Returns nil, if no value or nil is found, or the cache does not
+exist.
+
+
+** org-publish-cache-get-file-property =filename property &optional default no-create project-name=
+
+Return the value for a =property= of file =filename= in publishing cache.
+Use cache file of =project-name=. Return the value of that =property= or
+=default=, if the value does not yet exist.
+If the entry will be created, unless =no-create= is not nil.
+
+
+** org-publish-cache-set =key value=
+
+Store =key= =value= pair in /org-publish-cache/.
+Returns value on success, else nil.
+
+
+** org-publish-cache-set-file-property =filename property value &optional project-name=
+
+Set the =value= for a =property= of file =filename= in publishing cache to =value=.
+Use cache file of =project-name=.  If the entry does not exist, it will be
+created.  Return =value=.
+
+
+** org-publish-compare-directory-files =a b=
+
+Predicate for /sort/, that sorts folders and files for sitemap.
+
+
+** org-publish-current-file =&optional force=
+
+Publish the current file.
+With prefix argument, force publish the file.
+
+
+** org-publish-current-project =&optional force=
+
+Publish the project associated with the current file.
+With a prefix argument, force publishing of all files in
+the project.
+
+
+** org-publish-delete-dups =list=
+
+Destructively remove /equal/ duplicates from =list=.
+Store the result in =list= and return it.  =list= must be a proper list.
+Of several /equal/ occurrences of an element in =list=, the first
+one is kept.
+
+
+** org-publish-expand-projects =projects-alist=
+
+Expand projects in =projects-alist=.
+This splices all the components into the list.
+
+
+** org-publish-file =filename &optional project no-cache=
+
+Publish file =filename= from =project=.
+If =no-cache= is not nil, do not initialize org-publish-cache and
+write it to disk.  This is needed, since this function is used to
+publish single files, when entire projects are published.
+See /org-publish-projects/.
+
+
+** org-publish-find-date =file=
+
+Find the date of =file= in project.
+If =file= provides a #+date keyword use it else use the file
+system's modification time.
+
+It returns time in /current-time/ format.
+
+
+** org-publish-find-title =file &optional reset=
+
+Find the title of =file= in project.
+
+
+** org-publish-get-base-files =project &optional exclude-regexp=
+
+Return a list of all files in =project=.
+If =exclude-regexp= is set, this will be used to filter out
+matching filenames.
+
+
+** org-publish-get-base-files-1 =base-dir &optional recurse match skip-file skip-dir=
+
+Set /org-publish-temp-files/ with files from =base-dir= directory.
+If =recurse= is non-nil, check =base-dir= recursively.  If =match= is
+non-nil, restrict this list to the files matching the regexp
+=match=.  If =skip-file= is non-nil, skip file matching the regexp
+=skip-file=.  If =skip-dir= is non-nil, don't check directories
+matching the regexp =skip-dir= when recursing through =base-dir=.
+
+
+** org-publish-get-project-from-filename =filename &optional up=
+
+Return the project that =filename= belongs to.
+
+
+** org-publish-index-generate-theindex =directory=
+
+Generate the index from all .orgx files in =directory=.
+
+
+** org-publish-initialize-cache =project-name=
+
+Initialize the projects cache if not initialized yet and return it.
+
+
+** org-publish-needed-p =filename &optional pub-dir pub-func true-pub-dir=
+
+Return t if =filename= should be published in =pub-dir= using =pub-func=.
+=true-pub-dir= is where the file will truly end up.  Currently we are not using
+this - maybe it can eventually be used to check if the file is present at
+the target location, and how old it is.  Right now we cannot do this, because
+we do not know under what file name the file will be stored - the publishing
+function can still decide about that independently.
+
+
+** org-publish-org-sitemap =project &optional sitemap-filename=
+
+Create a sitemap of pages in set defined by =project=.
+Optionally set the filename of the sitemap with =sitemap-filename=.
+Default for =sitemap-filename= is 'sitemap.org'.
+
+
+** org-publish-org-to =format plist filename pub-dir=
+
+Publish an org file to =format=.
+=plist= is the property list for the given project.
+=filename= is the filename of the org file to be published.
+=pub-dir= is the publishing directory.
+
+
+** org-publish-org-to-ascii =plist filename pub-dir=
+
+Publish an org file to ASCII.
+See /org-publish-org-to/ to the list of arguments.
+
+
+** org-publish-org-to-html =plist filename pub-dir=
+
+Publish an org file to HTML.
+See /org-publish-org-to/ to the list of arguments.
+
+
+** org-publish-org-to-latex =plist filename pub-dir=
+
+Publish an org file to LaTeX.
+See /org-publish-org-to/ to the list of arguments.
+
+
+** org-publish-org-to-latin1 =plist filename pub-dir=
+
+Publish an org file to Latin-1.
+See /org-publish-org-to/ to the list of arguments.
+
+
+** org-publish-org-to-org =plist filename pub-dir=
+
+Publish an org file to HTML.
+See /org-publish-org-to/ to the list of arguments.
+
+
+** org-publish-org-to-pdf =plist filename pub-dir=
+
+Publish an org file to PDF (via LaTeX).
+See /org-publish-org-to/ to the list of arguments.
+
+
+** org-publish-org-to-utf8 =plist filename pub-dir=
+
+Publish an org file to UTF-8.
+See /org-publish-org-to/ to the list of arguments.
+
+
+** org-publish-project =project &optional force=
+
+Publish =project=.
+
+
+** org-publish-projects =projects=
+
+Publish all files belonging to the =projects= alist.
+If :auto-sitemap is set, publish the sitemap too.
+If :makeindex is set, also produce a file theindex.org.
+
+
+** org-publish-remove-all-timestamps  
+
+Remove all files in the timestamp directory.
+
+
+** org-publish-reset-cache  
+
+Empty org-publish-cache and reset it nil.
+
+
+** org-publish-timestamp-filename =filename &optional pub-dir pub-func=
+
+Return path to timestamp file for filename =filename=.
+
+
+** org-publish-update-timestamp =filename &optional pub-dir pub-func=
+
+Update publishing timestamp for file =filename=.
+If there is no timestamp, create one.
+
+
+** org-publish-with-aux-preprocess-maybe =&rest body=
+
+Execute =body= with a modified hook to preprocess for index.
+
+
+** org-publish-write-cache-file =&optional free-cache=
+
+Write /org-publish-cache/ to file.
+If =free-cache=, empty the cache.

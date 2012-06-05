@@ -16,8 +16,7 @@ tutorials on how to extend Org.
 
 * Git workflow
 
-As of March 20th (see [[http://article.gmane.org/gmane.emacs.orgmode/53608/match%3Dnew%2Bgit%2Bworkflow][this email]]), Org development uses a three-branches
-git workflow.
+Org development uses a two-branches git workflow.
 
 - master :: This branch contains latest development for Org.  Temporary
             feature branch (either local or remote) should branch out from
@@ -25,23 +24,20 @@ git workflow.
             there is a major release.
 
 - maint :: This branch is the "production" branch for Org.  It contains
-           only releases.  No branch should branch out from it, and it is
-           *never* merged into another branch.  The Org version on this
-           branch is the one regularily sync'ed with Emacs repository.
-
-- hotfix-7.8.06 :: This branch is the hotfix branch for the latest release.
-
-** Future changes
-
-In the near future, the =maint= branch will probably be renamed =release=
-and the =hotfix-7.8.06= will probably be renamed =hotfix=.  The role of the
-branches won't change.
+           stable releases and bug fixes against them.  This branch is
+           merged into master when bug are fixed there first.  The Org
+           version on this branch is the one regularily sync'ed with Emacs
+           repository.
 
 ** Git repositories
 
-The git repository for Org is on =orgmode.org=: 
+The git repository for Org is on =orgmode.org=:
 
 - http://orgmode.org/w/org-mode.git
+
+If you are a developer, you can clone this branch like this:
+
+: ~$ git clone orgsync@orgmode.org:org-sync.git
 
 This repository is cloned on =repo.or.cz=:
 
@@ -57,5 +53,9 @@ You can display a graphic representation of the branches here:
 
 * Reference documentation
 
-- [[file:org-export-reference.org][reference documentation]] for the new export engine (=org-export.el=)
+- [[file:org-export-reference.org][Reference documentation]] for the new export engine (=org-export.el=)
   written by Nicolas Goaziou.
+
+- [[../org-api/index.org][Org-mode API]] with signatures and docstrings for all public functions of
+  all Org-mode libraries.
+  

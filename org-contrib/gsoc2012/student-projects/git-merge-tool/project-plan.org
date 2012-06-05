@@ -1,0 +1,102 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Merge Tool for Org-Mode
+#+AUTHOR:     Andrew Young
+#+EMAIL:      youngar17 at gmail dot com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+# #+LINK_UP:  http://orgmode.org/worg/org-faq.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Project Plan
+/This is only a preliminary plan, as outlined in the project proposal/
+
+** Introductory Period 
+(April 23 – May 21)
+
+During this period I will review previous art, and become fully
+familiar with OrgMode files and any addons and plugins which may
+influence my work (Babel, MobileOrg, etc.). This includes research
+into object representation, and command language representation. A
+quick proof of concept be created. The project page, code repository,
+and other framework will be created.
+
+** Org-Mode Data Representation 
+(May 22 - 27)
+
+The deliverable for this part of the project is to create a
+representation of org-mode files, and a data manipulation language for
+working with them. The completness and thoroughness of this
+deliverable is to be decided according to the determined potential
+usefullness to other users. The data representation may vary greatly
+with the language used. Fundamental to this stage will be the use of
+org-element.el, which is a parser and interface for Org-Mode data.
+
+** Org-Mode File Processor Parser 
+(May 28 - 31) 
+
+The deliverable for this stage is a program (algorithm) which will
+turn an Org-Mode file into a set of objects and relationships. The
+parser will create objects using the OrgMode Data Representation
+above.
+
+** Create Basic Modification Guesser 
+(June 1 - 15) 
+
+This stage will create a list of modification actions which a user
+might perform on an OrgMode file. The deliverable will be a
+modification guesser which tries to create a list of
+modifications. The modifications actually detected at this stage will
+be very basic. This step should lay the ground work for defining more
+modification types, and advanced detection methods.
+
+** Create Modification Merger 
+(June 16 – June 30) 
+
+The deliverable for this stage is a program which takes a list of
+object modifications and objects, and combines them together. This
+step will combine all modification actions into a single file. It will
+generate conflicts for unmergable modifications.
+
+** Enhance Modification Guesser 
+(July 1 – July 16) 
+
+This is the really complicated stage of the whole project. At this
+stage, the modification guesser will be enhanced to be able to
+recognize a greater amount of modifications. For example, and 'remove'
+and 'add' action of an identical heading may be recognized as a 'move'
+action. The modification merger will have to be modified to properly
+handle new modification types. At this stage, the modification guesser
+will only mark modifications it is sure of.
+
+** Further Modification Guesser Enhancements
+(July 16 – July 29)
+
+At this stage, the modification guesser will be extended to use fuzzy
+logic to guess at modifications. For example, calculate the
+probability that a tree is just a modified version of another tree,
+and if probable enough, add the modification (if not probable they
+will be considered seperate 'add's and 'remove's possibly causing a
+conflict in the final merge).
+
+** Further Enhancements
+(July 30 – August 5)
+
+ This stage will include all optional features thought up as the
+project progresses. It could include Emacs mode that generates a
+modification list, so the merger program does not have to guess at the
+modifications, or the automatic use of IDs created by MobileOrg to
+recognize nodes.
+
+** Project Finish
+(August 6 - 13)
+
+This stage will be for final review and testing. It is expected during
+this stage to make an official release. This stage is meant to handle
+all finishing touches needed for a release.
+
+The project should end seven days before August 20, which is the day
+of “Firm Pencils Down”.

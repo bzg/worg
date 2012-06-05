@@ -176,7 +176,6 @@ devices.  They include:
   ,#+end_src
 #+end_src
 
-
 ** Sessions
 Sessions are fully supported by R source code blocks.  They can be
 used as one way to preserve state accessed by several source code
@@ -351,7 +350,7 @@ The output exported to HTML can be quite nice.
 #+RESULTS:
 #+BEGIN_ORG
 #+CAPTION: Quantiles of 100 random numbers
-| 0%   | 25%  | 50%  | 75%  | 100% |
+|   0% |  25% |  50% |  75% | 100% |
 |------+------+------+------+------|
 | 0.03 | 0.28 | 0.52 | 0.74 | 1.00 |
 #+END_ORG
@@ -363,16 +362,16 @@ graphics=.  The following example writes the graphics output to the
 file specified in the =:file= header argument.
 
 #+begin_example
-  ,#+name: r-edge-angle-histogram
-  ,#+begin_src R :results output graphics :var x=whole-adzes :file r/adze_edge_angle.png :width 400 :height 300
+  ,#+name: r-with-ggplot2
+  ,#+begin_src R :results output graphics :var tbl=foo :file r/foo-output.png :width 400 :height 300
     library(ggplot2)
-    adze.edge.angle <- ggplot(x, aes(edge_angle))
-    adze.edge.angle + geom_histogram(aes(y=..density..)) +
-    geom_density(weight=2) + xlab("Measured cutting edge angle (degrees)")
+    res <- ggplot(tbl, aes(a_foo_var))
+    res + geom_histogram(aes(y=..density..)) +
+    geom_density(weight=2) + xlab("A foo variable")
   ,#+end_src
   
   ,#+results:
-  [[file:r/adze_edge_angle.png]]
+  [[file:r/foo-output.png]]
 #+end_example
 
 ** LaTeX code from R

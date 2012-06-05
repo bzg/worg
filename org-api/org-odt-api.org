@@ -1,0 +1,128 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-ODT API functions (org-odt.el)
+** org-odt-add-automatic-style =object-type &optional object-props=
+
+Create an automatic style of type =object-type= with param =object-props=.
+=object-props= is (typically) a plist created by passing
+"#+ATTR_ODT: " option of the object in question to
+/org-lparse-get-block-params/.
+
+Use /org-odt-object-counters/ to generate an automatic
+OBJECT-NAME and STYLE-NAME.  If =object-props= is non-nil, add a
+new entry in /org-odt-automatic-styles/.  Return (OBJECT-NAME
+. STYLE-NAME).
+
+
+** org-odt-add-label-definition =label default-category=
+
+Create an entry in /org-odt-entity-labels-alist/ and return it.
+
+
+** org-odt-configure-outline-numbering =level=
+
+Outline numbering is retained only upto =level=.
+To disable outline numbering pass a =level= of 0.
+
+
+** org-odt-copy-formula-file =path=
+
+Returns the internal name of the file
+
+
+** org-odt-copy-image-file =path=
+
+Returns the internal name of the file
+
+
+** org-odt-format-org-link =opt-plist type-1 path fragment desc attr descp=
+
+Make a OpenDocument link.
+=opt-plist= is an options list.
+=type-1= is the device-type of the link (THIS://foo.html).
+=path= is the path of the link (http://THIS#location).
+=fragment= is the fragment part of the link, if any (foo.html#THIS).
+=desc= is the link description, if any.
+=attr= is a string of other attributes of the a element.
+
+
+** org-odt-format-source-code-or-example =lines lang caption textareap cols rows num cont rpllbl fmt=
+
+Format source or example blocks for export.
+Use /org-odt-format-source-code-or-example-plain/ or
+/org-odt-format-source-code-or-example-colored/ depending on the
+value of `org-export-odt-fontify-srcblocks.
+
+
+** org-odt-format-source-code-or-example-colored =lines lang caption textareap cols rows num cont rpllbl fmt=
+
+Format source or example blocks using /htmlfontify-string/.
+Use this routine when /org-export-odt-fontify-srcblocks/ option
+is turned on.
+
+
+** org-odt-format-source-code-or-example-plain =lines lang caption textareap cols rows num cont rpllbl fmt=
+
+Format source or example blocks much like fixedwidth blocks.
+Use this when /org-export-odt-fontify-srcblocks/ option is turned
+off.
+
+
+** org-odt-get-table-cell-styles =r c &optional style-spec=
+
+=r=etrieve styles applicable to a table cell.
+=r= and =c= are (zero-based) row and column numbers of the table
+cell.  =style-spec= is an entry in /org-export-odt-table-styles/
+applicable to the current table.  It is /nil/ if the table is not
+associated with any style attributes.
+
+=r=eturn a cons of (TABLE-=c=ELL-STYLE-NAME . PA=r=AG=r=APH-STYLE-NAME).
+
+When =style-spec= is nil, style the table cell the conventional way
+- choose cell borders based on row and column groupings and
+choose paragraph alignment based on /org-col-cookies/ text
+property.  See also
+/org-odt-get-paragraph-style-cookie-for-table-cell/.
+
+When =style-spec= is non-nil, ignore the above cookie and return
+styles congruent with the ODF-1.2 specification.
+
+
+** org-odt-hfy-face-to-css =fn=
+
+Create custom style for face =fn=.
+When =fn= is the default face, use it's foreground and background
+properties to create "OrgSrcBlock" paragraph style.  Otherwise
+use it's color attribute to create a character style whose name
+is obtained from =fn=.  Currently all attributes of =fn= other than
+color are ignored.
+
+The style name for a face =fn= is derived using the following
+operations on the face name in that order - de-dash, CamelCase
+and prefix with "OrgSrc".  For example,
+/font-lock-function-name-face/ is associated with
+"OrgSrcFontLockFunctionNameFace".
+
+
+** org-odt-insert-custom-styles-for-srcblocks =styles=
+
+Save =styles= used for colorizing of source blocks.
+Update styles.xml with styles that were collected as part of
+/org-odt-hfy-face-to-css/ callbacks.
+
+
+** org-odt-write-automatic-styles  
+
+Write automatic styles to "content.xml".
+

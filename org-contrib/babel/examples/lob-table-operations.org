@@ -1,0 +1,543 @@
+
+* Table operations --- filter or combine tables
+
+  This section within the library of babel provides table operations.
+  See the documentation just below for details and working examples.
+
+  Author  : Marc-Oliver Ihm <ihm@ferntreffer.de>
+  Version : 1.0
+
+** Documentation
+
+*** Introduction
+
+    The table operations (currently four) are grouped in two categories:
+    
+    - Filtering the rows of a single table: keeping or removing rows
+    - Combining two tables into one: merging or intersecting tables
+     
+    All four operations are demonstrated below.
+
+*** Example tables
+
+    To demonstrate we need three tables: upper, lower and keys:
+
+#+name: upper
+|  1 | A |
+|  3 | C |
+|  4 | D |
+| 10 | J |
+|  2 | B |
+
+#+name: lower
+| Position | Letter |
+|----------+--------|
+|        2 | b      |
+|        4 | d      |
+|        5 | e      |
+|        6 | h      |
+
+#+name: keys
+| Position |
+|----------|
+|        1 |
+|        2 |
+|        4 |
+
+    The tables upper and lower both have two columns and associate a position in
+    the alphabet with the matching letter.  E.g. the row "| 1 | A |" from table
+    upper, just states that the letter "A" comes at position 1 in the alphabet.
+
+    Nearly the same is true for table lower, only that it contains lower case
+    letters.  Some of its letters (e.g. "b") have counterparts in table upper
+    ("B"), some (e.g. "e") dont.
+
+    The table keys finally, contains keys (i.e. positions within the alphabet),
+    that can be used to select rows from either table upper or lower.
+
+    Note, that tables may have column headings or not.
+
+*** Filtering a table
+
+**** Keeping rows
+
+     Let's say, we want to select the upper-case letters (i.e. rows from the
+     table upper), that are given in table keys (i.e. the first, second and
+     fourth letter).
+
+     This can be described as filtering table upper and keeping only those rows,
+     that appear in table keys.
+
+     As a babel-call, this reads:
+
+#+call: table-operations-filter-keep(upper,keys)
+
+#+results: table-operations-filter-keep(upper,keys)
+| 1 | A |
+| 4 | D |
+| 2 | B |
+
+     ,which gives exactly those rows from table upper, that are specified in
+     keys.
+
+**** Removing rows
+
+     Now, if on the contrary you want to filter table upper to remove any rows,
+     which are given in table keys:
+
+#+call: table-operations-filter-remove(upper,keys) :colnames yes
+
+#+results: table-operations-filter-remove(upper,keys)
+| Position | t2c2 |
+|----------+------|
+|        3 | C    |
+|       10 | J    |
+
+     ,which is the expected result.
+
+     Please note, that the call contains the header argument ":colnames yes",
+     which causes the result table to contain the headings "Position" and
+     "t2c2". These headings are taken from the input-tables upper and
+     keys. However, as upper does not contain any headings, the heading "t2c2"
+     is generated artificially; it stands for "table 2 column 2".
+
+     If you do not want to have column names in the result table, just leave out
+     the header argument ":colnames yes" like in the first example. Note
+     however, that ":colnames no" does not give the expected effect.
+
+*** Combining tables
+
+    Now, lets have a look at the tables upper and lower alone and see how to
+    combine them.
+
+    Note, that we only look at combining two tables for simplicity, however, all
+    operations can be easily scaled up to seven tables.
+
+**** Merging rows
+
+     We have two tables, one with upper case letters and one with lower
+     case. What now, if you want to have only one table, which contains both,
+     upper and lower case letters ?
+     
+     You may want to merge them:
+
+#+call: table-operations-combine-merge(upper,lower) :colnames yes
+
+#+results: table-operations-combine-merge(upper,lower)
+| Position | t1c2 | Letter |
+|----------+------+--------|
+|        1 | A    |        |
+|        2 | B    | b      |
+|        3 | C    |        |
+|        4 | D    | d      |
+|        5 |      | e      |
+|        6 |      | h      |
+|       10 | J    |        |
+
+
+     This result combines both upper and lower case letters and lists them by
+     their position within the alphabet.
+
+**** Intersecting rows
+
+     If you only want the rows, that are complete (i.e. have both upper and
+     lower case letters) you may compute the intersection:
+
+#+call: table-operations-combine-intersect(upper,lower)
+
+#+results: table-operations-combine-intersect(upper,lower)
+| 2 | B | b |
+| 4 | D | d |
+
+
+     ,which has only those keys and letters, that appear in both tables.
+
+     Note, that we have ommitted the headeragument ":colnames yes" so that the
+     result table has no headings.
+
+** Internals
+
+   This section is not required if you just want to use table operations as
+   described above. Only if you are curious about its implementation or
+   development, you might want to have a look.
+
+*** Implementation
+   
+   Here is the actual lisp code, that implements the functionality of table
+   operations.
+
+**** table-operations-filter
+***** Directly callable blocks
+
+#+name: table-operations-filter-keep
+#+begin_src emacs-lisp :noweb yes :results silent :var table=() :var filter=() 
+  <<lob-table-operations-helper-get-headings-defun>>
+  <<lob-table-operations-filter-defun>>
+  (let ((filter-and-table (list filter table)))
+    (lob-table-operations-filter 'keep filter-and-table))
+#+end_src
+
+#+name: table-operations-filter-remove
+#+begin_src emacs-lisp :noweb yes :results silent :var table=() :var filter=() :colnames nil
+  <<lob-table-operations-helper-get-headings-defun>>
+  <<lob-table-operations-filter-defun>>
+  (let ((filter-and-table (list filter table)))
+    (lob-table-operations-filter 'remove filter-and-table))
+#+end_src
+
+***** Included defuns
+
+#+name: lob-table-operations-filter-defun
+#+begin_src emacs-lisp
+  (defun lob-table-operations-filter (what filter-and-table)
+    "Internal function for table operations in orgmode library of babel"
+  
+    (let (keys
+          result-table
+          headings-all-tables
+          filter
+          table)
+  
+      ;; seperate headings from rest of tables
+      (setq headings-all-tables 
+            (lob-table-operations-helper-get-headings filter-and-table))
+  
+      ;; extract arguments
+      (setq filter (car filter-and-table))
+      (setq table (cadr filter-and-table))
+  
+      ;; remove hlines
+      (setq table (org-babel-del-hlines table))
+      (setq filter (org-babel-del-hlines filter))
+      (setq keys (mapcar 'car filter))
+  
+      ;; start result with headings (reversed)
+      (setq result-table (cons 'hline (cons headings-all-tables nil)))
+  
+      (dolist (line table) ; loop over table lines 
+        (if (equal (not (not (member (car line) keys))) 
+                   (equal what 'keep)) ; 'keep or 'remove ?
+            (setq result-table (cons line result-table))))
+      (nreverse result-table)))
+#+end_src
+
+**** table-operations-combine
+***** Directly callable blocks
+
+#+name: table-operations-combine-merge 
+#+begin_src emacs-lisp :noweb yes :results silent :var t1=() :var t2=() :var t3=() :var t4=() :var t5=() :var t6=() :var t7=()
+  <<lob-table-operations-helper-get-headings-defun>>
+  <<lob-table-operations-combine-defun>>
+  (let ((tables (list t1 t2 t3 t4 t5 t6 t7)))
+    (lob-table-operations-combine 'merge tables))
+#+end_src
+
+#+name: table-operations-combine-intersect 
+#+begin_src emacs-lisp :noweb yes :results silent :var t1=() :var t2=() :var t3=() :var t4=() :var t5=() :var t6=() :var t7=()
+  <<lob-table-operations-helper-get-headings-defun>>
+  <<lob-table-operations-combine-defun>>
+  (let ((tables (list t1 t2 t3 t4 t5 t6 t7)))
+    (lob-table-operations-combine 'intersect tables))
+#+end_src
+
+***** Included defuns
+
+#+name: lob-table-operations-combine-defun
+#+begin_src emacs-lisp
+  (defun lob-table-operations-combine (what tables)
+    "Internal function for table-operations in orgmode library of babel"
+    (let (is-all-numbers                 
+          format-specifier
+          rest-of-tables
+          rests-of-tables
+          rest-of-rests-of-tables
+          rest-of-table
+          headings-all-tables
+          widths-of-tables
+          current-key
+          current-key-in-intersection
+          result-table
+          result-line
+          i)
+  
+      ;; remove possible empty trailing tables
+      (setq rest-of-tables tables)
+      (while (cadr rest-of-tables) (setq rest-of-tables (cdr rest-of-tables)))
+      (setcdr rest-of-tables nil)
+  
+      ;; seperate headings from rest of tables
+      (setq headings-all-tables (lob-table-operations-helper-get-headings 
+                                 tables))
+      (setq result-table (cons 'hline (cons headings-all-tables nil)))
+      
+      ;; remove all remaining hlines
+      (setq tables (mapcar 'org-babel-del-hlines tables))
+  
+      ;; Find out, if all keys in all tables are numbers or if 
+      ;; there are strings among them
+      (setq is-all-numbers
+            (catch 'not-a-number
+              (dolist (table tables) 
+                (dolist (line table) 
+                  (unless (numberp (car line)) 
+                    (throw 'not-a-number 'nil))))
+              't))
+      
+      (setq format-specifier (if is-all-numbers "%g" "%s"))
+      ;; Prepare functions to treat table contents in a unified way
+      (flet ((convert (x) 
+                      (if is-all-numbers
+                          x
+                        (if (numberp x) 
+                            (number-to-string x) 
+                          x)))
+             (less-than (x y) 
+                        (if is-all-numbers (< x y) 
+                          (string< (convert x) 
+                                   (convert y))))
+             (compare (x y) 
+                      (if is-all-numbers (= x y) 
+                        (string= (convert x) 
+                                 (convert y)))))
+        
+        ;; sort tables
+        (setq tables (mapcar (lambda (table) 
+                               (sort table (lambda (x y) 
+                                             (less-than (car x) 
+                                                        (car y))))) 
+                             tables))
+        
+        ;; compute and remember table widths
+        (setq widths-of-tables (mapcar (lambda (x) (length (car x))) tables))
+        
+        ;; copy initially and shorten below
+        (setq rests-of-tables (copy-list tables))
+  
+        ;; loop as long as the rest of table still contains lines
+        (while (progn 
+                 ;; find lowest key among all tables, which is the key for the
+                 ;; next line of the result
+                 (setq current-key nil)
+                 (setq current-key-in-intersection 't) ; remember for later
+                 (dolist (rest-of-table rests-of-tables) ; loop over all tables
+                   (when (and rest-of-table ; and compare against all keys
+                              (or (null current-key) 
+                                  (less-than (caar rest-of-table) 
+                                             current-key)))
+                     (setq current-key (caar rest-of-table))))
+                 current-key)
+          
+          (progn
+            
+            (setq result-line (list current-key))
+            
+            ;; go through all tables and collect one line for the result table
+            (setq i 0)                      ; table-count
+            ;; cannot use dolist like above, because we need to modify the
+            ;; cons-cells
+            (setq rest-of-rests-of-tables rests-of-tables)
+            (while (progn
+                     (setq rest-of-table (car rest-of-rests-of-tables))
+                     (incf i)
+                     ;; if table contains current key 
+                     (if (and rest-of-table
+                              (compare current-key (caar rest-of-table)))
+                         ;; then copy rest of line
+                         (progn (nconc result-line (cdar rest-of-table))
+                                ;; and shorten rest
+                                (setcar rest-of-rests-of-tables 
+                                        (cdar rest-of-rests-of-tables))
+                                ;; and check, if current-key appears again
+                                (when (and (caadr rest-of-table)
+                                           (compare current-key 
+                                                    (caadr rest-of-table)))
+                                  (error (concat "Key '" 
+                                                 format-specifier 
+                                                 "' appears twice within "
+                                                 "input table %i") 
+                                         (convert current-key) i)
+                                  )
+                                )
+                       ;; otherwise fill with nil and do not shorte
+                       ;; rest of table
+                       (progn 
+                         (setq current-key-in-intersection nil)
+                         (nconc result-line (make-list (1- 
+                                                        (elt widths-of-tables 
+                                                             (1- i))) 
+                                                       ""))))
+                     
+                     (setq rest-of-rests-of-tables 
+                           (cdr rest-of-rests-of-tables))
+                     rest-of-rests-of-tables)) ; condition for loop
+            (if (or (eq what 'merge) current-key-in-intersection)
+                ;; store away line
+                (setq result-table (cons  
+                                    result-line 
+                                    result-table)))))
+  
+        (nreverse result-table))))
+#+end_src
+
+**** Common helper functions
+
+#+name: lob-table-operations-helper-get-headings-defun
+#+begin_src emacs-lisp
+  (defun lob-table-operations-helper-get-headings (tables)
+    "Internal function for table-operations in orgmode library of babel"
+    (let ((rest-of-tables tables)
+          (i 1)
+          headings-all-tables
+          headings-one-table
+          heading-of-key)
+      (while rest-of-tables 
+        (progn
+          (setq table (car rest-of-tables))
+          (if (eq (cadr table) 'hline)
+              ;; second line is a hline, so first is a heading
+              (progn 
+                ; take headings from first table row
+                (setq headings-one-table (cdar table)) 
+                (unless heading-of-key (setq heading-of-key (caar table)))
+                (unless (string= heading-of-key (caar table))
+                  (error "Name of first column is not the same in all tables"))
+                (setcar rest-of-tables 
+                        (cdar rest-of-tables))) ; and shorten rest
+            ;; table does not contain headings, so make them up
+            (setq headings-one-table 
+                  (mapcar 
+                   (lambda (x) (format "t%dc%d" i x))
+                   (number-sequence 2 (length (car table))))))
+          (setq headings-all-tables (append headings-all-tables 
+                                            headings-one-table))
+          (setq rest-of-tables (cdr rest-of-tables))
+          (incf i)
+          rest-of-tables)) ; condition for while loop
+      (unless heading-of-key (setq heading-of-key "key"))
+      (setq headings-all-tables (cons heading-of-key headings-all-tables))
+      headings-all-tables))
+  
+#+end_src
+
+**** Debugging and testing
+***** Clean up
+#+begin_src emacs-lisp
+  (save-excursion
+    (beginning-of-buffer)
+    (while (re-search-forward "^#\\+results:.*\n\\(^\|.+\n\\)*\n" nil t)
+      (replace-match ""))
+    )
+#+end_src
+
+#+results:
+
+***** Byte Compilation
+
+   (byte-compile 'lob-table-operations-combine)
+   (byte-compile 'lob-table-operations-filter)
+
+*** Development
+**** Versions and history
+
+     [2012-03-18 So] Version 1.0: 
+     - Added handling of hlines and table headings
+
+     [2012-01-07 Sa] Version 0.01:
+     - Restructured as a single org-file; no special .el-file needed any more
+     - Combined and restructured documentation and implementation
+
+**** Bugs and Todos
+
+     - [X] Brush up documentation
+     - [X] Stay below 80 columns
+     - [X] Tests with more than two columns per table
+     - [X] Tests with more than two tables for merging
+     - [X] Handle optional table captions
+     - [X] Handle hlines
+     - [X] flet within lob-table-operations-combine
+     - [-] flet within directly callable blocks; try to avoid global functions
+       Not feasible, because that hinders debugging to much
+     - [X] Use :results silent
+       
+**** Testcases
+
+#+name: upper-wide
+| Position | c1 | c2 | c3 | c4 |
+|----------+----+----+----+----|
+|        1 | A1 | A2 | A3 | A4 |
+|        3 | C1 | C2 | C3 | C4 |
+|        4 | D1 | D2 | D3 | D4 |
+|       10 | J1 | J2 | J3 | J4 |
+|        2 | B1 | B2 | B3 | B4 |
+
+#+name: lower-wide
+| 2 | b1 | b2 | b3 | b4 |
+| 4 | d1 | d2 | d3 | d4 |
+| 5 | e1 | e2 | e3 | e4 |
+| 6 | h1 | h2 | h3 | h4 |
+
+#+name: upper-lower-wide 
+|  2 | Bb1 | Bb2 | Bb3 | Bb4 |
+|  6 | Hh1 | Hh2 | Hh3 | Hh4 |
+|  4 | Dd1 | Dd2 | Dd3 | Dd4 |
+| 10 | Jj1 | Jj2 | Jj3 | Jj4 |
+
+#+call: table-operations-filter-keep(upper-wide,keys)
+
+#+results: table-operations-filter-keep(upper-wide,keys)
+| 1 | A1 | A2 | A3 | A4 |
+| 4 | D1 | D2 | D3 | D4 |
+| 2 | B1 | B2 | B3 | B4 |
+
+#+call: table-operations-filter-remove(lower-wide,keys) :colnames yes
+
+#+results: table-operations-filter-remove(lower-wide,keys)
+| Position | t2c2 | t2c3 | t2c4 | t2c5 |
+|----------+------+------+------+------|
+|        5 | e1   | e2   | e3   | e4   |
+|        6 | h1   | h2   | h3   | h4   |
+
+#+call: table-operations-combine-merge(upper-wide,lower-wide) :colnames yes
+
+#+results: table-operations-combine-merge(upper-wide,lower-wide)
+| Position | c1 | c2 | c3 | c4 | t2c2 | t2c3 | t2c4 | t2c5 |
+|----------+----+----+----+----+------+------+------+------|
+|        1 | A1 | A2 | A3 | A4 |      |      |      |      |
+|        2 | B1 | B2 | B3 | B4 | b1   | b2   | b3   | b4   |
+|        3 | C1 | C2 | C3 | C4 |      |      |      |      |
+|        4 | D1 | D2 | D3 | D4 | d1   | d2   | d3   | d4   |
+|        5 |    |    |    |    | e1   | e2   | e3   | e4   |
+|        6 |    |    |    |    | h1   | h2   | h3   | h4   |
+|       10 | J1 | J2 | J3 | J4 |      |      |      |      |
+
+#+call: table-operations-combine-intersect(upper-wide,lower-wide)
+
+#+results: table-operations-combine-intersect(upper-wide,lower-wide)
+| 2 | B1 | B2 | B3 | B4 | b1 | b2 | b3 | b4 |
+| 4 | D1 | D2 | D3 | D4 | d1 | d2 | d3 | d4 |
+
+#+call: table-operations-combine-merge(upper-wide,lower-wide,upper-lower-wide) :colnames yes
+
+#+results: table-operations-combine-merge(upper-wide,lower-wide,upper-lower-wide)
+| Position | c1 | c2 | c3 | c4 | t2c2 | t2c3 | t2c4 | t2c5 | t3c2 | t3c3 | t3c4 | t3c5 |
+|----------+----+----+----+----+------+------+------+------+------+------+------+------|
+|        1 | A1 | A2 | A3 | A4 |      |      |      |      |      |      |      |      |
+|        2 | B1 | B2 | B3 | B4 | b1   | b2   | b3   | b4   | Bb1  | Bb2  | Bb3  | Bb4  |
+|        3 | C1 | C2 | C3 | C4 |      |      |      |      |      |      |      |      |
+|        4 | D1 | D2 | D3 | D4 | d1   | d2   | d3   | d4   | Dd1  | Dd2  | Dd3  | Dd4  |
+|        5 |    |    |    |    | e1   | e2   | e3   | e4   |      |      |      |      |
+|        6 |    |    |    |    | h1   | h2   | h3   | h4   | Hh1  | Hh2  | Hh3  | Hh4  |
+|       10 | J1 | J2 | J3 | J4 |      |      |      |      | Jj1  | Jj2  | Jj3  | Jj4  |
+
+#+call: table-operations-combine-intersect(upper-wide,lower-wide,upper-lower-wide)
+
+#+results: table-operations-combine-intersect(upper-wide,lower-wide,upper-lower-wide)
+| 2 | B1 | B2 | B3 | B4 | b1 | b2 | b3 | b4 | Bb1 | Bb2 | Bb3 | Bb4 |
+| 4 | D1 | D2 | D3 | D4 | d1 | d2 | d3 | d4 | Dd1 | Dd2 | Dd3 | Dd4 |
+
+**** Keeping the margins
+
+     (setq-default fill-column 80)
+     (column-marker-3 80)
+
+

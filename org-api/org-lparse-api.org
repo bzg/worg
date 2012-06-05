@@ -1,0 +1,324 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-LParse API functions (org-lparse.el)
+** org-lparse =target-backend native-backend arg &optional hidden ext-plist to-buffer body-only pub-dir=
+
+Export the outline to various formats.
+If there is an active region, export only the region.  The
+outline is first exported to =native-backend= and optionally
+converted to =target-backend=.  See /org-lparse-native-backends/
+for list of known native backends.  Each native backend can
+specify a converter and list of target backends it exports to
+using the CONVERT-PROCESS and OTHER-BACKENDS settings of it's get
+method.  See /org-xhtml-get/ for an illustrative example.
+
+=arg= is a prefix argument that specifies how many levels of
+outline should become headlines.  The default is 3.  Lower levels
+will become bulleted lists.
+
+=hidden= is obsolete and does nothing.
+
+=ext-plist= is a property list that controls various aspects of
+export.  The settings here override org-mode's default settings
+and but are inferior to file-local settings.
+
+=to-buffer= dumps the exported lines to a buffer or a string
+instead of a file.  If =to-buffer= is the symbol /string/ return the
+exported lines as a string.  If =to-buffer= is non-nil, create a
+buffer with that name and export to that buffer.
+
+=body-only= controls the presence of header and footer lines in
+exported text.  If =body-only= is non-nil, don't produce the file
+header and footer, simply return the content of <body>...</body>,
+without even the body tags themselves.
+
+=pub-dir= specifies the publishing directory.
+
+
+** org-lparse-and-open =target-backend native-backend arg &optional file-or-buf=
+
+Export outline to =target-backend= via =native-backend= and open exported file.
+If there is an active region, export only the region.  The prefix
+=arg= specifies how many levels of the outline should become
+headlines.  The default is 3.  Lower levels will become bulleted
+lists.
+
+
+** org-lparse-apply-char-styles =string=
+
+Apply char styles to =string=.
+The variable /org-lparse-char-styles/ controls how the Org
+emphasis markers are interpreted.
+
+
+** org-lparse-apply-sub-superscript-styles =string=
+
+Apply subscript and superscript styles to =string=.
+Use /org-export-with-sub-superscripts/ to control application of
+sub and superscript styles.
+
+
+** org-lparse-backend-get =backend what &optional opt-plist=
+
+Query =backend= for value of =what=.
+Dispatch the call to /org-<backend>-user-get/.  If that throws an
+error, dispatch the call to /org-<backend>-get/.  See
+/org-xhtml-get/ for all known settings queried for by
+/org-lparse/ during the course of export.
+
+
+** org-lparse-batch =target-backend &optional native-backend=
+
+Call the function /org-lparse/.
+This function can be used in batch processing as:
+emacs   --batch
+#+begin_src emacs-lisp
+        --load=$HOME/lib/emacs/org.el
+        --eval "(setq org-export-headline-levels 2)"
+        --visit=MyFile --funcall org-lparse-batch
+#+end_src
+
+
+
+** org-lparse-begin =entity &rest args=
+
+Begin =entity= in current buffer.  =args= is entity specific.
+=entity= can be one of PARAGRAPH, LIST, LIST-ITEM etc.
+
+Use (org-lparse-begin 'LIST "o") to begin a list in current
+buffer.
+
+See /org-xhtml-entity-control-callbacks-alist/ for more
+information.
+
+
+** org-lparse-begin-collect  
+
+Temporarily switch to /org-lparse-collect-buffer/.
+Also erase it's contents.
+
+
+** org-lparse-begin-level =level title umax head-count=
+
+Insert a new =level= in HTML export.
+When =title= is nil, just close all open levels.
+
+
+** org-lparse-begin-paragraph =&optional style=
+
+Insert <p>, but first close previous paragraph if any.
+
+
+** org-lparse-convert-read-params  
+
+Return IN-FILE and OUT-FMT params for /org-lparse-do-convert/.
+This is a helper routine for interactive use.
+
+
+** org-lparse-convert-special-strings =string=
+
+Convert special characters in =string= to HTML.
+
+
+** org-lparse-do-convert =in-file out-fmt &optional prefix-arg=
+
+Workhorse routine for /org-export-odt-convert/.
+
+
+** org-lparse-do-reachable-formats =in-fmt=
+
+Return verbose info about formats to which =in-fmt= can be converted.
+Return a list where each element is of the
+form (CONVERTER-PROCESS . OUTPUT-FMT-ALIST).  See
+/org-export-odt-convert-processes/ for CONVERTER-PROCESS and see
+/org-export-odt-convert-capabilities/ for OUTPUT-FMT-ALIST.
+
+
+** org-lparse-end =entity &rest args=
+
+Close =entity= in current buffer.  =args= is entity specific.
+=entity= can be one of PARAGRAPH, LIST, LIST-ITEM
+etc.
+
+Use (org-lparse-end 'LIST "o") to close a list in current
+buffer.
+
+See /org-xhtml-entity-control-callbacks-alist/ for more
+information.
+
+
+** org-lparse-end-collect  
+
+Switch to /org-lparse-output-buffer/.
+Return contents of /org-lparse-collect-buffer/ as a /string/.
+
+
+** org-lparse-end-list-item-1 =&optional type=
+
+Close <li> if necessary.
+
+
+** org-lparse-end-paragraph  
+
+Close paragraph if there is one open.
+
+
+** org-lparse-export-list-line =line pos struct prevs=
+
+Insert list syntax in export buffer.  Return =line=, maybe modified.
+
+=pos= is the item position or line position the line had before
+modifications to buffer.  =struct= is the list structure.  =prevs= is
+the alist of previous items.
+
+
+** org-lparse-format =entity &rest args=
+
+Format =entity= in backend-specific way and return it.
+=args= is specific to entity being formatted.
+
+Use (org-lparse-format 'HEADING "text" 1) to format text as
+level 1 heading.
+
+See /org-xhtml-entity-format-callbacks-alist/ for more information.
+
+
+** org-lparse-format-org-link =line opt-plist=
+
+Return =line= with markup of Org mode links.
+=opt-plist= is the export options list.
+
+
+** org-lparse-format-table =lines olines=
+
+Returns backend-specific code for org-type and table-type tables.
+
+
+** org-lparse-format-table-table-using-table-generate-source =backend lines &optional spanned-only=
+
+Format a table into =backend=, using /table-generate-source/ from table.el.
+Use =spanned-only= to suppress exporting of simple table.el tables.
+
+When =spanned-only= is nil, all table.el tables are exported.  When
+=spanned-only= is non-nil, only tables with either row or column
+spans are exported.
+
+This routine returns the generated source or nil as appropriate.
+
+Refer docstring of /org-export-prefer-native-exporter-for-tables/
+for further information.
+
+
+** org-lparse-get =what &optional opt-plist=
+
+Query for value of =what= for the current backend /org-lparse-backend/.
+See also /org-lparse-backend-get/.
+
+
+** org-lparse-handle-time-stamps =s=
+
+Format time stamps in string =s=, or remove them.
+
+
+** org-lparse-insert-org-table =lines &optional splice=
+
+Format a org-type table into backend-specific code.
+=lines= is a list of lines.  Optional argument =splice= means, do not
+insert header and surrounding <table> tags, just format the lines.
+Optional argument NO-CSS means use XHTML attributes instead of CSS
+for formatting.  This is required for the DocBook exporter.
+
+
+** org-lparse-insert-table-table =lines=
+
+Format a table generated by table.el into backend-specific code.
+This conversion does *not* use /table-generate-source/ from table.el.
+This has the advantage that Org-mode's HTML conversions can be used.
+But it has the disadvantage, that no cell- or row-spanning is allowed.
+
+
+** org-lparse-org-table-to-list-table =lines &optional splice=
+
+Convert org-table to list-table.
+=lines= is a list of the form (ROW1 ROW2 ROW3 ...) where each
+element is a /string/ representing a single row of org-table.
+Thus each ROW has vertical separators "|" separating the table
+fields.  A ROW could also be a row-group separator of the form
+"|---...|".  Return a list of the form (ROW1 ROW2 ROW3
+...). ROW could either be symbol /:hrule/ or a list of the
+form (FIELD1 FIELD2 FIELD3 ...) as appropriate.
+
+
+** org-lparse-preprocess-after-blockquote-hook  
+
+Treat /org-lparse-special-blocks/ specially.
+
+
+** org-lparse-reachable-formats =in-fmt=
+
+Return list of formats to which =in-fmt= can be converted.
+The list of the form (OUTPUT-FMT-1 OUTPUT-FMT-2 ...).
+
+
+** org-lparse-reachable-p =in-fmt out-fmt=
+
+Return non-nil if =in-fmt= can be converted to =out-fmt=.
+
+
+** org-lparse-region =backend beg end &optional body-only buffer=
+
+Convert region from =beg= to =end= in org-mode buffer to HTML.
+If prefix arg =body-only= is set, omit file header, footer, and table of
+contents, and only produce the region of converted text, useful for
+cut-and-paste operations.
+If =buffer= is a buffer or a string, use/create that buffer as a target
+of the converted HTML.  If =buffer= is the symbol /string/, return the
+produced HTML as a string and leave not buffer behind.  For example,
+a Lisp program could call this function in the following way:
+
+#+begin_src emacs-lisp
+  (setq html (org-lparse-region "html" beg end t 'string))
+#+end_src
+
+When called interactively, the output buffer is selected, and shown
+in a window.  A non-interactive call will only return the buffer.
+
+
+** org-lparse-register-backend =backend=
+
+Make =backend= known to /org-lparse/ library.
+Add =backend= to /org-lparse-native-backends/.
+
+
+** org-lparse-should-inline-p =filename descp=
+
+Return non-nil if link =filename= should be inlined.
+The decision to inline the =filename= link is based on the current
+settings.  =descp= is the boolean of whether there was a link
+description.  See variables /org-export-html-inline-images/ and
+/org-export-html-inline-image-extensions/.
+
+
+** org-lparse-strip-experimental-blocks-maybe-hook  
+
+Strip "list-table" and "annotation" blocks.
+Stripping happens only when the exported backend is not one of
+"odt" or "xhtml".
+
+
+** org-lparse-to-buffer =backend arg=
+
+Call /org-lparse/ with output to a temporary buffer.
+No file is created.  The prefix =arg= is passed through to
+/org-lparse/.

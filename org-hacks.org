@@ -2783,17 +2783,17 @@ Tycho Garen sent [[http://comments.gmane.org/gmane.emacs.orgmode/44773][this]]:
 
 Everything is documented [[http://tychoish.com/code/org-mail/][here]].
 
-** fileconversion
+** Save File With Different Format for Headings (fileconversion)
    :PROPERTIES:
    :CUSTOM_ID: fileconversion
    :END:
 #+index: Conversion!fileconversion
 
 Using hooks and on the fly
-- when writing a buffer to the file replace the stars from headings with a
-  file char
-- when reading a file into the buffer replace the file chars with stars for
-  headings
+- when writing a buffer to the file replace the leading stars from headings
+  with a file char
+- when reading a file into the buffer replace the file chars with leading
+  stars for headings
 
 To change to save an Org file in one of the formats or back just add or
 remove the keyword in the STARTUP line and save.
@@ -2802,7 +2802,7 @@ Now you can also change to Fundamental mode to see how the file looks like
 on the level of the file, go back to Org mode, reenter Org mode or change to
 any other major mode and the conversion gets done whenever necessary.
 
-*** the format hidestarsfile
+*** Headings Without Leading Stars (hidestarsfile and nbspstarsfile)
     :PROPERTIES:
     :CUSTOM_ID: hidestarsfile
     :END:
@@ -2844,12 +2844,16 @@ with an editor not capable of the Org file format.
 
 hidestarsfile is a hack and can not become part of the Org core:
 - An Org file with hidestarsfile can not contain list items with a star as
-  bullet due to the syntax conflict at read time.
+  bullet due to the syntax conflict at read time. Mark E. Shoulson suggested
+  to use the non-breaking space which is now implemented in fileconversion
+  as nbspstarsfile as an alternative for hidestarsfile. Although I don't
+  recommend it because an editor like typically e. g. Emacs may render the
+  non-breaking space differently from the space 0x20.
 - An Org file with hidestarsfile can almost not be edited with an Org mode
   without added functionality of hidestarsfile as long as the file is not
   converted back.
 
-*** the format markdownstarsfile
+*** Headings in Markdown Format (markdownstarsfile)
     :PROPERTIES:
     :CUSTOM_ID: markdownstarsfile
     :END:
@@ -2864,14 +2868,15 @@ Example of the _file content_:
 
 #+BEGIN_EXAMPLE
   #+STARTUP: oddeven markdownstarsfile
-  # section level 1 with Org or Markdown numbered list
-    1. item
-  ## section level 2 with Org or Markdown unordered list
-     - item
-  ### section level 3 with Org or Markdown unordered list
-      + item
-  #### section level 4 with Org or Markdown unordered list
-       * item (avoid this type to be compatible with Org hidestarsfile)
+  # section level 1
+    1. first item of numbered list (same format in Org and Markdown)
+  ## section level 2
+     - first item of unordered list (same format in Org and Markdown)
+  ### section level 3
+      + first item of unordered list (same format in Org and Markdown)
+  #### section level 4
+       * first item of unordered list (same format in Org and Markdown)
+       * avoid this item type to be compatible with Org hidestarsfile
 #+END_EXAMPLE
 
 An Org file with markdownstarsfile can not contain code comment lines
@@ -2884,17 +2889,19 @@ prefixed with "#", even not when within source blocks.
 #+index: Conversion!fileconversion emacs-lisp code
 
 #+BEGIN_SRC emacs-lisp
-  ;; - fileconversion version 0.2
+  ;; - fileconversion version 0.6
   ;; - DISCLAIMER: Make a backup of your Org files before using
   ;;   my-org-fileconv-*.
   ;; - supported formats: hidestarsfile, markdownstarsfile
 
   ;; design summary: fileconversion is a round robin of two states
   ;; linked by two actions:
-  ;; - the level is "file" (encoded): my-org-fileconv-level-org-p is nil
-  ;; - replace file char with '*': my-org-fileconv-decode
-  ;; - the level is "Org" (decoded): my-org-fileconv-level-org-p is t
-  ;; - replace '*' with file char: my-org-fileconv-encode
+  ;; - state my-org-fileconv-level-org-p is nil: the level is "file"
+  ;;   (encoded)
+  ;; - action my-org-fileconv-decode: replace file char with '*'
+  ;; - state my-org-fileconv-level-org-p is t: the level is "Org"
+  ;;   (decoded)
+  ;; - action my-org-fileconv-encode replace '*' with file char
 
   (defvar my-org-fileconv-level-org-p nil
     "Whether level of buffer is Org or only file.
@@ -2902,28 +2909,36 @@ prefixed with "#", even not when within source blocks.
   (decoded).")
   (make-variable-buffer-local 'my-org-fileconv-level-org-p)
   ;; survive a change of major mode that does kill-all-local-variables,
-  ;; e. g. reentering Org mode through “C-c C-c” on a STARTUP line
+  ;; e. g. when reentering Org mode through “C-c C-c” on a STARTUP line
   (put 'my-org-fileconv-level-org-p 'permanent-local t)
 
   (add-hook 'org-mode-hook 'my-org-fileconv-init
-            ;; append to hook to have a chance that the last message
-            ;; left over in the minibuffer is from this function
+            ;; _append_ to hook to have a higher chance that a message
+            ;; from this function will be visible as the last message in
+            ;; the minibuffer
             t
-            nil)  ; global
+            ;; hook addition global
+            nil)
 
   (defun my-org-fileconv-init ()
     (interactive)
-    (message (concat "INF: my-org-fileconv-init, buffer: "
-                     (buffer-name)))
-    (my-org-fileconv-decode)
-    ;; the hooks will be lost as needed at the moment when the major
-    ;; mode is changed, not permanent-local
-    (add-hook 'change-major-mode-hook 'my-org-fileconv-encode nil
-              t)   ; limit hook change local to buffer
-    (add-hook 'before-save-hook 'my-org-fileconv-encode nil
-              t)   ; limit hook change local to buffer
-    (add-hook 'after-save-hook 'my-org-fileconv-decode nil
-              t))  ; limit hook change local to buffer
+    ;; instrument only when converting really from/to an Org _file_, not
+    ;; e. g. for a temp Org buffer unrelated to a file like used e. g.
+    ;; when calling the old Org exporter
+    (when (buffer-file-name)
+      (message "INF: my-org-fileconv-init, buffer: %s" (buffer-name))
+      (my-org-fileconv-decode)
+      ;; the hooks are not permanent-local, this way and as needed they
+      ;; will disappear when the major mode of the buffer changes
+      (add-hook 'change-major-mode-hook 'my-org-fileconv-encode nil
+                ;; hook addition limited to buffer locally
+                t)
+      (add-hook 'before-save-hook 'my-org-fileconv-encode nil
+                ;; hook addition limited to buffer locally
+                t)
+      (add-hook 'after-save-hook 'my-org-fileconv-decode nil
+                ;; hook addition limited to buffer locally
+                t)))
 
   (defun my-org-fileconv-re ()
     "Check whether there is a STARTUP line for fileconversion.
@@ -2932,6 +2947,7 @@ prefixed with "#", even not when within source blocks.
       (beginning-of-buffer)
       (let (re-list (count 0))
         (while (re-search-forward "^#\\+STARTUP:" nil t)
+          ;; #+STARTUP: hidestarsfile
           (when (string-match-p "\\bhidestarsfile\\b"
                                 (thing-at-point 'line))
             ;; exclude e. g.:
@@ -2941,6 +2957,13 @@ prefixed with "#", even not when within source blocks.
             (setq re-list '("\\(\\* \\)"  ; common-re
                             ?\ ))         ; file-char
             (setq count (1+ count)))
+          ;; #+STARTUP: nbspstarsfile
+          (when (string-match-p "\\bnbspstarsfile\\b"
+                                (thing-at-point 'line))
+            (setq re-list '("\\(\\* \\)"  ; common-re
+                            ?\xa0))       ; file-char non-breaking space
+            (setq count (1+ count)))
+          ;; #+STARTUP: markdownstarsfile
           (when (string-match-p "\\bmarkdownstarsfile\\b"
                                 (thing-at-point 'line))
             ;; exclude e. g.:
@@ -2962,22 +2985,26 @@ prefixed with "#", even not when within source blocks.
                (file-re   (concat "^" (string file-char) "+" common-re))
                (org-re    (concat "^\\*+" common-re))
                len
-               (p         (point))
-               (mod-p     (buffer-modified-p)))
+               (p         (point)))
           (beginning-of-buffer)
+          ;; syntax check
           (when (re-search-forward org-re nil t)
             (goto-char (match-beginning 0))
             (org-reveal)
             (error
              "ERR: my-org-fileconv-decode syntax conflict at point"))
           (beginning-of-buffer)
-          (while (re-search-forward file-re nil t)
-            (goto-char (match-beginning 0))
-            ;; faster than lisp call of ins and del for each single char
-            (setq len (- (match-beginning 1) (match-beginning 0)))
-            (insert-char ?* len)
-            (delete-char len))
-          (goto-char p)
+          ;; substitution
+          (with-silent-modifications
+            (while (re-search-forward file-re nil t)
+              (goto-char (match-beginning 0))
+              ;; faster than a lisp call of insert and delete on each
+              ;; single char
+              (setq len (- (match-beginning 1) (match-beginning 0)))
+              (insert-char ?* len)
+              (delete-char len)))
+          (goto-char p))))
+
           ;; notes for ediff when only one file has fileconversion:
           ;; - The changes to the buffer with fileconversion until here
           ;;   are not regarded by ediff-files because the first call to
@@ -2990,7 +3017,7 @@ prefixed with "#", even not when within source blocks.
           ;;   - instead of using ediff-files first open the files and
           ;;     then run ediff-buffers (better for e. g. a script that
           ;;     takes two files as arguments and uses "emacs --eval")
-          (when (not mod-p) (not-modified)))))
+
     ;; the level is Org most of all when no fileconversion is in effect
     (setq my-org-fileconv-level-org-p t))
 
@@ -3004,23 +3031,25 @@ prefixed with "#", even not when within source blocks.
                (file-re   (concat "^" (string file-char) "+" common-re))
                (org-re    (concat "^\\*+" common-re))
                len
-               (p         (point))
-               (mod-p     (buffer-modified-p)))
+               (p         (point)))
           (beginning-of-buffer)
+          ;; syntax check
           (when (re-search-forward file-re nil t)
             (goto-char (match-beginning 0))
             (org-reveal)
             (error
              "ERR: my-org-fileconv-encode syntax conflict at point"))
           (beginning-of-buffer)
-          (while (re-search-forward org-re nil t)
-            (goto-char (match-beginning 0))
-            ;; faster than lisp call of ins and del for each single char
-            (setq len (- (match-beginning 1) (match-beginning 0)))
-            (insert-char file-char len)
-            (delete-char len))
+          ;; substitution
+          (with-silent-modifications
+            (while (re-search-forward org-re nil t)
+              (goto-char (match-beginning 0))
+              ;; faster than a lisp call of insert and delete on each
+              ;; single char
+              (setq len (- (match-beginning 1) (match-beginning 0)))
+              (insert-char file-char len)
+              (delete-char len)))
           (goto-char p)
-          (when (not mod-p) (not-modified))
           (setq my-org-fileconv-level-org-p nil))))
     nil)  ;; for the hook
 #+END_SRC

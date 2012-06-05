@@ -12,12 +12,80 @@
 [[file:../index.org][{Back to Worg's index}]]
 
 This document is aimed at back-end developers for the generic export
-engine =org-export.el=.  It assumes a good understanding of Org syntax
-— as specified by /Org Elements/ — from the reader.
+engine =org-export.el=.  It assumes a good understanding of Org
+syntax --- as specified by /Org Elements/ --- from the reader.
 
-It covers [[#attributes][attributes]] associated to each element or object type,
-properties offered by the [[#communication][communication channel]] during export process
-and [[#toolbox][tools]] provided by the exporter.
+It covers [[#back-end][back-end creation]] process, all [[#attributes][attributes]] associated to each
+element or object type, properties offered by the [[#communication][communication
+channel]] during export, the [[#filter-system][filter system]] internals and [[#toolbox][tools]] provided
+by the exporter.
+
+
+* Defining a Back-End
+
+  A back-end is defined through one mandatory variable: his
+  translation table.  Its name is always ~org-BACKEND-translate-alist~
+  where ~BACKEND~ stands for the name chosen for the back-end.  Its
+  value is an alist whose keys are elements and objects types and
+  values translator functions.
+
+  These functions should return a string without any trailing space,
+  or nil.  They must accept three arguments: the object or element
+  itself, its contents or nil when it isn't recursive and the property
+  list used as a communication channel.
+
+  Contents, when not nil, are stripped from any global indentation
+  (although the relative one is preserved).  They also always end with
+  a single newline character.
+
+  If, for a given type, no function is found, that element or object
+  type will simply be ignored, along with any blank line or white
+  space at its end.  The same will happen if the function returns the
+  nil value.  If that function returns the empty string, the type will
+  be ignored, but the blank lines or white spaces will be kept.
+
+  In addition to element and object types, one function can be
+  associated to the ~template~ symbol and another one to the
+  ~plain-text~ symbol.
+
+  The former returns the final transcoded string, and can be used to
+  add a preamble and a postamble to document's body.  It must accept
+  two arguments: the transcoded string and the property list
+  containing export options.
+
+  The latter, when defined, is to be called on every text not
+  recognized as an element or an object.  It must accept two
+  arguments: the text string and the information channel.  It is an
+  appropriate place to protect special chars relative to the back-end.
+
+  Optionally, a back-end can support specific buffer keywords and
+  ~OPTION~ keyword's items by setting ~org-BACKEND-filters-alist~
+  variable.  Refer to ~org-export-options-alist~ documentation for
+  more information about its value.
+
+  For example, =e-latex= back-end introduces three new buffer
+  keywords, and redefine ~DATE~ default value with the following
+  snippet:
+
+  #+BEGIN_SRC emacs-lisp
+    (defconst org-e-latex-options-alist
+    '((:date "DATE" nil org-e-latex-date-format t)
+      (:latex-class "LATEX_CLASS" nil org-e-latex-default-class t)
+      (:latex-class-options "LATEX_CLASS_OPTIONS" nil nil t)
+      (:latex-header-extra "LATEX_HEADER" nil nil newline)))
+  #+END_SRC
+
+  If the new back-end shares most properties with another one,
+  ~org-export-define-derived-backend~ macro can be used to simplify
+  the process.  In the example below, we implement a new back-end
+  which behaves like =e-latex= excepted for headlines and the
+  template.
+
+  #+BEGIN_SRC emacs-lisp
+  (org-export-define-derived-backend my-latex e-latex
+  :translate-alist ((headline . custom-headline-translator)
+                    (template . custom-template)))
+  #+END_SRC
 
 * Elements Attributes
   :PROPERTIES:
@@ -44,6 +112,18 @@ and [[#toolbox][tools]] provided by the exporter.
                 by ~ob-babel-lob-get-info~ (string).
    - ~:post-blank~ :: Number of blank lines between keyword and next
                       non-blank line or buffer's end (integer).
+** Bold
+
+   Recursive object.
+
+   - ~:begin~ :: Buffer position before opening star (integer).
+   - ~:contents-begin~ :: Buffer position after opening star (integer).
+   - ~:contents-end~ :: Buffer position before closing star (integer).
+   - ~:end~ :: Buffer position before first non-blank character after
+               closing star or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing star and
+                      next non-blank character or paragraph's end
+                      (integer).
 
 ** Center Block
 
@@ -64,6 +144,35 @@ and [[#toolbox][tools]] provided by the exporter.
    - ~:post-blank~ :: Number of blank lines between block's closing
                       line and next non-blank line or buffer's end
                       (integer).
+
+** Clock
+
+   Element.
+
+   - ~:status~ :: Status of current clock (symbol: ~closed~ or
+                  ~running~).
+   - ~:value~ :: Timestamp associated to clock keyword (string).
+   - ~:time~ :: Clock duration for a closed clock, or nil (string or
+                nil).
+   - ~:post-blank~ :: Number of blank lines between the line after the
+                      clock element and the first non-blank line or
+                      buffer's end (integer).
+   - ~:begin~ :: Buffer position at the beginning of the line
+                 (integer).
+   - ~:end~ :: Buffer position at the beginning of the next line
+               (integer).
+
+** Code
+
+   Object.
+
+   - ~:begin~ :: Buffer position before opening tilde (integer).
+   - ~:end~ :: Buffer position before first non-blank character after
+               closing tilde or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing tilde and
+                      next non-blank character or paragraph's end
+                      (integer).
+   - ~:value~ :: Contents (string).
 
 ** Comment
 
@@ -136,20 +245,6 @@ and [[#toolbox][tools]] provided by the exporter.
                    ~org-hide-block~, nil).
    - ~:post-blank~ :: Number of blank lines between block's closing
                       line and next non-blank line or buffer's end
-                      (integer).
-
-** Emphasis
-
-   Recursive object.
-
-   - ~:begin~ :: Buffer position before opening marker (integer).
-   - ~:contents-begin~ :: Buffer position after opening marker (integer).
-   - ~:contents-end~ :: Buffer position before closing marker (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               closing marker or paragraph's end (integer).
-   - ~:marker~ :: Marker used (string).
-   - ~:post-blank~ :: Number of white spaces between closing marker
-                      and next non-blank character or paragraph's end
                       (integer).
 
 ** Entity
@@ -341,7 +436,7 @@ and [[#toolbox][tools]] provided by the exporter.
    - ~:scheduled~ :: Headline's SCHEDULED reference, if any (string or
                      nil).
    - ~:tags~ :: Headline's tags, if any, without the archive
-                tag. (string or nil).
+                tag. (list of strings).
    - ~:timestamp~ :: Headline's TIMESTAMP reference, if any (string or
                      nil).
    - ~:title~ :: Parsed headline's text, without the stars and the
@@ -425,7 +520,7 @@ and [[#toolbox][tools]] provided by the exporter.
                      tags (string).
    - ~:scheduled~ :: Inlinetask's SCHEDULED reference, if any (string
                      or nil).
-   - ~:tags~ :: Inlinetask's tags, if any (string or nil).
+   - ~:tags~ :: Inlinetask's tags, if any (list of strings).
    - ~:timestamp~ :: Inlinetask's TIMESTAMP reference, if any (string
                      or nil).
    - ~:title~ :: Parsed inlinetask's text, without the stars and the
@@ -434,6 +529,20 @@ and [[#toolbox][tools]] provided by the exporter.
         nil).
    - ~:todo-type~ :: Type of inlinetask's TODO keyword, if any
                      (symbol: ~done~, ~todo~).
+
+** Italic
+
+   Recursive object.
+
+   - ~:begin~ :: Buffer position before opening slash (integer).
+   - ~:contents-begin~ :: Buffer position after opening slash
+        (integer).
+   - ~:contents-end~ :: Buffer position before closing slash (integer).
+   - ~:end~ :: Buffer position before first non-blank character after
+               closing slash or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing slash and
+                      next non-blank character or paragraph's end
+                      (integer).
 
 ** Item
 
@@ -597,14 +706,30 @@ and [[#toolbox][tools]] provided by the exporter.
         sub-list (integer).
    - ~:end~ :: Buffer position at the first non-blank line after
                list's last item, or at buffer's end (integer).
-   - ~:level~ :: Level of current list within the full list hierarchy,
-                 starting from 0 (integer).
    - ~:post-blank~ :: Number of blank lines between end of list and
                       next element or end of buffer (integer).
    - ~:structure~ :: Full list's structure, as returned by
                      ~org-list-struct~ (alist).
    - ~:type~ :: List's type (symbol: ~descriptive~, ~ordered~,
                 ~unordered~).
+
+** Planning
+
+   Element.
+
+   - ~:begin~ :: Buffer position at the beginning of the line
+                 (integer).
+   - ~:closed~ :: Timestamp associated to closed keyword, if any
+                  (string or nil).
+   - ~:deadline~ :: Timestamp associated to deadline keyword, if any
+                    (string or nil).
+   - ~:end~ :: Buffer position at the beginning of the line after
+               planning element (integer).
+   - ~:post-blank~ :: Number of blank lines between the line after the
+                      planning element and the next non-blank line or
+                      buffer's end (integer).
+   - ~:scheduled~ :: Timestamp associated to scheduled keyword, if any
+                     (string or nil).
 
 ** Property Drawer
 
@@ -758,6 +883,20 @@ and [[#toolbox][tools]] provided by the exporter.
                       paragraph's end (integer).
    - ~:value~ :: Full cookie (string).
 
+** Strike Through
+
+   Recursive object.
+
+   - ~:begin~ :: Buffer position before opening plus sign (integer).
+   - ~:contents-begin~ :: Buffer position after opening plus sign
+        (integer).
+   - ~:contents-end~ :: Buffer position before closing plus sign
+        (integer).
+   - ~:end~ :: Buffer position before first non-blank character after
+               closing plus sign or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing plus sign
+                      and next non-blank character or paragraph's end
+                      (integer).
 ** Subscript
 
    Recursive object.
@@ -798,20 +937,52 @@ and [[#toolbox][tools]] provided by the exporter.
 
 ** Table
 
-   Element.
+   Greater element.
 
    - ~:begin~ :: Buffer position at beginning of first affiliated
                  keyword, if any, at beginning of table's first line
                  otherwise (integer).
    - ~:end~ :: Buffer position at beginning of first non-blank line
-               after table's last line or at buffer's end.
+               after table's last line or at buffer's end (integer).
+   - ~:contents-begin~ :: For an ~org~ table, buffer position at
+        beginning of the first table's line, ignoring affiliated
+        keywords, nil otherwise (integer or nil).
+   - ~:contents-end~ :: For an ~org~ table, buffer position at
+        beginning of the first line after table's last line or at
+        buffer's end, nil otherwise (integer or nil).
    - ~:post-blank~ :: Number of blank lines between table's last line
                       and next non-blank line or buffer's end.
-   - ~:raw-table~ :: Table as it appears in original Org buffer
-                     (string).
    - ~:tblfm~ :: Formulas associated to the table, if any (string or
                  nil).
    - ~:type~ :: Table's origin (symbol: ~table.el~, ~org~).
+   - ~:value~ :: Raw ~table.el~ table or nil (string or nil).
+
+** Table Cell
+
+   Recursive object.
+
+   - ~:begin~ :: Buffer position after the opening vertical bar
+                 (integer).
+   - ~:end~ :: Buffer position after the closing vertical bar
+               (integer).
+   - ~:contents-begin~ :: Buffer position at the first non-whitespace
+        character after the vertical bar (integer).
+   - ~:contents-end~ :: Buffer position after the closest
+        non-whitespace character before the next vertical bar
+        (integer).
+
+** Table Row
+
+   Element.
+
+   - ~:begin~ :: Buffer position at beginning of the line (integer).
+   - ~:end~ :: Buffer position at beginning of the first line after
+               the row, or at buffer's end (integer).
+   - ~:contents-begin~ :: Buffer position after the first vertical
+        line (integer or nil).
+   - ~:contents-end~ :: Buffer position after the last vertical line
+        (integer).
+   - ~:type~ :: Row's type (symbol: ~standard~, ~rule~).
 
 ** Target
 
@@ -833,35 +1004,45 @@ and [[#toolbox][tools]] provided by the exporter.
    - Target should become an anchor, if back-end permits it.
    - Target's ID shouldn't be visible on export.
 
-** Time Stamp
+** Timestamp
 
    Object.
 
-   - ~:appt-type~ :: Time-stamp keyword's type, if any (symbol:
-                     ~closed~, ~deadline~, ~scheduled~, nil).
-   - ~:begin~ :: Buffer position at beginning of time-stamp's keyword,
-                 if any, or at opening /less-than/ sign (integer).
+   - ~:begin~ :: Buffer position at opening /less-than/ sign
+                 (integer).
    - ~:end~ :: Buffer position at first non-blank character after
                closing /greater-than/ sign, or at paragraph's end
                (integer).
    - ~:post-blank~ :: Number of white spaces between closing
                       /greater-than/ sign and next non-blank character
                       or paragraph's end (integer).
-   - ~:type~ :: Type of time-stamp (symbol: ~active~, ~active-range~,
+   - ~:type~ :: Type of timestamp (symbol: ~active~, ~active-range~,
                 ~diary~, ~inactive~, ~inactive-range~).
-   - ~:value~ :: Full time-stamp, with any keyword stripped (string).
+   - ~:value~ :: Full time-stamp (string).
 
+** Underline
+
+   Recursive object.
+
+   - ~:begin~ :: Buffer position before opening underscore (integer).
+   - ~:contents-begin~ :: Buffer position after opening underscore (integer).
+   - ~:contents-end~ :: Buffer position before closing underscore
+        (integer).
+   - ~:end~ :: Buffer position before first non-blank character after
+               closing underscore or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing
+                      underscore and next non-blank character or
+                      paragraph's end (integer).
 ** Verbatim
 
    Object.
 
-   - ~:begin~ :: Buffer position before opening marker (integer).
+   - ~:begin~ :: Buffer position before opening equal sign (integer).
    - ~:end~ :: Buffer position before first non-blank character after
-               closing marker or paragraph's end (integer).
-   - ~:marker~ :: Marker used (string).
-   - ~:post-blank~ :: Number of white spaces between closing marker
-                      and next non-blank character or paragraph's end
-                      (integer).
+               closing equal sign or paragraph's end (integer).
+   - ~:post-blank~ :: Number of white spaces between closing equal
+                      sign and next non-blank character or paragraph's
+                      end (integer).
    - ~:value~ :: Contents (string).
 
 ** Verse Block
@@ -874,13 +1055,14 @@ and [[#toolbox][tools]] provided by the exporter.
    - ~:end~ :: Buffer position at beginning of the first non-blank
                line after block's closing line or at buffer's end
                (integer).
-   - ~:hiddenp~ :: Non-nil if block is hidden (symbol:
-                   ~org-hide-block~, nil).
+   - ~:contents-begin~ :: Buffer position at beginning of the first
+        line after block's opening string (integer).
+   - ~:contents-end~ :: Buffer position at the beginning of block's
+        closing line (integer).
+   - ~:hiddenp~ :: Non-nil if block is hidden (boolean).
    - ~:post-blank~ :: Number of blank lines between block's closing
                       line and next non-blank line or buffer's end
                       (integer).
-   - ~:raw-value~ :: Raw contents (string).
-   - ~:value~ :: Parsed contents (secondary string).
 
 * The Communication Channel
   :PROPERTIES:
@@ -888,8 +1070,8 @@ and [[#toolbox][tools]] provided by the exporter.
   :END:
 
   This is the full list of properties available during transcode
-  process, with their category (~option~, ~tree~ or ~local~) and their
-  value type.
+  process, with their category (~option~ or ~tree~) and their value
+  type.
 
 ** ~:author~
 
@@ -1017,7 +1199,7 @@ and [[#toolbox][tools]] provided by the exporter.
 
    Whole parse tree, available at any time during transcoding.
 
-   - category :: global
+   - category :: option
    - type :: list (as returned by ~org-element-parse-buffer~)
 
 ** ~:preserve-breaks~
@@ -1062,6 +1244,15 @@ and [[#toolbox][tools]] provided by the exporter.
    - category :: option
    - type :: symbol (nil, t)
 
+** ~:translate-alist~
+
+   Alist between element and object types and transcoding functions
+   relative to the current back-end.  Special keys ~template~ and
+   ~plain-text~ are also possible.
+
+   - category :: option
+   - type :: alist (SYMBOL . FUNCTION)
+
 ** ~:use-select-tags~
    :PROPERTIES:
    :CUSTOM_ID: use-select-tags
@@ -1090,9 +1281,16 @@ and [[#toolbox][tools]] provided by the exporter.
    - category :: option
    - type :: symbol (nil, t)
 
+** ~:with-clocks~
+
+   Non-nil means clock keywords should be exported.
+
+   - category :: option
+   - type :: symbol (nil, t)
+
 ** ~:with-creator~
 
-   Non-nild means a creation sentence should be inserted at the end of
+   Non-nil means a creation sentence should be inserted at the end of
    the transcoded string.  If the value is ~comment~, it should be
    commented.
 
@@ -1132,6 +1330,13 @@ and [[#toolbox][tools]] provided by the exporter.
 ** ~:with-footnotes~
 
    Non-nil if transcoder should interpret footnotes.
+
+   - category :: option
+   - type :: symbol (nil, t)
+
+** ~:with-plannings~
+
+   Non-nil means transcoding should include planning info.
 
    - category :: option
    - type :: symbol (nil, t)
@@ -1189,11 +1394,12 @@ and [[#toolbox][tools]] provided by the exporter.
 
 ** ~:with-timestamps~
 
-   Non-nil means transcoding should include time stamps and associated
-   keywords.  Otherwise, completely remove them.
+   Non-nil means transcoding should include time stamps.  Special
+   value ~active~ (resp. ~inactive~) ask to export only active
+   (resp. inactive) timestamps.  Otherwise, completely remove them.
 
    - category :: option
-   - type :: symbol: (t, nil)
+   - type :: symbol: (~active~, ~inactive~, t, nil)
 
 ** ~:with-toc~
 
@@ -1229,12 +1435,14 @@ and [[#toolbox][tools]] provided by the exporter.
   a list of functions as value:
 
   - ~:filter-babel-call~
+  - ~:filter-bold~
   - ~:filter-center-block~
+  - ~:filter-clock~
+  - ~:filter-code~
   - ~:filter-comment~
   - ~:filter-comment-block~
   - ~:filter-drawer~
   - ~:filter-dynamic-block~
-  - ~:filter-emphasis~
   - ~:filter-entity~
   - ~:filter-example-block~
   - ~:filter-export-block~
@@ -1248,6 +1456,7 @@ and [[#toolbox][tools]] provided by the exporter.
   - ~:filter-inline-babel-call~
   - ~:filter-inline-src-block~
   - ~:filter-inlinetask~
+  - ~:filter-italic~
   - ~:filter-item~
   - ~:filter-keyword~
   - ~:filter-latex-environment~
@@ -1259,6 +1468,7 @@ and [[#toolbox][tools]] provided by the exporter.
   - ~:filter-parse-tree~
   - ~:filter-plain-list~
   - ~:filter-plain-text~
+  - ~:filter-planning~
   - ~:filter-property-drawer~
   - ~:filter-quote-block~
   - ~:filter-quote-section~
@@ -1266,12 +1476,16 @@ and [[#toolbox][tools]] provided by the exporter.
   - ~:filter-section~
   - ~:filter-special-block~
   - ~:filter-src-block~
+  - ~:filter-strike-through~
   - ~:filter-statistics-cookie~
   - ~:filter-subscript~
   - ~:filter-superscript~
   - ~:filter-table~
+  - ~:filter-table-cell~
+  - ~:filter-table-row~
   - ~:filter-target~
-  - ~:filter-time-stamp~
+  - ~:filter-timestamp~
+  - ~:filter-underline~
   - ~:filter-verbatim~
   - ~:filter-verse-block~
 
@@ -1309,15 +1523,6 @@ and [[#toolbox][tools]] provided by the exporter.
   Many of them are high-level access to properties from the
   communication channel.  As such, they should be preferred to
   straight access to communication channel, when possible.
-
-** ~org-export-clean-table~
-   :PROPERTIES:
-   :CUSTOM_ID: clean-table
-   :END:
-
-   Clean a raw table from any Org table-specific syntax.
-
-   See also: [[#table-format-info][~org-export-table-format-info~]].
 
 ** ~org-export-collect-figures~
    :PROPERTIES:
@@ -1404,31 +1609,6 @@ and [[#toolbox][tools]] provided by the exporter.
    See also: [[#get-relative-level][~org-export-get-relative-level~]],
    [[#number-to-roman][~org-export-number-to-roman~]], [[#last-sibling-p][~org-export-last-sibling-p~]].
 
-** ~org-export-format-code~
-   :PROPERTIES:
-   :CUSTOM_ID: format-code
-   :END:
-
-   Helper function to format source code.  It applies a given function
-   on each line of the code, passing current line number and
-   associated code reference label, if any, as arguments.
-
-   See also: [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]],
-   [[#unravel-code][~org-export-unravel-code~]].
-
-** ~org-export-format-code-default~
-   :PROPERTIES:
-   :CUSTOM_ID: format-code-default
-   :END:
-
-   Return contents of a =src-block= or =example-block= element in
-   a format suited for raw text or verbatim output.  More
-   specifically, it takes care of line numbering and labels
-   integration depending of element's switches, but no formatting is
-   otherwise applied to source code.
-
-   See also: [[#format-code][~org-export-format-code~]], [[#unravel-code][~org-export-unravel-code~]].
-
 ** ~org-export-footnote-first-reference-p~
    :PROPERTIES:
    :CUSTOM_ID: footnote-first-reference-p
@@ -1443,6 +1623,31 @@ and [[#toolbox][tools]] provided by the exporter.
    See also: [[#collect-footnote-definitions][~org-export-collect-footnote-definitions~]],
    [[#get-footnote-definition][~org-export-get-footnote-definition~]],
    [[#get-footnote-number][~org-export-get-footnote-number~]].
+
+** ~org-export-format-code-default~
+   :PROPERTIES:
+   :CUSTOM_ID: format-code-default
+   :END:
+
+   Return contents of a =src-block= or =example-block= element in
+   a format suited for raw text or verbatim output.  More
+   specifically, it takes care of line numbering and labels
+   integration depending of element's switches, but no formatting is
+   otherwise applied to source code.
+
+   See also: [[#format-code][~org-export-format-code~]], [[#unravel-code][~org-export-unravel-code~]].
+
+** ~org-export-format-code~
+   :PROPERTIES:
+   :CUSTOM_ID: format-code
+   :END:
+
+   Helper function to format source code.  It applies a given function
+   on each line of the code, passing current line number and
+   associated code reference label, if any, as arguments.
+
+   See also: [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]],
+   [[#unravel-code][~org-export-unravel-code~]].
 
 ** ~org-export-get-coderef-format~
    :PROPERTIES:
@@ -1487,7 +1692,7 @@ and [[#toolbox][tools]] provided by the exporter.
    Return flat list of current object or element's parents from
    closest to farthest, along with their contents.
 
-   See also: [[#get-next-element][~org-export-get-next-element]], [[#get-parent][~org-export-get-parent]],
+   See also: [[#get-next-element][~org-export-get-next-element~]], [[#get-parent][~org-export-get-parent~]],
    [[#get-parent-headline][~org-export-get-parent-headline~]],
    [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
    [[#get-previous-element][~org-export-get-previous-element~]].
@@ -1566,19 +1771,6 @@ and [[#toolbox][tools]] provided by the exporter.
 
    See also : [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]]
 
-** ~org-export-get-parent~
-   :PROPERTIES:
-   :CUSTOM_ID: get-parent
-   :END:
-
-   Return closest element containing current element or object, if
-   any.  Return nil otherwise.
-
-   See also: [[#get-genealogy][~org-export-get-genealogy~]],
-   [[#get-next-element][~org-export-get-next-element~]], [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
-   [[#get-parent-headline][~org-export-get-parent-headline~]],
-   [[#get-previous-element][~org-export-get-previous-element~]].
-
 ** ~org-export-get-parent-headline~
    :PROPERTIES:
    :CUSTOM_ID: get-parent-headline
@@ -1588,7 +1780,7 @@ and [[#toolbox][tools]] provided by the exporter.
    Return nil otherwise.
 
    See also: [[#get-genealogy][~org-export-get-genealogy~]],
-   [[#get-next-element][~org-export-get-next-element~]], [[#get-parent][~org-export-get-parent]],
+   [[#get-next-element][~org-export-get-next-element~]], [[#get-parent][~org-export-get-parent~]],
    [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
    [[#get-previous-element][~org-export-get-previous-element~]].
 
@@ -1603,6 +1795,19 @@ and [[#toolbox][tools]] provided by the exporter.
    See also: [[#get-genealogy][~org-export-get-genealogy~]], [[#get-parent][~org-export-get-parent~]],
    [[#get-parent-headline][~org-export-get-parent-headline~]],
    [[#get-previous-element][~org-export-get-previous-element~]], [[#get-next-element][~org-export-get-next-element~]].
+
+** ~org-export-get-parent~
+   :PROPERTIES:
+   :CUSTOM_ID: get-parent
+   :END:
+
+   Return closest element containing current element or object, if
+   any.  Return nil otherwise.
+
+   See also: [[#get-genealogy][~org-export-get-genealogy~]],
+   [[#get-next-element][~org-export-get-next-element~]], [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
+   [[#get-parent-headline][~org-export-get-parent-headline~]],
+   [[#get-previous-element][~org-export-get-previous-element~]].
 
 ** ~org-export-get-previous-element~
    :PROPERTIES:
@@ -1630,6 +1835,18 @@ and [[#toolbox][tools]] provided by the exporter.
     [[#get-headline-number][~org-export-get-headline-number~]],[[#headline-numbered-p][~org-export-headline-numbered-p~]],
     [[#last-sibling-p][~org-export-last-sibling-p~]].
 
+** ~org-export-get-table-cell-at~
+   :PROPERTIES:
+   :CUSTOM_ID: get-table-cell-at
+   :END:
+
+   Return exportable cell object at a given position, or nil.  Hence,
+   position ~(0 . 0)~ will always point to the first exportable cell
+   in the table.
+
+   See also: [[#table-cell-address][~org-export-table-cell-address~]],
+   [[#table-dimensions][~org-export-table-dimensions~]].
+
 ** ~org-export-headline-numbered-p~
    :PROPERTIES:
    :CUSTOM_ID: headline-numbered-p
@@ -1646,8 +1863,23 @@ and [[#toolbox][tools]] provided by the exporter.
    :END:
 
    Non-nil when the link provided should be considered as an inline
-   image.  It also accepts an optional set of rules in order to tweak
-   the definition of an inline image.
+   image.  Note that it always return nil when the link has
+   a description.
+
+   It accepts an optional set of rules in order to tweak the
+   definition of an inline image, which is, by default, any link
+   targetting a local file whose extension is either "png", "jpeg",
+   "jpg", "gif", "tiff", "tif", "xbm", "xpm", "pbm", "pgm" or "ppm".
+
+   A set of rules consists in an alist whose key is a type of link, as
+   a string, and whose value is a regexp matching link's path.  As an
+   example, =e-html= back-end uses the following rules:
+
+   #+BEGIN_SRC emacs-lisp
+   '(("file" . "\\.\\(jpeg\\|jpg\\|png\\|gif\\|svg\\)\\'")
+     ("http" . "\\.\\(jpeg\\|jpg\\|png\\|gif\\|svg\\)\\'")
+     ("https" . "\\.\\(jpeg\\|jpg\\|png\\|gif\\|svg\\)\\'"))
+   #+END_SRC
 
    See also: [[#solidify-link-text][~org-export-solidify-link-text~]],
    [[#get-coderef-format][~org-export-get-coderef-format~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
@@ -1685,7 +1917,8 @@ and [[#toolbox][tools]] provided by the exporter.
    number, or reference itself, depending on container's switches.
 
    See also : [[#get-coderef-format][~org-export-get-coderef-format~]],
-   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
+   [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#resolve-id-link][~org-export-resolve-id-link~]],
+   [[#resolve-radio-link][~org-export-resolve-radio-link~]].
 
 ** ~org-export-resolve-fuzzy-link~
    :PROPERTIES:
@@ -1697,19 +1930,268 @@ and [[#toolbox][tools]] provided by the exporter.
    object, or nil.
 
    See also: [[#get-ordinal][~org-export-get-ordinal~]], [[#resolve-coderef][~org-export-resolve-coderef~]],
-   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#solidify-link-text][~org-export-solidify-link-text~]].
+   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-radio-link][~org-export-resolve-radio-link~]],
+   [[#solidify-link-text][~org-export-solidify-link-text~]].
 
 ** ~org-export-resolve-id-link~
    :PROPERTIES:
    :CUSTOM_ID: resolve-id-link
    :END:
 
-   Search headline targetted by an id link — i.e. it has a ~id~ or
-   ~custom-id~ ~:type~ attribute – within the parse tree.  Return that
-   headline, or nil.
+   Search headline targetted by an id link --- i.e. it has a ~id~ or
+   ~custom-id~ ~:type~ attribute --- within the parse tree.  Return
+   that headline, or nil.
 
    See also : [[#resolve-coderef][~org-export-resolve-coderef~]],
-   [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#solidify-link-text][~org-export-solidify-link-text~]].
+   [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#resolve-radio-link][~org-export-resolve-radio-link~]],
+   [[#solidify-link-text][~org-export-solidify-link-text~]].
+
+** ~org-export-resolve-radio-link~
+   :PROPERTIES:
+   :CUSTOM_ID: resolve-radio-link
+   :END:
+
+   Return first radio target object matching a radio link --- that is
+   with a ~radio~ ~:type~ attribute --- in the parse tree, or nil.
+
+   Typically, target's contents are exported through ~org-export-data~
+   and used as link description, as in the following excerpt from
+   =org-e-latex.el=:
+
+   #+BEGIN_SRC emacs-lisp
+   (defun org-e-latex-link (link desc info)
+     (let* ((type (org-element-property :type link))
+            ...)
+       (cond
+        ...
+        ((string= type "radio")
+         (let ((destination (org-export-resolve-radio-link link info)))
+           (when destination
+             (format "\\hyperref[%s]{%s}"
+                     (org-export-solidify-link-text path)
+                     (org-export-data (org-element-contents destination) info)))))
+        ...)))
+   #+END_SRC
+
+   See also : [[#resolve-coderef][~org-export-resolve-coderef~]],
+   [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#resolve-id-link][~org-export-resolve-id-link~]],
+   [[#solidify-link-text][~org-export-solidify-link-text~]].
+
+** ~org-export-solidify-link-text~
+   :PROPERTIES:
+   :CUSTOM_ID: solidify-link-text
+   :END:
+
+   Normalize a string, replacing most non-standard characters with
+   hyphens.
+
+   Used to turn targets names into safer versions for links.
+
+   See also: [[#inline-image-p][~org-export-inline-image-p~]],
+   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]],
+   [[#resolve-radio-link][~org-export-resolve-radio-link~]].
+
+** ~org-export-table-cell-address~
+   :PROPERTIES:
+   :CUSTOM_ID: table-cell-address
+   :END:
+
+   Return row and column of a given cell object.  Positions are
+   0-indexed and only exportable rows and columns are considered.  The
+   function returns nil if called on a non-exportable cell.
+
+   See also: [[#get-table-cell-at][~org-export-get-table-cell-at~]],
+   [[#table-dimensions][~org-export-table-dimensions~]].
+
+** ~org-export-table-cell-alignment~
+   :PROPERTIES:
+   :CUSTOM_ID: table-cell-alignment
+   :END:
+
+   Return expected alignment for the contents of a given cell object.
+   It can be either ~left~, ~right~ or ~center~.
+
+   See also: [[#table-cell-borders][~org-export-table-cell-borders~]],
+   [[#table-cell-width][~org-export-table-cell-width~]].
+
+** ~org-export-table-cell-borders~
+   :PROPERTIES:
+   :CUSTOM_ID: table-cell-borders
+   :END:
+
+   Indicate expected borders for a given cell object.  When non-nil,
+   return value is a list of symbols among ~top~, ~bottom~, ~above~,
+   ~below~, ~left~ and ~right~.
+
+   Special values ~top~ and ~bottom~ only happen for cells in,
+   respectively, the first and the last exportable rows.
+
+   See also: [[#table-cell-alignment][~org-export-table-cell-alignment~]],
+   [[#table-cell-width][~org-export-table-cell-width~]].
+
+** ~org-export-table-cell-ends-colgroup-p~
+   :PROPERTIES:
+   :CUSTOM_ID: table-cell-ends-colgroup-p
+   :END:
+
+   Non-nil when a table cell object ends a column group.
+
+   See also: [[#table-cell-starts-colgroup-p][~org-export-table-cell-starts-colgroup-p~]].
+
+** ~org-export-table-cell-starts-colgroup-p~
+   :PROPERTIES:
+   :CUSTOM_ID: table-cell-starts-colgroup-p
+   :END:
+
+   Non-nil when a table cell object starts a column group.
+
+   See also: [[#table-cell-ends-colgroup-p][~org-export-table-cell-ends-colgroup-p~]].
+
+** ~org-export-table-cell-width~
+   :PROPERTIES:
+   :CUSTOM_ID: table-cell-width
+   :END:
+
+   Return expected width for contents of a given cell object.
+
+   Only width specified explicitely through meta-data is considered.
+   If no such information can be found, return nil instead.
+
+   Some back-end may still need to know the actual width of exported
+   cell's contents in order to compute column's width.  In that case,
+   every cell in the column must be transcoded in order to find the
+   widest one.  The snippet below, extracted from =org-e-ascii.el=
+   illustrates a possible implementation.
+
+   #+BEGIN_SRC emacs-lisp
+   (or (org-export-table-cell-width table-cell info)
+       (let* ((max-width 0)
+              (table (org-export-get-parent-table table-cell info))
+              (specialp (org-export-table-has-special-column-p table))
+              (col (cdr (org-export-table-cell-address table-cell info))))
+         (org-element-map
+          table 'table-row
+          (lambda (row)
+            ;; For each exportable row, get the cell at column COL and
+            ;; transcode its contents.  Then compare its length with
+            ;; MAX-WIDTH and keep the greater of two.
+            (setq max-width
+                  (max (length
+                        (org-export-data
+                         (org-element-contents
+                          (elt (if specialp (car (org-element-contents row))
+                                 (org-element-contents row))
+                               col))
+                         info))
+                       max-width)))
+          info)
+         max-width))
+   #+END_SRC
+
+   See also: [[#table-cell-alignment][~org-export-table-cell-alignment~]],
+   [[#table-cell-borders][~org-export-table-cell-borders~]].
+
+** ~org-export-table-dimensions~
+   :PROPERTIES:
+   :CUSTOM_ID: table-dimensions
+   :END:
+
+   Return the number of exportable rows and columns in a given table.
+
+   See also: [[#get-table-cell-at][~org-export-get-table-cell-at~]],
+   [[#table-cell-address][~org-export-table-cell-address~]].
+
+** ~org-export-table-has-header-p~
+   :PROPERTIES:
+   :CUSTOM_ID: table-has-header-p
+   :END:
+
+   Non-nil when table has at least two row groups.
+
+   See also: [[#table-has-special-column-p][~org-export-table-has-special-column-p~]],
+   [[#table-row-is-special-p][~org-export-table-row-is-special-p~]].
+
+** ~org-export-table-has-special-column-p~
+   :PROPERTIES:
+   :CUSTOM_ID: table-has-special-column-p
+   :END:
+
+   Non-nil when first column in the table only contains meta-data.
+
+   See also: [[#table-has-header-p][~org-export-table-has-header-p~]],
+   [[#table-row-is-special-p][~org-export-table-row-is-special-p~]].
+
+** ~org-export-table-row-ends-header-p~
+   :PROPERTIES:
+   :CUSTOM_ID: table-row-ends-header-p
+   :END:
+
+   Non-nil when a table row element ends table's header.
+
+   See also: [[#table-row-ends-rowgroup-p][~org-export-table-row-ends-rowgroup-p~]],
+   [[#table-row-group][~org-export-table-row-group~]],
+   [[#table-row-starts-header-p][~org-export-table-row-starts-header-p~]],
+   [[#table-row-starts-rowgroup-p][~org-export-table-row-starts-rowgroup-p~]].
+
+** ~org-export-table-row-ends-rowgroup-p~
+   :PROPERTIES:
+   :CUSTOM_ID: table-row-ends-rowgroup-p
+   :END:
+
+   Non-nil when a a table row element ends a rowgroup, header
+   included.
+
+   See also: [[#table-cell-starts-ends-header-p][~org-export-table-row-ends-header-p~]],
+   [[#table-row-group][~org-export-table-row-group~]],
+   [[#table-row-starts-header-p][~org-export-table-row-starts-header-p~]],
+   [[#table-row-starts-rowgroup-p][~org-export-table-row-starts-rowgroup-p~]].
+
+** ~org-export-table-row-group~
+   :PROPERTIES:
+   :CUSTOM_ID: table-row-group
+   :END:
+
+   Return row group number for a given table row element.
+
+   See also: [[#table-cell-starts-ends-header-p][~org-export-table-row-ends-header-p~]],
+   [[#table-row-ends-rowgroup-p][~org-export-table-row-ends-rowgroup-p~]],
+   [[#table-row-starts-header-p][~org-export-table-row-starts-header-p~]],
+   [[#table-row-starts-rowgroup-p][~org-export-table-row-starts-rowgroup-p~]].
+
+** ~org-export-table-row-is-special-p~
+   :PROPERTIES:
+   :CUSTOM_ID: table-row-is-special-p
+   :END:
+
+   Non-nil a given table row element only contains meta-data.
+
+   See also: [[#table-has-header-p][~org-export-table-has-header-p~]],
+   [[#table-has-special-column-p][~org-export-table-has-special-column-p~]].
+
+** ~org-export-table-row-starts-header-p~
+   :PROPERTIES:
+   :CUSTOM_ID: table-row-starts-header-p
+   :END:
+
+   Non-nil when a table row element starts table's header.
+
+   See also: [[#table-cell-starts-ends-header-p][~org-export-table-row-ends-header-p~]],
+   [[#table-row-ends-rowgroup-p][~org-export-table-row-ends-rowgroup-p~]],
+   [[#table-row-group][~org-export-table-row-group~]],
+   [[#table-row-starts-rowgroup-p][~org-export-table-row-starts-rowgroup-p~]].
+
+** ~org-export-table-row-starts-rowgroup-p~
+   :PROPERTIES:
+   :CUSTOM_ID: table-row-starts-rowgroup-p
+   :END:
+
+   Non-nil when a table row element starts a rowgroup, header
+   included.
+
+   See also: [[#table-cell-starts-ends-header-p][~org-export-table-row-ends-header-p~]],
+   [[#table-row-ends-rowgroup-p][~org-export-table-row-ends-rowgroup-p~]],
+   [[#table-row-group][~org-export-table-row-group~]],
+   [[#table-row-starts-header-p][~org-export-table-row-starts-header-p~]].
 
 ** ~org-export-unravel-code~
    :PROPERTIES:
@@ -1726,29 +2208,4 @@ and [[#toolbox][tools]] provided by the exporter.
 
    See also: [[#format-code][~org-export-format-code~]],
    [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]].
-
-** ~org-export-solidify-link-text~
-   :PROPERTIES:
-   :CUSTOM_ID: solidify-link-text
-   :END:
-
-   Normalize a string, replacing most non-standard characters with
-   hyphens.
-
-   Used to turn targets names into safer versions for links.
-
-   See also: [[#inline-image-p][~org-export-inline-image-p~]],
-   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
-
-** ~org-export-table-format-info~
-   :PROPERTIES:
-   :CUSTOM_ID: table-format-info
-   :END:
-
-   Extract formatting information (alignment, column groups, presence
-   of a special column, explicit width of columns and row groups) from
-   a raw table and return it as a property list.
-
-   See also: [[#clean-table][~org-export-clean-table~]].
-
 

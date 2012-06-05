@@ -1,0 +1,263 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Merge Tool for Org-Mode
+#+AUTHOR:     Andrew Young
+#+EMAIL:      youngar17 at gmail dot com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+# #+LINK_UP:  http://orgmode.org/worg/org-faq.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-merge-driver Prototype
+The program takes 2 modified versions of an Orgmode file and the
+original file, and tries to merge the changes into a single file.  Any
+changes from the two files which cannot be merged properly are marked
+as a conflict, with the standard conflict markers.
+
+The prototype only deals with one type of org-mode element: headings.
+An org-mode file is parsed into a tree of headings.  All text below a
+heading but before the next heading is considered apart of the
+heading's text.  A heading is identified by the text in the title
+(first line), or by an :ID: property if it has one.  
+
+The program then takes the parsed trees, and matches headings from one
+file to another.  While it does this, it also detects new headings,
+removed headings, and headings moved underneath a new parent.  For the
+prototype, I decided to regard headings as a un-ordered elements, so
+changing of position underneath a parent heading is not detected.
+This has also caused problems of accidentally reordering headings
+under a single parent in the output.  This will be fixed for the final
+program.
+
+** Example Results 1
+Here is an example run through with the program:
+
+Ancestor:
+#+begin_src org
+  ,* original heading
+  ,- here is some text
+#+end_src
+
+File 1:
+#+begin_src org
+  ,* original heading
+  ,- here is some text
+  ,- add some text in file 1
+  ,** New heading in file 1
+  ,- more text
+  ,*** Sub new heading in file 1
+#+end_src
+
+File2:
+#+begin_src org
+  ,#+TITLE: A New Title In File 2
+  ,* original heading
+  ,- here is some text
+  ,** File 2 new sub heading
+  ,* A new heading in file 2
+  ,- with some text
+#+end_src
+
+Program Stdout:
+#+begin_example
+----------------
+Node Change List:
+----------------
+Remove nodes: file 0
+----------
+Add nodes: file 1
+(:title "New heading in file 1" :level 2 :parent-level 1 :id "" :text "- more text
+")
+(:title "Sub new heading in file 1" :level 3 :parent-level 2 :id "" :text "")
+----------
+Remove nodes: file 0
+----------
+Add nodes: file 2
+(:title "File 2 new sub heading" :level 2 :parent-level 1 :id "" :text "")
+(:title "A new heading in file 2" :level 1 :parent-level 0 :id "" :text "- with some text
+")
+----------------------
+FILE : 0 NO_CHANGE
+(:title "" :level 0 :no-parent :id "" :text "")
+FILE : 2 NEW
+(:title "A new heading in file 2" :level 1 :parent-level 0 :id "" :text "- with some text
+")
+FILE : 0 NO_CHANGE
+(:title "original heading" :level 1 :parent-level 0 :id "" :text "- here is some text
+")
+FILE : 2 NEW
+(:title "File 2 new sub heading" :level 2 :parent-level 1 :id "" :text "")
+FILE : 1 NEW
+(:title "New heading in file 1" :level 2 :parent-level 1 :id "" :text "- more text
+")
+FILE : 1 NEW
+(:title "Sub new heading in file 1" :level 3 :parent-level 2 :id "" :text "")
+#+end_example
+
+The stdout can be confusing and misleading.  It mostly shows what
+positional changes for the headings it has detected.  It does not,
+however, show changes to the content under a heading.
+
+Merged Document:
+#+begin_src org
+  ,#+TITLE: A New Title In File 2
+  ,* A new heading in file 2
+  ,- with some text
+  ,* original heading
+  ,- here is some text
+  ,- add some text in file 1
+  ,** File 2 new sub heading
+  ,** New heading in file 1
+  ,- more text
+  ,*** Sub new heading in file 1
+#+end_src
+
+The file merged without any conflicts.  This is because neither file
+updated the same heading.  If File 1 had an additional top line that
+changed it to:
+
+New file 1:
+#+begin_src org
+  ,- conflicting text in file 1
+  ,* original heading
+  ,- here is some text
+  ,- add some text in file 1
+  ,** New heading in file 1
+  ,- more text
+  ,*** Sub new heading in file 1
+#+end_src
+
+Then the output has a conflict, and prints:
+#+begin_src org
+  ,<<<<<<< yours: t1-1.org
+  ,- conflicting text in file 1
+  ,=======
+  ,#+TITLE: A New Title In File 2
+  ,>>>>>>> theirs: t1-2.org
+  ,* A new heading in file 2
+  ,- with some text
+  ,* original heading
+  ,- here is some text
+  ,- add some text in file 1
+  ,** File 2 new sub heading
+  ,** New heading in file 1
+  ,- more text
+  ,*** Sub new heading in file 1
+#+end_src
+
+** Example Results 2
+A more complicated example:
+
+Ancestor:
+#+begin_src org
+  ,* heading 1
+  ,** test heading
+  ,:PROPERTIES:
+  ,:ID: 100
+  ,:END:
+  ,- this is just a test
+  ,* heading 2
+  ,** test heading
+  ,- this is a different heading
+  
+#+end_src
+
+File 1:
+#+begin_src org
+  ,* heading 1
+  ,** test heading
+  ,- this is a different heading
+  ,* heading 3
+  ,** heading 4
+  ,*** test heading
+  ,:PROPERTIES:
+  ,:ID: 100
+  ,:END:
+  ,- this is just a test
+#+end_src
+
+
+File 2:
+#+begin_src org
+  ,* heading 1
+  ,** test heading
+  ,:PROPERTIES:
+  ,:ID: 100
+  ,:END:
+  ,- updated line in file 2
+  ,* heading 2
+  ,- new text under heading 2
+  ,- this will conflict since heading 2
+  ,  deleted in file 1
+  ,** test heading
+  ,- this is a different heading
+  ,- this line added in file 2
+#+end_src
+
+#+begin_example
+----------------
+Node Change List:
+----------------
+Remove nodes: file 0
+(:title "heading 2" :level 1 :parent-level 0 :id "" :text "")
+----------
+Add nodes: file 1
+(:title "heading 3" :level 1 :parent-level 0 :id "" :text "")
+(:title "heading 4" :level 2 :parent-level 1 :id "" :text "")
+----------
+Remove nodes: file 0
+----------
+Add nodes: file 2
+----------------------
+FILE : 0 NO_CHANGE
+(:title "" :level 0 :no-parent :id "" :text "")
+FILE : 2 REMOVE
+(:title "heading 2" :level 1 :parent-level 0 :id "" :text "")
+FILE : 1 NEW
+(:title "heading 3" :level 1 :parent-level 0 :id "" :text "")
+FILE : 1 NEW
+(:title "heading 4" :level 2 :parent-level 1 :id "" :text "")
+FILE : 1 MOVE
+(:title "test heading" :level 3 :parent-level 2 :id "100" :text ":PROPERTIES:
+:ID: 100
+:END:
+- this is just a test
+")
+FILE : 1 NO_CHANGE
+(:title "heading 1" :level 1 :parent-level 0 :id "" :text "")
+FILE : 1 MOVE
+(:title "test heading" :level 2 :parent-level 1 :id "" :text "- this is a different heading
+")
+#+end_example
+
+Merged Document:
+#+begin_src org
+  ,<<<<<<< yours: t1-1.org
+  ,=======
+  ,* heading 2
+  ,- new text under heading 2
+  ,- this will conflict since heading 2
+  ,  deleted in file 1
+  ,>>>>>>> theirs: t1-2.org
+  ,* heading 3
+  ,** heading 4
+  ,** test heading
+  ,:PROPERTIES:
+  ,:ID: 100
+  ,:END:
+  ,- updated line in file 2
+  ,* heading 1
+  ,** test heading
+  ,- this is a different heading
+  ,- this line added in file 2
+#+end_src
+
+In this example, the ID was used to distinguish the headings called
+'test heading', and a heading could be moved in one document and
+content updated in another without a conflict.  An identical content
+change in two files would not have resulted in a conflict.  If a identical
+heading is added to each of the documents, then the merged result will
+have two identical headings without conflict.

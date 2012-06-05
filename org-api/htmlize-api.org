@@ -1,0 +1,181 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Htmlize API functions (htmlize.el)
+** htmlize-buffer =&optional buffer=
+
+Convert =buffer= to HTML, preserving colors and decorations.
+
+The generated HTML is available in a new buffer, which is returned.
+When invoked interactively, the new buffer is selected in the current
+window.  The title of the generated document will be set to the buffer's
+file name or, if that's not available, to the buffer's name.
+
+Note that htmlize doesn't fontify your buffers, it only uses the
+decorations that are already present.  If you don't set up font-lock or
+something else to fontify your buffers, the resulting HTML will be
+plain.  Likewise, if you don't like the choice of colors, fix the mode
+that created them, or simply alter the faces it uses.
+
+
+** htmlize-despam-address =string=
+
+Replace every occurrence of '@' in =string= with &#64;.
+/htmlize-make-hyperlinks/ uses this to spam-protect mailto links
+without modifying their meaning.
+
+
+** htmlize-face-list-p =face-prop=
+
+Return non-nil if =face-prop= is a list of faces, nil otherwise.
+
+
+** htmlize-face-to-fstruct =face=
+
+Convert Emacs face =face= to fstruct.
+
+
+** htmlize-faces-in-buffer  
+
+Return a list of faces used in the current buffer.
+Under XEmacs, this returns the set of faces specified by the extents
+with the /face/ property.  (This covers text properties as well.)  Under
+GNU Emacs, it returns the set of faces specified by the /face/ text
+property and by buffer overlays that specify /face/.
+
+
+** htmlize-file =file &optional target=
+
+Load =file=, fontify it, convert it to HTML, and save the result.
+
+Contents of =file= are inserted into a temporary buffer, whose major mode
+is set with /normal-mode/ as appropriate for the file type.  The buffer
+is subsequently fontified with /font-lock/ and converted to HTML.  Note
+that, unlike /htmlize-buffer/, this function explicitly turns on
+font-lock.  If a form of highlighting other than font-lock is desired,
+please use /htmlize-buffer/ directly on buffers so highlighted.
+
+Buffers currently visiting =file= are unaffected by this function.  The
+function does not change current buffer or move the point.
+
+If =target= is specified and names a directory, the resulting file will be
+saved there instead of to =file='s directory.  If =target= is specified and
+does not name a directory, it will be used as output file name.
+
+
+** htmlize-get-color-rgb-hash =&optional rgb-file=
+
+Return a hash table mapping X color names to RGB values.
+The keys in the hash table are X11 color names, and the values are the
+#rrggbb RGB specifications, extracted from /rgb.txt/.
+
+If =rgb-file= is nil, the function will try hard to find a suitable file
+in the system directories.
+
+If no rgb.txt file is found, return nil.
+
+
+** htmlize-locate-file =filename path &optional suffixes predicate=
+
+Search for =filename= through =path=.
+If found, return the absolute file name of =filename=, with its suffixes;
+otherwise return nil.
+=path= should be a list of directories to look in, like the lists in
+/exec-path/ or /load-path/.
+If =suffixes= is non-nil, it should be a list of suffixes to append to
+file name when searching.  If =suffixes= is nil, it is equivalent to '("").
+Use '("/") to disable =path= search, but still try the suffixes in =suffixes=.
+If non-nil, =predicate= is used instead of /file-readable-p/.
+
+This function will normally skip directories, so if you want it to find
+directories, make sure the =predicate= function returns /dir-ok/ for them.
+
+=predicate= can also be an integer to pass to the /access/ system call,
+in which case file-name handlers are ignored.  This usage is deprecated.
+For compatibility, =predicate= can also be one of the symbols
+/executable/, /readable/, /writable/, or /exists/, or a list of
+one or more of those symbols.
+
+
+** htmlize-make-file-name =file=
+
+Make an HTML file name from =file=.
+
+In its default implementation, this simply appends /.html/ to =file=.
+This function is called by htmlize to create the buffer file name, and
+by /htmlize-file/ to create the target file name.
+
+More elaborate transformations are conceivable, such as changing =file='s
+extension to /.html/ ("file.c" -> "file.html").  If you want them,
+overload this function to do it and htmlize will comply.
+
+
+** htmlize-make-hyperlinks  
+
+Make hyperlinks in HTML.
+
+
+** htmlize-many-files =files &optional target-directory=
+
+Convert =files= to HTML and save the corresponding HTML versions.
+
+=files= should be a list of file names to convert.  This function calls
+/htmlize-file/ on each file; see that function for details.  When
+invoked interactively, you are prompted for a list of files to convert,
+terminated with RET.
+
+If =target-directory= is specified, the HTML files will be saved to that
+directory.  Normally, each HTML file is saved to the directory of the
+corresponding source file.
+
+
+** htmlize-many-files-dired =arg &optional target-directory=
+
+HTMLize dired-marked files.
+
+
+** htmlize-memoize =key generator=
+
+Return the value of =generator=, memoized as =key=.
+That means that =generator= will be evaluated and returned the first time
+it's called with the same value of =key=.  All other times, the cached
+(memoized) value will be returned.
+
+
+** htmlize-protect-string =string=
+
+HTML-protect string, escaping HTML metacharacters and I18N chars.
+
+
+** htmlize-region =beg end=
+
+Convert the region to HTML, preserving colors and decorations.
+See /htmlize-buffer/ for details.
+
+
+** htmlize-region-for-paste =beg end=
+
+Htmlize the region and return just the HTML as a string.
+This forces the /inline-css/ style and only returns the HTML body,
+but without the BODY tag.  This should make it useful for inserting
+the text to another HTML buffer.
+
+
+** htmlize-unstringify-face =face=
+
+If =face= is a string, return it interned, otherwise return it unchanged.
+
+
+** htmlize-untabify =text start-column=
+
+Untabify =text=, assuming it starts at =start-column=.

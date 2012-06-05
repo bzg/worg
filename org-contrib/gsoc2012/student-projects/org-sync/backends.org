@@ -1,0 +1,218 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org-sync backends
+#+AUTHOR:     Aurélien Aptel
+#+EMAIL:      aurelien.aptel@gmail.com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../../index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+Note: everything here is a work in progress.
+
+
+* Workflow/Roadmap
+
+** First import
+
+- the user runs =os-import=, and is prompted for a repo url
+- org-sync tries to match it against per-backend pattern in order to
+  chose the right one.
+- org-sync inserts a new headline named "Bugs of /repo/" or prompts
+  the user for a name. The headline name is not stored remotely and
+  can be changed to anything.
+- this headline has a set of well defined PROPERTIES used by every
+  backend and (optionally) other for a specific backend.
+- This headlines contains sub-headlines, one for each bug.
+- Again, each bug headline has a set of PROPERTIES common to every
+  backend and some for a specific one.
+
+** Synchronization
+
+- the user runs =os-sync= which syncs each buglist in the buffer.
+- if the document doesn't have any buglist, inform the user to call
+  =os-import= (or call it directly).
+- org-sync fetches the buglist, and adds any new bugs to the
+  right buglist.
+- conflicting changes are handled by showing the new and the old entries in a
+  distinctive manner. The user deletes the one he doesn't want.
+- org-sync sends the resulting merge to the remote bugtracker.
+
+** Shared properties
+
+After looking at each web service, I came up with the following set of
+properties.
+
+*** Buglist
+
+- title
+- source-url
+
+*** Bug
+
+- id
+- status
+- title
+- description
+- creation-date
+- update-date
+- deadline
+- priority
+- tags
+- author
+- assignee
+
+* Bugtrackers
+
+Here are useful information about planned backends. I won't list
+detailed information about properties that don't fit in the project.
+
+** Bugzilla
+
+Bugzilla is a full-featured bugtracker written in Perl. There is a
+XML-RPC and a JSON-RPC interface which Org-sync can use.
+
+Since the JSON-RPC interface was added fairly recently in Bugzilla
+(v3.6 released April 13, 2010), we should focus on the XML one.
+
+- [[http://www.bugzilla.org][Bugzilla website]]
+- [[http://www.bugzilla.org/docs/3.2/en/html/api/Bugzilla/WebService.html][XML-RPC API]]
+- [[https://landfill.bugzilla.org/bugzilla-tip-sqlite/page.cgi?id=fields.html][Bug fields in default install]]
+
+*** Relevent bug properties
+
+- id: simple unsigned number
+- status: there are multiple status but they all fall in the
+  open/closed categories. [[https://landfill.bugzilla.org/bugzilla-tip-sqlite/page.cgi?id=fields.html#status][Status definition in default install]].
+  - Open: unconfirmed, confirmed, in_progress, ...
+  - Closed: resolved, verified, fixed, invalid, wontfix, duplicate,
+    worksforme, ...
+- classification & component: bugs are categorised into Classifications,
+  Products and Components. classifications is the top-level
+  categorisation.
+- creation date
+- update date
+- severity
+- priority to fix
+- summary: short description, aka title
+- description
+- milestone: simple string
+
+** GitHub
+
+GitHub hosts open source projects and provides git repositories along
+with other things, notably a wiki and a bugtracker (GitHub Issues).
+
+GitHub also provides a REST API for their bugtracker. The output format is JSON.
+
+- [[http://github.com][GitHub website]]
+- [[http://developer.github.com/v3/issues/][Bugtracker REST API]]
+
+*** Relevant bug properties
+
+- id: simple unsigned number.
+- title
+- author
+- description: can be fetched in various format.
+- state: open or closed.
+- creation date
+- update date
+- labels: each bug can be tagged with multiple strings ex: bug,
+  wontfix, etc.
+- milestone: each bug can be assigned to one milestone.
+- assignee: each bug can be assigned to one person.
+
+A milestone has:
+- id
+- title
+- description
+- number of open/closed issues.
+- deadline
+
+** Redmine
+
+Redmine is a project management web application written in Ruby. It
+has a REST API in both JSON and XML.
+
+- [[http://www.redmine.org/projects/redmine][Redmine website]]
+- [[http://www.redmine.org/projects/redmine/wiki/Rest_api][REST API]]
+
+*** Relevant bug properties
+
+- id: simple unsigned number
+- status: can be arbitrary string. [[http://www.redmine.org/projects/redmine/wiki/RedmineIssueTrackingSetup][Default ones]]:
+  - Closed: Closed, Rejected
+  - Open: everything else
+- tracker: simple string. Top-level categorisation. ex: bug, feature,
+  support, task, ...
+- category: second-level categorisation (can be empty).
+- author
+- creation date
+- update date
+- deadline
+- priority
+- assignee
+- title
+- description
+
+** Google Code
+
+Google has its own open source project hoster. It provides a
+bugtracker. I didn't find any API for it but each the bug list can be
+exported to CSV.
+
+- [[http://code.google.com/][Google Code website]]
+- [[http://code.google.com/p/chromium/issues/csv][Sample project CSV export]]
+
+** Bitbucket
+
+Bitbucket provides free public/private git/mercurial repository, along
+with a wiki, issue tracker, etc.
+
+There's a REST API in JSON.
+
+- [[http://bitbucket.org][Bitbucket website]]
+- [[http://confluence.atlassian.com/display/BITBUCKET/Using+the+bitbucket+REST+APIs][REST API]]
+
+** Relevant bug properties
+
+- id: simple unsigned number
+- status: fixed number of status
+  - Open: open, new
+  - Closed: resolved, on hold, duplicate, wontfix, invalid
+- type: category, fixed string: bug, enhancement, proposal, task
+- priority: fixed string: trivial, minor, major, critical, blocker
+- component: category, string
+- version: category, string
+- milestone: category, string
+- author
+- creation date
+- update date
+- title
+- description
+
+* TO-DO list manager
+
+** Toodledo
+
+Toodledo is yet another webservice to organize tasks. It features
+TO-DO list, folders, calendars and more.
+
+Toodledo has a REST API specifically designed for syncing. The output
+format can be JSON or XML.
+
+- [[https://www.toodledo.com/index.php][Toodledo website]]
+- [[http://api.toodledo.com/2/tasks/index.php][REST API]]
+
+** Google Task
+
+Google also has its own task manager. It's more simple and
+straightforward than Toodledo: TODO-list and dates.
+
+There's a REST API in JSON.
+
+- [[http://mail.google.com/mail/help/tasks/][Google Tasks website]]
+- [[https://developers.google.com/google-apps/tasks/v1/reference/][REST API]]

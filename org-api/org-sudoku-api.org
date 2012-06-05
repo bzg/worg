@@ -1,0 +1,64 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-Sudoku API functions (org-sudoku.el)
+** org-sudoku-create =nfilled=
+
+Create a sudoku game.
+
+
+** org-sudoku-deep-copy =game=
+
+Make a copy of the game so that manipulating the copy does not change the parent.
+
+
+** org-sudoku-get-game  
+
+Interpret table at point as sudoku game and read it.
+A game structure is returned.
+
+
+** org-sudoku-rel-fields =i j=
+
+Compute the list of related fields for field (i j).
+
+
+** org-sudoku-set-field =game field value=
+
+Put =value= into =field=, and tell related fields that they cannot be =value=.
+
+
+** org-sudoku-solve  
+
+Solve the sudoku game in the table at point.
+
+
+** org-sudoku-solve-field  
+
+Just solve the field at point.
+This works by solving the whole game, then inserting only the single field.
+
+
+** org-sudoku-solve-game =game &optional random stop-at=
+
+Solve =game=.
+If =random= is non-nit, select candidates randomly from a fields option.
+If =random= is nil, always start with the first allowed value and try
+solving from there.
+=stop-at= can be a float time, the solver will abort at that time because
+it is probably stuck.
+
+
+** org-sudoku-unknown-field-p =game=
+
+Are there still unknown fields in the game?

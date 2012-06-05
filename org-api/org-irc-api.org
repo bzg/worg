@@ -1,0 +1,71 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org API
+#+AUTHOR:     Thorsten Jolitz
+#+EMAIL:      tjolitz [at] gmail [dot] com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    index.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Org-IRC API functions (org-irc.el)
+** org-irc-elipsify-description =string &optional after=
+
+Remove unnecessary white space from =string= and add ellipses if necessary.
+Strip starting and ending white space from =string= and replace any
+chars that the value =after= with '...'
+
+
+** org-irc-erc-get-line-from-log =erc-line=
+
+Find the best line to link to from the ERC logs given =erc-line= as a start.
+If the user is on the ERC-prompt then search backward for the
+first non-blank line, otherwise return the current line.  The
+result is a cons of the filename and search string.
+
+
+** org-irc-erc-store-link  
+
+Store a link to the IRC log file or the session itself.
+Depending on the variable /org-irc-link-to-logs/ store either a
+link to the log file for the current session or an irc: link to
+the session itself.
+
+
+** org-irc-get-current-erc-port  
+
+Return the current port as a number.
+Return the current port number or, if none is set, return the ERC
+default.
+
+
+** org-irc-get-erc-link  
+
+Return an org compatible irc:/ link from an ERC buffer.
+
+
+** org-irc-parse-link =link=
+
+Parse an IRC =link= and return the attributes found.
+Parse a =link= that looks like server:port/chan/user (port, chan
+and user being optional) and return any of the port, channel or user
+attributes that are found.
+
+
+** org-irc-store-link  
+
+Dispatch to the appropriate function to store a link to an IRC session.
+
+
+** org-irc-visit =link=
+
+Parse =link= and dispatch to the correct function based on the client found.
+
+
+** org-irc-visit-erc =link=
+
+Visit an ERC buffer based on criteria found in =link=.
+
