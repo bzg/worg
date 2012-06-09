@@ -96,54 +96,42 @@ by the exporter.
   function.  Other accessors relative to elements are
   ~org-element-type~ and ~org-element-contents~.
 
+  Each greater element, element and object has a fixed set of
+  properties attached to it.  Among them, four are shared by all
+  types: ~:begin~ and ~:end~, which refer to the beginning and ending
+  buffer positions of the considered element or object, ~:post-blank~,
+  which holds the number of blank lines, or white spaces, at its end
+  and ~:parent~ which refers to the element or object containing it.
+
+  Greater elements, elements containing objects and recursive objects
+  will also have ~:contents-begin~ and ~:contents-end~ properties to
+  delimit contents.
+
   In addition to these properties, each element can optionally get
   some more from affiliated keywords, namely: ~:attr_ascii~,
   ~:attr_docbook~, ~:attr_html~, ~:attr_latex~, ~:attr_odt~,
   ~:caption~, ~:header~, ~:name~, ~:plot~, and ~:results~.
 
+  Other properties, specific to each element or object, are listed
+  below.
+
 ** Babel Call
 
    Element.
 
-   - ~:begin~ :: Buffer position at beginning of line (integer).
-   - ~:end~ :: Buffer position at first non-blank line after keyword,
-               or at buffer's end (integer).
    - ~:info~ :: Information about function being called, as returned
                 by ~ob-babel-lob-get-info~ (string).
-   - ~:post-blank~ :: Number of blank lines between keyword and next
-                      non-blank line or buffer's end (integer).
 ** Bold
 
    Recursive object.
 
-   - ~:begin~ :: Buffer position before opening star (integer).
-   - ~:contents-begin~ :: Buffer position after opening star (integer).
-   - ~:contents-end~ :: Buffer position before closing star (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               closing star or paragraph's end (integer).
-   - ~:post-blank~ :: Number of white spaces between closing star and
-                      next non-blank character or paragraph's end
-                      (integer).
+   No specific property.
 
 ** Center Block
 
    Greater element.
 
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, if any, at beginning of block's opening line
-                 otherwise (integer).
-   - ~:contents-begin~ :: Buffer position at the beginning of the line
-        below block's opening string (integer).
-   - ~:contents-end~ :: Buffer position at the beginning of block's
-        closing line (integer).
-   - ~:end~ :: Buffer position at the beginning of the first non-blank
-               line after block's closing line or at buffer's end
-               (integer).
-   - ~:hiddenp~ :: Non-nil if the block is hidden (symbol:
-                   ~org-hide-block~, nil).
-   - ~:post-blank~ :: Number of blank lines between block's closing
-                      line and next non-blank line or buffer's end
-                      (integer).
+   - ~:hiddenp~ :: Non-nil if the block is hidden (boolean).
 
 ** Clock
 
@@ -154,134 +142,63 @@ by the exporter.
    - ~:value~ :: Timestamp associated to clock keyword (string).
    - ~:time~ :: Clock duration for a closed clock, or nil (string or
                 nil).
-   - ~:post-blank~ :: Number of blank lines between the line after the
-                      clock element and the first non-blank line or
-                      buffer's end (integer).
-   - ~:begin~ :: Buffer position at the beginning of the line
-                 (integer).
-   - ~:end~ :: Buffer position at the beginning of the next line
-               (integer).
 
 ** Code
 
    Object.
 
-   - ~:begin~ :: Buffer position before opening tilde (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               closing tilde or paragraph's end (integer).
-   - ~:post-blank~ :: Number of white spaces between closing tilde and
-                      next non-blank character or paragraph's end
-                      (integer).
    - ~:value~ :: Contents (string).
 
 ** Comment
 
    Element.
 
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, if any, or at beginning of first commented
-                 line (integer).
-   - ~:end~ :: Buffer position at first non-blank line after last
-               commented line, or at buffer's end (integer).
-   - ~:post-blank~ :: Number of blank lines between last commented
-                      line and next non-blank line or buffer's end
-                      (integer).
    - ~:value~ :: Comments, with pound signs (string).
 
 ** Comment Block
 
    Element.
 
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, or at beginning of block's opening line
-                 (integer).
-   - ~:end~ :: Buffer position at first non-blank line after block's
-               closing line or buffer's end (integer).
    - ~:value~ :: Comments, without block's boundaries (string).
-   - ~:hiddenp~ :: Non-nil if block is hidden (symbol:
-                   ~org-hide-block~, nil).
-   - ~:post-blank~ :: Number of blank lines between block's closing
-                      line and next non-blank line or buffer's end.
+   - ~:hiddenp~ :: Non-nil if block is hidden (boolean).
 
 ** Drawer
 
    Greater element.
 
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, if any, at beginning of drawer's opening
-                 line otherwise (integer).
-   - ~:contents-begin~ :: Buffer position at the beginning of line
-        below drawer's opening string (integer).
-   - ~:contents-end~ :: Buffer position at the beginning of line
-        containing drawer's closing string (integer).
    - ~:drawer-name~ :: Drawer's name (string).
-   - ~:end~ :: Buffer position at the beginning of the first non-blank
-               line after drawer's closing line or at buffer's end
-               (integer).
-   - ~:hiddenp~ :: Non-nil if the drawer is hidden (symbol: ~outline~,
-                   nil).
-   - ~:post-blank~ :: Number of blank lines between drawer's closing
-                      line and next non-blank line or buffer's end
-                      (integer).
+   - ~:hiddenp~ :: Non-nil if the drawer is hidden (boolean).
 
 ** Dynamic Block
 
    Greater element.
 
    - ~:arguments~ :: Block's parameters (string).
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, if any, at beginning of block's opening line
-                 otherwise (integer).
    - ~:block-name~ :: Block's name (string).
-   - ~:contents-begin~ :: Buffer position at the beginning of line
-        below block's opening line (integer).
-   - ~:contents-end~ :: Buffer position at the beginning of block's
-        closing line (integer).
    - ~:drawer-name~ :: Drawer's name (string).
-   - ~:end~ :: Buffer position at beginning of the first non-blank
-               line after block's closing line or at buffer's end
-               (integer).
-   - ~:hiddenp~ :: Non-nil if the block is hidden (symbol:
-                   ~org-hide-block~, nil).
-   - ~:post-blank~ :: Number of blank lines between block's closing
-                      line and next non-blank line or buffer's end
-                      (integer).
+   - ~:hiddenp~ :: Non-nil if the block is hidden (boolean).
 
 ** Entity
 
    Object.
 
    - ~:ascii~ :: Entity's ASCII representation (string).
-   - ~:begin~ :: Buffer position before entity's starting backslash
-                 (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               entity's name and brackets, if any, or at paragraph's
-               end (integer).
    - ~:html~ :: Entity's HTML representation (string).
    - ~:latex~ :: Entity's LaTeX representation (string).
    - ~:latex-math-p~ :: Non-nil if entity's LaTeX representation
-        should be in math mode (symbol: t, nil).
+        should be in math mode (boolean).
    - ~:latin1~ :: Entity's Latin-1 encoding representation (string).
    - ~:name~ :: Entity's name, without backslash nor brackets
                 (string).
-   - ~:post-blank~ :: Number of white spaces between entity's end and
-                      next non-blank character or paragraph's end
-                      (integer).
    - ~:use-brackets-p~ :: Non-nil if entity is written with optional
-        brackets in original buffer (symbol: t, nil).
+        brackets in original buffer (boolean).
    - ~:utf-8~ :: Entity's UTF-8 encoding representation (string).
 
 ** Example Block
 
    Element.
 
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, if any, at beginning of block's opening line
-                 otherwise (integer).
-   - ~:end~ :: Buffer position at first non-blank line after block's
-               closing line or at buffer's end (integer).
-   - ~:hiddenp~ :: Non-nil if block is hidden (symbol:
-                   ~org-hide-block~, nil).
+   - ~:hiddenp~ :: Non-nil if block is hidden (boolean).
    - ~:label-fmt~ :: Format string used to write labels in current
                      block, if different from
                      ~org-coderef-label-format~ (string or nil).
@@ -294,9 +211,6 @@ by the exporter.
    - ~:options~ :: Block's options located on the block's opening line
                    (string).
    - ~:parameters~ :: Optional header arguments (string or nil).
-   - ~:post-blank~ :: Number of blank lines between block's closing
-                      line and next non-blank line or buffer's end
-                      (integer).
    - ~:preserve-indent~ :: Non-nil when indentation within the block
         mustn't be modified upon export (boolean).
    - ~:retain-labels~ :: Non-nil if labels should be kept visible upon
@@ -312,17 +226,7 @@ by the exporter.
 
    Element.
 
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, if any, at beginning of block's opening line
-                 otherwise (integer).
-   - ~:end~ :: Buffer position at beginning of first non-blank line
-               after block's closing line, or at buffer's end
-               (integer).
-   - ~:hiddenp~ :: Non-nil if block is hidden (symbol:
-                   ~org-hide-block~, nil).
-   - ~:post-blank~ :: Number of blank lines between block's closing
-                      line and next non-blank line or buffer's end
-                      (integer).
+   - ~:hiddenp~ :: Non-nil if block is hidden (boolean).
    - ~:type~ :: Related back-end's name (string).
    - ~:value~ :: Contents (string).
 
@@ -331,64 +235,27 @@ by the exporter.
    Object.
 
    - ~:back-end~ :: Relative back-end's name (string).
-   - ~:begin~ :: Buffer position before snippet's opening commercial
-                 at (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               snippet's closing marker or at paragraph's end
-               (integer).
-   - ~:post-blank~ :: Number of white spaces between snippet's closing
-                      marker and next non-blank character or
-                      paragraph's end (integer).
    - ~:value~ :: Export code (string).
 
 ** Fixed Width
 
    Element.
 
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, if any, at beginning of first fixed-width
-                 line otherwise (integer).
-   - ~:end~ :: Buffer position at first non-blank line after last
-               fixed-width line, or at buffer's end (integer).
-   - ~:post-blank~ :: Number of blank lines between last fixed-width
-                      line and next non-blank line or buffer's end
-                      (integer).
    - ~:value~ :: Contents, with colons (string).
 
 ** Footnote Definition
 
    Greater element.
 
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, if any, at beginning of definition's label
-                 otherwise (integer).
-   - ~:contents-begin~ :: Buffer position at beginning of definition's
-        contents, after the label and any white space (integer).
-   - ~:contents-end~ :: Buffer position at the beginning of first
-        blank line after definition's contents, or at the end of
-        buffer (integer).
-   - ~:end~ :: Buffer position at the beginning of the first non-blank
-               line after the definition, if any, or at the end of
-               buffer (integer).
    - ~:label~ :: Label used for references (string).
-   - ~:post-blank~ :: Number of blank lines between definition's end
-                      and the next non-blank line, or buffer's end
-                      (integer).
 
 ** Footnote Reference
 
    Object.
 
-   - ~:begin~ :: Buffer position before reference's opening square
-                 bracket (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               reference's closing square bracket or paragraph's end.
    - ~:inline-definition~ :: Footnote's definition, when inlined
         (secondary string or nil).
    - ~:label~ :: Footnote's label, if any (string or nil).
-   - ~:post-blank~ :: Number of white spaces between reference's
-                      closing square bracket and next non-blank
-                      character or paragraph's end (integer).
    - ~:raw-definition~ :: Uninterpreted footnote's definition, when
         inlined (string or nil).
    - ~:type~ :: Determine whether reference has its definition inline,
@@ -404,33 +271,23 @@ by the exporter.
    name, i.e. ~:custom-id~).
    
    - ~:archivedp~ :: Non-nil if the headline has an archive tag
-                     (integer or nil).
-   - ~:begin~ :: Buffer position at the beginning of the headline (integer).
+                     (boolean).
    - ~:category~ :: Headline's category (string).
    - ~:clock~ :: Headline's CLOCK reference, if any (string or nil).
    - ~:commentedp~ :: Non-nil if the headline has a comment keyword
-                      (integer or nil).
-   - ~:contents-begin~ :: Buffer position at the beginning of the
-        first non-blank line of the contents (integer).
-   - ~:contents-end~ :: Buffer position at the beginning of the first
-        blank line at the end of the sub-tree, or at the end of buffer
-        (integer).
+                      (boolean).
    - ~:deadline~ :: Headline's DEADLINE reference, if any (string or
                     nil).
-   - ~:end~ :: Buffer position at the end of the sub-tree (integer).
    - ~:footnote-section-p~ :: Non-nil if the headline is a footnote
-        section (symbol: nil, t).
-   - ~:hiddenp~ :: Non-nil if the headline is hidden (symbol:
-                   ~outline~, nil).
+        section (boolean).
+   - ~:hiddenp~ :: Non-nil if the headline is hidden (boolean).
    - ~:level~ :: Reduced level of the headline (integer).
-   - ~:post-blank~ :: Number of blank lines at the end of the sub-tree
-                      (integer).
    - ~:pre-blank~ :: Number of blank lines between the headline and
                      the first non-blank line of its contents
                      (integer).
    - ~:priority~ :: Headline's priority, as a character (integer).
    - ~:quotedp~ :: Non-nil if the headline contains a quote keyword
-                   (integer or nil).
+                   (boolean).
    - ~:raw-value~ :: Raw headline's text, without the stars and the
                      tags (string).
    - ~:scheduled~ :: Headline's SCHEDULED reference, if any (string or
@@ -450,40 +307,21 @@ by the exporter.
 
    Element.
 
-   - ~:begin~ :: Buffer position at first affiliated keyword or
-                 beginning of line (integer).
-   - ~:end~ :: Buffer position at first non-blank line after the rule,
-               or at buffer's end (integer).
-   - ~:post-blank~ :: Number of blank lines between the rule and first
-                      non-blank line after it or buffer's end
-                      (integer).
+   No specific property.
 
 ** Inline Babel Call
 
    Object.
 
-   - ~:begin~ :: Buffer position before opening pound sign (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               inline call's closing or at paragraph's end (integer).
    - ~:info~ :: Information about function called, as returned by
                 ~org-babel-lob-get-info~ (list).
-   - ~:post-blank~ :: Number of white spaces between inline call's
-                      closing and next non-blank character or
-                      paragraph's end (integer).
 
 ** Inline Src Block
 
    Object.
 
-   - ~:begin~ :: Buffer position before opening pound sign (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               inline src block's closing character or at paragraph's
-               end (integer).
    - ~:language~ :: Language of the code in the block (string).
    - ~:parameters~ :: Optional header arguments (string or nil).
-   - ~:post-blank~ :: Number of white spaces between inline src
-                      block's closing character and next non-blank
-                      character or paragraph's end (integer).
    - ~:value~ :: Source code (string).
 
 ** Inlinetask
@@ -495,26 +333,11 @@ by the exporter.
    attribute (with underscores replaced with hyphens and a lowercase
    name, i.e. ~:custom-id~).
 
-   - ~:begin~ :: Buffer position at the beginning of the inlinetask
-                 (integer).
    - ~:clock~ :: Inlinetask's CLOCK reference, if any (string or nil).
-   - ~:contents-begin~ :: Buffer position at the beginning of the
-        first non-blank line of its contents (integer).
-   - ~:contents-end~ :: Buffer position at the beginning of the line
-        at the closing string, if any, at the beginning of the line
-        after the openining string or the end of buffer otherwise
-        (integer).
    - ~:deadline~ :: Inlinetask's DEADLINE reference, if any (string or
                     nil).
-   - ~:end~ :: Buffer position at the beginning of the first non-blank
-               line after inlinetask's closing string, if any, after
-               inlinetask's opening string or at the end of buffer
-               otherwise (integer).
-   - ~:hiddenp~ :: Non-nil if the headline is hidden (symbol:
-                   ~outline~, nil).
+   - ~:hiddenp~ :: Non-nil if the headline is hidden (boolean).
    - ~:level~ :: Reduced level of the inlinetask (integer).
-   - ~:post-blank~ :: Number of blank lines between inlinetask's end
-                      and the next element (integer).
    - ~:priority~ :: Headline's priority, as a character (integer).
    - ~:raw-value~ :: Raw inlinetask's text, without the stars and the
                      tags (string).
@@ -534,53 +357,28 @@ by the exporter.
 
    Recursive object.
 
-   - ~:begin~ :: Buffer position before opening slash (integer).
-   - ~:contents-begin~ :: Buffer position after opening slash
-        (integer).
-   - ~:contents-end~ :: Buffer position before closing slash (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               closing slash or paragraph's end (integer).
-   - ~:post-blank~ :: Number of white spaces between closing slash and
-                      next non-blank character or paragraph's end
-                      (integer).
+   No specific property.
 
 ** Item
 
    Greater element.
 
-   - ~:begin~ :: Buffer position at the beginning of the item (integer).
    - ~:bullet~ :: Item's bullet (string).
    - ~:checkbox~ :: Item's check-box, if any (symbol: ~on~, ~off~,
                     ~trans~, nil).
-   - ~:contents-begin~ :: Buffer position at the beginning of item's
-        body, that is after any check-box, tag, counter (integer).
-   - ~:contents-end~ :: Buffer position at the first blank line after
-        the item, at the next element, or at buffer's end otherwise
-        (integer).
    - ~:counter~ :: Item's counter, if any.  Literal counters become
                    ordinals (integer).
-   - ~:end~ :: Buffer position at the beginning of the first non-blank
-               line after the item, if any, or at the end of buffer
-               (integer).
    - ~:raw-tag~ :: Uninterpreted item's tag, if any (string or nil).
    - ~:tag~ :: Parsed item's tag, if any (secondary string or nil).
-   - ~:hiddenp~ :: Non-nil if item is hidden (integer or nil).
+   - ~:hiddenp~ :: Non-nil if item is hidden (boolean).
    - ~:structure~ :: Full list's structure, as returned by
                      ~org-list-struct~ (alist).
-   - ~:post-blank~ :: Number of blank lines between item contents' end
-                      and next non-blank line or plain list end
-                      (integer).
 
 ** Keyword
 
    Element.
 
-   - ~:begin~ :: Buffer position at beginning of line (integer).
-   - ~:end~ :: Buffer position at first non-blank line after the
-               keyword, or at buffer's end (integer).
    - ~:key~ :: Keyword's name (string).
-   - ~:post-blank~ :: Number of blank lines between keyword and next
-                      non-blank line, or buffer's end (integer).
    - ~:value~ :: Keyword's value (string).
 
 ** LaTeX Environment
@@ -600,41 +398,20 @@ by the exporter.
 
    Object.
 
-   - ~:begin~ :: Buffer position before fragment's opening character (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               fragment's closing character, or at paragraph's end
-               (integer).
-   - ~:post-blank~ :: Number of white spaces between fragment's
-                      closing character and next non-blank character
-                      or paragraph's end (integer).
    - ~:value~ :: LaTeX code (string).
 
 ** Line Break
 
    Element.
 
-   - ~:begin~ :: Buffer position before first backslash character (integer).
-   - ~:end~ :: Buffer position at end of line (integer).
-   - ~:post-blank~ :: Number of white spaces between second backslash
-                      and end of line (integer).
+   No specific property.
 
 ** Link
 
    Recursive object.
 
-   - ~:begin~ :: Buffer position before opening square bracket (integer).
-   - ~:contents-begin~ :: Buffer position link description's first
-        character, if any (integer or nil).
-   - ~:contents-end~ :: Buffer position after link description's last
-        character, if any (integer or nil).
-   - ~:end~ :: Buffer position before first non-blank character after
-               link's closing bracket, or at paragraph's end
-               (integer).
    - ~:path~ :: Identifier for link's destination.  It is usually the
                 link part with type, if specified, removed (string).
-   - ~:post-blank~ :: Number of white spaces between link's closing
-                      square bracket and next non-blank character or
-                      paragraph's end (integer).
    - ~:raw-link~ :: Uninterpreted Link part (string).
    - ~:type~ :: Link's type.  Possible types (string) are:
      - ~coderef~ :: Line in some source code,
@@ -667,47 +444,19 @@ by the exporter.
    Object.
 
    - ~:args~ :: Arguments passed to the macro (list of strings).
-   - ~:begin~ :: Buffer position before first opening curly bracket
-                 (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               last closing curly bracket, or at paragraph's end.
    - ~:key~ :: Macro's name (string).
-   - ~:post-blank~ :: Number of white spaces between last closing
-                      curly bracket and next non-blank character or
-                      paragraph's end (integer).
    - ~:value~ :: Replacement text (string).
 
 ** Paragraph
 
-   Element.
+   Element containing objects.
 
-   - ~:begin~ :: Buffer position at first affiliated keyword or at the
-                 beginning of the paragraph (integer).
-   - ~:contents-begin~ :: Buffer position at the beginning of
-        paragraph's first line (integer).
-   - ~:contents-end~ :: Buffer position at the beginning of the first
-        line after the paragraph or at buffer's end.
-   - ~:end~ :: Buffer position at the first non-blank line after the
-               end of the paragraph or at buffer's end (integer).
-   - ~:post-blank~ :: Number of blank lines between paragraph's last
-                      line and the next non-blank line or buffer's end
-                      (integer).
+   No specific property.
 
 ** Plain List
 
    Greater element.
 
-   - ~:begin~ :: Buffer position at the first affiliated keyword, if
-                 any, at the beginning of list's first item otherwise
-                 (integer).
-   - ~:contents-begin~ :: Buffer position at the beginning of list's
-        first item (integer).
-   - ~:contents-end~ :: Buffer position at the end of the list or
-        sub-list (integer).
-   - ~:end~ :: Buffer position at the first non-blank line after
-               list's last item, or at buffer's end (integer).
-   - ~:post-blank~ :: Number of blank lines between end of list and
-                      next element or end of buffer (integer).
    - ~:structure~ :: Full list's structure, as returned by
                      ~org-list-struct~ (alist).
    - ~:type~ :: List's type (symbol: ~descriptive~, ~ordered~,
@@ -717,17 +466,10 @@ by the exporter.
 
    Element.
 
-   - ~:begin~ :: Buffer position at the beginning of the line
-                 (integer).
    - ~:closed~ :: Timestamp associated to closed keyword, if any
                   (string or nil).
    - ~:deadline~ :: Timestamp associated to deadline keyword, if any
                     (string or nil).
-   - ~:end~ :: Buffer position at the beginning of the line after
-               planning element (integer).
-   - ~:post-blank~ :: Number of blank lines between the line after the
-                      planning element and the next non-blank line or
-                      buffer's end (integer).
    - ~:scheduled~ :: Timestamp associated to scheduled keyword, if any
                      (string or nil).
 
@@ -735,117 +477,45 @@ by the exporter.
 
    Element.
 
-   - ~:begin~ :: Buffer position at beginning of drawer's opening line
-                 (integer).
-   - ~:end~ :: Buffer position at beginning of line below drawer's
-               opening line (integer).
-   - ~:hiddenp~ :: Non-nil if drawer is hidden (symbol: ~outline~,
-                   nil).
-   - ~:post-blank~ :: Number of blank lines between drawer's closing
-                      line and the next non-blank line or buffer's end
-                      (integer).
+   - ~:hiddenp~ :: Non-nil if drawer is hidden (boolean).
    - ~:properties~ :: Properties defined in the drawer (alist).
 
 ** =Quote= Block
 
    Greater element.
 
-   - ~:begin~ :: Buffer position at beginning of the first affiliated
-                 keyword, if any, at beginning of block's opening line
-                 otherwise (integer).
-   - ~:contents-begin~ :: Buffer position at the beginning of the
-        first line after block's opening line (integer).
-   - ~:contents-end~ :: Buffer position at the beginning of block's
-        closing string (integer).
-   - ~:end~ :: Buffer position at the beginning of the first non-blank
-               line after block's closing line or buffer's end
-               (integer).
-   - ~:hiddenp~ :: Non-nil if block is hidden (symbol:
-                   ~org-hide-block~, nil).
-   - ~:post-blank~ :: Number of blank lines between block's closing
-                      line and next non-blank line or buffer's end
-                      (integer).
+   - ~:hiddenp~ :: Non-nil if block is hidden (boolean).
 
 ** =Quote= Section
 
-   Greater element.
+   Element.
 
-   - ~:begin~ :: Buffer position at beginning of first non-blank line
-                 after headline (integer).
-   - ~:end~ :: Buffer position at beginning of next headline or
-               buffer's end (integer).
-   - ~:post-blank~ :: Number of blank lines between last non-blank
-                      line in section and next headline or buffer's
-                      end (integer)
    - ~:value~ :: Quoted text (string).
 
 ** Radio Target
 
    Recursive object.
 
-   - ~:begin~ :: Buffer position before first /less-than/ opening sign
-                 (integer).
-   - ~:contents-begin~ :: Buffer position after third /less-than/
-        opening sign (integer).
-   - ~:contents-end~ :: Buffer position before first /greater-than/
-        closing sign (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               last /greater-than/ closing sign, or at paragraph's end
-               (integer).
-   - ~:post-blank~ :: Number of white spaces between last
-                      /greater-than/ closing sign and next non-blank
-                      character or paragraph's end (integer).
    - ~:raw-value~ :: Uninterpreted contents (string).
 
 ** Section
 
    Greater element.
 
-   - ~:begin~ :: Buffer position at beginning the first non-blank line
-                 after either previous headline or beginning of
-                 buffer (integer).
-   - ~:contents-begin~ :: Buffer position at beginning the first
-        non-blank line after either previous headline or beginning of
-        buffer (integer).
-   - ~:contents-end~ :: Buffer position at beginning of first line
-        after last non-blank line before next headline (integer).
-   - ~:end~ :: Buffer position at beginning of next headline or end of
-               buffer (integer).
-   - ~:post-blank~ :: Number of blank lines between =:contents-end= and
-                      =:end= positions.
+   No specific property.
 
 ** Special Block
 
    Greater element.
 
-   - ~:begin~ :: Buffer position at beginning of the first affiliated
-                 keyword, if any, at beginning of block's opening line
-                 otherwise (integer).
-   - ~:contents-begin~ :: Buffer position at the beginning of the
-        first line after block's opening line (integer).
-   - ~:contents-end~ :: Buffer position at the beginning of the line
-        at block's closing line (integer).
-   - ~:end~ :: Buffer position at the beginning of the first non-blank
-               line after block's closing line or buffer's end
-               (integer).
-   - ~:hiddenp~ :: Non-nil if block is hidden (symbol:
-                   ~org-hide-block~, nil).
-   - ~:post-blank~ :: Number of blank lines between block's closing
-                      line and next non-blank line or buffer's end
-                      (integer).
+   - ~:hiddenp~ :: Non-nil if block is hidden (boolean).
    - ~:type~ :: Block's name (string).
 
 ** Src Block
 
    Element.
 
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, if any, at beginning of block's opening line
-                 otherwise (integer).
-   - ~:end~ :: Buffer position at the first non-blank line after
-               block's closing line or at buffer's end (integer).
-   - ~:hiddenp~ :: Non-nil if block is hidden (symbol:
-                   ~org-hide-block~ nil).
+   - ~:hiddenp~ :: Non-nil if block is hidden (boolean).
    - ~:label-fmt~ :: Format string used to write labels in current
                      block, if different from
                      ~org-coderef-label-format~ (string or nil).
@@ -856,9 +526,6 @@ by the exporter.
         resume numbering from previous numbered block (symbol: ~new~,
         ~continued~ or nil).
    - ~:parameters~ :: Optional header arguments (string or nil).
-   - ~:post-blank~ :: Number of blank lines between block's closing
-                      line and next non-blank line or buffer's end
-                      (integer).
    - ~:preserve-indent~ :: Non-nil when indentation within the block
         mustn't be modified upon export (boolean).
    - ~:retain-labels~ :: Non-nil if labels should be kept visible upon
@@ -874,45 +541,18 @@ by the exporter.
 
    Object.
 
-   - ~:begin~ :: Buffer position before opening square bracket (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               cookie's closing square bracket, or at paragraph's end
-               (integer).
-   - ~:post-blank~ :: Number of white spaces between cookie's closing
-                      square bracket and next non-blank character or
-                      paragraph's end (integer).
    - ~:value~ :: Full cookie (string).
 
 ** Strike Through
 
    Recursive object.
 
-   - ~:begin~ :: Buffer position before opening plus sign (integer).
-   - ~:contents-begin~ :: Buffer position after opening plus sign
-        (integer).
-   - ~:contents-end~ :: Buffer position before closing plus sign
-        (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               closing plus sign or paragraph's end (integer).
-   - ~:post-blank~ :: Number of white spaces between closing plus sign
-                      and next non-blank character or paragraph's end
-                      (integer).
+   No specific property.
+
 ** Subscript
 
    Recursive object.
 
-   - ~:begin~ :: Buffer position before /underscore/ opening sign
-                 (integer).
-   - ~:contents-begin~ :: Buffer position after enclosing left curly
-        bracket, if any, after /underscore/ opening sign otherwise
-        (integer).
-   - ~:contents-end~ :: Buffer position before enclosing right curly
-        bracket, if any, or at end of subscript (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               subscript's end, or at paragraph's end (integer).
-   - ~:post-blank~ :: Number of white spaces between subscript's end
-                      and next non-blank character or paragraph's end
-                      (integer).
    - ~:use-brackets-p~ :: Non-nil if contents are enclosed in curly
         brackets (t, nil).
 
@@ -920,18 +560,6 @@ by the exporter.
 
    Recursive object.
 
-   - ~:begin~ :: Buffer position before /caret/ opening sign
-                 (integer).
-   - ~:contents-begin~ :: Buffer position after enclosing left curly
-        bracket, if any, after /caret/ opening sign otherwise
-        (integer).
-   - ~:contents-end~ :: Buffer position before enclosing right curly
-        bracket, if any, or at end of superscript (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               superscript's end, or at paragraph's end (integer).
-   - ~:post-blank~ :: Number of white spaces between superscript's end
-                      and next non-blank character or paragraph's end
-                      (integer).
    - ~:use-brackets-p~ :: Non-nil if contents are enclosed in curly
         brackets (t, nil).
 
@@ -939,19 +567,6 @@ by the exporter.
 
    Greater element.
 
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, if any, at beginning of table's first line
-                 otherwise (integer).
-   - ~:end~ :: Buffer position at beginning of first non-blank line
-               after table's last line or at buffer's end (integer).
-   - ~:contents-begin~ :: For an ~org~ table, buffer position at
-        beginning of the first table's line, ignoring affiliated
-        keywords, nil otherwise (integer or nil).
-   - ~:contents-end~ :: For an ~org~ table, buffer position at
-        beginning of the first line after table's last line or at
-        buffer's end, nil otherwise (integer or nil).
-   - ~:post-blank~ :: Number of blank lines between table's last line
-                      and next non-blank line or buffer's end.
    - ~:tblfm~ :: Formulas associated to the table, if any (string or
                  nil).
    - ~:type~ :: Table's origin (symbol: ~table.el~, ~org~).
@@ -961,41 +576,18 @@ by the exporter.
 
    Recursive object.
 
-   - ~:begin~ :: Buffer position after the opening vertical bar
-                 (integer).
-   - ~:end~ :: Buffer position after the closing vertical bar
-               (integer).
-   - ~:contents-begin~ :: Buffer position at the first non-whitespace
-        character after the vertical bar (integer).
-   - ~:contents-end~ :: Buffer position after the closest
-        non-whitespace character before the next vertical bar
-        (integer).
+   No specific property.
 
 ** Table Row
 
-   Element.
+   Element containing objects.
 
-   - ~:begin~ :: Buffer position at beginning of the line (integer).
-   - ~:end~ :: Buffer position at beginning of the first line after
-               the row, or at buffer's end (integer).
-   - ~:contents-begin~ :: Buffer position after the first vertical
-        line (integer or nil).
-   - ~:contents-end~ :: Buffer position after the last vertical line
-        (integer).
    - ~:type~ :: Row's type (symbol: ~standard~, ~rule~).
 
 ** Target
 
    Object.
 
-   - ~:begin~ :: Buffer position before first /less-than/ opening sign
-                 (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               last /greater-than/ closing sign, or at paragraph's end
-               (integer).
-   - ~:post-blank~ :: Number of white spaces between last
-                      /greater-than/ closing sign and next non-blank
-                      character or paragraph's end (integer).
    - ~:value~ :: Target's ID (string).
 
 
@@ -1008,14 +600,6 @@ by the exporter.
 
    Object.
 
-   - ~:begin~ :: Buffer position at opening /less-than/ sign
-                 (integer).
-   - ~:end~ :: Buffer position at first non-blank character after
-               closing /greater-than/ sign, or at paragraph's end
-               (integer).
-   - ~:post-blank~ :: Number of white spaces between closing
-                      /greater-than/ sign and next non-blank character
-                      or paragraph's end (integer).
    - ~:type~ :: Type of timestamp (symbol: ~active~, ~active-range~,
                 ~diary~, ~inactive~, ~inactive-range~).
    - ~:value~ :: Full time-stamp (string).
@@ -1024,45 +608,19 @@ by the exporter.
 
    Recursive object.
 
-   - ~:begin~ :: Buffer position before opening underscore (integer).
-   - ~:contents-begin~ :: Buffer position after opening underscore (integer).
-   - ~:contents-end~ :: Buffer position before closing underscore
-        (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               closing underscore or paragraph's end (integer).
-   - ~:post-blank~ :: Number of white spaces between closing
-                      underscore and next non-blank character or
-                      paragraph's end (integer).
+   No specific property.
+
 ** Verbatim
 
    Object.
 
-   - ~:begin~ :: Buffer position before opening equal sign (integer).
-   - ~:end~ :: Buffer position before first non-blank character after
-               closing equal sign or paragraph's end (integer).
-   - ~:post-blank~ :: Number of white spaces between closing equal
-                      sign and next non-blank character or paragraph's
-                      end (integer).
    - ~:value~ :: Contents (string).
 
 ** Verse Block
 
-   Element.
+   Element containing objects.
 
-   - ~:begin~ :: Buffer position at beginning of first affiliated
-                 keyword, if any, at beginning of block's opening line
-                 otherwise (integer).
-   - ~:end~ :: Buffer position at beginning of the first non-blank
-               line after block's closing line or at buffer's end
-               (integer).
-   - ~:contents-begin~ :: Buffer position at beginning of the first
-        line after block's opening string (integer).
-   - ~:contents-end~ :: Buffer position at the beginning of block's
-        closing line (integer).
    - ~:hiddenp~ :: Non-nil if block is hidden (boolean).
-   - ~:post-blank~ :: Number of blank lines between block's closing
-                      line and next non-blank line or buffer's end
-                      (integer).
 
 * The Communication Channel
   :PROPERTIES:
@@ -1173,6 +731,14 @@ by the exporter.
 
    - category :: option
    - type :: list of elements
+
+** ~:id-alist~
+
+   Alist between ID strings and destination file's path, relative to
+   current directory.
+
+   - category :: option
+   - type :: alist (STRING . STRING)
 
 ** ~:input-file~
 
@@ -1771,6 +1337,18 @@ by the exporter.
 
    See also : [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]]
 
+** ~org-export-get-parent-element~
+   :PROPERTIES:
+   :CUSTOM_ID: get-parent-paragraph
+   :END:
+
+   Return the first element containing provided object, if any.
+   Return nil otherwise.
+
+   See also: [[#get-genealogy][~org-export-get-genealogy~]], [[#get-parent][~org-export-get-parent~]],
+   [[#get-parent-headline][~org-export-get-parent-headline~]],
+   [[#get-previous-element][~org-export-get-previous-element~]], [[#get-next-element][~org-export-get-next-element~]].
+
 ** ~org-export-get-parent-headline~
    :PROPERTIES:
    :CUSTOM_ID: get-parent-headline
@@ -1783,18 +1361,6 @@ by the exporter.
    [[#get-next-element][~org-export-get-next-element~]], [[#get-parent][~org-export-get-parent~]],
    [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
    [[#get-previous-element][~org-export-get-previous-element~]].
-
-** ~org-export-get-parent-paragraph~
-   :PROPERTIES:
-   :CUSTOM_ID: get-parent-paragraph
-   :END:
-
-   Return the paragraph containing provided object, if any.  Return
-   nil otherwise.
-
-   See also: [[#get-genealogy][~org-export-get-genealogy~]], [[#get-parent][~org-export-get-parent~]],
-   [[#get-parent-headline][~org-export-get-parent-headline~]],
-   [[#get-previous-element][~org-export-get-previous-element~]], [[#get-next-element][~org-export-get-next-element~]].
 
 ** ~org-export-get-parent~
    :PROPERTIES:
@@ -1846,6 +1412,34 @@ by the exporter.
 
    See also: [[#table-cell-address][~org-export-table-cell-address~]],
    [[#table-dimensions][~org-export-table-dimensions~]].
+
+** ~org-export-get-tags~
+   :PROPERTIES:
+   :CUSTOM_ID: get-tags
+   :END:
+
+   Return list of exportable tags attached to a given headline or
+   inlinetask element.
+
+   In particular, it removes select tags and exclude tags. The
+   function also accepts an arbitrary list of tags for further
+   cleaning.
+
+   For example, =e-latex= back-end uses the following snippet in the
+   inlinetask transcode function.
+
+   #+BEGIN_SRC emacs-lisp
+   (let ((title (org-export-data (org-element-property :title inlinetask) info))
+      (todo (and (plist-get info :with-todo-keywords)
+                 (let ((todo (org-element-property :todo-keyword inlinetask)))
+                   (and todo (org-export-data todo info)))))
+      (todo-type (org-element-property :todo-type inlinetask))
+      (tags (and (plist-get info :with-tags)
+                 (org-export-get-tags inlinetask info)))
+      (priority (and (plist-get info :with-priority)
+                     (org-element-property :priority inlinetask))))
+  ...)
+   #+END_SRC
 
 ** ~org-export-headline-numbered-p~
    :PROPERTIES:
@@ -1940,7 +1534,8 @@ by the exporter.
 
    Search headline targetted by an id link --- i.e. it has a ~id~ or
    ~custom-id~ ~:type~ attribute --- within the parse tree.  Return
-   that headline, or nil.
+   the matching headline in the tree, the name of the external file,
+   as a string, or nil.
 
    See also : [[#resolve-coderef][~org-export-resolve-coderef~]],
    [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#resolve-radio-link][~org-export-resolve-radio-link~]],
@@ -1976,6 +1571,14 @@ by the exporter.
    See also : [[#resolve-coderef][~org-export-resolve-coderef~]],
    [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#resolve-id-link][~org-export-resolve-id-link~]],
    [[#solidify-link-text][~org-export-solidify-link-text~]].
+
+** ~org-export-set-element~
+   :PROPERTIES:
+   :CUSTOM_ID: set-element
+   :END:
+
+   Replaces, destructively, an element with another in the parse tree.
+   It is meant to be used as a tool for parse tree filters.
 
 ** ~org-export-solidify-link-text~
    :PROPERTIES:
