@@ -155,10 +155,10 @@ First evaluate the following lisp code:
 #+begin_src emacs-lisp
 (defun mm/org-insert-trigger ()
   "Automatically insert chain-find-next trigger when entry becomes NEXT"
-  (cond ((equal state "NEXT")
+  (cond ((equal org-state "NEXT")
          (unless org-depend-doing-chain-find-next
            (org-set-property "TRIGGER" "chain-find-next(NEXT,from-current,priority-up,effort-down)")))
-        ((not (member state org-done-keywords))
+        ((not (member org-state org-done-keywords))
          (org-delete-property "TRIGGER"))))
 
 (add-hook 'org-after-todo-state-change-hook 'mm/org-insert-trigger)
