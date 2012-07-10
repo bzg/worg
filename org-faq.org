@@ -365,13 +365,20 @@ options.
 
    3. Compile and install Org-mode and build documentation.
 
-      : $ cd org-mode && make && make doc && make install
+      : $ cd $HOME/elisp/org-mode && make
 
       Please note that you can choose to /not/ compile at all and run
-      using source =.el= files only.  Compiled files speed things up.
+      using source =.el= files only (compiled files speed things up),
+      but you will still need to generate the autoload files.
 
-      Also note that running =make install= is necessary only if you'd
-      like to install org-mode system-wide.
+      : $ cd $HOME/elisp/org-mode && make uncompiled
+
+      If you'd like to install org-mode someplace outside the source
+      tree (private or system-wide), you should edit =local.mk= to
+      point to the appropriate install location.  You may need
+      administrator rights to do a system-wide installation.
+
+      : $ cd $HOME/elisp/org-mode && make install
 
    4. This is where you configure Org-mode with Emacs.  Please refer
       to [[./org-tutorials/index.org][Org tutorials]].
@@ -379,18 +386,26 @@ options.
    5. Keeping up-to-date.
 
       Cloning the repository is a one time activity.  From this point
-      onwards you only need to /pull/ the latest changes.
+      onwards you only need to /pull/ the latest changes, which the
+      Makefile is set up to do automatically for certain make targets.
 
-      : $ cd $HOME/elisp/org-mode
+      : $ cd $HOME/elisp/org-mode && make update
 
-      and then
+      or if you immediately want to install as well
 
-      : $ git pull && make clean && make && make doc && make install
+      : $ cd $HOME/elisp/org-mode && make update2
 
-   6. You should restart Org-mode to have the changes take effect (if
-      you are not rebooting Emacs.)  Also since the intention is to
-      "keep up" with Org-mode, you should visit updated sections of
-      documentation for latest updates (use =git log=.)
+      Actually in this case it is recommended to run the test suite
+      before installation so that you don't install a version that
+      fails testing.
+
+      : $ cd $HOME/elisp/org-mode && make up2
+
+   6. You should reload Org-mode to have the changes take effect (if
+      you are not restarting Emacs, which is recommended).  Also since
+      the intention is to "keep up" with Org-mode, you should visit
+      updated sections of documentation for latest updates (use =git
+      log=.)
 
    7. As you use your repository over time it will accumulate loose objects.
       You can reduce the total size of your git repository with
@@ -408,7 +423,9 @@ options.
 
    Since org-mode already ships with Emacs, a rather common problem
    among users is "How do I update the info documentation to the
-   latest version of org-mode?". There are three ways to achieve this:
+   latest version of org-mode?".  This is not a problem if org-mode is
+   installed system-wide, which autoimatically takes care of this
+   issue!  There are three ways to achieve this:
 
    1. You can set the =INFOPATH= environment variable in your login
       script like this:
@@ -440,21 +457,20 @@ options.
         infodir = $(prefix)/share/info
       #+end_src
 
-      After you install org-mode with =make install=, you can now
-      install the new info files with =make install-info=. Note that
-      this method _overwrites_ the old org-mode info files that is
-      distributed with your version of GNU Emacs.
-
 ** How can I keep local changes and still track Org-mode development?
    :PROPERTIES:
    :CUSTOM_ID: keeping-local-changes-current-with-Org-mode-development
    :END:
 
-  Say you want to make minor changes to the Makefile to reflect your
-  location for =emacs=.
+  *This example is outdated.* There is no need to do this anymore for
+  this particular purpose, since this can now be specified in
+  =local.mk=.  The changes to the build system that enable this are
+  currently only available on =master= and will be generally released
+  with Org 7.9.
 
-  Create a local branch for your changes on top of origin/master as
-  follows:
+  Say you want to make minor changes to the Makefile to reflect your
+  location for =emacs=.  Create a local branch for your changes on top
+  of origin/master as follows:
 
   : $ git checkout -b local origin/master
   : $ git config branch.local.rebase true
@@ -584,18 +600,24 @@ using
    :CUSTOM_ID: using-stable-releases-only
    :END:
 
-The master branch of the git repository always contains the bleeding
+The =master= branch of the git repository always contains the bleeding
 edge development code.  This is important for Org's fast development,
 because code on master gets checked out by many people daily and we
 quickly receive bug reports if something is wrong.  On rare occasions,
 this code may not function perfectly for a limited time while we are
-trying to fix things.
+trying to fix things.  It is therefore recommended to keep a
+known-good version of org-mode installed outside the source tree and
+always run the full test suite before using a new version from master.
 
 Not everyone like to use this bleeding-edge code and face the danger
-to hit a surprising bug.
+to hit a surprising bug.  The branch =maint= is specifically for
+collecting only fixes for known bugs between releases.  If you don't
+want to wait for a new release, but don't want to live on the bleeding
+edge, consider using =maint=.
 
-Therefore, from time to time, we make a release.  This typically
-happens when the maintainers feel that
+From time to time, we make a release by merging all the new features
+from =master= into =maint=.  This typically happens when the
+maintainers feel that
 
 1. they have reached a good point in the development
 2. the code has a feature set that should stay and be supported in the
@@ -651,12 +673,9 @@ If you are using org-mode on a computer that lacks developer tools for
 compiling software, such as [[http://www.gnu.org/software/make/][GNU Make]], you will have to use a
 *different* installation method than [[http://orgmode.org/manual/Installation.html#Installation][the one outlined in the manual]].
 
-Please see [[http://article.gmane.org/gmane.emacs.orgmode/15264][this thread]] on the mailing list for several different ways
-you can install a recent version of org-mode without using the
-customary =make clean && make && make install=.
-
-The result of that discussion is the file/function found in
-[[http://orgmode.org/worg/org-hacks.html#compiling-org-without-make]].
+Please see this description for [[http://orgmode.org/worg/org-hacks.html#compiling-org-without-make][compiling org-mode without make]]
+several different ways you can install a recent version of org-mode
+without using the full build system.
 
 ** I don't use git. Can I download bleeding edge .zip and .tar.gz archives?
 
@@ -670,7 +689,7 @@ The result of that discussion is the file/function found in
    :CUSTOM_ID: installing-via-elpa
    :END:
 
-   Daily builds of Org-mode is distributed as an ELPA package from
+   Daily builds of Org-mode are distributed as an ELPA package from
    both [[http://elpa.gnu.org/packages/][GNU Emacs Lisp Package Archive]] as well as from [[http://orgmode.org/pkg/daily/][Org-mode Emacs
    Lisp Archive]].
 
