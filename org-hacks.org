@@ -29,21 +29,35 @@ workaround. Go crazy.
   Compilation is optional, but you _must_ update the autoloads file
   each time you update org, even when you run org uncompiled!
 
-  Presumably starting with Org 7.9 (and in Git on current master
-  already) you'll find functions for creating the autoload files and
-  do byte-compilation in =UTILITIES/org-fixup.el=.  To make just the
+  Starting with Org 7.9 (and in Git on current master already) you'll
+  find functions for creating the autoload files and do
+  byte-compilation in =UTILITIES/org-fixup.el=.  To make just the
   autoloads file do:
   : emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup -f org-make-autoloads
   To make the autoloads file and byte-compile org:
   : emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup -f org-make-autoloads-compile
   If you are not using Git, you'll have to make fake version strings
-  first if =org-version.el= is not available:
+  first if =org-version.el= is not already available (if it is, you
+  can also edit the version strings there).
   : emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup \
-  : --eval '(org-make-org-version "7.8.11" "7.8.11-fake" "/path/to/odt/styles")'
+  : --eval '(let ((org-fake-release "7.8.11")(org-fake-git-version "7.8.11-fake"))\
+  : (org-make-autoloads-compile))'
+  The above assumes a POSIX shell for its quoting.  Windows =CMD.exe=
+  has quite different quoting rules, so your other option is to start
+  Emacs like this
+  : emacs -Q -L lisp -l ../UTILITIES/org-fixup
+  then paste the following into the =*scratch*= buffer
+#+BEGIN_SRC emacs-lisp
+  (let ((org-fake-release     "7.8.11")
+        (org-fake-git-version "7.8.11-fake"))
+    (org-make-autoloads-compile))
+#+END_SRC
+  position the cursor after the closing paren and press =C-j= or =C-x
+  C-e= to evaluate the form.
 
-  For older org versions, use the definitions below.  To use this
-  function, adjust the variables =my/org-lisp-directory= and
-  =my/org-compile-sources= to suit your needs.  If you have
+  For *older* org versions only, you can use the definitions below.
+  To use this function, adjust the variables =my/org-lisp-directory=
+  and =my/org-compile-sources= to suit your needs.  If you have
   byte-compiled org, but want to run org uncompiled again, just remove
   all =*.elc= files in the =lisp/= directory, set
   =my/org-compile-sources= to =nil=.
