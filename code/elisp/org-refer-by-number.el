@@ -1,12 +1,12 @@
-;;; org-refer-by-number.el --- Use numbers to refer to things within and outside of org
+;;; org-refer-by-number.el --- Create and search numbers used as references
 
 ;; Copyright (C) 2011,2012 Free Software Foundation, Inc.
 
 ;; Author: Marc-Oliver Ihm <ihm@ferntreffer.de>
 ;; Keywords: hypermedia, matching
 ;; Requires: org
-;; Download: http://ferntreffer.de/elisp/org-refer-by-number.el
-;; Version: 1.3.0
+;; Download: http://orgmode.org/worg/code/elisp/org-refer-by-number.el
+;; Version: 1.4.0
 
 ;;; License:
 
@@ -29,15 +29,15 @@
 
 ;; Purpose:
 ;;
-;;  Refer to things outside of org by reference numbers, especially if
-;;  direct linking is not possible. These reference numbers are added to
-;;  and kept within a table along with the timestamp of their creation.
+;;  Refer to things by reference numbers, especially if direct linking is
+;;  not possible. These reference numbers are added to and kept within a
+;;  table along with the timestamp of their creation.
 ;;
-;;  The reference numbers may then be used to refer to things outside of
-;;  Org (e.g. by writing them on a piece of paper or by using them as part
-;;  of a directory name). Within Org you may then refer to these things by
-;;  their reference number (e.g. "R153"). Later, these numbers can be
-;;  looked up easily.
+;;  These reference numbers may then be used to refer to things outside of
+;;  or within Org. E.g. by writing them on a piece of paper or using them
+;;  as part of a directory name or the heading of an Org node. Within Org
+;;  you may then refer to these things by their reference number
+;;  (e.g. "R153"); the numbers can be looked up and searched easily.
 ;;
 ;;  The whole functionality is available through the function
 ;;  `org-refer-by-number'; the necessary setup is described in the
@@ -66,6 +66,9 @@
 ;;
 
 ;;; Change Log:
+
+;;   [2012-07-13 Fr] Version 1.4.0:
+;;   - New operation heading
 
 ;;   [2012-04-28 Sa] Version 1.3.0:
 ;;   - New operations occur and multi-occur
@@ -111,18 +114,20 @@ numbers will be stored. It may look like this:
 You may just want to copy this node into one of your org-files.
 Many things however can or should be adjusted:
 
-- The node needs not be a the top level node.
+- The node needs not be a top level node.
 
-- Its name is completely at you choice.
+- Its name is completely at you choice. The node is found
+  through its ID.
 
 - Column names can be changed.
 
 - You can add further columns or even remove the
-  \"Comment\"-column.
+  \"Comment\"-column. The columns \"Number\" and \"Date\" however
+  are required.
 
 - Your references need not start at \"R1\"; and of course you can
   adjust date and comment.  However, having an initial row is
-  required (as a template for subsequent references).
+  required (it servers a template for subsequent references).
 
 - Your reference need not have the form \"R1\"; you may just as
   well choose any text, that contains a single number,
@@ -130,9 +135,11 @@ Many things however can or should be adjusted:
   `org-refer-by-number' will inspect your first reference and
   create all subsequent references in the same way.
     
-- You may want to change the ID-Property of the node above (in
-  which case you should change it within your .emacs
-  too). However, this is not required to make things work.
+- You may want to change the ID-Property of the node above and
+  create a new one, which is unique (and not just a copy of
+  mine). You need to change it in the lines copied to your .emacs
+  too. However, this is not strictly required to make things
+  work, so you may do this later, after trying out this package.
 
 
 Having created the node with your reference table, you only need
@@ -193,7 +200,7 @@ of the containing node; this id must be stored within
 
 
 The function `org-refer-by-number' is the only interactive
-function of this package and its sole entry point; it offers six
+function of this package and its sole entry point; it offers seven
 different operations (short names in parens):
 
 - Add a new row with a new reference number and the
@@ -209,6 +216,9 @@ different operations (short names in parens):
 - Find all occurences of a particular reference number within all
   of your org-files (\"multi-occur\").
 
+- Go to the first heading, that contains a given reference
+  number (\"heading\").
+
 - Enter the reference table and position the cursor at the
   top (\"enter\").
 
@@ -221,9 +231,9 @@ is to supply a negative or a a double prefix argument:
 
 `C-- \\[org-refer-by-number]' or `\\[universal-argument] \\[universal-argument] \\[org-refer-by-number]'
 
-You will then be prompted to type a single letter (\"a\", \"s\", \"o\",
-\"m\", \"e\" or \"l\") to invoke the respective operation from the list
-above.
+You will then be prompted to type a single letter (\"a\", \"s\",
+\"o\", \"m\", \"h\", \"e\" or \"l\") to invoke the respective
+operation from the list above.
 
 
 Some of the operations above can be invoked with less keystrokes. In that
@@ -235,10 +245,10 @@ case the precise operation invoked depends on two things:
   within
 
 
-The following cases explain, which of the six
+The following cases explain, which of the seven
 operations (\"add\", \"search\", \"occur\", \"multi-occur\",
-\"enter\" and \"leave\") is actually invoked dependng on the
-conditions above:
+\"heading\", \"enter\" and \"leave\") is actually invoked
+dependng on the conditions above:
 
 
   If no prefix argument is given (`\\[org-refer-by-number]') and
@@ -281,6 +291,7 @@ and complete the necessary setup decribed there.
         below-cursor       ; word below cursor
         active-region      ; active region (if any)
         search             ; final string to search for
+        guarded-search     ; with guard against additional digits
         what               ; What are we supposed to do ? Will be stored in
                            ; org-refer-by-number-last-action
         what-adjusted      ; True, if we had to adjust what
@@ -325,13 +336,18 @@ and complete the necessary setup decribed there.
           ((numberp arg)
            (setq what (if within-node 'multi-occur 'search)))
           (t ; C-- or C-u C-u
-           (let ((key (read-char-exclusive 
-                      "Please choose: e=enter l=leave s=search a=add o=occur m=multi-occur")))
-             (setq what (case key
-                          (?l 'leave) (?e 'enter) (?a 'add) 
-                          (?s 'search) (?o 'occur) (?m 'multi-occur)
-                           (otherwise (error "Invalid key '%c'" key)))))
-           (setq what-explicit t)))
+           (let (key)
+             (while 
+                 (progn 
+                   (setq key (read-char-exclusive 
+                              "Please choose: e=enter l=leave s=search a=add o=occur m=multi-occur h=heading"))
+                   (not 
+                    (setq what (case key
+                                 (?l 'leave) (?e 'enter) (?a 'add) 
+                                 (?s 'search) (?o 'occur) (?m 'multi-occur) (?h 'heading)))))
+               (message "Invalid key '%c'" key)
+               (sleep-for 1))
+           (setq what-explicit t))))
 
     ;; Get decoration and number of last row from reference table
     (let ((m (org-id-find org-refer-by-number-id 'marker)))
@@ -352,7 +368,7 @@ and complete the necessary setup decribed there.
     
 
     ;; These actions need a search string:
-    (when (memq what '(search occur multi-occur))
+    (when (memq what '(search occur multi-occur heading))
 
       ;; Search string can come from several sources:
       ;; From explicit numerical prefix
@@ -372,7 +388,7 @@ and complete the necessary setup decribed there.
       ;; Depending on requested action, get search from one of the sources above
       (cond ((eq what 'search)
              (setq search (or search-from-prefix search-from-cursor)))
-            ((eq what 'multi-occur)
+            ((or (eq what 'multi-occur) (eq what 'heading))
              (setq search (or search-from-table search-from-cursor)))
             ((eq what 'occur)
              (setq search active-region)))
@@ -381,7 +397,7 @@ and complete the necessary setup decribed there.
       ;; If we still do not have a search string, ask user explicitly
       (unless search
         (setq search (read-from-minibuffer
-                      (cond ((memq what '(search multi-occur))
+                      (cond ((memq what '(search multi-occur heading))
                              "Reference number to search for: ")
                             ((eq what 'occur)
                              "Text to search for: "))))
@@ -392,10 +408,17 @@ and complete the necessary setup decribed there.
       ;; Clean up search string
       (if (string= search "") (setq search nil))
       (if search (setq search (org-trim search)))
+
+      (setq guarded-search 
+            (concat (regexp-quote search)
+                    ;; if there is no tail in reference number, we
+                    ;; have to guard agains trailing digits
+                    (if (string= tail "") "\\($\\|[^0-9]\\)" "")))
+
     
       ;; Correct requested action, if nothing to search
       (when (and (not search)
-               (memq what '(search occur multi-occur)))
+               (memq what '(search occur multi-occur heading)))
           (setq what 'enter)
           (setq what-adjusted t))
            
@@ -403,8 +426,8 @@ and complete the necessary setup decribed there.
       (if (string-match (concat (regexp-quote head) "[0-9]+" (regexp-quote tail) )
                         search)
           (if (eq what 'occur) 
-              (error "Can do 'occur' only for text, try 'search' or 'multi-occur' for a number"))
-        (if (memq what '(search multi-occur))
+              (error "Can do 'occur' only for text, try 'search', 'multi-occur' or 'heading' for a number"))
+        (if (memq what '(search multi-occur heading))
             (error "Can do '%s' only for a number, try 'occur' to search for text" what))))
     
     ;; Move into table, if outside ...
@@ -426,7 +449,8 @@ and complete the necessary setup decribed there.
         (move-marker m nil)
         (show-subtree)
         (org-show-context)))
-      
+
+
     ;; Actually do, what is requested
     (cond
      ((eq what 'multi-occur) 
@@ -453,18 +477,35 @@ and complete the necessary setup decribed there.
               (setq org-buffers (cons buff org-buffers))))
        
         ;; Do multi-occur
-        (multi-occur org-buffers 
-                     (concat (regexp-quote search)
-                             ; if there is no tail in reference number, we
-                             ; have to guard agains trailing digits
-                             (if (string= tail "") "\\($\\|[^0-9]\\)" ""))) 
+        (multi-occur org-buffers guarded-search)
         (if (get-buffer "*Occur*")
             (progn 
               (setq message-text (format "multi-occur for '%s'" search))
               (setq org-refer-by-number-occur-buffer (get-buffer "*Occur*")))
           (setq message-text (format "Did not find '%s'" search)))))
 
-     
+
+     ((eq what 'heading)
+      (message (format "Scanning headlines for '%s' ..." search))
+      (let (buffer point)
+        (if (catch 'found
+              (progn
+                (org-map-entries 
+                 (lambda () 
+                   (when (looking-at (concat ".*\\b" guarded-search))
+                     (setq buffer (current-buffer))
+                     (setq point (point))
+                     (throw 'found t)))          
+                 nil 'agenda)
+                nil))
+            (progn
+              (setq message-text (format "Found '%s'" search))
+              (org-pop-to-buffer-same-window buffer)
+              (goto-char point)
+              (org-reveal))
+          (setq message-text (format "Did not find '%s'" search)))))
+
+
      ((eq what 'leave)
 
       (when result-is-visible
