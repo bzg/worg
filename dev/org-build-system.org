@@ -44,10 +44,13 @@ implicitly read by GNU make.
 
 ** Defaults =default.mk=
 
+*Never change anything in =default.mk=, always do your changes in
+=local.mk=!*
+
 The defaults will work on a typical GNU/Linux system.  For system-wide
 installation as assumed by the build system the user must be able to
 obtain administrative privileges via sudo.  Besides Emacs, the
-following programs must be avilable in PATH:
+following programs must be available in PATH:
 
 - find
 - install
@@ -64,75 +67,23 @@ tolerated:
 
 ** Local Customization =local.mk=
 
+*Never push =local.mk= to any public branch!*
+
 The build system is an integral part of Org.  To allow easy local
 customization, that customization must never become part of the
 official Git repository.  On the other hand the build system must work
 even when no local customization has been applied.  Therefore when the
 file =local.mk= does not exist, a local customization template will be
-created that copies the settings from default.mk.
+created that copies some settings that most commonly would need to be
+changed from default.mk.  The template includes some comments that are
+hopefully self-documenting.  As long as all necessary programs are
+available, the customization should in most cases be limited to
+setting $prefix correctly.
 
-The template includes some comments that are hopefully
-self-documenting.  As long as all necessary programs are available,
-the customization should in most cases be limited to setting $prefix
-correctly.
-
-*** Example 1 — non-standard Emacs location
-
-Customization for using a self-compiled Emacs 24 installed in
-=/usr/local=.  Additional customization to enable htmlize installed
-from ELPA in users' home directory and ESS (for R) in the system
-=/usr/share/emacs/site-lisp/= and all Babel languages for testing.
-
-#+BEGIN_SRC Makefile
-EMACS   = /usr/local/bin/emacs-24.1
-prefix  = /usr/local/share
-lispdir = $(prefix)/emacs/site-lisp/org
-datadir = $(prefix)/emacs/etc/org
-infodir = $(prefix)/info
-
-BTEST_EXTRA = ess-site 
-BTEST_OB_LANGUAGES = awk C fortran maxima lilypond octave python sh R
-BTEST_POST = -L ~/.emacs.d/elpa/htmlize-1.39 \
-	     -L /usr/share/emacs/site-lisp/emacs-ess-12.04.4
-#+END_SRC
-
-*** Example 2 — XEmacs
-
-Customization for using XEmacs 21.5, since there seems to be no ERT
-for XEmacs testing will not work and has been disabled.
-
-#+BEGIN_SRC Makefile
-EMACS   = xemacs
-prefix  = /usr/local/share
-lispdir = $(prefix)/xemacs/site-lisp/org
-datadir = $(prefix)/xemacs/etc/org
-infodir = $(prefix)/info
-
-BTEST = /bin/true
-BATCH = $(EMACS) -batch -q -vanilla # XEmacs
-# How to byte-compile the whole source directory
-ELCDIR	= $(BATCH) \
-		--eval '(add-to-list '"'"'load-path ".")' \
-		--eval '(byte-recompile-directory "." 0)'
-#+END_SRC
-
-*** Example 3 — Emacs on Windows
-
-Customization for using vanilla Emacs 24 on Windows, with GNU make and
-other binaries provided by Cygwin.  Make sure the installation paths
-contain no spaces!  Babel languages have been stripped down.
-
-#+BEGIN_SRC Makefile
-CYGWIN += nodosfilewarning
-prefix  = SHELL=sh C:/Freeware/Emacs-24.1
-EMACS   = $(prefix)/bin/emacs
-lispdir = $(prefix)/site-lisp/org
-datadir = $(prefix)/etc/org
-infodir = $(prefix)/info
-
-BTEST_OB_LANGUAGES = octave
-SUDO =
-#+END_SRC
+If you need to do more extensive changes, copy the relevant parts from
+=default.mk= to =local.mk= (or maybe even the whole file if that seems
+easier to you).  Please look at some of the [[Customization][Customization Examples]] to
+get an idea of what is possible.
 
 ** Make Targets =targets.mk=
 
@@ -163,6 +114,101 @@ A few of these functions have been designed to be from the command line
 or even from within Emacs itself.  This is an aid for manually building
 a working Org installation when the external dependencies of the build
 system cannot be met.  See [[Support%20for%20Manual%20Build][Support for Manual Build]].
+
+* Customization
+
+Changing the behaviour of the build system to conform to your local
+system rules is done by editing the file =local.mk=.  The standard
+template that is created when this file does not exist offers only the
+most common customization variables, but you are free to customize
+anything that =default.mk= offers (but you really have to know what
+you are doing for some of this).  Remember to only change =local.mk=,
+please.
+
+** Simple Customization
+
+*** Non-standard Emacs location
+
+Customization for using a self-compiled Emacs 24 installed in
+=/usr/local=.  Additional customization to enable htmlize installed
+from ELPA in users' home directory and ESS (for R) in the system
+=/usr/share/emacs/site-lisp/= and all Babel languages for testing.
+
+#+BEGIN_SRC Makefile
+EMACS   = /usr/local/bin/emacs-24.1
+prefix  = /usr/local/share
+lispdir = $(prefix)/emacs/site-lisp/org
+datadir = $(prefix)/emacs/etc/org
+infodir = $(prefix)/info
+
+BTEST_EXTRA = ess-site 
+BTEST_OB_LANGUAGES = awk C fortran maxima lilypond octave python sh R
+BTEST_POST = -L ~/.emacs.d/elpa/htmlize-1.39 \
+	     -L /usr/share/emacs/site-lisp/emacs-ess-12.04.4
+#+END_SRC
+
+*** XEmacs
+
+Customization for using XEmacs 21.5, since there seems to be no ERT
+for XEmacs testing will not work and has been disabled.
+
+#+BEGIN_SRC Makefile
+EMACS   = xemacs
+prefix  = /usr/local/share
+lispdir = $(prefix)/xemacs/site-lisp/org
+datadir = $(prefix)/xemacs/etc/org
+infodir = $(prefix)/info
+
+BTEST = /bin/true
+BATCH = $(EMACS) -batch -q -vanilla # XEmacs
+# How to byte-compile the whole source directory
+ELCDIR	= $(BATCH) \
+		--eval '(add-to-list '"'"'load-path ".")' \
+		--eval '(byte-recompile-directory "." 0)'
+#+END_SRC
+
+*** Emacs on Windows
+
+Customization for using vanilla Emacs 24 on Windows, with GNU make and
+other binaries provided by Cygwin.  Make sure the installation paths
+contain no spaces!  Babel languages have been stripped down.
+
+#+BEGIN_SRC Makefile
+CYGWIN += nodosfilewarning
+prefix  = SHELL=sh C:/Freeware/Emacs-24.1
+EMACS   = $(prefix)/bin/emacs
+lispdir = $(prefix)/site-lisp/org
+datadir = $(prefix)/etc/org
+infodir = $(prefix)/info
+
+BTEST_OB_LANGUAGES = octave
+SUDO =
+#+END_SRC
+
+** Advanced Customization
+
+*** Multiple Emacsen
+
+If you're a developer (or a system administrator that serves a diverse
+set of users) you'll likely have to deal with the need to build and
+test Org for different versions of Emacs.  Having to copy or link the
+correct customization file to =local.mk= quickly loses the appeal and
+is error prone.  Here's a (hopefully better) suggestion: put each
+customization into a file named =local-<pattern>.mk= and create a
+=local.mk= that looks like this:
+
+#+BEGIN_SRC Makefile
+ifdef LOCALMK
+  include local-$(LOCALMK).mk
+else
+  include local-emac24.mk
+endif
+#+END_SRC
+
+Now switching between your different customizations is as easy as
+: make LOCALMK=emacs23
+(which assumes that there is a customization file =local-emacs23.mk=
+available).
 
 * Support for Installers
 
