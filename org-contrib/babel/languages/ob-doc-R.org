@@ -92,6 +92,28 @@ will contain many entries.  The example below omits other languages.
    '((R . t)))
 #+end_src
 
+** Note for Windows Users
+Additional steps may be necessary on Windows. See [[http://www.mail-archive.com/emacs-orgmode@gnu.org/msg57159.html][this Org-mode mailing list
+thread]] for background information. If when trying to execute R source code from
+Org-mode one encouters the message "=The system cannot find the path specified=", it
+may be necessary to set the variable =org-babel-R-command= in
+.emacs. Note the addition of =--slave --no-save= to the custom path, which are
+the R defaults for Babel.
+
+#+begin_src emacs-lisp
+(setq org-babel-R-command "C:/Progra~1/R/R-2.15.0/bin/R --slave --no-save")
+#+end_src
+
+Adjust the path appropriately based on your R installation.
+
+For 64bit Windows users, the R installation process may have installed
+both 32bit and 64bit binaries. The above path points to the 32bit paths; for
+64bit operating systems the analog is:
+
+#+begin_src emacs-lisp
+(setq org-babel-R-command "C:/Progra~1/R/R-2.15.0/bin/x64/R --slave --no-save")
+#+end_src
+
 * Org Mode Features for R Source Code Blocks
 ** Header Arguments
 
