@@ -23,12 +23,12 @@ by the exporter.
 
 * Defining a Back-End
 
-  A back-end is defined through one mandatory variable: his
-  translation table.  Its name is always ~org-BACKEND-translate-alist~
-  where ~BACKEND~ stands for the name chosen for the back-end.  Its
-  value is an alist whose keys are elements and objects types and
-  values translator functions.
+  A back-end is defined with ~org-export-define-backend~ macro.  It
+  requires two mandatory arguments: the back-end name and its
+  translation table, an alist that associates element and object types
+  to translator functions.  According to the macro doc-string:
 
+  #+BEGIN_QUOTE
   These functions should return a string without any trailing space,
   or nil.  They must accept three arguments: the object or element
   itself, its contents or nil when it isn't recursive and the property
@@ -57,23 +57,55 @@ by the exporter.
   recognized as an element or an object.  It must accept two
   arguments: the text string and the information channel.  It is an
   appropriate place to protect special chars relative to the back-end.
+  #+END_QUOTE
 
-  Optionally, a back-end can support specific buffer keywords and
-  ~OPTION~ keyword's items by setting ~org-BACKEND-filters-alist~
-  variable.  Refer to ~org-export-options-alist~ documentation for
-  more information about its value.
+  Optionally, the macro can set-up back-end specific properties (like
+  values from specific buffer keywords) accessible from every
+  translator function with the ~:options-alist~ keyword.  See
+  ~org-export-options-alist~ for details on the structure of the
+  value.
 
-  For example, =e-latex= back-end introduces three new buffer
-  keywords, and redefine ~DATE~ default value with the following
-  snippet:
+  As an example, the following excerpt from =e-latex= back-end
+  definition introduces three new buffer keywords (and their
+  headline's property counterpart:), and redefine ~DATE~ default
+  value:
 
   #+BEGIN_SRC emacs-lisp
-    (defconst org-e-latex-options-alist
-    '((:date "DATE" nil org-e-latex-date-format t)
-      (:latex-class "LATEX_CLASS" nil org-e-latex-default-class t)
-      (:latex-class-options "LATEX_CLASS_OPTIONS" nil nil t)
-      (:latex-header-extra "LATEX_HEADER" nil nil newline)))
+  (org-export-define-backend e-latex
+    ...
+    :options-alist ((:date "DATE" nil org-e-latex-date-format t)
+                    (:latex-class "LATEX_CLASS" nil org-e-latex-default-class t)
+                    (:latex-class-options "LATEX_CLASS_OPTIONS" nil nil t)
+                    (:latex-header-extra "LATEX_HEADER" nil nil newline)))
   #+END_SRC
+
+  It is also possible, with ~:export-block~ keyword, to associate
+  given block names to the ~export-block~ type.  Such blocks can
+  contain raw code that will be directly inserted in the output, as
+  long as the corresponding translator function says so.
+
+  In the following example, in the ~e-html~ back-end, =HTML= blocks
+  are export blocks.  The associated translator function inserts their
+  contents as-is, and ignores any other export block.
+
+  #+BEGIN_SRC emacs-lisp
+  (org-export-define-backend e-html
+    (...
+     (export-block . org-e-html-export-block)
+     ... )
+    :export-block "HTML")
+
+  (defun org-e-html-export-block (export-block contents info)
+    "Transcode a EXPORT-BLOCK element from Org to HTML.
+  CONTENTS is nil.  INFO is a plist used as a communication
+  channel."
+    (when (string= (org-element-property :type export-block) "HTML")
+      (org-element-property :value export-block)))
+  #+END_SRC
+
+  Eventually ~org-export-define-backend~ allows to define back-ends
+  specific filters.  Refer to [[#filter-system][The Filter System]] section for more
+  information.
 
   If the new back-end shares most properties with another one,
   ~org-export-define-derived-backend~ macro can be used to simplify
@@ -83,8 +115,8 @@ by the exporter.
 
   #+BEGIN_SRC emacs-lisp
   (org-export-define-derived-backend my-latex e-latex
-  :translate-alist ((headline . custom-headline-translator)
-                    (template . custom-template)))
+    :translate-alist ((headline . custom-headline-translator)
+                      (template . custom-template)))
   #+END_SRC
 
 * Elements Attributes
@@ -997,10 +1029,11 @@ by the exporter.
   a parse tree as a special case), a symbol representing the current
   back-end, and the communication channel, as a plist.
 
-  From the developer side, filters sets can be installed in the
-  process with the help of ~org-BACKEND-filters-alist~ variable.  Each
-  association has a key among the following symbols and a function or
-  a list of functions as value:
+  From the developer side, filters sets can be installed using
+  ~:filters-alist~ keyword while defining the back-end with
+  ~org-export-define-derived-backend~.  Each association has a key
+  among the following symbols and a function or a list of functions as
+  value:
 
   - ~:filter-babel-call~
   - ~:filter-bold~
@@ -1059,24 +1092,19 @@ by the exporter.
 
 
   For example, =e-ascii= back-end implements a filter that makes sure
-  sections end with two blank lines:
+  headlines end with two blank lines:
 
   #+BEGIN_SRC emacs-lisp
+  (org-export-define-backend e-ascii
+    ...
+    :filters-alist ((:filter-headline . org-e-ascii-filter-headline-blank-lines)
+                    (:filter-section . org-e-ascii-filter-headline-blank-lines)))
+
   (defun org-e-ascii-filter-section-blank-lines (headline back-end info)
     "Filter controlling number of blank lines after a section."
     (if (not (eq back-end 'e-ascii)) headline
       (let ((blanks (make-string 2 ?\n)))
         (replace-regexp-in-string "\n\\(?:\n[ \t]*\\)*\\'" blanks headline))))
-  #+END_SRC
-
-  The filter is then installed with the following:
-
-  #+BEGIN_SRC emacs-lisp
-  (defconst org-e-ascii-filters-alist
-    '((:filter-headline . org-e-ascii-filter-section-blank-lines)
-      (:filter-section . org-e-ascii-filter-section-blank-lines))
-    "Alist between filters keywords and back-end specific filters.
-  See `org-export-filters-alist' for more information.")
   #+END_SRC
 
 * The Toolbox
