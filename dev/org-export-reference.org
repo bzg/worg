@@ -714,6 +714,13 @@ by the exporter.
    - category :: option
    - type :: list of strings
 
+** ~:exported-data~
+
+   Hash table used to memoize results from [[#data][~org-export-data~]].
+
+   - category :: tree
+   - type :: hash table
+
 ** ~:footnote-definition-alist~
 
    /Alist/ between footnote labels and their definition, as parsed
@@ -1205,6 +1212,23 @@ by the exporter.
 
    See also: [[#collect-headlines][~org-export-collect-headlines~]],
    [[#collect-figures][~org-export-collect-figures~]], [[#collect-listings][~org-export-collect-listings~]].
+
+** ~org-export-data~
+   :PROPERTIES:
+   :CUSTOM_ID: data
+   :END:
+
+   Transcode a given element, object, secondary string or string using
+   current back-end.
+
+   It is used primarily to transcode secondary strings, like ~:title~.
+   For example =e-beamer= back-end uses the following:
+
+   #+BEGIN_SRC emacs-lisp
+   (defun org-e-beamer-template (contents info)
+     (let ((title (org-export-data (plist-get info :title) info)))
+       ...))
+   #+END_SRC
 
 ** ~org-export-expand-macro~
 
