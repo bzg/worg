@@ -126,15 +126,26 @@ you are doing for some of this).  Remember to only change =local.mk=,
 please.
 
 ** Simple Customization
+*** Default target
+
+The /default target/ is what =make= tries to build when you don't give
+it anything else to do.  For compatibility with the old build system,
+a freshly created =local.mk= will have =oldorg= defined as the default
+target.  If you remove that line entirely from =local.mk=, =all= will
+become the default target.  But you can put any other target there
+that you want to become the default target or even define a new one
+(OK, that isn't simple customization anymore).
 
 *** Non-standard Emacs location
 
 Customization for using a self-compiled Emacs 24 installed in
-=/usr/local=.  Additional customization to enable htmlize installed
-from ELPA in users' home directory and ESS (for R) in the system
-=/usr/share/emacs/site-lisp/= and all Babel languages for testing.
+=/usr/local= and the default target changed to =up2=.  Additional
+customization to enable htmlize installed from ELPA in users' home
+directory and ESS (for R) in the system =/usr/share/emacs/site-lisp/=
+and all Babel languages for testing.
 
 #+BEGIN_SRC Makefile
+up2::	# default target
 EMACS   = /usr/local/bin/emacs-24.1
 prefix  = /usr/local/share
 lispdir = $(prefix)/emacs/site-lisp/org
@@ -150,9 +161,13 @@ BTEST_POST = -L ~/.emacs.d/elpa/htmlize-1.39 \
 *** XEmacs
 
 Customization for using XEmacs 21.5, since there seems to be no ERT
-for XEmacs testing will not work and has been disabled.
+for XEmacs testing will not work and has been disabled.  The default
+target is set to =up0 doc uncompiled= (pull from Git and update
+documentation and autoload files).
 
 #+BEGIN_SRC Makefile
+.PHONY:	xemacs
+xemacs:	up0 doc uncompiled
 EMACS   = xemacs
 prefix  = /usr/local/share
 lispdir = $(prefix)/xemacs/site-lisp/org
@@ -173,9 +188,11 @@ Customization for using vanilla Emacs 24 on Windows, with GNU make and
 other binaries provided by Cygwin.  Make sure the installation path(s)
 contain no spaces!  Use the 8.3 compatible names, e.g. =PROGRA~1=
 instead of "Program Files", if you already installed the applications
-in such a location. Babel languages have been stripped down.
+in such a location. Babel languages have been stripped down for
+testing and the default target is again set to =up2=.
 
 #+BEGIN_SRC Makefile
+up2::
 CYGWIN += nodosfilewarning
 prefix  = C:/Freeware/Emacs-24.1
 EMACS   = SHELL=sh $(prefix)/bin/emacs
@@ -188,7 +205,6 @@ SUDO =
 #+END_SRC
 
 ** Advanced Customization
-
 *** Multiple Emacsen
 
 If you're a developer (or a system administrator that serves a diverse
