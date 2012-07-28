@@ -1,0 +1,119 @@
+** Man Pages and PDF export
+Org mode provides the ability to export files marked with the Groff
+Man Pages (-man) set. With additional processing it can turn
+these files into PDF files that can be used for general
+distribution. 
+
+Groff is used for the generation of =man= pages. But writing those pages 
+may be an intimidating task. With this export mode, Org mode structured 
+editing and facilities are available to facilitate the creation of these
+pages. 
+*** To use this feature
+Include =(require 'org-e-man)= in your =.emacs= file, after the
+invocation for =(org-install)=.  This feature only works with the new
+=org-export= facility. 
+*** Header and sectioning structure
+There is only one type of document available to create man pages,
+therefore there are no classes. However the following customizations are available:
+- The =#+TITLE:= line is used to set the name of the command in the Man page's 
+title line.  
+- The =#+MAN_CLASS_OPTIONS:= line contains one available option:
+   - :section-id :: Defines the section id to be placed in the Man Page. 
+                    Defaults to "1". /(string)/
+*** Man export commands
+  - M-x org-e-man-export-to-man :: Converts buffer to a man page
+       the assumptions that it was Org mode syntax. For an Org file like
+       =myfile.org= the Groff file will be =myfile.man=. The file will
+       be overwritten without warning. 
+  - M-x org-e-man-export-to-pdf :: Converts buffer to a PDF file under
+       the assumptions that it was Org mode syntax. It uses Groff as its
+       typesetter engine. 
+
+*** Tables in Man export
+Groff uses the =tbl= preprocessor for table exports but the Groff export
+process also supports the specification of labels, captions and table 
+options with the use of the =#+ATTR_MAN:= line. The following options
+are available to modify table behavior. 
+
+- :divider :: Places vertical bars between the different
+              columns. /(boolean)/
+- :placement :: Defines where the table will be placed in the
+                line. There are two possible values: center or
+                left. /(symbol)/
+- :boxtype :: Defines the box type. /(symbol)/ The following values are supported: 
+   - box :: Creates a border only. Default
+   - doublebox :: Creates a border with two lines.
+   - allbox :: Creates a table in which all cells are divided. 
+   - none :: No borders. 
+- :title-line :: Forces the first row to be centered bold. /(boolean)/
+- :diable-caption :: Captions are placed by default. This will disable
+     its creation. /(boolean)/
+- :expand :: Expands the table across the width of the page. 
+
+The Groff export will honor columns definitions placed on top of a given
+table in Org mode and propagates those definitions as =tbl= commands. 
+
+Man pages do support the use of tables, however the definition in
+/man.conf/ needs to invoke =tbl= when the =man= command is
+executed. This is to ensure that tables are rendered correctly
+*** Source highlight in Man export
+Man export supports source highlight. See /Source highlight in Groff
+export/ for details on how to configure this feature in your
+system.  
+
+One important difference is the name of the variable used to enable
+its use, the name is =org-e-man-source-highlight=. Albeit its name
+is analogous for the one used in the Groff export, the name
+indicates its used to be specific for Man pages.
+*** Embedded Groff commands for Man exports. 
+Groff commands can be exported literally by surrounding the text on a
+pair of =#+BEGIN_MAN/#+END_MAN= lines.  These are a couple of 
+commands that can be useful during export to control the output. 
+
+#+begin_src dummy
+#+BEGIN_MAN
+.bp
+#+END_MAN
+#+end_src
+
+Page break. Skips to a new page. 
+
+#+begin_src dummy
+#+BEGIN_MAN
+.DS C
+.EQ
+
+
+.EN
+.DE
+.EC
+#+END_MAN
+#+end_src
+
+EQN escape. This is used to add equations in your exported document. The
+Groff export uses the =eqn= processor to add them in your output. EQN
+statements must be placed between .EQ and .EN.
+
+#+begin_src dummy
+#+BEGIN_MAN
+.EX
+
+.EE
+#+END_MAN
+#+end_src
+
+Example start and end. Text must be placed between .EX and
+.EE. Using =#+BEGIN_EXAMPLE/#+END_EXAMPLE= or =#+begin_src dummy/#+end_src= 
+does the same with commands that are compatible on all platforms.
+*** Man export limitations
+The following items are partially or not supported during Man pages
+exports. 
+  - Images :: Images are not supported.
+  - .EX/.EQ :: These are not used on export. They are implemented using
+               .nf/.fi pairs for compatibility with legacy systems. Use
+               embedded Man Pages commands to use these. 
+  - .UR/UE and .MT/ME :: These are not used on export to ensure 
+                         support with legacy systems. Use embedded Man Pages
+                         commands to use these. 
+  - .SY/OP/YS :: These are not used on export. Use embedded Man
+                 pages commands to use these. 
