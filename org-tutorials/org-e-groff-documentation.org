@@ -103,7 +103,11 @@ list. The element of the list are:
    - :last-section :: Defines what is the last item to print. Options
                       are "toc" for table of content and "sign" for
                       signature. 
-                   
+   - :paragraph :: Defines the command to invoke each of the paragraph
+                   commands. Options are 'default or a pointer to a
+                   function that will return a format string containing
+                   the paragraph formatting commands before writing the
+                   paragraph.                    
 
 [2] All memorandum types are defined by default. This command is useful
 for new types of covers or when a custom file is being invoked. 
@@ -172,7 +176,8 @@ are available to modify table behavior.
 - :diable-caption :: Captions are placed by default. This will disable
      its creation. /(boolean)/
 - :expand :: Expands the table across the width of the page. 
-
+- :long-cells :: Encloses all cells in T{ }T to allow the use of multi
+                 line cells. /(boolean)/
 The Groff export will honor columns definitions placed on top of a given
 table in Org mode and propagates those definitions as =tbl= commands. 
 
@@ -208,6 +213,34 @@ The following options are available:
             example :width 1.0i or :width 2.0c  /(symbol)/
 - :heigth :: Defines the hight of the image in Groff units. For
              example :heigth 1.0i or :height 2.0c.  /(symbol)/
+*** Footnotes and References
+The Groff export uses the same footnote mechanism to identify footnotes
+and bibliographic references. Adding a =\[1\]= or a =\[fn:123\]= marker with its
+appropriate reference will create a footnote at the end of the page.
+However adding a reference with a /"rl"/ tag, creates a Reference to the
+end of the page. 
+
+For example:
+#+BEGIN_EXAMPLE
+This is a refered text\[fn:rl1\]. 
+\[fn:rl1\] Author, Title (c) 2010. 
+#+END_EXAMPLE
+
+Will place "Author, Title (c) 2010" in the reference list in the Table
+of Contents.
+
+Footnotes markers with the same tag will refer to the same reference in
+the list. 
+
+*** Special Characters
+Special character substitution can be enabled if there is a list
+specified in the =org-e-groff-special-char= variable. This variable
+consists of a list of cons pairs in which the first value is the item to
+substitute and the second value is the value to be substituted with. By
+default it will substitute (c) for copyright notice, (tm) for trademark
+and (rg) for registered mark. 
+
+Character substitution can be disabled by setting this variable to *nil*.
 *** Source highlight in Groff export
 There are no packages or processors for syntax highlight in
 Groff. However this feature is available for Groff export with the use
@@ -358,11 +391,6 @@ The following limitations are known at the time of release. They will be
 looked at and addressed  in subsequent releases if they are technically 
 solvable. 
 
-  - Long Tables :: Long tables are supported by =tbl=, but long table
-                   markers (T%{}%T) are not in use. This will result in
-                   a warning and a table running out of space. To solve
-                   this issue, partition the table in Org or fix the groff file
-                   to include them.  A fix is planned for a future release.
   - Images :: Image support is limited to PIC, PS and EPS. 
   - Links :: There is no support for document linking or grefer. Most
              links will be just written. The only exception are for
