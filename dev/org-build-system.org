@@ -205,6 +205,31 @@ SUDO =
 #+END_SRC
 
 ** Advanced Customization
+*** Different compilation methods
+
+The default compilation method compiles all source files within the
+same Emacs process, simply because that is the fastest method.
+Unfortunately, Emacs does not isolate each of the compilations from
+each other, so the byte compiler may not issue some errors or warnings
+(mostly about missing declarations or requires).  To enable developers
+to catch these errors, different compilation methods can be configured
+by defining =_COMPILE_= to one of these values (either permanently in
+=local.mk= or for a single invocation of =make=):
+
+- =dirall=:: The default compilation method invoked via =ELCDIR=.
+- =single=:: uses a separate Emacs for each compilation invoked via
+  =ELC=.
+- =source=:: uses a separate Emacs for each compilation invoked via
+  =ELC=.  Removes all =*.elc= files before and each =*.elc= file
+  directly after compilation.
+- =slint1=:: first compiles using =dirall=, then compiles each file
+  again using =single=.
+- =slint2=:: first compiles via =source= and then again via =slint1=.
+
+Both =ELCDIR= and =ELC= are also customizable, but changing their
+definitions must not alter the semantics of compilation.  You have
+been warned.
+
 *** Multiple Emacsen
 
 If you're a developer (or a system administrator that serves a diverse
