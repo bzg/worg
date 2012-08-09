@@ -20,22 +20,37 @@ documents.
 
 * Installation
 
-Org-sync uses Nicolas Goaziou's new parser, org-element.  It's in the
-contrib directory of org-mode.  If it's not loaded or not on your
-load-path, you can download it from the git repo and manually load it
-with =M-x load-file=.
+** Check out Org-sync
 
-Next, Org-sync.  It can be fetched from here.  Make sure to checkout
-the same revision this tutorial was written with:
+Make sure to checkout the same revision this tutorial was written with.
 
 #+begin_src sh
 git clone git://orgmode.org/org-sync.git
-git checkout 2dc5c6a250
+git checkout 8222ec31f
 #+end_src
 
-Org-sync is still a work in progress so for now you will have to load
-every .el in the repo using =M-x load-file=.  Start by =os.el= then
-=os-github.el= and =os-bb.el=.
+** Org-element
+
+Org-sync uses Nicolas Goaziou's new parser, org-element.  It's in the
+contrib directory of Org-mode which is not included in vanilla Emacs.
+
+If you don't have it you can download a recent version from the
+Org-mode repo and move it to your Org-sync directory.
+
+#+begin_src sh
+wget -O org-element.el 'http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-element.el;hb=5057ae0fc2c0d551a83d3c3e9bd621b751db9f09'
+#+end_src
+
+** Loading
+
+Add Org-sync directory to your load-path and load the backend you
+want.
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "path/to/org-sync")
+(mapc 'load
+      '("org-element" "os" "os-bb" "os-github" "os-rmine"))
+#+end_src
 
 Phew!  Still there?  Good because it's starting to get interesting...
 
