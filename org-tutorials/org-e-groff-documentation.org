@@ -73,8 +73,11 @@ The following classes are defined by default:
 | ms         | COVER ms        | Creates a document with a cover page similar to the one used by the ms macros. | cover   | toc     |
 | se_ms      | COVER se_ms     | Creates a document with a cover page similar to the one used by the se macros. | cover   | toc     |
 | dummy      | ""              | Creates a document without a cover, but defines all the cover attributes. This is used to generate documents with an Abstract section | memo    | toc     |
+| block      | "BL"            | Creates a blocked letter using the Groff letter macros | letter  | sign    |
+| semiblock  | "SB"            | Creates a semiblocked letter using the Groff letter macros | letter  | sign    |
+| fullblock  | "FB"            | Creates a full block letter using the Groff letter macros | letter  | sign    |
+| simplified | "SP"            | Creates a simplified letter using the Groff letter macros | letter  | sign    |
 | none       | ""              | Creates a document without any header. Used for customized documents or letters using the Groff's macros. | custom  | nothing |
-
 
 This variable can be used to defined your own document types in which
 different type of documents be loaded using the .COVER or .so commands. 
@@ -109,7 +112,7 @@ list. The element of the list are:
                    the paragraph formatting commands before writing the
                    paragraph.                    
 
-[2] All memorandum types are defined by default. This command is useful
+[2] All memorandum and letter types are defined by default. This command is useful
 for new types of covers or when a custom file is being invoked. 
 
 Example: 
@@ -120,8 +123,7 @@ Example:
 ;; macro. 
 
 (defun org-e-groff--colored-heading (level numberedp)
-  (concat ".HL " (number-to-string level) " \"%s\"\n%s")
-)
+  (concat ".HL " (number-to-string level) " \"%s\"\n%s"))
 
 ;; adds the class definition. 
 
@@ -129,8 +131,7 @@ Example:
        '("myclass" 
          ".so myclassfile.groff"
          (:heading org-e-groff--colored-heading :type
-          "memo" :last-section "toc"))
-)
+          "memo" :last-section "toc")))
 
 #+end_src
 
@@ -156,6 +157,182 @@ gets exported.  The following options are supported:
                 helpful when custom covers are used.  These two
                 options will be used when the .TL macro is invoked 
                 during export. /(string)/
+- :salutation :: Defines a custom salutation. Defaults to "Tho whom it
+                 may concern" /(string)/
+- :confidential :: Toggles the confidential batter. /(boolean)/
+- :subject :: Adds a subject line /(string)/
+- :references :: Addss an "In Reference Line". The value of =#+TITLE= is
+                  used to populate the reference. /(boolean)/
+- :attention :: Adds an "ATTENTION:" line. /(string)/
+*** Special Tags
+The Groff exporter now features a set of tags that handles special
+contents required for the inclusion of abstracts sections, and parts of
+a business letter. The following special tags are in use by the
+=org-e-groff.el= exporter.
+- FROM :: Defines the originator of a letter.
+- TO :: Defines the recipient of a letter.
+- ABSTRACT :: Defines the abstract part of a memo. 
+- NS :: Defines a notational sign at the letter. Notational signs items
+        like "Copy to" or "Carbon Copy" that are placed at the end of
+        the letter to indicate its disposition.
+- BODY :: Defines the body part of a letter. 
+
+Special tags have several rules to follow. These are:
+  1. It must be the first tag of a list of tags, or a single tag.
+  2. It should be placed on first level headlines only
+  3. Items will be placed in their location and not written as part of
+     the document.
+The use of these is described in detail in the following sections.
+**** Tags used for Letter types. 
+Letter types use the FROM, TO, BODY and NS tags for placing content in
+a document class of letter.  Letter types are the ones defined as:
+block, semiblock, simplified and fullblock.
+
+Illustrated below is how a typical letter looks like:
+#+BEGIN_EXAMPLE
+  * FROM :FROM:
+  Joe Smith
+  00 Street
+  City, ST, 00000
+  * TO :TO:
+  Maria Rivera
+  Urbanizacion Palma Lejos
+  Calle 22, Bloque A, Numero 10
+  Ciudad, ES, 00000
+  * BODY :BODY:
+  letter content
+  * Copy to :NS:
+  Jill Brown
+#+END_EXAMPLE
+
+- FROM :: A header with a /:FROM:/ tag contains the address of the
+          originator. It needs to be
+          written in free form but it should follow the
+          addressing standards of the originator. 
+- TO :: A header with a /:TO:/ tag contains the address of the
+        recipient. It needs to be written in free form but it should
+- BODY :: The /:BODY:/ tag indicates the start of the letter. This is needed to
+          start the content of the letter without writing the header on
+          output. 
+- NS :: /:NS: will write the title of the header as the type of
+        disposition at the end of the letter, after the signature. 
+        In the exaple, it will write "Copy to" Jill Brown at
+        the end of the letter. 
+**** Tags used for Memorandum Types letters
+Letters that are of type "memo" also use the FROM, TO, BODY and NS tags 
+for placing content in a document class of letter.  
+Memo letter types are the ones defined as: "letter" or a custom cover. 
+
+Illustrated below is how a typical letter looks like:
+#+BEGIN_EXAMPLE
+  * FROM :FROM:
+  initials
+  location
+  department
+  extension
+  room
+  additional
+  * TO :TO:
+  Maria Rivera
+  Urbanizacion Palma Lejos
+  Calle 22, Bloque A, Numero 10
+  Ciudad, ES, 00000
+  * BODY :BODY:
+  letter content
+  * Copy to :NS:
+  Jill Brown
+#+END_EXAMPLE
+
+- FROM :: A header with a /:FROM:/ tag contains the address of the
+          originator. It needs to be
+          written in the same order as the AU macro call. This order is
+          1. Initials: Author initials
+          2. Author location: Building Name
+          3. Author department code
+          4. Author extension
+          5. Author room
+          6. Additional items, like email or street address.
+- TO :: A header with a /:TO:/ tag contains the address of the
+        recipient. It needs to be written in free form but it should
+- BODY :: The /:BODY:/ tag indicates the start of the letter. This is needed to
+          start the content of the letter without writing the header on
+          output. 
+- NS :: The /:NS:/ tag will write the title of the header as the type of
+        disposition at the end of the letter, after the signature. 
+        In the exaple, it will write "Copy to" Jill Brown at
+        the end of the letter. 
+
+The placement of items depends directly on the way the cover has been
+written. Although MT 5 is the "letter" memorandum type, Groff does not
+follow the same convention as Bell Labs' troff. Therefore, the use
+of these document classes is usable only to custom type covers. 
+
+**** Tags used for Memorandum Types documents.
+Documents that are of type "memo" use the FROM and ABSTRACT
+for placing content in a document class of memo
+Letter types are the ones defined as: internal, external, file,
+engineering, programmer or a custom cover. 
+
+Illustrated below is how a typical memo looks like:
+#+BEGIN_EXAMPLE
+  * FROM :FROM:
+  initials
+  location
+  department
+  extension
+  room
+  additional
+ * TO :ABSTRACT:
+  Abstract Body
+ * First Header
+#+END_EXAMPLE
+
+- FROM :: A header with a /:FROM:/ tag contains the address of the
+          originator. It needs to be
+          written in the same order as the AU macro call. This order is
+          1. Author initials
+          2. Author location code or Building Name
+          3. Author department number
+          4. Author extension
+          5. Author room
+          6. Additional items, like email or street address.
+- ABSTRACT :: A header with an /:ABSTRACT:/ tag contains the abstract 
+              The abstract will be placed in the Abstract Location,
+              usually at the cover sheet, before the start of the document.
+
+The placement of items depends directly on the way the cover has been
+written and these follows the Bell Labs standards. This may or may not be
+applicable for your case. As an alternative you should use the external
+or letter class, which does not fully use the author information in the
+cover or create your own custom cover.
+
+However, the following alternate ordering used in headers with the FROM tag may
+be more suitable to use than the one prescribed in the manual page. This
+is because it does not follow the Bell Labs nomenclature. 
+
+This alternate ordering is:
+  1. Initials
+  2. Building Name or Location
+  3. Room
+  4. Extension
+  5. Main telephone switch number
+  6. Street
+  7. City, State, Province, Postal code
+  8. Email address
+
+This ordering places the author information in the following order:
+
+#+BEGIN_EXAMPLE
+Name
+BLDG ROOM
+Switch Phone Number xExtension
+Street
+City, State, Province, Postal Code
+Email Address
+#+END_EXAMPLE. 
+
+Out of all these values, the only one required is the initials. The
+others do not need to be written and they will not be written in the document.
 *** Tables in Groff export
 Groff uses the =tbl= preprocessor for table exports but the Groff export
 process also supports the specification of labels, captions and table 
