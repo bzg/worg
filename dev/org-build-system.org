@@ -217,14 +217,20 @@ by defining =_COMPILE_= to one of these values (either permanently in
 =local.mk= or for a single invocation of =make=):
 
 - =dirall= :: The default compilation method invoked via =ELCDIR=.
-- =single= :: uses a separate Emacs for each compilation invoked via
-  =ELC=.
-- =source= :: uses a separate Emacs for each compilation invoked via
-  =ELC=.  Removes all =*.elc= files before and each =*.elc= file
-  directly after compilation.
-- =slint1= :: first compiles using =dirall=, then compiles each file
+- =single= :: Uses a separate Emacs for each compilation invoked via
+              =ELC=.
+- =source= :: Uses a separate Emacs for each compilation invoked via
+              =ELC=.  Removes all =*.elc= files before and each
+              =*.elc= file directly after compilation so that all
+              requires are also loaded from source.  Recompiles via
+              =dirall= at the end so that all the =*.elc= files exist.
+- =slint1= :: First compiles using =dirall=, then compiles each file
   again using =single=.
-- =slint2= :: first compiles via =source= and then again via =slint1=.
+- =slint2= :: First compiles via =source= and then again via =slint1=.
+- =slint3= :: Checks all sources with =elint= in a single Emacs, then
+              compiles them via =dirall=.
+- =slint3= :: Checks all sources with =elint= in a separate Emacs for
+              each source file, then compiles them via =dirall=.
 
 Both =ELCDIR= and =ELC= are also customizable, but changing their
 definitions must not alter the semantics of compilation.  You have
