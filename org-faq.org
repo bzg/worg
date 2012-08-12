@@ -326,6 +326,9 @@ options.
  3. Install and updated org-mode automatically through the Emacs
     Package Manager as [[#installing-via-elpa][explained in this FAQ]].
 
+/Note/: Please also see [[#mixed-install][Is my Orgmode installation mixed?]] for a common
+issue with mixed installations.
+
 ** How do I keep current with bleeding edge development?
    :PROPERTIES:
    :CUSTOM_ID: keeping-current-with-Org-mode-development
@@ -1101,6 +1104,28 @@ something like this:
   :PROPERTIES:
   :CUSTOM_ID: Errors
   :END:
+** Is my Orgmode installation mixed?
+   :PROPERTIES:
+   :CUSTOM_ID: mixed-install
+   :END:
+   Emacs is distributed with a version of Orgmode bundled with it.  A
+   common problem among users who install a [[#updating-org][newer version]] of Orgmode
+   separately is a mixed install where Emacs loads some files from the
+   bundled and the rest from the latest version.  This can lead to
+   /unending/ troubles in the future.  An easy first step to
+   investigate this is to look at the output of =M-x org-version=.
+   - Good :: ~Org-mode version 7.8.11 (release_7.8.11-448-g1737d3 @
+             /home/jallad/build/org-mode/lisp/)~
+   - Bad :: ~Org-mode version 6.33x (release_7.8.11.409.ga3778)~
+
+   You should go through the output of =list-load-path-shadows=
+   line-by-line to get hints to what in your configuration is causing
+   the issue.  Among the most common reasons is Orgmode gets loaded
+   before the =load-path= variable is updated to include the
+   installation directory of the latest Orgmode.  To avoid issues like
+   this, it is recommended that the load path is updated very early on
+   in your init file.
+
 ** Opening Org files in Emacs leads to a crash
    :PROPERTIES:
    :CUSTOM_ID: Emacs-crashes-with-org-indent-mode
