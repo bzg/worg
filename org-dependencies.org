@@ -204,7 +204,7 @@ OK, let's assume you fixed your version of texi2dvi. How do you use
 it? Just set
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-latex-to-pdf-process "texi2dvi --pdf %f")
+  (setq org-latex-to-pdf-process '("texi2dvi --pdf %f" ))
 #+END_SRC
 
 Wait a minute: where do I put the --shell-escape option? That's the
@@ -246,6 +246,23 @@ the error is clear:
 
   =! Package minted Error: You must invoke LaTeX with the -shell-escape flag.=
 
+Achim Gratz suggested a different, less intrusive method on the mailing list:
+#+BEGIN_QUOTE
+> 2) put this in ~/.profile:
+>    PDFLATEX="pdflatex --shell-escape"
+>    export PDFLATEX
+
+You might not want to do this either.  The canonical way to set the
+environment for a single command is to define it right there with the
+invocation of the command.
+
+ (setq org-latex-to-pdf-process '("PDFLATEX=\"pdflatex --shell-escape\" texi2dvi -p %f"))
+
+Or if your system still had the locale bug even
+
+ (setq org-latex-to-pdf-process '("LC_ALL=C PDFLATEX=\"pdflatex --shell-escape\" texi2dvi -p %f"))
+
+#+END_QUOTE
 
 *** STARTED Symbols
 
