@@ -3,6 +3,7 @@
 #+LANGUAGE:  en
 #+TITLE:     Org-mode Frequently Asked Questions
 #+OPTIONS:   toc:t H:2
+#+SETUPFILE: macros.setupfile
 
 [[file:index.org][{Back to Worg's index}]]
 
@@ -4250,48 +4251,83 @@ remote and safe place.
 
 #+index: MobileOrg
 
-** Which versions of MobileOrg do exist?
+** Which versions of MobileOrg are available?
    :PROPERTIES:
    :CUSTOM_ID: mobileorg_versions
    :END:
 
 MobileOrg is available for Apple's iOS, and for Google's Android.
-Both Apps use the same synchronization paradigm with a computer-based
-installation.
 
 - MobileOrg for the *iPhone/iPod Touch/iPad* series of devices, by
   Richard Moreland.  Check out [[http://mobileorg.ncogni.to/][Richard's page]].
 - MobileOrg for *Android*, by Matt Jones.  See [[http://wiki.github.com/matburt/mobileorg-android/][his project page]].
 
-** What can I do if I don't want to use Dropbox.com?
+** Can I use the same files on my mobile device as on my computer?
+
+Absolutely!  Both apps currently offer the same options for
+synchronization of =.org= files with a computer-based installation of
+Org-mode:
+
+- via [[http://www.dropbox.com/][Dropbox.com]] (easier to set up, free accounts available)
+- via a [[http://en.wikipedia.org/wiki/WebDAV][WebDAV]] server of your choice (potentially more data privacy)
+
+** How does synchronization via WebDAV work?
    :PROPERTIES:
    :CUSTOM_ID: mobileorg_webdav
    :END:
 
-Dropbox.com is the easiest way to connect between Emacs and MobileOrg,
-you can get a free account there.  If for some reason you cannot or do
-not want to use this path, you can use any webdav server.  On this
-webdav server you need to create a dedicated directory for the
-communication between Emacs and MobileOrg.  If you can mount that
-directory locally so that Emacs can directly write to it, just point
-to that directory using the variable =org-mobile-directory=.  Using
-the /tramp/ method, =org-mobile-directory= may point to a remote
-directory accessible through, for example, /ssh/ and /scp/:
+You need to create a dedicated directory on the WebDAV server for the
+communication between Emacs and MobileOrg.
+
+#+begin_src ditaa :file images/orgmobile/tramp-webdav.png :cmdline -r
+  +----------------------+           +----------------------+
+  | desktop              |           | WebDAV server        |
+  +----------------------+           +----------------------+
+  | emacs                |           | org-mobile-directory |
+  |   + org-mode         |           | containing:          |
+  |                      | scp (ssh) |                      |
+  |   org-mobile-push ----------------->  *.org             |
+  |   org-mobile-pull <-----------------                    |
+  |                      | via tramp |       ^              |
+  +----------------------+           +-------|--------------+
+                                             |
+                +----------------------+     |
+                | mobile device        |     | WebDAV
+                +----------------------+     |
+                |                      |     |
+                |    MobileOrg     <---------+
+                |                      |
+                +----------------------+
+#+end_src
+
+#+RESULTS:
+[[file:images/orgmobile/org-mobile-tramp-webdav.png]]
+
+If you can mount that directory locally so that Emacs can directly
+write to it, just set the variable =org-mobile-directory= to point to
+that directory.  Alternatively, by using the [[http://www.gnu.org/software/tramp/][/TRAMP/]] method,
+=org-mobile-directory= may point to a remote directory accessible
+through, for example, /ssh/ and /scp/:
 
 #+begin_src emacs-lisp
 (setq org-mobile-directory "/scpc:user@remote.host:org/webdav/")
 #+end_src
 
-However, if you have configured ssh to use =ControlPersist=, due
-to [[http://article.gmane.org/gmane.emacs.tramp/7991][a bug with tramp and =ControlPersist=]] you may need to use =scpx=
-instead of =scp= as the /tramp/ transfer method.
+  {{{BeginWarningBox}}} N.B. Since this configures /TRAMP/ to connect
+  via /ssh/, you will need to use your /ssh/ password, not a WebDAV
+  password.
 
-If Emacs cannot access the WebDAV directory directly using a /tramp/
-method, you can use a local directory for staging.  Other means must
-then be used to keep this directory in sync with the WebDAV directory.
-In the following example, files are staged in =~/stage/=, and Org-mode
-hooks take care of moving files to and from the WebDAV directory using
-/scp/.
+  Also note that if you have configured ssh to use =ControlPersist=, due
+  to [[http://article.gmane.org/gmane.emacs.tramp/7991][a bug with tramp and =ControlPersist=]] you may need to use =scpx=
+  instead of =scp= as the /tramp/ transfer method.{{{EndWarningBox}}}
+
+** Does Emacs have to use /TRAMP/ to access the remote directory?
+
+No, you can alternatively use a local directory for staging.  Other
+means must then be used to keep this directory in sync with the WebDAV
+directory.  In the following example, files are staged in =~/stage/=,
+and Org-mode hooks take care of moving files to and from the WebDAV
+directory using /scp/.
 
 #+begin_src emacs-lisp
 (setq org-mobile-directory "~/stage/")
@@ -4302,6 +4338,9 @@ hooks take care of moving files to and from the WebDAV directory using
 (add-hook 'org-mobile-post-pull-hook
   (lambda () (shell-command "scp ~/stage/mobileorg.org user@wdhost:mobile/")))
 #+end_src
+
+Alternatively you could write a simple script to synchronise from
+=~/stage/= to the remote directory via /rsync/.
 
 * Mathjax
 
