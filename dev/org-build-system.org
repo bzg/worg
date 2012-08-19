@@ -15,8 +15,8 @@ Org can be run directly from sources, however usually it is
 byte-compiled and installed before use.  Also, the documentation needs
 to be rebuilt from their respective sources, registered and put into a
 place where it can be found.  Instead of you having to do all this by
-hand, a build system based on GNU make will do it for you.  The Org
-build system makes extensive use of GNU make features.
+hand, a build system based on GNU make will do it for you.  The Org
+build system makes extensive use of GNU make features.
 
 * Build System Structure
 
@@ -40,7 +40,7 @@ changed or removed at any time.
 
 All other functionality of the build system is provided in separate
 files, which will either be explicitly included from the top level or
-implicitly read by GNU make.
+implicitly read by GNU make.
 
 ** Defaults =default.mk=
 
@@ -117,6 +117,100 @@ manually building a working Org installation when the external
 dependencies of the build system cannot be met.  See [[Support%20for%20Manual%20Build][Support for
 Manual Build]].
 
+
+* Make Targets
+
+Each time you want GNU make to build something for you, you need to
+tell it what that is: this is called a /target/.  For each /target/,
+make determines the /prerequisites/ and then goes on to build them in
+the order of dependence.  A /target/ can be an actual file that
+GNU make should build, but more commonly it is just a moniker (called
+a /phony target/) that has the files to build as /prerequisites/.
+
+** Help
+
+- =help= :: Shows a brief list of the most commonly used /targets/
+            with a short description of what they do.
+- =targets= :: This is an alias for =help=, mandated by GNU Makefile
+               conventions.
+- =helpall= :: Shows (almost) all /targets/ and a short description of
+               what they do.
+
+** Configuration Check
+
+- =check= :: Show the main customization.
+- =config-test= :: Show the test customization.
+- =config-cmd= :: Show what commands will be used.
+- =config-all= :: Show all customization.
+
+** Build
+
+- =all= :: Build all of Org: byte-compile the source files and create
+           all documentation.[fn:1]
+- =compile= :: Ensure a clean source directory and then byte-compile
+               the source files using the [[Compilation Methods][compilation method]] =dirall=
+               by default.
+- =compile-dirty= :: Byte-compile just those sources that haven't been
+     compiled already or are newer than their byte-compiled
+     counterpart.[fn:2]
+- =single= :: The same as =compile=, but uses the [[Compilation Methods][compilation method]]
+              =single= (unless overridden by defining =ORGCM= on the
+              command line).
+- =autoloads= :: Create just the autoload files, but do not
+                 byte-compile anything.
+
+** Test
+
+- =test= :: runs =compile= and then the full testsuite.[fn:3]
+- =test-dirty= :: Run the full testsuite on whatever currently is
+                  available, compiled or not.
+
+** Installation
+
+- =install= :: Build all of Org and install it.
+- =install-etc= :: Install only the =etc/= part of Org.
+- =install-lisp= :: Install only the =lisp= part of Org.
+- =install-info= :: Build the documentation and install only the info
+                    documentation.
+
+** Documentation
+
+- =doc= :: Create all documentation.[fn:1]
+- =docs= :: An alias for =doc=.
+- =info= :: Create only GNU Info documentation (requires GNU Makeinfo).
+- =pdf= :: Create only PDF documentation (requires PDFTeX).
+- =card= :: Create only the reference card (requires PDFTeX).
+- =refcard= :: An alias for =card=.
+
+** Cleaning
+
+- =clean= :: Cleans in =lisp/= and =doc/=.
+- =cleanall= :: Cleans everything that can be cleaned, including
+                several types of backup files, so do not use this when
+                you have active edit sessions!
+- =clean-install= :: Removes a previous Org installation.  The build
+     system doesn't really know where your previous installation is,
+     of course: it tries to remove Org from where it would install it,
+     based on the current customization.
+- =cleantest= :: Removes a test directory if it exists.[fn:4]
+
+** Compatibility and Convenience
+
+- =up0= :: Updates the current Git branch from upstream by doing a
+           =git pull=.
+- =up1= :: Does =up0= and then builds and checks Org.
+- =up2= :: Does =up1= and installs Org if there was no test error.
+- =update= :: Does =up0= and then builds Org.  Does not test.
+- =update2= :: Does =update= and then installs.  This is not
+               recommended, since there is no way of telling whether
+               the just built Org has errors.
+- =uncompiled= :: Removes any bytecompiled files and then creates the
+                  autoload files.  You can then use the Git worktree
+                  almost like an installed version of Org.  Not
+                  recommended for normal use of Org.
+- =local.mk= :: Create a customization template.  If one already
+                exists, you need to rename or remove it first.
+
 * Customization
 
 Changing the behaviour of the build system to conform to your local
@@ -186,7 +280,7 @@ ELCDIR	= $(BATCH) \
 
 *** Emacs on Windows
 
-Customization for using vanilla Emacs 24 on Windows, with GNU make and
+Customization for using vanilla Emacs 24 on Windows, with GNU make and
 other binaries provided by Cygwin.  Make sure the installation path(s)
 contain no spaces!  Use the 8.3 compatible names, e.g. =PROGRA~1=
 instead of "Program Files", if you already installed the applications
@@ -218,8 +312,8 @@ to catch these errors, different compilation methods can be configured
 by defining =_COMPILE_= to one of these values (either permanently in
 =local.mk= or for a single invocation of =make=):
 
-- =dirall= :: The default compilation method invoked via =ELCDIR=.
-- =single= :: Uses a separate Emacs for each compilation invoked via
+- =dirall= :: The default compilation method, invoked via =ELCDIR=.
+- =single= :: Uses a separate Emacs for each compilation, invoked via
               =ELC=.
 - =source= :: Uses a separate Emacs for each compilation invoked via
               =ELC=.  Removes all =*.elc= files before and each
@@ -229,10 +323,6 @@ by defining =_COMPILE_= to one of these values (either permanently in
 - =slint1= :: First compiles using =dirall=, then compiles each file
               again using =single=.
 - =slint2= :: First compiles via =source= and then again via =slint1=.
-- =slint3= :: Checks all sources with =elint= in a single Emacs, then
-              compiles them via =dirall=.
-- =slint4= :: Checks all sources with =elint= in a separate Emacs for
-              each source file, then compiles them via =dirall=.
 
 Both =ELCDIR= and =ELC= are also customizable, but changing their
 definitions must not alter the semantics of compilation.  You have
@@ -273,7 +363,7 @@ directory also.
 
 * Support for Manual Build
 
-Since GNU make or some programs used by the build system might not be
+Since GNU make or some programs used by the build system might not be
 available on some systems, the core functionality has been implemented
 or replicated in Emacs Lisp with no dependencies on external tools.  The
 supported functions are: =org-make-autoloads=,
@@ -305,3 +395,20 @@ then paste the following into the =*scratch*= buffer
         (org-fake-git-version "7.8.11-fake"))
     (org-make-autoloads))
 #+END_SRC
+
+* Footnotes
+
+[fn:1] The build systems' notion of "all documentation" can be
+influenced via the configuration variable =ORG_MAKE_DOC=.
+
+[fn:2] If you just want to re-compile all lisp sources without doing
+anything else, you can run =make cleanelc compile-dirty=.
+
+[fn:3] The build systems' notion of "full testsuite can be configured
+with =BTEST_OB_LANGUAGES=.
+
+[fn:4] The test directory is generally removed after testing, but this
+may not happen when there are test errors.  Also, the automatic
+removal of the test directory can be prevented (for debugging
+purposes) by defining a variable =TEST_NO_AUTOCLEAN=.
+
