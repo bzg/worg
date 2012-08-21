@@ -4219,6 +4219,32 @@ as of Org version 7.8:
 
 Yes: simply use a blank #+TITLE in your Org file.
 
+** How can I use arbitrary colors for words/sentences in HTML export?
+
+The question has been raised by Jos'h Fuller and answered by Eric Schulte.
+
+Add the following to your Emacs config,
+
+#+BEGIN_SRC emacs-lisp
+    ;; -*- emacs-lisp -*-
+    (org-add-link-type
+     "color"
+     (lambda (path)
+       (message (concat "color "
+                        (progn (add-text-properties
+                                0 (length path)
+                                (list 'face `((t (:foreground ,path))))
+                                path) path))))
+     (lambda (path desc format)
+       (cond
+        ((eq format 'html)
+         (format "<span style=\"color:%s;\">%s</span>" path desc))
+        ((eq format 'latex)
+         (format "{\\color{%s}%s}" path desc)))))
+#+END_SRC
+
+and then you can use [[color:red][in red]] for colored export.
+
 * Backup
 
 #+index: Backup
