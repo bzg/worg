@@ -3788,17 +3788,6 @@ TAB= and =C-h v org- TAB= respectively.
 : split.  When called from outside of a code block a new code block
 : is created.  In both cases if the region is demarcated and if the
 : region is not active then the point is demarcated.
-** org-forward-element
-   :PROPERTIES:
-   :CUSTOM_ID: org-forward-element
-   :END:
-
-- *Access:* ~M-}~
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-forward-element&sr=1][Find modifications in git logs]]
-
-: Move forward by one element.
-: Move to the next element at the same level, when possible.
 ** org-edit-src-continue  =(e)=
    :PROPERTIES:
    :CUSTOM_ID: org-edit-src-continue
@@ -3818,6 +3807,17 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Set the tags for the current headline.
 : With prefix ARG, realign all tags in headings in the current buffer.
+** org-forward-element
+   :PROPERTIES:
+   :CUSTOM_ID: org-forward-element
+   :END:
+
+- *Access:* ~M-}~
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-forward-element&sr=1][Find modifications in git logs]]
+
+: Move forward by one element.
+: Move to the next element at the same level, when possible.
 ** org-edit-src-code  =(&optional context code edit-buffer-name)=
    :PROPERTIES:
    :CUSTOM_ID: org-edit-src-code
@@ -4253,6 +4253,16 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-store-agenda-views&sr=1][Find modifications in git logs]]
 
 
+** org-mark-ring-push  =(&optional pos buffer)=
+   :PROPERTIES:
+   :CUSTOM_ID: org-mark-ring-push
+   :END:
+
+- *Access:* ~C-c %~
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-mark-ring-push&sr=1][Find modifications in git logs]]
+
+: Put the current position or POS into the mark ring and rotate it.
 ** org-transpose-element
    :PROPERTIES:
    :CUSTOM_ID: org-transpose-element
@@ -4264,16 +4274,6 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Transpose current and previous elements, keeping blank lines between.
 : Point is moved after both elements.
-** org-mark-ring-push  =(&optional pos buffer)=
-   :PROPERTIES:
-   :CUSTOM_ID: org-mark-ring-push
-   :END:
-
-- *Access:* ~C-c %~
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-mark-ring-push&sr=1][Find modifications in git logs]]
-
-: Put the current position or POS into the mark ring and rotate it.
 ** org-table-edit-field  =(arg)=
    :PROPERTIES:
    :CUSTOM_ID: org-table-edit-field
@@ -4397,17 +4397,6 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-Quit&sr=1][Find modifications in git logs]]
 
 : Exit agenda by removing the window or the buffer.
-** org-timer-pause-or-continue  =(&optional stop)=
-   :PROPERTIES:
-   :CUSTOM_ID: org-timer-pause-or-continue
-   :END:
-
-- *Access:* ~C-c C-x ,, <menu-bar> <Org> <Dates and Scheduling> <Pause/Continue Timer>, <menu-bar> <Org> <Dates and Scheduling> <Stop Timer>~
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-timer.el;hb=HEAD][org-timer.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-timer-pause-or-continue&sr=1][Find modifications in git logs]]
-
-: Pause or continue the relative timer.
-: With prefix arg STOP, stop it entirely.
 ** org-compute-property-at-point
    :PROPERTIES:
    :CUSTOM_ID: org-compute-property-at-point
@@ -4419,6 +4408,17 @@ TAB= and =C-h v org- TAB= respectively.
 : Compute the property at point.
 : This looks for an enclosing column format, extracts the operator and
 : then applies it to the property in the column format's scope.
+** org-timer-pause-or-continue  =(&optional stop)=
+   :PROPERTIES:
+   :CUSTOM_ID: org-timer-pause-or-continue
+   :END:
+
+- *Access:* ~C-c C-x ,, <menu-bar> <Org> <Dates and Scheduling> <Pause/Continue Timer>, <menu-bar> <Org> <Dates and Scheduling> <Stop Timer>~
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-timer.el;hb=HEAD][org-timer.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-timer-pause-or-continue&sr=1][Find modifications in git logs]]
+
+: Pause or continue the relative timer.
+: With prefix arg STOP, stop it entirely.
 ** org-babel-examplize-region  =(beg end &optional results-switches)=
    :PROPERTIES:
    :CUSTOM_ID: org-babel-examplize-region
@@ -5770,8 +5770,8 @@ TAB= and =C-h v org- TAB= respectively.
 : Fill element at point, when applicable.
 : 
 : This function only applies to comment blocks, comments, example
-: blocks, paragraphs and verse blocks.  Also, as a special case,
-: re-align table when point is at one.
+: blocks and paragraphs.  Also, as a special case, re-align table
+: when point is at one.
 : 
 : If JUSTIFY is non-nil (interactively, with prefix argument),
 : justify as well.  If `sentence-end-double-space' is non-nil, then
@@ -5945,7 +5945,7 @@ TAB= and =C-h v org- TAB= respectively.
    :CUSTOM_ID: org-iswitchb
    :END:
 
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-install.el;hb=HEAD][org-install.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-iswitchb&sr=1][Find modifications in git logs]]
 
 : Switch between Org buffers.
@@ -6689,7 +6689,7 @@ TAB= and =C-h v org- TAB= respectively.
    :CUSTOM_ID: org-ido-switchb
    :END:
 
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-install.el;hb=HEAD][org-install.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-ido-switchb&sr=1][Find modifications in git logs]]
 
 : Switch between Org buffers.
@@ -7337,15 +7337,6 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-table-fedit-toggle-ref-type&sr=1][Find modifications in git logs]]
 
 : Convert all references in the buffer from B3 to @3$2 and back.
-** org-drag-element-backward
-   :PROPERTIES:
-   :CUSTOM_ID: org-drag-element-backward
-   :END:
-
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-drag-element-backward&sr=1][Find modifications in git logs]]
-
-: Move backward element at point.
 ** org-insert-todo-heading  =(arg &optional force-heading)=
    :PROPERTIES:
    :CUSTOM_ID: org-insert-todo-heading
@@ -7358,6 +7349,15 @@ TAB= and =C-h v org- TAB= respectively.
 : Insert a new heading with the same level and TODO state as current heading.
 : If the heading has no TODO state, or if the state is DONE, use the first
 : state (TODO by default).  Also with prefix arg, force first state.
+** org-drag-element-backward
+   :PROPERTIES:
+   :CUSTOM_ID: org-drag-element-backward
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-drag-element-backward&sr=1][Find modifications in git logs]]
+
+: Move backward element at point.
 ** org-bibtex-check-all  =(&optional optional)=
    :PROPERTIES:
    :CUSTOM_ID: org-bibtex-check-all
@@ -9183,16 +9183,6 @@ TAB= and =C-h v org- TAB= respectively.
 : A lisp caller can specify CHAR.  NARROW means that the new tag should be
 : used to narrow the search - the interactive user can also press `-' or `+'
 : to switch to narrowing.
-** org-babel-screen-test
-   :PROPERTIES:
-   :CUSTOM_ID: org-babel-screen-test
-   :END:
-
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-screen.el;hb=HEAD][ob-screen.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-screen-test&sr=1][Find modifications in git logs]]
-
-: Test if the default setup works.
-: The terminal should shortly flicker.
 ** org-table-current-column
    :PROPERTIES:
    :CUSTOM_ID: org-table-current-column
@@ -12449,6 +12439,44 @@ TAB= and =C-h v org- TAB= respectively.
 : sequence on the command line.  If nil, the sequence of the filenames is
 : unchanged.
 
+** org-capture-templates-contexts  ~nil~
+   :PROPERTIES:
+   :CUSTOM_ID: org-capture-templates-contexts
+   :END:
+
+- *Type:* (repeat (list :tag "Rule" (str...
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-capture.el;hb=HEAD][org-capture.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-capture-templates-contexts&sr=1][Find modifications in git logs]]
+
+: Alist of capture templates and valid contexts.
+: 
+: For example, if you have a capture template "c" and you want
+: this template to be accessible only from `message-mode' buffers,
+: use this:
+: 
+:    '(("c" (in-mode . "message-mode")))
+: 
+: Here are the available contexts definitions:
+: 
+:       in-file: command displayed only in matching files
+:       in-mode: command displayed only in matching modes
+:   not-in-file: command not displayed in matching files
+:   not-in-mode: command not displayed in matching modes
+:    [function]: a custom function taking no argument
+: 
+: If you define several checks, the agenda command will be
+: accessible if there is at least one valid check.
+: 
+: You can also bind a key to another agenda custom command
+: depending on contextual rules.
+: 
+:     '(("c" "d" (in-mode . "message-mode")))
+: 
+: Here it means: in `message-mode buffers', use "d" as the
+: key for the capture template otherwise associated with "d".
+: (The template originally associated with "q" is not displayed
+: to avoid duplicates.)
+
 ** org-bbdb-extract-date-fun  ~(quote org-bbdb-anniv-extract-...~
    :PROPERTIES:
    :CUSTOM_ID: org-bbdb-extract-date-fun
@@ -14051,18 +14079,6 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-latex-image-default-option&sr=1][Find modifications in git logs]]
 
 : Default option for images.
-
-** org-babel-js-cmd  ~"node"~
-   :PROPERTIES:
-   :CUSTOM_ID: org-babel-js-cmd
-   :END:
-
-- *Type:* string
-- *Since:* Emacs version 24.1
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-js.el;hb=HEAD][ob-js.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-js-cmd&sr=1][Find modifications in git logs]]
-
-: Name of command used to evaluate js blocks.
 
 ** org-mac-mail-account  ~"customize"~
    :PROPERTIES:
@@ -16815,6 +16831,44 @@ TAB= and =C-h v org- TAB= respectively.
 : Non-nil means fontify *bold*, /italic/ and _underlined_ text.
 : Changing this variable requires a restart of Emacs to take effect.
 
+** org-agenda-custom-commands-contexts  ~nil~
+   :PROPERTIES:
+   :CUSTOM_ID: org-agenda-custom-commands-contexts
+   :END:
+
+- *Type:* (repeat (list :tag "Rule" (str...
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-custom-commands-contexts&sr=1][Find modifications in git logs]]
+
+: Alist of custom agenda keys and contextual rules.
+: 
+: For example, if you have a custom agenda command "p" and you
+: want this command to be accessible only from plain text files,
+: use this:
+: 
+:    '(("p" (in-file . "\.txt")))
+: 
+: Here are the available contexts definitions:
+: 
+:       in-file: command displayed only in matching files
+:       in-mode: command displayed only in matching modes
+:   not-in-file: command not displayed in matching files
+:   not-in-mode: command not displayed in matching modes
+:    [function]: a custom function taking no argument
+: 
+: If you define several checks, the agenda command will be
+: accessible if there is at least one valid check.
+: 
+: You can also bind a key to another agenda custom command
+: depending on contextual rules.
+: 
+:     '(("p" "q" (in-file . "\.txt")))
+: 
+: Here it means: in .txt files, use "p" as the key for the
+: agenda command otherwise associated with "q".  (The command
+: originally associated with "q" is not displayed to avoid
+: duplicates.)
+
 ** org-read-date-display-live  ~t~
    :PROPERTIES:
    :CUSTOM_ID: org-read-date-display-live
@@ -16902,7 +16956,7 @@ TAB= and =C-h v org- TAB= respectively.
 
 : The uuidgen program.
 
-** org-table-number-regexp  ~"^\\([<>]?[-+^.0-9]*[0-9][-+^....~
+** org-table-number-regexp  ~"^\\([<>]?[-+^.,0-9]*[0-9][-+^...~
    :PROPERTIES:
    :CUSTOM_ID: org-table-number-regexp
    :END:
@@ -16919,7 +16973,8 @@ TAB= and =C-h v org- TAB= respectively.
 : anything which looks remotely like a number as used in scientific
 : context.  For example, all of the following will be considered a
 : number:
-:     12    12.2    2.4e-08    2x10^12    4.034+-0.02    2.7(10)  >3.5
+: 
+:    12    12.2   12,2   2.4e-08   2x10^12   4.034+-0.02   2.7(10)   >3.5
 : 
 : Other options offered by the customize interface are more restrictive.
 
@@ -19632,18 +19687,6 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Non-nil means remove time ranges specifications in agenda
 : items that span on several days.
-
-** org-babel-scheme-cmd  ~"guile"~
-   :PROPERTIES:
-   :CUSTOM_ID: org-babel-scheme-cmd
-   :END:
-
-- *Type:* string
-- *Since:* Emacs version 24.1
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-scheme.el;hb=HEAD][ob-scheme.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-scheme-cmd&sr=1][Find modifications in git logs]]
-
-: Name of command used to evaluate scheme blocks.
 
 ** org-time-clocksum-format  ~"%d:%02d"~
    :PROPERTIES:
@@ -23054,20 +23097,6 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-latex-tables-tend&sr=1][Find modifications in git logs]]
 
 : LaTeX command for bottom rule for tables.
-
-** org-babel-lisp-dir-fmt  ~"(let ((*default-pathname-defa...~
-   :PROPERTIES:
-   :CUSTOM_ID: org-babel-lisp-dir-fmt
-   :END:
-
-- *Type:* string
-- *Since:* Emacs version 24.1
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-lisp.el;hb=HEAD][ob-lisp.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-lisp-dir-fmt&sr=1][Find modifications in git logs]]
-
-: Format string used to wrap code bodies to set the current directory.
-: For example a value of "(progn ;; %s\n   %%s)" would ignore the
-: current directory string.
 
 ** org-archive-reversed-order  ~nil~
    :PROPERTIES:
