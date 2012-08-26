@@ -253,6 +253,42 @@ become the default target.  But you can put any other target there
 that you want to become the default target or even define a new one
 (OK, that isn't simple customization anymore).
 
+*** Including sources from =contrib/=
+
+If you just want to try out some of the things in =contrib/=, you can
+simply add the directory to =load-path=.  But if you want to include
+some files in an installed version of Org, this has been more
+difficult.  There is now an easier way to do this: simply specify in
+the customization variable =ORG_ADD_CONTRIB= which files you want
+included, then build and install in the usual way.  Your =local.mk=
+default customization template has a commented out example for
+including the new exporter, you just need to remove the comment
+marker:
+
+#+BEGIN_SRC Makefile
+# Define if you want to include some (or all) files from contrib/lisp
+# just the filename please (no path prefix, no .el suffix), maybe with globbing
+ORG_ADD_CONTRIB = org-e-* org-md org-export # e.g. the new exporter
+#+END_SRC
+
+You just give the base name of the file to include (much like you do
+in a =require= form), only that you can use a shell globbing pattern
+to specify many similar names at ones.  You do not need to specify the
+path prefix =contrib/lisp/= nor the file suffix =.el=, these are added
+by the build system.  To include all of =contrib/lisp/= you'd say:
+
+#+BEGIN_SRC Makefile
+ORG_ADD_CONTRIB = org*
+#+END_SRC
+
+Or if that was just a one-time install (with quoting for POSIX shell):
+
+:make ORG_ADD_CONTRIB="org*" install
+
+A simple =*= would also include =htmlize.el=, which is currently
+bundled in contrib.  It is recommended to install that seperately, it
+is available for instance in GNU ELPA.
+
 *** Non-standard Emacs location
 
 Customization for using a self-compiled Emacs 24 installed in
