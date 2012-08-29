@@ -16,20 +16,28 @@ byte-compiled and installed before use.  Also, the documentation needs
 to be rebuilt from their respective sources, registered and put into a
 place where it can be found.  Instead of you having to do all this by
 hand, a build system based on GNU make will do it for you.  The Org
-build system makes extensive use of GNU make features.
+build system makes extensive use of GNU make features and requires at
+least version 3.81 (use of the latest released version is
+recommended).
 
 * Build System Structure
 
-The build system consists of these files.
+The build system consists of these files:
 
 : <org-mode>/Makefile
-: <org-mode>/default.mk
 : <org-mode>/local.mk
-: <org-mode>/targets.mk
 : <org-mode>/doc/Makefile
 : <org-mode>/etc/Makefile
 : <org-mode>/lisp/Makefile
-: <org-mode>/UTILITIES/org-fixup.el
+: <org-mode>/mk/default.mk
+: <org-mode>/mk/targets.mk
+: <org-mode>/mk/org-fixup.el
+
+Additional files are present for the Orgmode server in the
+=<org-mode>/mk/= subdirectory.  An additional file
+=<org-mode>/mk/version.mk= is present in the distribution archives to
+record the version information that gets used when building from these
+sources.
 
 ** Top Level =Makefile=
 
@@ -42,15 +50,42 @@ All other functionality of the build system is provided in separate
 files, which will either be explicitly included from the top level or
 implicitly read by GNU make.
 
-** Defaults =default.mk=
+** Local Customization =local.mk=
 
-*Never change anything in* =default.mk= *— always do your changes in*
+*Never push* =local.mk= *to any public branch!*
+
+The build system is an integral part of Org.  To allow easy local
+customization, that customization must never become part of the
+official Git repository.  On the other hand the build system must work
+even when no local customization has been applied.  Therefore when the
+file =local.mk= does not exist, a local customization template will be
+created that copies some settings that most commonly would need to be
+changed from =mk/default.mk=.  The template includes some comments
+that are hopefully self-documenting.  As long as all necessary
+programs are available, the customization should in most cases be
+limited to setting $prefix correctly.
+
+If you need to do more extensive changes, copy the relevant parts from
+=mk/default.mk= to =local.mk= (or maybe even the whole file if that seems
+easier to you).  Please look at some of the [[Customization][Customization Examples]] to
+get an idea of what is possible.
+
+** Second Level =Makefile=
+
+The =Makefile= in subdirectories can be invoked from the top level only
+since they rely on the definitions that have been made there.
+
+** Defaults =mk/default.mk=
+
+*Never change anything in* =mk/default.mk= *— always do your changes in*
  =local.mk= *!*
 
 The defaults will work on a typical GNU/Linux system.  For system-wide
 installation as assumed by the build system the user must be able to
-obtain administrative privileges via sudo.  Besides Emacs, the
-following programs must be available in PATH:
+obtain administrative privileges via sudo.  If sudo is not available,
+the user running make must have the necessary privileges to do the
+install (i.e. full access to the build and install directories).
+Besides Emacs, the following programs must be available in PATH:
 
 - find
 - install
@@ -65,67 +100,53 @@ tolerated:
 - sudo
 - git
 
-** Local Customization =local.mk=
-
-*Never push* =local.mk= *to any public branch!*
-
-The build system is an integral part of Org.  To allow easy local
-customization, that customization must never become part of the
-official Git repository.  On the other hand the build system must work
-even when no local customization has been applied.  Therefore when the
-file =local.mk= does not exist, a local customization template will be
-created that copies some settings that most commonly would need to be
-changed from default.mk.  The template includes some comments that are
-hopefully self-documenting.  As long as all necessary programs are
-available, the customization should in most cases be limited to
-setting $prefix correctly.
-
-If you need to do more extensive changes, copy the relevant parts from
-=default.mk= to =local.mk= (or maybe even the whole file if that seems
-easier to you).  Please look at some of the [[Customization][Customization Examples]] to
-get an idea of what is possible.
-
-** Make Targets =targets.mk=
+** Make Targets =mk/targets.mk=
 
 All targets that the Org build system can build are defined here.
 Most of the actual work will be handed off to the second level of
 =Makefile=s in their respective subdirectories.  It is possible to
 override some parts of the build system by defining some variables.
 This is largely untested and consequently unsupported, but may still
-be useful in some situations.
+be useful in some situations.  The following variables are considered
+stable:
 
-- define =TEST_NO_AUTOCLEAN= to keep the test directory around for
-  inspection
-- define =ORGVERSION=, =GITVERSION= and =GITSTATUS= if git is
-  not available
+- =TEST_NO_AUTOCLEAN= :: Define to a non-null value to keep the test
+     directory around for inspection.  This is mostly useful for
+     debugging the test suite.
+- =ORGVERSION= :: Can be used to override the automatic determination
+                  of the version strings.  If you find a need to do
+                  this, it is likely a bug someplace else.  *Never
+                  define this in a customization file!*
+- =GITVERSION= :: See =ORGVERSION=.  Please do not define it to a
+                  value that could be confused with a real Git
+                  version string.
+- =GITSTATUS= :: See =GITVERSION=.  If this variable is defined
+                 non-null, the string ".dirty" will be appended to the
+                 Git version string, which indicates a locally
+                 modified version.
 
-** Second Level =Makefile=
-
-The =Makefile= in subdirectories can be invoked from the top level only
-since they rely on the definitions that have been made there.
-
-** Utilities =org-fixup.el=
+** Utilities =mk/org-fixup.el=
 
 This is a collection of some Emacs Lisp routines that implement basic
-functionality of the build system.  This mainly eliminates the need for
-some external programs and thus reduces the number of external
+functionality of the build system.  This mainly eliminates the need
+for some external programs and thus reduces the number of external
 dependencies.
 
 A few of these functions have been designed to be used from the
 command line or even from within Emacs itself.  This is an aid for
 manually building a working Org installation when the external
-dependencies of the build system cannot be met.  See [[Support%20for%20Manual%20Build][Support for
-Manual Build]].
-
+dependencies of the build system cannot be met.  See
+[[Support%20for%20Manual%20Build][Support for Manual Build]].
 
 * Make Targets
 
 Each time you want GNU make to build something for you, you need to
-tell it what that is: this is called a /target/.  For each /target/,
-make determines the /prerequisites/ and then goes on to build them in
-the order of dependence.  A /target/ can be an actual file that
-GNU make should build, but more commonly it is just a moniker (called
-a /phony target/) that has the files to build as /prerequisites/.
+tell it what that is: this is called a /target/ or /goal/.  For each
+/target/, make determines the /prerequisites/ and then goes on to
+build them in the order of dependence.  A /target/ can be an actual
+file that GNU make should build, but more commonly it is just a
+moniker (called a /phony target/) that has the files to build as
+/prerequisites/.
 
 ** Help
 
@@ -217,7 +238,7 @@ Changing the behaviour of the build system to conform to your local
 system rules is done by editing the file =local.mk=.  The standard
 template that is created when this file does not exist offers only the
 most common customization variables, but you are free to customize
-anything that =default.mk= offers (but you really have to know what
+anything that =mk/default.mk= offers (but you really have to know what
 you are doing for some of this).  Remember to only change =local.mk=,
 please.
 
@@ -231,6 +252,42 @@ target.  If you remove that line entirely from =local.mk=, =all= will
 become the default target.  But you can put any other target there
 that you want to become the default target or even define a new one
 (OK, that isn't simple customization anymore).
+
+*** Including sources from =contrib/=
+
+If you just want to try out some of the things in =contrib/=, you can
+simply add the directory to =load-path=.  But if you want to include
+some files in an installed version of Org, this has been more
+difficult.  There is now an easier way to do this: simply specify in
+the customization variable =ORG_ADD_CONTRIB= which files you want
+included, then build and install in the usual way.  Your =local.mk=
+default customization template has a commented out example for
+including the new exporter, you just need to remove the comment
+marker:
+
+#+BEGIN_SRC Makefile
+# Define if you want to include some (or all) files from contrib/lisp
+# just the filename please (no path prefix, no .el suffix), maybe with globbing
+ORG_ADD_CONTRIB = org-e-* org-md org-export # e.g. the new exporter
+#+END_SRC
+
+You just give the base name of the file to include (much like you do
+in a =require= form), only that you can use a shell globbing pattern
+to specify many similar names at ones.  You do not need to specify the
+path prefix =contrib/lisp/= nor the file suffix =.el=, these are added
+by the build system.  To include all of =contrib/lisp/= you'd say:
+
+#+BEGIN_SRC Makefile
+ORG_ADD_CONTRIB = org*
+#+END_SRC
+
+Or if that was just a one-time install (with quoting for POSIX shell):
+
+: make ORG_ADD_CONTRIB="org*" install
+
+A simple =*= would also include =htmlize.el=, which is currently
+bundled in contrib.  It is recommended to install that seperately, it
+is available for instance in GNU ELPA.
 
 *** Non-standard Emacs location
 
@@ -305,12 +362,12 @@ SUDO =
 
 The default compilation method compiles all source files within the
 same Emacs process, simply because that is the fastest method.
-Unfortunately, Emacs does not isolate each of the compilations from
-each other, so the byte compiler may not issue some errors or warnings
-(mostly about missing declarations or requires).  To enable developers
-to catch these errors, different compilation methods can be configured
-by defining =ORGCM= to one of these values (either permanently in
-=local.mk= or for a single invocation of =make=):
+Unfortunately, Emacs does not isolate the side-effects of compilations
+from each other, so the byte compiler may not issue some errors or
+warnings (mostly about missing declarations or requires).  To enable
+developers to catch these errors, different compilation methods can be
+configured by defining =ORGCM= to one of these values (either
+permanently in =local.mk= or for a single invocation of =make=):
 
 - =dirall= :: The default compilation method, invoked via =ELCDIR=.
 - =single= :: Uses a separate Emacs for each compilation, invoked via
@@ -371,30 +428,41 @@ supported functions are: =org-make-autoloads=,
 All other interfaces should be considered private and are subject to
 change without notice.  The commands assume that the current working
 directory is at the toplevel of the Org build directory (i.e. where
-you'll find =default.mk=).
+you'll find =mk/default.mk=).
 
 To make the autoloads file:
-: emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup -f org-make-autoloads
+: emacs -batch -Q -L lisp -l ../mk/org-fixup -f org-make-autoloads
 To make the autoloads file and byte-compile Org:
-: emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup -f org-make-autoloads-compile
+: emacs -batch -Q -L lisp -l ../mk/org-fixup -f org-make-autoloads-compile
 To make the autoloads file and byte-compile all of Org again:
-: emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup -f org-make-autoloads-compile-force
+: emacs -batch -Q -L lisp -l ../mk/org-fixup -f org-make-autoloads-compile-force
 
 If =git= is also unavailable, fake version strings need to be provided.
-: emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup \
+: emacs -batch -Q -L lisp -l ../mk/org-fixup \
 : --eval '(let ((org-fake-release "7.8.11")(org-fake-git-version "7.8.11-fake"))\
 : (org-make-autoloads))'
 
-The above assumes a POSIX shell for its quoting.  Windows =CMD.exe= has
-quite different quoting rules and this won't work, so your other option
-is to start Emacs like this
-: emacs -Q -L lisp -l ../UTILITIES/org-fixup
-then paste the following into the =*scratch*= buffer
+The above assumes a POSIX shell for its quoting, Windows =CMD.exe= has
+quite different quoting rules and this won't work.  Also, users of
+Aquamacs have reported that the command line examples aren't working
+for them.  Your other option is to start Emacs like this
+: emacs -Q -L lisp -l ../mk/org-fixup
+then paste the following into the =*scratch*= buffer:
 #+BEGIN_SRC emacs-lisp
+  ; replace the version strings with something sensible that can't be
+  ; confused with a real Git version
   (let ((org-fake-release     "7.8.11")
         (org-fake-git-version "7.8.11-fake"))
     (org-make-autoloads))
 #+END_SRC
+
+Execute each form by placing the cursor after the closing paren on the
+last line and press =C-j= or =C-x C-e=.
+
+If the command line above is still spooking you: start Emacs like you
+normally do, then add =<orgmode>/lisp= to your load-path, then issue
+=M-x load-library=, answer the prompt with =../mk/org-fixup.el=, then
+do the same things in the scratch buffer as outlined above.
 
 * Footnotes
 

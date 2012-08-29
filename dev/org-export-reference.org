@@ -67,8 +67,7 @@ by the exporter.
 
   As an example, the following excerpt from =e-latex= back-end
   definition introduces three new buffer keywords (and their
-  headline's property counterpart:), and redefine ~DATE~ default
-  value:
+  headline's property counterpart), and redefine ~DATE~ default value:
 
   #+BEGIN_SRC emacs-lisp
   (org-export-define-backend e-latex
@@ -442,9 +441,14 @@ by the exporter.
 
    Recursive object.
 
+   - ~:application~ :: Name of application requested to open the link
+                       in Emacs (string or nil). It only applies to
+                       "file" type links.
    - ~:path~ :: Identifier for link's destination.  It is usually the
                 link part with type, if specified, removed (string).
-   - ~:raw-link~ :: Uninterpreted Link part (string).
+   - ~:raw-link~ :: Uninterpreted link part (string).
+   - ~:search-option~ :: Additional information for file location
+        (string or nil). It only applies to "file" type links.
    - ~:type~ :: Link's type.  Possible types (string) are:
      - ~coderef~ :: Line in some source code,
      - ~custom-id~ :: Specific headline's custom-id,
@@ -460,16 +464,23 @@ by the exporter.
 
    - A fuzzy link leading to a target keyword should be ignored during
      export: it's an invisible target.
+
    - A fuzzy link with no description should display the
      cross-reference number of its target.  This number can be:
+
      - If link's destination is a target object within a footnote, it
        will be footnote's number.
+
      - If link's destination is a target object in a list, it will be
        an item number.
+
      - If link leads to a named element, it will be the sequence number
        of that element among named elements of the same type.
+
      - Otherwise, it will be the number of the headline containing
        link's destination.
+
+     See [[#get-ordinal][~org-export-get-ordinal~]] function.
 
 ** Macro
 
