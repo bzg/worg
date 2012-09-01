@@ -200,6 +200,10 @@ by the exporter.
    - ~:drawer-name~ :: Drawer's name (string).
    - ~:hiddenp~ :: Non-nil if the drawer is hidden (boolean).
 
+   /Note relative to export:/ The idea behind drawers is that they are
+   transparent export-wise.  By default, they should return their
+   contents only.
+
 ** Dynamic Block
 
    Greater element.
@@ -347,6 +351,9 @@ by the exporter.
    - ~:info~ :: Information about function called, as returned by
                 ~org-babel-lob-get-info~ (list).
 
+   /Note relative to export:/ Since Babel related blocks are expanded
+   before parsing, these can safely be ignored by back-ends.
+
 ** Inline Src Block
 
    Object.
@@ -412,6 +419,24 @@ by the exporter.
    - ~:key~ :: Keyword's name (string).
    - ~:value~ :: Keyword's value (string).
 
+   /Note relative to export:/ Each back-end should, as far as
+   possible, support a number of common keywords.  These include:
+
+   - Back-end relative keyword (i.e. "LATEX" for =e-latex=), which
+     should always return its value as-is.
+
+   - "TARGET" keyword, which should always return a nil value.
+
+   - "TOC" keyword.  It accepts four common values: "headlines",
+     "tables", "figures", "listings".  Also, "headlines" value can
+     have an optional numeric argument to specify depth of the
+     contents.
+
+     See [[#collect-headlines][~org-export-collect-headlines~]], [[#collect-tables][~org-export-collect-tables~]],
+     [[#collect-figures][~org-export-collect-figures~]] and [[#collect-listings][~org-export-collect-listings~]].
+
+   - "INDEX" keyword.
+
 ** LaTeX Environment
 
    Element.
@@ -460,7 +485,7 @@ by the exporter.
      It can also be any ~org-link-types~ element.
 
 
-   Notes relative to export:
+   /Notes relative to export:/
 
    - A fuzzy link leading to a target keyword should be ignored during
      export: it's an invisible target.
@@ -489,6 +514,10 @@ by the exporter.
    - ~:args~ :: Arguments passed to the macro (list of strings).
    - ~:key~ :: Macro's name (string).
    - ~:value~ :: Replacement text (string).
+
+   /Note relative to export:/ Macro expansion takes place before
+   buffer parsing. As such, export back-ends don't have to handle:
+   they'll never see them.
 
 ** Paragraph
 
@@ -1241,10 +1270,6 @@ by the exporter.
        ...))
    #+END_SRC
 
-** ~org-export-expand-macro~
-
-   Expand a given macro.
-
 ** ~org-export-first-sibling-p~
    :PROPERTIES:
    :CUSTOM_ID: first-sibling-p
@@ -1915,3 +1940,7 @@ by the exporter.
    See also: [[#format-code][~org-export-format-code~]],
    [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]].
 
+
+# Local Variables:
+# sentence-end-double-space: t
+# End:
