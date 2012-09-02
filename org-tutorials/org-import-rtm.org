@@ -1,0 +1,123 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+TITLE:      Import items from remember the milk
+#+AUTHOR:     Arun Persaud
+#+EMAIL:      arun@nubati.net
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+* Overview
+This page will show you how to import items from [[http://www.rememberthemilk.com][remember the milk]](RTM) into org mode (one way sync).
+The script will parse the atom feed from RTM adding more information such as scheduled date, location, tags and priority.
+
+* Setup
+
+The script uses the built-in feed parser from org-mode. Since the feed parser is very unspecific, we add a function that parses each RTM entry
+and scans it for some org-mode relevant information such as the scheduled date, location, tags, etc. You will need to add these scripts to your .emacs file
+and modify them to fit your needs (you need to add your RTM-atom feed url at least).
+
+#+begin_src emacs-lisp
+(defun org-feed-parse-RTM-entry (entry)
+  "Parse the `:item-full-text' as a sexp and create new properties."
+  (let ((xml (car (read-from-string (plist-get entry :item-full-text)))))
+    ;; Get first <link href='foo'/>.
+    (setq entry (plist-put entry :link
+                           (xml-get-attribute
+                            (car (xml-get-children xml 'link))
+                            'href)))
+    ;; Add <title/> as :title.
+    (setq entry (plist-put entry :title
+                           (xml-substitute-special
+                            (car (xml-node-children
+                                  (car (xml-get-children xml 'title)))))))
+    ;; look for some other information that's in the content of the entry
+    ;; the structure looks something like:
+    ;; <content><div>   <div item> <span itemname></span><span itemvalue></span></div>...
+    (let* ((content (car (xml-get-children xml 'content)))
+           (main  (car (xml-get-children content 'div)))
+           (items (xml-get-children main 'div)))
+      (when items
+        ; iterate over all items and check for certain classes
+        (while items
+          (setq item (car items))
+          ; get the second span entry
+          (setq valuesub (car (cdr (xml-node-children item))))
+             (cond
+              ((string= (xml-get-attribute item 'class) "rtm_due")
+               (setq entry (plist-put entry :due (car (xml-node-children valuesub))))
+               (setq mydate (car (xml-node-children valuesub)))
+               (if (string= mydate "never")
+                   nil
+                 (progn
+                  (string-match "^\\([a-zA-Z]*\\) \\([0-9]*\\) \\([a-zA-Z]*\\) \\([0-9]*\\)$" mydate)
+                  (setq mydate (concat "20" (match-string 4 mydate) " " (match-string 3 mydate) " " (match-string 2 mydate) " 00:00:01"))
+                  (setq mydate (parse-time-string mydate))
+                  (setq mydate (apply #'encode-time mydate))
+                  (setq mydate (format-time-string (car org-time-stamp-formats) mydate))
+                  (setq entry (plist-put entry :dueorgformat mydate)))))
+              ((string= (xml-get-attribute item 'class) "rtm_tags")
+               (setq entry (plist-put entry :tags (car (xml-node-children valuesub)))))
+              ((string= (xml-get-attribute item 'class) "rtm_time_estimate")
+               (setq entry (plist-put entry :timeestimate (car (xml-node-children valuesub)))))
+              ((string= (xml-get-attribute item 'class) "rtm_priority")
+               (setq entry (plist-put entry :priority (car (xml-node-children valuesub)))))
+              ((string= (xml-get-attribute item 'class) "rtm_location")
+               (setq entry (plist-put entry :location (car (xml-node-children valuesub))))))
+          (setq items (cdr items))
+          )))
+    entry))
+#+end_src
+
+It's also easy to set up special filters for the RTM entries. Here, we for example set up a filter that skips all entries that don't have a due-date set in RTM.
+
+#+begin_src emacs-lisp
+(defun org-feed-RTM-filter-non-scheduled (entry)
+  "filter out all entries that don't have a due date set"
+  (if (string= (plist-get entry :due) "never")
+      nil
+    entry))
+#+end_src
+
+Next we need to tell org-mode where to find the feed, for this you need to copy the url location for your RTM atom-feed. The code below will
+write the RTM information into a file called "~/org/RTM.org". If you want to change the file name, just edit the 4th line (you will also need to edit the file name in the scriptlet below). Furthermore, we define
+here the functions we defined above to filter and parse the RTM entries. We also define a template that will be used in the org-file. Here, we use
+the newly defined items for the due date and location, etc.
+
+#+begin_src emacs-lisp
+(setq org-feed-alist
+      '(("Remember The Milk"
+         "https://www.rememberthemilk.com/atom/<add url for RTM atom feed here>"
+         "~/org/RTM.org"
+         "Remember The Milk"
+         :parse-feed org-feed-parse-atom-feed
+         :parse-entry org-feed-parse-RTM-entry
+         :template "* TODO %title\n SCHEDULED:%dueorgformat\n Due: %due\n Location: %location\n Priority:%priority\n Tags:%tags\n %a\n "
+         :filter org-feed-RTM-filter-non-scheduled
+         )))
+#+end_src
+
+Finally, we need to tell emacs to run this automatically, for example, every hour. For this, we delete the old file and buffer and then recreate it. If you wanted to change the file name
+for the RTM file you need to edit this too.
+
+#+begin_src emacs-lisp
+(defun myupdate-RTM ()
+  "deletes old RTM.org and generates a new one"
+  (save-current-buffer
+    (if (not (eq nil (get-buffer "RTM.org")))
+        (progn
+         (kill-buffer "RTM.org")
+         (delete-file "~/org/RTM.org")))
+    (set-buffer (get-buffer-create "RTM.org"))
+    (write-file "~/org/RTM.org")
+    (org-feed-update-all)
+    (save-buffer)))
+
+;;* rtm feed timer
+(run-at-time 3600 3600 'myupdate-RTM)
+
+#+end_src
+
+[[file:index.org][{Back to Worg's index}]]
