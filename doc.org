@@ -6,7 +6,7 @@
 
 * Definitions
 
-This page lists *all hooks, commands and options* of Org 7.9.
+This page lists *all hooks, commands and options* of Org 7.9.1.
 
 - *Hooks* :: are options containing functions to be run before or after a
              function.  For example, =org-mode-hook= can contain a list of
@@ -30,7 +30,6 @@ of the =org-agenda= command.
 On top of these symbols, there are other non-interactive /functions/ and
 /variables/.  You can get more documentation about them with =C-h f org-
 TAB= and =C-h v org- TAB= respectively.
-
 
 * Hooks
   :PROPERTIES:
@@ -1108,21 +1107,12 @@ TAB= and =C-h v org- TAB= respectively.
 
 ** org-timer-stop-hook  ~nil~
    :PROPERTIES:
-   :CUSTOM_ID: org-timer-stop-hook
+   :CUSTOM_ID: org-finalize-agenda-hook
    :END:
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-timer.el;hb=HEAD][org-timer.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-timer-stop-hook&sr=1][Find modifications in git logs]]
 
 : Hook run before relative timer is stopped.
-
-** org-finalize-agenda-hook  ~nil~
-   :PROPERTIES:
-   :CUSTOM_ID: org-finalize-agenda-hook
-   :END:
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-finalize-agenda-hook&sr=1][Find modifications in git logs]]
-
-: Hook run just before displaying an agenda buffer.
 
 ** org-follow-link-hook  ~nil~
    :PROPERTIES:
@@ -1276,12 +1266,21 @@ TAB= and =C-h v org- TAB= respectively.
 
 ** org-capture-mode-hook  ~nil~
    :PROPERTIES:
-   :CUSTOM_ID: org-capture-mode-on-hook
+   :CUSTOM_ID: org-capture-mode-hook
    :END:
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-capture.el;hb=HEAD][org-capture.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-capture-mode-hook&sr=1][Find modifications in git logs]]
 
 : Hook for the minor `org-capture-mode'.
+
+** org-agenda-finalize-hook  ~nil~
+   :PROPERTIES:
+   :CUSTOM_ID: org-capture-mode-on-hook
+   :END:
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-finalize-hook&sr=1][Find modifications in git logs]]
+
+: Hook run just before displaying an agenda buffer.
 
 ** org-src-mode-hook  ~nil~
    :PROPERTIES:
@@ -1965,7 +1964,7 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-toggle-time-stamp-overlays&sr=1][Find modifications in git logs]]
 
 : Toggle the use of custom time stamp formats.
-** org-agenda  =(&optional arg keys restriction)=
+** org-agenda  =(&optional arg org-keys restriction)=
    :PROPERTIES:
    :CUSTOM_ID: org-agenda
    :END:
@@ -1988,6 +1987,7 @@ TAB= and =C-h v org- TAB= respectively.
 : L     Create a timeline for the current buffer.
 : e     Export views to associated files.
 : s     Search entries for keywords.
+: S     Search entries for keywords, only with TODO keywords.
 : /     Multi occur across all agenda files and also files listed
 :       in `org-agenda-text-search-extra-files'.
 : <     Restrict agenda commands to buffer, subtree, or region.
@@ -2126,7 +2126,7 @@ TAB= and =C-h v org- TAB= respectively.
 : <remap>		Prefix Command
 : <tab>		org-cycle
 : 
-: M-TAB		pcomplete
+: C-M-i		pcomplete
 : M-RET		org-insert-heading
 : C-M-t		org-transpose-element
 : M-J		org-insert-todo-subheading
@@ -2245,7 +2245,7 @@ TAB= and =C-h v org- TAB= respectively.
 : C-c C-<		outline-promote
 : C-c C->		outline-demote
 : 
-: M-TAB		ispell-complete-word
+: C-M-i		ispell-complete-word
 :   (that binding is currently shadowed by another mode)
 : 
 : C-c C-M-l	org-insert-all-links
@@ -2472,15 +2472,6 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-as-docbook-pdf&sr=1][Find modifications in git logs]]
 
 : Export as DocBook XML file, and generate PDF file.
-** org-set-autofill-regexps
-   :PROPERTIES:
-   :CUSTOM_ID: org-set-autofill-regexps
-   :END:
-
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-set-autofill-regexps&sr=1][Find modifications in git logs]]
-
-
 ** org-insert-todo-subheading  =(arg)=
    :PROPERTIES:
    :CUSTOM_ID: org-insert-todo-subheading
@@ -2983,11 +2974,11 @@ TAB= and =C-h v org- TAB= respectively.
 : d		org-agenda-day-view
 : e		org-agenda-set-effort
 : f		org-agenda-later
-: g		org-agenda-redo
+: g		??
 : h		org-agenda-holidays
 : i		org-agenda-diary-entry
 : j		org-agenda-goto-date
-: k		org-agenda-action
+: k		org-agenda-capture
 : l		org-agenda-log-mode
 : m		org-agenda-bulk-mark
 : n		org-agenda-next-line
@@ -3044,7 +3035,6 @@ TAB= and =C-h v org- TAB= respectively.
 : C-c C-x C-e	org-clock-modify-effort-estimate
 : C-c C-x TAB	org-agenda-clock-in
 : C-c C-x C-j	org-clock-goto
-: C-c C-x C-k	org-agenda-action
 : C-c C-x RET	Prefix Command
 : C-c C-x C-o	org-agenda-clock-out
 : C-c C-x C-s	org-agenda-archive
@@ -3589,7 +3579,7 @@ TAB= and =C-h v org- TAB= respectively.
 : 
 : If there is no region, but you specify a prefix ARG, the current field gets
 : blank, and the content is appended to the field above.
-** org-todo-list  =(arg)=
+** org-todo-list  =(&optional arg)=
    :PROPERTIES:
    :CUSTOM_ID: org-todo-list
    :END:
@@ -4067,6 +4057,15 @@ TAB= and =C-h v org- TAB= respectively.
 : Move the item at point down, i.e. swap with following item.
 : Sub-items (items with larger indentation) are considered part of
 : the item, so this really moves item trees.
+** org-agenda-prepare-buffers  =(files)=
+   :PROPERTIES:
+   :CUSTOM_ID: org-agenda-prepare-buffers
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-prepare-buffers&sr=1][Find modifications in git logs]]
+
+: Create buffers for all agenda files, protect archived trees and comments.
 ** org-export-as-taskjuggler-and-open
    :PROPERTIES:
    :CUSTOM_ID: org-export-as-taskjuggler-and-open
@@ -4108,15 +4107,6 @@ TAB= and =C-h v org- TAB= respectively.
 : interactively.
 : 
 : With prefix arg SPECIAL, offer additional commands in a menu.
-** org-prepare-agenda-buffers  =(files)=
-   :PROPERTIES:
-   :CUSTOM_ID: org-prepare-agenda-buffers
-   :END:
-
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-prepare-agenda-buffers&sr=1][Find modifications in git logs]]
-
-: Create buffers for all agenda files, protect archived trees and comments.
 ** org-agenda-write  =(file &optional open nosettings agenda-bufname)=
    :PROPERTIES:
    :CUSTOM_ID: org-agenda-write
@@ -4192,6 +4182,15 @@ TAB= and =C-h v org- TAB= respectively.
 : Conditionally execute a source block.
 : Detect if this is context for a Babel src-block and if so
 : then run `org-babel-execute-src-block'.
+** org-setup-comments-handling
+   :PROPERTIES:
+   :CUSTOM_ID: org-setup-comments-handling
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-setup-comments-handling&sr=1][Find modifications in git logs]]
+
+
 ** org-occur  =(regexp &optional keep-previous callback)=
    :PROPERTIES:
    :CUSTOM_ID: org-occur
@@ -4347,6 +4346,15 @@ TAB= and =C-h v org- TAB= respectively.
 : This can be used in any buffer.  For example, you could write an
 : itemized list in org-mode syntax in an HTML buffer and then use this
 : command to convert it.
+** org-agenda-capture
+   :PROPERTIES:
+   :CUSTOM_ID: org-agenda-capture
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-capture&sr=1][Find modifications in git logs]]
+
+: Call `org-capture' with the date at point.
 ** org-columns-move-right
    :PROPERTIES:
    :CUSTOM_ID: org-columns-move-right
@@ -4779,9 +4787,12 @@ TAB= and =C-h v org- TAB= respectively.
 : 
 : When called with a `C-0' (zero) prefix, insert a template at point.
 : 
-: Lisp programs can set KEYS to a string associated with a template in
-: `org-capture-templates'.  In this case, interactive selection will be
-: bypassed.
+: Lisp programs can set KEYS to a string associated with a template
+: in `org-capture-templates'.  In this case, interactive selection
+: will be bypassed.
+: 
+: If `org-capture-use-agenda-date' is non-nil, capturing from the
+: agenda will use the date at point as the default date.
 ** org-table-fedit-ref-down
    :PROPERTIES:
    :CUSTOM_ID: org-table-fedit-ref-down
@@ -4800,7 +4811,7 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-columns-remove-overlays&sr=1][Find modifications in git logs]]
 
 : Remove all currently active column overlays.
-** org-agenda-goto-date  =(date)=
+** org-agenda-goto-date  =(span)=
    :PROPERTIES:
    :CUSTOM_ID: org-agenda-goto-date
    :END:
@@ -4978,26 +4989,6 @@ TAB= and =C-h v org- TAB= respectively.
 : and the buffer is switched into `artist-mode' for editing.  When done,
 : exit with M-x org-edit-src-exit.  The edited text will then replace
 : the fragment in the Org-mode buffer.
-** org-agenda-action
-   :PROPERTIES:
-   :CUSTOM_ID: org-agenda-action
-   :END:
-
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-action&sr=1][Find modifications in git logs]]
-
-: Select entry for agenda action, or execute an agenda action.
-: This command prompts for another letter.  Valid inputs are:
-: 
-: m     Mark the entry at point for an agenda action
-: s     Schedule the marked entry to the date at the cursor
-: d     Set the deadline of the marked entry to the date at the cursor
-: r     Call `org-remember' with cursor date as the default date
-: c     Call `org-capture' with cursor date as the default date
-: SPC   Show marked entry in other window
-: TAB   Visit marked entry in other window
-: 
-: The cursor may be at a date in the calendar, or in the Org agenda.
 ** org-babel-do-key-sequence-in-edit-buffer  =(key)=
    :PROPERTIES:
    :CUSTOM_ID: org-babel-do-key-sequence-in-edit-buffer
@@ -5945,7 +5936,7 @@ TAB= and =C-h v org- TAB= respectively.
    :CUSTOM_ID: org-iswitchb
    :END:
 
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-install.el;hb=HEAD][org-install.el]]
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-iswitchb&sr=1][Find modifications in git logs]]
 
 : Switch between Org buffers.
@@ -6689,7 +6680,7 @@ TAB= and =C-h v org- TAB= respectively.
    :CUSTOM_ID: org-ido-switchb
    :END:
 
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-install.el;hb=HEAD][org-install.el]]
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-ido-switchb&sr=1][Find modifications in git logs]]
 
 : Switch between Org buffers.
@@ -6873,6 +6864,15 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-as-utf8&sr=1][Find modifications in git logs]]
 
 : Like `org-export-as-ascii', use encoding for special symbols.
+** org-agenda-goto-block-beginning
+   :PROPERTIES:
+   :CUSTOM_ID: org-agenda-goto-block-beginning
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-goto-block-beginning&sr=1][Find modifications in git logs]]
+
+: Go the agenda block beginning.
 ** org-capture-goto-last-stored
    :PROPERTIES:
    :CUSTOM_ID: org-capture-goto-last-stored
@@ -9847,6 +9847,15 @@ TAB= and =C-h v org- TAB= respectively.
 : 
 : Comparing entries ignores case by default.  However, with an optional argument
 : WITH-CASE, the sorting considers case as well.
+** org-setup-filling
+   :PROPERTIES:
+   :CUSTOM_ID: org-setup-filling
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-setup-filling&sr=1][Find modifications in git logs]]
+
+
 ** org-switchb  =(&optional arg)=
    :PROPERTIES:
    :CUSTOM_ID: org-switchb
@@ -10598,7 +10607,7 @@ TAB= and =C-h v org- TAB= respectively.
 : week.  Any digits before this encode a year.  So 200712 means
 : week 12 of year 2007.  Years in the range 1938-2037 can also be
 : written as 2-digit years.
-** org-agenda-redo
+** org-agenda-redo  =(&optional all)=
    :PROPERTIES:
    :CUSTOM_ID: org-agenda-redo
    :END:
@@ -10606,8 +10615,7 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-redo&sr=1][Find modifications in git logs]]
 
-: Rebuild Agenda.
-: When this is the global TODO list, a prefix argument will be interpreted.
+: Rebuild possibly ALL agenda view(s) in the current buffer.
 ** org-capture-refile
    :PROPERTIES:
    :CUSTOM_ID: org-capture-refile
@@ -12839,6 +12847,9 @@ TAB= and =C-h v org- TAB= respectively.
 : resulting document to this format.  During customization of this
 : variable, the list of valid values are populated based on
 : `org-export-odt-convert-capabilities'.
+: 
+: You can set this option on per-file basis using file local
+: values.  See Info node `(emacs) File Variables'.
 
 ** org-adapt-indentation  ~t~
    :PROPERTIES:
@@ -14215,6 +14226,19 @@ TAB= and =C-h v org- TAB= respectively.
 : All trees carrying any of these tags will be excluded from export.
 : This is without condition, so even subtrees inside that carry one of the
 : `org-export-select-tags' will be removed.
+
+** org-export-taskjuggler-default-global-header  ~""~
+   :PROPERTIES:
+   :CUSTOM_ID: org-export-taskjuggler-default-global-header
+   :END:
+
+- *Type:* (string :tag "Preamble")
+- *Since:* Emacs version 24.1
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-taskjuggler.el;hb=HEAD][org-taskjuggler.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-taskjuggler-default-global-header&sr=1][Find modifications in git logs]]
+
+: Default global header for the project. This goes before
+: project declaration, and might be useful for early macros
 
 ** org-export-html-link-home  ~""~
    :PROPERTIES:
@@ -16956,7 +16980,7 @@ TAB= and =C-h v org- TAB= respectively.
 
 : The uuidgen program.
 
-** org-table-number-regexp  ~"^\\([<>]?[-+^.,0-9]*[0-9][-+^...~
+** org-table-number-regexp  ~"^\\([<>]?[-+^.0-9]*[0-9][-+^....~
    :PROPERTIES:
    :CUSTOM_ID: org-table-number-regexp
    :END:
@@ -16973,8 +16997,7 @@ TAB= and =C-h v org- TAB= respectively.
 : anything which looks remotely like a number as used in scientific
 : context.  For example, all of the following will be considered a
 : number:
-: 
-:    12    12.2   12,2   2.4e-08   2x10^12   4.034+-0.02   2.7(10)   >3.5
+:     12    12.2    2.4e-08    2x10^12    4.034+-0.02    2.7(10)  >3.5
 : 
 : Other options offered by the customize interface are more restrictive.
 
@@ -19080,6 +19103,32 @@ TAB= and =C-h v org- TAB= respectively.
 : option to decide if the schedule for today should come before or after timeless
 : agenda entries.
 
+** org-image-actual-width  ~t~
+   :PROPERTIES:
+   :CUSTOM_ID: org-image-actual-width
+   :END:
+
+- *Type:* (choice (const :tag "Use the i...
+- *Since:* Emacs version 24.3
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-image-actual-width&sr=1][Find modifications in git logs]]
+
+: Should we use the actual width of images when inlining them?
+: 
+: When set to `t', always use the image width.
+: 
+: When set to a number, use imagemagick (when available) to set
+: the image's width to this value.
+: 
+: When set to a number in a list, try to get the width from the
+: #+ATTR.* keyword if it matches a width specification like
+: width="[0-9]+", and fall back on that number if none is found.
+: 
+: When set to nil, try to get the width from an #+ATTR.* keyword
+: and fall back on the original width if none is found.
+: 
+: This requires Emacs >= 24.1, build with imagemagick support.
+
 ** org-latex-default-figure-position  ~"htb"~
    :PROPERTIES:
    :CUSTOM_ID: org-latex-default-figure-position
@@ -19371,6 +19420,19 @@ TAB= and =C-h v org- TAB= respectively.
 
 : If non-nil, include in the agenda entries from the Emacs Calendar's diary.
 : Custom commands can set this variable in the options section.
+
+** org-export-taskjuggler-report-tag  ~"taskjuggler_report"~
+   :PROPERTIES:
+   :CUSTOM_ID: org-export-taskjuggler-report-tag
+   :END:
+
+- *Type:* string
+- *Since:* Emacs version 24.1
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-taskjuggler.el;hb=HEAD][org-taskjuggler.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-taskjuggler-report-tag&sr=1][Find modifications in git logs]]
+
+: Tag, property or todo used to find the tree containing all the
+: reports for the project.
 
 ** org-export-taskjuggler-target-version  ~2.4~
    :PROPERTIES:
@@ -19853,7 +19915,7 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Terms used in clocktable, translated to different languages.
 
-** org-self-insert-cluster-for-undo  ~(version<= emacs-version "24.1...~
+** org-self-insert-cluster-for-undo  ~(or (featurep (quote xemacs)) ...~
    :PROPERTIES:
    :CUSTOM_ID: org-self-insert-cluster-for-undo
    :END:
@@ -21543,6 +21605,18 @@ TAB= and =C-h v org- TAB= respectively.
 : it will be used as a format string, passing the title as an
 : argument.
 
+** org-capture-use-agenda-date  ~nil~
+   :PROPERTIES:
+   :CUSTOM_ID: org-capture-use-agenda-date
+   :END:
+
+- *Type:* boolean
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-capture.el;hb=HEAD][org-capture.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-capture-use-agenda-date&sr=1][Find modifications in git logs]]
+
+: Non-nil means use the date at point when capturing from agendas.
+: When nil, you can still capturing using the date at point with \[org-agenda-capture]].
+
 ** org-export-latex-quotes  ~(quote (("fr" ("\\(\\s-\\|[[(]...~
    :PROPERTIES:
    :CUSTOM_ID: org-export-latex-quotes
@@ -22868,6 +22942,20 @@ TAB= and =C-h v org- TAB= respectively.
 : During customization, the list of converter names are populated
 : from `org-export-odt-convert-processes'.
 
+** org-export-taskjuggler-keep-project-as-task  ~t~
+   :PROPERTIES:
+   :CUSTOM_ID: org-export-taskjuggler-keep-project-as-task
+   :END:
+
+- *Type:* boolean
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-taskjuggler.el;hb=HEAD][org-taskjuggler.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-taskjuggler-keep-project-as-task&sr=1][Find modifications in git logs]]
+
+: Whether to keep the project headline as an umbrella task for
+:   all declared tasks. Setting this to nil will allow maintaining
+:   completely separated task buckets, while still sharing the same
+:   resources pool.
+
 ** org-publish-sitemap-sort-ignore-case  ~nil~
    :PROPERTIES:
    :CUSTOM_ID: org-publish-sitemap-sort-ignore-case
@@ -22975,7 +23063,7 @@ TAB= and =C-h v org- TAB= respectively.
 
 - *Type:* (repeat (cons (string "Languag...
 - *Since:* Emacs version 24.1
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-install.el;hb=HEAD][org-install.el]]
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-tangle.el;hb=HEAD][ob-tangle.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-tangle-lang-exts&sr=1][Find modifications in git logs]]
 
 : Alist mapping languages to their file extensions.
