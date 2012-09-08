@@ -31,28 +31,28 @@ workaround. Go crazy.
 
   Starting with Org 7.9 (and in Git on current master already) you'll
   find functions for creating the autoload files and do
-  byte-compilation in =UTILITIES/org-fixup.el=.  When you execute the
+  byte-compilation in =mk/org-fixup.el=.  When you execute the
   commands below, your current directory must be where org has been
   unpacked into, in other words the file =default.mk= should be found
   in your current directory.  The command =emacs= should be found in
   your =PATH= and start the Emacs version you are using.  To make just
   the autoloads file do:
-  : emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup -f org-make-autoloads
+  : emacs -batch -Q -L lisp -l ../mk/org-fixup -f org-make-autoloads
   To make the autoloads file and byte-compile org:
-  : emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup -f org-make-autoloads-compile
+  : emacs -batch -Q -L lisp -l ../mk/org-fixup -f org-make-autoloads-compile
   To make the autoloads file and byte-compile all of org again:
-  : emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup -f org-make-autoloads-compile-force
+  : emacs -batch -Q -L lisp -l ../mk/org-fixup -f org-make-autoloads-compile-force
   If you are not using Git, you'll have to make fake version strings
   first if =org-version.el= is not already available (if it is, you
   could also edit the version strings there).
-  : emacs -batch -Q -L lisp -l ../UTILITIES/org-fixup \
+  : emacs -batch -Q -L lisp -l ../mk/org-fixup \
   : --eval '(let ((org-fake-release "7.8.11")(org-fake-git-version "7.8.11-fake"))\
   : (org-make-autoloads))'
   The above assumes a
   POSIX shell for its quoting.  Windows =CMD.exe= has quite different
   quoting rules and this won't work, so your other option is to start
   Emacs like this
-  : emacs -Q -L lisp -l ../UTILITIES/org-fixup
+  : emacs -Q -L lisp -l ../mk/org-fixup
   then paste the following into the =*scratch*= buffer
 #+BEGIN_SRC emacs-lisp
   (let ((org-fake-release     "7.8.11")
@@ -65,7 +65,7 @@ workaround. Go crazy.
   =org-make-autoloads-compile-force= if you wish with both variants.
 
   For *older org versions only* (that do not yet have
-  UTILITIES/org-fixup.el), you can use the definitions below.  To use
+  =mk/org-fixup.el=), you can use the definitions below.  To use
   this function, adjust the variables =my/org-lisp-directory= and
   =my/org-compile-sources= to suit your needs.  If you have
   byte-compiled org, but want to run org uncompiled again, just remove
