@@ -1113,13 +1113,17 @@ something like this:
    common problem among users who install a [[#updating-org][newer version]] of Orgmode
    separately is a mixed install where Emacs loads some files from the
    bundled and the rest from the latest version.  This can lead to
-   /unending/ troubles in the future.  An easy first step to
-   investigate this is to look at the output of =M-x org-version=.
+   /unending/ troubles in the future.  With a recent installation of
+   Org mode =M-x org-version= will indicate if the installation is mixed.
+
+   With somewhat older Org mode installations, the procedure is more
+   involved and indeterminate. An easy first step is to look
+   at the output of =M-x org-version=.
    - Good :: ~Org-mode version 7.8.11 (release_7.8.11-448-g1737d3 @
              /path/to/org-mode/lisp/)~
    - Bad :: ~Org-mode version 6.33x (release_7.8.11.409.ga3778)~
 
-   You should go through the output of =list-load-path-shadows=
+   A second step is to go through the output of =list-load-path-shadows=
    line-by-line to get hints to what in your configuration is causing
    the issue.  Among the most common reasons is Orgmode gets loaded
    before the =load-path= variable is updated to include the
