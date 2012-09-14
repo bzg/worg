@@ -118,6 +118,11 @@ by the exporter.
                       (template . custom-template)))
   #+END_SRC
 
+  Back-ends defined with either function can be registered in the
+  export dispatcher using special keyword =:menu-entry= (and also
+  =:sub-menu-entry= for a derived back-end).  See macros docstrings
+  for more information.
+
 * Elements Attributes
   :PROPERTIES:
   :CUSTOM_ID: attributes
@@ -1323,6 +1328,35 @@ by the exporter.
    See also: [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]],
    [[#unravel-code][~org-export-unravel-code~]].
 
+** ~org-export-get-caption~
+   :PROPERTIES:
+   :CUSTOM_ID: get-caption
+   :END:
+
+   Return the caption of a given element, as a secondary string.  With
+   an optional argument, return the short caption instead.
+
+   As an example, =e-ascii= back-end, when creating a list of
+   listings, uses the following:
+
+   #+BEGIN_SRC emacs-lisp
+   (defun org-e-ascii--list-listings (keyword info)
+     (let ((title (org-e-ascii--translate "List of Listings" info)))
+       (concat title "\n"
+               ...
+               (mapconcat
+                (lambda (src-block)
+                  ...
+                  ;; Use short name in priority, if available.
+                  (let ((caption (or (org-export-get-caption src-block t)
+                                     (org-export-get-caption src-block))))
+                    (org-export-data caption info)
+                    ...))
+                (org-export-collect-listings info) "\n"))))
+   #+END_SRC
+
+   See also: [[#read-attribute][~org-export-read-attribute~]].
+
 ** ~org-export-get-coderef-format~
    :PROPERTIES:
    :CUSTOM_ID: get-coderef-format
@@ -1616,18 +1650,20 @@ by the exporter.
 
    Read a property from a given element as a plist.  It can be used to
    normalize affiliated keywords' syntax.  For example, the following
-   affiliated keywords
+   affiliated keywords:
 
    #+BEGIN_SRC org
    ,#+ATTR_HTML: :width 10 :height 5
    ,#+ATTR_HTML: :file "filename.ext"
    #+END_SRC
 
-   would be returned as
+   would be returned as:
 
    #+BEGIN_SRC emacs-lisp
    '(:width 10 :height 5 :file "filename.ext")
    #+END_SRC
+
+   See also: [[#get-caption][~org-export-get-caption~]].
 
 ** ~org-export-resolve-coderef~
    :PROPERTIES:
