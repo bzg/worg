@@ -1424,6 +1424,25 @@ One possible solution is to add (package-initialize) to the primary init.el
 before starter-kit gets going. This will pick up the local install so
 that the built-in version never enters to muddy the picture.
 
+** (Filling a paragraph|Indenting a list|...) behaves strangely
+Many filling/indenting problems have been reported on the mailing
+list: many of those were bugs (that have been fixed), but quite a lot
+are caused by people using the filladapt package, which is fundamentally
+incompatible with Org, which has its own facilities for these tasks. If you see
+strange behavior in this area, first check if you are using filladapt: visit an org
+file and check the modeline for "Filladapt".
+
+If filladapt is on, you want to turn it off before investigating
+further. Anthony Lander suggested on the mailing list the following
+method to turn off filladapt mode when you visit org files:
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-mode-hook 'turn-off-filladapt-mode)
+#+END_SRC
+
+This should be placed in your .emacs (or other initialization file) after org
+is loaded.
+
 * Faces and highlighting
   :PROPERTIES:
   :CUSTOM_ID: Faces
@@ -2146,6 +2165,30 @@ incremental numbers:
 
 Note that you could use arbitrary starting values and column formulas.
 
+Alternatively, you can just start the table
+
+#+begin_src org
+,| N |   |
+,|---+---|
+,| 1 |   |
+#+end_src
+
+and with the cursor on the 1, use S-RET (bound to org-table-copy-down). That
+will add a row, incrementing the number as it goes. See the docstring for org-table-copy-down
+for more information and also see the next FAQ entry [[=S-RET= in a table keeps increasing the copied numbers.  How can I stop this?]]
+if you don't want this behavior.
+
+** =S-RET= in a table keeps increasing the copied numbers.  How can I stop this?
+   :PROPERTIES:
+   :CUSTOM_ID: S-RET-in-a-table-increases-copied-numbers
+   :END:
+
+   Well, it is /supposed/ to be a feature, to make it easy to create a
+   column with increasing numbers.  If this gets into your way, turn it
+   off with
+
+   : (setq org-table-copy-increment nil)
+
 ** Why does my table column get filled with #ERROR?
    :PROPERTIES:
    :CUSTOM_ID: table-column-filled-with-ERROR
@@ -2247,17 +2290,6 @@ Note that you could use arbitrary starting values and column formulas.
    have been thinking about moving a bit further down this line.
    However, for my applications this has so far not been an issue at
    all.  If you have a good case, you could try to convince me.
-
-** =S-RET= in a table keeps increasing the copied numbers.  How can I stop this?
-   :PROPERTIES:
-   :CUSTOM_ID: S-RET-in-a-table-increases-copied-numbers
-   :END:
-
-   Well, it is /supposed/ to be a feature, to make it easy to create a
-   column with increasing numbers.  If this gets into your way, turn it
-   off with
-
-   : (setq org-table-copy-increment nil)
 
 ** When I export tables to HTML, they don't have borders.
    :PROPERTIES:
