@@ -6,7 +6,7 @@
 ;; Keywords: hypermedia, matching
 ;; Requires: org
 ;; Download: http://orgmode.org/worg/code/elisp/org-refer-by-number.el
-;; Version: 1.4.0
+;; Version: 1.5.0
 
 ;;; License:
 
@@ -67,8 +67,12 @@
 
 ;;; Change Log:
 
+;;   [2012-09-22 Sa] Version 1.5.0:
+;;   - New operation "sort" to sort a buffer or region by reference number
+;;   - New operations "highlight" and "unhighlight" to mark references
+
 ;;   [2012-07-13 Fr] Version 1.4.0:
-;;   - New operation heading
+;;   - New operation "head" to find a headline with a reference number
 
 ;;   [2012-04-28 Sa] Version 1.3.0:
 ;;   - New operations occur and multi-occur
@@ -204,7 +208,7 @@ function of this package and its sole entry point; it offers seven
 different operations (short names in parens):
 
 - Add a new row with a new reference number and the
-  date of creation (\"add\"):
+  date of creation (\"add\").
 
 - Search for an existing reference number within your reference
   table (\"search\").
@@ -226,6 +230,12 @@ different operations (short names in parens):
   window configuration, back to the state before entering
   it (\"leave\").
 
+- Sort lines in current buffer or active region by the first
+  reference number, they contain, if any (\"sort\").
+
+- Highlight or unhighlight all occurences of reference number
+  within current buffer (\"highlight\" or \"unhighlight\").
+ 
 The most straightforward way to select between these operations
 is to supply a negative or a a double prefix argument:
 
@@ -233,7 +243,9 @@ is to supply a negative or a a double prefix argument:
 
 You will then be prompted to type a single letter (\"a\", \"s\",
 \"o\", \"m\", \"h\", \"e\" or \"l\") to invoke the respective
-operation from the list above.
+operation from the list above. If your type \"+\" you will be
+prompted a second time to choose among some of the less common
+operations (e.g. \"sort\").
 
 
 Some of the operations above can be invoked with less keystrokes. In that
@@ -248,7 +260,7 @@ case the precise operation invoked depends on two things:
 The following cases explain, which of the seven
 operations (\"add\", \"search\", \"occur\", \"multi-occur\",
 \"heading\", \"enter\" and \"leave\") is actually invoked
-dependng on the conditions above:
+depending on the conditions above:
 
 
   If no prefix argument is given (`\\[org-refer-by-number]') and
@@ -301,6 +313,7 @@ and complete the necessary setup decribed there.
         head               ; Any header before number (e.g. "R")
         last-number        ; Last number used in reference table (e.g. "153")
         tail               ; Tail after number (e.g. "}" or "")
+        ref-regex          ; Regular expression to match a reference
         columns            ; Number of columns in reference table
         kill-new-text      ; Text that will be appended to kill ring
         message-text       ; Text that will be issued as an explanation,
@@ -340,14 +353,18 @@ and complete the necessary setup decribed there.
              (while 
                  (progn 
                    (setq key (read-char-exclusive 
-                              "Please choose: e=enter l=leave s=search a=add o=occur m=multi-occur h=heading"))
+                              "Please choose: e=enter l=leave s=search a=add o=occur m=multi-occur h=heading +=more choices"))
                    (not 
                     (setq what (case key
                                  (?l 'leave) (?e 'enter) (?a 'add) 
-                                 (?s 'search) (?o 'occur) (?m 'multi-occur) (?h 'heading)))))
+                                 (?s 'search) (?o 'occur) (?m 'multi-occur) (?h 'heading) (?+ 'more)))))
                (message "Invalid key '%c'" key)
                (sleep-for 1))
-           (setq what-explicit t))))
+             (if (eq what 'more)
+                 (setq what (cdr (assoc 
+                                  (org-icompleting-read "Please choose: " '("sort" "highlight" "unhighlight") nil t)
+                                  '(("sort" . sort)("highlight" . highlight)("unhighlight" . unhighlight))))))
+             (setq what-explicit t))))
 
     ;; Get decoration and number of last row from reference table
     (let ((m (org-id-find org-refer-by-number-id 'marker)))
@@ -364,8 +381,9 @@ and complete the necessary setup decribed there.
       (setq head (nth 0 parts))
       (setq last-number (nth 1 parts))
       (setq tail (nth 2 parts))
-      (setq columns (nth 3 parts)))
-    
+      (setq columns (nth 3 parts))
+      (setq ref-regex (concat (regexp-quote head) "\\([0-9]+\\)" (regexp-quote tail))))
+      
 
     ;; These actions need a search string:
     (when (memq what '(search occur multi-occur heading))
@@ -381,7 +399,7 @@ and complete the necessary setup decribed there.
       ;; From string below cursor
       (when (and (not within-node)
                  below-cursor
-                 (string-match (concat "\\(" (regexp-quote head) "[0-9]+" (regexp-quote tail) "\\)") 
+                 (string-match (concat "\\(" ref-regex "\\)") 
                                below-cursor))
         (setq search-from-cursor (match-string 1 below-cursor)))
       
@@ -423,8 +441,7 @@ and complete the necessary setup decribed there.
           (setq what-adjusted t))
            
       ;; Check for invalid combinations of arguments; try to be helpful
-      (if (string-match (concat (regexp-quote head) "[0-9]+" (regexp-quote tail) )
-                        search)
+      (if (string-match ref-regex search)
           (if (eq what 'occur) 
               (error "Can do 'occur' only for text, try 'search', 'multi-occur' or 'heading' for a number"))
         (if (memq what '(search multi-occur heading))
@@ -623,6 +640,53 @@ and complete the necessary setup decribed there.
       (if what-adjusted
           (setq message-text "Nothing to search for; at reference table")
         (setq message-text "At reference table")))
+     
+
+     ((eq what 'sort)
+      (let (begin end where)
+        (if (if (and transient-mark-mode
+                     mark-active)
+                (progn
+                  (setq begin (region-beginning))
+                  (setq end (region-end))
+                  (setq where "region")
+                  t)
+              (setq begin (point-min))
+              (setq end (point-max))
+              (setq where "whole buffer")
+              (y-or-n-p "Sort whole buffer ")
+              )
+            (save-excursion
+              (save-restriction
+                (beginning-of-buffer)
+                (narrow-to-region begin end)
+                (sort-subr nil 'forward-line 'end-of-line 
+                           (lambda ()
+                             (if (looking-at (concat "^.*\\b" ref-regex "\\b"))
+                                 (string-to-number (match-string 1))
+                               0))))
+              (highlight-regexp ref-regex)
+              (setq message-text (format "Sorted %s from character %d to %d, %d lines" 
+                                         where begin end
+                                         (count-lines begin end))))
+          (setq message-text "Sort aborted"))))
+      
+
+     ((memq what '(highlight unhighlight))
+      (let ((where "buffer"))
+        (save-excursion
+          (save-restriction
+            (when (and transient-mark-mode
+                     mark-active)
+                (narrow-to-region (region-beginning) (region-end))
+                (setq where "region")
+              )
+          (if (eq what 'highlight)
+              (progn
+                (highlight-regexp ref-regex)
+                (setq message-text (format "Highlighted references in %s" where)))
+            (unhighlight-regexp ref-regex)
+            (setq message-text (format "Removed highlights for references in %s" where)))))))
      
 
      (t (error "This is a bug: Unmatched condition '%s'" what)))
