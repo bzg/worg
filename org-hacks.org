@@ -2471,48 +2471,50 @@ The functions (and latitude/longitude settings which you have to modify for
 your location) are as follows:
 
 #+begin_src emacs-lisp
-(setq calendar-latitude 40.3)
-(setq calendar-longitude -71.0)
+(setq calendar-latitude 48.2)
+(setq calendar-longitude 16.4)
+(setq calendar-location-name "Vienna, Austria")
+
+(autoload 'solar-sunrise-sunset "solar.el")
+(autoload 'solar-time-string "solar.el")
 (defun diary-sunrise ()
-  (let ((dss (diary-sunrise-sunset)))
-    (with-temp-buffer
-      (insert dss)
-      (goto-char (point-min))
-      (while (re-search-forward " ([^)]*)" nil t)
-        (replace-match "" nil nil))
-      (goto-char (point-min))
-      (search-forward ",")
-      (buffer-substring (point-min) (match-beginning 0)))))
+  "Local time of sunrise as a diary entry.
+The diary entry can contain `%s' which will be replaced with
+`calendar-location-name'."
+  (let ((l (solar-sunrise-sunset date)))
+    (when (car l)
+      (concat
+       (if (string= entry "")
+           "Sunrise"
+         (format entry (eval calendar-location-name))) " "
+         (solar-time-string (caar l) nil)))))
 
 (defun diary-sunset ()
-  (let ((dss (diary-sunrise-sunset))
-        start end)
-    (with-temp-buffer
-      (insert dss)
-      (goto-char (point-min))
-      (while (re-search-forward " ([^)]*)" nil t)
-        (replace-match "" nil nil))
-      (goto-char (point-min))
-      (search-forward ", ")
-      (setq start (match-end 0))
-      (search-forward " at")
-      (setq end (match-beginning 0))
-      (goto-char start)
-      (capitalize-word 1)
-      (buffer-substring start end))))
+  "Local time of sunset as a diary entry.
+The diary entry can contain `%s' which will be replaced with
+`calendar-location-name'."
+  (let ((l (solar-sunrise-sunset date)))
+    (when (cadr l)
+      (concat
+       (if (string= entry "")
+           "Sunset"
+         (format entry (eval calendar-location-name))) " "
+         (solar-time-string (caadr l) nil)))))
 #+end_src
 
 You also need to add a couple of diary s-expressions in one of your agenda
 files:
 
 #+begin_src org-mode
-%%(diary-sunrise)
+%%(diary-sunrise)Sunrise in %s
 %%(diary-sunset)
 #+end_src
 
+This will show sunrise with the location and sunset without it.
+
 The thread on the mailing list that started this can be found [[http://thread.gmane.org/gmane.emacs.orgmode/38723Here%20is%20a%20pointer%20to%20the%20thread%20on%20the%20mailing%20list][here]].
 In comparison to the version posted on the mailing list, this one
-gets rid of the timezone information.
+gets rid of the timezone information and can show the location.
 ** Export BBDB contacts to org-contacts.el
 #+index: Address Book!BBDB to org-contacts
 Try this tool by Wes Hardaker:
