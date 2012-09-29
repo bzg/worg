@@ -1041,6 +1041,35 @@ or a function:
 
 They put the link destination on the killring and can be easily bound to a key.
 
+*** Insert link with HTML title as default description
+When using `org-insert-link' (`C-c C-l') it might be useful to extract contents
+from HTML <title> tag and use it as a default link description. Here is a way to
+accomplish this:
+
+#+begin_src emacs-lisp
+(require 'mm-url) ; to include mm-url-decode-entities-string
+
+(defun my-org-insert-link ()
+  "Insert org link where default description is set to html title."
+  (interactive)
+  (let* ((url (read-string "URL: "))
+         (title (get-html-title-from-url url)))
+    (org-insert-link nil url title)))
+
+(defun get-html-title-from-url (url)
+  "Return content in <title> tag."
+  (let (x1 x2 (download-buffer (url-retrieve-synchronously url)))
+    (save-excursion
+      (set-buffer download-buffer)
+      (beginning-of-buffer)
+      (setq x1 (search-forward "<title>"))
+      (search-forward "</title>")
+      (setq x2 (search-backward "<"))
+      (mm-url-decode-entities-string (buffer-substring-no-properties x1 x2)))))
+#+end_src
+
+Then just use `M-x my-org-insert-link' instead of `org-insert-link'.
+
 ** Archiving Content in Org-Mode
 *** Preserve top level headings when archiving to a file
 #+index: Archiving!Preserve top level headings
