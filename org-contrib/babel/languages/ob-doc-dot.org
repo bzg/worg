@@ -1,0 +1,156 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Dot Source Code Blocks in Org Mode
+#+AUTHOR:     Thomas S. Dye
+#+EMAIL:      tsd[at]tsdye[dot]com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="http://www.graphviz.org/">Dot</a>
+  </p>
+  <p>
+  <a href="http://language-site/">
+  <img src="http://www.graphviz.org/app.png"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* Template Checklist [12/12]                                       :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result%20Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+=Dot= is one of six layout programs in the =Graphviz= open source
+graph visualization software, created at AT&T. The =Graphviz= layout
+programs take simple text graph descriptions and make useful diagrams
+in a variety of formats. =Dot= source code blocks call the =dot=
+layout program by default, but can be configured to call any of the
+other five =Graphviz= layout programs.
+
+Graph visualization has applications in many technical domains, where
+it is often used to explore large data sets. A typical use in =Org
+mode= chains the =dot= source code block to a source code block in
+another language that is responsible for converting a data table into
+source code for one of the =Graphviz= layout languages.
+
+* Requirements and Setup
+=Graphviz= is distributed on an open source basis under [[http://www.eclipse.org/legal/eplfaq.php][The Eclipse
+Public License]].  [[http://www.graphviz.org/Download..php][Executable packages]] from AT&T are available for
+Linux, Solaris, Windows, and Mac.
+
+You can configure Org mode to execute =dot= source code blocks by
+adding a line to =org-babel-load-languages=:
+
+#+BEGIN_SRC emacs-lisp
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((dot . t))) ; this line activates dot
+#+END_SRC
+
+* Org Mode Features for =Dot= Source Code Blocks
+** Header Arguments
+=Dot= source code blocks produce graphics files. The default value for
+the =:results= header argument is "file" and for the =:exports= header
+argument it is "results".
+
+There are two =dot= specific header arguments that can be used to
+               tailor the command line.  They are:
+   - =:cmd= :: this header argument can be used to change the layout
+               program from the default "dot".  [[http://www.graphviz.org/Home.php][Sensible values]]
+               are "neato", "fdp", "sfdp", "twopi", and "circo".
+   - =:cmdline= :: the default sets the =dot= flag =-T= to the
+                   extension of the output file in order to indicate
+                   the output format. =Graphviz= recognizes three
+                   dozen [[http://www.graphviz.org/content/output-formats][output formats]]. [[http://www.graphviz.org/content/command-line-invocation][Other flags]] that can be set
+                   with =:cmdline= control default graph, node, and
+                   edge attributes, among other functionality.
+
+The =:file= header argument is required for =dot= source code blocks.
+
+** Sessions
+=Dot= does not support sessions.
+** Result Types
+=Dot= source code blocks produce graphic files, so the default value
+"file" is the only sensible type of result.
+
+** Other
+=Dot= source code blocks currently do not evaluate variables.
+
+* Examples of Use
+A typical use of a =dot= source code block is to produce a graph
+visualization of a data set.  In this example, the following input
+table 
+
+#+name: dot-eg-table
+| a | Hello  |
+| b | World! |
+
+is passed to a source code block that is responsible for producing
+valid =dot= code 
+
+#+name: make-dot
+#+BEGIN_SRC emacs-lisp :var table=dot-eg-table :results output :exports none
+  (mapcar #'(lambda (x)
+              (princ (format "%s [label =\"%s\", shape = \"box\"];\n"
+                             (first x) (second x)))) table)
+              (princ (format "%s -- %s;\n" (first (first table)) (first (second table))))
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+,#+name: make-dot
+,#+BEGIN_SRC emacs-lisp :var table=dot-eg-table :results output :exports none
+  (mapcar #'(lambda (x)
+              (princ (format "%s [label =\"%s\", shape = \"box\"];\n"
+                             (first x) (second x)))) table)
+              (princ (format "%s -- %s;\n" (first (first table)) (first (second table))))
+,#+END_SRC
+#+END_EXAMPLE
+
+and this is chained to a =dot= source code block 
+
+#+BEGIN_EXAMPLE
+,#+BEGIN_SRC dot :file images/test-dot.png :var input=make-dot :exports results
+graph {
+ $input
+}
+,#+END_SRC
+#+END_EXAMPLE
+
+that wraps the input in a =graph{}= command to produce the following
+graphic output
+
+#+BEGIN_SRC dot :file images/test-dot.png :var input=make-dot :exports results
+graph {
+ $input
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:images/test-dot.png]]
+
+An example of chaining source code blocks to produce a =dot= graph is
+provided by Schulte et al. in [[http://www.jstatsoft.org/v46/i03][A Multi-Language Computing Environment
+for Literate Programming and Reproducible Research]].

@@ -1041,6 +1041,35 @@ or a function:
 
 They put the link destination on the killring and can be easily bound to a key.
 
+*** Insert link with HTML title as default description
+When using `org-insert-link' (`C-c C-l') it might be useful to extract contents
+from HTML <title> tag and use it as a default link description. Here is a way to
+accomplish this:
+
+#+begin_src emacs-lisp
+(require 'mm-url) ; to include mm-url-decode-entities-string
+
+(defun my-org-insert-link ()
+  "Insert org link where default description is set to html title."
+  (interactive)
+  (let* ((url (read-string "URL: "))
+         (title (get-html-title-from-url url)))
+    (org-insert-link nil url title)))
+
+(defun get-html-title-from-url (url)
+  "Return content in <title> tag."
+  (let (x1 x2 (download-buffer (url-retrieve-synchronously url)))
+    (save-excursion
+      (set-buffer download-buffer)
+      (beginning-of-buffer)
+      (setq x1 (search-forward "<title>"))
+      (search-forward "</title>")
+      (setq x2 (search-backward "<"))
+      (mm-url-decode-entities-string (buffer-substring-no-properties x1 x2)))))
+#+end_src
+
+Then just use `M-x my-org-insert-link' instead of `org-insert-link'.
+
 ** Archiving Content in Org-Mode
 *** Preserve top level headings when archiving to a file
 #+index: Archiving!Preserve top level headings
@@ -2079,6 +2108,44 @@ Fix a problem with =saveplace.el= putting you back in a folded position:
 		(org-show-subtree)))))
 #+end_src
 
+** Using ido-mode for org-refile (and archiving via refile)
+
+First set up ido-mode, for example using:
+
+#+begin_src emacs-lisp
+; use ido mode for completion
+(setq ido-everywhere t)
+(setq ido-enable-flex-matching t)
+(setq ido-max-directory-size 100000)
+(ido-mode (quote both))
+#+end_src
+
+Now to enable it in org-mode, use the following:
+#+begin_src emacs-lisp
+(setq org-completion-use-ido t)
+(setq org-refile-use-outline-path nil)
+(setq org-refile-allow-creating-parent-nodes 'confirm)
+#+end_src
+The last line enables the creation of nodes on the fly.
+
+If you refile into files that are not in your agenda file list, you can add them as target like this (replace file1\_done, etc with your files):
+#+begin_src emacs-lisp
+(setq org-refile-targets '((org-agenda-files :maxlevel . 5) (("~/org/file1_done" "~/org/file2_done") :maxlevel . 5) ))
+#+end_src
+
+For refiling it is often not useful to include targets that have a DONE state. It's easy to remove them by using the verify-refile-target hook.
+#+begin_src emacs-lisp
+; Exclude DONE state tasks from refile targets; taken from http://doc.norang.ca/org-mode.html
+; added check to only include headlines, e.g. line must have at least one child
+(defun my/verify-refile-target ()
+  "Exclude todo keywords with a DONE state from refile targets"
+  (or (not (member (nth 2 (org-heading-components)) org-done-keywords)))
+      (save-excursion (org-goto-first-child))
+  )
+(setq org-refile-target-verify-function 'my/verify-refile-target)
+#+end_src
+Now when looking for a refile target, you can use the full power of ido to find them. Ctrl-R can be used to switch between different options that ido offers.
+
 ** Using ido-completing-read to find attachments
 
 #+index: Attachment!ido completion
@@ -2471,48 +2538,50 @@ The functions (and latitude/longitude settings which you have to modify for
 your location) are as follows:
 
 #+begin_src emacs-lisp
-(setq calendar-latitude 40.3)
-(setq calendar-longitude -71.0)
+(setq calendar-latitude 48.2)
+(setq calendar-longitude 16.4)
+(setq calendar-location-name "Vienna, Austria")
+
+(autoload 'solar-sunrise-sunset "solar.el")
+(autoload 'solar-time-string "solar.el")
 (defun diary-sunrise ()
-  (let ((dss (diary-sunrise-sunset)))
-    (with-temp-buffer
-      (insert dss)
-      (goto-char (point-min))
-      (while (re-search-forward " ([^)]*)" nil t)
-        (replace-match "" nil nil))
-      (goto-char (point-min))
-      (search-forward ",")
-      (buffer-substring (point-min) (match-beginning 0)))))
+  "Local time of sunrise as a diary entry.
+The diary entry can contain `%s' which will be replaced with
+`calendar-location-name'."
+  (let ((l (solar-sunrise-sunset date)))
+    (when (car l)
+      (concat
+       (if (string= entry "")
+           "Sunrise"
+         (format entry (eval calendar-location-name))) " "
+         (solar-time-string (caar l) nil)))))
 
 (defun diary-sunset ()
-  (let ((dss (diary-sunrise-sunset))
-        start end)
-    (with-temp-buffer
-      (insert dss)
-      (goto-char (point-min))
-      (while (re-search-forward " ([^)]*)" nil t)
-        (replace-match "" nil nil))
-      (goto-char (point-min))
-      (search-forward ", ")
-      (setq start (match-end 0))
-      (search-forward " at")
-      (setq end (match-beginning 0))
-      (goto-char start)
-      (capitalize-word 1)
-      (buffer-substring start end))))
+  "Local time of sunset as a diary entry.
+The diary entry can contain `%s' which will be replaced with
+`calendar-location-name'."
+  (let ((l (solar-sunrise-sunset date)))
+    (when (cadr l)
+      (concat
+       (if (string= entry "")
+           "Sunset"
+         (format entry (eval calendar-location-name))) " "
+         (solar-time-string (caadr l) nil)))))
 #+end_src
 
 You also need to add a couple of diary s-expressions in one of your agenda
 files:
 
 #+begin_src org-mode
-%%(diary-sunrise)
+%%(diary-sunrise)Sunrise in %s
 %%(diary-sunset)
 #+end_src
 
+This will show sunrise with the location and sunset without it.
+
 The thread on the mailing list that started this can be found [[http://thread.gmane.org/gmane.emacs.orgmode/38723Here%20is%20a%20pointer%20to%20the%20thread%20on%20the%20mailing%20list][here]].
 In comparison to the version posted on the mailing list, this one
-gets rid of the timezone information.
+gets rid of the timezone information and can show the location.
 ** Export BBDB contacts to org-contacts.el
 #+index: Address Book!BBDB to org-contacts
 Try this tool by Wes Hardaker:
