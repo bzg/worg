@@ -6,7 +6,7 @@
 
 * Definitions
 
-This page lists *all hooks, commands and options* of Org 7.9.1.
+This page lists *all hooks, commands and options* of Org 7.9.2.
 
 - *Hooks* :: are options containing functions to be run before or after a
              function.  For example, =org-mode-hook= can contain a list of
@@ -35,7 +35,6 @@ TAB= and =C-h v org- TAB= respectively.
   :PROPERTIES:
   :CUSTOM_ID: hooks
   :END:
-
 
 ** org-shiftmetaup-hook  ~nil~
    :PROPERTIES:
@@ -423,7 +422,7 @@ TAB= and =C-h v org- TAB= respectively.
 : The function(s) in this hook must accept a single argument which indicates
 : the new state that was set by the most recent `org-cycle' command.  The
 : argument is a symbol.  After a global state change, it can have the values
-: `overview', `content', or `all'.  After a local state change, it can have
+: `overview', `contents', or `all'.  After a local state change, it can have
 : the values `folded', `children', or `subtree'.
 
 ** org-agenda-before-write-hook  ~(quote (org-agenda-add-entry-t...~
@@ -433,8 +432,8 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-before-write-hook&sr=1][Find modifications in git logs]]
 
-: Hook run in temporary buffer before writing it to an export file.
-: A useful function is `org-agenda-add-entry-text'.
+: Hook run in a temporary buffer before writing the agenda to an export file.
+: A useful function for this hook is `org-agenda-add-entry-text'.
 
 ** org-read-date-minibuffer-setup-hook  ~nil~
    :PROPERTIES:
@@ -467,7 +466,7 @@ TAB= and =C-h v org- TAB= respectively.
 : be one of an interactive command, a function, or a form.
 : 
 : Set `org-use-speed-commands' to non-nil value to enable this
-: hook.  The default setting is `org-speed-command-default-hook'.
+: hook.  The default setting is `org-speed-command-activate'.
 
 ** org-export-preprocess-hook  ~nil~
    :PROPERTIES:
@@ -862,7 +861,7 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob.el;hb=HEAD][ob.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-after-execute-hook&sr=1][Find modifications in git logs]]
 
-: Hook for functions to be called after `org-babel-execute-src-block'
+
 
 ** org-babel-post-tangle-hook  ~nil~
    :PROPERTIES:
@@ -1083,7 +1082,8 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-mode-hook&sr=1][Find modifications in git logs]]
 
-: Hook for `org-agenda-mode', run after the mode is turned on.
+: Hook run after `org-agenda-mode' is turned on.
+: The buffer is still writable when this hook is called.
 
 ** org-publish-before-export-hook  ~nil~
    :PROPERTIES:
@@ -1107,12 +1107,21 @@ TAB= and =C-h v org- TAB= respectively.
 
 ** org-timer-stop-hook  ~nil~
    :PROPERTIES:
-   :CUSTOM_ID: org-finalize-agenda-hook
+   :CUSTOM_ID: org-timer-stop-hook
    :END:
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-timer.el;hb=HEAD][org-timer.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-timer-stop-hook&sr=1][Find modifications in git logs]]
 
 : Hook run before relative timer is stopped.
+
+** org-finalize-agenda-hook  ~nil~
+   :PROPERTIES:
+   :CUSTOM_ID: org-finalize-agenda-hook
+   :END:
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-finalize-agenda-hook&sr=1][Find modifications in git logs]]
+
+
 
 ** org-follow-link-hook  ~nil~
    :PROPERTIES:
@@ -1281,6 +1290,11 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-finalize-hook&sr=1][Find modifications in git logs]]
 
 : Hook run just before displaying an agenda buffer.
+: The buffer is still writable when the hook is called.
+: 
+: You can modify some of the buffer substrings but you should be
+: extra careful not to modify the text properties of the agenda
+: headlines as the agenda display heavily relies on them.
 
 ** org-src-mode-hook  ~nil~
    :PROPERTIES:
@@ -1446,7 +1460,7 @@ TAB= and =C-h v org- TAB= respectively.
 :               this when inserting this link into an Org-mode buffer.
 : 
 : In addition to these, any additional properties can be specified
-: and then used in remember templates.
+: and then used in capture templates.
 
 ** org-after-todo-statistics-hook  ~nil~
    :PROPERTIES:
@@ -2717,6 +2731,8 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-capture-mode&sr=1][Find modifications in git logs]]
 
 : Minor mode for special key bindings in a capture buffer.
+: 
+: Turning on this mode runs the normal hook `org-capture-mode-hook'.
 ** org-table-fedit-menu  =(event)=
    :PROPERTIES:
    :CUSTOM_ID: org-table-fedit-menu
@@ -3024,7 +3040,7 @@ TAB= and =C-h v org- TAB= respectively.
 : C-c C-x		Prefix Command
 : C-c C-z		org-agenda-add-note
 : C-c $		org-agenda-archive
-: C-c ,		org-agenda-show-priority
+: C-c ,		org-agenda-priority
 : 
 : C-x C-s		org-save-all-org-buffers
 : C-x C-w		org-agenda-write
@@ -3101,17 +3117,6 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Add bibliographical data to the current entry.
 : With a prefix arg, query for optional fields.
-** org-agenda-show-priority
-   :PROPERTIES:
-   :CUSTOM_ID: org-agenda-show-priority
-   :END:
-
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-show-priority&sr=1][Find modifications in git logs]]
-
-: Show the priority of the current item.
-: This priority is composed of the main priority given with the [#A] cookies,
-: and by additional input from the age of a schedules or deadline entry.
 ** org-end-of-line  =(&optional arg)=
    :PROPERTIES:
    :CUSTOM_ID: org-end-of-line
@@ -3778,6 +3783,17 @@ TAB= and =C-h v org- TAB= respectively.
 : split.  When called from outside of a code block a new code block
 : is created.  In both cases if the region is demarcated and if the
 : region is not active then the point is demarcated.
+** org-forward-element
+   :PROPERTIES:
+   :CUSTOM_ID: org-forward-element
+   :END:
+
+- *Access:* ~M-}~
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-forward-element&sr=1][Find modifications in git logs]]
+
+: Move forward by one element.
+: Move to the next element at the same level, when possible.
 ** org-edit-src-continue  =(e)=
    :PROPERTIES:
    :CUSTOM_ID: org-edit-src-continue
@@ -3797,17 +3813,6 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Set the tags for the current headline.
 : With prefix ARG, realign all tags in headings in the current buffer.
-** org-forward-element
-   :PROPERTIES:
-   :CUSTOM_ID: org-forward-element
-   :END:
-
-- *Access:* ~M-}~
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-forward-element&sr=1][Find modifications in git logs]]
-
-: Move forward by one element.
-: Move to the next element at the same level, when possible.
 ** org-edit-src-code  =(&optional context code edit-buffer-name)=
    :PROPERTIES:
    :CUSTOM_ID: org-edit-src-code
@@ -3964,8 +3969,9 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-tree-to-indirect-buffer&sr=1][Find modifications in git logs]]
 
 : Create indirect buffer and narrow it to current subtree.
-: With numerical prefix ARG, go up to this level and then take that tree.
+: With a numerical prefix ARG, go up to this level and then take that tree.
 : If ARG is negative, go up that many levels.
+: 
 : If `org-indirect-buffer-display' is not `new-frame', the command removes the
 : indirect buffer previously made with this command, to avoid proliferation of
 : indirect buffers.  However, when you call the command with a C-u prefix, or
@@ -4252,16 +4258,6 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-store-agenda-views&sr=1][Find modifications in git logs]]
 
 
-** org-mark-ring-push  =(&optional pos buffer)=
-   :PROPERTIES:
-   :CUSTOM_ID: org-mark-ring-push
-   :END:
-
-- *Access:* ~C-c %~
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-mark-ring-push&sr=1][Find modifications in git logs]]
-
-: Put the current position or POS into the mark ring and rotate it.
 ** org-transpose-element
    :PROPERTIES:
    :CUSTOM_ID: org-transpose-element
@@ -4273,6 +4269,16 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Transpose current and previous elements, keeping blank lines between.
 : Point is moved after both elements.
+** org-mark-ring-push  =(&optional pos buffer)=
+   :PROPERTIES:
+   :CUSTOM_ID: org-mark-ring-push
+   :END:
+
+- *Access:* ~C-c %~
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-mark-ring-push&sr=1][Find modifications in git logs]]
+
+: Put the current position or POS into the mark ring and rotate it.
 ** org-table-edit-field  =(arg)=
    :PROPERTIES:
    :CUSTOM_ID: org-table-edit-field
@@ -4405,17 +4411,6 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-Quit&sr=1][Find modifications in git logs]]
 
 : Exit agenda by removing the window or the buffer.
-** org-compute-property-at-point
-   :PROPERTIES:
-   :CUSTOM_ID: org-compute-property-at-point
-   :END:
-
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-compute-property-at-point&sr=1][Find modifications in git logs]]
-
-: Compute the property at point.
-: This looks for an enclosing column format, extracts the operator and
-: then applies it to the property in the column format's scope.
 ** org-timer-pause-or-continue  =(&optional stop)=
    :PROPERTIES:
    :CUSTOM_ID: org-timer-pause-or-continue
@@ -4427,6 +4422,17 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Pause or continue the relative timer.
 : With prefix arg STOP, stop it entirely.
+** org-compute-property-at-point
+   :PROPERTIES:
+   :CUSTOM_ID: org-compute-property-at-point
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-compute-property-at-point&sr=1][Find modifications in git logs]]
+
+: Compute the property at point.
+: This looks for an enclosing column format, extracts the operator and
+: then applies it to the property in the column format's scope.
 ** org-babel-examplize-region  =(beg end &optional results-switches)=
    :PROPERTIES:
    :CUSTOM_ID: org-babel-examplize-region
@@ -4538,7 +4544,7 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Update the statistics cookie, either from TODO or from checkboxes.
 : This should be called with the cursor in a line with a statistics cookie.
-** org-agenda-priority  =(&optional force-direction)=
+** org-agenda-priority  =(&optional force-direction show)=
    :PROPERTIES:
    :CUSTOM_ID: org-agenda-priority
    :END:
@@ -5159,15 +5165,6 @@ TAB= and =C-h v org- TAB= respectively.
 : Like `self-insert-command', use overwrite-mode for whitespace in tables.
 : If the cursor is in a table looking at whitespace, the whitespace is
 : overwritten, and the table is not marked as requiring realignment.
-** org-table-fedit-scroll-down  =(N)=
-   :PROPERTIES:
-   :CUSTOM_ID: org-table-fedit-scroll-down
-   :END:
-
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-table.el;hb=HEAD][org-table.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-table-fedit-scroll-down&sr=1][Find modifications in git logs]]
-
-
 ** org-encrypt-entry
    :PROPERTIES:
    :CUSTOM_ID: org-encrypt-entry
@@ -5177,6 +5174,15 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-encrypt-entry&sr=1][Find modifications in git logs]]
 
 : Encrypt the content of the current headline.
+** org-table-fedit-scroll-down  =(N)=
+   :PROPERTIES:
+   :CUSTOM_ID: org-table-fedit-scroll-down
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-table.el;hb=HEAD][org-table.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-table-fedit-scroll-down&sr=1][Find modifications in git logs]]
+
+
 ** org-table-get-stored-formulas  =(&optional noerror)=
    :PROPERTIES:
    :CUSTOM_ID: org-table-get-stored-formulas
@@ -5705,7 +5711,7 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-shiftcontrolup&sr=1][Find modifications in git logs]]
 
 : Change timestamps synchronously up in CLOCK log lines.
-** org-agenda-tree-to-indirect-buffer
+** org-agenda-tree-to-indirect-buffer  =(arg)=
    :PROPERTIES:
    :CUSTOM_ID: org-agenda-tree-to-indirect-buffer
    :END:
@@ -5714,9 +5720,10 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-tree-to-indirect-buffer&sr=1][Find modifications in git logs]]
 
 : Show the subtree corresponding to the current entry in an indirect buffer.
-: This calls the command `org-tree-to-indirect-buffer' from the original
-: Org-mode buffer.
-: With numerical prefix arg ARG, go up to this level and then take that tree.
+: This calls the command `org-tree-to-indirect-buffer' from the original buffer.
+: 
+: With a numerical prefix ARG, go up to this level and then take that tree.
+: With a negative numeric ARG, go up by this number of levels.
 : With a C-u prefix, make a separate frame for this tree (i.e. don't
 : use the dedicated frame).
 ** org-ctags-append-topic  =(name &optional narrowp)=
@@ -7113,7 +7120,7 @@ TAB= and =C-h v org- TAB= respectively.
    :CUSTOM_ID: org-refile
    :END:
 
-- *Access:* ~C-c C-w~
+- *Access:* ~C-c C-w, <menu-bar> <Org> <Edit Structure> <Refile Subtree>~
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-refile&sr=1][Find modifications in git logs]]
 
@@ -7337,6 +7344,15 @@ TAB= and =C-h v org- TAB= respectively.
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-table-fedit-toggle-ref-type&sr=1][Find modifications in git logs]]
 
 : Convert all references in the buffer from B3 to @3$2 and back.
+** org-drag-element-backward
+   :PROPERTIES:
+   :CUSTOM_ID: org-drag-element-backward
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-drag-element-backward&sr=1][Find modifications in git logs]]
+
+: Move backward element at point.
 ** org-insert-todo-heading  =(arg &optional force-heading)=
    :PROPERTIES:
    :CUSTOM_ID: org-insert-todo-heading
@@ -7349,15 +7365,6 @@ TAB= and =C-h v org- TAB= respectively.
 : Insert a new heading with the same level and TODO state as current heading.
 : If the heading has no TODO state, or if the state is DONE, use the first
 : state (TODO by default).  Also with prefix arg, force first state.
-** org-drag-element-backward
-   :PROPERTIES:
-   :CUSTOM_ID: org-drag-element-backward
-   :END:
-
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-drag-element-backward&sr=1][Find modifications in git logs]]
-
-: Move backward element at point.
 ** org-bibtex-check-all  =(&optional optional)=
    :PROPERTIES:
    :CUSTOM_ID: org-bibtex-check-all
@@ -8976,7 +8983,7 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Go forward in time by thee current span.
 : With prefix ARG, go forward that many times the current span.
-** org-priority  =(&optional action)=
+** org-priority  =(&optional action show)=
    :PROPERTIES:
    :CUSTOM_ID: org-priority
    :END:
@@ -9092,6 +9099,16 @@ TAB= and =C-h v org- TAB= respectively.
 : | 5 | d | h |
 : 
 : Note that horizontal lines disappeared.
+** org-add-protective-commas  =(beg end &optional line)=
+   :PROPERTIES:
+   :CUSTOM_ID: org-add-protective-commas
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-src.el;hb=HEAD][org-src.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-add-protective-commas&sr=1][Find modifications in git logs]]
+
+: Add protective commas in region.
+: Return the delta in size of the region.
 ** org-org-menu  =(event)=
    :PROPERTIES:
    :CUSTOM_ID: org-org-menu
@@ -10034,15 +10051,6 @@ TAB= and =C-h v org- TAB= respectively.
 : 
 : When INVISIBLE-OK is set, stop at invisible headlines when going back.
 : This is important for non-interactive uses of the command.
-** org-clock-timestamps-down
-   :PROPERTIES:
-   :CUSTOM_ID: org-clock-timestamps-down
-   :END:
-
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-clock.el;hb=HEAD][org-clock.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-clock-timestamps-down&sr=1][Find modifications in git logs]]
-
-: Increase CLOCK timestamps at cursor.
 ** org-inlinetask-promote
    :PROPERTIES:
    :CUSTOM_ID: org-inlinetask-promote
@@ -10054,6 +10062,15 @@ TAB= and =C-h v org- TAB= respectively.
 : Promote the inline task at point.
 : If the task has an end part, promote it.  Also, prevents level from
 : going below `org-inlinetask-min-level'.
+** org-clock-timestamps-down
+   :PROPERTIES:
+   :CUSTOM_ID: org-clock-timestamps-down
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-clock.el;hb=HEAD][org-clock.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-clock-timestamps-down&sr=1][Find modifications in git logs]]
+
+: Increase CLOCK timestamps at cursor.
 ** org-publish-project  =(project &optional force)=
    :PROPERTIES:
    :CUSTOM_ID: org-publish-project
@@ -10717,6 +10734,17 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Toggle the display of inline images.
 : INCLUDE-LINKED is passed to `org-display-inline-images'.
+** org-show-priority
+   :PROPERTIES:
+   :CUSTOM_ID: org-show-priority
+   :END:
+
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-show-priority&sr=1][Find modifications in git logs]]
+
+: Show the priority of the current item.
+: This priority is composed of the main priority given with the [#A] cookies,
+: and by additional input from the age of a schedules or deadline entry.
 ** org-insert-all-links  =(&optional keep)=
    :PROPERTIES:
    :CUSTOM_ID: org-insert-all-links
@@ -10897,45 +10925,6 @@ TAB= and =C-h v org- TAB= respectively.
 : bibtex headlines from within an org file.  This can be set to ID
 : to enable global links, but only with great caution, as global
 : IDs must be unique.
-
-** org-link-to-org-use-id  ~(quote create-if-interactive-a...~
-   :PROPERTIES:
-   :CUSTOM_ID: org-link-to-org-use-id
-   :END:
-
-- *Type:* (choice (const :tag "Create ID...
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-link-to-org-use-id&sr=1][Find modifications in git logs]]
-
-: Non-nil means storing a link to an Org file will use entry IDs.
-: 
-: Note that before this variable is even considered, org-id must be loaded,
-: so please customize `org-modules' and turn it on.
-: 
-: The variable can have the following values:
-: 
-: t     Create an ID if needed to make a link to the current entry.
-: 
-: create-if-interactive
-:       If `org-store-link' is called directly (interactively, as a user
-:       command), do create an ID to support the link.  But when doing the
-:       job for remember, only use the ID if it already exists.  The
-:       purpose of this setting is to avoid proliferation of unwanted
-:       IDs, just because you happen to be in an Org file when you
-:       call `org-capture' that automatically and preemptively creates a
-:       link.  If you do want to get an ID link in a remember template to
-:       an entry not having an ID, create it first by explicitly creating
-:       a link to it, using `C-c C-l' first.
-: 
-: create-if-interactive-and-no-custom-id
-:       Like create-if-interactive, but do not create an ID if there is
-:       a CUSTOM_ID property defined in the entry.  This is the default.
-: 
-: use-existing
-:       Use existing ID, do not create one.
-: 
-: nil   Never use an ID to make a link, instead link using a text search for
-:       the headline text.
 
 ** org-entities-user  ~nil~
    :PROPERTIES:
@@ -11488,7 +11477,7 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-plantuml.el;hb=HEAD][ob-plantuml.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-plantuml-jar-path&sr=1][Find modifications in git logs]]
 
-: Path to the plantuml.jar file.
+
 
 ** org-list-demote-modify-bullet  ~nil~
    :PROPERTIES:
@@ -11848,11 +11837,11 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-make-link-description-function&sr=1][Find modifications in git logs]]
 
-: Function to use to generate link descriptions from links.
-: If nil the link location will be used.  This function must take
-: two parameters; the first is the link and the second the
-: description `org-insert-link' has generated, and should return the
-: description to use.
+: Function to use for generating link descriptions from links.
+: When nil, the link location will be used.  This function must take
+: two parameters: the first one is the link, the second one is the
+: description generated by `org-insert-link'.  The function should
+: return the description to use.
 
 ** org-remember-warn-about-backups  ~t~
    :PROPERTIES:
@@ -12052,6 +12041,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* boolean
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-sticky&sr=1][Find modifications in git logs]]
 
@@ -12453,6 +12443,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* (repeat (list :tag "Rule" (str...
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-capture.el;hb=HEAD][org-capture.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-capture-templates-contexts&sr=1][Find modifications in git logs]]
 
@@ -12817,19 +12808,6 @@ TAB= and =C-h v org- TAB= respectively.
 : is better to limit inheritance to certain tags using the variables
 : `org-use-tag-inheritance' and `org-tags-exclude-from-inheritance'.
 
-** org-custom-properties  ~nil~
-   :PROPERTIES:
-   :CUSTOM_ID: org-custom-properties
-   :END:
-
-- *Type:* (repeat (string :tag "Property...
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-custom-properties&sr=1][Find modifications in git logs]]
-
-: List of properties (as strings) with a special meaning.
-: The default use of these custom properties is to let the user
-: hide them with `org-toggle-custom-properties-visibility'.
-
 ** org-export-odt-preferred-output-format  ~nil~
    :PROPERTIES:
    :CUSTOM_ID: org-export-odt-preferred-output-format
@@ -12850,6 +12828,20 @@ TAB= and =C-h v org- TAB= respectively.
 : 
 : You can set this option on per-file basis using file local
 : values.  See Info node `(emacs) File Variables'.
+
+** org-custom-properties  ~nil~
+   :PROPERTIES:
+   :CUSTOM_ID: org-custom-properties
+   :END:
+
+- *Type:* (repeat (string :tag "Property...
+- *Since:* Emacs version 24.3
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-custom-properties&sr=1][Find modifications in git logs]]
+
+: List of properties (as strings) with a special meaning.
+: The default use of these custom properties is to let the user
+: hide them with `org-toggle-custom-properties-visibility'.
 
 ** org-adapt-indentation  ~t~
    :PROPERTIES:
@@ -12917,7 +12909,7 @@ TAB= and =C-h v org- TAB= respectively.
 : If this option is t, the double prefix can be used to exceptionally
 : force an export command into the current process.
 
-** org-agenda-export-html-style  ~""~
+** org-agenda-export-html-style  ~nil~
    :PROPERTIES:
    :CUSTOM_ID: org-agenda-export-html-style
    :END:
@@ -12961,8 +12953,7 @@ TAB= and =C-h v org- TAB= respectively.
 :    <link rel="stylesheet" type="text/css" href="mystyles.css">
 : 
 : As the value of this option simply gets inserted into the HTML <head> header,
-: you can "misuse" it to also add other text to the header.  However,
-: <style>...</style> is required, if not present the variable will be ignored.
+: you can "misuse" it to also add other text to the header.
 
 ** org-clock-frame-title-format  ~(quote (t org-mode-line-string...~
    :PROPERTIES:
@@ -13507,6 +13498,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* string
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-latex.el;hb=HEAD][org-latex.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-latex-hyperref-options-format&sr=1][Find modifications in git logs]]
 
@@ -14226,19 +14218,6 @@ TAB= and =C-h v org- TAB= respectively.
 : All trees carrying any of these tags will be excluded from export.
 : This is without condition, so even subtrees inside that carry one of the
 : `org-export-select-tags' will be removed.
-
-** org-export-taskjuggler-default-global-header  ~""~
-   :PROPERTIES:
-   :CUSTOM_ID: org-export-taskjuggler-default-global-header
-   :END:
-
-- *Type:* (string :tag "Preamble")
-- *Since:* Emacs version 24.1
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-taskjuggler.el;hb=HEAD][org-taskjuggler.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-taskjuggler-default-global-header&sr=1][Find modifications in git logs]]
-
-: Default global header for the project. This goes before
-: project declaration, and might be useful for early macros
 
 ** org-export-html-link-home  ~""~
    :PROPERTIES:
@@ -15332,6 +15311,25 @@ TAB= and =C-h v org- TAB= respectively.
 
 : LaTeX command for top rule for tables.
 
+** org-export-latex-emphasis-alist  ~(quote (("*" "\\textbf{%s}" ni...~
+   :PROPERTIES:
+   :CUSTOM_ID: org-export-latex-emphasis-alist
+   :END:
+
+- *Type:* alist
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-latex.el;hb=HEAD][org-latex.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-latex-emphasis-alist&sr=1][Find modifications in git logs]]
+
+: Alist of LaTeX expressions to convert emphasis fontifiers.
+: Each element of the list is a list of three elements.
+: The first element is the character used as a marker for fontification.
+: The second element is a format string to wrap fontified text with.
+: If it is "\verb", Org will automatically select a delimiter
+: character that is not in the string.  "\protectedtexttt" will use \texttt
+: to typeset and try to protect special characters.
+: The third element decides whether to protect converted text from other
+: conversions.
+
 ** orgtbl-optimized  ~(eq org-enable-table-editor (q...~
    :PROPERTIES:
    :CUSTOM_ID: orgtbl-optimized
@@ -15351,25 +15349,6 @@ TAB= and =C-h v org- TAB= respectively.
 : The default for this option is t if the optimized version is also used in
 : Org-mode.  See the variable `org-enable-table-editor' for details.  Changing
 : this variable requires a restart of Emacs to become effective.
-
-** org-export-latex-emphasis-alist  ~(quote (("*" "\\textbf{%s}" ni...~
-   :PROPERTIES:
-   :CUSTOM_ID: org-export-latex-emphasis-alist
-   :END:
-
-- *Type:* alist
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-latex.el;hb=HEAD][org-latex.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-latex-emphasis-alist&sr=1][Find modifications in git logs]]
-
-: Alist of LaTeX expressions to convert emphasis fontifiers.
-: Each element of the list is a list of three elements.
-: The first element is the character used as a marker for fontification.
-: The second element is a format string to wrap fontified text with.
-: If it is "\verb", Org will automatically select a delimiter
-: character that is not in the string.  "\protectedtexttt" will use \texttt
-: to typeset and try to protect special characters.
-: The third element decides whether to protect converted text from other
-: conversions.
 
 ** org-habit-graph-column  ~40~
    :PROPERTIES:
@@ -16195,20 +16174,7 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-exp.el;hb=HEAD][ob-exp.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-exp-code-template&sr=1][Find modifications in git logs]]
 
-: Template used to export the body of code blocks.
-: This template may be customized to include additional information
-: such as the code block name, or the values of particular header
-: arguments.  The template is filled out using `org-fill-template',
-: and the following %keys may be used.
-: 
-:  lang ------ the language of the code block
-:  name ------ the name of the code block
-:  body ------ the body of the code block
-:  flags ----- the flags passed to the code block
-: 
-: In addition to the keys mentioned above, every header argument
-: defined for the code block may be used as a key and will be
-: replaced with its value.
+
 
 ** org-descriptive-links  ~t~
    :PROPERTIES:
@@ -16334,6 +16300,43 @@ TAB= and =C-h v org- TAB= respectively.
 : should get a different face (`org-mode-line-clock-overrun').
 : When this is a string, it is prepended to the clock string as an indication,
 : also using the face `org-mode-line-clock-overrun'.
+
+** org-id-link-to-org-use-id  ~nil~
+   :PROPERTIES:
+   :CUSTOM_ID: org-id-link-to-org-use-id
+   :END:
+
+- *Type:* (choice (const :tag "Create ID...
+- *Since:* Emacs version 24.3
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-id.el;hb=HEAD][org-id.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-id-link-to-org-use-id&sr=1][Find modifications in git logs]]
+
+: Non-nil means storing a link to an Org file will use entry IDs.
+: 
+: The variable can have the following values:
+: 
+: t     Create an ID if needed to make a link to the current entry.
+: 
+: create-if-interactive
+:       If `org-store-link' is called directly (interactively, as a user
+:       command), do create an ID to support the link.  But when doing the
+:       job for capture, only use the ID if it already exists.  The
+:       purpose of this setting is to avoid proliferation of unwanted
+:       IDs, just because you happen to be in an Org file when you
+:       call `org-capture' that automatically and preemptively creates a
+:       link.  If you do want to get an ID link in a capture template to
+:       an entry not having an ID, create it first by explicitly creating
+:       a link to it, using `C-c C-l' first.
+: 
+: create-if-interactive-and-no-custom-id
+:       Like create-if-interactive, but do not create an ID if there is
+:       a CUSTOM_ID property defined in the entry.
+: 
+: use-existing
+:       Use existing ID, do not create one.
+: 
+: nil   Never use an ID to make a link, instead link using a text search for
+:       the headline text.
 
 ** org-hide-leading-stars  ~nil~
    :PROPERTIES:
@@ -16578,7 +16581,7 @@ TAB= and =C-h v org- TAB= respectively.
 :   %^g         Prompt for tags, with completion on tags in target file.
 :   %^G         Prompt for tags, with completion on all tags in all agenda files.
 :   %^t         Like %t, but prompt for date.  Similarly %^T, %^u, %^U.
-:               You may define a prompt like %^{Please specify birthday.
+:               You may define a prompt like: %^{Please specify birthday}t
 :   %^C         Interactive selection of which kill or clip to use.
 :   %^L         Like %^C, but insert as link.
 :   %^{prop}p   Prompt the user for a value for property `prop'.
@@ -16688,6 +16691,18 @@ TAB= and =C-h v org- TAB= respectively.
 : You can set the property LOG_INTO_DRAWER to overrule this setting for
 : a subtree.
 
+** org-export-odt-inline-image-extensions  ~(quote ("png" "jpeg" "jpg" "gi...~
+   :PROPERTIES:
+   :CUSTOM_ID: org-export-odt-inline-image-extensions
+   :END:
+
+- *Type:* (repeat (string :tag "Extensio...
+- *Since:* Emacs version 24.1
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-odt.el;hb=HEAD][org-odt.el]]
+- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-odt-inline-image-extensions&sr=1][Find modifications in git logs]]
+
+: Extensions of image files that can be inlined into HTML.
+
 ** org-table-relative-ref-may-cross-hline  ~t~
    :PROPERTIES:
    :CUSTOM_ID: org-table-relative-ref-may-cross-hline
@@ -16709,18 +16724,6 @@ TAB= and =C-h v org- TAB= respectively.
 : 
 : It is probably good to never set this variable to nil, for the sake of
 : portability of tables.
-
-** org-export-odt-inline-image-extensions  ~(quote ("png" "jpeg" "jpg" "gi...~
-   :PROPERTIES:
-   :CUSTOM_ID: org-export-odt-inline-image-extensions
-   :END:
-
-- *Type:* (repeat (string :tag "Extensio...
-- *Since:* Emacs version 24.1
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-odt.el;hb=HEAD][org-odt.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-odt-inline-image-extensions&sr=1][Find modifications in git logs]]
-
-: Extensions of image files that can be inlined into HTML.
 
 ** org-mobile-files-exclude-regexp  ~""~
    :PROPERTIES:
@@ -16861,6 +16864,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* (repeat (list :tag "Rule" (str...
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-agenda.el;hb=HEAD][org-agenda.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-agenda-custom-commands-contexts&sr=1][Find modifications in git logs]]
 
@@ -16980,7 +16984,7 @@ TAB= and =C-h v org- TAB= respectively.
 
 : The uuidgen program.
 
-** org-table-number-regexp  ~"^\\([<>]?[-+^.0-9]*[0-9][-+^...."~
+** org-table-number-regexp  ~"^\\([<>]?[-+^.0-9]*[0-9][-+^....~
    :PROPERTIES:
    :CUSTOM_ID: org-table-number-regexp
    :END:
@@ -17093,18 +17097,7 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-exp.el;hb=HEAD][ob-exp.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-exp-call-line-template&sr=1][Find modifications in git logs]]
 
-: Template used to export call lines.
-: This template may be customized to include the call line name
-: with any export markup.  The template is filled out using
-: `org-fill-template', and the following %keys may be used.
-: 
-:  line --- call line
-: 
-: An example value would be "\n: call: %line" to export the call line
-: wrapped in a verbatim environment.
-: 
-: Note: the results are inserted separately after the contents of
-: this template.
+
 
 ** org-mobile-agendas  ~(quote all)~
    :PROPERTIES:
@@ -17811,12 +17804,11 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Cycle globally if cursor is at beginning of buffer and not at a headline.
 : This makes it possible to do global cycling without having to use S-TAB or
-: \[universal-argument] TAB.  For this special case to work, the first line of the buffer
-: must not be a headline - it may be empty or some other text.  When used in
-: this way, `org-cycle-hook' is disables temporarily, to make sure the
-: cursor stays at the beginning of the buffer.
-: When this option is nil, don't do anything special at the beginning
-: of the buffer.
+: \[universal-argument] TAB.  For this special case to work, the first line
+: of the buffer must not be a headline -- it may be empty or some other text.
+: When used in this way, `org-cycle-hook' is disabled temporarily to make
+: sure the cursor stays at the beginning of the buffer.  When this option is
+: nil, don't do anything special at the beginning of the buffer.
 
 ** org-protocol-protocol-alist  ~nil~
    :PROPERTIES:
@@ -19103,32 +19095,6 @@ TAB= and =C-h v org- TAB= respectively.
 : option to decide if the schedule for today should come before or after timeless
 : agenda entries.
 
-** org-image-actual-width  ~t~
-   :PROPERTIES:
-   :CUSTOM_ID: org-image-actual-width
-   :END:
-
-- *Type:* (choice (const :tag "Use the i...
-- *Since:* Emacs version 24.3
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-image-actual-width&sr=1][Find modifications in git logs]]
-
-: Should we use the actual width of images when inlining them?
-: 
-: When set to `t', always use the image width.
-: 
-: When set to a number, use imagemagick (when available) to set
-: the image's width to this value.
-: 
-: When set to a number in a list, try to get the width from the
-: #+ATTR.* keyword if it matches a width specification like
-: width="[0-9]+", and fall back on that number if none is found.
-: 
-: When set to nil, try to get the width from an #+ATTR.* keyword
-: and fall back on the original width if none is found.
-: 
-: This requires Emacs >= 24.1, build with imagemagick support.
-
 ** org-latex-default-figure-position  ~"htb"~
    :PROPERTIES:
    :CUSTOM_ID: org-latex-default-figure-position
@@ -19420,19 +19386,6 @@ TAB= and =C-h v org- TAB= respectively.
 
 : If non-nil, include in the agenda entries from the Emacs Calendar's diary.
 : Custom commands can set this variable in the options section.
-
-** org-export-taskjuggler-report-tag  ~"taskjuggler_report"~
-   :PROPERTIES:
-   :CUSTOM_ID: org-export-taskjuggler-report-tag
-   :END:
-
-- *Type:* string
-- *Since:* Emacs version 24.1
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-taskjuggler.el;hb=HEAD][org-taskjuggler.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-taskjuggler-report-tag&sr=1][Find modifications in git logs]]
-
-: Tag, property or todo used to find the tree containing all the
-: reports for the project.
 
 ** org-export-taskjuggler-target-version  ~2.4~
    :PROPERTIES:
@@ -20052,6 +20005,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* string
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-doi-server-url&sr=1][Find modifications in git logs]]
 
@@ -20082,7 +20036,7 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-sh.el;hb=HEAD][ob-sh.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-sh-var-quote-fmt&sr=1][Find modifications in git logs]]
 
-: Format string used to escape variables when passed to shell scripts.
+
 
 ** org-clock-into-drawer  ~org-log-into-drawer~
    :PROPERTIES:
@@ -20375,10 +20329,10 @@ TAB= and =C-h v org- TAB= respectively.
 : at all to put your files into this directory.  It is only used in the
 : following situations:
 : 
-: 1. When a remember template specifies a target file that is not an
+: 1. When a capture template specifies a target file that is not an
 :    absolute path.  The path will then be interpreted relative to
 :    `org-directory'
-: 2. When a remember note is filed away in an interactive way (when exiting the
+: 2. When a capture note is filed away in an interactive way (when exiting the
 :    note buffer with `C-1 C-c C-c'.  The user is prompted for an org file,
 :    with `org-directory' as the default path.
 
@@ -20592,7 +20546,7 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-picolisp.el;hb=HEAD][ob-picolisp.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-picolisp-cmd&sr=1][Find modifications in git logs]]
 
-: Name of command used to evaluate picolisp blocks.
+
 
 ** org-clock-idle-time  ~nil~
    :PROPERTIES:
@@ -20611,6 +20565,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* string
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-latex-preview-ltxpng-directory&sr=1][Find modifications in git logs]]
 
@@ -20900,7 +20855,7 @@ TAB= and =C-h v org- TAB= respectively.
 :   the time given here, the day recognized as TODAY is actually yesterday.
 : - When a date is read from the user and it is still before the time given
 :   here, the current date and time will be assumed to be yesterday, 23:59.
-:   Also, timestamps inserted in remember templates follow this rule.
+:   Also, timestamps inserted in capture templates follow this rule.
 : 
 : IMPORTANT:  This is a feature whose implementation is and likely will
 : remain incomplete.  Really, it is only here because past midnight seems to
@@ -21270,8 +21225,7 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-lob.el;hb=HEAD][ob-lob.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-lob-files&sr=1][Find modifications in git logs]]
 
-: Files used to populate the `org-babel-library-of-babel'.
-: To add files to this list use the `org-babel-lob-ingest' command.
+
 
 ** org-agenda-add-entry-text-maxlines  ~0~
    :PROPERTIES:
@@ -21284,7 +21238,7 @@ TAB= and =C-h v org- TAB= respectively.
 
 : Maximum number of entry text lines to be added to agenda.
 : This is only relevant when `org-agenda-add-entry-text' is part of
-: `org-agenda-before-write-hook', which it is by default.
+: `org-agenda-before-write-hook', which is the default.
 : When this is 0, nothing will happen.  When it is greater than 0, it
 : specifies the maximum number of lines that will be added for each entry
 : that is listed in the agenda view.
@@ -21611,6 +21565,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* boolean
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-capture.el;hb=HEAD][org-capture.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-capture-use-agenda-date&sr=1][Find modifications in git logs]]
 
@@ -21921,6 +21876,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* (choice (const :tag "Scheduled...
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-sparse-tree-default-date-type&sr=1][Find modifications in git logs]]
 
@@ -22261,8 +22217,7 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-ditaa.el;hb=HEAD][ob-ditaa.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-ditaa-jar-option&sr=1][Find modifications in git logs]]
 
-: Option for the ditaa jar file.
-: Do not leave leading or trailing spaces in this string.
+
 
 ** org-export-docbook-doctype  ~nil~
    :PROPERTIES:
@@ -22449,6 +22404,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* string
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-latex.el;hb=HEAD][org-latex.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-latex-link-with-unknown-path-format&sr=1][Find modifications in git logs]]
 
@@ -22942,20 +22898,6 @@ TAB= and =C-h v org- TAB= respectively.
 : During customization, the list of converter names are populated
 : from `org-export-odt-convert-processes'.
 
-** org-export-taskjuggler-keep-project-as-task  ~t~
-   :PROPERTIES:
-   :CUSTOM_ID: org-export-taskjuggler-keep-project-as-task
-   :END:
-
-- *Type:* boolean
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-taskjuggler.el;hb=HEAD][org-taskjuggler.el]]
-- [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-export-taskjuggler-keep-project-as-task&sr=1][Find modifications in git logs]]
-
-: Whether to keep the project headline as an umbrella task for
-:   all declared tasks. Setting this to nil will allow maintaining
-:   completely separated task buckets, while still sharing the same
-:   resources pool.
-
 ** org-publish-sitemap-sort-ignore-case  ~nil~
    :PROPERTIES:
    :CUSTOM_ID: org-publish-sitemap-sort-ignore-case
@@ -22977,6 +22919,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* boolean
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org.el;hb=HEAD][org.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-url-hexify-p&sr=1][Find modifications in git logs]]
 
@@ -23063,7 +23006,7 @@ TAB= and =C-h v org- TAB= respectively.
 
 - *Type:* (repeat (cons (string "Languag...
 - *Since:* Emacs version 24.1
-- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-tangle.el;hb=HEAD][ob-tangle.el]]
+- *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-install.el;hb=HEAD][org-install.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-tangle-lang-exts&sr=1][Find modifications in git logs]]
 
 : Alist mapping languages to their file extensions.
@@ -23326,7 +23269,7 @@ TAB= and =C-h v org- TAB= respectively.
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ob-R.el;hb=HEAD][ob-R.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-babel-R-command&sr=1][Find modifications in git logs]]
 
-: Name of command to use for executing R code.
+
 
 ** org-export-with-timestamps  ~t~
    :PROPERTIES:
@@ -23583,6 +23526,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* boolean
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-capture.el;hb=HEAD][org-capture.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-capture-bookmark&sr=1][Find modifications in git logs]]
 
@@ -23789,6 +23733,7 @@ TAB= and =C-h v org- TAB= respectively.
    :END:
 
 - *Type:* (choice (const :tag "Do not ad...
+- *Since:* Emacs version 24.3
 - *In file:* [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/org-datetree.el;hb=HEAD][org-datetree.el]]
 - [[http://orgmode.org/w/?p=org-mode.git&a=search&h=HEAD&st=commit&s=org-datetree-add-timestamp&sr=1][Find modifications in git logs]]
 
