@@ -2079,6 +2079,44 @@ Fix a problem with =saveplace.el= putting you back in a folded position:
 		(org-show-subtree)))))
 #+end_src
 
+** Using ido-mode for org-refile (and archiving via refile)
+
+First set up ido-mode, for example using:
+
+#+begin_src emacs-lisp
+; use ido mode for completion
+(setq ido-everywhere t)
+(setq ido-enable-flex-matching t)
+(setq ido-max-directory-size 100000)
+(ido-mode (quote both))
+#+end_src
+
+Now to enable it in org-mode, use the following:
+#+begin_src emacs-lisp
+(setq org-completion-use-ido t)
+(setq org-refile-use-outline-path nil)
+(setq org-refile-allow-creating-parent-nodes 'confirm)
+#+end_src
+The last line enables the creation of nodes on the fly.
+
+If you refile into files that are not in your agenda file list, you can add them as target like this (replace file1\_done, etc with your files):
+#+begin_src emacs-lisp
+(setq org-refile-targets '((org-agenda-files :maxlevel . 5) (("~/org/file1_done" "~/org/file2_done") :maxlevel . 5) ))
+#+end_src
+
+For refiling it is often not useful to include targets that have a DONE state. It's easy to remove them by using the verify-refile-target hook.
+#+begin_src emacs-lisp
+; Exclude DONE state tasks from refile targets; taken from http://doc.norang.ca/org-mode.html
+; added check to only include headlines, e.g. line must have at least one child
+(defun my/verify-refile-target ()
+  "Exclude todo keywords with a DONE state from refile targets"
+  (or (not (member (nth 2 (org-heading-components)) org-done-keywords)))
+      (save-excursion (org-goto-first-child))
+  )
+(setq org-refile-target-verify-function 'my/verify-refile-target)
+#+end_src
+Now when looking for a refile target, you can use the full power of ido to find them. Ctrl-R can be used to switch between different options that ido offers.
+
 ** Using ido-completing-read to find attachments
 
 #+index: Attachment!ido completion
