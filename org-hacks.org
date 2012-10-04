@@ -78,7 +78,7 @@ workaround. Go crazy.
   
   (defvar my/org-compile-sources t
     "If `nil', never compile org-sources. `my/compile-org' will only create
-  the autoloads file `org-install.el' then. If `t', compile the sources, too.")
+  the autoloads file `org-loaddefs.el' then. If `t', compile the sources, too.")
   
   ;; Customize: (must end with a slash!)
   (setq my/org-lisp-directory "~/.emacs.d/org/lisp/")
@@ -87,18 +87,18 @@ workaround. Go crazy.
   (setq  my/org-compile-sources t)
   
   (defun my/compile-org(&optional directory)
-    "Generate autoloads file org-install.el.  Optionally compile
+    "Generate autoloads file org-loaddefs.el.  Optionally compile
      all *.el files that come with org-mode."
     (interactive)
     (defun my/compile-org()
-      "Generate autoloads file org-install.el.  Optionally compile
+      "Generate autoloads file org-loaddefs.el.  Optionally compile
        all *.el files that come with org-mode."
       (interactive)
       (let ((dirlisp (file-name-directory my/org-lisp-directory)))
         (add-to-list 'load-path dirlisp)
         (require 'autoload)
-        (let ((generated-autoload-file (concat dirlisp "org-install.el")))
-          ;; create the org-install file
+        (let ((generated-autoload-file (concat dirlisp "org-loaddefs.el")))
+          ;; create the org-loaddefs file
           (update-directory-autoloads dirlisp)
           (when my/org-compile-sources
             ;; optionally byte-compile
