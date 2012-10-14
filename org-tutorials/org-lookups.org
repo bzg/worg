@@ -26,13 +26,13 @@
   of how much money you have spent on the trip. You decide to convert
   all sums to euros. Before your trip you write down the following
   table of approximate currency rates.
-  #+TBLNAME: rates
-  | currency        | abbreviation | euros |
-  |-----------------+--------------+-------|
-  | euro            | eur          |     1 |
-  | Norwegian krone | nok          |  0.14 |
-  | Swedish krona   | sek          |  0.12 |
-  | US dollar       | usd          |  0.77 |
+:  #+TBLNAME: rates
+: | currency        | abbreviation | euros |
+: |-----------------+--------------+-------|
+: | euro            | eur          |     1 |
+: | Norwegian krone | nok          |  0.14 |
+: | Swedish krona   | sek          |  0.12 |
+: | US dollar       | usd          |  0.77 |
 
   In what follows we will use the function =org-lookup-first= and the
   previous table =rates= to automatically convert the sums in
@@ -53,16 +53,16 @@
   key is not found: in the last row, an empty key is being searched
   for.
 
-  |  date | expense          |  sum | currency |   rate |  euros |
-  |-------+------------------+------+----------+--------+--------|
-  |  1.3. | flights          |  324 | eur      |      1 |    324 |
-  |  4.6. | books and maps   |  243 | usd      |   0.77 | 187.11 |
-  | 30.7. | rental car       | 8300 | sek      |   0.12 |   996. |
-  |  2.7. | hotel            | 1150 | sek      |   0.12 |   138. |
-  |  2.7. | lunch            |  190 | sek      |   0.12 |   22.8 |
-  |  3.7. | fishing licenses | 1400 | nok      |   0.14 |   196. |
-  |  3.7. | gasoline         |  340 |          | #ERROR | #ERROR |
-  #+TBLFM: $5='(org-lookup-first $4 '(remote(rates,@2$2..@>$2)) '(remote(rates,@2$3..@>$3)))::$6=$5*$3
+: |  date | expense          |  sum | currency |   rate |  euros |
+: |-------+------------------+------+----------+--------+--------|
+: |  1.3. | flights          |  324 | eur      |      1 |    324 |
+: |  4.6. | books and maps   |  243 | usd      |   0.77 | 187.11 |
+: | 30.7. | rental car       | 8300 | sek      |   0.12 |   996. |
+: |  2.7. | hotel            | 1150 | sek      |   0.12 |   138. |
+: |  2.7. | lunch            |  190 | sek      |   0.12 |   22.8 |
+: |  3.7. | fishing licenses | 1400 | nok      |   0.14 |   196. |
+: |  3.7. | gasoline         |  340 |          | #ERROR | #ERROR |
+:  #+TBLFM: $5='(org-lookup-first $4 '(remote(rates,@2$2..@>$2)) '(remote(rates,@2$3..@>$3)))::$6=$5*$3
 
 * Multiple matches with preferred ordering
 
@@ -71,14 +71,14 @@
   grade boundaries. Below is one such table, with the rows in
   increasing order of the lower bound required for a particular grade.
 
-  #+TBLNAME: grade-boundaries
-  | lower bound | grade |
-  |-------------+-------|
-  |           0 | F     |
-  |          10 | D     |
-  |          20 | C     |
-  |          30 | B     |
-  |          40 | A     |
+:  #+TBLNAME: grade-boundaries
+: | lower bound | grade |
+: |-------------+-------|
+: |           0 | F     |
+: |          10 | D     |
+: |          20 | C     |
+: |          30 | B     |
+: |          40 | A     |
 
   We will use the function =org-lookup-last= and the previous table
   =grade-boundaries= to assign grades to students based on their
@@ -91,9 +91,9 @@
   =S-LIST= and returns the a value from the corresponding position in
   =R-LIST=. Here the idea of the lookup used in assigning the grade is
   as follows. Say a student's exam result is 33 marks.  We look for
-  the /last/ row in the table for which the students marks are greater
+  the /last/ row in the table for which the student's marks are greater
   than or equal to the lower bound; in this case it is the row with
-  lower bound 30. The students grade is the corresponding element from
+  lower bound 30. The student's grade is the corresponding element from
   the second column, in this case a B.
 
   Thus, given the number of marks =VAL= of a student, we find the last
@@ -107,13 +107,13 @@
   the Elisp formula, which is needed because some values are numbers
   and some are symbols.
 
-  | student | marks | grade |
-  |---------+-------+-------|
-  | X       |    30 | B     |
-  | Y       |    29 | C     |
-  | Z       |     5 | F     |
-  | W       |    55 | A     |
-  #+TBLFM: $3='(org-lookup-last $2 '(remote(grade-boundaries,@2$1..@>$1)) '(remote(grade-boundaries,@2$2..@>$2)) '>=);L
+: | student | marks | grade |
+: |---------+-------+-------|
+: | X       |    30 | B     |
+: | Y       |    29 | C     |
+: | Z       |     5 | F     |
+: | W       |    55 | A     |
+:  #+TBLFM: $3='(org-lookup-last $2 '(remote(grade-boundaries,@2$1..@>$1)) '(remote(grade-boundaries,@2$2..@>$2)) '>=);L
 
 * Counting matching cells
 
@@ -137,19 +137,20 @@
   the range. Also notice that in this case we are doing the lookup in
   a true two-dimensional range, which is thus also possible
 
-  | group | round 1 | round 2 |
-  |-------+---------+---------|
-  | A     |         |     2.4 |
-  | B     |     4.7 |      11 |
-  | C     |         |         |
-  | D     |       5 |         |
-  | E     |         |     7.2 |
-  | F     |     3.2 |     4.3 |
-  | G     |         |     4.4 |
-  | H     |         |       8 |
-  |-------+---------+---------|
-  | total | missing |       7 |
-  #+TBLFM: @>$3='(length(org-lookup-all "" '(@2$2..@-1$3) nil));E
+: | group | round 1 | round 2 |
+: |-------+---------+---------|
+: | A     |         |     2.4 |
+: | B     |     4.7 |      11 |
+: | C     |         |         |
+: | D     |       5 |         |
+: | E     |         |     7.2 |
+: | F     |     3.2 |     4.3 |
+: | G     |         |     4.4 |
+: | H     |         |       8 |
+: |-------+---------+---------|
+: | total | missing |       7 |
+:  #+TBLFM: @>$3='(length(org-lookup-all "" '(@2$2..@-1$3) nil));E
+
 * Ranking results
 
   Another example application of =org-lookup-all= is an automatic
@@ -157,14 +158,15 @@
   marks is better. Notice that the Elisp expression also
   automatically takes care of ties.
 
-  | group | marks | rank |
-  |-------+-------+------|
-  | A     |    22 |    2 |
-  | B     |    22 |    2 |
-  | C     |    14 |    4 |
-  | D     |    28 |    1 |
-  | E     |     9 |    5 |
-  #+TBLFM: $3='(+ 1 (length (org-lookup-all $2 '(@2$2..@>$2) nil '<)));N
+: | group | marks | rank |
+: |-------+-------+------|
+: | A     |    22 |    2 |
+: | B     |    22 |    2 |
+: | C     |    14 |    4 |
+: | D     |    28 |    1 |
+: | E     |     9 |    5 |
+:  #+TBLFM: $3='(+ 1 (length (org-lookup-all $2 '(@2$2..@>$2) nil '<)));N
+
 * Frequency counts from raw data
   A common situation in the analysis of data is the classification
   (grouping) of raw data values for, e.g., visualisation. Often this
@@ -176,18 +178,18 @@
 
   Consider the following table with different results from different
   groups A-I.
-  #+TBLNAME: raw-data
-  | group | result |
-  |-------+--------|
-  | A     |    2.3 |
-  | B     |    4.2 |
-  | C     |    1.1 |
-  | D     |    3.6 |
-  | E     |    4.5 |
-  | F     |    2.4 |
-  | G     |    1.0 |
-  | H     |    2.3 |
-  | I     |    2.8 |
+:  #+TBLNAME: raw-data
+: | group | result |
+: |-------+--------|
+: | A     |    2.3 |
+: | B     |    4.2 |
+: | C     |    1.1 |
+: | D     |    3.6 |
+: | E     |    4.5 |
+: | F     |    2.4 |
+: | G     |    1.0 |
+: | H     |    2.3 |
+: | I     |    2.8 |
 
   We will classify the results into different, mutually exclusive
   classes. For example, the observations that will belong to the first
@@ -197,13 +199,13 @@
   this function is a pair whose first element is the lower bound and
   second member the upper bound of the interval.
 
-  #+BEGIN_SRC emacs-lisp
-    (defun in-interval (bounds el)
-      (and (>= el (car bounds)) (<= el (cadr bounds))))
-  #+END_SRC
+:  #+BEGIN_SRC emacs-lisp
+:    (defun in-interval (bounds el)
+:      (and (>= el (car bounds)) (<= el (cadr bounds))))
+:  #+END_SRC
 
-  #+RESULTS:
-  : in-interval
+:  #+RESULTS:
+:  : in-interval
 
   Using this predicate function, we can construct a table with class
   boundaries and corresponding frequencies. Note that the first
@@ -211,13 +213,13 @@
   as the first argument to the predicate =in-interval=, is the pair of
   bounds.
 
-  | lower bound | upper bound | frequency |
-  |-------------+-------------+-----------|
-  |           1 |         1.9 |         2 |
-  |           2 |         2.9 |         4 |
-  |           3 |         3.9 |         1 |
-  |           4 |         4.9 |         2 |
-  #+TBLFM: $3='(length (org-lookup-all '($1 $2) '(remote(raw-data,@2$2..@>$2)) nil 'in-interval));N
+: | lower bound | upper bound | frequency |
+: |-------------+-------------+-----------|
+: |           1 |         1.9 |         2 |
+: |           2 |         2.9 |         4 |
+: |           3 |         3.9 |         1 |
+: |           4 |         4.9 |         2 |
+:  #+TBLFM: $3='(length (org-lookup-all '($1 $2) '(remote(raw-data,@2$2..@>$2)) nil 'in-interval));N
 * Conclusion
 
   The org lookup functions can be used for a large number of different
