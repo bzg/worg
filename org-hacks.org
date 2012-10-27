@@ -529,6 +529,26 @@ If you think you might have subtrees with misplaced =SCHEDULED= and
 	 (message "All subtrees checked."))))))
 #+end_src
 
+*** Sorting list by checkbox type
+
+#+index: checkbox!sorting
+
+You can use a custom function to sort list by checkbox type.  Here is a
+function suggested by Carsten:
+
+#+BEGIN_SRC emacs-lisp
+(defun org-sort-list-by-checkbox-type ()
+  "Sort list items according to Checkbox state."
+  (interactive)
+  (org-sort-list
+   nil ?f
+   (lambda ()
+     (if (looking-at org-list-full-item-re)
+	 (cdr (assoc (match-string 3)
+		     '(("[X]" . 1) ("[-]" . 2) ("[ ]" . 3) (nil . 4))))
+       4))))
+#+END_SRC
+
 ** Org Table
 *** Align all tables in a file
 
