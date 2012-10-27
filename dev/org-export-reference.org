@@ -148,6 +148,9 @@ by the exporter.
   ~:attr_docbook~, ~:attr_html~, ~:attr_latex~, ~:attr_odt~,
   ~:caption~, ~:header~, ~:name~, ~:plot~, and ~:results~.
 
+  At the lowest level, a ~:parent~ property is also attached to any
+  string, as a text property.
+
   Other properties, specific to each element or object, are listed
   below.
 
@@ -1000,6 +1003,13 @@ by the exporter.
    - category :: option
    - type :: symbol (nil, t)
 
+** ~:with-smart-quotes~
+
+   Non-nil means activate smart quotes during export.
+
+   - category :: option
+   - type :: symbol (nil ,t)
+
 ** ~:with-special-strings~
 
    Non-nil means transcoding should interpret special strings in plain
@@ -1189,6 +1199,39 @@ by the exporter.
    Replace an element with another in the parse tree.
 
    See also: [[#adopt-element][~org-element-adopt-element~]].
+
+** ~org-export-activate-smart-quotes~
+   :PROPERTIES:
+   :CUSTOM_ID: activate-smart-quotes
+   :END:
+
+   Transform quotes and apostrophes into their "smart" counterpart in
+   a given string.
+
+   It should be used after a check against ~:with-smart-quotes~ value
+   in communication channel.
+
+   Since this function needs the original string, it may be useful to
+   apply others transformations (i.e. characters protection) on a copy
+   of that string and provide the pristine original string as the
+   optional argument.
+
+   For example, in ~e-html~ back-end, it is necessary to protect "<",
+   ">" and "&" characters before calling this function.  Here's an
+   excerpt of the ~plain-text~ transcoder:
+
+   #+BEGIN_SRC emacs-lisp
+   (let ((output text))
+     ;; Protect following characters: <, >, &.
+     (setq output (org-e-html-encode-plain-text output))
+     ;; Handle smart quotes.  Be sure to provide original string since
+     ;; OUTPUT may have been modified.
+     (when (plist-get info :with-smart-quotes)
+       (setq output (org-export-activate-smart-quotes output :html info text)))
+     ...
+     ;; Return value.
+     output)
+   #+END_SRC
 
 ** ~org-export-collect-figures~
    :PROPERTIES:
