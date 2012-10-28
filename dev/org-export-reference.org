@@ -176,11 +176,12 @@ by the exporter.
 
    Element.
 
+   - ~:duration~ :: Clock duration for a closed clock, or nil (string
+                    or nil).
    - ~:status~ :: Status of current clock (symbol: ~closed~ or
                   ~running~).
-   - ~:value~ :: Timestamp associated to clock keyword (string).
-   - ~:time~ :: Clock duration for a closed clock, or nil (string or
-                nil).
+   - ~:value~ :: Timestamp associated to clock keyword (timestamp
+                 object).
 
 ** Code
 
@@ -321,12 +322,14 @@ by the exporter.
    
    - ~:archivedp~ :: Non-nil if the headline has an archive tag
                      (boolean).
-   - ~:category~ :: Headline's category (string).
-   - ~:clock~ :: Headline's CLOCK reference, if any (string or nil).
+   - ~:clockedp~ :: Non-nil when headline is currently being clocked
+                    (boolean).
+   - ~:closed~ :: Headline's CLOSED reference, if any (timestamp
+                  object or nil)
    - ~:commentedp~ :: Non-nil if the headline has a comment keyword
                       (boolean).
-   - ~:deadline~ :: Headline's DEADLINE reference, if any (string or
-                    nil).
+   - ~:deadline~ :: Headline's DEADLINE reference, if any (timestamp
+                    object or nil).
    - ~:footnote-section-p~ :: Non-nil if the headline is a footnote
         section (boolean).
    - ~:hiddenp~ :: Non-nil if the headline is hidden (boolean).
@@ -339,12 +342,10 @@ by the exporter.
                    (boolean).
    - ~:raw-value~ :: Raw headline's text, without the stars and the
                      tags (string).
-   - ~:scheduled~ :: Headline's SCHEDULED reference, if any (string or
-                     nil).
+   - ~:scheduled~ :: Headline's SCHEDULED reference, if any (timestamp
+                     object or nil).
    - ~:tags~ :: Headline's tags, if any, without the archive
                 tag. (list of strings).
-   - ~:timestamp~ :: Headline's TIMESTAMP reference, if any (string or
-                     nil).
    - ~:title~ :: Parsed headline's text, without the stars and the
                  tags (secondary string).
    - ~:todo-keyword~ :: Headline's TODO keyword without quote and
@@ -385,19 +386,20 @@ by the exporter.
    attribute (with underscores replaced with hyphens and a lowercase
    name, i.e. ~:custom-id~).
 
-   - ~:clock~ :: Inlinetask's CLOCK reference, if any (string or nil).
-   - ~:deadline~ :: Inlinetask's DEADLINE reference, if any (string or
-                    nil).
+   - ~:clockedp~ :: Non-nil when inlinetask is currently being clocked
+                    (boolean).
+   - ~:closed~ :: Inlinetask's CLOSED reference, if any (timestamp
+                  object or nil)
+   - ~:deadline~ :: Inlinetask's DEADLINE reference, if any (timestamp
+                    object or nil).
    - ~:hiddenp~ :: Non-nil if the headline is hidden (boolean).
    - ~:level~ :: Reduced level of the inlinetask (integer).
    - ~:priority~ :: Headline's priority, as a character (integer).
    - ~:raw-value~ :: Raw inlinetask's text, without the stars and the
                      tags (string).
-   - ~:scheduled~ :: Inlinetask's SCHEDULED reference, if any (string
-                     or nil).
+   - ~:scheduled~ :: Inlinetask's SCHEDULED reference, if any
+                     (timestamp object or nil).
    - ~:tags~ :: Inlinetask's tags, if any (list of strings).
-   - ~:timestamp~ :: Inlinetask's TIMESTAMP reference, if any (string
-                     or nil).
    - ~:title~ :: Parsed inlinetask's text, without the stars and the
                  tags (secondary string).
    - ~:todo-keyword~ :: Inlinetask's TODO keyword, if any (string or
@@ -553,11 +555,11 @@ by the exporter.
    Element.
 
    - ~:closed~ :: Timestamp associated to closed keyword, if any
-                  (string or nil).
+                  (timestamp object or nil).
    - ~:deadline~ :: Timestamp associated to deadline keyword, if any
-                    (string or nil).
+                    (timestamp object or nil).
    - ~:scheduled~ :: Timestamp associated to scheduled keyword, if any
-                     (string or nil).
+                     (timestamp object or nil).
 
 ** Property Drawer
 
@@ -686,11 +688,36 @@ by the exporter.
 
    Object.
 
-   - ~:range-end~ :: Timestamp ending the date range, if any (string
-                     or nil).
+   - ~:day-end~ :: Day part from timestamp end.  If no ending date is
+                   defined, it defaults to start day part (integer).
+   - ~:day-start~ :: Day part from timestamp start (integer).
+   - ~:hour-start~ :: Hour part from timestamp end. If no ending date
+                      is defined, it defaults to start hour part, if
+                      any (integer or nil).
+   - ~:hour-start~ :: Hour part from timestamp start, if specified
+                      (integer or nil).
+   - ~:minute-start~ :: Minute part from timestamp end. If no ending
+        date is defined, it defaults to start minute part, if any
+        (integer or nil).
+   - ~:minute-start~ :: Minute part from timestamp start, if specified
+        (integer or nil).
+   - ~:month-end~ :: Month part from timestamp end.  If no ending date
+                     is defined, it defaults to start month part
+                     (integer).
+   - ~:month-start~ :: Month part from timestamp start (integer).
+   - ~:raw-value~ :: Raw timestamp (string).
+   - ~:repeater-type~ :: Type of repeater, if any (symbol: ~catch-up~,
+        ~restart~, ~cumulate~ or nil)
+   - ~:repeater-unit~ :: Unit of shift, if a repeater is defined
+        (symbol: ~year~, ~month~, ~week~, ~day~, ~hour~ or nil).
+   - ~:repeater-value~ :: Value of shift, if a repeater is defined
+        (integer or nil).
    - ~:type~ :: Type of timestamp (symbol: ~active~, ~active-range~,
                 ~diary~, ~inactive~, ~inactive-range~).
-   - ~:value~ :: Timestamp (string).
+   - ~:year-end~ :: Year part from timestamp end.  If no ending date
+                    is defined, it defaults to start year part
+                    (integer).
+   - ~:year-start~ :: Year part from timestamp start (integer).
 
 ** Underline
 
