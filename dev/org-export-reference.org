@@ -2084,6 +2084,36 @@ by the exporter.
    See also: [[#format-code][~org-export-format-code~]],
    [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]].
 
+** ~org-export-with-backend~
+   :PROPERTIES:
+   :CUSTOM_ID: with-backend
+   :END:
+
+   Export an element or object using locally another back-end.
+
+   In a derived back-end, it may be used as a fall-back function once
+   all specific cases have been handled.  Thus, =e-beamer= back-end,
+   derived from =e-latex=, takes care of every internal link type and
+   delagates everything else to its parent back-end:
+
+   #+BEGIN_SRC emacs-lisp
+   (let ((type (org-element-property :type link))
+         (path (org-element-property :path link)))
+     (cond
+      ;; Handle every internal link type, but be careful to ignore "id"
+      ;; type links pointing to external files.
+      ((equal type "radio") ...)
+      ((and (member type '("custom-id" "fuzzy" "id"))
+            (let ((destination (if (string= type "fuzzy")
+                                   (org-export-resolve-fuzzy-link link info)
+                                 (org-export-resolve-id-link link info))))
+              (case (org-element-type destination)
+                (headline ...)
+                (target ...)))))
+      ;; Otherwise, use `e-latex' back-end.
+      (t (org-export-with-backend 'e-latex link contents info))))
+   #+END_SRC
+
 
 # Local Variables:
 # sentence-end-double-space: t
