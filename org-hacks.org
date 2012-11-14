@@ -2611,18 +2611,18 @@ This can be used to display lunar phases in the agenda display with the
 following function:
 
 #+begin_src emacs-lisp
+(require 'cl-lib)
+
 (org-no-warnings (defvar date))
 (defun org-lunar-phases ()
   "Show lunar phase in Agenda buffer."
   (require 'lunar)
-  (let ((phase-list (lunar-phase-list (nth 0 date) (nth 2 date)))
-        ret)
-    (mapc (lambda (phase)
-            (when (equal (car phase) date)
-              (setq ret (concat (lunar-phase-name (nth 2 phase)) " "
-                                (substring (nth 1 phase) 0 5)))))
-          phase-list)
-    ret))
+  (let* ((phase-list (lunar-phase-list (nth 0 date) (nth 2 date)))
+         (phase (cl-find-if (lambda (phase) (equal (car phase) date))
+                            phase-list)))
+    (when phase
+      (setq ret (concat (lunar-phase-name (nth 2 phase)) " "
+                        (substring (nth 1 phase) 0 5))))))
 #+end_src
 
 Add the following line to an agenda file:
