@@ -2602,6 +2602,54 @@ This will show sunrise with the location and sunset without it.
 The thread on the mailing list that started this can be found [[http://thread.gmane.org/gmane.emacs.orgmode/38723Here%20is%20a%20pointer%20to%20the%20thread%20on%20the%20mailing%20list][here]].
 In comparison to the version posted on the mailing list, this one
 gets rid of the timezone information and can show the location.
+** Add lunar phases to the agenda.
+#+index: Agenda!Diary s-expressions
+   -- Rüdiger
+
+Emacs comes with =lunar.el= to display the lunar phases (=M-x lunar-phases=).
+This can be used to display lunar phases in the agenda display with the
+following function:
+
+#+begin_src emacs-lisp
+(org-no-warnings (defvar date))
+(defun org-lunar-phases ()
+  "Show lunar phase in Agenda buffer."
+  (require 'lunar)
+  (let ((phase-list (lunar-phase-list (nth 0 date) (nth 2 date)))
+        ret)
+    (mapc (lambda (phase)
+            (when (equal (car phase) date)
+              (setq ret (concat (lunar-phase-name (nth 2 phase)) " "
+                                (substring (nth 1 phase) 0 5)))))
+          phase-list)
+    ret))
+#+end_src
+
+Add the following line to an agenda file:
+
+#+begin_src org-mode
+* Lunar phase
+#+CATEGORY: Lunar
+%%(org-lunar-phase)
+#+end_src
+
+This should display an entry on new moon, first/last quarter moon, and on full
+moon.  You can customize the entries by customizing =lunar-phase-names=.
+
+E.g., to add Unicode symbols:
+
+#+begin_src emacs-lisp
+(setq lunar-phase-names
+      '("● New Moon" ; Unicode symbol: 🌑 Use full circle as fallback
+        "☽ First Quarter Moon"
+        "○ Full Moon" ; Unicode symbol: 🌕 Use empty circle as fallback
+        "☾ Last Quarter Moon"))
+#+end_src
+
+Unicode 6 even provides symbols for the Moon with nice faces.  But those
+symbols are currently barely supported in fonts.
+See [[https://en.wikipedia.org/wiki/Astronomical_symbols#Moon][Astronomical symbols on Wikipedia]].
+
 ** Export BBDB contacts to org-contacts.el
 #+index: Address Book!BBDB to org-contacts
 Try this tool by Wes Hardaker:
