@@ -1422,7 +1422,9 @@ by the exporter.
 
    Format a timestamp object with an arbitrary format string.
 
-   See also: [[#timestamp-has-time-p][~org-export-timestamp-has-time-p~]].
+   See also: [[#timestamp-has-time-p][~org-export-timestamp-has-time-p~]],
+   [[#split-timestamp-range][~org-export-split-timestamp-range~]],
+   [[#translate-timestamp][~org-export-translate-timestamp~]].
 
 ** ~org-export-get-caption~
    :PROPERTIES:
@@ -2093,6 +2095,50 @@ by the exporter.
 
    Refer to ~org-export-dictionary~ variable for the list of all
    supported strings.
+
+** ~org-export-split-timestamp-range~
+   :PROPERTIES:
+   :CUSTOM_ID: split-timestamp-range
+   :END:
+
+   Extract the date start or end from a timestamp range.
+
+   See also: [[#format-timestamp][~org-export-format-timestamp~]],
+   [[#translate-timestamp][~org-export-translate-timestamp~]].
+
+** ~org-export-translate-timestamp~
+   :PROPERTIES:
+   :CUSTOM_ID: translate-timestamp
+   :END:
+
+   Apply ~org-translate-time~ on a timestamp object.
+
+   According to ~org-time-stamp-custom-formats~ documentation:
+
+   #+BEGIN_QUOTE
+   The custom formats are also honored by export commands, if custom
+   time display is turned on at the time of export.
+   #+END_QUOTE
+
+   Therefore, this function is applied by default on timestamps in
+   many back-ends. For example, in =e-latex=:
+
+   #+BEGIN_SRC emacs-lisp
+   (defun org-e-latex-timestamp (timestamp contents info)
+     "Transcode a TIMESTAMP object from Org to LaTeX.
+   CONTENTS is nil.  INFO is a plist holding contextual
+   information."
+     (let ((value (org-e-latex-plain-text
+                   (org-export-translate-timestamp timestamp) info)))
+       (case (org-element-property :type timestamp)
+         ((active active-range) (format org-e-latex-active-timestamp-format value))
+         ((inactive inactive-range)
+          (format org-e-latex-inactive-timestamp-format value))
+         (otherwise (format org-e-latex-diary-timestamp-format value)))))
+   #+END_SRC
+
+   See also: [[#format-timestamp][~org-export-format-timestamp~]],
+   [[#split-timestamp-range][~org-export-split-timestamp-range~]].
 
 ** ~org-export-unravel-code~
    :PROPERTIES:
