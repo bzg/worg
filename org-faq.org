@@ -468,137 +468,53 @@ issue with mixed installations.
    :CUSTOM_ID: keeping-local-changes-current-with-Org-mode-development
    :END:
 
-  *This example is outdated.* There is no need to do this anymore for
-  this particular purpose, since this can now be specified in
-  =local.mk=.  The changes to the build system that enable this are
-  currently only available on =master= and will be generally released
-  with Org 7.9.
+  There is no need to do this anymore for the purpose of adapting the
+  build system to the local environment, since this can now be
+  specified in =local.mk=.  However, there may be a need to make other
+  local changes to Org.
 
-  Say you want to make minor changes to the Makefile to reflect your
-  location for =emacs=.  Create a local branch for your changes on top
-  of origin/master as follows:
+  Say you want to make minor changes to the =org.el= or any other
+  version controlled file from Org and you want to keep these changes
+  on top of the =master= branch from Org.  Create a local branch for
+  your changes on top of origin/master as follows:
 
   : $ git checkout -b local origin/master
   : $ git config branch.local.rebase true
-  : # Make your changes to the Makefile and create a new commit
-  : $ git add Makefile
-  : $ git commit -m 'My local Makefile configurations'
-  : # Update git to a newer version
+  : # Make your changes to the sources and create a new commit
+  : $ git commit -am 'My local changes to Org'
+  : # Update to a newer version
   : $ git pull
 
   Now each time you pull new commits from the distribution repository
   your local commits will be rewound and replayed on top of the new
-  origin/master.
+  origin/master.  You would normally work on your =local= branch which
+  includes your custom commits; there's no need to switch back to the
+  =master= branch.
 
------------
+  If you get a conflict during a =git pull= (a change in Org and one
+  of your local changes try to alter the same line of code) you will
+  need to edit the file with the conflict to fix up the conflicting
+  lines and then tell git that you have resolved the conflict:
 
-  You would normally work on your =local= branch which includes your
-  custom commits; there's no need to switch back to the =master=
-  branch.
+  1. =git pull= fails with a conflict
+  2. edit the file: look for the conflict markers =>>>>>>>= and
+     =<<<<<<<= and either keep one version or create a new one and
+     remove all conflict markers while doing this.
+  3. =git add= the file to the index to mark the conflict resolved
+  4. =git rebase --continue=
+  5. lather, rinse, and repeat 2-4 as needed
 
------------
+  Note that it is possible to have silent conflicts when a change in
+  Org and one of your local changes do not edit the same line of code,
+  but are logically incompatible — for example Org might have changed
+  to assume /roses are red/ while you've made a local change that
+  defines /my roses are yellow/ in some other place.  Git will not
+  warn you about such conflicts (it doesn't understand what the code
+  _does_, of course).
 
-Here is an example of dealing with conflict resolution during git pull.
-
-If you get a conflict during a =git pull= you will need to edit the
-file with the conflict to fix up the conflicting lines and then tell
-git that you have resolved the conflict.
-
-Conflict resolution goes something like this:
-
-1. =git pull= fails with a conflict
-2. edit the file
-3. =git add= the file to mark the conflict resolved
-4. =git rebase --continue=
-5. lather, rinse, and repeat 2-4 as needed
-
-For this example we have the following Makefile:
-
-: #
-: # Example Makefile
-: #
-:
-: EMACS=emacs
-:
-: VERSION=V1.0
-
-and we need to change the =EMACS=emacs= line to =EMACS=myemacs= to
-make it work well on our system.
-
-To do this we
-
-  - create a local branch for our work
-
-    : $ git checkout -b local origin/master
-    : $ git config branch.local.rebase true
-
-    This marks the branch so that all local commits on it are rebased
-    on top of any new commits we get in origin/master during a =git
-    pull= operation.
-
-  - Make our custom changes
-
-    Edit the makefile so it looks like this:
-
-    : #
-    : # Example Makefile
-    : #
-    :
-    : EMACS=myemacs
-    :
-    : VERSION=V1.0
-
-  - Create a commit with our custom changes
-    : $ git add Makefile
-    : $ git commit -m 'My local Makefile configurations'
-
-  - Later we do a =git pull= but that fails with conflicts.
-
-    : $ git pull
-    : remote: Counting objects: 5, done.
-    : ...
-    : Patch failed at 0001.
-    :
-    : When you have resolved this problem run "git rebase --continue".
-    : If you would prefer to skip this patch, instead run "git rebase --skip".
-    : To restore the original branch and stop rebasing run "git rebase --abort".
-
-  - Fix the conflict in your favourite editor
-
-    Conflict markers look like this:
-
-    : <<<<<<< HEAD:Makefile
-    : EMACS=emacs22
-    : =======
-    : EMACS=myemacs
-    : >>>>>>> Change emacs location:Makefile
-
-    This attempted =git pull= caused a conflict.  Fire up your
-    favourite editor and fix the conflict in the Makefile.  The
-    conflict markers are <<<<<<<<<< , ======= , and >>>>>>>>>>.  Fix
-    the Makefile appropriately and delete the conflict markers.  You
-    already edited these lines earlier so fixing it should be trivial.
-
-    In this case we changed =EMACS=emacs= to =EMACS=myemacs= and
-    upstream changed =EMACS=emacs= to =EMACS=emacs22=.  Just fix the
-    file and save it by deleting the conflict markers and keeping the
-    code you need (in this case the =EMACS=myemacs= line which we
-    originally modified.)
-
-  - Mark the file's conflict resolved
-
-    : $ git add Makefile
-
-    You use =git add= because you are adding new content to be tracked - you're not adding a file, but you are adding changes in content.
-
-  - Continue the rebase operation
-
-    : $ git rebase --continue
-
-    If any other conflicts arise you fix them the same way - edit the file, mark the conflict resolved, and continue.
-
-At anytime during the rebase conflict resolution you can say "oops this is all wrong - put it back the way it was before I did a pull"
-using
+  At anytime during the rebase conflict resolution you can say "oops
+  this is all wrong - put it back the way it was before I did a pull"
+  using
 : $ git rebase --abort
 
 ** How can I use a stable release version instead of the bleeding edge master?
