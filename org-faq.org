@@ -1929,7 +1929,19 @@ consult the [[http://orgmode.org/worg/org-contrib/org-wikinodes.html][documentat
 
 ** Can I create links to Thunderbirds emails?
 
-Yes, see this: [[http://mid.gmane.org/k9tuql$192$1%2540ger.gmane.org][from Christoph Herzog: Linking to Thunderbird]]
+Yes, see this: [[http://mid.gmane.org/ka42mn$mn9$1%2540ger.gmane.org][from Christoph Herzog: Re: Linking to Thunderbird (correction)]]
+
+#+BEGIN_SRC emacs-lisp
+(require 'org)
+
+(org-add-link-type "thunderlink" 'org-thunderlink-open)
+
+(defun org-thunderlink-open (path)
+  "Opens an email in Thunderbird with ThunderLink."
+  (start-process "myname" nil "thunderbird" "-thunderlink" (concat "thunderlink:" path)))
+
+(provide 'org-thunderlink)
+#+END_SRC
 
 * Plain Lists
   :PROPERTIES:
