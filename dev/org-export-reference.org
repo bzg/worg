@@ -18,7 +18,8 @@ syntax --- as specified by /Org Elements/ --- from the reader.
 It covers [[#back-end][back-end creation]] process, all [[#attributes][attributes]] associated to each
 element or object type, properties offered by the [[#communication][communication
 channel]] during export, the [[#filter-system][filter system]] internals and [[#toolbox][tools]] provided
-by the exporter.
+by the exporter.  Eventually, expected [[#interactive][interactive functions]] aimed at
+end-users are explained in the last part of this document.
 
 
 * Defining a Back-End
@@ -218,7 +219,7 @@ by the exporter.
 
    /Note relative to export:/ The idea behind drawers is that they are
    transparent export-wise.  By default, they should return their
-   contents only.
+   contents without additional decorations.
 
 ** Dynamic Block
 
@@ -803,18 +804,19 @@ by the exporter.
 
    List of global tags for buffer.  Used by [[#get-tags][~org-export-get-tags~]] to
    get tags with inheritance.
+
    - category :: option
    - type :: list of strings
 
 ** ~:footnote-definition-alist~
 
-   /Alist/ between footnote labels and their definition, as parsed
-   data.  Only non-inline footnotes are represented in this /alist/.
-   Also, every definition isn't guaranteed to be referenced in the
-   parse tree.  The purpose of this property is to preserve
-   definitions from oblivion – i.e. when the parse tree comes from
-   a part of the original buffer –, it isn't meant for direct use in
-   a back-end.  To retrieve a definition relative to a reference, use
+   Alist between footnote labels and their definition, as parsed data.
+   Only non-inline footnotes are represented in this alist.  Also,
+   every definition isn't guaranteed to be referenced in the parse
+   tree.  The purpose of this property is to preserve definitions from
+   oblivion – i.e. when the parse tree comes from a part of the
+   original buffer –, it isn't meant for direct use in a back-end.  To
+   retrieve a definition relative to a reference, use
    [[#get-footnote-definition][~org-export-get-footnote-definition~]] instead.
 
    - category :: option
@@ -1208,9 +1210,8 @@ by the exporter.
 
   (defun org-e-ascii-filter-section-blank-lines (headline back-end info)
     "Filter controlling number of blank lines after a section."
-    (if (not (eq back-end 'e-ascii)) headline
-      (let ((blanks (make-string 2 ?\n)))
-        (replace-regexp-in-string "\n\\(?:\n[ \t]*\\)*\\'" blanks headline))))
+    (let ((blanks (make-string 2 ?\n)))
+      (replace-regexp-in-string "\n\\(?:\n[ \t]*\\)*\\'" blanks headline)))
   #+END_SRC
 
 * The Toolbox
@@ -1262,7 +1263,7 @@ by the exporter.
 
    For example, in ~e-html~ back-end, it is necessary to protect "<",
    ">" and "&" characters before calling this function.  Here's an
-   excerpt of the ~plain-text~ transcoder:
+   excerpt of its ~plain-text~ transcoder:
 
    #+BEGIN_SRC emacs-lisp
    (let ((output text))
@@ -2185,6 +2186,92 @@ by the exporter.
       ;; Otherwise, use `e-latex' back-end.
       (t (org-export-with-backend 'e-latex link contents info))))
    #+END_SRC
+
+* Interactive functions
+  :PROPERTIES:
+  :CUSTOM_ID: interactive
+  :END:
+
+  Once the back-end is complete, interactive functions have to be
+  offered for the user to use it.  Depending on the desired output,
+  three functions are provided to help in this task, along with
+  a wrapper function allowing to make export asynchronous.
+
+  Hence, ~org-export-to-buffer~ may be used if the expected output is
+  a temporary buffer whereas ~org-export-to-file~ will be used when
+  exporting to a file.  In the latter case,
+  ~org-export-output-file-name~ can be useful to guess the name of the
+  output file --- though, don't use it in an external process, since
+  it will ask the user for a file name when guessing fails.  At the
+  lowest level, ~org-export-as~ returns the output as a string.  It
+  may be used in conjunction with ~org-export-async-start~ in order to
+  export asynchronously to a temporary buffer, since buffer creation
+  cannot happen in the external process.
+
+  When exporting in background, the output is expected to be displayed
+  in the Export Stack.  The function ~org-export-add-to-stack~ helps
+  doing so.
+
+  While it is suggested to have a look at their respective docstring,
+  the following examples illustrate how to combine all these
+  functions:
+
+  1. Export to a temporary buffer:
+
+     #+BEGIN_SRC emacs-lisp
+     ;;;###autoload
+     (defun org-e-latex-export-as-latex
+     (&optional async subtreep visible-only body-only ext-plist)
+       (interactive)
+       (if async
+           (org-export-async-start
+               (lambda (output)
+                 (with-current-buffer (get-buffer-create "*Org E-LATEX Export*")
+                   (erase-buffer)
+                   (insert output)
+                   (goto-char (point-min))
+                   (LaTeX-mode)
+                   (org-export-add-to-stack (current-buffer) 'e-latex)))
+             `(org-export-as 'e-latex ,subtreep ,visible-only ,body-only
+                             ',ext-plist))
+         (let ((outbuf
+                (org-export-to-buffer 'e-latex "*Org E-LATEX Export*"
+                                      subtreep visible-only body-only ext-plist)))
+           (with-current-buffer outbuf (LaTeX-mode))
+           (when org-export-show-temporary-export-buffer
+             (switch-to-buffer-other-window outbuf)))))
+     #+END_SRC
+
+  2. Export to a file:
+
+     #+BEGIN_SRC emacs-lisp
+     ;;;###autoload
+     (defun org-e-latex-export-to-latex
+       (&optional async subtreep visible-only body-only ext-plist)
+       (interactive)
+       (let ((outfile (org-export-output-file-name ".tex" subtreep)))
+         (if async
+             (org-export-async-start
+                 (lambda (f) (org-export-add-to-stack f 'e-latex))
+               `(expand-file-name
+                 (org-export-to-file
+                  'e-latex ,outfile ,subtreep ,visible-only ,body-only ',ext-plist)))
+           (org-export-to-file
+            'e-latex outfile subtreep visible-only body-only ext-plist))))
+     #+END_SRC
+
+  It may also be interesting to provide a publishing function for the
+  back-end.  Such function must accept three arguments: a plist
+  containing properties relative to the project being exported, the
+  name of the current file being published and the publishing
+  directory.  It often is a simple wrapper around
+  ~org-e-publish-org-to~ function defined in =org-e-publish.el=, as
+  shown in the following example:
+
+  #+BEGIN_SRC emacs-lisp
+  (defun org-e-html-publish-to-html (plist filename pub-dir)
+    (org-e-publish-org-to 'e-html filename ".html" plist pub-dir))
+  #+END_SRC
 
 
 # Local Variables:
