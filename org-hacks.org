@@ -1,10 +1,10 @@
+#+TITLE:      Org ad hoc code, quick hacks and workarounds
+#+AUTHOR:     Worg people
+#+EMAIL:      mdl AT imapmail DOT org
 #+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c)
-#+TITLE:      Org ad hoc code, quick hacks and workarounds
-#+AUTHOR:     Worg people
-#+EMAIL:      mdl AT imapmail DOT org
 #+LANGUAGE:   en
 #+PRIORITIES: A C B
 #+CATEGORY:   worg
@@ -540,8 +540,8 @@ If you think you might have subtrees with misplaced =SCHEDULED= and
 
 #+index: checkbox!sorting
 
-You can use a custom function to sort list by checkbox type.  Here is a
-function suggested by Carsten:
+You can use a custom function to sort list by checkbox type.
+Here is a function suggested by Carsten:
 
 #+BEGIN_SRC emacs-lisp
 (defun org-sort-list-by-checkbox-type ()
@@ -554,6 +554,18 @@ function suggested by Carsten:
 	 (cdr (assoc (match-string 3)
 		     '(("[X]" . 1) ("[-]" . 2) ("[ ]" . 3) (nil . 4))))
        4))))
+#+END_SRC
+
+Use the function above directly on the list.  If you want to use an
+equivalent function after =C-c ^ f=, use this one instead:
+
+#+BEGIN_SRC emacs-lisp
+  (defun org-sort-list-by-checkbox-type-1 ()
+    (lambda ()
+      (if (looking-at org-list-full-item-re)
+          (cdr (assoc (match-string 3)
+                      '(("[X]" . 1) ("[-]" . 2) ("[ ]" . 3) (nil . 4))))
+        4)))
 #+END_SRC
 
 ** Org Table
