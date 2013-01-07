@@ -2878,6 +2878,85 @@ popup window.
 Richard Riley uses gnome-osd in interaction with Org-Mode to display
 appointments.  You can look at the code on the [[http://www.emacswiki.org/emacs-en/OrgMode-OSD][emacswiki]].
 
+** txt2org convert text data to org-mode tables
+From Eric Schulte
+
+I often find it useful to generate Org-mode tables on the command line
+from tab-separated data.  The following awk script makes this easy to
+do.  Text data is read from STDIN on a pipe and any command line
+arguments are interpreted as rows at which to insert hlines.
+
+Here are two usage examples.
+1. running the following
+   : $ cat <<EOF|~/src/config/bin/txt2org
+   : one 1
+   : two 2
+   : three 3
+   : twenty 20
+   : EOF                  
+   results in
+   : |    one |  1 |
+   : |    two |  2 |
+   : |  three |  3 |
+   : | twenty | 20 |
+
+2. and the following (notice the command line argument)
+   : $ cat <<EOF|~/src/config/bin/txt2org 1
+   : strings numbers                                          
+   : one 1
+   : two 2
+   : three 3
+   : twenty 20
+   : EOF 
+   results in
+   : | strings | numbers |
+   : |---------+---------|
+   : |     one |       1 |
+   : |     two |       2 |
+   : |   three |       3 |
+   : |  twenty |      20 |
+
+Here is the script itself
+#+begin_src awk
+  #!/usr/bin/gawk -f
+  #
+  # Read tab separated data from STDIN and output an Org-mode table.
+  #
+  # Optional command line arguments specify row numbers at which to
+  # insert hlines.
+  #
+  BEGIN {
+      for(i=1; i<ARGC; i++){
+          hlines[ARGV[i]+1]=1; ARGV[i] = "-"; } }
+  
+  {
+      if(NF > max_nf){ max_nf = NF; };
+      for(f=1; f<=NF; f++){
+          if(length($f) > lengths[f]){ lengths[f] = length($f); };
+          row[NR][f]=$f; } }
+  
+  END {
+      hline_str="|"
+      for(f=1; f<=max_nf; f++){
+          for(i=0; i<(lengths[f] + 2); i++){ hline_str=hline_str "-"; }
+          if( f != max_nf){ hline_str=hline_str "+"; }
+          else            { hline_str=hline_str "|"; } }
+  
+      for(r=1; r<=NR; r++){ # rows
+          if(hlines[r] == 1){ print hline_str; }
+          printf "|";
+          for(f=1; f<=max_nf; f++){ # columns
+              cell=row[r][f]; padding=""
+              for(i=0; i<(lengths[f] - length(cell)); i++){ padding=padding " "; }
+              # for now just print everything right-aligned
+              # if(cell ~ /[0-9.]/){ printf " %s%s |", cell, padding; }
+              # else{                printf " %s%s |", padding, cell; }
+              printf " %s%s |", padding, cell; }
+          printf "\n"; }
+      
+      if(hlines[NR+1]){ print hline_str; } }
+#+end_src
+
 ** remind2org
 #+index: Agenda!Views
 #+index: Agenda!and Remind (external program)
