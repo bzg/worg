@@ -3201,62 +3201,65 @@ prefixed with "#", even not when within source blocks.
 #+index: Conversion!fileconversion emacs-lisp code
 
 #+BEGIN_SRC emacs-lisp
-  ;; - fileconversion version 0.6
+  ;; - fileconversion version 0.7
   ;; - DISCLAIMER: Make a backup of your Org files before using
   ;;   my-org-fileconv-*.
   ;; - supported formats: hidestarsfile, markdownstarsfile
 
   ;; design summary: fileconversion is a round robin of two states
   ;; linked by two actions:
-  ;; - state my-org-fileconv-level-org-p is nil: the level is "file"
+  ;; - state v-org-fileconv-level-org-p is nil: the level is “file”
   ;;   (encoded)
-  ;; - action my-org-fileconv-decode: replace file char with '*'
-  ;; - state my-org-fileconv-level-org-p is t: the level is "Org"
+  ;; - action f-org-fileconv-decode: replace file char with “*”
+  ;; - state v-org-fileconv-level-org-p is t: the level is “Org”
   ;;   (decoded)
-  ;; - action my-org-fileconv-encode replace '*' with file char
+  ;; - action f-org-fileconv-encode: replace “*” with file char
+  ;; naming convention of prefix:
+  ;; - f-[...]: “my function”, instead of the unspecific prefix “my-”
+  ;; - v-[...]: “my variable”, instead of the unspecific prefix “my-”
 
-  (defvar my-org-fileconv-level-org-p nil
+  (defvar v-org-fileconv-level-org-p nil
     "Whether level of buffer is Org or only file.
   nil means the level is file (encoded), non-nil means the level is Org
   (decoded).")
-  (make-variable-buffer-local 'my-org-fileconv-level-org-p)
+  (make-variable-buffer-local 'v-org-fileconv-level-org-p)
   ;; survive a change of major mode that does kill-all-local-variables,
   ;; e. g. when reentering Org mode through “C-c C-c” on a STARTUP line
-  (put 'my-org-fileconv-level-org-p 'permanent-local t)
+  (put 'v-org-fileconv-level-org-p 'permanent-local t)
 
-  (add-hook 'org-mode-hook 'my-org-fileconv-init
+  (add-hook 'org-mode-hook 'f-org-fileconv-init
             ;; _append_ to hook to have a higher chance that a message
             ;; from this function will be visible as the last message in
             ;; the minibuffer
             t
-            ;; hook addition global
+            ;; hook addition globally
             nil)
 
-  (defun my-org-fileconv-init ()
+  (defun f-org-fileconv-init ()
     (interactive)
     ;; instrument only when converting really from/to an Org _file_, not
     ;; e. g. for a temp Org buffer unrelated to a file like used e. g.
     ;; when calling the old Org exporter
     (when (buffer-file-name)
-      (message "INF: my-org-fileconv-init, buffer: %s" (buffer-name))
-      (my-org-fileconv-decode)
+      (message "INF: f-org-fileconv-init, buffer: %s" (buffer-name))
+      (f-org-fileconv-decode)
       ;; the hooks are not permanent-local, this way and as needed they
       ;; will disappear when the major mode of the buffer changes
-      (add-hook 'change-major-mode-hook 'my-org-fileconv-encode nil
+      (add-hook 'change-major-mode-hook 'f-org-fileconv-encode nil
                 ;; hook addition limited to buffer locally
                 t)
-      (add-hook 'before-save-hook 'my-org-fileconv-encode nil
+      (add-hook 'before-save-hook 'f-org-fileconv-encode nil
                 ;; hook addition limited to buffer locally
                 t)
-      (add-hook 'after-save-hook 'my-org-fileconv-decode nil
+      (add-hook 'after-save-hook 'f-org-fileconv-decode nil
                 ;; hook addition limited to buffer locally
                 t)))
 
-  (defun my-org-fileconv-re ()
+  (defun f-org-fileconv-re ()
     "Check whether there is a STARTUP line for fileconversion.
   If found then return the expressions required for the conversion."
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))  ;; beginning-of-buffer not allowed
       (let (re-list (count 0))
         (while (re-search-forward "^#\\+STARTUP:" nil t)
           ;; #+STARTUP: hidestarsfile
@@ -3284,13 +3287,13 @@ prefixed with "#", even not when within source blocks.
                             ?#))       ; file-char
             (setq count (1+ count))))
         (when (> count 1)
-          (error "ERR: more than one fileconversion found"))
+          (error "More than one fileconversion found"))
         re-list)))
 
-  (defun my-org-fileconv-decode ()
+  (defun f-org-fileconv-decode ()
     "In headings replace file char with '*'."
-    (let ((re-list (my-org-fileconv-re)))
-      (when (and re-list (not my-org-fileconv-level-org-p))
+    (let ((re-list (f-org-fileconv-re)))
+      (when (and re-list (not v-org-fileconv-level-org-p))
         ;; no `save-excursion' to be able to keep point in case of error
         (let* ((common-re (nth 0 re-list))
                (file-char (nth 1 re-list))
@@ -3298,14 +3301,13 @@ prefixed with "#", even not when within source blocks.
                (org-re    (concat "^\\*+" common-re))
                len
                (p         (point)))
-          (beginning-of-buffer)
+          (goto-char (point-min))  ;; beginning-of-buffer not allowed
           ;; syntax check
           (when (re-search-forward org-re nil t)
             (goto-char (match-beginning 0))
             (org-reveal)
-            (error
-             "ERR: my-org-fileconv-decode syntax conflict at point"))
-          (beginning-of-buffer)
+            (error "Org fileconversion dec: syntax conflict at point"))
+          (goto-char (point-min))  ;; beginning-of-buffer not allowed
           ;; substitution
           (with-silent-modifications
             (while (re-search-forward file-re nil t)
@@ -3331,12 +3333,12 @@ prefixed with "#", even not when within source blocks.
           ;;     takes two files as arguments and uses "emacs --eval")
 
     ;; the level is Org most of all when no fileconversion is in effect
-    (setq my-org-fileconv-level-org-p t))
+    (setq v-org-fileconv-level-org-p t))
 
-  (defun my-org-fileconv-encode ()
+  (defun f-org-fileconv-encode ()
     "In headings replace '*' with file char."
-    (let ((re-list (my-org-fileconv-re)))
-      (when (and re-list my-org-fileconv-level-org-p)
+    (let ((re-list (f-org-fileconv-re)))
+      (when (and re-list v-org-fileconv-level-org-p)
         ;; no `save-excursion' to be able to keep point in case of error
         (let* ((common-re (nth 0 re-list))
                (file-char (nth 1 re-list))
@@ -3344,14 +3346,13 @@ prefixed with "#", even not when within source blocks.
                (org-re    (concat "^\\*+" common-re))
                len
                (p         (point)))
-          (beginning-of-buffer)
+          (goto-char (point-min))  ;; beginning-of-buffer not allowed
           ;; syntax check
           (when (re-search-forward file-re nil t)
             (goto-char (match-beginning 0))
             (org-reveal)
-            (error
-             "ERR: my-org-fileconv-encode syntax conflict at point"))
-          (beginning-of-buffer)
+            (error "Org fileconversion enc: syntax conflict at point"))
+          (goto-char (point-min))  ;; beginning-of-buffer not allowed
           ;; substitution
           (with-silent-modifications
             (while (re-search-forward org-re nil t)
@@ -3362,7 +3363,7 @@ prefixed with "#", even not when within source blocks.
               (insert-char file-char len)
               (delete-char len)))
           (goto-char p)
-          (setq my-org-fileconv-level-org-p nil))))
+          (setq v-org-fileconv-level-org-p nil))))
     nil)  ;; for the hook
 #+END_SRC
 
