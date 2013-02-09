@@ -66,17 +66,19 @@ end-users are explained in the last part of this document.
   ~org-export-options-alist~ for details on the structure of the
   value.
 
-  As an example, the following excerpt from =e-latex= back-end
+  As an example, the following excerpt from ~latex~ back-end
   definition introduces three new buffer keywords (and their
   headline's property counterpart), and redefine ~DATE~ default value:
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-backend e-latex
+  (org-export-define-backend latex
     ...
-    :options-alist ((:date "DATE" nil org-e-latex-date-format t)
-                    (:latex-class "LATEX_CLASS" nil org-e-latex-default-class t)
+    :options-alist ((:date "DATE" nil "\\today" t)
+                    (:date-format nil nil org-latex-date-timestamp-format)
+                    (:latex-class "LATEX_CLASS" nil org-latex-default-class t)
                     (:latex-class-options "LATEX_CLASS_OPTIONS" nil nil t)
-                    (:latex-header-extra "LATEX_HEADER" nil nil newline)))
+                    (:latex-header-extra "LATEX_HEADER" nil nil newline)
+                    (:latex-hyperref-p nil "texht" org-latex-with-hyperref t)))
   #+END_SRC
 
   It is also possible, with ~:export-block~ keyword, to associate
@@ -84,18 +86,18 @@ end-users are explained in the last part of this document.
   contain raw code that will be directly inserted in the output, as
   long as the corresponding translator function says so.
 
-  In the following example, in the ~e-html~ back-end, =HTML= blocks
-  are export blocks.  The associated translator function inserts their
+  In the following example, in the ~html~ back-end, =HTML= blocks are
+  export blocks.  The associated translator function inserts their
   contents as-is, and ignores any other export block.
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-backend e-html
+  (org-export-define-backend html
     (...
-     (export-block . org-e-html-export-block)
+     (export-block . org-html-export-block)
      ... )
     :export-block "HTML")
 
-  (defun org-e-html-export-block (export-block contents info)
+  (defun org-html-export-block (export-block contents info)
     "Transcode a EXPORT-BLOCK element from Org to HTML.
   CONTENTS is nil.  INFO is a plist used as a communication
   channel."
@@ -110,13 +112,12 @@ end-users are explained in the last part of this document.
   If the new back-end shares most properties with another one,
   ~org-export-define-derived-backend~ macro can be used to simplify
   the process.  In the example below, we implement a new back-end
-  which behaves like =e-latex= excepted for headlines and the
-  template.
+  which behaves like ~latex~ excepted for headlines and the template.
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-derived-backend my-latex e-latex
-    :translate-alist ((headline . custom-headline-translator)
-                      (template . custom-template)))
+  (org-export-define-derived-backend my-latex latex
+    :translate-alist ((headline . my-latex-headline-translator)
+                      (template . my-latex-template)))
   #+END_SRC
 
   Back-ends defined with either function can be registered in the
@@ -566,13 +567,13 @@ end-users are explained in the last part of this document.
    - ~:hiddenp~ :: Non-nil if drawer is hidden (boolean).
    - ~:properties~ :: Properties defined in the drawer (alist).
 
-** =Quote= Block
+** Quote Block
 
    Greater element.
 
    - ~:hiddenp~ :: Non-nil if block is hidden (boolean).
 
-** =Quote= Section
+** Quote Section
 
    Element.
 
@@ -719,15 +720,15 @@ end-users are explained in the last part of this document.
 
    Note relative to export: =org.el= provides tools to work on
    timestamps objects.  In particular, back-ends usually make use of
-   ~org-timestamp-translate~ function.  Thus, in =org-e-html.el=, the
+   ~org-timestamp-translate~ function.  Thus, in =ox-html.el=, the
    timestamp object is first translated:
 
    #+BEGIN_SRC emacs-lisp
-   (defun org-e-html-timestamp (timestamp contents info)
+   (defun org-html-timestamp (timestamp contents info)
      "Transcode a TIMESTAMP object from Org to HTML.
    CONTENTS is nil.  INFO is a plist holding contextual
    information."
-     (let ((value (org-e-html-plain-text
+     (let ((value (org-html-plain-text
                    (org-timestamp-translate timestamp) info)))
        (format "<span class=\"timestamp-wrapper\"><span class=\"timestamp\">%s</span></span>"
                (replace-regexp-in-string "--" "&ndash;" value))))
@@ -938,15 +939,6 @@ end-users are explained in the last part of this document.
    - category :: option
    - type :: list of strings
 
-** ~:target-list~
-
-   List of targets raw names encountered in the parse tree.  This is
-   used to partly resolve "fuzzy" links —
-   cf. [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
-
-   - category :: tree
-   - type :: list of strings
-
 ** ~:time-stamp-file~
 
    Non-nil means transcoding should insert a time stamp in the output.
@@ -1051,6 +1043,15 @@ end-users are explained in the last part of this document.
    - category :: option
    - type :: symbol (nil, t)
 
+** ~:with-latex~
+
+   Non-nil means ~latex-environment~ elements and ~latex-fragment~
+   objects should appear in export output.  When this property is set
+   to ~verbatim~, they will be left as-is.
+
+   - category :: option
+   - type :: symbol (~verbatim~, nil, t)
+
 ** ~:with-plannings~
 
    Non-nil means transcoding should include planning info.
@@ -1153,6 +1154,10 @@ end-users are explained in the last part of this document.
   a parse tree as a special case), a symbol representing the current
   back-end, and the communication channel, as a plist.
 
+  As an exception, functions in options filter only accept two
+  arguments: the property list containing the export options and the
+  back-end, as a symbol.
+
   From the developer side, filters sets can be installed using
   ~:filters-alist~ keyword while defining the back-end with
   ~org-export-define-derived-backend~.  Each association has a key
@@ -1189,6 +1194,8 @@ end-users are explained in the last part of this document.
   - ~:filter-line-break~
   - ~:filter-link~
   - ~:filter-macro~
+  - ~:filter-node-property~
+  - ~:filter-options~
   - ~:filter-paragraph~
   - ~:filter-parse-tree~
   - ~:filter-plain-list~
@@ -1215,16 +1222,16 @@ end-users are explained in the last part of this document.
   - ~:filter-verse-block~
 
 
-  For example, =e-ascii= back-end implements a filter that makes sure
+  For example, ~ascii~ back-end implements a filter that makes sure
   headlines end with two blank lines:
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-backend e-ascii
+  (org-export-define-backend ascii
     ...
-    :filters-alist ((:filter-headline . org-e-ascii-filter-headline-blank-lines)
-                    (:filter-section . org-e-ascii-filter-headline-blank-lines)))
+    :filters-alist ((:filter-headline . org-ascii-filter-headline-blank-lines)
+                    (:filter-section . org-ascii-filter-headline-blank-lines)))
 
-  (defun org-e-ascii-filter-section-blank-lines (headline back-end info)
+  (defun org-ascii-filter-section-blank-lines (headline back-end info)
     "Filter controlling number of blank lines after a section."
     (let ((blanks (make-string 2 ?\n)))
       (replace-regexp-in-string "\n\\(?:\n[ \t]*\\)*\\'" blanks headline)))
@@ -1277,14 +1284,14 @@ end-users are explained in the last part of this document.
    of that string and provide the pristine original string as the
    optional argument.
 
-   For example, in ~e-html~ back-end, it is necessary to protect "<",
+   For example, in ~html~ back-end, it is necessary to protect "<",
    ">" and "&" characters before calling this function.  Here's an
    excerpt of its ~plain-text~ transcoder:
 
    #+BEGIN_SRC emacs-lisp
    (let ((output text))
      ;; Protect following characters: <, >, &.
-     (setq output (org-e-html-encode-plain-text output))
+     (setq output (org-html-encode-plain-text output))
      ;; Handle smart quotes.  Be sure to provide original string since
      ;; OUTPUT may have been modified.
      (when (plist-get info :with-smart-quotes)
@@ -1371,13 +1378,36 @@ end-users are explained in the last part of this document.
    current back-end.
 
    It is used primarily to transcode secondary strings, like ~:title~.
-   For example =e-beamer= back-end uses the following:
+   For example ~beamer~ back-end uses the following:
 
    #+BEGIN_SRC emacs-lisp
-   (defun org-e-beamer-template (contents info)
+   (defun org-beamer-template (contents info)
      (let ((title (org-export-data (plist-get info :title) info)))
        ...))
    #+END_SRC
+
+** ~org-export-data-with-backend~
+   :PROPERTIES:
+   :CUSTOM_ID: data-with-backend
+   :END:
+
+   Recursively convert some data (an element, an object, a secondary
+   string or a string) using another backend.
+
+   See also: [[#with-backend][~org-export-with-backend~]],
+   [[#data-with-translations][~org-export-data-with-translations~]]
+
+** ~org-export-data-with-translations~
+   :PROPERTIES:
+   :CUSTOM_ID: data-with-translations
+   :END:
+
+   Recursively convert some data (an element, an object, a secondary
+   string or a string) using a given translation table, which
+   basically acts as an anonymous back-end.
+
+   See also: [[#with-backend][~org-export-with-backend~]],
+   [[#data-with-backend][~org-export-data-with-backend~]]
 
 ** ~org-export-first-sibling-p~
    :PROPERTIES:
@@ -1440,12 +1470,12 @@ end-users are explained in the last part of this document.
    Return the caption of a given element, as a secondary string.  With
    an optional argument, return the short caption instead.
 
-   As an example, =e-ascii= back-end, when creating a list of
-   listings, uses the following:
+   As an example, ~ascii~ back-end, when creating a list of listings,
+   uses the following:
 
    #+BEGIN_SRC emacs-lisp
-   (defun org-e-ascii--list-listings (keyword info)
-     (let ((title (org-e-ascii--translate "List of Listings" info)))
+   (defun org-ascii--list-listings (keyword info)
+     (let ((title (org-ascii--translate "List of Listings" info)))
        (concat title "\n"
                ...
                (mapconcat
@@ -1585,8 +1615,8 @@ end-users are explained in the last part of this document.
    links are expected to be replaced with the sequence number of their
    destination, provided they have no description.
 
-   Taken from =e-ascii= back-end, the following example shows how
-   fuzzy links could be handled :
+   Taken from ~ascii~ back-end, the following example shows how fuzzy
+   links could be handled :
 
    #+BEGIN_SRC emacs-lisp :exports code
    (let ((type (org-element-property :type link)))
@@ -1698,7 +1728,7 @@ end-users are explained in the last part of this document.
    function also accepts an arbitrary list of tags for further
    cleaning.
 
-   For example, =e-latex= back-end uses the following snippet in the
+   For example, ~latex~ back-end uses the following snippet in the
    inlinetask transcode function.
 
    #+BEGIN_SRC emacs-lisp
@@ -1740,7 +1770,7 @@ end-users are explained in the last part of this document.
 
    A set of rules consists in an alist whose key is a type of link, as
    a string, and whose value is a regexp matching link's path.  As an
-   example, =e-html= back-end uses the following rules:
+   example, ~html~ back-end uses the following rules:
 
    #+BEGIN_SRC emacs-lisp
    '(("file" . "\\.\\(jpeg\\|jpg\\|png\\|gif\\|svg\\)\\'")
@@ -1846,10 +1876,10 @@ end-users are explained in the last part of this document.
 
    Typically, target's contents are exported through ~org-export-data~
    and used as link description, as in the following excerpt from
-   =org-e-latex.el=:
+   =ox-latex.el=:
 
    #+BEGIN_SRC emacs-lisp
-   (defun org-e-latex-link (link desc info)
+   (defun org-latex-link (link desc info)
      (let* ((type (org-element-property :type link))
             ...)
        (cond
@@ -1950,7 +1980,7 @@ end-users are explained in the last part of this document.
    Some back-end may still need to know the actual width of exported
    cell's contents in order to compute column's width.  In that case,
    every cell in the column must be transcoded in order to find the
-   widest one.  The snippet below, extracted from =org-e-ascii.el=
+   widest one.  The snippet below, extracted from =ox-ascii.el=
    illustrates a possible implementation.
 
    #+BEGIN_SRC emacs-lisp
@@ -2115,8 +2145,8 @@ end-users are explained in the last part of this document.
    Export an element or object using locally another back-end.
 
    In a derived back-end, it may be used as a fall-back function once
-   all specific cases have been handled.  Thus, =e-beamer= back-end,
-   derived from =e-latex=, takes care of every internal link type and
+   all specific cases have been handled.  Thus, ~beamer~ back-end,
+   derived from ~latex~, takes care of every internal link type and
    delagates everything else to its parent back-end:
 
    #+BEGIN_SRC emacs-lisp
@@ -2133,9 +2163,12 @@ end-users are explained in the last part of this document.
               (case (org-element-type destination)
                 (headline ...)
                 (target ...)))))
-      ;; Otherwise, use `e-latex' back-end.
-      (t (org-export-with-backend 'e-latex link contents info))))
+      ;; Otherwise, use `latex' back-end.
+      (t (org-export-with-backend 'latex link contents info))))
    #+END_SRC
+
+   See also: [[#data-with-backend][~org-export-data-with-backend~]],
+   [[#data-with-translations][~org-export-data-with-translations~]]
 
 * Interactive functions
   :PROPERTIES:
@@ -2170,7 +2203,7 @@ end-users are explained in the last part of this document.
 
      #+BEGIN_SRC emacs-lisp
      ;;;###autoload
-     (defun org-e-latex-export-as-latex
+     (defun org-latex-export-as-latex
      (&optional async subtreep visible-only body-only ext-plist)
        (interactive)
        (if async
@@ -2181,11 +2214,9 @@ end-users are explained in the last part of this document.
                    (insert output)
                    (goto-char (point-min))
                    (LaTeX-mode)
-                   (org-export-add-to-stack (current-buffer) 'e-latex)))
-             `(org-export-as 'e-latex ,subtreep ,visible-only ,body-only
-                             ',ext-plist))
-         (let ((outbuf
-                (org-export-to-buffer 'e-latex "*Org E-LATEX Export*"
+                   (org-export-add-to-stack (current-buffer) 'latex)))
+             `(org-export-as 'latex ,subtreep ,visible-only ,body-only ',ext-plist))
+         (let ((outbuf (org-export-to-buffer 'latex "*Org E-LATEX Export*"
                                       subtreep visible-only body-only ext-plist)))
            (with-current-buffer outbuf (LaTeX-mode))
            (when org-export-show-temporary-export-buffer
@@ -2196,31 +2227,31 @@ end-users are explained in the last part of this document.
 
      #+BEGIN_SRC emacs-lisp
      ;;;###autoload
-     (defun org-e-latex-export-to-latex
+     (defun org-latex-export-to-latex
        (&optional async subtreep visible-only body-only ext-plist)
        (interactive)
        (let ((outfile (org-export-output-file-name ".tex" subtreep)))
          (if async
              (org-export-async-start
-                 (lambda (f) (org-export-add-to-stack f 'e-latex))
+                 (lambda (f) (org-export-add-to-stack f 'latex))
                `(expand-file-name
                  (org-export-to-file
-                  'e-latex ,outfile ,subtreep ,visible-only ,body-only ',ext-plist)))
+                  'latex ,outfile ,subtreep ,visible-only ,body-only ',ext-plist)))
            (org-export-to-file
-            'e-latex outfile subtreep visible-only body-only ext-plist))))
+            'latex outfile subtreep visible-only body-only ext-plist))))
      #+END_SRC
 
   It may also be interesting to provide a publishing function for the
   back-end.  Such function must accept three arguments: a plist
   containing properties relative to the project being exported, the
   name of the current file being published and the publishing
-  directory.  It often is a simple wrapper around
-  ~org-e-publish-org-to~ function defined in =org-e-publish.el=, as
-  shown in the following example:
+  directory.  It often is a simple wrapper around ~org-publish-org-to~
+  function defined in =ox-publish.el=, as shown in the following
+  example:
 
   #+BEGIN_SRC emacs-lisp
-  (defun org-e-html-publish-to-html (plist filename pub-dir)
-    (org-e-publish-org-to 'e-html filename ".html" plist pub-dir))
+  (defun org-html-publish-to-html (plist filename pub-dir)
+    (org-publish-org-to 'html filename ".html" plist pub-dir))
   #+END_SRC
 
 
