@@ -2777,6 +2777,32 @@ See the relevant discussion [[http://thread.gmane.org/gmane.emacs.orgmode/58715/
 [[https://github.com/pinard/PopOrg/blob/master/poporg.el][poporg.el]] is a library by François Pinard which lets you edit comments
 from your code using a separate org-mode buffer.
 
+** Convert a .csv file to an Org-mode table
+
+Nicolas Richard has a [[http://article.gmane.org/gmane.emacs.orgmode/65456][nice recipe]] using the pcsv library ([[http://marmalade-repo.org/packages/pcsv][available]] from
+the Marmelade ELPA repository):
+
+#+BEGIN_SRC emacs-lisp
+(defun yf/lisp-table-to-org-table (table &optional function)
+  "Convert a lisp table to `org-mode' syntax, applying FUNCTION to each of its elements.
+The elements should not have any more newlines in them after
+applying FUNCTION ; the default converts them to spaces. Return
+value is a string containg the unaligned `org-mode' table."
+  (unless (functionp function)
+    (setq function (lambda (x) (replace-regexp-in-string "\n" " " x))))
+  (mapconcat (lambda (x)                ; x is a line.
+               (concat "| " (mapconcat function x " | ") " |"))
+             table "\n"))
+
+(defun yf/csv-to-table (beg end)
+"Convert a csv file to an `org-mode' table."
+  (interactive "r")
+  (require 'pcsv)
+  (insert (yf/lisp-table-to-org-table (pcsv-parse-region beg end)))
+  (delete-region beg end)
+  (org-table-align))
+#+END_SRC
+
 * Hacking Org: Working with Org-mode and External Programs.
 ** Use Org-mode with Screen [Andrew Hyatt]
 #+index: Link!to screen session
