@@ -1,7 +1,7 @@
+#+TITLE:     Org-mode Frequently Asked Questions
 #+EMAIL:     mdl AT imapmail DOT org
 #+AUTHOR:    Worg people
 #+LANGUAGE:  en
-#+TITLE:     Org-mode Frequently Asked Questions
 #+OPTIONS:   toc:t H:2
 #+SETUPFILE: macros.setupfile
 
@@ -313,6 +313,61 @@ about the number of list readers.
    :END:
 
 #+index: Upgrade
+#+index: Export
+
+*** Using the current master branch
+
+As of [[http://orgmode.org/cgit.cgi/org-mode.git/commit/?id%3D1cac3127c2f810e83fcc1203f1dd2b15250a687e][commit 1cac3127c]], the master branch of Org's git repository uses the
+new exporter by default.  If you use the master branch, you need to update
+your configuration.
+
+If the instructions below do not help solving your problem, please ask any
+question on the mailing list, it will help us moving forward with
+documenting every thing for Org 8.0.
+
+**** Updating global export configuration options
+
+Global export options start with the =org-export-*= prefix, most of them
+are in the =ox.el= file.
+
+For options starting with e.g. =org-export-html-*=, see the section below.
+
+For generic export options, most of them should not need any change.  If
+you find that a generic option is useless or broken or badly documented in
+the manual, please report it to the list.
+
+**** Updating backend-specific configuration options
+
+Backend-specific options are defined like this:
+
+- =org-html-*= for =HTML= and live in =ox-html.el=
+- =org-latex-*= for =LaTeX= and live in =ox-latex.el=
+- Etc.  
+
+There is a new variable =org-export-backends= which controls what backends
+are loaded when you lauch Org.  By default, the =ASCII=, =HTML= and =LaTeX=
+are loaded, with some others.
+
+*Updating*: In your =.emacs= you need to rename =org-export-html-*= options
+to =org-html-*= (except for =ox-jsinfo.el= options), and do the same for
+other backends.
+
+**** Updating =org-publish-project-alist=
+
+The publishing functions are not loaded until the corresponding backend has
+been loaded.  You need to update =org-publish-project-alist= and to use the
+function from the new publishing engine -- here is correspondance table:
+
+| Old publishing engine    | New publishing engine      |
+|--------------------------+----------------------------|
+| org-publish-org-to-html  | org-html-publish-to-html   |
+| org-publish-org-to-org   | org-org-publish-to-org     |
+| org-publish-org-to-latex | org-latex-publish-to-latex |
+| ...                      | ...                        |
+
+If something does not work, please report it on the mailing list.
+
+*** Using Org 7.9.3e or earlier versions of Org
 
 Some quick notes on how to switch to the new exporter.
 
