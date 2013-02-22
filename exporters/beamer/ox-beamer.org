@@ -1,0 +1,135 @@
+#+TITLE:     Beamer presentations using the new export engine
+#+AUTHOR:    Suvayu Ali
+#+EMAIL:     fatkasuvayu+linux at gmail dot com
+#+DATE:      2013-02-05
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:   folded
+#+CATEGORY:   worg
+
+
+* Introduction
+This tutorial covers exporting org documents to LaTeX Beamer slides
+using the new export engine, =org-elements= and =org-export=, written
+by Nicolas Goaziou.
+
+_Note:_ It will not cover any of the basic features common with the
+old beamer exporter; it will only focus on the improvements, new
+additions and backwards incompatibilities.  It is also assumed that
+the reader is already acquainted with GNU Emacs and Org mode itself.
+Basic understanding of LaTeX and the Beamer package is also assumed.
+
+* Configuring export options
+Apart from the usual export options provided by the =OPTIONS= keyword,
+you can put additional beamer export options in the file header.  For
+a minimal beamer export, you have to specify the =LaTeX_CLASS= and the
+=LaTeX_CLASS_OPTIONS= keywords in the header of a file.  A preset
+export template can be inserted by calling the interactive function
+=org-e-beamer-insert-options-template=.  This can be further modified
+as per your needs.  You can also do a subtree export; in that case you
+can provide the keywords as =PROPERTIES=.  However the keyword names
+should be prepended with =EXPORT_=.  A list of supported
+keywords are,
+
+#+caption: Export option keywords and corresponding subtree properties.
+| File header keywords  | Subtree properties           |
+|-----------------------+------------------------------|
+| =OPTIONS=             | =EXPORT_OPTIONS=             |
+| =LaTeX_CLASS=         | =EXPORT_LaTeX_CLASS=         |
+| =LaTeX_CLASS_OPTIONS= | =EXPORT_LaTeX_CLASS_OPTIONS= |
+| =LaTeX_HEADER=        | =EXPORT_LaTeX_HEADER=        |
+| =BEAMER_THEME=        | =EXPORT_BEAMER_THEME=        |
+| =BEAMER_FONT_THEME=   | =EXPORT_BEAMER_FONT_THEME=   |
+| =BEAMER_INNER_THEME=  | =EXPORT_BEAMER_INNER_THEME=  |
+| =BEAMER_OUTER_THEME=  | =EXPORT_BEAMER_OUTER_THEME=  |
+
+For a subtree export, a few extra keywords are supported.  For example
+you can specify the exported filename with the =EXPORT_FILE_NAME=
+property.
+
+#+caption: Properties specific to subtree export
+| Subtree properties | Functionality    |
+|--------------------+------------------|
+| =EXPORT_TITLE=     | Export title     |
+| =EXPORT_AUTHOR=    | Export author    |
+| =EXPORT_DATE=      | Export date      |
+| =EXPORT_FILE_NAME= | Export file name |
+
+A simple file header might look like the example below.
+#+begin_example
+  ,#+LaTeX_CLASS: beamer
+  ,#+LaTeX_CLASS_OPTIONS: [smaller,presentation]
+  ,#+BEAMER_THEME: default
+#+end_example
+A corresponding subtree export should have properties as shown below.
+#+begin_example
+  ,* Exported title
+    :PROPERTIES:
+    :EXPORT_LaTeX_CLASS: beamer
+    :EXPORT_LaTeX_CLASS_OPTIONS: [presentation,smaller]
+    :EXPORT_BEAMER_THEME: default
+    :EXPORT_FILE_NAME: presentation.pdf
+    :END:
+#+end_example
+
+The export class is passed on to the =\documentclass= LaTeX command,
+and the options go in as the optional arguments.
+: \documentclass[smaller,presentation]{beamer}
+
+** TODO Export level
+- To export third level headlines as frames, use the following in the
+  file header.
+  : #+OPTIONS: H:3
+- Can be overridden with the =frame= beamer environment (maybe link to
+  new features section below).
+
+** TODO Filters to customise export
+
+* Structure editing and beamer environments
+All the usual Org mode structure editing commands work.  However there
+is also a minor mode called =org-e-beamer-mode=, that makes it very
+convenient to insert Beamer specific environments in an org-mode
+buffer.
+
+* New features available with the new exporter
+** TODO Beamer article
+Discuss that =EXPORT_LaTeX_CLASS= need not be beamer.  Useful to
+export =beamerarticle= document for slides.
+
+Email from Nicolas Goaziou discussing this feature:
+http://mid.gmane.org/87hapz3na9.fsf@gmail.com
+
+** TODO Ordered and unordered lists
+
+** TODO Images
+
+** TODO Tables
+
+** TODO Environments
+
+** TODO Overlays
+
+** TODO Example and source blocks
+
+* TODO Examples
+1) [ ] Sectioning and TOC (progress state between sections)
+2) [ ] Overlays
+3) [ ] Blocks
+   1. [ ] Normal blocks
+   2. [ ] Verbatim blocks
+   3. [ ] Source blocks
+4) [ ] Columns
+5) [ ] Text / LaTeX commands in between frames
+6) [ ] Images
+   + Centering
+   + Captions
+7) [ ] Footnotes and references
+8) [ ] Backup slides with =\appendix=
+9) [ ] Caveats about using alternate TeX binaries
+
+* TODO Migrating from the old to the new exporter
+- Backwards incompatible changes in the new exporter
+- Configuration:
+  1. variable name changes,
+  2. filters instead of hooks (except for two)
