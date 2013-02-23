@@ -1807,6 +1807,24 @@ No.  The "*" character is used in =outline-mode=, and Org is derived from
 If you are curious as to what other rationales there are for "*", check out
 [[http://permalink.gmane.org/gmane.emacs.orgmode/44271][this]] mail and the thread it is in.
 
+Even if you cannot use another character, you can add an overlay on top of
+the "*" characters and your buffer will look like the way you want.  See
+the library =org-bullets.el= from the =contrib/= directory, or test this
+snippet shared by Jambunathan:
+
+#+BEGIN_SRC emacs-lisp
+  (font-lock-add-keywords
+     'org-mode `(("\\(?:^\\(?1:\\*+\\)[[:blank:]]\\)"
+                  (0 (progn (compose-region
+                             (match-beginning 1) (match-end 1)
+                             (pcase (length (match-string 1))
+                               (1 ?\u2219)
+                               (2 ?\u2022)
+                               (3 ?\u25c9)
+                               (_ ?\u25CB)))
+                            nil)))))
+#+END_SRC
+
 * Todos and Tags
   :PROPERTIES:
   :CUSTOM_ID: Todos-and-Tags
