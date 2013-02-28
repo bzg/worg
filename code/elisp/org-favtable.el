@@ -1,4 +1,4 @@
-;;; org-favtable.el --- Table of favorite references and links
+;;; org-favtable.el --- Lookup table of favorite references and links
 
 ;; Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
@@ -6,7 +6,7 @@
 ;; Keywords: hypermedia, matching
 ;; Requires: org
 ;; Download: http://orgmode.org/worg/code/elisp/org-favtable.el
-;; Version: 2.1.0
+;; Version: 2.2.0
 
 ;;; License:
 
@@ -29,14 +29,14 @@
 
 ;; Purpose:
 ;;
-;;  Mark and find your favorite items and org-locations easily: Create and
-;;  update a lookup table of your favorite references and links. Often used
-;;  entries automatically bubble to the top of the table; entering some
-;;  keywords narrows it to just the matching entries; that way the right
-;;  one can be picked easily.
+;;  Mark and find your favorite things and locations in org easily: Create
+;;  and update a lookup table of your references and links. Often used
+;;  entries bubble to the top and entering some keywords displays only the
+;;  matching entries. That way the right entry one can be picked easily.
 ;;
-;;  References are essentially small numbers (e.g. "R237" or "-455-"), as
-;;  created by this package; links are normal org-mode links.
+;;  References are essentially small numbers (e.g. "R237" or "-455-"),
+;;  which are created by this package; they are well suited to be used
+;;  outside of org. Links are just normal org-mode links.
 ;;
 ;;
 ;; Setup:
@@ -64,6 +64,10 @@
 
 ;;; Change Log:
 
+;;   [2013-02-28 Th] Version 2.2.0:
+;;    - Allowed shortcuts like "h237" for command "head" with argument "237"
+;;    - Integrated with org-mark-ring-goto
+;;
 ;;   [2013-01-25 Fr] Version 2.1.0:
 ;;    - Added full support for links
 ;;    - New commands "missing" and "statistics"
@@ -102,12 +106,13 @@
 (require 'org-table)
 (require 'cl)
 
-(defvar org-favtable--version "2.1.0")
+(defvar org-favtable--version "2.2.0")
 (defvar org-favtable--preferred-command nil)
 
 (defvar org-favtable--commands '(occur head ref link enter leave goto + help reorder fill sort update highlight unhighlight missing statistics)
   "List of commands known to org-favtable:
  
+Commands known:
 
   occur: If you supply a keyword (text): Apply emacs standard
     occur operation on the table of favorites; ask for a
@@ -138,6 +143,8 @@
 
   leave: Leave the table of favorites. If the last command has
     been \"ref\", the new reference is copied and ready to yank.
+    This \"org-mark-ring-goto\" and can be called several times
+    in succession.
 
   enter: Just enter the node with the table of favorites.
 
@@ -175,13 +182,26 @@
     reference) about favtable.
 
 
+
+Two ways to save keystrokes:
+
 When prompting for a command, org-favtable puts the most likely
-chosen one (e.g. \"occur\" or \"ref\") at the front of the list,
-so that you may just type RET. 
+one (e.g. \"occur\" or \"ref\") at the front of the list, so that
+you may just type RET.
 
 If this command needs additional input (like e.g. \"occur\"), you
 may supply this input right away, although you are still beeing
-prompted for the command.
+prompted for the command. So do an occur for the string \"foo\",
+you can just enter \"foo\" without even entering \"occur\".
+
+
+Another way to save keystrokes applies if you want to choose a
+command, that requrires a reference number (and would normally
+prompt for it): In that case you may just enter enough characters
+from your command, so that it appears first in the list of
+matches; then immediately enter the number of the reference you
+are searching for. So the input \"h237\" would execute the
+command \"head\" for reference \"237\" right away.
 
 ")
 
@@ -311,8 +331,7 @@ for help on single commands.
 ")
 
 
-(defvar org-favtable--windowconfig-before nil)
-(defvar org-favtable--marker-outside-before nil)
+(defvar org-favtable--text-to-yank nil)
 (defvar org-favtable--last-action nil)
 (defvar org-favtable--occur-buffer nil)
 (defvar org-favtable--ref-regex nil)
@@ -386,846 +405,846 @@ An example would be:
 
   (interactive "P")
 
-(let (within-node        ; True, if we are within node with favtable
-      result-is-visible  ; True, if node or occur is visible in any window
-      ref-node-buffer-and-point ; cons with buffer and point of favorites node
-      below-cursor              ; word below cursor
-      active-region             ; active region (if any)
-      link-id                   ; link of starting node, if required
-      guarded-search            ; with guard against additional digits
-      search-is-ref             ; true, if search is a reference
-      commands                ; currently active set of selectable commands
-      what-adjusted           ; True, if we had to adjust what
-      what-input    ; Input on what question (need not necessary be "what")
-      reorder-once  ; Column to use for single time sorting
-      parts         ; Parts of a typical reference number (which
-                    ; need not be a plain number); these are:
-      head               ; Any header before number (e.g. "R")
-      maxref             ; Maximum number from reference table (e.g. "153")
-      tail               ; Tail after number (e.g. "}" or "")
-      ref-regex          ; Regular expression to match a reference
-      has-reuse          ; True, if table contains a line for reuse
-      numcols            ; Number of columns in favtable
-      kill-new-text      ; Text that will be appended to kill ring
-      message-text       ; Text that will be issued as an explanation,
-                                                  ; what we have done
-      initial-ref-or-link                    ; initial position in reftable
+  (let (within-node        ; True, if we are within node with favtable
+        result-is-visible  ; True, if node or occur is visible in any window
+        ref-node-buffer-and-point ; cons with buffer and point of favorites node
+        below-cursor              ; word below cursor
+        active-region             ; active region (if any)
+        link-id                   ; link of starting node, if required
+        guarded-search            ; with guard against additional digits
+        search-is-ref             ; true, if search is a reference
+        commands                ; currently active set of selectable commands
+        what-adjusted           ; True, if we had to adjust what
+        what-input    ; Input on what question (need not necessary be "what")
+        reorder-once  ; Column to use for single time sorting
+        parts         ; Parts of a typical reference number (which
+                                                  ; need not be a plain number); these are:
+        head               ; Any header before number (e.g. "R")
+        maxref             ; Maximum number from reference table (e.g. "153")
+        tail               ; Tail after number (e.g. "}" or "")
+        ref-regex          ; Regular expression to match a reference
+        has-reuse          ; True, if table contains a line for reuse
+        numcols            ; Number of columns in favtable
+        kill-new-text      ; Text that will be appended to kill ring
+        message-text       ; Text that will be issued as an explanation,
+                           ; what we have done
+        initial-ref-or-link      ; Initial position in reftable
+        )
+
+    ;;
+    ;; Examine current buffer and location, before turning to favtable
+    ;;
+
+    ;; Get the content of the active region or the word under cursor
+    (if (and transient-mark-mode
+             mark-active)
+        (setq active-region (buffer-substring (region-beginning) (region-end))))
+    (setq below-cursor (thing-at-point 'symbol))
+
+
+    ;; Find out, if we are within favable or not
+    (setq within-node (string= (org-id-get) org-favtable-id))
+
+    ;; Find out, if point in any window is within node with favtable
+    (mapc (lambda (x) (with-current-buffer (window-buffer x)
+                        (when (or 
+                               (string= (org-id-get) org-favtable-id)
+                               (eq (window-buffer x) 
+                                   org-favtable--occur-buffer))
+                          (setq result-is-visible t))))
+          (window-list))
+    
+
+
+    ;;
+    ;; Get decoration of references and highest reference from favtable
+    ;;
+
+
+    ;; Save initial ref or link
+    (if (and within-node
+             (org-at-table-p))
+        (setq initial-ref-or-link 
+              (or (org-favtable--get-field 'ref)
+                  (org-favtable--get-field 'link))))
+
+    ;; Find node
+    (setq ref-node-buffer-and-point (org-favtable--id-find))
+    (unless ref-node-buffer-and-point
+      (org-favtable--report-setup-error 
+       (format "Cannot find node with id \"%s\"" org-favtable-id)))
+
+    ;; Get configuration of reftable; catch errors
+    (let ((error-message
+           (catch 'content-error
+
+             (with-current-buffer (car ref-node-buffer-and-point)
+               (save-excursion
+                 (unless (string= (org-id-get) org-favtable-id)
+                   (goto-char (cdr ref-node-buffer-and-point)))
+
+                 ;; parse table while still within buffer
+                 (setq parts (org-favtable--parse-and-adjust-table)))
+               
+               nil))))
+      (when error-message 
+        (org-pop-to-buffer-same-window (car ref-node-buffer-and-point))
+        (org-reveal)
+        (error error-message)))
+
+    ;; Give names to parts of configuration
+    (setq head (nth 0 parts))
+    (setq maxref (nth 1 parts))
+    (setq tail (nth 2 parts))
+    (setq numcols (nth 3 parts))
+    (setq ref-regex (nth 4 parts))
+    (setq has-reuse (nth 5 parts))
+    (setq org-favtable--ref-regex ref-regex)
+    (setq org-favtable--ref-format (concat head "%d" tail))
+
+    ;;
+    ;; Find out, what we are supposed to do
+    ;;
+
+    (if (equal what '(4)) (setq what 'leave))
+
+    ;; Set preferred action, that will be the default choice
+    (setq org-favtable--preferred-command
+          (if within-node
+              (if (memq org-favtable--last-action '(ref link))
+                  'leave
+                'occur)
+            (if active-region
+                'ref
+              (if (and below-cursor (string-match ref-regex below-cursor))
+                  'occur
+                nil))))
+    
+    ;; Ask user, what to do
+    (unless what
+      (setq commands (copy-list org-favtable--commands-some))
+      (while (progn
+               (setq what-input
+                     (org-icompleting-read 
+                      "Please choose: " 
+                      (mapcar 'symbol-name 
+                              ;; Construct unique list of commands with
+                              ;; preferred one at front
+                              (delq nil (delete-dups 
+                                         (append 
+                                          (list org-favtable--preferred-command)
+                                          commands))))
+                      nil nil))
+
+
+               ;; if input starts with "+", any command (not only some) may follow
+               ;; this allows input like "+sort" to be accepted
+               (when (string= (substring what-input 0 1) "+")
+                 ;; make all commands available for selection
+                 (setq commands (copy-list org-favtable--commands))
+                 (unless (string= what-input "+") 
+                   ;; not just "+", use following string
+                   (setq what-input (substring what-input 1))
+                   
+                   (let ((completions
+                          ;; get list of possible completions for what-input
+                          (all-completions what-input (mapcar 'symbol-name commands))))
+                     ;; use it, if unambigously
+                     (if (= (length completions) 1)
+                         (setq what-input (car completions))))))
+
+
+               ;; if input ends in digits, save them away and do completions on head of input
+               ;; this allows input like "h224" to be accepted
+               (when (string-match "^\\([^0-9+]\\)\\([0-9]+\\)\\s *$" what-input)
+                 ;; use first match as input, even if ambigously
+                 (setq org-favtable--preferred-command 
+                       (intern (first (all-completions (match-string 1 what-input) 
+                                                       (mapcar 'symbol-name commands)))))
+                 ;; use digits as argument to commands
+                 (setq what-input (format org-favtable--ref-format 
+                                          (string-to-number (match-string 2 what-input)))))
+
+               (setq what (intern what-input))
+               
+               ;; user is not required to input one of the commands; if
+               ;; not, take the first one and use the original input for
+               ;; next question
+               (if (memq what commands)
+                   ;; input matched one element of list, dont need original
+                   ;; input any more
+                   (setq what-input nil)
+                 ;; what-input will be used for next question, use first
+                 ;; command for what
+                 (setq what (or org-favtable--preferred-command
+                                (first commands)))
+                 ;; remove any trailing dot, that user might have added to
+                 ;; disambiguate his input
+                 (if (equal (substring what-input -1) ".")
+                     ;; but do this only, if dot was really necessary to
+                     ;; disambiguate
+                     (let ((shortened-what-input (substring what-input 0 -1)))
+                       (unless (test-completion shortened-what-input 
+                                                (mapcar 'symbol-name 
+                                                        commands))
+                         (setq what-input shortened-what-input)))))
+               
+               ;; ask for reorder in loop, because we have to ask for
+               ;; what right again
+               (if (eq what 'reorder)
+                   (setq reorder-once
+                         (intern
+                          (org-icompleting-read 
+                           "Please choose column to reorder reftable once: " 
+                           (mapcar 'symbol-name '(ref count last-accessed))
+                           nil t))))
+               
+               ;; maybe ask initial question again
+               (memq what '(reorder +)))))
+
+
+    ;;
+    ;; Get search, if required
+    ;;
+
+    ;; These actions need a search string:
+    (when (memq what '(goto occur head update))
+
+      ;; Maybe we've got a search string from the arguments
+      (unless search
+        (let (search-from-table
+              search-from-cursor)
+          
+          ;; Search string can come from several sources:
+          ;; From ref column of table
+          (when within-node
+            (setq search-from-table (org-favtable--get-field 'ref)))      
+          ;; From string below cursor
+          (when (and (not within-node)
+                     below-cursor
+                     (string-match (concat "\\(" ref-regex "\\)") 
+                                   below-cursor))
+            (setq search-from-cursor (match-string 1 below-cursor)))
+          
+          ;; Depending on requested action, get search from one of the sources above
+          (cond ((eq what 'goto)
+                 (setq search (or what-input search-from-cursor)))
+                ((memq what '(head occur))
+                 (setq search (or what-input search-from-table search-from-cursor))))))
+
+
+      ;; If we still do not have a search string, ask user explicitly
+      (unless search
+        
+        (if what-input 
+            (setq search what-input)
+          (setq search (read-from-minibuffer
+                        (cond ((memq what '(occur head))
+                               "Text or reference number to search for: ")
+                              ((eq what 'goto)
+                               "Reference number to search for, or enter \".\" for id of current node: ")
+                              ((eq what 'update)
+                               "Reference number to update: ")))))
+
+        (if (string-match "^\\s *[0-9]+\\s *$" search)
+            (setq search (format "%s%s%s" head (org-trim search) tail))))
+      
+      ;; Clean up and examine search string
+      (if search (setq search (org-trim search)))
+      (if (string= search "") (setq search nil))
+      (setq search-is-ref (string-match ref-regex search))
+
+      ;; Check for special case
+      (when (and (memq what '(head goto))
+                 (string= search "."))
+        (setq search (org-id-get))
+        (setq search-is-link t))
+
+      (when search-is-ref
+        (setq guarded-search (org-favtable--make-guarded-search search)))
+
+      ;;
+      ;; Do some sanity checking before really starting
+      ;;
+
+      ;; Correct requested action, if nothing to search
+      (when (and (not search)
+                 (memq what '(search occur head)))
+        (setq what 'enter)
+        (setq what-adjusted t))
+
+      ;; For a proper reference as input, we do multi-occur
+      (if (and (string-match ref-regex search)
+               (eq what 'occur))
+          (setq what 'multi-occur))
+
+      ;; Check for invalid combinations of arguments; try to be helpful
+      (when (and (memq what '(head goto))
+                 (not search-is-link)
+                 (not search-is-ref))
+        (error "Can do '%s' only for a reference or link (not '%s'), try 'occur' to search for text" what search)))
+
+    
+    ;;
+    ;; Prepare
+    ;;
+
+    ;; Get link if required before moving in
+    (if (eq what 'link)
+        (setq link-id (org-id-get-create)))
+
+    ;; Move into table, if outside
+    (when (memq what '(enter ref link goto occur multi-occur missing statistics))
+
+      ;; Support orgmode-standard of going back (buffer and position)
+      (org-mark-ring-push)
+
+      ;; Switch to favtable
+      (org-pop-to-buffer-same-window (car ref-node-buffer-and-point))
+      (goto-char (cdr ref-node-buffer-and-point))
+      (show-subtree)
+      (org-show-context)
+
+      ;; sort favtable
+      (org-favtable--sort-table reorder-once))
+
+    ;; Goto back to initial ref, because reformatting of table above might
+    ;; have moved point
+    (when initial-ref-or-link
+      (while (and (org-at-table-p)
+                  (not (or
+                        (string= initial-ref-or-link (org-favtable--get-field 'ref))
+                        (string= initial-ref-or-link (org-favtable--get-field 'link)))))
+        (forward-line))
+      ;; did not find ref, go back to top
+      (if (not (org-at-table-p)) (goto-char top)))
+
+
+    ;;
+    ;; Actually do, what is requested
+    ;;
+
+    (cond
+
+
+     ((eq what 'help)
+      
+      (let ((help-what
+             ;; which sort of help ?
+             (intern
+              (concat 
+               "help-"
+               (org-icompleting-read 
+                "Help on: "
+                (mapcar 'symbol-name '(commands usage setup version example)) 
+                nil t)))))
+
+        ;; help is taken from docstring of functions or variables
+        (cond ((eq help-what 'help-commands)
+               (org-favtable--show-help 'org-favtable--commands))
+              ((eq help-what 'help-usage)
+               (org-favtable--show-help 'org-favtable))
+              ((eq help-what 'help-setup)
+               (org-favtable--show-help 'org-favtable-id))
+              ((eq help-what 'help-version)
+               (org-favtable-version)))))
+
+
+     ((eq what 'multi-occur) 
+      
+      ;; Conveniently position cursor on number to search for
+      (org-favtable--goto-top)
+      (let (found (initial (point)))
+        (while (and (not found)
+                    (forward-line)
+                    (org-at-table-p))
+          (save-excursion 
+            (setq found (string= search 
+                                 (org-favtable--get-field 'ref)))))
+        (if found 
+            (org-favtable--update-line nil)
+          (goto-char initial)))
+
+      ;; Construct list of all org-buffers
+      (let (buff org-buffers)
+        (dolist (buff (buffer-list))
+          (set-buffer buff)
+          (if (string= major-mode "org-mode")
+              (setq org-buffers (cons buff org-buffers))))
+
+        ;; Do multi-occur
+        (multi-occur org-buffers guarded-search)
+        (if (get-buffer "*Occur*")
+            (progn 
+              (setq message-text (format "multi-occur for '%s'" search))
+              (setq org-favtable--occur-buffer (get-buffer "*Occur*"))
+              (other-window 1)
+              (toggle-truncate-lines 1))
+          (setq message-text (format "Did not find '%s'" search)))))
+
+
+     ((eq what 'head)
+
+      (let (link)
+        ;; link either from table or passed in as argument
+        
+        ;; try to get link
+        (if search-is-link 
+            (setq link (org-trim search))
+          (if (and within-node
+                   (org-at-table-p))
+              (setq link (org-favtable--get-field 'link))))
+
+        ;; use link if available
+        (if (and link
+                 (not (string= link "")))
+            (progn 
+              (org-id-goto link)
+              (org-favtable--update-line search)
+              (setq message-text "Followed link"))
+
+          (message (format "Scanning headlines for '%s' ..." search))
+          (let (buffer point)
+            (if (catch 'found
+                  (progn
+                    ;; loop over all headlines, stop on first match
+                    (org-map-entries 
+                     (lambda () 
+                       (when (looking-at (concat ".*" guarded-search))
+                         ;; remember location and bail out
+                         (setq buffer (current-buffer))
+                         (setq point (point))
+                         (throw 'found t)))          
+                     nil 'agenda)
+                    nil))
+
+                (progn
+                  (org-favtable--update-line search)
+                  (setq message-text (format "Found '%s'" search))
+                  (org-pop-to-buffer-same-window buffer)
+                  (goto-char point)
+                  (org-reveal))
+              (setq message-text (format "Did not find '%s'" search)))))))
+
+
+     ((eq what 'leave)
+
+      (when result-is-visible
+
+        ;; If we are within the occur-buffer, switch over to get current line
+        (if (and (string= (buffer-name) "*Occur*")
+                 (eq org-favtable--last-action 'occur))
+            (occur-mode-goto-occurrence)))
+      
+      (setq kill-new-text org-favtable--text-to-yank)
+      (setq org-favtable--text-to-yank nil)
+      
+      ;; If "leave" has been called two times in succession, make
+      ;; org-mark-ring-goto believe it has been called two times too
+      (if (eq org-favtable--last-action 'leave) 
+          (let ((this-command nil) (last-command nil))
+            (org-mark-ring-goto 1))
+        (org-mark-ring-goto 0)))
+
+
+     ((eq what 'goto)
+
+      ;; Go downward in table to requested reference
+      (let (found (initial (point)))
+        (org-favtable--goto-top)
+        (while (and (not found)
+                    (forward-line)
+                    (org-at-table-p))
+          (save-excursion 
+            (setq found 
+                  (string= search 
+                           (org-favtable--get-field 
+                            (if search-is-link 'link 'ref))))))
+        (if found
+            (progn
+              (setq message-text (format "Found '%s'" search))
+              (org-favtable--update-line nil)
+              (org-table-goto-column (org-favtable--column-num 'ref))
+              (if (looking-back " ") (backward-char))
+              ;; remember string to copy
+              (setq org-favtable--text-to-yank 
+                    (org-trim (org-table-get-field (org-favtable--column-num 'copy)))))
+          (setq message-text (format "Did not find '%s'" search))
+          (goto-char initial)
+          (forward-line)
+          (setq what 'missed))))
+
+
+     ((eq what 'occur)
+
+      ;; search for string: occur
+      (let (search-regexp
+            all-or-any
+            (search-words (split-string search "," t)))
+        
+        (if (< (length search-words) 2)
+            ;; only one word to search; use it as is
+            (setq search-regexp search)
+          ;; construct regexp to match any of the words (maybe throw out some matches later)
+          (setq search-regexp 
+                (mapconcat (lambda (x) (concat "\\(" x "\\)")) search-words "\\|"))
+          (setq all-or-any
+                (intern 
+                 (org-icompleting-read 
+                  "Two or more words have been specified; show lines, that match: " '("all" "any")))))
+        
+        (save-restriction
+          (org-narrow-to-subtree)
+          (occur search-regexp)
+          (widen)
+          (if (get-buffer "*Occur*")
+              (with-current-buffer "*Occur*"
+
+                ;; install helpful keyboard-shortcuts within occur-buffer
+                (let ((keymap (make-sparse-keymap)))
+                  (set-keymap-parent keymap occur-mode-map)
+
+                  (define-key keymap (kbd "RET") 
+                    (lambda () (interactive) 
+                      (org-favtable--occur-helper 'head)))
+
+                  (define-key keymap (kbd "<C-return>") 
+                    (lambda () (interactive) 
+                      (org-favtable--occur-helper 'multi-occur)))
+
+                  (define-key keymap (kbd "<M-return>") 
+                    (lambda () (interactive) 
+                      (org-favtable--occur-helper 'goto)))
+
+                  (define-key keymap (kbd "<C-M-return>") 
+                    (lambda () (interactive) 
+                      (org-favtable--occur-helper 'update)))
+
+                  (use-local-map keymap))
+
+                ;; Brush up occur buffer
+                (other-window 1)
+                (toggle-truncate-lines 1)
+                (let ((inhibit-read-only t)) 
+                  ;; insert some help text
+                  (insert (substitute-command-keys 
+                           "Type RET to find heading, C-RET for multi-occur, M-RET to go to occurence and C-M-RET to update line in reftable.\n\n"))
+                  (forward-line 1)
+
+                  ;; when matching all of multiple words, remove all lines that do not match one of the words
+                  (when (eq all-or-any 'all)
+                    (mapc (lambda (x) (keep-lines x)) search-words))
+
+                  ;; replace description from occur
+                  (when all-or-any 
+                    (forward-line -1)
+                    (kill-line)
+                    (let ((count (- (count-lines (point) (point-max)) 1)))
+                      (insert (format "%d %s for %s of %s" 
+                                      count 
+                                      (if (= count 1) "match" "matches")
+                                      all-or-any
+                                      search)))
+                    (forward-line)
+                    (beginning-of-line))
+                  
+                  ;; Record link or reference for each line in
+                  ;; occur-buffer, that is linked into reftable. Because if
+                  ;; we later realign the reftable and then reuse the occur
+                  ;; buffer, the original links might point nowehere.
+                  (save-excursion
+                    (while (not (eq (point) (point-max)))
+                      (let ((beg (line-beginning-position))
+                            (end (line-end-position))
+                            pos ref link)
+
+                        ;; occur has saved the position into a special property
+                        (setq pos (get-text-property (point) 'occur-target))
+                        (when pos 
+                          ;; but this property might soon point nowhere; so retrieve ref-or-link instead
+                          (with-current-buffer (marker-buffer pos)
+                            (goto-char pos)
+                            (setq ref (org-favtable--get-field 'ref))
+                            (setq link (org-favtable--get-field 'link))))
+                        ;; save as text property
+                        (put-text-property beg end 'org-favtable--ref ref)
+                        (put-text-property beg end 'org-favtable--link link))
+                      (forward-line))))
+                
+                (setq message-text
+                      (format  "Occur for '%s'" search)))
+            (setq message-text
+                  (format "Did not find any matches for '%s'" search))))))
+
+
+     ((memq what '(ref link))
+
+      ;; add a new row (or reuse existing one)
+      (let (new)
+
+        (when (eq what 'ref)
+            ;; go through table to find first entry to be reused
+          (when has-reuse
+            (org-favtable--goto-top)
+            ;; go through table
+            (while (and (org-at-table-p)
+                        (not new))
+              (when (string= 
+                     (org-favtable--get-field 'count)
+                     ":reuse:")
+                (setq new (org-favtable--get-field 'ref))
+                (if new (org-table-kill-row)))
+              (forward-line)))
+          
+          ;; no ref to reuse; construct new reference
+          (unless new 
+            (setq new (format "%s%d%s" head (1+ maxref) tail)))
+
+          ;; remember for org-mark-ring-goto
+          (setq org-favtable--text-to-yank new))
+        
+        ;; insert ref or link as very first row
+        (org-favtable--goto-top)
+        (org-table-insert-row)
+        
+        ;; fill special columns with standard values
+        (when (eq what 'ref)
+          (org-table-goto-column (org-favtable--column-num 'ref))
+          (insert new))
+        (when (eq what 'link)
+          (org-table-goto-column (org-favtable--column-num 'link))
+          (insert link-id))
+        (org-table-goto-column (org-favtable--column-num 'created))
+        (org-insert-time-stamp nil nil t)
+
+        ;; goto first empty field
+        (unless (catch 'empty
+                  (dotimes (col numcols)
+                    (org-table-goto-column (+ col 1))
+                    (if (string= (org-trim (org-table-get-field)) "")
+                        (throw 'empty t))))
+          ;; none found, goto first
+          (org-table-goto-column 1))
+
+        (org-table-align)
+        (if active-region (setq kill-new-text active-region))
+        (if (eq what 'ref)
+            (setq message-text (format "Adding a new row with ref '%s'" new))
+          (setq message-text (format "Adding a new row linked to '%s'" link-id)))))
+
+
+     ((eq what 'enter)
+
+      ;; simply go into table
+      (org-favtable--goto-top)
+      (show-subtree)
+      (recenter)
+      (if what-adjusted
+          (setq message-text "Nothing to search for; at favtable")
+        (setq message-text "At favtable")))
+
+     
+     ((eq what 'fill)
+
+      ;; check, if within reftable
+      (unless (and within-node
+                   (org-at-table-p))
+        (error "Not within table of favorites"))
+
+      ;; applies to missing refs and missing links alike
+      (let ((ref (org-favtable--get-field 'ref))
+            (link (org-favtable--get-field 'link)))
+
+        (if (and (not ref)
+                 (not link))
+            ;; have already checked this during parse, check here anyway
+            (error "Columns ref and link are both empty in this line"))
+
+        ;; fill in new ref
+        (if (not ref)
+            (progn 
+              (setq kill-new-text (format "%s%d%s" head (1+ maxref) tail))
+              (org-favtable--get-field 'ref kill-new-text)
+              ;; remember for org-mark-ring-goto
+              (setq org-favtable--text-to-yank kill-new-text)
+              (org-id-goto link)
+              (setq message-text "Filled reftable field with new reference"))
+
+          ;; fill in new link
+          (if (not link)
+              (progn
+                (setq guarded-search (org-favtable--make-guarded-search ref))
+                (message (format "Scanning headlines for '%s' ..." ref))
+                (let (link)
+                  (if (catch 'found
+                        (org-map-entries 
+                         (lambda () 
+                           (when (looking-at (concat ".*" guarded-search))
+                             (setq link (org-id-get-create))
+                             (throw 'found t)))   
+                         nil 'agenda)
+                        nil)
+
+                      (progn
+                        (org-favtable--get-field 'link link)
+                        (setq message-text "Inserted link"))
+
+                    (setq message-text (format "Did not find reference '%s'" ref)))))
+            
+            ;; nothing is missing
+            (setq message-text "Columns 'ref' and 'link' are already filled; nothing to do")))))
+     
+
+     ((eq what 'sort)
+
+      ;; sort lines according to contained reference
+      (let (begin end where)
+        (catch 'aborted
+          ;; either active region or whole buffer
+          (if (and transient-mark-mode
+                   mark-active)
+              ;; sort only region
+              (progn
+                (setq begin (region-beginning))
+                (setq end (region-end))
+                (setq where "region"))
+            ;; sort whole buffer
+            (setq begin (point-min))
+            (setq end (point-max))
+            (setq where "whole buffer")
+            ;; make sure
+            (unless (y-or-n-p "Sort whole buffer ")
+              (setq message-text "Sort aborted")
+              (throw 'aborted nil)))
+          
+          (save-excursion
+            (save-restriction
+              (goto-char (point-min))
+              (narrow-to-region begin end)
+              (sort-subr nil 'forward-line 'end-of-line 
+                         (lambda ()
+                           (if (looking-at (concat ".*" 
+                                                   (org-favtable--make-guarded-search ref-regex 'dont-quote)))
+                               (string-to-number (match-string 1))
+                             0))))
+            (highlight-regexp ref-regex)
+            (setq message-text (format "Sorted %s from character %d to %d, %d lines" 
+                                       where begin end
+                                       (count-lines begin end)))))))
+     
+
+     ((eq what 'update)
+
+      ;; simply update line in reftable
+      (save-excursion
+        (let ((ref-or-link (if search-is-link "link" "reference")))
+          (beginning-of-line)
+          (if (org-favtable--update-line search)
+              (setq message-text (format "Updated %s '%s'" ref-or-link search))
+            (setq message-text (format "Did not find %s '%s'" ref-or-link search))))))
+
+
+     ((eq what 'parse)
+
+      ;; Just parse the reftable, which is already done, so nothing to do
       )
 
-  ;;
-  ;; Examine current buffer and location, before turning to favtable
-  ;;
 
-  ;; Get the content of the active region or the word under cursor
-  (if (and transient-mark-mode
-           mark-active)
-      (setq active-region (buffer-substring (region-beginning) (region-end))))
-  (setq below-cursor (thing-at-point 'symbol))
+     ((memq what '(highlight unhighlight))
 
-
-  ;; Find out, if we are within favable or not
-  (setq within-node (string= (org-id-get) org-favtable-id))
-
-  ;; Find out, if point in any window is within node with favtable
-  (mapc (lambda (x) (with-current-buffer (window-buffer x)
-                      (when (or 
-                             (string= (org-id-get) org-favtable-id)
-                             (eq (window-buffer x) 
-                                 org-favtable--occur-buffer))
-                        (setq result-is-visible t))))
-        (window-list))
-        
-
-
-  ;;
-  ;; Get decoration of references and highest reference from favtable
-  ;;
-
-
-  ;; Save initial ref or link
-  (if (and within-node
-           (org-at-table-p))
-      (setq initial-ref-or-link 
-            (or (org-favtable--get-field 'ref)
-                (org-favtable--get-field 'link))))
-
-  ;; Find node
-  (setq ref-node-buffer-and-point (org-favtable--id-find))
-  (unless ref-node-buffer-and-point
-    (org-favtable--report-setup-error 
-     (format "Cannot find node with id \"%s\"" org-favtable-id)))
-
-  ;; Get configuration of reftable; catch errors
-  (let ((error-message
-         (catch 'content-error
-
-           (with-current-buffer (car ref-node-buffer-and-point)
-             (unless (string= (org-id-get) org-favtable-id)
-
-               ;; Get marker for point within reftable-buffer, but only if outside
-               ;; of reftable (if point is within reftable, we will try to stay at
-               ;; the same ref)
-               (setq org-favtable--marker-outside-before (point-marker))
-               (goto-char (cdr ref-node-buffer-and-point)))
-
-             ;; parse table while still within buffer
-             (save-excursion
-               (setq parts (org-favtable--parse-and-adjust-table)))
-              
-             nil))))
-    (when error-message 
-      (org-pop-to-buffer-same-window (car ref-node-buffer-and-point))
-      (org-reveal)
-      (error error-message)))
-
-  ;; Give names to parts of configuration
-  (setq head (nth 0 parts))
-  (setq maxref (nth 1 parts))
-  (setq tail (nth 2 parts))
-  (setq numcols (nth 3 parts))
-  (setq ref-regex (nth 4 parts))
-  (setq has-reuse (nth 5 parts))
-  (setq org-favtable--ref-regex ref-regex)
-  (setq org-favtable--format (concat head "%d" tail))
-
-  ;;
-  ;; Find out, what we are supposed to do
-  ;;
-
-  (if (equal what '(4)) (setq what 'leave))
-
-  ;; Set preferred action, that will be the default choice
-  (setq org-favtable--preferred-command
-        (if within-node
-            (if (memq org-favtable--last-action '(ref link))
-                'leave
-              'occur)
-          (if active-region
-              'ref
-            (if (and below-cursor (string-match ref-regex below-cursor))
-                'occur
-              nil))))
-    
-  ;; Ask user, what to do
-  (unless what
-    (setq commands (copy-list org-favtable--commands-some))
-    (while (progn
-             (setq what-input
-                   (org-icompleting-read 
-                    "Please choose: " 
-                    (mapcar 'symbol-name 
-                            ;; Construct unique list of commands with
-                            ;; preferred one at front
-                            (delq nil (delete-dups 
-                                       (append 
-                                        (list org-favtable--preferred-command)
-                                        commands))))
-                    nil nil))
-
-
-             ;; if input starts with "+" any command (not only some) may follow
-             (when (string= (substring what-input 0 1) "+")
-               ;; make all commands available for selection
-               (setq commands (copy-list org-favtable--commands))
-               (unless (string= what-input "+") 
-                 ;; not just "+", use following string
-                 (setq what-input (substring what-input 1))
-                 
-                 (let ((completions
-                        ;; get list of possible completions for what-input
-                        (all-completions what-input (mapcar 'symbol-name org-favtable--commands))))
-                   ;; use it, if unambigously
-                   (if (= (length completions) 1)
-                       (setq what-input (car completions))))))
-
-
-             (setq what (intern what-input))
-               
-             ;; user is not required to input one of the commands; if
-             ;; not, take the first one and use the original input for
-             ;; next question
-             (if (memq what commands)
-                 ;; input matched one element of list, dont need original
-                 ;; input any more
-                 (setq what-input nil)
-               ;; what-input will be used for next question, use first
-               ;; command for what
-               (setq what (or org-favtable--preferred-command
-                              (first commands)))
-               ;; remove any trailing dot, that user might have added to
-               ;; disambiguate his input
-               (if (equal (substring what-input -1) ".")
-                   ;; but do this only, if dot was really necessary to
-                   ;; disambiguate
-                   (let ((shortened-what-input (substring what-input 0 -1)))
-                     (unless (test-completion shortened-what-input 
-                                              (mapcar 'symbol-name 
-                                                      commands))
-                       (setq what-input shortened-what-input)))))
-                     
-             ;; ask for reorder in loop, because we have to ask for
-             ;; what right again
-             (if (eq what 'reorder)
-                 (setq reorder-once
-                       (intern
-                        (org-icompleting-read 
-                         "Please choose column to reorder reftable once: " 
-                         (mapcar 'symbol-name '(ref count last-accessed))
-                         nil t))))
-               
-             ;; maybe ask initial question again
-             (memq what '(reorder +)))))
-
-
-  ;;
-  ;; Get search, if required
-  ;;
-
-  ;; These actions need a search string:
-  (when (memq what '(goto occur head update))
-
-    ;; Maybe we've got a search string from the arguments
-    (unless search
-      (let (search-from-table
-            search-from-cursor)
-          
-        ;; Search string can come from several sources:
-        ;; From ref column of table
-        (when within-node
-          (setq search-from-table (org-favtable--get-field 'ref)))      
-        ;; From string below cursor
-        (when (and (not within-node)
-                   below-cursor
-                   (string-match (concat "\\(" ref-regex "\\)") 
-                                 below-cursor))
-          (setq search-from-cursor (match-string 1 below-cursor)))
-          
-        ;; Depending on requested action, get search from one of the sources above
-        (cond ((eq what 'goto)
-               (setq search (or what-input search-from-cursor)))
-              ((memq what '(head occur))
-               (setq search (or what-input search-from-table search-from-cursor))))))
-
-
-    ;; If we still do not have a search string, ask user explicitly
-    (unless search
-        
-      (if what-input 
-          (setq search what-input)
-        (setq search (read-from-minibuffer
-                      (cond ((memq what '(occur head))
-                             "Text or reference number to search for: ")
-                            ((eq what 'goto)
-                             "Reference number to search for, or enter \".\" for id of current node: ")
-                            ((eq what 'update)
-                             "Reference number to update: ")))))
-
-      (if (string-match "^\\s *[0-9]+\\s *$" search)
-          (setq search (format "%s%s%s" head (org-trim search) tail))))
-      
-    ;; Clean up and examine search string
-    (if search (setq search (org-trim search)))
-    (if (string= search "") (setq search nil))
-    (setq search-is-ref (string-match ref-regex search))
-
-    ;; Check for special case
-    (when (and (memq what '(head goto))
-               (string= search "."))
-      (setq search (org-id-get))
-      (setq search-is-link t))
-
-    (when search-is-ref
-      (setq guarded-search (org-favtable--make-guarded-search search)))
-
-    ;;
-    ;; Do some sanity checking before really starting
-    ;;
-
-    ;; Correct requested action, if nothing to search
-    (when (and (not search)
-               (memq what '(search occur head)))
-      (setq what 'enter)
-      (setq what-adjusted t))
-
-    ;; For a proper reference as input, we do multi-occur
-    (if (and (string-match ref-regex search)
-             (eq what 'occur))
-        (setq what 'multi-occur))
-
-    ;; Check for invalid combinations of arguments; try to be helpful
-    (when (and (memq what '(head goto))
-               (not search-is-link)
-               (not search-is-ref))
-      (error "Can do '%s' only for a reference or link (not '%s'), try 'occur' to search for text" what search)))
-
-    
-  ;;
-  ;; Prepare
-  ;;
-
-  ;; Get link if required before moving in
-  (if (eq what 'link)
-      (setq link-id (org-id-get-create)))
-
-  ;; Move into table, if outside
-  (when (memq what '(enter ref link goto occur multi-occur missing statistics))
-    ;; Save current window configuration
-    (when (or (not result-is-visible)
-              (not org-favtable--windowconfig-before))
-      (setq org-favtable--windowconfig-before (current-window-configuration)))
-
-    ;; Switch to favtable
-    (org-pop-to-buffer-same-window (car ref-node-buffer-and-point))
-    (goto-char (cdr ref-node-buffer-and-point))
-    (show-subtree)
-    (org-show-context)
-
-    ;; sort favtable
-    (org-favtable--sort-table reorder-once))
-
-  ;; Goto back to initial ref, because reformatting of table above might
-  ;; have moved point
-  (when initial-ref-or-link
-    (while (and (org-at-table-p)
-                (not (or
-                      (string= initial-ref-or-link (org-favtable--get-field 'ref))
-                      (string= initial-ref-or-link (org-favtable--get-field 'link)))))
-      (forward-line))
-    ;; did not find ref, go back to top
-    (if (not (org-at-table-p)) (goto-char top)))
-
-
-  ;;
-  ;; Actually do, what is requested
-  ;;
-
-  (cond
-
-
-   ((eq what 'help)
-      
-    (let ((help-what
-           ;; which sort of help ?
-           (intern
-            (concat 
-             "help-"
-             (org-icompleting-read 
-              "Help on: "
-              (mapcar 'symbol-name '(commands usage setup version example)) 
-              nil t)))))
-
-      ;; help is taken from docstring of functions or variables
-      (cond ((eq help-what 'help-commands)
-             (org-favtable--show-help 'org-favtable--commands))
-            ((eq help-what 'help-usage)
-             (org-favtable--show-help 'org-favtable))
-            ((eq help-what 'help-setup)
-             (org-favtable--show-help 'org-favtable-id))
-            ((eq help-what 'help-version)
-             (org-favtable-version)))))
-
-
-   ((eq what 'multi-occur) 
-      
-    ;; Conveniently position cursor on number to search for
-    (org-favtable--goto-top)
-    (let (found (initial (point)))
-      (while (and (not found)
-                  (forward-line)
-                  (org-at-table-p))
-        (save-excursion 
-          (setq found (string= search 
-                               (org-favtable--get-field 'ref)))))
-      (if found 
-          (org-favtable--update-line nil)
-        (goto-char initial)))
-
-    ;; Construct list of all org-buffers
-    (let (buff org-buffers)
-      (dolist (buff (buffer-list))
-        (set-buffer buff)
-        (if (string= major-mode "org-mode")
-            (setq org-buffers (cons buff org-buffers))))
-
-      ;; Do multi-occur
-      (multi-occur org-buffers guarded-search)
-      (if (get-buffer "*Occur*")
-          (progn 
-            (setq message-text (format "multi-occur for '%s'" search))
-            (setq org-favtable--occur-buffer (get-buffer "*Occur*"))
-            (other-window 1)
-            (toggle-truncate-lines 1))
-        (setq message-text (format "Did not find '%s'" search)))))
-
-
-   ((eq what 'head)
-
-    (let (link)
-      ;; link either from table or passed in as argument
-        
-      ;; try to get link
-      (if search-is-link 
-          (setq link (org-trim search))
-        (if (and within-node
-                 (org-at-table-p))
-            (setq link (org-favtable--get-field 'link))))
-
-      ;; use link if available
-      (if (and link
-               (not (string= link "")))
-          (progn 
-            (org-id-goto link)
-            (org-favtable--update-line search)
-            (setq message-text "Followed link"))
-
-        (message (format "Scanning headlines for '%s' ..." search))
-        (let (buffer point)
-          (if (catch 'found
-                (progn
-                  ;; loop over all headlines, stop on first match
-                  (org-map-entries 
-                   (lambda () 
-                     (when (looking-at (concat ".*" guarded-search))
-                       ;; remember location and bail out
-                       (setq buffer (current-buffer))
-                       (setq point (point))
-                       (throw 'found t)))          
-                   nil 'agenda)
-                  nil))
-
-              (progn
-                (org-favtable--update-line search)
-                (setq message-text (format "Found '%s'" search))
-                (org-pop-to-buffer-same-window buffer)
-                (goto-char point)
-                (org-reveal))
-            (setq message-text (format "Did not find '%s'" search)))))))
-
-
-   ((eq what 'leave)
-
-    (when result-is-visible
-
-      ;; If we are within the occur-buffer, switch over to get current line
-      (if (and (string= (buffer-name) "*Occur*")
-               (eq org-favtable--last-action 'occur))
-          (occur-mode-goto-occurrence))
-
-      (let (copy-column)              
-        ;; Try to copy requested column
-        (setq copy-column (org-favtable--column-num (if (eq org-favtable--last-action 'ref)
-                                                        'goto
-                                                      'copy)))
-            
-        ;; Add to kill ring
-        (if (memq org-favtable--last-action '(ref enter goto occur))
-            (setq kill-new-text 
-                  (org-trim (org-table-get-field copy-column))))))
-
-    ;; Restore position within buffer with favtable
-    (with-current-buffer (car ref-node-buffer-and-point)
-      (when org-favtable--marker-outside-before
-        (goto-char (marker-position org-favtable--marker-outside-before))
-        (move-marker org-favtable--marker-outside-before nil)))
-
-    ;; Restore windowconfig
-    (if org-favtable--windowconfig-before 
-        (progn  
-          ;; Restore initial window configuration
-          (set-window-configuration org-favtable--windowconfig-before)
-          (setq org-favtable--windowconfig-before nil)
-          ;; Goto initial position
-          (recenter)
-          (setq message-text "Back"))
-      ;; We did not have a window-configuration to restore, so we cannot
-      ;; pretend we have returned back
-      (setq message-text "Cannot leave; nowhere to go to")
-      (setq kill-new-text nil)))
-
-
-   ((eq what 'goto)
-
-    ;; Go downward in table to requested reference
-    (let (found (initial (point)))
-      (org-favtable--goto-top)
-      (while (and (not found)
-                  (forward-line)
-                  (org-at-table-p))
-        (save-excursion 
-          (setq found 
-                (string= search 
-                         (org-favtable--get-field 
-                          (if search-is-link 'link 'ref))))))
-      (if found
-          (progn
-            (setq message-text (format "Found '%s'" search))
-            (org-favtable--update-line nil)
-            (org-table-goto-column (org-favtable--column-num 'ref))
-            (if (looking-back " ") (backward-char)))
-        (setq message-text (format "Did not find '%s'" search))
-        (goto-char initial)
-        (forward-line)
-        (setq what 'missed))))
-
-
-   ((eq what 'occur)
-
-    ;; search for string: occur
-    (let (search-regexp
-          all-or-any
-          (search-words (split-string search "," t)))
-            
-      (if (< (length search-words) 2)
-          ;; only one word to search; use it as is
-          (setq search-regexp search)
-        ;; construct regexp to match any of the words (maybe throw out some matches later)
-        (setq search-regexp 
-              (mapconcat (lambda (x) (concat "\\(" x "\\)")) search-words "\\|"))
-        (setq all-or-any
-              (intern 
-               (org-icompleting-read 
-                "Two or more words have been specified; show lines, that match: " '("all" "any")))))
-            
-      (save-restriction
-        (org-narrow-to-subtree)
-        (occur search-regexp)
-        (widen)
-        (if (get-buffer "*Occur*")
-            (with-current-buffer "*Occur*"
-
-              ;; install helpful keyboard-shortcuts within occur-buffer
-              (let ((keymap (make-sparse-keymap)))
-                (set-keymap-parent keymap occur-mode-map)
-
-                (define-key keymap (kbd "RET") 
-                  (lambda () (interactive) 
-                    (org-favtable--occur-helper 'head)))
-
-                (define-key keymap (kbd "<C-return>") 
-                  (lambda () (interactive) 
-                    (org-favtable--occur-helper 'multi-occur)))
-
-                (define-key keymap (kbd "<M-return>") 
-                  (lambda () (interactive) 
-                    (org-favtable--occur-helper 'goto)))
-
-                (define-key keymap (kbd "<C-M-return>") 
-                  (lambda () (interactive) 
-                    (org-favtable--occur-helper 'update)))
-
-                (use-local-map keymap))
-
-              ;; Brush up occur buffer
-              (other-window 1)
-              (toggle-truncate-lines 1)
-              (let ((inhibit-read-only t)) 
-                ;; insert some help text
-                (insert (substitute-command-keys 
-                         "Type RET to find heading, C-RET for multi-occur, M-RET to go to occurence and C-M-RET to update line in reftable.\n\n"))
-                (forward-line 1)
-
-                ;; when matching all of multiple words, remove all lines that do not match one of the words
-                (when (eq all-or-any 'all)
-                  (mapc (lambda (x) (keep-lines x)) search-words))
-
-                ;; replace description from occur
-                (when all-or-any 
-                  (forward-line -1)
-                  (kill-line)
-                  (let ((count (- (count-lines (point) (point-max)) 1)))
-                    (insert (format "%d %s for %s of %s" 
-                                    count 
-                                    (if (= count 1) "match" "matches")
-                                    all-or-any
-                                    search)))
-                  (forward-line)
-                  (beginning-of-line))
-                  
-                ;; Record link or reference for each line in
-                ;; occur-buffer, that is linked into reftable. Because if
-                ;; we later realign the reftable and then reuse the occur
-                ;; buffer, the original links might point nowehere.
-                (save-excursion
-                  (while (not (eq (point) (point-max)))
-                    (let ((beg (line-beginning-position))
-                          (end (line-end-position))
-                          pos ref link)
-
-                      ;; occur has saved the position into a special property
-                      (setq pos (get-text-property (point) 'occur-target))
-                      (when pos 
-                        ;; but this property might soon point nowhere; so retrieve ref-or-link instead
-                        (with-current-buffer (marker-buffer pos)
-                          (goto-char pos)
-                          (setq ref (org-favtable--get-field 'ref))
-                          (setq link (org-favtable--get-field 'link))))
-                      ;; save as text property
-                      (put-text-property beg end 'org-favtable--ref ref)
-                      (put-text-property beg end 'org-favtable--link link))
-                    (forward-line))))
-                  
-              (setq message-text
-                    (format  "Occur for '%s'" search)))
-          (setq message-text
-                (format "Did not find any matches for '%s'" search))))))
-
-
-   ((memq what '(ref link))
-
-    ;; add a new row (or reuse existing one)
-    (let (new)
-
-      ;; go through table to find first entry to be reused
-      (when has-reuse
-        (org-favtable--goto-top)
-        ;; go through table
-        (while (and (org-at-table-p)
-                    (not new))
-          (when (string= 
-                 (org-favtable--get-field 'count)
-                 ":reuse:")
-            (setq new (org-favtable--get-field 'ref))
-            (if new (org-table-kill-row)))
-          (forward-line)))
-        
-      ;; no ref to reuse; construct new reference
-      (unless new 
-        (setq new (format "%s%d%s" head (1+ maxref) tail)))
-
-      ;; insert ref as very first row
-      (org-favtable--goto-top)
-      (org-table-insert-row)
-        
-      ;; fill special columns with standard values
-      (when (eq what 'ref)
-        (org-table-goto-column (org-favtable--column-num 'ref))
-        (insert new))
-      (when (eq what 'link)
-        (org-table-goto-column (org-favtable--column-num 'link))
-        (insert link-id))
-      (org-table-goto-column (org-favtable--column-num 'created))
-      (org-insert-time-stamp nil nil t)
-
-      ;; goto first nonempty field
-      (catch 'empty
-        (dotimes (col numcols)
-          (org-table-goto-column (+ col 1))
-          (if (string= (org-trim (org-table-get-field)) "")
-              (throw 'empty t)))
-        ;; none found, goto first
-        (org-table-goto-column 1))
-
-      (org-table-align)
-      (if active-region (setq kill-new-text active-region))
-      (if (eq what 'ref)
-          (setq message-text (format "Adding a new row with ref '%s'" new))
-        (setq message-text (format "Adding a new row linked to '%s'" link-id)))))
-
-
-   ((eq what 'enter)
-
-    ;; simply go into table
-    (org-favtable--goto-top)
-    (show-subtree)
-    (recenter)
-    (if what-adjusted
-        (setq message-text "Nothing to search for; at favtable")
-      (setq message-text "At favtable")))
-
-     
-   ((eq what 'fill)
-
-    ;; check if within reftable
-    (unless (and within-node
-                 (org-at-table-p))
-      (error "Not within table of favorites"))
-
-    ;; applies to missing refs and missing links alike
-    (let ((ref (org-favtable--get-field 'ref))
-          (link (org-favtable--get-field 'link)))
-
-      (if (and (not ref)
-               (not link))
-          ;; have already checked this during parse, check here anyway
-          (error "Columns ref and link are both empty in this line"))
-
-      ;; fill in new ref
-      (if (not ref)
-          (progn 
-            (setq kill-new-text (format "%s%d%s" head (1+ maxref) tail))
-            (org-favtable--get-field 'ref kill-new-text)
-            (org-id-goto link)
-            (setq message-text "Filled reftable field with new reference"))
-
-        ;; fill in new link
-        (if (not link)
-            (progn
-              (setq guarded-search (org-favtable--make-guarded-search ref))
-              (message (format "Scanning headlines for '%s' ..." ref))
-              (let (link)
-                (if (catch 'found
-                      (org-map-entries 
-                       (lambda () 
-                         (when (looking-at (concat ".*" guarded-search))
-                           (setq link (org-id-get-create))
-                           (throw 'found t)))   
-                       nil 'agenda)
-                      nil)
-
-                    (progn
-                      (org-favtable--get-field 'link link)
-                      (setq message-text "Inserted link"))
-
-                  (setq message-text (format "Did not find reference '%s'" ref)))))
-          
-          ;; nothing is missing
-          (setq message-text "Columns 'ref' and 'link' are already filled; nothing to do")))))
-     
-
-   ((eq what 'sort)
-
-    ;; sort lines according to contained reference
-    (let (begin end where)
-      (catch 'aborted
-        ;; either active region or whole buffer
-        (if (and transient-mark-mode
-                 mark-active)
-            ;; sort only region
-            (progn
-              (setq begin (region-beginning))
-              (setq end (region-end))
-              (setq where "region"))
-          ;; sort whole buffer
-          (setq begin (point-min))
-          (setq end (point-max))
-          (setq where "whole buffer")
-          ;; make sure
-          (unless (y-or-n-p "Sort whole buffer ")
-            (setq message-text "Sort aborted")
-            (throw 'aborted nil)))
-          
+      (let ((where "buffer"))
         (save-excursion
           (save-restriction
-            (goto-char (point-min))
-            (narrow-to-region begin end)
-            (sort-subr nil 'forward-line 'end-of-line 
-                       (lambda ()
-                         (if (looking-at (concat ".*" 
-                                                 (org-favtable--make-guarded-search ref-regex 'dont-quote)))
-                             (string-to-number (match-string 1))
-                           0))))
-          (highlight-regexp ref-regex)
-          (setq message-text (format "Sorted %s from character %d to %d, %d lines" 
-                                     where begin end
-                                     (count-lines begin end)))))))
-    
+            (when (and transient-mark-mode
+                       mark-active)
+              (narrow-to-region (region-beginning) (region-end))
+              (setq where "region"))
 
-   ((eq what 'update)
-
-    ;; simply update line in reftable
-    (save-excursion
-      (let ((ref-or-link (if search-is-link "link" "reference")))
-        (beginning-of-line)
-        (if (org-favtable--update-line search)
-            (setq message-text (format "Updated %s '%s'" ref-or-link search))
-          (setq message-text (format "Did not find %s '%s'" ref-or-link search))))))
+            (if (eq what 'highlight)
+                (progn
+                  (highlight-regexp ref-regex)
+                  (setq message-text (format "Highlighted references in %s" where)))
+              (unhighlight-regexp ref-regex)
+              (setq message-text (format "Removed highlights for references in %s" where)))))))
 
 
-   ((memq what '(highlight unhighlight))
+     ((memq what '(missing statistics))
 
-    (let ((where "buffer"))
-      (save-excursion
-        (save-restriction
-          (when (and transient-mark-mode
-                     mark-active)
-            (narrow-to-region (region-beginning) (region-end))
-            (setq where "region"))
+      (org-favtable--goto-top)
+      (let (missing 
+            ref-field
+            ref
+            min
+            max 
+            (total 0))
 
-          (if (eq what 'highlight)
-              (progn
-                (highlight-regexp ref-regex)
-                (setq message-text (format "Highlighted references in %s" where)))
-            (unhighlight-regexp ref-regex)
-            (setq message-text (format "Removed highlights for references in %s" where)))))))
+        ;; start with list of all references
+        (setq missing (mapcar (lambda (x) (format "%s%d%s" head x tail)) 
+                              (number-sequence 1 maxref)))
 
+        ;; go through table and remove all refs, that we see
+        (while (and (forward-line)
+                    (org-at-table-p))
 
-   ((memq what '(missing statistics))
+          ;; get ref-field and number
+          (setq ref-field (org-favtable--get-field 'ref))
+          (if (and ref-field 
+                   (string-match ref-regex ref-field))
+              (setq ref (string-to-number (match-string 1 ref-field))))
 
-    (org-favtable--goto-top)
-    (let (missing 
-          ref-field
-          ref
-          min
-          max 
-          (total 0))
+          ;; remove existing refs from list
+          (if ref-field (setq missing (delete ref-field missing)))
 
-      ;; start with list of all references
-      (setq missing (mapcar (lambda (x) (format "%s%d%s" head x tail)) 
-                            (number-sequence 1 maxref)))
+          ;; record min and max            
+          (if (or (not min) (< ref min)) (setq min ref))
+          (if (or (not max) (> ref max)) (setq max ref))
 
-      ;; go through table and remove all refs, that we see
-      (while (and (forward-line)
-                  (org-at-table-p))
+          ;; count
+          (setq total (1+ total)))
 
-        ;; get ref-field and number
-        (setq ref-field (org-favtable--get-field 'ref))
-        (if (and ref-field 
-                 (string-match ref-regex ref-field))
-            (setq ref (string-to-number (match-string 1 ref-field))))
-
-        ;; remove existing refs from list
-        (if ref-field (setq missing (delete ref-field missing)))
-
-        ;; record min and max            
-        (if (or (not min) (< ref min)) (setq min ref))
-        (if (or (not max) (> ref max)) (setq max ref))
-
-        ;; count
-        (setq total (1+ total)))
-
-      ;; insert them, if requested
-      (forward-line -1)
-      (if (eq what 'statistics)
+        ;; insert them, if requested
+        (forward-line -1)
+        (if (eq what 'statistics)
             
-          (setq message-text (format "Found %d references from %s to %s. %d references below highest do not appear in table. "
-                                     total 
-                                     (format org-favtable--format min)   
-                                     (format org-favtable--format max)
-                                     (length missing)))
+            (setq message-text (format "Found %d references from %s to %s. %d references below highest do not appear in table. "
+                                       total 
+                                       (format org-favtable--format min)   
+                                       (format org-favtable--format max)
+                                       (length missing)))
 
-        (if (y-or-n-p (format "Found %d missing references; do you wish to append them to the table of favorites" 
-                              (length missing)))
-            (let (type)
-              (setq type (org-icompleting-read 
-                          "Insert new lines for reuse by command \"new\" or just as missing ? " '("reuse" "missing")))
-              (mapc (lambda (x) 
-                      (let (org-table-may-need-update) (org-table-insert-row t))
-                      (org-favtable--get-field 'ref x)
-                      (org-favtable--get-field 'count (format ":%s:" type)))
-                    missing)
-              (org-table-align)
-              (setq message-text (format "Inserted %d new lines for missing refernces" (length missing))))
-          (setq message-text (format "%d missing references." (length missing)))))))
+          (if (y-or-n-p (format "Found %d missing references; do you wish to append them to the table of favorites" 
+                                (length missing)))
+              (let (type)
+                (setq type (org-icompleting-read 
+                            "Insert new lines for reuse by command \"new\" or just as missing ? " '("reuse" "missing")))
+                (mapc (lambda (x) 
+                        (let (org-table-may-need-update) (org-table-insert-row t))
+                        (org-favtable--get-field 'ref x)
+                        (org-favtable--get-field 'count (format ":%s:" type)))
+                      missing)
+                (org-table-align)
+                (setq message-text (format "Inserted %d new lines for missing refernces" (length missing))))
+            (setq message-text (format "%d missing references." (length missing)))))))
      
-      
-   (t (error "This is a bug: unmatched case '%s'" what)))
+     
+     (t (error "This is a bug: unmatched case '%s'" what)))
 
 
-  ;; remember what we have done for next time
-  (setq org-favtable--last-action what)
+    ;; remember what we have done for next time
+    (setq org-favtable--last-action what)
     
-  ;; tell, what we have done and what can be yanked
-  (if kill-new-text (setq kill-new-text 
-                          (substring-no-properties kill-new-text)))
-  (if (string= kill-new-text "") (setq kill-new-text nil))
-  (let ((m (concat 
-            message-text
-            (if (and message-text kill-new-text) 
-                " and r" 
-              (if kill-new-text "R" ""))
-            (if kill-new-text (format "eady to yank '%s'" kill-new-text) ""))))
-    (unless (string= m "") (message m)))
-  (if kill-new-text (kill-new kill-new-text))))
+    ;; tell, what we have done and what can be yanked
+    (if kill-new-text (setq kill-new-text 
+                            (substring-no-properties kill-new-text)))
+    (if (string= kill-new-text "") (setq kill-new-text nil))
+    (let ((m (concat 
+              message-text
+              (if (and message-text kill-new-text) 
+                  " and r" 
+                (if kill-new-text "R" ""))
+              (if kill-new-text (format "eady to yank '%s'" kill-new-text) ""))))
+      (unless (string= m "") (message m)))
+    (if kill-new-text (kill-new kill-new-text))))
 
 
 
@@ -1299,7 +1318,7 @@ An example would be:
        (format "First reference in table table of favorites ('%s') does not contain a number" ref-field) t))
     
 
-    ;; These are the decorations used within the first row of favtable
+    ;; These are the decorations used within the first ref of favtable
     (setq head (match-string 1 ref-field))
     (setq tail (match-string 3 ref-field))
     (setq ref-regex (concat (regexp-quote head)
@@ -1548,8 +1567,6 @@ An example would be:
     (org-favtable--show-help 'org-favtable-id))
 
   (error "")
-  (setq org-favtable--windowconfig-before nil)
-  (move-marker org-favtable--marker-outside-before nil)
   (setq org-favtable--last-action 'leave))
 
 
@@ -1651,12 +1668,27 @@ An example would be:
 
 
 (defun org-favtable-version ()
-  "Show version of org-favtable"
+  "Show version of org-favtable" (interactive)
   (message "org-favtable %s" org-favtable--version))
 
 
 (defun org-favtable--make-guarded-search (ref &optional dont-quote)
   (concat "\\b" (if dont-quote ref (regexp-quote ref)) "\\b"))
+
+
+(defun org-favtable-get-ref-regex-format ()
+  "return cons-cell with regular expression and format for references"
+  (unless org-favtable--ref-regex
+    (org-favtable 'parse))
+  (cons (org-favtable--make-guarded-search org-favtable--ref-regex 'dont-quote) org-favtable--ref-format))
+  
+
+(defadvice org-mark-ring-goto (after org-favtable--advice-text-to-yank activate)
+  "Make text from the favtable available for yank."
+  (when org-favtable--text-to-yank
+      (kill-new org-favtable--text-to-yank)
+      (message (format "Ready to yank '%s'" org-favtable--text-to-yank))
+      (setq org-favtable--text-to-yank nil)))
 
 
 (provide 'org-favtable)
