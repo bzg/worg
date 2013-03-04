@@ -307,7 +307,7 @@ about the number of list readers.
   :PROPERTIES:
   :CUSTOM_ID: Keeping-current
   :END:
-** Switching to the new export engine
+** Upgrading to Org 8.0/master and using the new export engine
    :PROPERTIES:
    :CUSTOM_ID: new-exporter-switch
    :END:
@@ -315,99 +315,7 @@ about the number of list readers.
 #+index: Upgrade
 #+index: Export
 
-*** Using the current master branch
-
-As of [[http://orgmode.org/cgit.cgi/org-mode.git/commit/?id%3D1cac3127c2f810e83fcc1203f1dd2b15250a687e][commit 1cac3127c]], the master branch of Org's git repository uses the
-new exporter by default.  If you use the master branch, you need to update
-your configuration.
-
-If the instructions below do not help solving your problem, please ask any
-question on the mailing list, it will help us moving forward with
-documenting every thing for Org 8.0.
-
-**** Updating global export configuration options
-
-Global export options start with the =org-export-*= prefix, most of them
-are in the =ox.el= file.
-
-For options starting with e.g. =org-export-html-*=, see the section below.
-
-For generic export options, most of them should not need any change.  If
-you find that a generic option is useless or broken or badly documented in
-the manual, please report it to the list.
-
-**** Updating backend-specific configuration options
-
-Backend-specific options are defined like this:
-
-- =org-html-*= for =HTML= and live in =ox-html.el=
-- =org-latex-*= for =LaTeX= and live in =ox-latex.el=
-- Etc.  
-
-There is a new variable =org-export-backends= which controls what backends
-are loaded when you lauch Org.  By default, the =ASCII=, =HTML= and =LaTeX=
-are loaded, with some others.
-
-*Updating*: In your =.emacs= you need to rename =org-export-html-*= options
-to =org-html-*= (except for =ox-jsinfo.el= options), and do the same for
-other backends.
-
-**** Updating =org-publish-project-alist=
-
-The publishing functions are not loaded until the corresponding backend has
-been loaded.  You need to update =org-publish-project-alist= and to use the
-function from the new publishing engine -- here is correspondance table:
-
-| Old publishing engine    | New publishing engine      |
-|--------------------------+----------------------------|
-| org-publish-org-to-html  | org-html-publish-to-html   |
-| org-publish-org-to-org   | org-org-publish-to-org     |
-| org-publish-org-to-latex | org-latex-publish-to-latex |
-| ...                      | ...                        |
-
-If something does not work, please report it on the mailing list.
-
-**** Other important changes
-
-1. =#+style:= -> =#+html_head:=
-
-2. =#+setupfile: myfile= -> =#+include: "myfile"=
-
-   Quotes are required and =#+include= works a little differently
-   than #+setupfile: by default, it makes sure that every headline in the
-   included file will be a child of the headline containing the include
-   keyword.  You can overwrite this behaviour with =:minlevel= num
-   parameter.
-
-1. Attribute lines now take plists:
-
-   : #+attr_latex :width "5cm"
-   : #+attr_beamer :options "width=5cm"
-
-2. Beamer backend now interprets nested headline levels as blocks instead
-   of lists.  For some preliminary guidance you can look at [[file:exporters/beamer/ox-beamer.org][this page]].
-
-*** Using Org 7.9.3e or earlier versions of Org
-
-Some quick notes on how to switch to the new exporter.
-
-1. If you had already been using the new exporter from contrib, you
-   should remove the following lines from your local.mk:
-   : ORG_ADD_CONTRIB = org-e-*
-   followed by a =make clean=, before you do =git pull=.
-2. Export engine renamed: org-export → ox
-3. Backend requires renamed: org-e-* → ox-*
-4. All backend specific variables and functions renamed:
-   - org-export-* → org-* (e.g. org-html-xml-declaration, ..)
-   - org-e-* → org-* (e.g. org-latex-classes, org-ascii-bullets, ..)
-5. Generic export variables retain the name org-export-*
-   (e.g. org-export-dispatch-use-expert-ui,
-   org-export-filter-headline-functions, ..)
-6. org-latex-to-pdf-process has been renamed to org-latex-pdf-process
-7. This is a guess, export snippets and backend symbols renamed:
-   - e-<backend> → <backend>
-
-Please also read [[http://mid.gmane.org/876229nrxf.fsf@gmail.com][Nicolas' announcement]] about the merge.
+See [[file:org-8.0.org][Upgrading to Org 8.0 (or the current master branch)]].
 
 ** My Emacs ships with an older version Org-mode! How do I upgrade?
    :PROPERTIES:
