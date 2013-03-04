@@ -11,8 +11,8 @@
 
 * Introduction
 This tutorial covers exporting org documents to LaTeX Beamer slides
-using the new export engine, =org-elements= and =org-export=, written
-by Nicolas Goaziou.
+using the new export engine, =org-elements= and =ox= (short for
+org-export), written by Nicolas Goaziou.
 
 _Note:_ It will not cover any of the basic features common with the
 old beamer exporter; it will only focus on the improvements, new
@@ -20,17 +20,41 @@ additions and backwards incompatibilities.  It is also assumed that
 the reader is already acquainted with GNU Emacs and Org mode itself.
 Basic understanding of LaTeX and the Beamer package is also assumed.
 
+** Initial setup
+Unlike the old exporter, requiring the beamer exporter is not enough
+to export to beamer slides with =ox=.  This difference arises from a
+new feature in =ox-beamer= that allows, in the author's words, a
+beamer translation of *any* org document.  This is extremely useful
+when creating handouts or article versions of your slides by loading
+the =beamerarticle= package (see the [[http://www.tex.ac.uk/tex-archive/macros/latex/contrib/beamer/doc/beameruserguide.pdf][beamer user guide]] for specifics).
+
+You can use the following minimal setup to start exporting to the
+beamer =documentclass=.
+#+begin_src emacs-lisp :eval no
+  (require 'ox-latex)
+  (add-to-list 'org-latex-classes
+               '("beamer"
+                 "\\documentclass\[presentation\]\{beamer\}"
+                 ("\\section\{%s\}" . "\\section*\{%s\}")
+                 ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+                 ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
+#+end_src
+The first string ~beamer~ in =org-latex-classes= is by no means
+unique, it can be substituted for any convenient name you wish.  This
+name however should be the argument to the =LaTeX_CLASS= file header
+option (or =EXPORT_LaTeX_CLASS= subtree property).
+
 * Configuring export options
 Apart from the usual export options provided by the =OPTIONS= keyword,
 you can put additional beamer export options in the file header.  For
 a minimal beamer export, you have to specify the =LaTeX_CLASS= and the
 =LaTeX_CLASS_OPTIONS= keywords in the header of a file.  A preset
 export template can be inserted by calling the interactive function
-=org-e-beamer-insert-options-template=.  This can be further modified
-as per your needs.  You can also do a subtree export; in that case you
-can provide the keywords as =PROPERTIES=.  However the keyword names
-should be prepended with =EXPORT_=.  A list of supported
-keywords are,
+=org-beamer-insert-options-template=.  This can be further modified as
+per your needs.  You can also do a subtree export; in that case you
+can provide the keywords as subtree =PROPERTIES=.  However take note
+that the keyword names should be prepended with =EXPORT_=.  A list of
+supported keywords are,
 
 #+caption: Export option keywords and corresponding subtree properties.
 | File header keywords  | Subtree properties           |
@@ -56,10 +80,11 @@ property.
 | =EXPORT_DATE=      | Export date      |
 | =EXPORT_FILE_NAME= | Export file name |
 
+** A simple example
 A simple file header might look like the example below.
 #+begin_example
   ,#+LaTeX_CLASS: beamer
-  ,#+LaTeX_CLASS_OPTIONS: [smaller,presentation]
+  ,#+LaTeX_CLASS_OPTIONS: [presentation,smaller]
   ,#+BEAMER_THEME: default
 #+end_example
 A corresponding subtree export should have properties as shown below.
@@ -73,24 +98,53 @@ A corresponding subtree export should have properties as shown below.
     :END:
 #+end_example
 
-The export class is passed on to the =\documentclass= LaTeX command,
-and the options go in as the optional arguments.
+The export class, as defined in =org-latex-classes=, determines the
+=documentclass=, and the class options are passed on as optional
+arguments (note the presence of square brackets).
 : \documentclass[smaller,presentation]{beamer}
 
-** TODO Export level
-- To export third level headlines as frames, use the following in the
-  file header.
-  : #+OPTIONS: H:3
-- Can be overridden with the =frame= beamer environment (maybe link to
-  new features section below).
+** Configuring export level
+The new exporter allows the grouping slides into LaTeX sections.  The
+sectioning behaviour is controlled by =org-latex-classes=, where as
+heading levels to be exported as frames are controlled by the =H:n=
+option to the =OPTIONS= keyword (=EXPORT_OPTIONS= property for subtree
+export).  The ~n~ here is the headline level number that you want to
+export as frames.  To elaborate with an example, to export third level
+headlines as frames, use =#+OPTIONS: H:3= in the file header.  This
+behaviour can be overridden per headline by setting the =BEAMER_env=
+property to =frame=.
 
-** TODO Filters to customise export
+** Use of filters to customise export
+=ox= also gives you access to all =org-element= entities in the
+exported text for customisation with user filters.  Filters are
+essentially simple lisp functions that reformat the exported elements.
+As a simple example; the =ox-beamer= translates *bold text* as
+=\alert{bold text}=.  To revert this back to the old behaviour, you
+can you a filter like this:
+#+begin_src emacs-lisp :eval no
+  (defun my-beamer-bold (contents backend info)
+    (if (not (eq backend 'beamer)) contents
+      (replace-regexp-in-string "\\`\\\\[A-Za-z0-9]+" "\\\\textbf" contents)))
+  
+  (add-to-list 'org-export-filter-bold-functions 'my-beamer-bold)
+#+end_src
+Another example would be to translate +strike through text+ to
+=\structure{strike through text}= with the following filter.
+#+begin_src emacs-lisp :eval no
+  (defun my-beamer-structure (contents backend info)
+    (if (not (eq backend 'beamer)) contents
+      (replace-regexp-in-string "\\`\\\\[A-Za-z0-9]+" "\\\\structure" contents)))
+  
+  (add-to-list 'org-export-filter-strike-through-functions 'my-beamer-structure)
+#+end_src
 
-* Structure editing and beamer environments
-All the usual Org mode structure editing commands work.  However there
-is also a minor mode called =org-e-beamer-mode=, that makes it very
-convenient to insert Beamer specific environments in an org-mode
-buffer.
+* Structure editing, environments and markup
+All the usual Org mode structure editing commands work.  The minor
+mode =org-beamer-mode= is also provided to make it convenient to
+insert Beamer specific environments in an org-mode buffer.
+
+A notable change in =ox-beamer= with regards to markup is, *bold text*
+is translated as =\alert{bold text}= by default.
 
 * New features available with the new exporter
 ** TODO Beamer article
