@@ -2112,6 +2112,25 @@ top of each kind of code box:
 Additionally, we use color to distinguish code output (the =.example=
 class) from input (all the =.src-*= classes).
 
+** Babel
+
+*** How do I preview LaTeX fragments when in a LaTeX source block?
+
+When editing =LaTeX= source blocks, you may want to preview LaTeX fragments
+just like in an Org-mode buffer.  You can do this by using the usual
+keybinding =C-c C-x C-l= after loading this snipped:
+
+#+BEGIN_SRC emacs-lisp
+(define-key org-src-mode-map "\C-c\C-x\C-l" 'org-edit-preview-latex-fragment)
+
+(defun org-edit-preview-latex-fragment ()
+  "Write latex fragment from source to parent buffer and preview it."
+  (interactive)
+  (org-src-in-org-buffer (org-preview-latex-fragment)))
+#+END_SRC
+
+Thanks to Sebastian Hofer for sharing this.
+
 * Hacking Org: Working with Org-mode and other Emacs Packages.
 ** org-remember-anything
 
