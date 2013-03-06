@@ -147,9 +147,9 @@ end-users are explained in the last part of this document.
   the buffer position after any affiliated keyword, when applicable.
 
   In addition to these properties, each element can optionally get
-  some more from affiliated keywords, namely: ~:attr_ascii~,
-  ~:attr_docbook~, ~:attr_html~, ~:attr_latex~, ~:attr_odt~,
-  ~:caption~, ~:header~, ~:name~, ~:plot~, and ~:results~.
+  some more from affiliated keywords, namely: ~:caption~, ~:header~,
+  ~:name~, ~:plot~, ~:results~ or ~:attr_NAME~ where =NAME= stands for
+  the name of an export back-end.
 
   At the lowest level, a ~:parent~ property is also attached to any
   string, as a text property.
@@ -808,6 +808,14 @@ end-users are explained in the last part of this document.
    - category :: option
    - type :: list of strings
 
+** ~:export-options~
+
+   List of export options available for current process.
+
+   - category :: none
+   - type :: list of symbols, among ~subtree~, ~body-only~ and
+             ~visible-only~.
+
 ** ~:exported-data~
 
    Hash table used to memoize results from [[#data][~org-export-data~]].
@@ -1459,6 +1467,16 @@ end-users are explained in the last part of this document.
 
    See also: [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]],
    [[#unravel-code][~org-export-unravel-code~]].
+
+** ~org-export-get-alt-title~
+   :PROPERTIES:
+   :CUSTOM_ID: get-alt-title
+   :END:
+
+   Return the alternative title for a given headline as a secondary
+   string.  If no such title is found, it will return its main title.
+
+   This function is useful when building a table of contents.
 
 ** ~org-export-get-caption~
    :PROPERTIES:

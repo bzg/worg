@@ -125,7 +125,7 @@ As a simple example; the =ox-beamer= translates *bold text* as
 can you a filter like this:
 #+begin_src emacs-lisp :eval no
   (defun my-beamer-bold (contents backend info)
-    (if (not (eq backend 'beamer)) contents
+    (when (eq backend 'beamer)
       (replace-regexp-in-string "\\`\\\\[A-Za-z0-9]+" "\\\\textbf" contents)))
 
   (add-to-list 'org-export-filter-bold-functions 'my-beamer-bold)
@@ -134,7 +134,7 @@ Another example would be to translate +strike through text+ to
 =\structure{strike through text}= with the following filter.
 #+begin_src emacs-lisp :eval no
   (defun my-beamer-structure (contents backend info)
-    (if (not (eq backend 'beamer)) contents
+    (when (eq backend 'beamer)
       (replace-regexp-in-string "\\`\\\\[A-Za-z0-9]+" "\\\\structure" contents)))
 
   (add-to-list 'org-export-filter-strike-through-functions 'my-beamer-structure)
