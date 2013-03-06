@@ -112,7 +112,9 @@ export).  The ~n~ here is the headline level number that you want to
 export as frames.  To elaborate with an example, to export third level
 headlines as frames, use =#+OPTIONS: H:3= in the file header.  This
 behaviour can be overridden per headline by setting the =BEAMER_env=
-property to =frame=.
+property to =frame=.  You can also provide options to a frame by
+setting the =BEAMER_opt= property on the headline.  This also adds the
+=fragile= option to the frame.
 
 ** Use of filters to customise export
 =ox= also gives you access to all =org-element= entities in the
@@ -125,7 +127,7 @@ can you a filter like this:
   (defun my-beamer-bold (contents backend info)
     (if (not (eq backend 'beamer)) contents
       (replace-regexp-in-string "\\`\\\\[A-Za-z0-9]+" "\\\\textbf" contents)))
-  
+
   (add-to-list 'org-export-filter-bold-functions 'my-beamer-bold)
 #+end_src
 Another example would be to translate +strike through text+ to
@@ -134,7 +136,7 @@ Another example would be to translate +strike through text+ to
   (defun my-beamer-structure (contents backend info)
     (if (not (eq backend 'beamer)) contents
       (replace-regexp-in-string "\\`\\\\[A-Za-z0-9]+" "\\\\structure" contents)))
-  
+
   (add-to-list 'org-export-filter-strike-through-functions 'my-beamer-structure)
 #+end_src
 
@@ -146,6 +148,69 @@ insert Beamer specific environments in an org-mode buffer.
 A notable change in =ox-beamer= with regards to markup is, *bold text*
 is translated as =\alert{bold text}= by default.
 
+** Block environments and overlay specifications
+All headlines below the =org-beamer-frame-level= (i.e. below =H= value
+in =OPTIONS=), are exported as blocks with =ox-beamer=.  You can
+choose special block environments by setting the =BEAMER_env= property
+on the headline.  Supported blocks are listed in
+=org-beamer-environments-default=.  To specify an overlay
+specification for a frame or block environment, set the =BEAMER_act=
+property.  If the value is enclosed in square brackets, it is
+interpreted as a default overlay specification.
+#+begin_example
+  ,* A theorem block
+    :PROPERTIES:
+    :BEAMER_env: theorem
+    :BEAMER_act: <2->
+    :END:
+
+  The =BEAMER_act= property says to overlay this environment from the
+  second frame onwards.
+#+end_example
+
+You can add your own environments by customising the
+=org-beamer-environments-extra= variable.  For example the snippet
+below adds support for =only= environment and associates to the letter
+~O~.
+#+begin_src emacs-lisp :eval no
+  (add-to-list 'org-beamer-environments-extra
+               '("onlyenv" "O" "\\begin{onlyenv}%a" "\\end{onlyenv}"))
+#+end_src
+
+** Special enviroments
+Environments can be put in a column by setting the =BEAMER_col=
+property on a headline.  It accepts decimal point numbers which is
+interpreted as a fraction of the text width.  If the beadline does not
+have an enviroment the headline text is ignored and all the contents
+are put inside the column environment.
+#+begin_example
+  ,* A block in a column
+    :PROPERTIES:
+    :BEAMER_env: block
+    :BEAMER_col: 0.5
+    :END:
+
+  ,* Just a column with contents
+    :PROPERTIES:
+    :BEAMER_col: 0.5
+    :END:
+  Some text, the headline above is ignored
+#+end_example
+
+You can start an appendix by setting the =BEAMER_env= property to
+=appendix= on a headline.  Similarly you can insert notes by setting
+the property to =note= (use =noteNH= to exclude the headline from the
+note).  You can also use Beamer's =againframe= command by setting the
+same property.  The frame being refered to by =againframe= is
+specified by the =BEAMER_ref= property.  You can also ignore a
+headline by using =ignoreheading=.  This can also be used to close a
+=column= environment.
+
+All contiguous environments are automatically wrapped in a =columns=
+environment, although it can be forced at any point by setting the
+=BEAMER_env= property to =columns=.  This might be handy if you want
+to pass special options.
+
 * New features available with the new exporter
 ** TODO Beamer article
 Discuss that =EXPORT_LaTeX_CLASS= need not be beamer.  Useful to
@@ -154,17 +219,20 @@ export =beamerarticle= document for slides.
 Email from Nicolas Goaziou discussing this feature:
 http://mid.gmane.org/87hapz3na9.fsf@gmail.com
 
+** TODO Overlays
+- [[*Block%20environments%20and%20overlay%20specifications][Overlay specifications for frames and blocks]]
+
+** TODO Snippet translation
+
 ** TODO Ordered and unordered lists
 
 ** TODO Images
 
 ** TODO Tables
 
-** TODO Environments
+** TODO Source blocks
 
-** TODO Overlays
-
-** TODO Example and source blocks
+** DONE Environments
 
 * TODO Examples
 1) [ ] Sectioning and TOC (progress state between sections)
@@ -173,13 +241,13 @@ http://mid.gmane.org/87hapz3na9.fsf@gmail.com
    1. [ ] Normal blocks
    2. [ ] Verbatim blocks
    3. [ ] Source blocks
-4) [ ] Columns
+4) [X] Columns
 5) [ ] Text / LaTeX commands in between frames
 6) [ ] Images
    + Centering
    + Captions
 7) [ ] Footnotes and references
-8) [ ] Backup slides with =\appendix=
+8) [X] Backup slides with =\appendix=
 9) [ ] Caveats about using alternate TeX binaries
 
 * TODO Migrating from the old to the new exporter
