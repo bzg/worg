@@ -21,7 +21,8 @@ Puedes encontrar más sobre mi en [[http://www.davidam.com][mi web personal]].
 También comparto algunas funciones que me ayudan cotidianamente:
 
 #+BEGIN_SRC lisp
-(defun davidam-envolve-org-src(msg)
+(defun davidam-org-envolve-src(msg)
+  "Envolve source between org tags"
   (interactive "sChoose your programming language: " msg)
   (if (equal nil msg) 
       (setq msg "lisp"))
@@ -31,26 +32,41 @@ También comparto algunas funciones que me ayudan cotidianamente:
   (insert "#+BEGIN_SRC " msg))
 
 (defun davidam-org-src(msg)
+  "Insert org source tags"
   (interactive "sChoose your programming language: " msg)
   (if (equal nil msg) 
       (setq msg "lisp"))
   (insert "#+BEGIN_SRC " msg)
   (insert "\n#+END_SRC\n"))
 
-(defun num-todo()
+(defun davidam-num-todo()
+  "Print a message with the number of todo tasks in the current buffer"
   (interactive)
   (goto-char (point-min))
   (message "Number of TODO: %d" (count-matches "* TODO"))
   (goto-char (mark)))
 									     
-(defun num-done()
+(defun davidam-num-done()
+  "Print a message with the number of done tasks in the current buffer"
   (interactive)
   (goto-char (point-min))
   (message "Number of DONE: %d" (count-matches "* DONE"))
   (goto-char (mark)))
 
-(defun effectiveness()
+(defun davidam-num-canceled()
+  "Print a message with the number of canceled tasks in the current buffer"
+  (interactive)
+  (goto-char (point-min))
+  (message "Number of Canceled: %d" (count-matches "* CANCELED"))
+  (goto-char (mark)))
+
+(defun davidam-effectiveness()
   "Returns the effectiveness in the current org file"
   (interactive)
-  (message "Effectiveness: %f" ( * 100 (/ (float (count-matches "* DONE")) (+ (float (count-matches "* TODO")) (float (count-matches "* DONE")) (float (count-matches "* CANCELLED")))))))
+  (goto-char (point-min))
+  (message "Effectiveness: %f" 
+	   ( * 100 
+	       (/ (float (count-matches "* DONE")) 
+		  (+ (float (count-matches "* TODO")) (float (count-matches "* DONE")) (float (count-matches "* CANCELED"))))))
+  (goto-char (mark)))
 #+END_SRC
