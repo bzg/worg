@@ -18,7 +18,7 @@ Mis contribuciones a org-mode han sido:
 
 Puedes encontrar más sobre mi en [[http://www.davidam.com][mi web personal]].
 
-También comparto algunas funciones que me ayudan cotideaneamente:
+También comparto algunas funciones que me ayudan cotidianamente:
 
 #+BEGIN_SRC lisp
 (defun davidam-envolve-org-src(msg)
@@ -36,4 +36,21 @@ También comparto algunas funciones que me ayudan cotideaneamente:
       (setq msg "lisp"))
   (insert "#+BEGIN_SRC " msg)
   (insert "\n#+END_SRC\n"))
+
+(defun num-todo()
+  (interactive)
+  (goto-char (point-min))
+  (message "Number of TODO: %d" (count-matches "* TODO"))
+  (goto-char (mark)))
+									     
+(defun num-done()
+  (interactive)
+  (goto-char (point-min))
+  (message "Number of DONE: %d" (count-matches "* DONE"))
+  (goto-char (mark)))
+
+(defun effectiveness()
+  "Returns the effectiveness in the current org file"
+  (interactive)
+  (message "Effectiveness: %f" ( * 100 (/ (float (count-matches "* DONE")) (+ (float (count-matches "* TODO")) (float (count-matches "* DONE")) (float (count-matches "* CANCELLED")))))))
 #+END_SRC
