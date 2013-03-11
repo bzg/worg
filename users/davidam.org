@@ -17,3 +17,23 @@ Mis contribuciones a org-mode han sido:
 + [[http://www.davidam.com/docu/orgguide.es.html][Traducción al español de la Guía Compacta de Org-Mode]]
 
 Puedes encontrar más sobre mi en [[http://www.davidam.com][mi web personal]].
+
+También comparto algunas funciones que me ayudan cotideaneamente:
+
+#+BEGIN_SRC lisp
+(defun davidam-envolve-org-src(msg)
+  (interactive "sChoose your programming language: " msg)
+  (if (equal nil msg) 
+      (setq msg "lisp"))
+  (goto-char (point))
+  (insert "\n#+END_SRC")
+  (goto-char (mark))
+  (insert "#+BEGIN_SRC " msg))
+
+(defun davidam-org-src(msg)
+  (interactive "sChoose your programming language: " msg)
+  (if (equal nil msg) 
+      (setq msg "lisp"))
+  (insert "#+BEGIN_SRC " msg)
+  (insert "\n#+END_SRC\n"))
+#+END_SRC
