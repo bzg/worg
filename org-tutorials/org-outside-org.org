@@ -75,10 +75,9 @@
     into that mode, and detect item context after the first line of an item.
 #+end_example
 
-Orgstruct currently doesn't work with /outorg/ and /navi-mode/ (see below for
-a description of these libraries). To make both libraries work with buffers
-with Orgstruct minor-mode just like with outline-minor-mode buffers (with
-outshine extensions), it would be necessary to:
+Orgstruct currently does NOT work with /outorg/ and /navi-mode/ (see below for
+a description of these libraries). To make both libraries work with
+orgstruct-buffers just like with outshine-buffers, it would be necessary to:
 
  1. Structure the file with outshine-style headings (e.g. =;; * Header=)
  2. Make Orgstruct calculate and set file-local variable =outline-regexp= the
@@ -96,6 +95,178 @@ outshine-buffer.
     :PROPERTIES:
     :CUSTOM_ID: outline-with-outshine
     :END:
+
+**** History and Credits
+    :PROPERTIES:
+    :CUSTOM_ID: history-and-credits
+    :END:
+
+/outshine/ is a merge and extension of older extensions for
+/outline-minor-mode/. More exactly, /outshine/ developed out of the now
+obsolete =outxxtra.el=, my modified extension of /Per Abrahamsen's/
+=out-xtra.el=. With the blessing of it's (well-known) author /Carsten
+Dominik/, I could merge his slightly modified =outline-magic.el= with
+=outxxtra.el= into the new =outshine.el= library. Thus, if you use outline
+with outshine, you don't need outline-magic and out-xtry anymore. However,
+outshine does not make either of these two libraries obsolete, since it has a
+more specialized approach and might not be able to replace them in all cases. 
+
+So what is /outshine/? It's an extension library for outline-minor-mode that
+gives buffers in different major-modes the 'look-and-feel' of Org-mode buffers
+and enables the use of /outorg/ and /navi-mode/ on them.
+
+To sum it up in one sentence:
+
+#+begin_verse
+ Outline with Outshine outshines Outline
+#+end_verse
+
+**** Installation
+     :PROPERTIES:
+     :CUSTOM_ID: outshine-installation
+     :END:
+
+Download =outshine.el= (or clone the github-repo) and copy it to a location
+where Emacs can find it:
+
+| https://github.com/tj64/outshine           |
+| git clone git@github.com:tj64/outshine.git |
+
+Use this in your '.emacs' to get started:
+
+#+begin_src emacs-lisp
+(require 'outshine)
+(add-hook ‘outline-minor-mode-hook ‘outshine-hook-function)
+#+end_src
+
+Add this for Org-mode style visibility-cycling with TAB and arrow-key
+structure-editing:
+
+#+begin_src emacs-lisp
+(add-hook ‘outline-minor-mode-hook
+            (lambda ()
+            (define-key outline-minor-mode-map
+              (kbd "<tab>") 'outline-cycle)
+            (define-key outline-minor-mode-map
+              (kbd "<M-left>") 'outline-promote)
+            (define-key outline-minor-mode-map
+              (kbd "<M-right>") 'outline-demote)
+            (define-key outline-minor-mode-map
+              (kbd "<M-up>") 'outline-move-subtree-up)
+            (define-key outline-minor-mode-map
+              (kbd "<M-down>") 'outline-move-subtree-down)))
+#+end_src
+
+Add this if you (e.g.) always want outline/outshine for emacs-lisp buffers:
+
+#+begin_src emacs-lisp
+(add-hook ‘emacs-lisp-mode-hook ‘outline-minor-mode)  
+#+end_src
+
+If you want a different prefix key for outline-minor-mode, insert first:
+
+#+begin_src emacs-lisp
+ (defvar outline-minor-mode-prefix "\C-c") 
+#+end_src
+
+or whatever. The prefix can only be changed before outline (minor) mode is
+loaded. /outshine/ already sets the prefix to "\C-c", replacing the
+(unusable) original "\C-c @". 
+
+**** Outshine's fundamental idea
+     :PROPERTIES:
+     :CUSTOM_ID: fundamental-idea
+     :END:
+
+/outshine/ is based on a very simple but powerfull idea, that enables its use
+in any Emacs major-mode (in theory at least):
+
+#+begin_verse
+Outshine headlines are Org-mode headlines out-commented with =comment-region=
+#+end_verse
+
+Thus, the file at hand must be outline-structured 'the outshine way', i.e.
+with the headlines being proper Org-mode headlines, marked and outcommented
+with =comment-region=. As an example, to generate a 3rd level
+outshine-headline in an Emacs Lisp file, write down
+
+,-----------------------
+| *** Third Level Header
+`-----------------------
+
+mark the header line, and apply =comment-region= on it:
+
+,-----------------------
+| ;; *** Third Level Header
+`-----------------------
+
+In a LaTeX file, an adecuate header will look like this:
+
+,-----------------------
+| % *** Third Level Header
+`-----------------------
+
+and in a PicoLisp file like this (always depending of the major-mode specific
+values of =comment-start=, =comment-end=, =comment-add= and
+=comment-padding=):
+
+,-----------------------
+| ## *** Third Level Header
+`-----------------------
+
+=outshine.el=, =outorg.el= and =navi-mode.el= are all examples of how to
+structure emacs-lisp source files with outshine-style headlines. 
+
+**** Fontification, Navigation and Structure Editing
+     :PROPERTIES:
+     :CUSTOM_ID: fontification-navigation-and-structure-editing
+     :END:
+
+After structuring a source code file the 'outshine-way' and loading
+outline-minor-mode with outshine-extensions, the file will have a very
+Org-mode like 'look-and-feel'. The headlines (up to level 8) are fontified the
+same way Org-mode headlines are fontified, and the very specific navigation
+and structure editing commands of outline-minor-mode as well as their more
+general Org-mode style counterparts are available:
+
+=outline-minor-mode= Minor Mode Bindings:
+
+| key       | binding                          |
+|-----------+----------------------------------|
+| C-c       | PrefixCommand                    |
+| <M-down>  | outline-move-subtree-down        |
+| <M-left>  | outline-promote                  |
+| <M-right> | outline-demote                   |
+| <M-up>    | outline-move-subtree-up          |
+| <tab>     | outline-cycle                    |
+| C-c C-a   | show-all                         |
+| C-c C-b   | outline-backward-same-level      |
+| C-c C-c   | hide-entry                       |
+| C-c C-d   | hide-subtree                     |
+| C-c C-e   | show-entry                       |
+| C-c C-f   | outline-forward-same-level       |
+| C-c TAB   | show-children                    |
+| C-c C-k   | show-branches                    |
+| C-c C-l   | hide-leaves                      |
+| C-c RET   | outline-insert-heading           |
+| C-c C-n   | outline-next-visible-heading     |
+| C-c C-o   | outline-hide-other               |
+| C-c C-p   | outline-previous-visible-heading |
+| C-c C-q   | outline-hide-sublevels           |
+| C-c C-s   | show-subtree                     |
+| C-c C-t   | hide-body                        |
+| C-c C-u   | outline-up-heading               |
+| C-c C-v   | outline-move-subtree-down        |
+| C-c C-^   | outline-move-subtree-up          |
+| C-c '     | outorg-edit-as-org               |
+| C-c @     | outline-mark-subtree             |
+| C-c I     | outline-previous-visible-heading |
+| C-c J     | outline-hide-more                |
+| C-c K     | outline-next-visible-heading     |
+| C-c L     | outline-show-more                |
+| C-c C-<   | outline-promote                  |
+| C-c C->   | outline-demote                   |
+
 ** Subtree and Comment Editing
    :PROPERTIES:
    :CUSTOM_ID: comment-editing
