@@ -75,7 +75,7 @@
     into that mode, and detect item context after the first line of an item.
 #+end_example
 
-Orgstruct currently does NOT work with /outorg/ and /navi-mode/ (see below for
+*orgstruct* currently does NOT work with /outorg/ and /navi-mode/ (see below for
 a description of these libraries). To make both libraries work with
 orgstruct-buffers just like with outshine-buffers, it would be necessary to:
 
@@ -101,7 +101,7 @@ outshine-buffer.
     :CUSTOM_ID: history-and-credits
     :END:
 
-/outshine/ is a merge and extension of older extensions for
+*outshine* is a merge and extension of older extensions for
 /outline-minor-mode/. More exactly, /outshine/ developed out of the now
 obsolete =outxxtra.el=, /Thorsten Jolitz's/ modified extension of /Per
 Abrahamsen's/ =out-xtra.el=. With the blessing of it's (well-known) author
@@ -301,7 +301,7 @@ general Org-mode style counterparts are available:
     :CUSTOM_ID: outorg-introduction-and-installation
     :END:
 
-/outorg/ is a library written by /Thorsten Jolitz/ on top of his /outshine/
+*outorg* is a library written by /Thorsten Jolitz/ on top of his /outshine/
 library. Thus, /outorg/ needs /outshine/, and files that are structured with
 outshine-style headers, otherwise it won't work. 
 
@@ -383,10 +383,12 @@ functions cannot be edited comfortably, since after transformation of the
 source-code buffer they end up inside Org-mode source-code blocks - as
 comment-strings, just like before. 
 
-Enters /poporg/. It will be described in more detail in the next section, but
+Enters /poporg/. It will be described in much detail in the next section, but
 it can already be mentioned here that it does exactly what /outorg/ cannot do
 well - Org-mode editing of atomic, isolated comment-strings, no matter where
-they are found in the source code buffer. 
+they are found in the source code buffer. And it is, in contrast to /outorg/,
+completely independent from outline structuring with e.g. /outshine/ or
+/orgstruct/. 
 
 *** Poporg
     :PROPERTIES:
@@ -680,15 +682,218 @@ any included sections is specified, then either be part of one of them or
 within the introduction (that is, before the first header).
 #+END_EXAMPLE
 
-
 ** Remote Buffer Control
    :PROPERTIES:
    :CUSTOM_ID: remote-buffer-control
    :END:
+
+While visibility-cycling and outline-navigation commands make it very
+convenient to work even with big Org-mode or outshine buffers, it can't be
+denied that an indirect read-only buffer with one-key command-bindings,
+exclusively for navigation and high-level structure editing of the associated
+original-buffer, can be even more convenient. 
+
+Enters *navi-mode*, a major-mode by /Thorsten Jolitz/ derived from and
+inspired by /occur-mode/ (and, to a certain extend,  the =org-goto= command).
+Just like /outorg/, /navi-mode/ depends on /outshine/ and works only with
+files structured with 'outshine-style' outline-headers.
+
+A /navi-buffer/ is a kind of "remote-control" for its associated
+/original-buffer/. It offers a vast amount of views on the /original-buffer/
+via predefined occur-searches that combine headlines and
+(programming-language specific) headlines. It further allows many frequent
+actions on the subtree at point to be triggered directly from the
+/navi-buffer/, without (visibly) switching to the /original-buffer/ where the
+actions take place. 
+
+A special feature of /navi-mode/ is its customizability. It predefines all
+ASCII printing characters as keybindings for the =navi-generic-command=, and
+users can therefore map their user-defined regexp-searches (customizable
+variable =navi-keywords=) to any of the many free one-key bindings (in
+customizable variable =navi-key-mappings=). These customizations are made by
+programming-language, thus the Emacs community could work out default
+'alists' for many languages that then may be used and modified by the users. 
+
+/navi-mode's/ author /Thorsten Jolitz/ already worked out two configurations,
+one for Emacs Lisp and the other for PicoLisp. You could use them as
+inspiration for a configuration of your favorite programming language - and
+send these 'alists' to him so that he can include them in the library. The
+more predefined sets of keyword searches there are, the easier to use
+/navi-mode/ with many languages.
+
 *** Navi-mode
     :PROPERTIES:
     :CUSTOM_ID: navi-mode
     :END:
+
+**** About navi-mode
+     :PROPERTIES:
+     :CUSTOM_ID: about-navi-mode
+     :END:
+
+This file implements extensions for occur-mode. You can think of a navi-buffer
+as a kind of 'remote-control' for an (adecuately) outline-structured
+original-buffer. It enables quick navigation and basic structure editing in
+the original-buffer without (necessarily) leaving the navi-buffer. When
+switching to the original-buffer and coming back after some modifications, the
+navi-buffer is always reverted (thus up-to-date).
+
+Besides the fundamental outline-heading-searches (8 outline-levels) and the 5
+basic keyword-searches (:FUN, :VAR, :DB, :OBJ and :ALL), all languages can
+have their own set of searches and keybindings (see =navi-key-mappings= and
+=navi-keywords=). Heading-searches and keyword-searches can be combined,
+offering a vast amount of possible 'views' at the original-buffer.
+
+**** Installation
+
+Download (or clone the github-repos of) the three required libraries
+
+| `navi-mode.el' | https://github.com/tj64/navi           |
+|                | git clone git@github.com:tj64/navi.git |
+| `outshine.el'  | https://github.com/tj64/outshineb      |
+| `outorg.el'    | https://github.com/tj64/outorg         |
+
+and put them in a place where Emacs can find them (on the Emacs 'load-path').
+Follow the installation instructions in =outshine.el= and =outorg.el=.
+
+Install =navi-mode.el= by adding
+
+#+begin_src emacs-lisp
+ (require 'navi-mode)
+#+end_src
+
+to your .emacs file. 
+
+
+**** Usage
+     :PROPERTIES:
+     :CUSTOM_ID: navi-mode-usage
+     :END:
+
+For /navi-mode/ to work, the original-buffer must be outline-structured 'the
+outshine way', i.e. with the headlines being proper Org-mode headlines, marked
+and outcommented with /comment-region/. 
+
+The second assumption is that /outline-minor-mode/ is activated in the
+original-buffer and /outshine.el/ loaded like described in its installation
+instructions.
+
+When these pre-conditions are fullfilled (/outorg.el/ must be loaded too), you
+can use =M-s n (navi-search-and-switch)= to open a /navi-buffer/ and
+immediately switch to it. The new navi-buffer will show the first-level
+headings of the /original-buffer/, with point at the first entry.
+
+You can then:
+
+1. Show headlines (up-to) different levels:
+
+| key     | command            | function-name        |
+|---------+--------------------+----------------------|
+| 1 ... 8 | show levels 1 to 8 | navi-generic-command |
+
+2. Navigate up and down in the search results shown in the navi-buffer:
+
+| key | command   | function-name       |
+|-----+-----------+---------------------|
+| p   | previous  | occur-prev          |
+| n   | next      | occur-next          |
+| DEL | down page | scroll-down-command |
+| SPC | up page   | scroll-up-command   |
+
+3. Revert the navi-buffer (seldom necessary), show help for the user-defined
+   keyword-searches, and quit the navi-buffer and switch-back to the
+   original-buffer:
+
+| key | command                   | function-name        |
+|-----+---------------------------+----------------------|
+| g   | revert buffer             | navi-revert-function |
+| h   | show help                 | navi-show-help       |
+| q   | quit navi-mode and switch | navi-quit-and-switch |
+
+4. Switch to the original-buffer and back to the navi-buffer, display an
+   occurence in the original-buffer or go to the occurence:
+
+| key     | command                | function-name                     |
+|---------+------------------------+-----------------------------------|
+| M-s n   | launch navi-buffer     | navi-search-and-switch            |
+| M-s s   | switch to other buffer | navi-switch-to-twin-buffer        |
+| M-s M-s |                        |                                   |
+| s       |                        |                                   |
+| d       | display occurrence     | occur-mode-display-occurrence     |
+| o       | goto occurrence        | navi-goto-occurrence-other-window |
+
+5. Structure editing on subtrees and visibility cycling
+
+| key       | command                        | function-name          |
+|-----------+--------------------------------+------------------------|
+| TAB       | cycle subtrees                 | navi-cycle-subtree     |
+| <backtab> | cycle buffer                   | navi-cycle-buffer      |
+| +         | Demote Subtree                 | navi-demote-subtree    |
+| -         | promote subtree                | navi-promote-subtree   |
+| ^         | move up subtree (same level)   | navi-move-up-subtree   |
+| <         | move down subtree (same level) | navi-move-down-subtree |
+
+6. Miscancellous actions on subtrees
+
+| key | command                    | function-name                     |
+|-----+----------------------------+-----------------------------------|
+| m   | mark subtree               | navi-mark-subtree-and-switch      |
+| c   | copy subtree               | navi-copy-subtree-to-register-s   |
+| k   | kill subtree               | navi-kill-subtree                 |
+| y   | yank killed/copied subtree | navi-yank-subtree-from-register-s |
+| u   | undo last change           | navi-undo                         |
+| r   | narrow to subtree          | navi-narrow-to-subtree            |
+| w   | widen                      | navi-widen                        |
+| l   | query-replace              | navi-query-replace                |
+| i   | isearch                    | navi-isearch                      |
+| e   | edit as org (outorg)       | navi-edit-as-org                  |
+
+7. Furthermore, there are five (semantically) predefined keyword-searches:
+
+| key | keyword-symbol | searches for               |
+|-----+----------------+----------------------------|
+| f   | :FUN           | functions, macros etc.     |
+| v   | :VAR           | vars, consts, customs etc. |
+| x   | :OBJ           | OOP (classes, methods etc) |
+| b   | :DB            | DB (store and select)      |
+| a   | :ALL           | all                        |
+
+
+8. And (potentially) many more user-defined keyword-searches
+(example Emacs Lisp):
+
+| key | keyword-symbol | searches for |
+|-----+----------------+--------------|
+| F   | :defun         | (defun       |
+| V   | :defvar        | (defvar      |
+| C   | :defconst      | (defconst    |
+| G   | :defgroup      | (defgroup    |
+| U   | :defcustom     | (defcustom   |
+| A   | :defadvice     | (defadvice   |
+| M   | :defmacro      | (defmacro    |
+| E   | :defface       | (defface     |
+| S   | :defstruct     | (defstruct   |
+| L   | :defclass      | (defclass    |
+
+9. Headline-searches and keyword-searches can be combined, e.g.
+
+,------
+| C-2 f
+`------
+
+in an Emacs Lisp (outshine-)buffer shows all headlines up-to level 2 as well
+as all function, macro and advice definitions in the original-buffer,
+
+,------
+| C-5 a
+`------
+
+shows all headlines up-to level 5 as well as all functions, variables,
+classes, methods, objects, and database-related definitions. The exact meaning
+of the standard keyword-searches 'f' and 'a' must be defined with a regexp in
+the customizable variable `navi-keywords' (just like the user-defined
+keyword-searches).
+
 * Examples with Screenshots
   :PROPERTIES:
   :CUSTOM_ID: example-with-screenshots
