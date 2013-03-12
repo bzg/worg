@@ -103,13 +103,14 @@ outshine-buffer.
 
 /outshine/ is a merge and extension of older extensions for
 /outline-minor-mode/. More exactly, /outshine/ developed out of the now
-obsolete =outxxtra.el=, my modified extension of /Per Abrahamsen's/
-=out-xtra.el=. With the blessing of it's (well-known) author /Carsten
-Dominik/, I could merge his slightly modified =outline-magic.el= with
-=outxxtra.el= into the new =outshine.el= library. Thus, if you use outline
-with outshine, you don't need outline-magic and out-xtry anymore. However,
-outshine does not make either of these two libraries obsolete, since it has a
-more specialized approach and might not be able to replace them in all cases. 
+obsolete =outxxtra.el=, /Thorsten Jolitz's/ modified extension of /Per
+Abrahamsen's/ =out-xtra.el=. With the blessing of it's (well-known) author
+/Carsten Dominik/, /Thorsten Jolitz/ could merge the (slightly modified)
+=outline-magic.el= with =outxxtra.el= and extend them into the new
+=outshine.el= library. Thus, if you use outline with outshine, you don't need
+outline-magic and out-xtry anymore. However, outshine does not make either of
+these two libraries obsolete, since it has a more specialized approach and
+might not be able to replace them in all cases.
 
 So what is /outshine/? It's an extension library for outline-minor-mode that
 gives buffers in different major-modes the 'look-and-feel' of Org-mode buffers
@@ -191,19 +192,19 @@ with =comment-region=. As an example, to generate a 3rd level
 outshine-headline in an Emacs Lisp file, write down
 
 ,-----------------------
-| *** Third Level Header
+| *** Third Level Header |
 `-----------------------
 
 mark the header line, and apply =comment-region= on it:
 
 ,-----------------------
-| ;; *** Third Level Header
+| ;; *** Third Level Header |
 `-----------------------
 
 In a LaTeX file, an adecuate header will look like this:
 
 ,-----------------------
-| % *** Third Level Header
+| % *** Third Level Header |
 `-----------------------
 
 and in a PicoLisp file like this (always depending of the major-mode specific
@@ -211,7 +212,7 @@ values of =comment-start=, =comment-end=, =comment-add= and
 =comment-padding=):
 
 ,-----------------------
-| ## *** Third Level Header
+| ## *** Third Level Header |
 `-----------------------
 
 =outshine.el=, =outorg.el= and =navi-mode.el= are all examples of how to
@@ -271,14 +272,122 @@ general Org-mode style counterparts are available:
    :PROPERTIES:
    :CUSTOM_ID: comment-editing
    :END:
+*** Introduction
+    :PROPERTIES:
+    :CUSTOM_ID: comment-editing-introduction
+    :END:
+
+    Once a (outshine) source code buffer looks and behaves like an Org-mode
+    buffer, it would be nice to have the full editing power of Org-mode
+    available when editing the (comment) text parts or overall structure of
+    the buffer.
+
+    Think "reverse Org-Babel": editing of comment-sections or entire subtrees
+    from source code files in temporary Org-mode buffers instead of editing of
+    Org-mode source-blocks in temporary source-code buffers.
+
+    There are two new libraries available for editing with Org-mode in other
+    major-modes, /outorg/ and /poporg/. Although developed independently with
+    very different implementations, both libraries complement each other very
+    well in their functionality. 
+
 *** Outorg
     :PROPERTIES:
     :CUSTOM_ID: outorg
     :END:
+
+**** Introduction and Installation
+    :PROPERTIES:
+    :CUSTOM_ID: outorg-introduction-and-installation
+    :END:
+
+/outorg/ is a library written by /Thorsten Jolitz/ on top of his /outshine/
+library. Thus, /outorg/ needs /outshine/, and files that are structured with
+outshine-style headers, otherwise it won't work. 
+
+You can download the file (or clone the github-repo) here:
+
+| https://github.com/tj64/outorg           |
+| git clone git@github.com:tj64/outorg.git |
+
+/outorg/ requires Org-mode too, thus should be loaded after Org-mode. Insert
+
+#+begin_src emacs-lisp
+ (require 'outorg)
+#+end_src
+
+in your .emacs and you are done. 
+
+**** Usage
+     :PROPERTIES:
+     :CUSTOM_ID: outorg-usage
+     :END:
+
+/outorg's/ main command is
+
+,------
+| C-c '
+`------
+
+(C-c and single quote), used for both =outorg-edit-as-org= (as a globally
+defined command in the source-code buffer) and =outorg-copy-edits-and-exit=
+(in the edit-buffer, as a key defined in =outorg-edit-mode=).
+
+Thus, with point inside a subtree or on a subtree header, pressing =C-c '
+(outorg-edit-as-org)= will open this subtree in a temporary Org-mode edit
+buffer, with all out-commented parts in the original buffer uncommented, and
+all source code parts enclosed in Org-mode source blocks. 
+
+With a prefix =C-u C-c '=, the whole source-code buffer will be transformed
+into Org-mode and offered for editing in a temporary Org-mode buffer, all
+headlines folded except the subtree where point was in. 
+
+If the original-buffer was read-only, the user is asked if he wants to make it
+writable for the Org-mode editing. If he answers yes, the buffer can be
+edited, but will be set back to read-only again after editing is finished.
+
+To avoid accidental loss of edits, the temporary outorg-edit-buffer is backed
+up in the OS =/tmp= directory. During editing, the outorg-edit-buffer can be
+saved as usual with =save-buffer= via  =C-x C-s=. Even when killed by
+accident, that last state of the outorg-edit-buffer will be saved and can be
+recovered. 
+
+When done with editing in Org-mode, =C-c ' (C-c and single quote)= is used
+again to call =outorg-copy-edits-and-exit=, a command that orderly exits the
+edit-buffer by converting the (modified) comment-sections back to comments
+and extracting the source-code parts out of the Org-mode source-code blocks. 
+
+**** Outorg vs Poporg
+     :PROPERTIES:
+     :CUSTOM_ID: outorg-vs-poporg
+     :END:
+
+/outorg/ works on subtrees (or whole buffers). 
+
+One advantage of this is that there is always a complete subtree (-hierarchy)
+in the outorg-edit-buffer, thus not only the Orgmode editing functionality can
+be applied, but also its export facilities. As an example, in order to produce
+the nice README.txt files for the github-repos of /outshine/, /outorg/ and
+/navi-mode/, I simply called =outorg-edit-as-org= on the first
+1st-level-headline of the source-code files (the file header comment-sections)
+and exported the subtree to ASCII.
+
+One disadvantage of this is that comment-strings of (e.g. emacs-lips)
+functions cannot be edited comfortably, since after transformation of the
+source-code buffer they end up inside Org-mode source-code blocks - as
+comment-strings, just like before. 
+
+Enters /poporg/. It will be described in more detail in the next section, but
+it can already be mentioned here that it does exactly what /outorg/ cannot do
+well - Org-mode editing of atomic, isolated comment-strings, no matter where
+they are found in the source code buffer. 
+
 *** Poporg
     :PROPERTIES:
     :CUSTOM_ID: poporg
     :END:
+
+
 ** Remote Buffer Control
    :PROPERTIES:
    :CUSTOM_ID: remote-buffer-control
