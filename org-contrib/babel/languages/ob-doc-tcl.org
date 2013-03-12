@@ -1,0 +1,217 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org-babel-tcl
+#+AUTHOR:     Luis Anaya
+#+EMAIL:      papoanaya[at]hotmail[dot]com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org-babel support for
+  <a href="http://www.tcl.tk/">tclsh</a>
+  </p>
+  </p>
+  </div>
+#+end_html
+
+* Introduction
+=org-babel-tcl= allows Tcl code to be executed directly
+within embedded code blocks in Org-mode documents. These code blocks and
+its results can be included as the document is exported to documentation
+formats. 
+
+The following provides instructions and some examples of tclsh
+usage. Since babel is simply allowing native code to run inside of
+Org-mode, all tclsh documentation is applicable and valid.
+
+* Requirements and Setup
+To get Tcl  up and running, you need the =tclsh= interpreter installed in your
+system or any of its variants: 
+
+  - =wish= if you want GUI support
+  - =expect= for interactions with the console 
+  - =ns2= to run network simulations from Org-mode. 
+
+The variable =org-babel-tcl-command= defines the value of the
+interpreter that will be run. It defaults to =tclsh=. 
+
+To enable support for Tcl, it must be enabled as part of your
+initialization script. For example: 
+
+#+begin_example
+;; set up babel support
+(require 'org-install)
+(require 'ob-tcl)
+;; add additional languages with (require 'ob-language)
+#+end_example
+
+* Babel Header Arguments
+Babel block headers are used to pass various arguments to control the
+results of the executed code. The complete list of header arguments
+is covered in the Org-mode manual; for now, some options frequently used for
+tclsh are:
+- =:exports {code, results, both, none}=
+  - When the code is run and the document exported (e.g. to HTML or
+    \LaTeX PDF), what should appear? Just the code block itself? Only
+    the produced output (in this case a plot of some sort)? Both the
+    code and the accompanying results? Or nothing?
+- =:results {value, output}=
+  - Controls the results of the output. Only two alternatives are
+    allowed: 
+  - /value/ :: Returns the value of the last =return= statement in the
+               code. and places in =#+RESULTS:=. 
+  - /output/ :: Returns the value of the =puts= or =write= statement and
+                places those in =#+RESULTS:=. 
+* Overview and Use
+Tcl is a complete language that provides a rich set of
+facilities. Describing these are beyond the scope of this
+manual. However, the examples provided in this guide should 
+be easy enough to follow to
+those that have program in other languages in the past.  If you are
+interested in learning about Tcl, please refer to the official documents
+or books on the subject. [fn:1]
+
+Through this overview, Any of the commands
+typed in =code= font below should be assumed to reside in a babel
+code block (between =#+begin_src tcl= and =#+end_src=).
+
+To run a Tcl block  and produce a result from the babel block
+move the cursor anywhere in the code
+block and press =C-c C-c= (Ctrl+C followed by Ctrl+C) and type "yes"
+in the minibuffer when asked about executing the code.
+
+** Basic Use 
+The easiest way to use this feature is to create a block of 
+=#+begin_src tcl= / =#+end_src= and enter your commands there. The 
+default is to return a value being this the last value from a =return=
+statement. 
+
+#+begin_example
+#+begin_src tcl
+  return "Hello"
+#+end_src
+
+#+RESULTS: 
+: Hello
+#+end_example
+
+In this example, pressing C-c C-c will result in the value "Hello" being
+written in the =#+RESULTS:=.  Placing a =puts= or =write= statement
+will *not* show up in the =#RESULTS:= 
+To change this behavior, the keyword
+=:results output= must be written in the header. For example: 
+
+#+begin_example
+#+begin_src tcl :results output
+puts "Hi"
+return "Hello"
+#+end_src 
+
+#+RESULTS:
+: Hi
+#+end_example
+
+** Named Procedures and Tables
+The Babel Tcl plugin supports the use of named procedures, calls  and table
+operations. The use of these are detailed in the /Org Manual/.  This
+manual will describe how they are used within the context of a Tcl
+program. 
+
+A variable can be passed to a Tcl program which can be used to call the
+aforementioned program later on in your org document.  The following
+example is a program that just writes the value of the variable. 
+
+#+begin_example
+#+name: reflector(x=0)
+#+begin_src tcl :results output
+puts $x
+#+end_src
+
+#+RESULTS: reflector
+: 0
+#+end_example 
+
+Pressing =C-c C-c= will result in the default value to be written. Calling
+the named block later on with a different value will result on that
+value been written in the =#RESULTS:= For example: 
+
+#+begin_example
+#+call: reflector(20)
+#+RESULTS: reflector(20)
+: 20
+#+end_example
+
+This is not constrained only to =:results output= headers. Procedures in
+which the result is a =value= can also be used. For example: 
+
+#+begin_example
+#+name: square(x=0)
+#+begin_src tcl :results value
+return [expr $x * $x]
+#+end_src
+
+#+RESULTS: square
+: 0
+#+end_example
+
+Executing it with C-c C-c with different values will result to that value being
+returned. For example:
+
+#+begin_example
+#+call: square(x=2)
+
+#+RESULTS: square(x=2)
+: 4
+#+end_example 
+
+Sending Tcl code as part of the parameter is also supported. For
+example: 
+
+#+begin_example
+#+call: square(x=[expr 2 + 10])
+
+#+RESULTS: square(x=[expr 2 + 10])
+: 144
+#+end_example 
+
+Table processing is supported in Tcl blocks. The resultant data
+structure in  Tcl is a list of lists. For example: 
+
+
+#+begin_example
+#+tblname: testtbl
+| 1 | 2 |
+| 3 | 4 |
+
+#+name: processtbl(x=0)
+#+begin_src tcl :results output
+puts $x
+foreach y $x {
+  puts [expr [lindex $y 0] * [lindex $y 1]]
+}
+#+end_src
+#+end_example
+
+The program prints the table as a list, add the first and second values and
+writing the results. Calling this block later on in the Org document
+will result in the following output.
+
+#+begin_example
+#+call: processtbl(x=testtbl)
+
+#+RESULTS: processtbl(x=testtbl)
+: {1  2}  {3  4}
+: 2
+: 12
+#+end_example
+
+* Footnotes
+
+[fn:1] Tcl  manual downloads and further information can be obtained
+from: [[http://www.tcl.tk/doc/]]

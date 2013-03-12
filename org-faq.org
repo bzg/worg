@@ -1,8 +1,9 @@
+#+TITLE:     Org-mode Frequently Asked Questions
 #+EMAIL:     mdl AT imapmail DOT org
 #+AUTHOR:    Worg people
 #+LANGUAGE:  en
-#+TITLE:     Org-mode Frequently Asked Questions
 #+OPTIONS:   toc:t H:2
+#+SETUPFILE: macros.setupfile
 
 [[file:index.org][{Back to Worg's index}]]
 
@@ -306,6 +307,16 @@ about the number of list readers.
   :PROPERTIES:
   :CUSTOM_ID: Keeping-current
   :END:
+** Upgrading to Org 8.0/master and using the new export engine
+   :PROPERTIES:
+   :CUSTOM_ID: new-exporter-switch
+   :END:
+
+#+index: Upgrade!new exporter
+#+index: Export!new exporter
+
+See [[file:org-8.0.org][Upgrading to Org 8.0 (or the current master branch)]].
+
 ** My Emacs ships with an older version Org-mode! How do I upgrade?
    :PROPERTIES:
    :CUSTOM_ID: updating-org
@@ -326,6 +337,9 @@ options.
  3. Install and updated org-mode automatically through the Emacs
     Package Manager as [[#installing-via-elpa][explained in this FAQ]].
 
+/Note/: Please also see [[#mixed-install][Is my Orgmode installation mixed?]] for a common
+issue with mixed installations.
+
 ** How do I keep current with bleeding edge development?
    :PROPERTIES:
    :CUSTOM_ID: keeping-current-with-Org-mode-development
@@ -337,7 +351,8 @@ options.
    developement by cloning the Org-mode repository and refreshing your
    copy with latest changes whenever you wish. You only need to use
    two Git commands (clone and pull.) Here are the steps in brief
-   (please customize locations to suit your setup):
+   (assuming a POSIX compatible shell and please customize locations
+   to suit your setup):
 
    1. Select a location to house the Org-mode repository (approx. 40
       MB; includes documentation, compiled elisp files and history
@@ -365,13 +380,20 @@ options.
 
    3. Compile and install Org-mode and build documentation.
 
-      : $ cd org-mode && make && make doc && make install
+      : $ cd $HOME/elisp/org-mode && make
 
       Please note that you can choose to /not/ compile at all and run
-      using source =.el= files only.  Compiled files speed things up.
+      using source =.el= files only (compiled files speed things up),
+      but you will still need to generate the autoload files.
 
-      Also note that running =make install= is necessary only if you'd
-      like to install org-mode system-wide.
+      : $ cd $HOME/elisp/org-mode && make uncompiled
+
+      If you'd like to install org-mode someplace outside the source
+      tree (private or system-wide), you should edit =local.mk= to
+      point to the appropriate install location.  You may need
+      administrator rights to do a system-wide installation.
+
+      : $ cd $HOME/elisp/org-mode && make install
 
    4. This is where you configure Org-mode with Emacs.  Please refer
       to [[./org-tutorials/index.org][Org tutorials]].
@@ -379,18 +401,26 @@ options.
    5. Keeping up-to-date.
 
       Cloning the repository is a one time activity.  From this point
-      onwards you only need to /pull/ the latest changes.
+      onwards you only need to /pull/ the latest changes, which the
+      Makefile is set up to do automatically for certain make targets.
 
-      : $ cd $HOME/elisp/org-mode
+      : $ cd $HOME/elisp/org-mode && make update
 
-      and then
+      or if you immediately want to install as well
 
-      : $ git pull && make clean && make && make doc && make install
+      : $ cd $HOME/elisp/org-mode && make update2
 
-   6. You should restart Org-mode to have the changes take effect (if
-      you are not rebooting Emacs.)  Also since the intention is to
-      "keep up" with Org-mode, you should visit updated sections of
-      documentation for latest updates (use =git log=.)
+      Actually in this case it is recommended to run the test suite
+      before installation so that you don't install a version that
+      fails testing.
+
+      : $ cd $HOME/elisp/org-mode && make up2
+
+   6. You should reload Org-mode to have the changes take effect (if
+      you are not restarting Emacs, which is recommended).  Also since
+      the intention is to "keep up" with Org-mode, you should visit
+      updated sections of documentation for latest updates (use =git
+      log=.)
 
    7. As you use your repository over time it will accumulate loose objects.
       You can reduce the total size of your git repository with
@@ -406,9 +436,12 @@ options.
    :CUSTOM_ID: update-info-manual-to-latest
    :END:
 
-   Since org-mode already ships with Emacs, a rather common problem
-   among users is "How do I update the info documentation to the
-   latest version of org-mode?". There are three ways to achieve this:
+   *This is not a problem if org-mode is installed system-wide, which
+   automatically takes care of this issue!* Since org-mode already
+   ships with Emacs, a rather common problem among users is "How do I
+   update the info documentation to the latest version of org-mode?".
+   There are three ways to achieve this if for whatever reason you
+   can't install into the standard, system-wide info directory:
 
    1. You can set the =INFOPATH= environment variable in your login
       script like this:
@@ -425,12 +458,12 @@ options.
 
       #+begin_src emacs-lisp :eval no
         ;; Info directory
-        (add-to-list 'Info-default-directory-list
+        (add-to-list 'Info-additional-directory-list
                      (expand-file-name "/path/to/org-mode/info"))
       #+end_src
 
-   3. You can also specify this in the Makefile while installing
-      org-mode like this:
+   3. You should specify the same location in the Makefile while
+      installing org-mode like this:
 
       #+begin_src makefile-gmake :eval no
         # Where local software is found
@@ -440,143 +473,58 @@ options.
         infodir = $(prefix)/share/info
       #+end_src
 
-      After you install org-mode with =make install=, you can now
-      install the new info files with =make install-info=. Note that
-      this method _overwrites_ the old org-mode info files that is
-      distributed with your version of GNU Emacs.
-
 ** How can I keep local changes and still track Org-mode development?
    :PROPERTIES:
    :CUSTOM_ID: keeping-local-changes-current-with-Org-mode-development
    :END:
 
-  Say you want to make minor changes to the Makefile to reflect your
-  location for =emacs=.
+  There is no need to do this anymore for the purpose of adapting the
+  build system to the local environment, since this can now be
+  specified in =local.mk=.  However, there may be a need to make other
+  local changes to Org.
 
-  Create a local branch for your changes on top of origin/master as
-  follows:
+  Say you want to make minor changes to the =org.el= or any other
+  version controlled file from Org and you want to keep these changes
+  on top of the =master= branch from Org.  Create a local branch for
+  your changes on top of origin/master as follows:
 
   : $ git checkout -b local origin/master
   : $ git config branch.local.rebase true
-  : # Make your changes to the Makefile and create a new commit
-  : $ git add Makefile
-  : $ git commit -m 'My local Makefile configurations'
-  : # Update git to a newer version
+  : # Make your changes to the sources and create a new commit
+  : $ git commit -am 'My local changes to Org'
+  : # Update to a newer version
   : $ git pull
 
   Now each time you pull new commits from the distribution repository
   your local commits will be rewound and replayed on top of the new
-  origin/master.
+  origin/master.  You would normally work on your =local= branch which
+  includes your custom commits; there's no need to switch back to the
+  =master= branch.
 
------------
+  If you get a conflict during a =git pull= (a change in Org and one
+  of your local changes try to alter the same line of code) you will
+  need to edit the file with the conflict to fix up the conflicting
+  lines and then tell git that you have resolved the conflict:
 
-  You would normally work on your =local= branch which includes your
-  custom commits; there's no need to switch back to the =master=
-  branch.
+  1. =git pull= fails with a conflict
+  2. edit the file: look for the conflict markers =>>>>>>>= and
+     =<<<<<<<= and either keep one version or create a new one and
+     remove all conflict markers while doing this.
+  3. =git add= the file to the index to mark the conflict resolved
+  4. =git rebase --continue=
+  5. lather, rinse, and repeat 2-4 as needed
 
------------
+  Note that it is possible to have silent conflicts when a change in
+  Org and one of your local changes do not edit the same line of code,
+  but are logically incompatible — for example Org might have changed
+  to assume /roses are red/ while you've made a local change that
+  defines /my roses are yellow/ in some other place.  Git will not
+  warn you about such conflicts (it doesn't understand what the code
+  _does_, of course).
 
-Here is an example of dealing with conflict resolution during git pull.
-
-If you get a conflict during a =git pull= you will need to edit the
-file with the conflict to fix up the conflicting lines and then tell
-git that you have resolved the conflict.
-
-Conflict resolution goes something like this:
-
-1. =git pull= fails with a conflict
-2. edit the file
-3. =git add= the file to mark the conflict resolved
-4. =git rebase --continue=
-5. lather, rinse, and repeat 2-4 as needed
-
-For this example we have the following Makefile:
-
-: #
-: # Example Makefile
-: #
-:
-: EMACS=emacs
-:
-: VERSION=V1.0
-
-and we need to change the =EMACS=emacs= line to =EMACS=myemacs= to
-make it work well on our system.
-
-To do this we
-
-  - create a local branch for our work
-
-    : $ git checkout -b local origin/master
-    : $ git config branch.local.rebase true
-
-    This marks the branch so that all local commits on it are rebased
-    on top of any new commits we get in origin/master during a =git
-    pull= operation.
-
-  - Make our custom changes
-
-    Edit the makefile so it looks like this:
-
-    : #
-    : # Example Makefile
-    : #
-    :
-    : EMACS=myemacs
-    :
-    : VERSION=V1.0
-
-  - Create a commit with our custom changes
-    : $ git add Makefile
-    : $ git commit -m 'My local Makefile configurations'
-
-  - Later we do a =git pull= but that fails with conflicts.
-
-    : $ git pull
-    : remote: Counting objects: 5, done.
-    : ...
-    : Patch failed at 0001.
-    :
-    : When you have resolved this problem run "git rebase --continue".
-    : If you would prefer to skip this patch, instead run "git rebase --skip".
-    : To restore the original branch and stop rebasing run "git rebase --abort".
-
-  - Fix the conflict in your favourite editor
-
-    Conflict markers look like this:
-
-    : <<<<<<< HEAD:Makefile
-    : EMACS=emacs22
-    : =======
-    : EMACS=myemacs
-    : >>>>>>> Change emacs location:Makefile
-
-    This attempted =git pull= caused a conflict.  Fire up your
-    favourite editor and fix the conflict in the Makefile.  The
-    conflict markers are <<<<<<<<<< , ======= , and >>>>>>>>>>.  Fix
-    the Makefile appropriately and delete the conflict markers.  You
-    already edited these lines earlier so fixing it should be trivial.
-
-    In this case we changed =EMACS=emacs= to =EMACS=myemacs= and
-    upstream changed =EMACS=emacs= to =EMACS=emacs22=.  Just fix the
-    file and save it by deleting the conflict markers and keeping the
-    code you need (in this case the =EMACS=myemacs= line which we
-    originally modified.)
-
-  - Mark the file's conflict resolved
-
-    : $ git add Makefile
-
-    You use =git add= because you are adding new content to be tracked - you're not adding a file, but you are adding changes in content.
-
-  - Continue the rebase operation
-
-    : $ git rebase --continue
-
-    If any other conflicts arise you fix them the same way - edit the file, mark the conflict resolved, and continue.
-
-At anytime during the rebase conflict resolution you can say "oops this is all wrong - put it back the way it was before I did a pull"
-using
+  At anytime during the rebase conflict resolution you can say "oops
+  this is all wrong - put it back the way it was before I did a pull"
+  using
 : $ git rebase --abort
 
 ** How can I use a stable release version instead of the bleeding edge master?
@@ -584,18 +532,24 @@ using
    :CUSTOM_ID: using-stable-releases-only
    :END:
 
-The master branch of the git repository always contains the bleeding
+The =master= branch of the git repository always contains the bleeding
 edge development code.  This is important for Org's fast development,
 because code on master gets checked out by many people daily and we
 quickly receive bug reports if something is wrong.  On rare occasions,
 this code may not function perfectly for a limited time while we are
-trying to fix things.
+trying to fix things.  It is therefore recommended to keep a
+known-good version of org-mode installed outside the source tree and
+always run the full test suite before using a new version from master.
 
 Not everyone like to use this bleeding-edge code and face the danger
-to hit a surprising bug.
+to hit a surprising bug.  The branch =maint= is specifically for
+collecting only fixes for known bugs between releases.  If you don't
+want to wait for a new release, but don't want to live on the bleeding
+edge, consider using =maint=.
 
-Therefore, from time to time, we make a release.  This typically
-happens when the maintainers feel that
+From time to time, we make a release by merging all the new features
+from =master= into =maint=.  This typically happens when the
+maintainers feel that
 
 1. they have reached a good point in the development
 2. the code has a feature set that should stay and be supported in the
@@ -650,13 +604,9 @@ and then regularly update this branch by doing
 If you are using org-mode on a computer that lacks developer tools for
 compiling software, such as [[http://www.gnu.org/software/make/][GNU Make]], you will have to use a
 *different* installation method than [[http://orgmode.org/manual/Installation.html#Installation][the one outlined in the manual]].
-
-Please see [[http://article.gmane.org/gmane.emacs.orgmode/15264][this thread]] on the mailing list for several different ways
-you can install a recent version of org-mode without using the
-customary =make clean && make && make install=.
-
-The result of that discussion is the file/function found in
-[[http://orgmode.org/worg/org-hacks.html#compiling-org-without-make]].
+Please see this description for [[http://orgmode.org/worg/org-hacks.html#compiling-org-without-make][compiling org-mode without make]] so you
+can install a recent version of org-mode without using the full build
+system.
 
 ** I don't use git. Can I download bleeding edge .zip and .tar.gz archives?
 
@@ -670,9 +620,9 @@ The result of that discussion is the file/function found in
    :CUSTOM_ID: installing-via-elpa
    :END:
 
-   Daily builds of Org-mode is distributed as an ELPA package from
-   both [[http://elpa.gnu.org/packages/][GNU Emacs Lisp Package Archive]] as well as from [[http://orgmode.org/pkg/daily/][Org-mode Emacs
-   Lisp Archive]].
+   Daily builds of Org-mode are distributed as an ELPA package from both
+   [[http://elpa.gnu.org/packages/][GNU Emacs Lisp Package Archive]] as well as from the [[http://orgmode.org/elpa/][Org-mode Emacs Lisp
+   Archive]].
 
    Steps for installing Org with package manager:
    1) Do =M-x list-packages= to browse available packages.
@@ -700,7 +650,7 @@ The result of that discussion is the file/function found in
 #   9) Use =M-x customize-variable RET package-archives=
 #   10) Add the following line to your =.emacs= and reload Emacs.
 #       #+begin_src emacs-lisp
-#         (add-to-list 'package-archives '("Org-mode" . "http://orgmode.org/pkg/daily/"))
+#         (add-to-list 'package-archives '("Org-mode" . "http://orgmode.org/elpa/"))
 #       #+end_src
 #
 
@@ -719,10 +669,8 @@ The result of that discussion is the file/function found in
       #+begin_src emacs-lisp
         ;; change "~/elisp/" as appropiate
         (setq load-path (cons "~/elisp" load-path))
-
-        ;; Add the below lines *at the end* of your .emacs. This
-        ;; ensures that packages installed with package manager
-        ;; overrides other local installation
+        
+        ;; Add the below lines *at the beginning* of your .emacs.
         (require 'package)
         (package-initialize)
       #+end_src
@@ -754,7 +702,7 @@ The result of that discussion is the file/function found in
 
    1. If you are already running Org-mode, note the current version
       reported by M-x org-version.
-   2. Download the latest tarball from [[http://orgmode.org/pkg/daily/][Org-mode repo]].
+   2. Download the latest tarball from [[http://orgmode.org/elpa/][Org-mode repo]].
    3. Do =M-x package-install-file=. When prompted for =Package file
       name=, point it to .tar file downloaded in step 2.
 
@@ -865,6 +813,21 @@ version of Org-mode you are using.
 
 For instructions on how to stay current with Org-mode, consult [[keeping-current-with-Org-mode-development][this
 FAQ]] or follow the instructions on [[http://orgmode.org][the official Org-mode site]].
+
+** Can I get the visibility-cycling features in emacs-lisp-mode?
+
+Yes.  This snippet in your =.emacs= will bind =C-M-]= and =M-]= to global
+and local cycling:
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-M-]") (lambda () (interactive) (org-cycle t)))
+(global-set-key (kbd "M-]") (lambda ()
+                              (interactive)
+                              (ignore-errors
+				(end-of-defun)
+				(beginning-of-defun))
+                              (org-cycle)))
+#+END_SRC
 
 ** Can I get the visibility-cycling features in outline-mode and outline-minor-mode?
    :PROPERTIES:
@@ -1081,6 +1044,36 @@ something like this:
   :PROPERTIES:
   :CUSTOM_ID: Errors
   :END:
+** Is my Orgmode installation mixed?
+   :PROPERTIES:
+   :CUSTOM_ID: mixed-install
+   :END:
+   Emacs is distributed with a version of Orgmode bundled with it.  A
+   common problem among users who install a [[#updating-org][newer version]] of Orgmode
+   separately is a mixed install where Emacs loads some files from the
+   bundled and the rest from the latest version.  This can lead to
+   /unending/ troubles in the future.  With a recent installation of
+   Org mode =M-x org-version= will indicate if the installation is mixed.
+
+   With somewhat older Org mode installations, the procedure is more
+   involved and indeterminate. An easy first step is to look
+   at the output of =M-x org-version=.
+   - Good :: ~Org-mode version 7.8.11 (release_7.8.11-448-g1737d3 @
+             /path/to/org-mode/lisp/)~
+   - Bad :: ~Org-mode version 6.33x (release_7.8.11.409.ga3778)~
+
+   A second step is to go through the output of =list-load-path-shadows=
+   line-by-line to get hints to what in your configuration is causing
+   the issue.  Among the most common reasons is Orgmode gets loaded
+   before the =load-path= variable is updated to include the
+   installation directory of the latest Orgmode.  To avoid issues like
+   this, it is recommended that the load path is updated very early on
+   in your init file.
+
+   /Note:/ The formatting of the version information, as shown in the
+   examples above, will be different for older Org mode releases,
+   e.g. ~Org-mode version 7.8.02~.
+
 ** Opening Org files in Emacs leads to a crash
    :PROPERTIES:
    :CUSTOM_ID: Emacs-crashes-with-org-indent-mode
@@ -1370,6 +1363,25 @@ One possible solution is to add (package-initialize) to the primary init.el
 before starter-kit gets going. This will pick up the local install so
 that the built-in version never enters to muddy the picture.
 
+** (Filling a paragraph|Indenting a list|...) behaves strangely
+Many filling/indenting problems have been reported on the mailing
+list: many of those were bugs (that have been fixed), but quite a lot
+are caused by people using the filladapt package, which is fundamentally
+incompatible with Org, which has its own facilities for these tasks. If you see
+strange behavior in this area, first check if you are using filladapt: visit an org
+file and check the modeline for "Filladapt".
+
+If filladapt is on, you want to turn it off before investigating
+further. Anthony Lander suggested on the mailing list the following
+method to turn off filladapt mode when you visit org files:
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-mode-hook 'turn-off-filladapt-mode)
+#+END_SRC
+
+This should be placed in your .emacs (or other initialization file) after org
+is loaded.
+
 * Faces and highlighting
   :PROPERTIES:
   :CUSTOM_ID: Faces
@@ -1561,7 +1573,10 @@ an outline heading, you can use inline tasks. Simply add...
    :CUSTOM_ID: C-k-is-killing-subtrees
    :END:
 
-  =(setq org-ctrl-k-protect-subtree t)= before losing your work.
+   =(setq org-ctrl-k-protect-subtree t)= before losing your work.
+
+   =(setq org-catch-invisible-edits 'show)= will also be helpful.  See the
+   docstring of this option, as it allows more flexible options.
 
 ** Why aren't commands working on regions?
    :PROPERTIES:
@@ -1700,10 +1715,38 @@ No.  The "*" character is used in =outline-mode=, and Org is derived from
 If you are curious as to what other rationales there are for "*", check out
 [[http://permalink.gmane.org/gmane.emacs.orgmode/44271][this]] mail and the thread it is in.
 
+Even if you cannot use another character, you can add an overlay on top of
+the "*" characters and your buffer will look like the way you want.  
+
+See the library =org-bullets.el= (by Evgeni Sabof) from the =contrib/=
+directory, or test this snippet shared by Jambunathan:
+
+#+BEGIN_SRC emacs-lisp
+  (font-lock-add-keywords
+     'org-mode `(("\\(?:^\\(?1:\\*+\\)[[:blank:]]\\)"
+                  (0 (progn (compose-region
+                             (match-beginning 1) (match-end 1)
+                             (pcase (length (match-string 1))
+                               (1 ?\u2219)
+                               (2 ?\u2022)
+                               (3 ?\u25c9)
+                               (_ ?\u25CB)))
+                            nil)))))
+#+END_SRC
+
 * Todos and Tags
   :PROPERTIES:
   :CUSTOM_ID: Todos-and-Tags
   :END:
+** How can I automatically archive canceled tasks?
+
+#+BEGIN_SRC emacs-lisp
+(setq org-todo-state-tags-triggers '(("CANCELLED" ("ARCHIVE" . t))))
+#+END_SRC
+
+See http://thread.gmane.org/gmane.emacs.orgmode/64824 -- thanks to Victor
+Rosenfeld for sharing [[http://doc.norang.ca/org-mode.html][Bernt Hansen]]'s solution.
+
 ** How can I cycle through the TODO keyword of an entry?
    :PROPERTIES:
    :CUSTOM_ID: cycle-TODO-keywords
@@ -1938,6 +1981,22 @@ message buffer, you could add the following to your =.emacs=:
 Yes, you can with the contributed package =org-wikinodes.el=.  Please
 consult the [[http://orgmode.org/worg/org-contrib/org-wikinodes.html][documentation]].
 
+** Can I create links to Thunderbirds emails?
+
+Yes, see this: [[http://mid.gmane.org/ka42mn$mn9$1%2540ger.gmane.org][from Christoph Herzog: Re: Linking to Thunderbird (correction)]]
+
+#+BEGIN_SRC emacs-lisp
+(require 'org)
+
+(org-add-link-type "thunderlink" 'org-thunderlink-open)
+
+(defun org-thunderlink-open (path)
+  "Opens an email in Thunderbird with ThunderLink."
+  (start-process "myname" nil "thunderbird" "-thunderlink" (concat "thunderlink:" path)))
+
+(provide 'org-thunderlink)
+#+END_SRC
+
 * Plain Lists
   :PROPERTIES:
   :CUSTOM_ID: Plain-Lists
@@ -2092,6 +2151,30 @@ incremental numbers:
 
 Note that you could use arbitrary starting values and column formulas.
 
+Alternatively, you can just start the table
+
+#+begin_src org
+,| N |   |
+,|---+---|
+,| 1 |   |
+#+end_src
+
+and with the cursor on the 1, use S-RET (bound to org-table-copy-down). That
+will add a row, incrementing the number as it goes. See the docstring for org-table-copy-down
+for more information and also see the next FAQ entry [[=S-RET= in a table keeps increasing the copied numbers.  How can I stop this?]]
+if you don't want this behavior.
+
+** =S-RET= in a table keeps increasing the copied numbers.  How can I stop this?
+   :PROPERTIES:
+   :CUSTOM_ID: S-RET-in-a-table-increases-copied-numbers
+   :END:
+
+   Well, it is /supposed/ to be a feature, to make it easy to create a
+   column with increasing numbers.  If this gets into your way, turn it
+   off with
+
+   : (setq org-table-copy-increment nil)
+
 ** Why does my table column get filled with #ERROR?
    :PROPERTIES:
    :CUSTOM_ID: table-column-filled-with-ERROR
@@ -2193,17 +2276,6 @@ Note that you could use arbitrary starting values and column formulas.
    have been thinking about moving a bit further down this line.
    However, for my applications this has so far not been an issue at
    all.  If you have a good case, you could try to convince me.
-
-** =S-RET= in a table keeps increasing the copied numbers.  How can I stop this?
-   :PROPERTIES:
-   :CUSTOM_ID: S-RET-in-a-table-increases-copied-numbers
-   :END:
-
-   Well, it is /supposed/ to be a feature, to make it easy to create a
-   column with increasing numbers.  If this gets into your way, turn it
-   off with
-
-   : (setq org-table-copy-increment nil)
 
 ** When I export tables to HTML, they don't have borders.
    :PROPERTIES:
@@ -2697,6 +2769,10 @@ variable =org-capture-templates= to "understand" (i.e. evaluate)
   :CUSTOM_ID: Agenda
   :END:
 
+** My agenda commands are slow.  What to do?
+
+See the dedicated page about [[file:~/install/git/agenda-optimization.org][agenda speed up and optimization]].
+
 ** How can I change the advanced warning time for deadlines?
    :PROPERTIES:
    :CUSTOM_ID: warning-period-for-deadlines
@@ -3184,8 +3260,7 @@ the following format:
 
 #+begin_src org
   ,** Class
-  ,%%(org-class 2009 2 16 2009 4 20 1 10) 7:00pm-9:00pm Class
-
+  ,<%%(org-class 2009 2 16 2009 4 20 1 10)> 7:00pm-9:00pm Class
 #+end_src
 
 In this case, the string following the sexp will be displayed in the
@@ -4173,6 +4248,33 @@ as of Org version 7.8:
 
 Yes: simply use a blank #+TITLE in your Org file.
 
+** How can I use arbitrary colors for words/sentences in HTML export?
+
+Add the following to your Emacs config,
+
+#+BEGIN_SRC emacs-lisp
+    ;; -*- emacs-lisp -*-
+    (org-add-link-type
+     "color"
+     (lambda (path)
+       (message (concat "color "
+                        (progn (add-text-properties
+                                0 (length path)
+                                (list 'face `((t (:foreground ,path))))
+                                path) path))))
+     (lambda (path desc format)
+       (cond
+        ((eq format 'html)
+         (format "<span style=\"color:%s;\">%s</span>" path desc))
+        ((eq format 'latex)
+         (format "{\\color{%s}%s}" path desc)))))
+#+END_SRC
+
+and then you can use [[color:red][in red]] for colored export.
+
+This question has been raised [[http://thread.gmane.org/gmane.emacs.orgmode/59130][on the mailing list]] by Jos'h Fuller and
+answered by Eric Schulte.
+
 * Backup
 
 #+index: Backup
@@ -4205,58 +4307,96 @@ remote and safe place.
 
 #+index: MobileOrg
 
-** Which versions of MobileOrg do exist?
+** Which versions of MobileOrg are available?
    :PROPERTIES:
    :CUSTOM_ID: mobileorg_versions
    :END:
 
 MobileOrg is available for Apple's iOS, and for Google's Android.
-Both Apps use the same synchronization paradigm with a computer-based
-installation.
 
 - MobileOrg for the *iPhone/iPod Touch/iPad* series of devices, by
   Richard Moreland.  Check out [[http://mobileorg.ncogni.to/][Richard's page]].
 - MobileOrg for *Android*, by Matt Jones.  See [[http://wiki.github.com/matburt/mobileorg-android/][his project page]].
 
-** What can I do if I don't want to use Dropbox.com?
+** Can I use the same files on my mobile device as on my computer?
+
+Absolutely!  Both apps currently offer the same options for
+synchronization of =.org= files with a computer-based installation of
+Org-mode:
+
+- via [[http://www.dropbox.com/][Dropbox.com]] (easier to set up, free accounts available)
+- via a [[http://en.wikipedia.org/wiki/WebDAV][WebDAV]] server of your choice (potentially more data privacy)
+
+** How does synchronization via WebDAV work?
    :PROPERTIES:
    :CUSTOM_ID: mobileorg_webdav
    :END:
 
-Dropbox.com is the easiest way to connect between Emacs and MobileOrg,
-you can get a free account there.  If for some reason you cannot or do
-not want to use this path, you can use any webdav server.  On this
-webdav server you need to create a dedicated directory for the
-communication between Emacs and MobileOrg.  If you can mount that
-directory locally so that Emacs can directly write to it, just point
-to that directory using the variable =org-mobile-directory=.  Using
-the /tramp/ method, =org-mobile-directory= may point to a remote
-directory accessible through, for example, /ssh/ and /scp/:
+You need to create a dedicated directory on the WebDAV server for the
+communication between Emacs and MobileOrg.
 
-#+begin_src emacs-lisp
-(setq org-mobile-directory "/scpc:user@@remote.host:org/webdav/")
+#+begin_src ditaa :file images/orgmobile/tramp-webdav.png :cmdline -r
+  +----------------------+           +----------------------+
+  | desktop              |           | WebDAV server        |
+  +----------------------+           +----------------------+
+  | emacs                |           | org-mobile-directory |
+  |   + org-mode         |           | containing:          |
+  |                      | scp (ssh) |                      |
+  |   org-mobile-push ----------------->  *.org             |
+  |   org-mobile-pull <-----------------                    |
+  |                      | via tramp |       ^              |
+  +----------------------+           +-------|--------------+
+                                             |
+                +----------------------+     |
+                | mobile device        |     | WebDAV
+                +----------------------+     |
+                |                      |     |
+                |    MobileOrg     <---------+
+                |                      |
+                +----------------------+
 #+end_src
 
-However, if you have configured ssh to use =ControlPersist=, due
-to [[http://article.gmane.org/gmane.emacs.tramp/7991][a bug with tramp and =ControlPersist=]] you may need to use =scpx=
-instead of =scp= as the /tramp/ transfer method.
+#+RESULTS:
+[[file:images/orgmobile/org-mobile-tramp-webdav.png]]
 
-If Emacs cannot access the WebDAV directory directly using a /tramp/
-method, you can use a local directory for staging.  Other means must
-then be used to keep this directory in sync with the WebDAV directory.
-In the following example, files are staged in =~/stage/=, and Org-mode
-hooks take care of moving files to and from the WebDAV directory using
-/scp/.
+If you can mount that directory locally so that Emacs can directly
+write to it, just set the variable =org-mobile-directory= to point to
+that directory.  Alternatively, by using the [[http://www.gnu.org/software/tramp/][/TRAMP/]] method,
+=org-mobile-directory= may point to a remote directory accessible
+through, for example, /ssh/ and /scp/:
+
+#+begin_src emacs-lisp
+(setq org-mobile-directory "/scpc:user@remote.host:org/webdav/")
+#+end_src
+
+  {{{BeginWarningBox}}} N.B. Since this configures /TRAMP/ to connect
+  via /ssh/, you will need to use your /ssh/ password, not a WebDAV
+  password.
+
+  Also note that if you have configured ssh to use =ControlPersist=, due
+  to [[http://article.gmane.org/gmane.emacs.tramp/7991][a bug with tramp and =ControlPersist=]] you may need to use =scpx=
+  instead of =scp= as the /tramp/ transfer method.{{{EndWarningBox}}}
+
+** Does Emacs have to use /TRAMP/ to access the remote directory?
+
+No, you can alternatively use a local directory for staging.  Other
+means must then be used to keep this directory in sync with the WebDAV
+directory.  In the following example, files are staged in =~/stage/=,
+and Org-mode hooks take care of moving files to and from the WebDAV
+directory using /scp/.
 
 #+begin_src emacs-lisp
 (setq org-mobile-directory "~/stage/")
 (add-hook 'org-mobile-post-push-hook
-  (lambda () (shell-command "scp -r ~/stage/* user@@wdhost:mobile/")))
+  (lambda () (shell-command "scp -r ~/stage/* user@wdhost:mobile/")))
 (add-hook 'org-mobile-pre-pull-hook
-  (lambda () (shell-command "scp user@@wdhost:mobile/mobileorg.org ~/stage/ ")))
+  (lambda () (shell-command "scp user@wdhost:mobile/mobileorg.org ~/stage/ ")))
 (add-hook 'org-mobile-post-pull-hook
-  (lambda () (shell-command "scp ~/stage/mobileorg.org user@@wdhost:mobile/")))
+  (lambda () (shell-command "scp ~/stage/mobileorg.org user@wdhost:mobile/")))
 #+end_src
+
+Alternatively you could write a simple script to synchronise from
+=~/stage/= to the remote directory via /rsync/.
 
 * Mathjax
 

@@ -1,0 +1,335 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+INFOJS_OPT: view:overview toc:1 path:http://orgmode.org/org-info.js tdepth:1 ftoc:t buttons:0 mouse:underline
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE:      Guía de Referencia Para el Modo Org
+#+AUTHOR:     Christian Giménez
+#+EMAIL:      cnngimenez@yahoo.com.ar
+#+DESCRIPTION: Guía básica de referencia para usar Org en Emacs.
+#+LANGUAGE:   es
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+[[file:index.org][{Back to Worg's index}]]
+
+* Tabla de Contenido
+
+[TABLE-OF-CONTENTS]
+
+* Introducción
+Esta guía de referencia no pretende ser completa ni abarcar todas las posibilidades de este fantástico modo para Emacs. Sin embargo, ¿quién lo diría? tal vez en un futuro, gracias a muchos colaboradores, las cosas sean distintas y esta guía abarque mucho más. 
+
+Por el momento, me concentraré en escribir una guía para las personas que quieren aprender. Iba a decir "principiantes", pero la verdad nunca me cayó bien esa palabra con lo que evitaré usarla así como también sus sinónimos.
+
+Como podrás ver, tampoco me concentraré en hacerla en un lenguaje demasiado formal. De hecho, todo lo contrario, seré informal cual si estuviese hablando con un compañer@ o con un amig@.
+
+
+Espero que esta guía te guste, te sirva mucho en este fascinante mundo y la encuentres entretenida. ¿Y por qué no? ¡hasta podría ser que me quieras ayudar a mejorarla!
+
+
+Saludos Cordiales.
+
+* Primero lo Primero
+
+#+BEGIN_QUOTE
+¡Todo es texto!
+#+END_QUOTE
+	
+
+  Seguro estás sobre una hermosa computadora, con Emacs iniciado y te estás preguntando ¿y ahora qué? 
+
+  Primero, vas a sentir un escalofríos cuando ves que está todo(¡sí todo!) en inglés. Dirás "esto no es lo mío" o "esto es difícil". Pues *no*, no te sientas intimidado. Lo mismo dije ¡y mirame!, con un par de canas verdes que otra ¡ahora uso Emacs para todo! (lo de las canas es un asunto meramente genético y no tiene nada que ver con Emacs).
+
+** Las Teclas
+
+  Bien, antes que nada te comentaré acerca de /las teclas/. Ya habrás visto en muchas páginas que hablan de Emacs que dicen "presioná M-x algo para hacer esto... ", "presioná 'M-x calendario' para saber en que día estás", etc. ¿Y qué es M-x? a eso vamos:
+
+  Las teclas especiales, en cada computadora, pueden llamarse diferente: en algunos se llaman "Alt", Alternate, Alternar, en otros es un símbolo, ¡en otros ni siquiera hay una tecla "Alt"! Por eso se inventó la convención de llamar a la tecla Alt (o simbolito) como "Meta". Por eso, la "M" de "M-x" es de Meta-x. 
+  Bien, ¿y si no tengo una tecla "Alt"? se usa la tecla Escape. De forma que M-x es Escape-x. Algo bueno de la tecla Escape es que puedes presionarla y soltarla, no hace falta presionar Escape y x juntos.
+
+  Otra tecla es la "Ctrl" o mejor conocida por Control. Esta tecla se representa por "C", de forma que "C-x" es Control-x.
+
+  
+  Hay una cosita más: ¿cuándo presionar a la vez y cuándo presionar una después de otra?. Sí, Emacs tiene accesos de teclados que se presionan varias teclas en secuencia. 
+  Por ejemplo: ~C-x 8_a~ escribe el símbolo "ª". 
+  
+  No es difícil de leer: 
+
+  - Si tiene un guión, se presionan a la vez. ~C-x~ es Control con la tecla ~x~ a la vez.
+  - Si están juntas, es en secuencia. ~8_a~ es ~8~, luego ~_~, luego ~a~.
+
+  ¡Hey! ¡Tranquilo! Tipea despacio y con tranquilidad que Emacs te espera. Primero presioná ~C-x~, luego con todo el tiempo del mundo ~8~, ~_~ y finalmente ~a~. 
+
+*** Referencias
+
+    - M :: Escape(podés presionar y soltar), Alt, Alternate o una tecla similar.
+    - S :: Shift o Mayúsculas.
+    - C :: Control, Ctrl o similar.
+    - ESC :: Lo mismo que ~M~
+    - RET :: Enter, Return, Retorno de Carro, etc.
+    - SPC :: Espacio.
+    - TAB :: Tabulador.
+
+
+** ¿Qué es Org?
+
+* Escribir en Modo Org
+** Encabezados y Títulos
+   - Primer encabezado :: Comenzar  la línea con un asterisco.
+   - Segundo encabezado :: Comenzar la línea con dos asteriscos.
+   - Tercer encabezado ::  Comenzar la línea con tres asteriscos.
+
+Y  así sucesivamente.
+
+*** Ejemplo
+
+#+BEGIN_SRC org
+  ,* Mi Primer Encabezado
+  ,  Aquí va el texto.     
+  ,** Mi Segundo Encabezado 
+  ,   ¡Hola mundo!
+  ,* Otro Primer Encabezado
+  ,  Un texto para probar Org.
+  ,** Segundo Encabezado Otra Vez
+  ,*** Tercer Encabezado
+  ,    Mi tercer encabezado
+  ,**** ¡Cuarto!
+  ,     ¡Agrega tantos encabezados como quieras!
+#+END_SRC
+
+*** Teclas
+    Todas las teclas funcionan cuando el cursor está sobre el título. No lo intentes en otro lugar porque ¡tendrás un resultado desastroso o te decepcionaras! 
+
+   - M-\rightarrow :: Aumentar la prioridad del título (de título tres a título dos, y así sucesivamente)
+   - M-\leftarrow :: Disminuir la prioridad del título (de título uno a título dos, y así sucesivamente)
+   - Tabulador :: Ocultar/mostrar el contenido del título. ¡El texto no se borró!
+   - M-\uparrow :: Subir el título y ponerlo antes del título anterior. ¡El contenido también se sube!
+   - M-\downarrow :: Bajar el título y ponerlo después del título siguiente. ¡El contenido también se baja!
+
+** Estilos de Fuentes
+   
+   - Negrita :: Se encierran las palabras entre asteriscos: ~*una frase en negrita*~
+   - Cursiva :: Se encierran las palabras entre barras inclinadas: ~/una frase en cursiva/~
+   - Subrayado :: Se encierran las palabras entre guiones bajos: ~_una frase subrayada_~
+   - Tachado :: Se encierran las palabras entre símbolos de suma: ~+una frase tachada+~
+   - Código Fuente :: Se encierran las palabras entre símbolos de igualdad: ~=una frase en código fuente=~
+   - Verbatim :: Se encierran las palabras entre tildes: ~\~una frase en verbatim\~~
+   
+*** Ejemplo
+#+BEGIN_SRC org
+  ,Escribo acerca de *una frase en negrita* que está antes /de una en cursiva/. Tenga en cuenta que el _subrayado se hace con_ guiones bajos.
+  
+  ,Si desea tachar alguna cosa +con símbolos de suma+ puede hacerlo fácilmente. 
+  
+  ,Una variable o el nombre de una función puede escribirlo con símbolos de igual, por ejemplo: la variable =emacs-version= posee la versión de su Emacs.
+  
+  ,Para decir cómo escribir algo, puede usar verbatim: para escribir una +frase cualquiera+ tachada debe hacerlo así: ~una +frase cualquiera+ tachada~. 
+  
+#+END_SRC
+
+Escribo acerca de *una frase en negrita* que está antes /de una en cursiva/. Tenga en cuenta que el _subrayado se hace con_ guiones bajos.
+
+Si desea tachar alguna cosa +con símbolos de suma+ puede hacerlo fácilmente. 
+
+Una variable o el nombre de una función puede escribirlo con símbolos de igual, por ejemplo: la variable =emacs-version= posee la versión de su Emacs.
+
+Para decir cómo escribir algo, puede usar verbatim: para escribir una +frase cualquiera+ tachada debe hacerlo así: ~una +frase cualquiera+ tachada~. 
+		   
+** Notas al Pié de Página
+
+*** Notas con Nombre
+    Siendo ~NOMBRE~ un número o un nombre con el cual hacer referencia a la nota:
+
+    1. Escribir ~[fn:NOMBRE]~ en el lugar que desees agregar la referencia. Será reemplazado por el ~NOMBRE~.
+    2. Escribir ~[fn:NOMBRE]~ en una sección aparte para escribir la nota.
+    
+**** Ejemplo:
+#+BEGIN_SRC org
+  ,Este es un texto en el cual está escrito en modo org [fn:1]. ¡Org es fantástico!
+  ,.
+  ,.
+  ,.
+  
+  ,* Footnotes
+  
+  , [fn:1] ¡Modo Org te organiza la vida!
+#+END_SRC
+
+     Este es un texto en el cual está escrito en modo org [fn:1]. ¡Org es fantástico!
+     .
+     .
+     .
+     
+    
+*** Notas En Línea
+    Estas notas se escriben directamente sobre el texto para no perder fluidez, al exportar aparecerán en una sección aparte o al pié de página.
+
+  - Escribir ~[fn:: Texto de la nota al pié de página]~.
+
+**** Ejemplo:
+#+BEGIN_SRC org
+  ,Este es un texto en el cual está escrito en modo org [fn:: ¡Modo Org te organiza la vida!]. ¡Org es fantástico!
+#+END_SRC
+
+     Este es un texto en el cual está escrito en modo org [fn:: ¡Modo Org te organiza la vida!]. ¡Org es fantástico!
+      
+
+*** Teclas
+    
+    - C-c C-x f :: El comando "Footnote"
+      - Si el cursor está en un texto :: Crea una nueva nota.
+      - Si el cursor está sobre una referencia a una nota :: Saltar a la definición de la nota.
+      - Si el cursor está sobre la definición de la nota :: Saltar a la referencia.
+    - C-c C-c :: 
+      - Si el cursor está sobre una referencia a una nota :: Saltar a la definición de la nota.
+      - Si el cursor está sobre la definición de la nota :: Saltar a la referencia.
+	   
+** Listas y Enumeraciones
+   
+   Existen tres tipos de listas:
+
+   - Listas Desordenadas :: Empezar la línea con ~-~ o ~+~. Se puede dejar espacios para indicar un orden jerárquico.
+   - Listas Ordenadas :: Empezar la línea con ~1.~ o ~1)~. Se puede dejar espacios para indicar un orden jerárquico.
+   - Listas de Descripciones :: Empezar la línea con ~-~ o ~+~, escribir un texto, dividir con ~::~ y escribir su descripción 
+       (~- texto :: descripción larga...~).
+
+*** Ejemplo:
+
+#+BEGIN_SRC org
+  ,- Item 1
+  ,- Item 2
+  ,  - Sub-item 2.1
+  ,  - Sub-item 2.2
+  ,    1. Sub-sub-item 2.2.1
+  ,    2. Sub-sub-item 2.2.2
+  ,       1. Un pequeño item 2.2.2.1
+  ,       2. Otro 2.2.2.2
+  ,    3. Sub-sub-item 2.2.3
+  ,  - Sub-item 2.3
+  ,- Item 3
+  ,  - Item 3.1 :: Describiendo item 3.1.
+  ,  - Item 3.2 :: Describiendo item 3.2
+  ,    - Item 3.2.1 :: Describiento item 3.2.1
+  
+#+END_SRC
+   
+- Item 1
+- Item 2
+  - Sub-item 2.1
+  - Sub-item 2.2
+    1. Sub-sub-item 2.2.1
+    2. Sub-sub-item 2.2.2
+       1. Un pequeño item 2.2.2.1
+       2. Otro 2.2.2.2
+    3. Sub-sub-item 2.2.3
+  - Sub-item 2.3
+- Item 3
+  - Item 3.1 :: Describiendo item 3.1.
+  - Item 3.2 :: Describiendo item 3.2
+    - Item 3.2.1 :: Describiento item 3.2.1
+
+*** Teclas
+    - M-\rightarrow :: Indentar a la derecha un item. Hacer de un item un subítem del anterior.
+    - M-\leftarrow :: Indentar a la izquierda un item. Hacer de un subítem un item.
+    - M-S-\rightarrow :: Indentar a la derecha el ítem y todos sus subítems.
+    - M-S-\leftarrow :: Indentar a la izquierda el ítem y todos sus subítems.
+    - M-\uparrow :: Subir un ítem, posicionarlo encima del anterior.
+    - M-\downarrow :: Bajar un ítem, posicionarlo debajo del siguiente.
+    - M-S-\uparrow :: Subir toda una jerarquía de items.
+    - M-S-\downarrow :: Bajar toda una jerarquía de items.
+    - M-RET :: Hacer un ítem nuevo. Si es una lista de descripciones preguntará el término a describir.
+    - TAB :: Cuando el cursor está en un ítem, oculta sus subítems.
+** Hipervínculos 
+   Los hipervínculos son textos que apuntan a una página web o a un archivo, de forma que al hacer clic puede verlo.
+
+   Un ejemplo de hipervínculo es [[http://orgmode.org][este texto]], que al hacer clic encima de él te llevará a la página http://orgmode.org. 
+
+   
+   Todos los hipervínculos poseen el siguiente formato:
+
+   : [[ubicación del archivo][Texto del archivo]]
+  
+
+
+   La ~ubicación del archivo~ se da en forma de URL   [fn:: URL son las siglas de Localizador Uniforme de Recursos. Es un texto utilizado para identificar y localizar recursos de Internet.].
+   
+   Una URL comienza con los siguientes caracteres:
+
+   - ~http://dirección_web~ :: Una página web. Ejemplo: http://orgmode.org
+   - ~https://dirección_web~ :: Una página web de acceso seguro. Ejemplo: https://es.wikipedia.org
+   - ~file://ubicación_del_archivo~ :: Un archivo en tu máquina. Ejemplo: ~file://../mi\_imagen.png~ [fn:subir_dir] o ~file:///home/mi\_usuario/mi\_imagen.png~
+
+   Entre muchos otros tipos de accesos.
+  
+*** Teclas    
+    - C-c C-l :: Insertar un hipervínculo. Primero pide el tipo de hipervínculo, luego pide la ubicación y finalmente el texto.
+    - TAB :: Si está escribiendo la ubicación de un archivo puede presionar ~TAB~ para auto-completar el nombre(si la computadora puede deducirlo).
+    - TAB TAB :: Si está escribiendo la ubicación de un archivo puede presionar ~TAB~ una vez para auto-completar, si la computadora no puede deducirlo, puede presionar otra vez ~TAB~ para ver qué nombres similares hay.
+** Insertar Imágenes y Otros Archivos
+   Para insertar archivos en general debemos hacer un [[*Hipervínculos][hipervínculo]]. 
+
+   - Inserción directa :: Escribir la URL o la ubicación directamente. 
+   - Imágenes sin previsualización :: Sólo hacer un [[*%20Hiperv%C3%ADnculos][hipervínculo]] sin texto de descripción.
+   - Imágenes con previsualización :: Hacer un [[*%20Hiperv%C3%ADnculos][hipervínculo]] con un texto de descripción que empiece con ~file:~ o ~http:~.
+
+   Véase a continuación para más detalles.
+
+*** Insertar Imágenes 
+    Se debe escribir la ubicación del archivo entre dobles corchetes. La ubicación puede ser relativa en donde está el archivo Org o absoluta, incluso se aceptan URLs de una imagen en Internet.
+    
+    Por ejemplo:
+
+    Un archivo 
+
+    : [[file:../imagenes/mi_imagen.png]]
+    : [[../imagenes/mi_imagen.png]]
+
+    [fn:subir_dir]
+
+    Dando la URL:
+
+    : [[http://orgmode.org/img/org-mode-unicorn.jpg]]
+
+    [[http://orgmode.org/img/org-mode-unicorn.jpg]]
+    
+
+    Dependiendo de la versión de Org, pueden soportar diversos formatos. Los más comunes son los siguientes:
+    
+    - JPG
+    - PNG
+    - GIF
+
+*** Insertar PDFs
+    
+    PDFs pueden ser insertados de manera análoga a las imágenes:
+
+    Ejemplos:
+    
+#+BEGIN_SRC org
+  
+  ../mis_archivos/mi_pdf.pdf
+  [[../mis_archivos/mi_pdf.pdf]]
+  
+  file:../mis_archivos/mi_pdf.pdf
+  [[file:../mis_archivos/mi_pdf.pdf]]
+  
+  http://mi_pagina/mis_archivos/mi_pdf.pdf
+  [[http://mi_pagina/mis_archivos/mi_pdf.pdf]]
+  
+#+END_SRC
+
+
+
+** Mis Cosas a Hacer
+      
+* Exportación a Otros Formatos
+* Búsquedas
+
+
+
+
+* Footnotes
+
+[fn:1] ¡Modo Org te organiza la vida!
+[fn:subir_dir]  El ".." significa que busca un directorio más arriba.

@@ -1,0 +1,208 @@
+#+TITLE:Org-babel-mathomatic
+#+AUTHOR: Luis Anaya
+#+EMAIL:  papoanaya[at]hotmail[dot]com
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org-babel support for
+  <a href="http://www.mathomatic.org/">Mathomatic</a>
+  </p>
+  <p>
+  <a href="http://www.mathomatic.org/">
+  <img src="http://www.mathomatic.org/math/png/mathomatic192x195.png"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+* Introduction
+=org-babel-mathomatic= allows Mathomatic statements to be executed directly
+within embedded code blocks in Org-mode documents. These code blocks and
+its results can be included as the document is exported to documentation
+formats. 
+
+The following provides instructions and some examples of Mathomatic
+usage. Since babel is simply allowing native code to run inside of
+Org-mode, all Mathomatic documentation is applicable and valid.
+* Requirements and Setup
+Mathomatic is a small Computer Algebra System (CAS) written in C. The
+program is quite portable and useful, and quite suitable for small
+systems. 
+
+To get Mathomatic up and running, you need the =mathomatic= program
+installed in your system. You can obtain and compile =mathomatic= from [[
+www.mathomatic.org]]
+
+To enable support for Mathomatic, it must be enabled as part of your
+initialization script. For example: 
+
+#+begin_example
+;; set up babel support
+(require 'org-install)
+(require 'ob-mathomatic)
+;; add additional languages with (require 'ob-language)
+#+end_example
+
+Babel block headers are used to pass various arguments to control the
+results of the executed code. The complete list of header arguments
+is covered in the Org-mode manual; for now, some options frequently used for
+tclsh are:
+- =:exports {code, results, both, none}=
+  - When the code is run and the document exported (e.g. to HTML or
+    \LaTeX PDF), what should appear? Just the code block itself? Only
+    the produced output (in this case a plot of some sort)? Both the
+    code and the accompanying results? Or nothing?
+- =:results {value, output}=
+  - Controls the results of the output. Only two alternatives are
+    allowed: 
+  - /value/ :: Returns the value of the last =return= statement in the
+               code. and places in =#+RESULTS:=. 
+  - /output/ :: Returns the value of the =puts= or =write= statement and
+                places those in =#+RESULTS:=. 
+- =:file foo.{png,eps,etc.}=
+  - Mathomatic uses gnuplot as its plotting engine. Using the =:file=
+    option specifies where the resulting output should be put. If
+    no option is given, a Gnuplot window will open with the
+    resultant plot. 
+    *NOTE:* Certain plot options may /not/ output
+    properly to Gnuplot directly and thus /must/ have the =:file
+    filename= option in the header. If the error "Code block produced
+    no output" recurs, try outputting to a file. 
+
+* Overview
+Mathomatic is a comprehensive CAS that includes many options and
+features. 
+Describing these are beyond the scope of this
+manual. However, the examples provided in this guide should 
+be easy enough to follow to
+those that have used similar programs in the past. 
+interested in learning about Mathomatic, please refer to the official documents
+or books on the subject. [fn:1]
+
+Through this overview, Any of the commands
+typed in =code= font below should be assumed to reside in a babel
+code block (between =#+begin_src mathomatic= and =#+end_src=).
+
+To run a Mathomatic block  and produce a result from the babel block
+move the cursor anywhere in the code
+block and press =C-c C-c= (Ctrl+C followed by Ctrl+C) and type "yes"
+in the minibuffer when asked about executing the code.
+
+** Basic Use
+An example of a Mathomatic  block in Org-babel is as follows:
+
+#+begin_example
+#+begin_src mathomatic :results output
+x + 2
+eliminate x
+#+end_src
+
+#+RESULTS: mathotest
+: #1: x = 0
+: #2: x + 2
+: Eliminating variable x using solved equation #1...
+: #2: 2
+#+end_example 
+
+Using =:results output= describes all the steps executed in the
+code. using =:results value= will write the results in a table. For
+example:
+
+#+begin_example
+#+begin_src mathomatic :results value
+x = 0
+x + 2
+eliminate x
+ans = x
+#+end_src
+
+#+RESULTS:
+| #1:         | x        | = |     0 |        |          |       |
+| #2:         | x        | + |     2 |        |          |       |
+| Eliminating | variable | x | using | solved | equation | #1... |
+| #2:         | 2        |   |       |        |          |       |
+| #3:         | ans      | = |     x |        |          |       |
+#+end_example
+
+
+** Graphical output
+Graphical output is supported in Mathomatic which can be stored using
+the =:file= header option. The following output formats are supported
+within Mathomatic: [fn:2]
+- Encapsulated Postscript =.eps=
+- Portable Network Graphics =.png=
+- Postscript =.ps=
+- Groff PIC =.pic=
+
+#+begin_example
+#+begin_src mathomatic :results graphics :file sine.png
+plot sin(x)
+#+end_src
+
+#+RESULTS:
+[[file:sine.png]]
+#+end_example 
+
+In order to get graphical output during evaluation use the Mathomatic =plot=
+command within Mathomatic. The file suffix will configure Gnuplot to
+write the right file format. 
+
+** Named Procedures
+The Babel Mathomatic plugin supports the use of named procedures and calls
+operations. The use of these are detailed in the /Org Manual/.  This
+manual will describe how they are used within the context of a Mathomatic
+script.
+
+A variable can be passed to a Mathomatic script which can be used to call the
+aforementioned program later on in your org document.  The following
+example is a program that evaluates X+2. 
+
+#+begin_example
+#+name: mathotest(x=0)
+#+begin_src mathomatic :results output
+x + 2
+eliminate x
+#+end_src
+
+#+RESULTS: mathotest
+: #1: x = 0
+: #2: x + 2
+: Eliminating variable x using solved equation #1...
+: #2: 2
+#+end_example
+
+Calling the named script with a different value will result in a
+different execution. For example: 
+
+#+begin_example
+#+call: mathotest(x=30)
+
+#+RESULTS: mathotest(x=30)
+: #1: x = 30
+: #2: x + 2
+: Eliminating variable x using solved equation #1...
+: #2: 32
+#+end_example
+
+Note that table processing is not supported. This is because Mathomatic
+does not have support for matrixes. However there are 
+plans to provide this in the future through the use of simulated
+arrays.  A simulated array is a syntactic sugar in Mathomatic to enclose
+indexes in square brackets (/[]/). 
+
+* Footnotes
+
+[fn:1] Mathomatic manual downloads and further information can be obtained
+from: [[http://www.mathomatic.org/math/doc/index.html]]
+
+[fn:2] Mathomatic uses Gnuplot as its plot engine. All plot modes are
+supported in Mathomatic. However, for convenience, only these are
+supported in the =:file= option. 

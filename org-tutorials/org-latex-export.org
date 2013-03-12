@@ -110,7 +110,7 @@ Here is a standard setup for export to a LaTeX book class:
 
 #+begin_src emacs-lisp
   (add-to-list 'org-export-latex-classes
-               `("book"
+               '("book"
                  "\\documentclass{book}"
                  ("\\part{%s}" . "\\part*{%s}")
                  ("\\chapter{%s}" . "\\chapter*{%s}")
@@ -130,9 +130,9 @@ Then, in the Org file with a book-full of notes, add this line:
 A useful set of alternatives is the [[http://www.komascript.de/][KOMA script]] classes.  These have a
 somewhat more modern design than the standard LaTeX classes.  
 
-For example, the KOMA script article class can be configured in =.emacs=.
+For example, the KOMA script article class can be configured in =.emacs=:
 
-#+begin_src emacs-lisp :
+#+begin_src emacs-lisp
   (add-to-list 'org-export-latex-classes
             '("koma-article"
                "\\documentclass{scrartcl}"
@@ -942,13 +942,13 @@ somewhere the LaTeX exporter won't see, perhaps in a sub-tree tagged with
 Finally, create a LaTeX source block something like this:
 
 : #+name: tabularx-export
-: #+begin_src latex :exports results :results latex
+: #+begin_src latex :exports results :results latex :noweb yes
 :   \begin{table}[htb!]
 :   \centering
 :   \footnotesize
 :   \caption{A table to test booktabs}
 :   \label{tab:test-table}
-:   <<booktabs(table=test-table,align="lrX",env="tabularx")>>  
+:   <<booktabs(table=test-table,align="lrX",env="tabularx",width="\\textwidth")>>  
 :   \end{table}
 :  #+end_src
 

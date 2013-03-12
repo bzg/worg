@@ -1,18 +1,26 @@
-#+STARTUP:    align fold nodlcheck hidestars oddeven intestate
-#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
-#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
 #+TITLE:      Org Mode tools!
 #+AUTHOR:     Worg people
 #+EMAIL:      mdl AT imapmail DOT org
+#+STARTUP:    align fold nodlcheck hidestars oddeven intestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
 #+LANGUAGE:   en
 #+PRIORITIES: A C B
 #+CATEGORY:   worg
-#+OPTIONS:    H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
 
 This page lists external tools useful for handling Org files.
 
 * Org-mode parsers
 
+** [[https://bitbucket.org/joebo/pico-org/src][pico-org]] - A PicoLisp parser
+
+[[http://thread.gmane.org/gmane.lisp.picolisp.general/3679][Message]] from the developer Joe Bogner:
+
+: I've written a tiny org-mode parser and hooked it up with my mustache
+: implementation to create a simple web page that dumps out the org
+: structure. I'm not sure where I'm going to go next but figured I'd
+: share it since I enjoy reading other's code as well.
 
 ** [[http://common-lisp.net/project/cl-org-mode/][cl-org-mode]] - A Common lisp parser for org-mode outlines
 
@@ -91,7 +99,77 @@ or textile.
 
 Read [[http://orgmode.org/worg/org-tutorials/org-ruby.html][the org-ruby tutorial for details.]]
 
-* Specific-purpose tools
+
+* Specific purpose tools
+
+** nakkaya: a static site generator parsing Org's files (and MarkDown)
+
+Static is a simple static site generator written in Clojure.  For a sample
+site build using static see http://nakkaya.com
+
+You can grab the latest version of nakkaya from [[https://github.com/nakkaya/static][its github repository]].
+
+** orgitdown - use Org keybindings in HTML text areas
+
+[[https://github.com/gnowgi/orgitdown][orgitdown]] is based on [[http://markitup.jaysalvat.com/home/][markitup]] and allows to use Org keybindings in text
+areas through some javascript magic.  The text inserted is using Org's
+syntax, and can be further processed with Emacs in batch mode on the
+server.
+
+Check [[http://mid.gmane.org/CADSSMeg5BDkZMBWEhXF2K7kssrEsX6SkZE%2BOjvXFpHY5aTcgmQ%2540mail.gmail.com][Nagarjuna G announcement on the mailing list]].
+
+** Exporter for the Octopress blogging engine
+
+#+BEGIN_QUOTE
+Octopress is a framework designed by Brandon Mathis for Jekyll, the blog
+aware static site generator powering Github Pages. To start blogging with
+Jekyll, you have to write your own HTML templates, CSS, Javascripts and set
+up your configuration. But with Octopress All of that is already taken care
+of. Simply clone or fork Octopress, install dependencies and the theme, and
+you’re set.
+#+END_QUOTE
+
+You can clone Octopress from [[https://github.com/imathis/octopress][the github repository]].
+
+[[https://github.com/craftkiller/orgmode-octopress][orgmode-octopress]] is an exporter for Emacs Org-Mode to Octopress by
+craftkiller.  For setup instructions, check [[http://blog.paphus.com/blog/2012/08/01/introducing-octopress-blogging-for-org-mode/][this blog entry]].  Note that
+orgmode-octopress will not work with the new export engine in Org 8.0.
+
+** Export OmniFocus to Org-mode files
+
+Jay McCarthy wrote [[https://github.com/jeapostrophe/exp/blob/master/of2org.rkt][this]], using [[http://racket-lang.org/][Racket]].
+
+** Convert from Planner to Org
+
+See this message from [[http://mid.gmane.org/8ay5hehupe.fsf%2540faepop01.tu-graz.ac.at][Andreas Hirczy]]:
+
+I have written yet another converter from planner to org:
+<http://itp.tugraz.at/~ahi/Computer/SW/muse2org.html>
+<http://itp.tugraz.at/~ahi/Computer/SW/muse2org>
+
+** Export vCard to org-mode entries
+
+[[http://mid.gmane.org/50B28EA7.6020900%2540gmx.de][Simon Thum]] shared some [[https://gist.github.com/4145201][Ruby code]] to export vCards to Org-mode entries.
+
+** ews-orgmode - Exchange calendar to orgmode
+
+https://github.com/kautsig/ews-orgmode
+
+See [[http://mid.gmane.org/50B78A90.3040609%2540kautsig.org][this message]] from Chris Raschl:
+
+: I recently wrote a python script to fetch my calendar from the corporate
+: exchange server into an orgmode file to view it in my agenda.
+: It uses the exchange webservices (ews).
+
+** michel-orgmode - script for pushing to / pulling from Google-Tasks lists
+
+- Authors: Mark Edgington, Christophe-Marie Duquesne
+- Homepage: https://bitbucket.org/edgimar/michel-orgmode
+
+Michel-orgmode is a python script which serves as a bridge between an
+org-mode textfile and a Google-tasks task list.  It can pull the contents
+of a Google-tasks list into an org-mode file, or push an org-mode file's
+contents to a Google-tasks list.  It supports bidirectional sync.
 
 ** Using GData API to import events in an Org file
 
@@ -133,6 +211,14 @@ You can find the script here: https://github.com/StAlphonsos/scriptologie
 See [[file:../org-tutorials/org-google-sync.org][the org-google-sync tutorial]] for explanations on how to use this
 script.
 
+** ical2org.rb - convert ics files to Org
+   - Author: Simon Thum
+   - Code: [[https://github.com/simonthum/ical2org][ical2org]]
+   - handles events and TODOs
+   - all sorts of repeating events
+   - and timezones!
+   - one-way only though
+     - except if you have a REST-capable ical server, see README
 ** org2remind - perl script to convert org appointments to remind
 
  - Author: Matt Lundin

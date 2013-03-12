@@ -318,14 +318,16 @@ In the Org-mode file:
 : #+end_src
 
 HTML export of code:
+
 #+begin_src R :colnames yes
   words <- tolower(scan("intro.org", what="", na.strings=c("|",":")))
-  t(rev(sort(table(words[nchar(words) > 3])))[1:10])
+  t(sort(table(words[nchar(words) > 3]), decreasing=TRUE)[1:10])
 #+end_src
-#+results:
-| code | source | org-mode | #+end_src | #+begin_src | this | block | that | org-babel | with |
-|------+--------+----------+-----------+-------------+------+-------+------+-----------+------|
-|   64 |     62 |       44 |        42 |          41 |   36 |    34 |   28 |        28 |   27 |
+
+#+RESULTS:
+| code | org-mode | #+end_src | #+begin_src | block | with | babel | that | #+name: | this |
+|------+----------+-----------+-------------+-------+------+-------+------+---------+------|
+|   85 |       60 |        47 |          44 |    40 |   38 |    35 |   34 |      33 |   33 |
 
 *** [[http://ditaa.sourceforge.net/][ditaa]]
 
@@ -462,13 +464,15 @@ value, =(2 + 2)=, 4 does not appear in the results.
      First let's look at a very simple example. The following source
      code block defines a function, using python, that squares its argument.
 
-#+name: square(x=0)
+#+name: square
+#+header: :var x=0
 #+begin_src python
 return x*x
 #+end_src
 
 In the Org-mode file, the function looks like this:
-: #+name: square(x)
+: #+name: square
+: #+header: :var x=0
 : #+begin_src python
 : return x*x
 : #+end_src
@@ -483,6 +487,7 @@ Now we use the source block:
 
 #+results: square(x=6)
 : 36
+
 
 *** A more complex example using an Org-mode table as input
 

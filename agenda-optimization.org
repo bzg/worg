@@ -1,0 +1,125 @@
+#+TITLE: Agenda speedup and optimization
+#+AUTHOR: Bastien Guerry
+#+STARTUP:    align fold nodlcheck hidestars oddeven
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+LANGUAGE:   en
+#+CATEGORY:   worg
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+LINK:       doc http://orgmode.org/worg/doc.html#%s
+
+When your Org files grow, agenda generation may slow down.
+
+Here are some tips on how to speed up the agenda generation.  For those
+tips that depend on a specific version of Org, we mention this version.
+
+#+INDEX: Agenda speedup
+
+* Reduce the number of Org agenda files
+
+The more agenda files, the more time it takes to check all of them before
+producing an agenda command.  The older your hardrive is, the longer it
+takes to visit a file.  Don't buy a new harddrive now!  Just reduce the
+number of agenda files.
+
+Also, don't forget that you can define the set of agenda files for each
+agenda custom command like this:
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-custom-commands
+        '((" " "Aujourd'hui" agenda "List of rendez-vous and tasks for today"
+           ((org-agenda-files '("~/org/rdv.org" "~/org/bzg.org"))))))
+#+END_SRC
+
+* Reduce the number of DONE and archived headlines
+
+When matching against TODO-type tasks, Org will skip the ones marked as
+DONE or archived.  If you have many DONE tasks and archived tasks in your
+file, better to store them in another file.
+
+* Inhibit the dimming of blocked tasks
+
+#+INDEX: Dim blocked tasks
+#+INDEX: org-agenda-dim-blocked-tasks
+
+By default [[doc::org-agenda-dim-blocked-tasks][org-agenda-dim-blocked-tasks]] is set to t, which will dim blocked
+tasks.  For the agenda to get the relevant information, it needs to check
+against the headline up, and this takes time.  If you don't need this
+feature globally or for a specific agenda, turning it off will speed up
+agenda generation.
+
+* Inhibit agenda files startup options (Org > 8.0)
+
+#+INDEX: org-startup-folded
+
+When you run an agenda command, Org visits agenda files that are not yet
+visited.  When finding a file for the first time, Org checks the startup
+options and apply them to the buffer: those options are either globally set
+through the =org-startup-*= variables or on a per-file basis through the
+=#+STARTUP= keyword.
+
+Especially, Org will honor the startup visibility status, as set by
+[[doc::org-startup-folded][org-startup-folded]] or =#+STARTUP: folded=.
+
+This may slow down the operation of visiting a file very much, and the
+process of selecting agenda entries consequently.
+
+To prevent agenda commands to honor startup options when visiting an agenda
+file for the first time, use this:
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-inhibit-startup t)
+#+END_SRC
+
+The side-effect is that newly visited file will have all their headlines
+visible, but this speeds up agenda generation /a lot/ when those files have
+many nested headlines.
+
+* Disable tag inheritance in agendas (Org > 8.0)
+
+#+INDEX: Tag inheritance
+#+INDEX: org-use-tag-inheritance
+#+INDEX: org-agenda-use-tag-inheritance
+#+INDEX: org-agenda-show-inherited-tags
+
+Defining inherited tags for a headline in the agenda takes time, because
+Org needs will grab inherited tags from higher level headlines.
+
+Whether the agenda knows about inherited tags for each task depends on
+[[doc::org-use-tag-inheritance][org-use-tag-inheritance]] and [[doc::org-agenda-use-tag-inheritance][org-agenda-use-tag-inheritance]]:
+
+- [[doc::org-use-tag-inheritance][org-use-tag-inheritance]] controls whether tags are inherited for tags-type
+  agenda commands: =tags=, =tags-todo= and =tags-tree=.  This variable also
+  controls whether tags are inherited when running the command =M-x
+  org-sparse-tree RET= in an Org buffer (hence the name of this variable,
+  without the =org-agenda-= prefix.)
+
+- [[doc::org-agenda-use-tag-inheritance][org-agenda-use-tag-inheritance]] controls whether tags are inherited for
+  other agenda types too: =todo=, =search=, =timeline=, =agenda=.
+
+  Generally, you want this variable to be nil, because the headlines on
+  those agenda types don't depend on tags (and /a fortiori/ on inherited
+  ones.)  Still, the default is to use tags in all agenda types, because
+  [[doc::org-agenda-show-inherited-tags][org-agenda-show-inherited-tags]] needs to do the right thing by default.
+
+What to do?  If you don't need inherited tags in
+todo/search/timeline/agenda, just use this setting:
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-use-tag-inheritance nil)
+#+END_SRC
+
+If you need tags in todo agendas only:
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-use-tag-inheritance '(search timeline agenda))
+#+END_SRC
+
+You can also set this on a per-command basis:
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-custom-commands
+        '((" " "Aujourd'hui" agenda "List of rendez-vous and tasks for today"
+           ((org-agenda-files '("~/org/rdv.org" "~/org/bzg.org"))
+            (org-agenda-use-tag-inheritance nil)))))
+#+END_SRC
+

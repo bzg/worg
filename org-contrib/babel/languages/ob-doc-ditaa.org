@@ -1,0 +1,119 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      =Ditaa= Source Code Blocks in Org Mode
+#+AUTHOR:     Thomas Dye
+#+EMAIL:      tsd[at]tsdye[dot]com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="http://ditaa.sourceforge.net//">ditaa</a>
+  </p>
+  <p>
+  <a href="http://ditaa.sourceforge.net/">
+<img src="http://ditaa.sourceforge.net/images/logo.png"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* Template Checklist [12/12]                                       :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result%20Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+=Ditaa= is a command-line utility that converts diagrams drawn using
+ASCII art into bitmap graphics.
+* Requirements and Setup
+=Ditaa= is distributed with =Org mode=. The file =ditaa.jar= can be found
+in =contrib/scripts=.
+
+Activate evaluation of =ditaa= source code blocks by adding =ditaa= to
+=org-babel-load-languages=.
+
+#+BEGIN_SRC emacs-lisp
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((ditaa . t))) ; this line activates ditaa
+#+END_SRC
+
+* Org Mode Features for =ditaa= Source Code Blocks
+** Header Arguments
+   - file :: =ditaa= source code blocks require that an output file
+              be specified.
+   - cmdline :: specify [[http://ditaa.sourceforge.net/#usage][command line arguments]] for =ditaa=
+   - java :: arguments for the =java= runtimes (JRE) 
+** Sessions
+   =ditaa= does not support sessions.
+** Result Types
+=Ditaa= source code blocks return a link to a [[http://www.libpng.org/pub/png/][png]] bitmap file.
+* Examples of Use
+The obligatory Hello World! example in =ditaa=:
+#+BEGIN_EXAMPLE
+#+BEGIN_SRC ditaa :file images/hello-world.png
++--------------+
+|              |
+| Hello World! |
+|              |
++--------------+
+#+END_SRC
+#+END_EXAMPLE
+
+#+header: :exports results
+#+BEGIN_SRC ditaa :file images/hello-world.png
++--------------+
+|              |
+| Hello World! |
+|              |
++--------------+
+#+END_SRC
+
+#+RESULTS:
+[[file:images/hello-world.png]]
+
+Now, round all corners by passing =ditaa= the =-r,--round-corners=
+command line switch.
+
+#+BEGIN_EXAMPLE
+#+BEGIN_SRC ditaa :file images/hello-world-round.png :cmdline -r
++--------------+
+|              |
+| Hello World! |
+|              |
++--------------+
+#+END_SRC
+#+END_EXAMPLE
+
+#+header: :exports results
+#+BEGIN_SRC ditaa :file images/hello-world-round.png :cmdline -r
++--------------+
+|              |
+| Hello World! |
+|              |
++--------------+
+#+END_SRC
+
+#+RESULTS:
+[[file:images/hello-world-round.png]]
+

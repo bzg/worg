@@ -1,0 +1,376 @@
+#+TITLE: Org-Merge-Driver Example Usage
+
+Here are some examples of the usage of org-merge-driver. When there is
+a conflict, local updates are shown on the top, and remote updates on
+the bottom.
+
+* Adding and Removing Headings
+When local and remote files add headings, org-merge-driver combines
+the information as best it can. If local and remote add the same in
+the same place, org-merge-driver will add them as the same heading.
+
+** Ancestor
+#+begin_src org
+  ,* Basket
+  ,** Green Apple
+  ,*** Seed 1
+  ,** Red Apple
+  ,*** Seed 1
+#+end_src
+
+** Local
+#+begin_src org
+  ,** Green Apple
+  ,*** Seed 1
+  ,*** Seed 2
+  ,** Red Apple
+  ,*** Seed 1
+  ,** Yellow Apple
+  ,*** Seed 1
+#+end_src
+
+** Remote
+#+begin_src org
+  ,* Basket
+  ,** Green Apple
+  ,*** Seed 2
+  ,** Red Apple
+  ,*** Seed 1
+  ,*** Seed 2
+  ,** Yellow Apple
+  ,*** Seed 1
+#+end_src
+
+** Output
+#+begin_src org
+  ,* Basket
+  ,** Green Apple
+  ,*** Seed 2
+  ,** Red Apple
+  ,*** Seed 1
+  ,*** Seed 2
+  ,** Yellow Apple
+  ,*** Seed 1
+#+end_src
+
+* Modifying Text
+Text blocks have more conservative rules for what will conflict than
+headings. Notably, if text is added to the same spot from local and
+remote, there will be a conflict.
+
+** Ancestor
+#+begin_src org
+  ,* Produce
+  ,- the farmers market is famous for their produce.
+#+end_src
+
+** Local
+#+begin_src org
+  ,#+TITLE: Farmers Market
+  ,* Produce
+  ,- They are open on weekends
+  ,- the farmers market is famous for their produce.
+  ,- Its too bad I HATE vegetables
+#+end_src
+
+** Remote
+#+begin_src org
+  ,* Produce
+  ,- the farmers market is famous for their produce.
+  ,- Its a good thing I love vegetables
+  ,  - Snow Peas are the best.
+  ,* Pies
+  ,- also they have a lot of pies
+#+end_src
+
+** Output
+#+begin_src org
+  ,#+TITLE: Farmers Market
+  ,* Produce
+  ,- They are open on weekends
+  ,- the farmers market is famous for their produce.
+  ,>>>>>>> Updated
+  ,- Its too bad I HATE vegetables
+  ,======= 
+  ,- Its a good thing I love vegetables
+  ,  - Snow Peas are the best.
+  ,<<<<<<< Updated
+  ,* Pies
+  ,- also they have a lot of pies
+#+end_src
+
+* Headline Matching
+In general, org-merge-driver will try to ignore white space and cookie
+values when determining if two headings are the same one. This works
+great as long as you do not identify headings by the amount of spaces
+in the name, or the value of a priority cookie. Dates can still be
+used as identifiers, though.
+
+** Ancestor
+#+begin_src org :tangle heading_match_anc.org
+  ,* Todo state updates
+  ,** Updated in one file
+  ,** Updated in both files
+  ,** Same update in both files
+  ,* Cookies
+  ,** Updated in one file
+  ,** Updated in both files
+  ,** Same update in both file
+  ,* Tags
+  ,** Updated in one file                                               :oldtag:
+  ,** Updated in both files                                      :oldtag:keeper:
+  ,** Same update in both files                                         :keeper:
+  ,* Other Examples
+  ,** Spacing    doesn't     matter
+  ,** spacingkindofmatters
+  ,** Cookies   [5/3]   are   [75%] stripped [#A]  out
+#+end_src
+
+** Local
+#+begin_src org :tangle heading_match_loc.org
+  ,* Todo state updates
+  ,** TODO Updated in one file
+  ,** DONE Updated in both files
+  ,** TODO Same update in both files
+  ,* Cookies
+  ,** [#B] Updated in one file
+  ,** [#C] Updated in both files
+  ,** [#B] Same update in both file
+  ,* Tags
+  ,** Updated in one file                                       :NEWTAG:NEWTAG2:
+  ,** Updated in both files                                      :NewTag:keeper:
+  ,** Same update in both file                                      :SameNewTag:
+  ,* Other Examples
+  ,** Spacing        doesn't         matter
+  ,** spacing[#B]kindofmatters
+  ,** Cookies are stripped out
+#+end_src
+
+** Remote
+#+begin_src org :tangle heading_match_rem.org
+  ,* Todo state updates
+  ,** Updated in one file
+  ,** TODO Updated in both files
+  ,** TODO Same update in both files
+  ,* Cookies
+  ,** Updated in one file
+  ,** [#A] Updated in both files
+  ,** [#B] Same update in both file
+  ,* Tags
+  ,** Updated in one file
+  ,** Updated in both files                                       :file2:keeper:
+  ,** Same update in both file                                      :SameNewTag:
+  ,* Other Examples
+  ,** Spacing                   doesn't           matter
+  ,** spacing kindofmatters
+  ,** Cookies   [5/3]   are   [75%] stripped [#A]  out
+#+end_src
+
+** Output
+#+begin_src org
+  ,* Todo state updates
+  ,** TODO Updated in one file
+  ,>>>>>>> Updated
+  ,** DONE Updated in both files
+  ,======= 
+  ,** TODO Updated in both files
+  ,<<<<<<< Updated
+  ,** TODO Same update in both files
+  ,* Cookies
+  ,** [#B] Updated in one file
+  ,>>>>>>> Updated
+  ,** [#C] Updated in both files
+  ,======= 
+  ,** [#A] Updated in both files
+  ,<<<<<<< Updated
+  ,** [#B] Same update in both file
+  ,* Tags
+  ,** Updated in one file                                       :NEWTAG:NEWTAG2:
+  ,** Updated in both files                                :keeper:file2:NewTag:
+  ,** Same update in both file                                      :SameNewTag:
+  ,* Other Examples
+  ,>>>>>>> Updated
+  ,** Spacing        doesn't         matter
+  ,======= 
+  ,** Spacing                   doesn't           matter
+  ,<<<<<<< Updated
+  ,** spacing kindofmatters
+  ,>>>>>>> Updated
+  ,** spacing[#B]kindofmatters
+  ,======= 
+  ,<<<<<<< Deleted
+  ,** Cookies are stripped out
+#+end_src
+
+* Properties
+Properties have special support when it comes to matching, as well as
+conflict resolution. Properties must be inside :PROPERTIES: to be
+identified as such.
+
+** Ancestor
+#+begin_src org
+  ,* Picnic Basket
+  ,:PROPERTIES:
+  ,   :Bread: Brown
+  ,:Apple:     green
+  ,   :Basket: wicker
+  ,:END:
+#+end_src
+
+** Local
+#+begin_src org
+  ,* Picnic Basket
+  ,:PROPERTIES:
+  , :Bread: White
+  , :Apple:    yellow
+  , :Basket:             wicker
+  ,:END:
+#+end_src
+
+** Remote
+#+begin_src org
+  ,* Picnic Basket
+  ,:PROPERTIES:
+  ,:Bread:    white
+  ,:Apple:  red
+  ,:Basket:     plastic
+  ,:END:
+#+end_src
+** Output
+
+#+begin_src org
+  ,* Picnic Basket
+  ,:PROPERTIES:
+  ,>>>>>>> Updated
+  , :Bread: White
+  ,======= 
+  ,:Bread:    white
+  ,<<<<<<< Updated
+  ,>>>>>>> Updated
+  , :Apple:    yellow
+  ,======= 
+  ,:Apple:  red
+  ,<<<<<<< Updated
+  ,:Basket:     plastic
+  ,:END:
+#+end_src
+* Heading Movement
+If your headings have unique ID properties, org-merge-driver can
+detect movements of those elements.
+
+** Ancestor
+#+begin_src org
+  ,* Changing the order of headings
+  ,** heading 1
+  ,:PROPERTIES:
+  ,:ID: 1
+  ,:END:
+  ,** heading 2
+  ,:PROPERTIES:
+  ,:ID: 2
+  ,:END:
+  ,*** sub heading
+  ,- some text
+  ,** heading 3
+  ,:PROPERTIES:
+  ,:ID: 3
+  ,:END:
+  ,** heading 4
+  ,:PROPERTIES:
+  ,:ID: 4
+  ,:END:
+  ,* Moving Children and Parent
+  ,* Deleting the 'moved to' heading
+#+end_src
+
+** Local
+#+begin_src org
+  ,* Matching ID Headings
+  ,* Changing the order of headings
+  ,** heading 4
+  ,:PROPERTIES:
+  ,:ID: 4
+  ,:END:
+  ,* Moving Children and Parent
+  ,** new heading
+  ,*** heading 2
+  ,:PROPERTIES:
+  ,:ID: 2
+  ,:END:
+  ,**** sub heading
+  ,- some text
+  ,- a new line in local
+  ,* Deleting the 'moved to' heading
+  ,** heading 3
+  ,:PROPERTIES:
+  ,:ID: 3
+  ,:END:
+  ,*** heading 1
+  ,:PROPERTIES:
+  ,:ID: 1
+  ,:END:
+#+end_src
+
+** Remote
+#+begin_src org 
+  ,* Matching ID Headings
+  ,* Changing the order of headings
+  ,** heading 1
+  ,:PROPERTIES:
+  ,:ID: 1
+  ,:END:
+  ,** heading 2
+  ,:PROPERTIES:
+  ,:ID: 2
+  ,:END:
+  ,- some new text in remote
+  ,** heading 3
+  ,:PROPERTIES:
+  ,:ID: 3
+  ,:END:
+  ,** heading 4
+  ,:PROPERTIES:
+  ,:ID: 4
+  ,:END:
+  ,* Moving Children and Parent
+#+end_src
+
+** Output
+#+begin_src org
+  ,* Matching ID Headings
+  ,* Changing the order of headings
+  ,>>>>>>> Deleted
+  ,======= 
+  ,** heading 2
+  ,- some new text in remote
+  ,<<<<<<< Updated
+  ,** heading 4
+  ,:PROPERTIES:
+  ,:ID: 4
+  ,:END:
+  ,* Moving Children and Parent
+  ,** new heading
+  ,*** heading 2
+  ,:PROPERTIES:
+  ,:ID: 2
+  ,:END:
+  ,**** sub heading
+  ,- some text
+  ,- a new line in local
+  ,>>>>>>> Updated
+  ,* Deleting the 'moved to' heading
+  ,** heading 3
+  ,:PROPERTIES:
+  ,:ID: 3
+  ,:END:
+  ,*** heading 1
+  ,:PROPERTIES:
+  ,:ID: 1
+  ,:END:
+  ,======= 
+  ,<<<<<<< Deleted
+#+end_src
+
+If you have any comments or suggestions for features, improvements, or
+bugs, please drop an email to me <youngar at gmail dot com>, or to the
+org-mode list <emacs-orgmode@gnu.org>.

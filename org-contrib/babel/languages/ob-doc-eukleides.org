@@ -1,0 +1,159 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      ΕΥΚΛΕΙΔΗΣ Source Code Blocks in Org Mode
+#+AUTHOR:     Luis Anaya
+#+EMAIL:      papoanaya[at]hotmail[dot]com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org-babel support for
+  <a href="http://www.eukleides.org/">Eukleides</a>
+  </p>
+  <p>
+  <a href="http://www.eukleides.org/">
+  <img src="http://www.eukleides.org/img/perdigal.png" width=200/>
+  </a>
+  </p>
+  </div>
+#+end_html
+* Introduction
+org-babel-eukleides allows =eukleides= code to be executed directly from
+within embedded code blocks in =Org mode= documents. These code blocks
+can draw pictures that are generated from =eukleides=
+and can include output as embedded graphics when the document is
+exported.
+
+The following provides instructions and some examples of =eukleides=
+usage. Since babel is simply allowing native code to run inside of
+=Org mode=, all =eukleides= documentation is applicable and valid. [fn:1]
+
+* Requirements and Setup
+To get =eukleides= up and running, you need =eukleides= to be available in
+your system. You *will* need a program to convert Encapsulated
+Postscript (EPS) files into PNG. Strings to convert files using =sam2p=
+or =pnmtopng= are supported, but other types of converters like
+ImageMagick can be used. 
+
+There are two strings being passed, the first one is the original file
+name and the second one is the converted one. 
+
+As of =Org mode= 7.01, babel support is included and there is no need to load it via
+.emacs. All you have to do is enable specific language support with
+the following in .emacs:
+
+#+begin_example
+;; active Babel languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((eukleides . t)))
+;; add additional languages with '((language . t)))
+#+end_example
+
+or
+
+#+begin_example
+;; set up babel support
+(require 'org-install)
+(require 'ob-eukleides)
+;; add additional languages with (require 'ob-language)
+#+end_example
+
+To run =eukleides= and produce a resultant image (or to produce any result
+from babel code blocks), simply move one's cursor anywhere in the code
+block and press =C-c C-c= (Ctrl+C followed by Ctrl+C) and type "yes"
+in the minibuffer when asked about executing the code.
+
+* Babel Header Arguments
+Babel block headers are used to pass various arguments to control the
+results of the executed code. The complete list of header arguments
+is covered in the =Org mode= manual; for now, some options frequently used for
+=eukleides= are:
+- =:exports {code, results, both, none}=
+  - When the code is run and the document exported (e.g. to HTML or
+    \LaTeX PDF), what should appear? Just the code block itself? Only
+    the produced output (in this case a plot of some sort)? Both the
+    code and the accompanying results? Or nothing?
+- =:file foo.{png,eps}=
+  - This option specifies where the resulting output should be put. This
+    option is *required*. Only EPS and PNG files are supported; PNG only
+    supported with a conversion script. 
+
+* Quick =Eukleides= Overview
+As stated earlier, the full =eukleides= documentation can and should be
+consulted as the official reference, but it might be helpful to lay
+out some common syntax here as a quick reference. Any of the commands
+typed in =code= font below should be assumed to reside in a babel
+code block (between =#+begin_src eukleides= and =#+end_src=).
+
+** Basic Use
+*** Defining Shapes
+=Eukleides= is a programming language that contain a complete set of logic
+constructs, but its main purpose is to generate pictures, commonly
+seen in geometry texts. This is for the most part a two part process:
+
+  1. Defining the Shapes
+  2. Drawing them. 
+
+Let's go through this example:
+
+#+begin_example
+#+begin_src eukleides :file test.eps
+O = point (2,2)
+C = circle(O,2)
+draw
+  O plus 
+  C 
+end
+#+end_src
+#+end_example
+
+There are two shapes being drawn in this example:
+  1.  A point in position 2,2. It is shaped as a cross
+  2.  A circle centered in 2,2 with a diameter of 2. 
+  
+Upon the execution of this block using =C-c C-c= the file name will be
+stated in =#+RESULTS:= containing the resultant picture. 
+
+*** Data Processing
+
+As mentioned, =eukleides= is a complete programming language, but
+support for results is not available from =Org mode= at this time
+being that its primary function is to draw pictures. But the following
+can be used to write text or other items to a file as part of the
+execution of an =eukleides= script.
+
+#+begin_example
+
+#+begin_src eukleides :file /dev/null
+write "myfile.txt"
+print "Hello"
+print 1,2,3
+release
+#+end_src
+
+#+RESULTS:
+[[file:/dev/null]]
+
+#+end_example
+
+In this example the a file named "myfile.txt" containing "Hello" and
+1,2,3 is written. 
+
+** Named Procedures and Tables
+Named procedures and tables are not supported at this moment. [fn:2]
+
+* Footnotes
+[fn:1] =Eukleides= manual downloads are located at [[eukleides.org]]
+
+[fn:2] =Eukleides= is able to support text results and variable
+processing, but it is not available in this release of the Babel
+plugin. The code will be enhanced in the future. 
+
+

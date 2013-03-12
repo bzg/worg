@@ -1,0 +1,401 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE:      Кreiranje Gantt grafikona izvozom do TaskJuggler
+#+AUTHOR:     Jovana Milutinovich
+#+EMAIL:      jovanam AT webhostinggeeks DOT com
+#+LANGUAGE:   scr
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+[[file:index.org][{{Nazad do Workq”s indeksa index}}]]
+
+/Thanks to Jovana Milutinovich (=jovanam AT webhostinggeeks DOT com=) for the translation./
+
+* Uvod
+
+[[http://orgmode.org/][Org mod]] је odličan dodatak za projektno planiranje , kao što je Peter Jones
+pokazao u svom članku o [[http://www.contextualdevelopment.com/articles/2008/project-planning][projektnom planiranju]]. On prvo podeli projekat na
+karakteristike i zadatke, zatim procenjuje efekt i trud i iz toga
+prezentuje projektni plan. U ovom vodiču ćemo ići još jedan korak napred,
+dodelićemo resurse zadacima, zatim napraviti raspored zadataka i kreirati
+odgovarajući gantt grafikon za ovaj projekat.
+
+Koristićemo [[http://www.taskjuggler.org/][TaskJuggler]] da bi rukovodili sa rasporedom zadataka,
+nivelisanjem izvora i kreiranjem bezbroj grafikona (kao [[http://en.wikipedia.org/wiki/Gantt_chart][Gantt grafikoni]]) za
+vašu mušteriju na vašem [[http://en.wikipedia.org/wiki/Pointy-haired_Boss][Pointy-haired Boss]].
+
+* Planirajte svoj projekat
+
+Startujete kao i obično tako što se projekat podeli na zadatke. Hajde da
+uzmemo sledeći primer gde imamo da kreiramo projetak u vezi sa
+računovodstvom (softver):
+
+#+BEGIN_SRC org
+  ,* Accounting Software
+  ,
+  ,** Specification
+  ,
+  ,** Software Development
+  ,*** Database coupling
+  ,*** Back-End Functions
+  ,*** Graphical User Interface
+  ,
+  ,** Software testing
+  ,*** Alpha Test
+  ,*** Beta Test
+  ,
+  ,** Manual
+  ,
+  ,** Milestones
+  ,*** Project start
+  ,*** Technology Preview
+  ,*** Beta version
+  ,*** Ship Product to Customer
+#+END_SRC
+
+* Proceniti napor
+
+Sada kada ste odgonetnuli zadatke, vreme je da procenimo napor za svaki
+pojedinačni zadatak. Koristeći kolonu pregleda ovo može da se završi vrlo
+efikasno i brzo. Takođe , pomaže da se definišu =COLUMNS= i standardne
+vrednosti za “Effort property” kao što je pokazano na sledećoj slici:
+
+#+CAPTION: Procenjujemo napor pomoću kolone pregleda
+#+ATTR_HTML: alt="Procenjujemo napor pomoću kolone pregleda"
+[[file:../images/taskjuggler/effort-estimation.png]]
+
+Rezultat vašeg projekta Org moda će izgledati nešto slično kao sledeće:
+
+#+BEGIN_SRC org
+  ,#+PROPERTY: Effort_ALL 2d 5d 10d 20d 30d 35d 50d 
+  ,#+COLUMNS: %70ITEM(Task) %Effort
+  ,
+  ,* Accounting Software
+  ,
+  ,** Specification
+  ,   :PROPERTIES:
+  ,   :Effort:   20d
+  ,   :END:
+  ,
+  ,** Software Development
+  ,
+  ,*** Database coupling
+  ,    :PROPERTIES:
+  ,    :Effort:   20d
+  ,    :END:
+  ,
+  ,*** Back-End Functions
+  ,    :PROPERTIES:
+  ,    :Effort:   30d
+  ,    :END:
+  ,
+  ,*** Graphical User Interface
+  ,    :PROPERTIES:
+  ,    :Effort:   35d
+  ,    :END:
+  ,
+  ,** Software testing
+  ,*** Alpha Test
+  ,    :PROPERTIES:
+  ,    :Effort:   5d
+  ,    :END:
+  ,
+  ,*** Beta Test
+  ,    :PROPERTIES:
+  ,    :Effort:   20d
+  ,    :END:
+  ,
+  ,** Manual
+  ,   :PROPERTIES:
+  ,   :Effort:   50d
+  ,   :END:
+  ,
+  ,** Milestones
+  ,*** Project start
+  ,*** Technology Preview
+  ,*** Beta version
+  ,*** Ship Product to Customer
+#+END_SRC
+
+* Generisati Gantt grafikone
+
+Sada, pre nego što eksportujete projekat do TaskJuggler-a, treba da kažete
+izvozniku na kom drvetu može pronaći zadatke. Ovo radite tako što dodajete
+tag do ~taskjuggler_project~ do člana “Accounting Softvare"[fn:1]. Uradite ovo
+pomeranjem do “Accounting Softvare” naslova i kucajte sledeće:
+
+: C-c C-c taskjuggler_project RET
+
+Оvo vam dozvoljava da imate i druge članove za ovaj projekat kao što su
+uvod i opšte napomene.
+
+Za izvoz projekta do TaskJuggler-a jednostavno ukucajte sledeće:
+
+: M-x org-export-as-taskjuggler-and-open
+
+Оvo će vam otvoriti projekat u TaskJuggler-u kao što je i prikazano ispod.
+
+#+CAPTION: Gantt grafikoni u TaskJuggler-UI
+#+ATTR_HTML: alt="Gantt grafikoni u TaskJuggler-UI"
+[[file:../images/taskjuggler/TaskJugglerUI1.png]]
+
+Kako nismo dodelili nijedan resurs za rad na ovom projektu, izvoznik
+pretpostavlja da ćete vi biti ti koji rade na projektu i dodeliće sve
+zadatke vama. Zadatak je serijalizovan, tj. izlazi u serijama tako da
+nećete imati da radite mnogo posla u isto vreme i resursi će biti
+nivelisani.
+
+* Dodeljivanje resursa
+
+Sledeći korak je da napravite listu svih resursa koji rade na projektu i
+dodeliti im zadatke. Kreirajte član za svaki resurs. Možete grupisati
+resurse kreiranjem hijerarhije. Označite drvo resursa sa oznakom
+~taskjuggler_resource~ tako da izvoznik zna gde da gleda za resurs
+definicije[fn:2].
+
+#+BEGIN_SRC org
+  ,* Resources					       :taskjuggler_resource:
+  ,** Developers
+  ,   :PROPERTIES:
+  ,   :resource_id: dev
+  ,   :END:
+  ,*** Paul Smith
+  ,    :PROPERTIES:
+  ,    :resource_id: paul
+  ,    :END:
+  ,*** Sébastien Bono
+  ,    :PROPERTIES:
+  ,    :resource_id: seb
+  ,    :END:
+  ,*** Klaus Müller
+  ,
+  ,** Others
+  ,*** Peter Murphy
+  ,    :PROPERTIES:
+  ,    :resource_id: doc
+  ,    :END:
+  ,*** Dim Sung
+  ,    :PROPERTIES:
+  ,    :resource_id: test
+  ,    :END:
+#+END_SRC
+
+Kao što ćete i primetiti, takođe sam dodao ~resource_id~ properties za neke
+resurse (grupe resursa). Koristiću te identifikatore za dodelu resursa
+zadacima. Izvoznik će kreirati jedinstveni ids za resurse automatski[fn:3],
+ali ako želite da koristite kratke forme bolje je da definišete
+~resource_id~ properties za vaše resurse. Ovo će vam takođe omogućiti da
+definišete standardne vrednosti za dodelu kao što sledi:
+
+: #+PROPERTY: allocate_ALL dev doc test
+
+Najlakši način za dodeljivanje resursa, je ponovo kolumna pregleda. Nema
+potrebe za dodeljivanjem resursa za svaki zadatak, jer je dodeljivanje
+nasledno u TaskJuggler[fn:4]. Primetićete na ekranu ispod da neki zadaci
+imaju više nego jedan resurs dodeljen. TaskJuggler će izračunati trajanje
+svakog zadatka, baziranom na naporu i resursu koji rade na ovom zadatku.
+
+#+CAPTION: Dodeljivanje resursa
+#+ATTR_HTML: alt="Dodeljivanje resursa"
+[[file:../images/taskjuggler/assign-resources.png]]
+
+Ako sada izvezemo projekat videćemo da je TaskJuggler organizovao neke
+zadatke paralelno (jer postoji nekoliko resursa koji mogu raditi
+paralelno).  Pogledajte sliku ispod:
+
+#+CAPTION: Gantt grafikoni sa višestrukim resursima
+#+ATTR_HTML: alt="Gantt grafikoni sa višestrukim resursima"
+[[file:../images/taskjuggler/TaskJugglerUI2.png]]
+
+Očigledno moramo da definišemo zavisnosti između zadataka.
+
+* Odrediti zavisnosti
+
+Ima nekoliko načina za definisanje zavisnosti između zadataka. Kada dolaze
+iz Org mod pozadine, vi ćete verovatno želeti da ih definišete koristeći
+postrojenja obezbeđena od strane Org moda, koji su ili:
+
+- The =ORDERED= imovina koja vam dozvoljava i navodi vas da dečiji zadaci
+  moraju biti kompletirani po tome kako se pojavljuju
+
+-  The =BLOCKER= imovina, koja vam dozvoljava i navodi vas da zadatak
+   zavisi od
+
+    - od prethodnog siblinga (prethodni-sibling)
+    - od bilo kog drugog zadatka, startujući ~task_id~ property od
+      prethodnika
+
+Ponovo, ovo je verovatno najlakši način za definisanje zavisnosti koristeći
+kolumnu pregleda kao što je prikazano na ekranu ispod:
+
+#+CAPTION: Definisanje zavisnosti korišćenjem kolumne pregleda
+#+ATTR_HTML: alt="Definisanje zavisnosti korišćenjem kolumne pregleda"
+[[file:../images/taskjuggler/define-dependencies.png]]
+
+Na kraju, takođe postoji i zavisnost imovine koja je u korespodenciji sa
+TaskJuggler terminologijom.  Može se koristiti na isti način kao =BLOCKER=
+imovina. Ovo je ilustrovano ispod gde je uzet primer “Softvare Development”
+koji je blokiran od strane zadatka “Specification”, gde mora da čeka dok se
+specifikacija ne završi.  Zadatak “Softvare Development” je definisan kao
+=ORDERED=, i svi podzadaci moraju biti kompletirani u sekvencama. Drugi
+primer je prekretnica “Ship Product to Customer” koji čeka dok se ne završe
+Beta i Ručni test.
+
+#+BEGIN_SRC org
+  ,#+PROPERTY: Effort_ALL 2d 5d 10d 20d 30d 35d 50d 
+  ,#+PROPERTY: allocate_ALL dev doc test
+  ,#+COLUMNS: %30ITEM(Task) %Effort %allocate %BLOCKER %ORDERED
+  ,
+  ,* Accounting Software					:taskjuggler_project:
+  ,
+  ,** Specification
+  ,   :PROPERTIES:
+  ,   :Effort:   20d
+  ,   :BLOCKER:  start
+  ,   :allocate: dev
+  ,   :END:
+  ,
+  ,** Software Development
+  ,   :PROPERTIES:
+  ,   :ORDERED:  t
+  ,   :BLOCKER:  previous-sibling
+  ,   :priority: 1000
+  ,   :allocate: dev
+  ,   :END:
+  ,
+  ,*** Database coupling
+  ,    :PROPERTIES:
+  ,    :Effort:   20d
+  ,    :END:
+  ,
+  ,*** Back-End Functions
+  ,    :PROPERTIES:
+  ,    :Effort:   30d
+  ,    :task_id:  back_end
+  ,    :END:
+  ,
+  ,*** Graphical User Interface
+  ,    :PROPERTIES:
+  ,    :Effort:   35d
+  ,    :allocate: paul, seb
+  ,    :END:
+  ,
+  ,** Software testing
+  ,   :PROPERTIES:
+  ,   :ORDERED:  t
+  ,   :BLOCKER:  previous-sibling
+  ,   :allocate: test
+  ,   :END:
+  ,*** Alpha Test
+  ,    :PROPERTIES:
+  ,    :Effort:   5d
+  ,    :task_id:  alpha
+  ,    :END:
+  ,
+  ,*** Beta Test
+  ,    :PROPERTIES:
+  ,    :Effort:   20d
+  ,    :task_id:  beta
+  ,    :allocate: test, paul
+  ,    :END:
+  ,
+  ,** Manual
+  ,   :PROPERTIES:
+  ,   :Effort:   50d
+  ,   :task_id:  manual
+  ,   :BLOCKER:  start
+  ,   :allocate: doc
+  ,   :END:
+  ,
+  ,** Milestones
+  ,*** Project start
+  ,    :PROPERTIES:
+  ,    :task_id:  start
+  ,    :END:
+  ,
+  ,*** Technology Preview
+  ,    :PROPERTIES:
+  ,    :BLOCKER:  back_end
+  ,    :END:
+  ,
+  ,*** Beta version
+  ,    :PROPERTIES:
+  ,    :BLOCKER:  alpha
+  ,    :END:
+  ,
+  ,*** Ship Product to Customer
+  ,    :PROPERTIES:
+  ,    :BLOCKER:  beta manual
+  ,    :END:
+  ,
+  ,
+  ,* Resources					       :taskjuggler_resource:
+  ,** Developers
+  ,   :PROPERTIES:
+  ,   :resource_id: dev
+  ,   :END:
+  ,*** Paul Smith
+  ,    :PROPERTIES:
+  ,    :resource_id: paul
+  ,    :END:
+  ,*** Sébastien Bono
+  ,    :PROPERTIES:
+  ,    :resource_id: seb
+  ,    :END:
+  ,*** Klaus Müller
+  ,
+  ,** Others
+  ,*** Peter Murphy
+  ,    :PROPERTIES:
+  ,    :resource_id: doc
+  ,    :limits:   { dailymax 6.4h }
+  ,    :END:
+  ,*** Dim Sung
+  ,    :PROPERTIES:
+  ,    :resource_id: test
+  ,    :END:
+#+END_SRC
+
+Ако izvozite primer iznad, TaskJuggler će napraviti raspored zadataka kao
+što je pokazano na ekranu ispod.
+
+#+CAPTION: Gantt grafikoni za zavisnostima
+#+ATTR_HTML: alt="Gantt grafikoni za zavisnostima"
+[[file:../images/taskjuggler/TaskJugglerUI3.png]]
+
+Takođe TaskJuggler će vam dati pregled koliko će uposleni biti resursi i na
+čemu rade. Pogledajte ispod sliku:
+
+#+CAPTION: Grafikon upotrebe resursa
+#+ATTR_HTML: alt="Grafikon upotrebe resursa"
+[[file:../images/taskjuggler/resource-graph.png]]
+
+Na posletku, možete generisati [[file:../images/taskjuggler/project-plan.pdf][good-lookin project plans]] u PDF fajlove
+štampanjem iz TaskJuggler-a.Ovo će usrećiti svakog [[http://en.wikipedia.org/wiki/Pointy-haired_Boss][pointy-haired Boss]].
+
+* Export of other properties
+
+
+Obično, izvoznik upisuje imovinu člana koja je već poznata TaskJuggler-u
+(kao smene, bukiranja, efikasnost, start, knjiženje,odgovornost, reference,
+raspored, trajanje, prekretnica, beleške, kraj, itd... za zadatke) kao i
+TaskJuggler fajlu.
+
+Оstala svojstva kao kompletnost ili prioritet su izvedene iz obuhvatnih
+informacija iz Org mod fajla. TODO izjava je pravi primer kompletnosti.
+Prioritet zadatka će biti determinisan kroz prioritet cookie.
+
+* Footnotes
+[fn:1] Možete kustomizirati tagove.
+
+[fn:2] Оpet, naravno, ovaj tag može biti kustomiziran.
+
+[fn:3] Preko downcasing naslova, zamene ne-ascii znakova sa “ i biranjem
+prve reči kao da je jedinstvena.
+
+[fn:4] U TaskJuggler-u dodeljivanja su kumulativna, izvoznik međutim,
+dodaje neke kodove tako da su nasleđena dodeljivanja ignorisana kada se
+eksplicitno dodeljuju resursu.
+

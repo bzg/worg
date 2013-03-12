@@ -1,0 +1,482 @@
+#+TITLE:    Org-mode Build System
+#+AUTHOR:   Achim Gratz
+#+EMAIL:    Stromeko <at> NexGo.DE
+#+STARTUP:    align fold nodlcheck hidestars oddeven intestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+
+* Introduction
+
+Org can be run directly from sources, however usually it is
+byte-compiled and installed before use.  Also, the documentation needs
+to be rebuilt from their respective sources, registered and put into a
+place where it can be found.  Instead of you having to do all this by
+hand, a build system based on GNU make will do it for you.  The Org
+build system makes extensive use of GNU make features and requires at
+least version 3.81 (use of the latest released version is
+recommended).
+
+* Build System Structure
+
+The build system consists of these files:
+
+: <org-mode>/Makefile
+: <org-mode>/local.mk
+: <org-mode>/doc/Makefile
+: <org-mode>/etc/Makefile
+: <org-mode>/lisp/Makefile
+: <org-mode>/mk/default.mk
+: <org-mode>/mk/targets.mk
+: <org-mode>/mk/org-fixup.el
+
+Additional files are present for the Orgmode server in the
+=<org-mode>/mk/= subdirectory.  An additional file
+=<org-mode>/mk/version.mk= is present in the distribution archives to
+record the version information that gets used when building from these
+sources.
+
+** Top Level =Makefile=
+
+This file provides only the help.  Short help can be requested by
+=make help=, while =make helpall= will list all documented targets.
+Undocumented targets may exist for internal purposes and can be
+changed or removed at any time.
+
+All other functionality of the build system is provided in separate
+files, which will either be explicitly included from the top level or
+implicitly read by GNU make.
+
+** Local Customization =local.mk=
+
+*Never push* =local.mk= *to any public branch!*
+
+The build system is an integral part of Org.  To allow easy local
+customization, that customization must never become part of the
+official Git repository.  On the other hand the build system must work
+even when no local customization has been applied.  Therefore when the
+file =local.mk= does not exist, a local customization template will be
+created that copies some settings that most commonly would need to be
+changed from =mk/default.mk=.  The template includes some comments
+that are hopefully self-documenting.  As long as all necessary
+programs are available, the customization should in most cases be
+limited to setting $prefix correctly.
+
+If you need to do more extensive changes, copy the relevant parts from
+=mk/default.mk= to =local.mk= (or maybe even the whole file if that seems
+easier to you).  Please look at some of the [[Customization][Customization Examples]] to
+get an idea of what is possible.
+
+** Second Level =Makefile=
+
+The =Makefile= in subdirectories can be invoked from the top level only
+since they rely on the definitions that have been made there.
+
+** Defaults =mk/default.mk=
+
+*Never change anything in* =mk/default.mk= *— always do your changes in*
+ =local.mk= *!*
+
+The defaults will work on a typical GNU/Linux system.  For system-wide
+installation as assumed by the build system the user must be able to
+obtain administrative privileges via sudo.  If sudo is not available,
+the user running make must have the necessary privileges to do the
+install (i.e. full access to the build and install directories).
+Besides Emacs, the following programs must be available in PATH:
+
+- find
+- install
+- rm
+
+The following programs are optional, when loss of functionality can be
+tolerated:
+
+- install-info
+- makeinfo
+- texi2pdf
+- sudo
+- git
+
+** Make Targets =mk/targets.mk=
+
+All targets that the Org build system can build are defined here.
+Most of the actual work will be handed off to the second level of
+=Makefile=s in their respective subdirectories.  It is possible to
+override some parts of the build system by defining some variables.
+This is largely untested and consequently unsupported, but may still
+be useful in some situations.  The following variables are considered
+stable:
+
+- =TEST_NO_AUTOCLEAN= :: Define to a non-null value to keep the test
+     directory around for inspection.  This is mostly useful for
+     debugging the test suite.
+- =ORGVERSION= :: Can be used to override the automatic determination
+                  of the version strings.  If you find a need to do
+                  this, it is likely a bug someplace else.  *Never
+                  define this in a customization file!*
+- =GITVERSION= :: See =ORGVERSION=.  Please do not define it to a
+                  value that could be confused with a real Git
+                  version string.
+- =GITSTATUS= :: See =GITVERSION=.  If this variable is defined
+                 non-null, the string ".dirty" will be appended to the
+                 Git version string, which indicates a locally
+                 modified version.
+
+** Utilities =mk/org-fixup.el=
+
+This is a collection of some Emacs Lisp routines that implement basic
+functionality of the build system.  This mainly eliminates the need
+for some external programs and thus reduces the number of external
+dependencies.
+
+A few of these functions have been designed to be used from the
+command line or even from within Emacs itself.  This is an aid for
+manually building a working Org installation when the external
+dependencies of the build system cannot be met.  See
+[[Support%20for%20Manual%20Build][Support for Manual Build]].
+
+* Make Targets
+
+Each time you want GNU make to build something for you, you need to
+tell it what that is: this is called a /target/ or /goal/.  For each
+/target/, make determines the /prerequisites/ and then goes on to
+build them in the order of dependence.  A /target/ can be an actual
+file that GNU make should build, but more commonly it is just a
+moniker (called a /phony target/) that has the files to build as
+/prerequisites/.
+
+** Help
+
+- =help= :: Shows a brief list of the most commonly used /targets/
+            with a short description of what they do.
+- =targets= :: This is an alias for =help=, mandated by GNU Makefile
+               conventions.
+- =helpall= :: Shows (almost) all /targets/ and a short description of
+               what they do.
+
+** Configuration Check
+
+- =check= :: Show the main customization.
+- =config-test= :: Show the test customization.
+- =config-cmd= :: Show what commands will be used.
+- =config-all= :: Show all customization.
+
+** Build
+
+- =all= :: Build all of Org: byte-compile the source files and create
+           all documentation.[fn:1]
+- =compile= :: Ensure a clean source directory and then byte-compile
+               the source files using the [[Compilation Methods][compilation method]] =dirall=
+               by default.
+- =compile-dirty= :: Byte-compile just those sources that haven't been
+     compiled already or are newer than their byte-compiled
+     counterpart.[fn:2]
+- =single= :: The same as =compile=, but uses the [[Compilation Methods][compilation method]]
+              =single= (unless overridden by defining =ORGCM= on the
+              command line).
+- =autoloads= :: Create just the autoload files, but do not
+                 byte-compile anything.
+
+** Test
+
+- =test= :: runs =compile= and then the full testsuite.[fn:3]
+- =test-dirty= :: Run the full testsuite on whatever currently is
+                  available, compiled or not.
+
+** Installation
+
+- =install= :: Build all of Org and install it.
+- =install-etc= :: Install only the =etc/= part of Org.
+- =install-lisp= :: Install only the =lisp= part of Org.
+- =install-info= :: Build the documentation and install only the info
+                    documentation.
+
+** Documentation
+
+- =doc= :: Create all documentation.[fn:1]
+- =docs= :: An alias for =doc=.
+- =info= :: Create only GNU Info documentation (requires GNU Makeinfo).
+- =pdf= :: Create only PDF documentation (requires PDFTeX).
+- =card= :: Create only the reference card (requires PDFTeX).
+- =refcard= :: An alias for =card=.
+
+** Cleaning
+
+- =clean= :: Cleans in =lisp/= and =doc/=.
+- =cleanall= :: Cleans everything that can be cleaned, including
+                several types of backup files, so do not use this when
+                you have active edit sessions!
+- =clean-install= :: Removes a previous Org installation.  The build
+     system doesn't really know where your previous installation is,
+     of course: it tries to remove Org from where it would install it,
+     based on the current customization.
+- =cleantest= :: Removes a test directory if it exists.[fn:4]
+
+** Compatibility and Convenience
+
+- =up0= :: Updates the current Git branch from upstream by doing a
+           =git pull=.
+- =up1= :: Does =up0= and then builds and checks Org.
+- =up2= :: Does =up1= and installs Org if there was no test error.
+- =update= :: Does =up0= and then builds Org.  Does not test.
+- =update2= :: Does =update= and then installs.  This is not
+               recommended, since there is no way of telling whether
+               the just built Org has errors.
+- =uncompiled= :: Removes any bytecompiled files and then creates the
+                  autoload files.  You can then use the Git worktree
+                  almost like an installed version of Org.  Not
+                  recommended for normal use of Org.
+- =local.mk= :: Create a customization template.  If one already
+                exists, you need to rename or remove it first.
+
+* Customization
+
+Changing the behaviour of the build system to conform to your local
+system rules is done by editing the file =local.mk=.  The standard
+template that is created when this file does not exist offers only the
+most common customization variables, but you are free to customize
+anything that =mk/default.mk= offers (but you really have to know what
+you are doing for some of this).  Remember to only change =local.mk=,
+please.
+
+** Simple Customization
+*** Default target
+
+The /default target/ is what =make= tries to build when you don't give
+it anything else to do.  For compatibility with the old build system,
+a freshly created =local.mk= will have =oldorg= defined as the default
+target.  If you remove that line entirely from =local.mk=, =all= will
+become the default target.  But you can put any other target there
+that you want to become the default target or even define a new one
+(OK, that isn't simple customization anymore).
+
+*** Including sources from =contrib/=
+
+If you just want to try out some of the things in =contrib/=, you can
+simply add the directory to =load-path=.  But if you want to include
+some files in an installed version of Org, this has been more
+difficult.  There is now an easier way to do this: simply specify in
+the customization variable =ORG_ADD_CONTRIB= which files you want
+included, then build and install in the usual way.  Your =local.mk=
+default customization template has a commented out example for
+including the new exporter, you just need to remove the comment
+marker:
+
+#+BEGIN_SRC Makefile
+# Define if you want to include some (or all) files from contrib/lisp
+# just the filename please (no path prefix, no .el suffix), maybe with globbing
+ORG_ADD_CONTRIB = org-e-* org-md org-export # e.g. the new exporter
+#+END_SRC
+
+You just give the base name of the file to include (much like you do
+in a =require= form), only that you can use a shell globbing pattern
+to specify many similar names at ones.  You do not need to specify the
+path prefix =contrib/lisp/= nor the file suffix =.el=, these are added
+by the build system.  To include all of =contrib/lisp/= you'd say:
+
+#+BEGIN_SRC Makefile
+ORG_ADD_CONTRIB = org*
+#+END_SRC
+
+Or if that was just a one-time install (with quoting for POSIX shell):
+
+: make ORG_ADD_CONTRIB="org*" install
+
+A simple =*= would also include =htmlize.el=, which is currently
+bundled in contrib.  It is recommended to install that seperately, it
+is available for instance in GNU ELPA.
+
+*** Non-standard Emacs location
+
+Customization for using a self-compiled Emacs 24 installed in
+=/usr/local= and the default target changed to =up2=.  Additional
+customization to enable htmlize installed from ELPA in users' home
+directory and ESS (for R) in the system =/usr/share/emacs/site-lisp/=
+and all Babel languages for testing.
+
+#+BEGIN_SRC Makefile
+up2::	# default target
+EMACS   = /usr/local/bin/emacs-24.1
+prefix  = /usr/local/share
+lispdir = $(prefix)/emacs/site-lisp/org
+datadir = $(prefix)/emacs/etc/org
+infodir = $(prefix)/info
+
+BTEST_EXTRA = ess-site 
+BTEST_OB_LANGUAGES = awk C fortran maxima lilypond octave python sh R
+BTEST_POST = -L ~/.emacs.d/elpa/htmlize-1.39 \
+	     -L /usr/share/emacs/site-lisp/emacs-ess-12.04.4
+#+END_SRC
+
+*** XEmacs
+
+Customization for using XEmacs 21.5, since there seems to be no ERT
+for XEmacs testing will not work and has been disabled.  The default
+target is set to =up0 doc uncompiled= (pull from Git and update
+documentation and autoload files).
+
+#+BEGIN_SRC Makefile
+.PHONY:	xemacs
+xemacs:	up0 doc uncompiled
+EMACS   = xemacs
+prefix  = /usr/local/share
+lispdir = $(prefix)/xemacs/site-lisp/org
+datadir = $(prefix)/xemacs/etc/org
+infodir = $(prefix)/info
+
+BTEST = /bin/true
+BATCH = $(EMACS) -batch -q -vanilla # XEmacs
+# How to byte-compile the whole source directory
+ELCDIR	= $(BATCH) \
+		--eval '(add-to-list '"'"'load-path ".")' \
+		--eval '(byte-recompile-directory "." 0)'
+#+END_SRC
+
+*** Emacs on Windows
+
+Customization for using vanilla Emacs 24 on Windows, with GNU make and
+other binaries provided by Cygwin.  Make sure the installation path(s)
+contain no spaces!  Use the 8.3 compatible names, e.g. =PROGRA~1=
+instead of "Program Files", if you already installed the applications
+in such a location. Babel languages have been stripped down for
+testing and the default target is again set to =up2=.
+
+#+BEGIN_SRC Makefile
+up2::
+CYGWIN += nodosfilewarning
+prefix  = C:/Freeware/Emacs-24.1
+EMACS   = SHELL=sh $(prefix)/bin/emacs
+lispdir = $(prefix)/site-lisp/org
+datadir = $(prefix)/etc/org
+infodir = $(prefix)/info
+
+BTEST_OB_LANGUAGES = octave
+SUDO =
+#+END_SRC
+
+** Advanced Customization
+*** Compilation Methods
+
+The default compilation method compiles all source files within the
+same Emacs process, simply because that is the fastest method.
+Unfortunately, Emacs does not isolate the side-effects of compilations
+from each other, so the byte compiler may not issue some errors or
+warnings (mostly about missing declarations or requires).  To enable
+developers to catch these errors, different compilation methods can be
+configured by defining =ORGCM= to one of these values (either
+permanently in =local.mk= or for a single invocation of =make=):
+
+- =dirall= :: The default compilation method, invoked via =ELCDIR=.
+- =single= :: Uses a separate Emacs for each compilation, invoked via
+              =ELC=.
+- =source= :: Uses a separate Emacs for each compilation invoked via
+              =ELC=.  Removes all =*.elc= files before and each
+              =*.elc= file directly after compilation so that all
+              requires are also loaded from source.  Recompiles via
+              =dirall= at the end so that all the =*.elc= files exist.
+- =slint1= :: First compiles using =dirall=, then compiles each file
+              again using =single=.
+- =slint2= :: First compiles via =source= and then again via =slint1=.
+
+Both =ELCDIR= and =ELC= are also customizable, but changing their
+definitions must not alter the semantics of compilation.  You have
+been warned.
+
+*** Multiple Emacsen
+
+If you're a developer (or a system administrator that serves a diverse
+set of users) you'll likely have to deal with the need to build and
+test Org for different versions of Emacs.  Having to copy or link the
+correct customization file to =local.mk= quickly loses the appeal and
+is error prone.  Here's a (hopefully better) suggestion: put each
+customization into a file named =local-<pattern>.mk= and create a
+=local.mk= that looks like this:
+
+#+BEGIN_SRC Makefile
+ifdef LOCALMK
+  include local-$(LOCALMK).mk
+else
+  include local-emacs24.mk
+endif
+#+END_SRC
+
+Now switching between your different customizations is as easy as
+: make LOCALMK=emacs23
+(which assumes that there is a customization file =local-emacs23.mk=
+available).
+
+* Support for Installers
+
+The Org build system supports staged installs via =DESTDIR=.  If
+=DESTDIR= is defined as a non-empty string (it really should be a
+leading path and end with a path separator), the actual installation
+paths are all prepended by the expansion of =DESTDIR=.  Except for
+install and testing, the build does not write outside the build
+directory and both of these can be customized to stay within the build
+directory also.
+
+* Support for Manual Build
+
+Since GNU make or some programs used by the build system might not be
+available on some systems, the core functionality has been implemented
+or replicated in Emacs Lisp with no dependencies on external tools.  The
+supported functions are: =org-make-autoloads=,
+=org-make-autoloads-compile= and =org-make-autoloads-compile-force=.
+All other interfaces should be considered private and are subject to
+change without notice.  The commands assume that the current working
+directory is at the toplevel of the Org build directory (i.e. where
+you'll find =mk/default.mk=).
+
+To make the autoloads file:
+: emacs -batch -Q -L lisp -l ../mk/org-fixup -f org-make-autoloads
+To make the autoloads file and byte-compile Org:
+: emacs -batch -Q -L lisp -l ../mk/org-fixup -f org-make-autoloads-compile
+To make the autoloads file and byte-compile all of Org again:
+: emacs -batch -Q -L lisp -l ../mk/org-fixup -f org-make-autoloads-compile-force
+
+If =git= is also unavailable, fake version strings need to be provided.
+: emacs -batch -Q -L lisp -l ../mk/org-fixup \
+: --eval '(let ((org-fake-release "7.8.11")(org-fake-git-version "7.8.11-fake"))\
+: (org-make-autoloads))'
+
+The above assumes a POSIX shell for its quoting, Windows =CMD.exe= has
+quite different quoting rules and this won't work.  Also, users of
+Aquamacs have reported that the command line examples aren't working
+for them.  Your other option is to start Emacs like this
+: emacs -Q -L lisp -l ../mk/org-fixup
+then paste the following into the =*scratch*= buffer:
+#+BEGIN_SRC emacs-lisp
+  ; replace the version strings with something sensible that can't be
+  ; confused with a real Git version
+  (let ((org-fake-release     "7.8.11")
+        (org-fake-git-version "7.8.11-fake"))
+    (org-make-autoloads))
+#+END_SRC
+
+Execute each form by placing the cursor after the closing paren on the
+last line and press =C-j= or =C-x C-e=.
+
+If the command line above is still spooking you: start Emacs like you
+normally do, then add =<orgmode>/lisp= to your load-path, then issue
+=M-x load-library=, answer the prompt with =../mk/org-fixup.el=, then
+do the same things in the scratch buffer as outlined above.
+
+* Footnotes
+
+[fn:1] The build systems' notion of "all documentation" can be
+influenced via the configuration variable =ORG_MAKE_DOC=.
+
+[fn:2] If you just want to re-compile all lisp sources without doing
+anything else, you can run =make cleanelc compile-dirty=.
+
+[fn:3] The build systems' notion of "full testsuite can be configured
+with =BTEST_OB_LANGUAGES=.
+
+[fn:4] The test directory is generally removed after testing, but this
+may not happen when there are test errors.  Also, the automatic
+removal of the test directory can be prevented (for debugging
+purposes) by defining a variable =TEST_NO_AUTOCLEAN=.
+

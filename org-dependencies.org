@@ -16,7 +16,7 @@ information), but if you don't or don't want to do it yourself, that's
 fine too: a note to the [[mailto:emacs-orgmode@gnu.org][orgmode mailing list]] will also do
 the job. Thanks!
 
-Version: Org-mode version 7.01trans (release_7.01h.224.gf6c09)
+Version: Org-mode version 7.8.03 (release_7.8.03.346.g1915.dirty)
 
 ** TODO Exporting in general.
 
@@ -87,15 +87,15 @@ The LaTeX packages included by default are as follows:
 | hyperref      | texlive-latex-base        |         |                                   |
 
 *** STARTED Code blocks
-By default, code blocks are rendered as verbatim blocks on export.
-LaTeX has a couple of packages that produce pleasanter output: one is
-the ``listings'' package and the other is the ``minted'' package.
-Which package is used is determined by the value of the variable
-org-export-latex-listings: nil means the default verbatim block
-export, 'minted means the minted package and any non-nil value other
-than 'minted means the listings package.
+By default, code blocks are rendered as verbatim blocks on export -
+this setting does not have any additional dependencies.  However,
+LaTeX provides a couple of packages that produce output that most
+people prefer: one is the ``listings'' package and the other is the
+``minted'' package.  Which package is used is determined by the value
+of the variable org-export-latex-listings: nil means the default
+verbatim block export, 'minted means the minted package and any
+non-nil value other than 'minted means the listings package.
 
-The default setting does not have any additional dependencies. 
 
 **** Listings package
 
@@ -132,7 +132,15 @@ The pygmentize library can be downloaded from
 
 and there is documentation about installation as well.
 
+To use minted with org, there is no setup involved other than
+setting org-export-latex-listings to minted:
 
+#+BEGIN_SRC emacs-lisp
+   (setq org-export-latex-listings 'minted)
+#+END_SRC
+
+The minted.sty package is automatically added to the output .tex
+file.
 
 **** Special note about TeX and external programs
 
@@ -196,7 +204,7 @@ OK, let's assume you fixed your version of texi2dvi. How do you use
 it? Just set
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-latex-to-pdf-process "texi2dvi --pdf %f")
+  (setq org-latex-to-pdf-process '("texi2dvi --pdf %f" ))
 #+END_SRC
 
 Wait a minute: where do I put the --shell-escape option? That's the
@@ -238,6 +246,23 @@ the error is clear:
 
   =! Package minted Error: You must invoke LaTeX with the -shell-escape flag.=
 
+Achim Gratz suggested a different, less intrusive method on the mailing list:
+#+BEGIN_QUOTE
+> 2) put this in ~/.profile:
+>    PDFLATEX="pdflatex --shell-escape"
+>    export PDFLATEX
+
+You might not want to do this either.  The canonical way to set the
+environment for a single command is to define it right there with the
+invocation of the command.
+
+ (setq org-latex-to-pdf-process '("PDFLATEX=\"pdflatex --shell-escape\" texi2dvi -p %f"))
+
+Or if your system still had the locale bug even
+
+ (setq org-latex-to-pdf-process '("LC_ALL=C PDFLATEX=\"pdflatex --shell-escape\" texi2dvi -p %f"))
+
+#+END_QUOTE
 
 *** STARTED Symbols
 

@@ -1,0 +1,141 @@
+#+TITLE: Export an Org file to TaskJuggler
+#+AUTHOR: Bastien Guerry
+
+/The content below comes from the Org 7.9.3e manual./
+
+* Introduction
+
+[[http://www.taskjuggler.org/][TaskJuggler]] is a project management tool.  It provides an optimizing
+scheduler that computes your project time lines and resource assignments
+based on the project outline and the constraints that you have provided.
+
+The TaskJuggler exporter is a bit different from other exporters, such as
+the =HTML= and @LaTeX{} exporters for example, in that it does not export
+all the nodes of a document or strictly follow the order of the nodes in
+the document.
+
+Instead the TaskJuggler exporter looks for a tree that defines the tasks
+and optionally trees that define the resources and reports for this
+project.  It then creates a TaskJuggler file based on these trees and the
+attributes defined in all the nodes.
+
+* TaskJuggler export commands
+
+You need to have Org's =contrib/= in your Emacs =load-path= and to
+=(require 'ox-taskjuggler)= to add the TaskJuggler export.  See also the
+docstring of =org-export-backends= on how to add new backends by default.
+
+When ox-taskjuggler.el is loaded, it defines two new handlers within =C-c
+C-e= (=org-export-dispatch=):
+
+| Keybinding  |                                    |                                                                                                     |
+|-------------+------------------------------------+-----------------------------------------------------------------------------------------------------|
+| C-c C-e j J | org-export-as-taskjuggler          | Export as a TaskJuggler file                                                                        |
+| C-c C-e j o | org-export-as-taskjuggler-and-open | Export as a TaskJuggler file and then open the file with TaskJugglerUI (only for TaskJugglerUI 2.x) |
+
+* Tasks
+
+#+index: org-export-taskjuggler-project-tag
+
+Create your tasks as you usually do with Org mode.  Assign efforts to each
+task using properties (it is easiest to do this in the column view).  You
+should end up with something similar to the example by Peter Jones in
+http://www.contextualdevelopment.com/static/artifacts/articles/2008/project-planning/project-planning.org.
+Now mark the top node of your tasks with a tag named
+=:taskjuggler_project:= (or whatever you customized
+=org-export-taskjuggler-project-tag= to).  You are now ready to export the
+project plan with =C-c C-e J= which will export the project plan and
+open a gantt chart in TaskJugglerUI.
+
+* Resources
+
+#+index: org-export-taskjuggler-resource-tag
+
+Next you can define resources and assign those to work on specific tasks.
+You can group your resources hierarchically.  Tag the top node of the
+resources with =:taskjuggler_resource:= (or whatever you customized
+=org-export-taskjuggler-resource-tag= to).  You can optionally assign an
+identifier (named ~resource_id~) to the resources (using the standard Org
+properties commands, see the [[http://orgmode.org/org.html#Property-syntax][Property syntax]] section of the manual) or you
+can let the exporter generate identifiers automatically (the exporter picks
+the first word of the headline as the identifier as long as it is
+unique---see the documentation of =org-taskjuggler-get-unique-id=).  Using
+that identifier you can then allocate resources to tasks.  This is again
+done with the ~allocate~ property on the tasks.  Do this in column view or
+when on the task type =C-c C-x p allocate RET <resource_id> RET=.
+
+Once the allocations are done you can again export to TaskJuggler and check
+in the Resource Allocation Graph which person is working on what task at
+what time.
+
+* Export of properties
+
+The exporter also takes TODO state information into consideration, i.e., if
+a task is marked as done it will have the corresponding attribute in
+TaskJuggler (~complete 100~).  Scheduling information is also taken into
+account to set start/end dates for tasks.
+
+The exporter will also export any property on a task resource or resource
+node which is known to TaskJuggler, such as ~limits~, ~vacation~, ~shift~,
+~booking~, ~efficiency~, ~journalentry~, ~rate~ for resources or ~account~,
+~start~, ~note~, ~duration~, ~end~, ~journalentry~, ~milestone~,
+~reference~, ~responsible~, ~scheduling~, etc.@: for tasks.
+
+* Dependencies
+
+The exporter will handle dependencies that are defined in the tasks either
+with the ~ORDERED~ attribute (@pxref{TODO dependencies}), with the
+~BLOCKER~ attribute (see @file{org-depend.el}) or alternatively with a
+~depends~ attribute.  Both the ~BLOCKER~ and the ~depends~ attribute can be
+either ~previous-sibling~ or a reference to an identifier (named ~task_id~)
+which is defined for another task in the project.  ~BLOCKER~ and the
+~depends~ attribute can define multiple dependencies separated by either
+space or comma.  You can also specify optional attributes on the dependency
+by simply appending it.  The following examples should illustrate this:
+
+#+BEGIN_EXAMPLE:
+* Preparation
+  :PROPERTIES:
+  :task_id:  preparation
+  :ORDERED:  t
+  :END:
+* Training material
+  :PROPERTIES:
+  :task_id:  training_material
+  :ORDERED:  t
+  :END:
+** Markup Guidelines
+   :PROPERTIES:
+   :Effort:   2d
+   :END:
+** Workflow Guidelines
+   :PROPERTIES:
+   :Effort:   2d
+   :END:
+* Presentation
+  :PROPERTIES:
+  :Effort:   2d
+  :BLOCKER:  training_material @{ gapduration 1d @} preparation
+  :END:
+#+END_EXAMPLE:
+
+#+index: org-export-taskjuggler-default-reports
+
+TaskJuggler can produce many kinds of reports (e.g., gantt chart, resource
+allocation, etc).  The user defines what kind of reports should be
+generated for a project in the TaskJuggler file.  By default, the exporter
+will automatically insert some pre-set reports in the file.  These defaults
+are defined in =org-export-taskjuggler-default-reports=.  They can be
+modified using customize along with a number of other options.  For a more
+complete list, see =M-x customize-group RET org-export-taskjuggler RET=.
+
+Alternately, the user can tag a tree with
+=org-export-taskjuggler-report-tag=, and define reports in sub-nodes,
+similarly to what is done with tasks or resources.  The properties used for
+report generation are defined in
+=org-export-taskjuggler-valid-report-attributes=. In addition, a special
+property named ~report-kind~ is used to define the kind of report one wants
+to generate (by default, a ~taskreport~).
+
+For more information and examples see the Org-taskjuggler tutorial at
+http://orgmode.org/worg/org-tutorials/org-taskjuggler.html.

@@ -14,15 +14,16 @@
 Note: everything here is a work in progress.
 
 
-* Workflow
+* Workflow/Roadmap
 
 ** First import
 
-- the user runs =org-sync-import-url=, and is prompted for a repo url
+- the user runs =os-import=, and is prompted for a repo url
 - org-sync tries to match it against per-backend pattern in order to
   chose the right one.
 - org-sync inserts a new headline named "Bugs of /repo/" or prompts
-  the user for a name.
+  the user for a name. The headline name is not stored remotely and
+  can be changed to anything.
 - this headline has a set of well defined PROPERTIES used by every
   backend and (optionally) other for a specific backend.
 - This headlines contains sub-headlines, one for each bug.
@@ -31,10 +32,9 @@ Note: everything here is a work in progress.
 
 ** Synchronization
 
-- the user runs =org-sync-buglist-at-point= or =org-sync-buffer= which
-  just calls =org-sync-buglist= for each buglist in the buffer.
+- the user runs =os-sync= which syncs each buglist in the buffer.
 - if the document doesn't have any buglist, inform the user to call
-  =org-sync-import-url= (or call it directly).
+  =os-import= (or call it directly).
 - org-sync fetches the buglist, and adds any new bugs to the
   right buglist.
 - conflicting changes are handled by showing the new and the old entries in a
@@ -62,7 +62,8 @@ properties.
 - deadline
 - priority
 - tags
-
+- author
+- assignee
 
 * Bugtrackers
 

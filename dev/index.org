@@ -18,16 +18,20 @@ tutorials on how to extend Org.
 
 Org development uses a two-branches git workflow.
 
-- master :: This branch contains latest development for Org.  Temporary
-            feature branch (either local or remote) should branch out from
-            this branch.  This branch is merged to the =maint= branch when
-            there is a major release.
+- master :: This branch contains the latest development for Org.
+            Temporary feature branches (either local or remote) should
+            branch out from =master=.  New features should be introduced
+            into org on master.  This branch is merged to the =maint=
+            branch when a major release is made.
 
-- maint :: This branch is the "production" branch for Org.  It contains
-           stable releases and bug fixes against them.  This branch is
-           merged into master when bug are fixed there first.  The Org
-           version on this branch is the one regularily sync'ed with Emacs
-           repository.
+- maint :: This branch is the "production" branch for Org.  It
+           contains stable releases and bug fixes against them.  Bugs
+           present in a release should always be fixed on =maint=,
+           which is then merged back into =master= so that the two
+           branches keep the same bugfixes.  Minor releases are made
+           so that not too many bug fixes are pending on maint.  The
+           Org version on this branch is regularly sync'ed with the
+           Emacs repository.
 
 ** Git repositories
 
@@ -35,9 +39,9 @@ The git repository for Org is on =orgmode.org=:
 
 - http://orgmode.org/w/org-mode.git
 
-If you are a developer, you can clone this branch like this:
+If you are a developer, you can clone it like this:
 
-: ~$ git clone orgsync@orgmode.org:org-sync.git
+: ~$ git clone orgmode@orgmode.org:org-mode.git
 
 This repository is cloned on =repo.or.cz=:
 
@@ -53,9 +57,13 @@ You can display a graphic representation of the branches here:
 
 * Reference documentation
 
+- [[file:org-syntax.org][Syntax reference (draft)]]
+
 - [[file:org-export-reference.org][Reference documentation]] for the new export engine (=org-export.el=)
   written by Nicolas Goaziou.
 
-- [[../org-api/index.org][Org-mode API]] with signatures and docstrings for all public functions of
-  all Org-mode libraries.
+- [[../doc.org][Org-mode's doc ]]for all hooks, commands and options.
   
+* Tips
+
+- [[file:org-build-system.org][Org Build System]] (aka Makefile)
