@@ -64,9 +64,9 @@ También comparto algunas funciones que me ayudan cotidianamente:
   "Returns the effectiveness in the current org file"
   (interactive)
   (goto-char (point-min))
-  (message "Effectiveness: %f" 
-	   ( * 100 
-	       (/ (float (count-matches "* DONE")) 
-		  (+ (float (count-matches "* DONE")) (float (count-matches "* CANCELED"))))))
+  (setq done (float (count-matches "* DONE")))
+  (setq canc (float (count-matches "* CANCELED")))
+  (setq effectiveness (* 100 (/ done (+ done canc))))
+  (message "Effectiveness: %f" effectiveness)
   (goto-char (mark)))
 #+END_SRC
