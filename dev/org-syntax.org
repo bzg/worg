@@ -15,7 +15,8 @@ within specific environments.
 
 Three categories are used to classify these environments: "Greater
 elements", "elements", and "objects", from the broadest scope to the
-narrowest.
+narrowest.  The word "element" is used for both Greater and non-Greater
+elements, the context should make that clear.
 
 The paragraph is the unit of measurement.  An element defines
 syntactical parts that are at the same level as a paragraph,
@@ -41,16 +42,17 @@ Unless specified otherwise, case is not significant.
   STARS KEYWORD PRIORITY TITLE TAGS
   #+END_EXAMPLE
 
-  STARS is a string starting at column 0 and containing at least one
+  STARS is a string starting at column 0, containing at least one
   asterisk (and up to ~org-inlinetask-min-level~ if =org-inlinetask=
-  library is loaded).  It's the sole compulsory part of a headline.
+  library is loaded) and ended by a space character.  The number of
+  asterisks is used to define the level of the headline.  It's the
+  sole compulsory part of a headline.
 
   KEYWORD is a TODO keyword, which has to belong to the list defined
-  in ~org-todo-keywords~.  Case is significant.
+  in ~org-todo-keywords-1~.  Case is significant.
 
   PRIORITY is a priority cookie, i.e. a single letter preceded by
-  a hash sign # and enclosed within square brackets.  Case is
-  significant.
+  a hash sign # and enclosed within square brackets.
 
   TITLE can be made of any character but a new line.  Though, it will
   match after every other part have been matched.
@@ -71,7 +73,7 @@ Unless specified otherwise, case is not significant.
   ,**** TODO [#A] COMMENT Title :tag:a2%:
   #+END_EXAMPLE
     
-  If the first word appearing in the title is ~org-comment-keyword~,
+  If the first word appearing in the title is ~org-comment-string~,
   the headline will be considered as "commented".  If that first word
   is ~org-quote-string~, it will be considered as "quoted".  In both
   situations, case is significant.
@@ -82,14 +84,14 @@ Unless specified otherwise, case is not significant.
   If ~org-archive-tag~ is one of its tags, it will be considered as
   "archived".  Case is significant.
 
-  A headline contains directly at most one section, followed by any
-  number of headlines.  Only a section can contain another section.
+  A headline contains directly one section (optionally), followed by
+  any number of deeper level headlines.
 
   A section contains directly any greater element or element.  Only
   a headline can contain a section.  As an exception, text before the
   first headline in the document also belongs to a section.
 
-  In a quoted headline contains a section, the latter will be
+  If a quoted headline contains a section, the latter will be
   considered as a "quote section".
 
   As an example, consider the following document:
@@ -136,7 +138,8 @@ Unless specified otherwise, case is not significant.
   attributes.
 
   This is done by adding specific keywords, named "affiliated
-  keywords", just above the element considered, no blank line allowed.
+  keywords", just above the element considered, no blank line
+  allowed.
 
   Affiliated keywords are built upon one of the following patterns:
   "#+KEY: VALUE", "#+KEY[OPTIONAL]: VALUE" or "#+ATTR_BACKEND: VALUE".
@@ -150,7 +153,7 @@ Unless specified otherwise, case is not significant.
   OPTIONAL and VALUE can contain any character but a new line.  Only
   "CAPTION" and "RESULTS" keywords can have an optional value.
 
-  An affiliated keyword can appear on multiple lines if KEY is either
+  An affiliated keyword can appear more than once if KEY is either
   "CAPTION" or "HEADER" or if its pattern is "#+ATTR_BACKEND: VALUE".
 
   "CAPTION", "AUTHOR", "DATE" and "TITLE" keywords can contain objects
@@ -183,7 +186,8 @@ Unless specified otherwise, case is not significant.
 
    NAME can contain any non-whitespace character.
 
-   PARAMETERS can contain any character, and can be omitted.
+   PARAMETERS can contain any character other than new line, and can
+   be omitted.
 
    If NAME is "CENTER", it will be a "center block".  If it is
    "QUOTE", it will be a "quote block".
@@ -191,8 +195,9 @@ Unless specified otherwise, case is not significant.
    If the block is neither a center block, a quote block or a [[#Blocks][block
    element]], it will be a "special block".
 
-   CONTENTS can contain any element, but another greater block of the
-   same type.
+   CONTENTS can contain any element, except : a line =#+END_NAME= on
+   its own.  Also lines beginning with STARS must be quoted by
+   a comma.
 
 ** Drawers and Property Drawers
    :PROPERTIES:
