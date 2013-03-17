@@ -272,30 +272,43 @@ and it is the main cause of merge conflicts.
 Instead, the change log entry should be part of the commit message.  A
 commit message should be constructed in the following way:
 
-- Line 1 of the commit message should always be a short description of
-  the overall change.  Line 1 does /not/ get a dot at the end.
-- Line 2 is an empty line
-- In line 3, the ChangeLog entry should start, in a similar format as
-  in the old ChangeLog files, but without the author information
-  (which is part of the commit anyway).
-- After the changelog, another empty line should come before any
-  additional information that the committer wishes to provide in order
-  to explain the patch.
-- If the change is a minor change made by a committer without
-  copyright assignment to the FSF, the commit message should also
-  contain the cookie =TINYCHANGE= (anywhere in the message).  When we
-  later produce the ChangeLog file for Emacs, the change will be
-  marked appropriately.
+- Line 1 of the commit message should always be a short description of the
+  overall change.  Line 1 does /not/ get a dot at the end and does not
+  start with a star.
 
-Here is an example for such a message
+- Line 2 is an empty line.
+
+- In line 3, the ChangeLog entry should start, in a similar format as in
+  the old ChangeLog files, but without the author information (which is
+  part of the commit anyway).
+
+- After the changelog, another empty line should come before any additional
+  information that the committer wishes to provide in order to explain the
+  patch.
+
+- If the change is a minor change made by a committer without copyright
+  assignment to the FSF, the commit message should also contain the cookie
+  =TINYCHANGE= (anywhere in the message).  When we later produce the
+  ChangeLog file for Emacs, the change will be marked appropriately.
+
+- Variables and functions names are quoted like =`this'= (backquote and
+  single quote).
+
+- Sentences should be separated by two spaces.
+
+- Sentences should start with an uppercase letter.
+
+- Avoid the passive form: i.e., use "change" instead of "changed".
+
+Here is an example for such a message:
 
 #+begin_example
   Capture: Fix the case of using a template file
       
-  ,* lisp/org-capture.el (org-capture-set-plist): Make sure txt is a string
-  before calling `string-match'.
+  ,* lisp/org-capture.el (org-capture-set-plist): Make sure txt is a
+  string before calling `string-match'.
   (org-capture-templates): Fix customization type.
-  ,* doc/org.texi (Capture): Document using a file for a template
+  ,* doc/org.texi (Capture): Document using a file for a template.
       
   The problem here was that a wrong keyword was given in the
   customization type.  This let to a string-match against a list value.
