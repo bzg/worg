@@ -24,10 +24,10 @@ end-users are explained in the last part of this document.
 
 * Defining a Back-End
 
-  A back-end is defined with ~org-export-define-backend~ macro.  It
-  requires two mandatory arguments: the back-end name and its
-  translation table, an alist that associates element and object types
-  to translator functions.  According to the macro doc-string:
+  A back-end is defined with ~org-export-define-backend~ function.  It
+  requires two mandatory arguments: the back-end name and its translation
+  table, an alist that associates element and object types to translator
+  functions.  According to the doc-string:
 
   #+BEGIN_QUOTE
   These functions should return a string without any trailing space,
@@ -60,25 +60,24 @@ end-users are explained in the last part of this document.
   appropriate place to protect special chars relative to the back-end.
   #+END_QUOTE
 
-  Optionally, the macro can set-up back-end specific properties (like
-  values from specific buffer keywords) accessible from every
-  translator function with the ~:options-alist~ keyword.  See
-  ~org-export-options-alist~ for details on the structure of the
-  value.
+  Optionally, the function can set-up back-end specific properties (like
+  values from specific buffer keywords) accessible from every translator
+  function with the ~:options-alist~ keyword.  See
+  ~org-export-options-alist~ for details on the structure of the value.
 
   As an example, the following excerpt from ~latex~ back-end
   definition introduces three new buffer keywords (and their
   headline's property counterpart), and redefine ~DATE~ default value:
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-backend latex
+  (org-export-define-backend 'latex
     ...
-    :options-alist ((:date "DATE" nil "\\today" t)
-                    (:date-format nil nil org-latex-date-timestamp-format)
-                    (:latex-class "LATEX_CLASS" nil org-latex-default-class t)
-                    (:latex-class-options "LATEX_CLASS_OPTIONS" nil nil t)
-                    (:latex-header-extra "LATEX_HEADER" nil nil newline)
-                    (:latex-hyperref-p nil "texht" org-latex-with-hyperref t)))
+    :options-alist '((:date "DATE" nil "\\today" t)
+                     (:date-format nil nil org-latex-date-timestamp-format)
+                     (:latex-class "LATEX_CLASS" nil org-latex-default-class t)
+                     (:latex-class-options "LATEX_CLASS_OPTIONS" nil nil t)
+                     (:latex-header-extra "LATEX_HEADER" nil nil newline)
+                     (:latex-hyperref-p nil "texht" org-latex-with-hyperref t)))
   #+END_SRC
 
   It is also possible, with ~:export-block~ keyword, to associate
@@ -91,10 +90,10 @@ end-users are explained in the last part of this document.
   contents as-is, and ignores any other export block.
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-backend html
-    (...
-     (export-block . org-html-export-block)
-     ... )
+  (org-export-define-backend 'html
+    '(...
+      (export-block . org-html-export-block)
+      ... )
     :export-block "HTML")
 
   (defun org-html-export-block (export-block contents info)
@@ -110,19 +109,19 @@ end-users are explained in the last part of this document.
   information.
 
   If the new back-end shares most properties with another one,
-  ~org-export-define-derived-backend~ macro can be used to simplify
-  the process.  In the example below, we implement a new back-end
-  which behaves like ~latex~ excepted for headlines and the template.
+  ~org-export-define-derived-backend~ can be used to simplify the
+  process.  In the example below, we implement a new back-end which behaves
+  like ~latex~ excepted for headlines and the template.
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-derived-backend my-latex latex
-    :translate-alist ((headline . my-latex-headline-translator)
-                      (template . my-latex-template)))
+  (org-export-define-derived-backend 'my-latex 'latex
+    :translate-alist '((headline . my-latex-headline-translator)
+                       (template . my-latex-template)))
   #+END_SRC
 
-  Back-ends defined with either function can be registered in the
-  export dispatcher using special keyword =:menu-entry=.  See macros
-  docstrings for more information.
+  Back-ends defined with either function can be registered in the export
+  dispatcher using special keyword =:menu-entry=.  See defuns docstrings
+  for more information.
 
 * Elements Attributes
   :PROPERTIES:
@@ -1232,10 +1231,10 @@ end-users are explained in the last part of this document.
   headlines end with two blank lines:
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-backend ascii
+  (org-export-define-backend 'ascii
     ...
-    :filters-alist ((:filter-headline . org-ascii-filter-headline-blank-lines)
-                    (:filter-section . org-ascii-filter-headline-blank-lines)))
+    :filters-alist '((:filter-headline . org-ascii-filter-headline-blank-lines)
+                     (:filter-section . org-ascii-filter-headline-blank-lines)))
 
   (defun org-ascii-filter-section-blank-lines (headline back-end info)
     "Filter controlling number of blank lines after a section."
