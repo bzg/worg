@@ -69,4 +69,21 @@ También comparto algunas funciones que me ayudan cotidianamente:
   (setq effectiveness (* 100 (/ done (+ done canc))))
   (message "Effectiveness: %f" effectiveness)
   (goto-char (mark)))
+
+(defun davidam-insert-output (command)
+   (interactive "sCommand: ")
+   (insert (shell-command-to-string command)))
+
+(defun davidam-output-to-buffer (buffer command)
+   (interactive "sBuffer name: \nsCommand: ")
+   (get-buffer-create buffer)
+   (call-process command nil buffer)
+   (switch-to-buffer (get-buffer buffer)))
+
+(defun davidam-rsync-rmail ()
+  (interactive)
+  (get-buffer-create "rsync")
+  (call-process "/home/davidam/scripts/rsync-rmail.sh" nil "rsync")
+  (switch-to-buffer (get-buffer "rsync")))
+
 #+END_SRC
