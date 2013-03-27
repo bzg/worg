@@ -1,0 +1,121 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Common Lisp Source Code Blocks in Org Mode
+#+AUTHOR:     Thomas S. Dye
+#+EMAIL:      tsd[at]tsdye[dot]com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="http://common-lisp.net/project/slime/">Common Lisp</a>
+  </p>
+  <p>
+  <a href="http://common-lisp.net/project/slime/">
+  <img src="./images/slime-small.png"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* Template Checklist [12/12]                                       :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result%20Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+According to [[http://en.wikiquote.org/wiki/Lisp_programming_language][John Foderaro]], Lisp is a programmable programming language.
+
+* Requirements and Setup
+
+Common Lisp source code blocks are evaluated by Babel with the Superior Lisp
+Interaction Mode for Emacs, or [[http://common-lisp.net/project/slime/][SLIME]].  [[http://common-lisp.net/project/slime/][SLIME]] supports many Common
+Lisp implementations and is compatible with GNU Emacs version 21 and
+later and with XEmacs version 21.
+
+You'll need a working installation one of the many Common Lisp
+implementations supported by [[http://common-lisp.net/project/slime/][SLIME]], and [[http://common-lisp.net/project/slime/][SLIME]] itself. Consult the
+installation instructions for the Common Lisp implementation of your
+choice. [[http://common-lisp.net/project/slime/doc/html/Installation.html#Installation][SLIME installation]] requires just a few lines in =.emacs=.
+
+To configure Common Lisp source code blocks in Org mode, add the
+appropriate dotted pair to =org-babel-load-languages=:
+
+#+begin_src emacs-lisp :exports code
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((lisp . t)))
+#+end_src
+
+* Org Mode Features for Common Lisp Source Code Blocks
+** Header Arguments
+There are no language-specific default values for header arguments
+to Common Lisp source code blocks.
+
+A single language-specific header argument is defined for Common Lisp
+source code blocks:
+
+- :package :: a string that names a Common Lisp package within which
+              to execute the source code block. The default value is
+              =:any=, which will execute the source code block in the
+              current package.
+** Sessions
+
+By their nature, Common Lisp interpreters always run "sessions."
+
+** Result Types
+All result types are supported.
+** Other
+
+The SLIME session must be running when the Common Lisp source code
+block is executed.
+
+* Examples of Use
+
+Start SLIME: =M-x slime <RET>=.
+
+#+begin_example
+,#+name: hello-world
+,#+header: :var message="Hello World!"
+,#+begin_src lisp
+  (princ message)
+,#+end_src
+#+end_example
+ 
+Execute the source code block with =C-c C-c= to yield this result:
+#+name: hello-world
+#+header: :exports results
+#+header: :var message="Hello World!"
+#+begin_src lisp
+(princ message)
+#+end_src
+
+#+results: hello-world
+: Hello World!
+
+
+* Links to Tutorials and Other Resources
+
+On-line Lisp books include an [[http://www.lisperati.com/casting.html][introductory comic book]], a [[http://www.gigamonkeys.com/book/][dead-sexy
+introduction and tutorial]], and a [[http://paulgraham.com/onlisp.html][comprehensive study of advanced Lisp
+techniques]].  Highly recommended.
+ 

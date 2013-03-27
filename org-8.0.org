@@ -54,20 +54,41 @@ the manual, please report it to the list.
 
 ** New #+TOC keyword
 
-There is a new =#+TOC= which allow adding more "table of contents" for the
-LaTeX backend (for now).
+There is a new =#+TOC= which allows adding table of contents, lists of
+tables and lists of listings at specific locations during export.
 
 #+BEGIN_SRC org
   ,#+TOC: headlines 2
-  ,#+TOC: figures
   ,#+TOC: tables
   ,#+TOC: listings
 #+END_SRC
 
-This will add the corresponding tables of contents.
-For now, the ODT backend only supports "headlines"
-
 See the "Table of contents" section in the manual.
+
+* Syntax changes
+
+** Export snippets
+
+   Export snippets are a generalization of ~@<tag>~ concept, which has
+   been removed, and the inline version of
+   ~#+begin_backend...#+end_backend~ blocks.
+
+   Their syntax is ~@@backend:value~ where ~backend~ is the targetted
+   export backend (e.g. ~html~) and ~value~ can contain anything but
+   ~@@~.
+
+   When export is done with ~backend~, the snippet is replaced with
+   ~value~, otherwise it is removed.  Whitespace characters around
+   the construct are never deleted.
+
+** Footnote definitions
+
+   A footnote definition (not inline) can now be ended with two
+   consecutive blank lines.
+
+   As a consequence, multiple paragraphs inside can be written
+   normally, separated with blank lines, instead of relying on the
+   ~\par~ command.
 
 * Updating backend-specific configuration options
 
@@ -118,11 +139,15 @@ If something does not work, please report it on the mailing list.
 
 1. =#+STYLE:= -> =#+HTML_HEAD:=
 
-2. =#+SETUPFILE: myfile= -> =#+INCLUDE: "myfile"=
+2. =#+SETUPFILE: myfile= versus =#+INCLUDE: "myfile".=
 
-   Quotes are required and =#+INCLUDE= works a little differently
-   than #+setupfile: by default, it makes sure that every headline in the
-   included file will be a child of the headline containing the include
+   Both =#+SETUPFILE:= and =#+INCLUDE:= now need quotes around the
+   file name.  There is now also a clear difference between these two
+   statements.  The first will only read keyword statements like
+   =#+TODO:= and use this to set up the current file.  The second will
+   pull in the entire content of the file during export.  The
+   =#+INCLUDE:= statement will make every headline in the included
+   file will be a child of the headline containing the include
    keyword.  You can overwrite this behaviour with =:minlevel= num
    parameter.
 
