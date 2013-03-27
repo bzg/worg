@@ -64,10 +64,10 @@
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (setq done (float (count-matches "* DONE")))
-    (setq canc (float (count-matches "* CANCELED")))
-    (setq effectiveness (* 100 (/ done (+ done canc))))
-    (message "Effectiveness: %f" effectiveness)))
+    (let ((done (float (count-matches "* DONE")))
+	  (canc (float (count-matches "* CANCELED")))
+	  (effectiveness (* 100 (/ done (+ done canc)))))
+      (message "Effectiveness: %f" effectiveness))))
 
 (defun org-keywords-in-date(keyword date)
   (interactive "sKeyword: \nsDate: " keyword date)
@@ -93,12 +93,11 @@
   (interactive "sGive me a date: " date)
   (save-excursion
     (goto-char (point-min))
-;;  (message "Tareas Hechas: %d" (float (count-matches "TODO.*\n.*11-16")))
-    (setq done (float (count-matches (concat "* DONE.*\n.*" date))))
-    (setq canc (float (count-matches (concat "* CANCELED.*\n.*" date))))
-    (if (and (= done canc) (zerop done))
-	(setq effectiveness 0)
-      (setq effectiveness (* 100 (/ done (+ done canc)))))
-    (message "Effectiveness: %d " effectiveness)))
+    (let ((done (float (count-matches (concat "* DONE.*\n.*" date))))
+	  (canc (float (count-matches (concat "* CANCELED.*\n.*" date)))))
+      (if (and (= done canc) (zerop done))
+	  (setq effectiveness 0)
+	(setq effectiveness (* 100 (/ done (+ done canc)))))
+      (message "Effectiveness: %d " effectiveness))))
 
 (provide 'org-effectiveness)
