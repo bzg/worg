@@ -34,40 +34,40 @@
 (defun org-count-keyword(keyword)
   "Print a message with the number of keyword outline in the current buffer"
   (interactive "sKeyword: ")
-  (goto-char (point-min))
-  (message "Number of %s: %d" keyword (count-matches (concat "* " keyword)))
-  (goto-char (mark)))
+  (save-excursion
+    (goto-char (point-min))
+    (message "Number of %s: %d" keyword (count-matches (concat "* " keyword)))))
 
 (defun org-count-todo()
   "Print a message with the number of todo tasks in the current buffer"
   (interactive)
-  (goto-char (point-min))
-  (message "Number of TODO: %d" (count-matches "* TODO"))
-  (goto-char (mark)))
+  (save-excursion 
+    (goto-char (point-min))
+    (message "Number of TODO: %d" (count-matches "* TODO"))))
 									     
 (defun org-count-done()
   "Print a message with the number of done tasks in the current buffer"
   (interactive)
-  (goto-char (point-min))
-  (message "Number of DONE: %d" (count-matches "* DONE"))
-  (goto-char (mark)))
+  (save-excursion
+    (goto-char (point-min))
+    (message "Number of DONE: %d" (count-matches "* DONE"))))
 
 (defun org-count-canceled()
   "Print a message with the number of canceled tasks in the current buffer"
   (interactive)
-  (goto-char (point-min))
-  (message "Number of Canceled: %d" (count-matches "* CANCELED"))
-  (goto-char (mark)))
+  (save-excursion
+    (goto-char (point-min))
+    (message "Number of Canceled: %d" (count-matches "* CANCELED"))))
 
 (defun org-effectiveness()
   "Returns the effectiveness in the current org file"
   (interactive)
-  (goto-char (point-min))
-  (setq done (float (count-matches "* DONE")))
-  (setq canc (float (count-matches "* CANCELED")))
-  (setq effectiveness (* 100 (/ done (+ done canc))))
-  (message "Effectiveness: %f" effectiveness)
-  (goto-char (mark)))
+  (save-excursion
+    (goto-char (point-min))
+    (setq done (float (count-matches "* DONE")))
+    (setq canc (float (count-matches "* CANCELED")))
+    (setq effectiveness (* 100 (/ done (+ done canc))))
+    (message "Effectiveness: %f" effectiveness)))
 
 (defun org-keywords-in-date(keyword date)
   (interactive "sKeyword: \nsDate: " keyword date)
@@ -91,14 +91,14 @@
 
 (defun org-effectiveness-in-date(date)
   (interactive "sGive me a date: " date)
-  (goto-char (point-min))
+  (save-excursion
+    (goto-char (point-min))
 ;;  (message "Tareas Hechas: %d" (float (count-matches "TODO.*\n.*11-16")))
-  (setq done (float (count-matches (concat "* DONE.*\n.*" date))))
-  (setq canc (float (count-matches (concat "* CANCELED.*\n.*" date))))
-  (if (and (= done canc) (zerop done))
-      (setq effectiveness 0)
-    (setq effectiveness (* 100 (/ done (+ done canc)))))
-  (message "Effectiveness: %d " effectiveness)
-  (goto-char (mark)))
+    (setq done (float (count-matches (concat "* DONE.*\n.*" date))))
+    (setq canc (float (count-matches (concat "* CANCELED.*\n.*" date))))
+    (if (and (= done canc) (zerop done))
+	(setq effectiveness 0)
+      (setq effectiveness (* 100 (/ done (+ done canc)))))
+    (message "Effectiveness: %d " effectiveness)))
 
 (provide 'org-effectiveness)
