@@ -3,28 +3,12 @@
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
 #+TITLE:      Header arguments and result types in Org Babel
-#+AUTHOR:     Thorsten Jolitz
+#+AUTHOR:     Thorsten Jolitz, Eric Schulte
 #+EMAIL:      tj[at]data-driven[dot]de
 #+LANGUAGE:   en
-#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
-#+LINK_UP:    index.html
+#+LINK_UP:    index.php
 #+LINK_HOME:  http://orgmode.org/worg/
 #+EXPORT_EXCLUDE_TAGS: noexport
-
-# #+name: banner
-# #+begin_html
-#   <div id="subtitle" style="float: center; text-align: center;">
-#   <p>
-#   Org Mode support for <a href="http://picolisp.com/5000/!wiki?home/">PicoLisp</a>
-#   </p>
-#   <p>
-#   <a href="http://picolisp.com/5000/!wiki?home/">
-#   <img src="http://picolisp.com/5000/wiki/logo.png"/>
-#   </a>
-#   </p>
-#   </div>
-# #+end_html
-
 
 * Common combinations of header-args and result types
    Many combinations of header arguments and result types are
@@ -100,3 +84,21 @@
     | :eval      | never    | query   |          |         |
 
 
+* Setting language and file specific default header argument values
+This may be useful to e.g., have all Python code blocks in a file use
+the same session.  The following file-local-variable syntax should be
+used, placing the customization at the end of the Org-mode file.
+
+: #+Title: Example of default file and language session
+: 
+: The value in this buffer is...
+: #+begin_src emacs-lisp
+:   org-babel-default-header-args:Python
+: #+end_src
+: 
+: #+RESULTS:
+: | (:session . foo) |
+: 
+: # Local Variables:
+: # eval: (setq-local org-babel-default-header-args:Python '((:session . "foo")))
+: # End:
