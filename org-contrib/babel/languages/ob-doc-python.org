@@ -1,0 +1,243 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Python Source Code Blocks in Org Mode
+#+AUTHOR:     Gary Oberbrunner
+#+EMAIL:      garyo[at]oberbrunner[dot]com
+#+LANGUAGE:   en
+#+STYLE:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="http://python.org/">Python</a>
+  </p>
+  <p>
+  <a href="http://python.org/">
+  <img src="http://www.python.org/images/python-logo.gif"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* Template Checklist [10/12] 					   :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [ ] Describe [[Result%20Types][Result Types]]
+  - [ ] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+Python is a high-level, readable, interpreted language which can be
+used for many common computing tasks.  It runs on most modern
+operating systems.  Python source code blocks are fully supported in
+Org Mode with a wide variety of Python-specific header arguments.
+
+Python source code blocks in Org Mode can be used to define functions,
+filter and analyze data, create graphics and figures, and produce
+reproducible research papers.
+
+* Requirements and Setup
+Python source code blocks in Org Mode require a working python installation.
+Python is included in Mac OS X and often in Gnu/Linux, and is easily
+available for Windows.  Python installers are located at
+the [[http://www.python.org/download/][Python download site]].
+
+Org Mode supports graphical output for LaTeX and HTML documents using
+[[http://matplotlib.org/][Matplotlib]].
+
+To configure your emacs org-mode to use python, you'll need to ensure
+that =org-babel-load-languages= includes an entry for it.
+Typically, =org-babel-load-languages= will contain many entries.  The
+example below omits other languages.
+
+#+begin_src emacs-lisp :tangle yes
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)))
+#+end_src
+
+* Org Mode Features for Python Source Code Blocks
+** Header Arguments
+*** Language-Specific Header Arguments
+ - =:results {output, value}=: Value mode is the default (as with
+   other languages).  In value mode you can use the following subtypes:
+    - =raw=: value is inserted directly
+    - =pp=: value is pretty-printed by python using =pprint.pformat(%s)=, then inserted
+    - =file=: value is interpreted as a filename to be interpolated
+      when exporting; commonly used for graphics output.
+ - =:preamble=: Preamble code, inserted before the body (not commonly
+   used).  Default is none.
+ - =:return=: Value to return (only when result-type is value, and not
+   in session mode; not commonly used).  Default is None; in
+   non-session mode use return() to return a value.
+
+*** Common Header Arguments
+ - =:session [name]=: default is no session.
+ - =:var data=data-table=: Variables can be passed into python from org-mode tables as
+   scalars or lists.  See the org-mode manual for more details.
+ - =:exports {code, results, both, none}=: Standard babel option for what to export.
+
+** Sessions
+Session mode is fully supported in python, including named sessions.
+In session mode, each block is run in the same long-running python
+interactive interpreter session, as if you had typed that block into
+python.  You can have multiple sessions, all independent.
+
+Sessions can be used to define functions, set up variables, and share
+code between source blocks.
+
+Session mode in python is slightly different from non-session mode,
+because in session mode you are talking to a single "interactive"
+python session.  In python's interactive mode, blank lines are
+special: they indicate the end of an indented block.  So you have to
+write your org-mode python a little differently when using session
+mode.
+
+Also, in non-session mode, the python code block will be wrapped in a
+function, so to return a value (in =:results value= mode) you have to
+use a =return= statement.  In session mode, the python code is
+evaluated directly by the interpreter, not in a function context, and
+the last statement's value will be automatically returned, so you must
+_not_ use a =return= statement.
+
+ - Session mode:
+#+begin_example
+# blank lines not OK in indented blocks, and don't use return()
+# Source block is passed directly to interactive python;
+# value is value of _ at end.
+#+begin_src python :session
+def foo(x):
+  if x>0:
+    return x+1
+  else:
+    return x-1
+
+foo(1)
+#+end_src
+
+#+RESULTS:
+: 2
+#+end_example
+
+ - Non-session mode:
+#+begin_example
+# blank lines OK in indented blocks, and use return()
+# Entire source block will get indented and used as the body of main()
+#+begin_src python
+def foo(x):
+  if x>0:
+    return x+1
+
+  else:
+    return x-1
+
+return foo(5)
+#+end_src
+
+#+RESULTS:
+: 6
+#+end_example
+
+Finally, if you are using matplotlib for graphics, matplotlib uses an
+"interactive" backend when started from an interactive python (as you
+might expect).  So you have to set the backend explicitly to a PDF or
+PNG or other file-exporting backend when using session mode.  See the
+example at
+
+#+begin_example
+#+begin_src python :session :results file
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+fig=plt.figure(figsize=(3,2))
+plt.plot([1,3,2])
+fig.tight_layout()
+plt.savefig('images/myfig.pdf')
+'images/myfig.pdf' # return this to org-mode
+#+end_src
+
+#+RESULTS:
+[[file:images/myfig.pdf]]
+#+end_example
+
+** Result Types
+   * =value=: Value results are the value of the last expression
+     evaluated in the code block.  This is found in session mode using
+     using the "_" special python interpreter variable.
+
+   * =output=: Output results come from whatever the python code prints on stdout.
+
+* Examples of Use
+  - Hello World!
+#+begin_example
+#+begin_src python :results output
+print "Hello, world!"
+#+end_src python
+
+#+RESULTS:
+: Hello, world!
+
+#+end_example
+
+  - Inline calling:
+#+begin_example
+Two plus two equals src_python{return(2+2)}
+#+end_example
+when exported, e.g. to HTML or LaTeX/PDF, becomes:
+#+begin_example
+Two plus two equals 4
+#+end_example
+
+
+  - Extracting data from an org-mode table
+#+begin_example
+#+tblname: data_table
+| a | 1 |
+| b | 2 |
+| c | 3 |
+#+begin_src python :var val=1 :var data=data_table
+# Return row specified by val.
+# In non-session mode, use return to return results.
+return(data[val])
+#+end_src
+
+#+RESULTS:
+| b | 2 |
+
+#+end_example
+
+  - Plotting
+#+begin_example
+#+begin_src python :results file
+import matplotlib, numpy
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+fig=plt.figure(figsize=(4,2))
+x=numpy.linspace(-15,15)
+plt.plot(numpy.sin(x)/x)
+fig.tight_layout()
+plt.savefig('images/python-matplot-fig.png')
+return 'images/python-matplot-fig.png' # return filename to org-mode
+#+end_src
+
+#+RESULTS:
+[[file:images/python-matplot-fig.png]]
+
+#+end_example
+[[file:images/python-matplot-fig.png]]
