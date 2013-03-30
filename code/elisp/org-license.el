@@ -41,7 +41,7 @@ Esta página está bajo una [[http://creativecommons.org/licenses/by/3.0/deed][L
 This page is under a [[http://creativecommons.org/licenses/by/3.0/deed][Creative Commons Attribution Unported 3.0]]")))
   (insert "\n[[file:http://i.creativecommons.org/l/by/3.0/88x31.png]]"))
 
-(defun org-license-cc-by-sa ()
+(defun org-license-cc-by-sa (language)
   (interactive "MLanguage: " language)
   (cond ((equal language "es") 
 	 (insert "* Licencia
@@ -50,8 +50,8 @@ Esta página está bajo una [[http://creativecommons.org/licenses/by-sa/3.0/deed
 This page is under a [[http://creativecommons.org/licenses/by-sa/3.0/deed][Creative Commons Reconocimiento Unported 3.0]]")))
   (insert "[[file:http://i.creativecommons.org/l/by-sa/3.0/88x31.png]]"))
 
-(defun org-license-cc-by-nd ()
-  (interactive)
+(defun org-license-cc-by-nd (language)
+  (interactive "MLanguage: " language)
   (cond ((equal language "es")
 	 (insert "* Licencia
 Esta página está bajo una [[http://creativecommons.org/licenses/by-nd/3.0/es/deed][Licencia Creative Commons
@@ -61,8 +61,8 @@ This page is under a [[http://creativecommons.org/licenses/by-nd/3.0/deed][Creat
   (insert "[[file:http://i.creativecommons.org/l/by-nd/3.0/88x31.png]]"))
 ;;"))
 
-(defun org-license-cc-by-nc ()
-  (interactive)
+(defun org-license-cc-by-nc (language)
+  (interactive "MLanguage: " language)
   (cond ((equal language "es")
 	 (insert "* Licencia
 Esta página está bajo una [[http://creativecommons.org/licenses/by-nc/3.0/es/deed][Licencia Creative Commons
@@ -72,16 +72,24 @@ This page is under a [[http://creativecommons.org/licenses/by-nc/3.0/deed][Creat
   (insert "[[file:http://i.creativecommons.org/l/by-nc/3.0/88x31.png]]"))
 
 
-(defun org-license-cc-by-nc-sa ()
-  (interactive)
-  (insert "* License
+(defun org-license-cc-by-nc-sa (language)
+  (interactive "MLanguage: " language)
+  (cond ((equal language "es")
+	 (insert "* Licencia
+Esta página está bajo una [[http://creativecommons.org/licenses/by-nc-sa/3.0/es/deed][Licencia Creative Commons Reconocimiento-NoComercial 3.0]]"))
+	(t (insert "* License
 This page is under a [[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][License Creative Commons
-Reconocimiento-NoComercial 3.0] Unported]
-[[file:http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png]]"))
+Reconocimiento-NoComercial 3.0] Unported]")))
+  (insert "[[file:http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png]]"))
 
-(defun org-license-cc-by-nc-nd ()
-  (interactive)
-  (insert "* License
-This page is under a [[http://creativecommons.org/licenses/by-nc-nd/3.0/deed][License Creative Commons
-Reconocimiento-NoComercial-SinObraDerivada 3.0] Unported]
-[[file:http://i.creativecommons.org/l/by-nc-nd/3.0/88x31.png]]"))
+(defun org-license-cc-by-nc-nd (language)
+  (interactive "MLanguage: " language)
+  (cond ((equal language "es")
+	 (insert "* Licencia 
+Esta página está bajo una [[http://creativecommons.org/licenses/by-nc-nd/3.0/deed][Licencia Creative Commons
+Reconocimiento-NoComercial-SinObraDerivada 3.0 Unported]]"))
+	(t (insert "* License
+This page is under a [[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][License Creative Commons
+Reconocimiento-NoComercial-SinObraDerivada 3.0] Unported]")))
+  (insert "[[file:http://i.creativecommons.org/l/by-nc-nd/3.0/88x31.png]]"))
+
