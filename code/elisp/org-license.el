@@ -64,9 +64,12 @@ This page is under a [[http://creativecommons.org/licenses/by-nd/3.0/deed][Creat
 (defun org-license-cc-by-nc ()
   (interactive)
   (cond ((equal language "es")
-	 (insert "* License
-This page is under a [[http://creativecommons.org/licenses/by-nc/3.0/deed][License Creative Commons
-Reconocimiento-NoComercial 3.0] Unported]"
+	 (insert "* Licencia
+Esta página está bajo una [[http://creativecommons.org/licenses/by-nc/3.0/es/deed][Licencia Creative Commons
+Reconocimiento-NoComercial 3.0]]"))
+	(t (insert "* License 
+This page is under a [[http://creativecommons.org/licenses/by-nc/3.0/deed][Creative Commons Attribution-NonCommercial 3.0 Unported]]")))
+  (insert "[[file:http://i.creativecommons.org/l/by-nc/3.0/88x31.png]]"))
 
 
 (defun org-license-cc-by-nc-sa ()
