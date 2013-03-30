@@ -2,62 +2,63 @@
 Org mode provides the ability to export files marked with the Groff
 Memorandum Macros (-mm) set. With additional processing it can turn
 these files into PDF files that can be used for general
-distribution. This feature is being provided as an alternative to the LaT_eX
+distribution. This feature is being provided as an alternative to the LaTeX
 export being that not all Unix installations have TeX available while
-Groff is commonly installed because it is needed for the generation of 
-=man= pages. 
+Groff is commonly installed because it is needed for the generation of
+=man= pages.
 
-The Groff export follows the sequence of macros calls needed for the 
-Memorandum Type covers. 
+The Groff export follows the sequence of macro calls needed for the
+Memorandum Type covers.
+
 *** To use this feature
-Include =(require 'org-e-groff)= in your =.emacs= file, after the
-invocation of =(org-install)=. This feature only works with the new
-=org-export= facility.
+Include =(require 'org-e-groff)= in your =.emacs= file. This feature
+only works with the new =ox= facility.
+
 *** Groff MM macro summary
-For the purpose of context, the following table describes some of the
+For the purpose of context, the following list describes some of the
 macros used during export. These are built from data stored by your org
 document and follows the order needed for the generation of cover
-sheets. 
+sheets.
 
-In such order: 
-- AF :: Firm. It is populated with the content of the custom 
-        variable org-e-groff-organization. It has a default value of
-        "Org User"
+In such order:
+- AF :: Firm. It is populated with the content of the custom
+        variable org-groff-organization. It has a default value of
+        "Org User".
 - TL :: Title. It uses the content of #+TITLE: during
         export. Subtitles are supported with the use of a custom
-        option. 
+        option.
 - AU :: Author Macro. It uses the content of #+AUTHOR: during
         export.
 - AT :: Author Title. It uses a custom option to populate the title,
-        otherwise it is not used. 
+        otherwise it is not used.
 - ND :: Date. It will use the content of #+DATE: during export. If
-        the #+DATE: is not written in your org file, it will default 
-        to the date at the moment of export. 
-- MT :: Memorandum Type. It defines the structure of the document. The
+        the #+DATE: is not written in your org file, it will default
+        to the date at the moment of export.
+- MT :: Memorandum Type. It defines the structure of the document.
         Groff supports the use of the different Memorandum Types as well
         as Cover Pages (COVER/COVEND pairs).
 
 *** Groff export commands
-  - M-x org-e-groff-export-to-groff :: Converts buffer to Groff under
+  - M-x org-groff-export-to-groff :: Converts buffer to Groff under
        the assumptions that it was Org mode syntax. For an Org file like
        =myfile.org= the Groff file will be =myfile.groff=. The file will
-       be overwritten without warning. 
-  - M-x org-e-groff-export-to-pdf :: Converts buffer to a PDF file under
+       be overwritten without warning.
+  - M-x org-groff-export-to-pdf :: Converts buffer to a PDF file under
        the assumptions that it was Org mode syntax. It uses Groff as its
-       typesetter engine. 
+       typesetter engine.
 
 *** Header and sectioning structure
 By default, the Groff export uses the =internal= (.MT 0) Memorandum Type
-to generate documents. 
+to generate documents.
 
 You can change this globally by setting a different value for
-=org-e-groff-default-class= or locally by adding an option
+=org-groff-default-class= or locally by adding an option
 like =#+GROFF_CLASS: myclass= in your file. The class must be listed in
-=org-e-groff-classes=. This variables defines the attributes for a
+=org-groff-classes=. This variables defines the attributes for a
 class, unlike L_aTex, the structure in Groff is defined in the content
 of the document. What this variable defines is the style of the cover
 page, the type of headers and if the export will generate a Table of
-Content or Letter Signature. 
+Content or Letter Signature.
 
 The following classes are defined by default:
 
@@ -80,9 +81,9 @@ The following classes are defined by default:
 | none       | ""              | Creates a document without any header. Used for customized documents or letters using the Groff's macros. | custom  | nothing |
 
 This variable can be used to defined your own document types in which
-different type of documents be loaded using the .COVER or .so commands. 
+different type of documents be loaded using the .COVER or .so commands.
 
-To define a new class add a new entry to the =org-e-groff-class=
+To define a new class add a new entry to the =org-groff-class=
 list. The element of the list are:
 
 - class name :: Name of the class
@@ -90,64 +91,64 @@ list. The element of the list are:
      invoked. If the document is a memorandum type, the whole .MT
      command written. If the document is a COVER, only the
      cover name is needed. If a custom file is being used, then an Groff
-     include statement (.so) with the path of the custom file is used. 
+     include statement (.so) with the path of the custom file is used.
 - document options :: This is a property list containing the document
-     options. These are: 
+     options. These are:
    - :type :: Document type. Defines if the header information is created
              or not. Options are "memo" for full header, "cover" for
              full header plus COVER/COVENT statement, "custom" for no
-             header[2]
+             header[1]
    - :heading :: Defines the command to invoke each of the section
                  heading. Options are 'default for the MM defaults and a
                  pointer to a function that will return a format string
                  containing the heading command. The format string takes
                  the =level= and the result of the =numberp= predicate that
-                 indicates if the heading is a numbered one or not. 
+                 indicates if the heading is a numbered one or not.
    - :last-section :: Defines what is the last item to print. Options
                       are "toc" for table of content and "sign" for
-                      signature. 
+                      signature.
    - :paragraph :: Defines the command to invoke each of the paragraph
                    commands. Options are 'default or a pointer to a
                    function that will return a format string containing
                    the paragraph formatting commands before writing the
-                   paragraph.                    
+                   paragraph.
 
-[2] All memorandum and letter types are defined by default. This command is useful
-for new types of covers or when a custom file is being invoked. 
+[1] All memorandum and letter types are defined by default. This command is useful
+for new types of covers or when a custom file is being invoked.
 
-Example: 
+Example:
 
 #+begin_src emacs-lisp
-;; org-e-groff--colored-heading is a function that will return
+;; org-groff--colored-heading is a function that will return
 ;; the invocation of the .HL macro. The .HL macro is a custom groff
-;; macro. 
+;; macro.
 
-(defun org-e-groff--colored-heading (level numberedp)
+(defun org-groff--colored-heading (level numberedp)
   (concat ".HL " (number-to-string level) " \"%s\"\n%s"))
 
-;; adds the class definition. 
+;; adds the class definition.
 
-(add-to-list 'org-e-groff-classes
-       '("myclass" 
+(add-to-list 'org-groff-classes
+       '("myclass"
          ".so myclassfile.groff"
-         (:heading org-e-groff--colored-heading :type
+         (:heading org-groff--colored-heading :type
           "memo" :last-section "toc")))
 
 #+end_src
 
 
 The =#+GROFF_CLASS_OPTIONS= option is used to add additional information
-that changes the document structure or adds additional information that 
+that changes the document structure or adds additional information that
 gets exported.  The following options are supported:
 
 - :firm :: overrides the Organization name stored in the
-           =org-e-groff-organization=. /(string)/
+           =org-groff-organization=. /(string)/
 - :author-title :: Adds the title for the author. If not available, the
                    .AT macro will not be used. /(string)/
 - :hyphernate :: Enables or disables hyphernation support. /("yes"/"no")/
 - :justify-right :: Enables or disables right justification /("yes"/"no")/
 - :closing :: Changes the final closing from "Sincerely
-              yours,". The string is used as part of a call to .FC.  
+              yours,". The string is used as part of a call to .FC.
               /(string)/
 - :subtitle1 :: Defines a subtitle that maps to the "Charge Case"
                 line. /(string)/
@@ -155,7 +156,7 @@ gets exported.  The following options are supported:
                 line. These two options might not be relevant for
                 many users, but setting values to these variables can be
                 helpful when custom covers are used.  These two
-                options will be used when the .TL macro is invoked 
+                options will be used when the .TL macro is invoked
                 during export. /(string)/
 - :salutation :: Defines a custom salutation. Defaults to "Tho whom it
                  may concern" /(string)/
@@ -164,18 +165,19 @@ gets exported.  The following options are supported:
 - :references :: Addss an "In Reference Line". The value of =#+TITLE= is
                   used to populate the reference. /(boolean)/
 - :attention :: Adds an "ATTENTION:" line. /(string)/
+
 *** Special Tags
 The Groff exporter now features a set of tags that handles special
 contents required for the inclusion of abstracts sections, and parts of
 a business letter. The following special tags are in use by the
-=org-e-groff.el= exporter.
+=ox-groff.el= exporter.
 - FROM :: Defines the originator of a letter.
 - TO :: Defines the recipient of a letter.
-- ABSTRACT :: Defines the abstract part of a memo. 
+- ABSTRACT :: Defines the abstract part of a memo.
 - NS :: Defines a notational sign at the letter. Notational signs items
         like "Copy to" or "Carbon Copy" that are placed at the end of
         the letter to indicate its disposition.
-- BODY :: Defines the body part of a letter. 
+- BODY :: Defines the body part of a letter.
 
 Special tags have several rules to follow. These are:
   1. It must be the first tag of a list of tags, or a single tag.
@@ -183,7 +185,8 @@ Special tags have several rules to follow. These are:
   3. Items will be placed in their location and not written as part of
      the document.
 The use of these is described in detail in the following sections.
-**** Tags used for Letter types. 
+
+**** Tags used for Letter types.
 Letter types use the FROM, TO, BODY and NS tags for placing content in
 a document class of letter.  Letter types are the ones defined as:
 block, semiblock, simplified and fullblock.
@@ -208,20 +211,21 @@ Illustrated below is how a typical letter looks like:
 - FROM :: A header with a /:FROM:/ tag contains the address of the
           originator. It needs to be
           written in free form but it should follow the
-          addressing standards of the originator. 
+          addressing standards of the originator.
 - TO :: A header with a /:TO:/ tag contains the address of the
         recipient. It needs to be written in free form but it should
 - BODY :: The /:BODY:/ tag indicates the start of the letter. This is needed to
           start the content of the letter without writing the header on
-          output. 
+          output.
 - NS :: /:NS: will write the title of the header as the type of
-        disposition at the end of the letter, after the signature. 
+        disposition at the end of the letter, after the signature.
         In the exaple, it will write "Copy to" Jill Brown at
-        the end of the letter. 
+        the end of the letter.
+
 **** Tags used for Memorandum Types letters
-Letters that are of type "memo" also use the FROM, TO, BODY and NS tags 
-for placing content in a document class of letter.  
-Memo letter types are the ones defined as: "letter" or a custom cover. 
+Letters that are of type "memo" also use the FROM, TO, BODY and NS tags
+for placing content in a document class of letter.
+Memo letter types are the ones defined as: "letter" or a custom cover.
 
 Illustrated below is how a typical letter looks like:
 #+BEGIN_EXAMPLE
@@ -256,22 +260,22 @@ Illustrated below is how a typical letter looks like:
         recipient. It needs to be written in free form but it should
 - BODY :: The /:BODY:/ tag indicates the start of the letter. This is needed to
           start the content of the letter without writing the header on
-          output. 
+          output.
 - NS :: The /:NS:/ tag will write the title of the header as the type of
-        disposition at the end of the letter, after the signature. 
+        disposition at the end of the letter, after the signature.
         In the exaple, it will write "Copy to" Jill Brown at
-        the end of the letter. 
+        the end of the letter.
 
 The placement of items depends directly on the way the cover has been
 written. Although MT 5 is the "letter" memorandum type, Groff does not
 follow the same convention as Bell Labs' troff. Therefore, the use
-of these document classes is usable only to custom type covers. 
+of these document classes is usable only to custom type covers.
 
 **** Tags used for Memorandum Types documents.
 Documents that are of type "memo" use the FROM and ABSTRACT
 for placing content in a document class of memo
 Letter types are the ones defined as: internal, external, file,
-engineering, programmer or a custom cover. 
+engineering, programmer or a custom cover.
 
 Illustrated below is how a typical memo looks like:
 #+BEGIN_EXAMPLE
@@ -296,7 +300,7 @@ Illustrated below is how a typical memo looks like:
           4. Author extension
           5. Author room
           6. Additional items, like email or street address.
-- ABSTRACT :: A header with an /:ABSTRACT:/ tag contains the abstract 
+- ABSTRACT :: A header with an /:ABSTRACT:/ tag contains the abstract
               The abstract will be placed in the Abstract Location,
               usually at the cover sheet, before the start of the document.
 
@@ -308,7 +312,7 @@ cover or create your own custom cover.
 
 However, the following alternate ordering used in headers with the FROM tag may
 be more suitable to use than the one prescribed in the manual page. This
-is because it does not follow the Bell Labs nomenclature. 
+is because it does not follow the Bell Labs nomenclature.
 
 This alternate ordering is:
   1. Initials
@@ -329,59 +333,60 @@ Switch Phone Number xExtension
 Street
 City, State, Province, Postal Code
 Email Address
-#+END_EXAMPLE. 
+#+END_EXAMPLE.
 
 Out of all these values, the only one required is the initials. The
 others do not need to be written and they will not be written in the document.
+
 *** Tables in Groff export
 Groff uses the =tbl= preprocessor for table exports but the Groff export
-process also supports the specification of labels, captions and table 
+process also supports the specification of labels, captions and table
 options with the use of the =#+ATTR_GROFF:= line. The following options
-are available to modify table behavior. 
+are available to modify table behavior.
 
 - :divider :: Places vertical bars between the different
               columns. /(boolean)/
 - :placement :: Defines where the table will be placed in the
                 line. There are two possible values: center or
                 left. /(symbol)/
-- :boxtype :: Defines the box type. /(symbol)/ The following values are supported: 
+- :boxtype :: Defines the box type. /(symbol)/ The following values are supported:
    - box :: Creates a border only. Default
    - doublebox :: Creates a border with two lines.
-   - allbox :: Creates a table in which all cells are divided. 
-   - none :: No borders. 
+   - allbox :: Creates a table in which all cells are divided.
+   - none :: No borders.
 - :title-line :: Forces the first row to be centered bold. /(boolean)/
 - :diable-caption :: Captions are placed by default. This will disable
      its creation. /(boolean)/
-- :expand :: Expands the table across the width of the page. 
+- :expand :: Expands the table across the width of the page.
 - :long-cells :: Encloses all cells in T{ }T to allow the use of multi
                  line cells. /(boolean)/
 The Groff export will honor columns definitions placed on top of a given
-table in Org mode and propagates those definitions as =tbl= commands. 
+table in Org mode and propagates those definitions as =tbl= commands.
 
 *** Images in Groff export
 Groff provides very limited support for image export and this limitation
 is reflected in the export. The Groff export uses the =pic= preprocessor
-and the -Tps device for image support. The only types that are supported 
-for export  are:[1]
+and the -Tps device for image support. The only types that are supported
+for export  are:[2]
 - Encapsulated Postscript (eps)
 - Postscript (ps)
 - Groff Pic (pic)
 
-[1] Although the MPIMG macro is available in the -mwww  set, it
-conflicts with the definition of list items (LI) in the -mm one. At 
-the end, these macros convert images to EPS. 
+[2] Although the MPIMG macro is available in the -mwww  set, it
+conflicts with the definition of list items (LI) in the -mm one. At
+the end, these macros convert images to EPS.
 
 Other types need to be converted into either of these for its use in
-Groff.  
+Groff.
 
 Images that are linked to without description part in the line like
 =[[file:img.eps]]= or =[[img.pic]]= will be inserted into the PDF output file
-resulting from Groff processing. Org will use a .PSPIC (for eps and ps) 
+resulting from Groff processing. Org will use a .PSPIC (for eps and ps)
 or PS/PE (for pic) macro to insert the image during export. If you have specified a
 caption or label, it will be included in the export through a call to
 the .FG macro. You can use an =#+ATTR_GROFF:= line to specify other
 options, but these only affect postscript types ones (eps and ps). This
-is because pic images contain its definition in the in the pic file.  
+is because pic images contain its definition in the in the pic file.
 The following options are available:
 
 - :position :: Positions the image in the line. There are three options:
@@ -390,34 +395,36 @@ The following options are available:
             example :width 1.0i or :width 2.0c  /(symbol)/
 - :heigth :: Defines the hight of the image in Groff units. For
              example :heigth 1.0i or :height 2.0c.  /(symbol)/
+
 *** Footnotes and References
 The Groff export uses the same footnote mechanism to identify footnotes
 and bibliographic references. Adding a =\[1\]= or a =\[fn:123\]= marker with its
 appropriate reference will create a footnote at the end of the page.
 However adding a reference with a /"rl"/ tag, creates a Reference to the
-end of the page. 
+end of the page.
 
 For example:
 #+BEGIN_EXAMPLE
-This is a refered text\[fn:rl1\]. 
-\[fn:rl1\] Author, Title (c) 2010. 
+This is a refered text\[fn:rl1\].
+\[fn:rl1\] Author, Title (c) 2010.
 #+END_EXAMPLE
 
 Will place "Author, Title (c) 2010" in the reference list in the Table
 of Contents.
 
 Footnotes markers with the same tag will refer to the same reference in
-the list. 
+the list.
 
 *** Special Characters
 Special character substitution can be enabled if there is a list
-specified in the =org-e-groff-special-char= variable. This variable
+specified in the =org-groff-special-char= variable. This variable
 consists of a list of cons pairs in which the first value is the item to
 substitute and the second value is the value to be substituted with. By
 default it will substitute (c) for copyright notice, (tm) for trademark
-and (rg) for registered mark. 
+and (rg) for registered mark.
 
 Character substitution can be disabled by setting this variable to *nil*.
+
 *** Source highlight in Groff export
 There are no packages or processors for syntax highlight in
 Groff. However this feature is available for Groff export with the use
@@ -428,23 +435,22 @@ this feature are as follows:
  1. Install source highlight according to the instruction in the
     distribution. Source highlight requires the Boost [[www.boost.org]]
     libraries installed and available as well. See their respective
-    documentation for details. 
+    documentation for details.
  2. Make sure that the source highlight binary is available in your
-    PATH. 
- 3. Download the groff language files from 
+    PATH.
+ 3. Download the groff language files from
     [[http://www.github.com/papoanaya/emacs_utils/source-highlight]]. Place
     them in the source-highlight configuration directory, usually under
     =share/source-highlight=. Note that the outlang.map will replace the
     one in the configuration directory. If you have custom outlang.map
     entries, they have to be merged with the ones from the Groff
-    language files. 
- 4. Set the custom variable =org-e-groff-source-highlight= to
-    *t* in your .emacs file (i. e. =(setq org-e-groff-source-highlight t)=)
-     
+    language files.
+ 4. Set the custom variable =org-groff-source-highlight= to
+    *t* in your .emacs file (i. e. =(setq org-groff-source-highlight t)=)
 
 When the #+begin_src line is used with a supported language, the Groff
 export process will submit the block to source-highlight for
-processing. 
+processing.
 
 For example:
 
@@ -457,7 +463,7 @@ For example:
 The resultant text will have Groff formatted text that corresponds to
 the highlighted code. This code will be surrounded with a Display Static pair
 (DS/DE) and finishes with a call to the EX macro. EX will add an
-/Exhibit/ caption at the bottom of the highlighted source. 
+/Exhibit/ caption at the bottom of the highlighted source.
 
 The following languages are supported by default:
 
@@ -508,23 +514,24 @@ The following languages are supported by default:
 | vala                 | vala                 |
 | vbscript             | vbscript             |
 | xorg                 | xorg                 |
- 
+
 New languages can be added to source highlight and made available for
-export by adding entries to the list stored in the 
-=org-e-groff-source-highlight-langs= variable. The format for each entry
+export by adding entries to the list stored in the
+=org-groff-source-highlight-langs= variable. The format for each entry
 consists on a symbol and a string. The symbol corresponds to the
 begin_src tag and the string to the corresponding language entry
-available in source highlight. An example  of an entry is: 
-#+begin_src emacs-lisp 
+available in source highlight. An example  of an entry is:
+#+begin_src emacs-lisp
    (sqlite "sql")
 #+end_src
 
 If a language is not defined, then the Groff export process will default
-to write the code in Constant Width font. 
+to write the code in Constant Width font.
+
 *** Embedded Groff
 Groff commands can be exported literally by surrounding the text on a
-pair of #+BEGIN_GROFF/#+END_GROFF lines.  These are a couple of 
-commands that can be useful during export to control the output. 
+pair of #+BEGIN_GROFF/#+END_GROFF lines.  These are a couple of
+commands that can be useful during export to control the output.
 
 #+begin_src dummy
 #+BEGIN_GROFF
@@ -532,7 +539,7 @@ commands that can be useful during export to control the output.
 #+END_GROFF
 #+end_src
 
-Page break. Skips to a new page. 
+Page break. Skips to a new page.
 
 #+begin_src dummy
 #+BEGIN_GROFF
@@ -552,7 +559,7 @@ statements must be placed between .EQ and .EN.
 
 #+begin_src dummy
 #+BEGIN_GROFF
-.AS 
+.AS
 
 .AE
 .MT 0
@@ -561,19 +568,19 @@ statements must be placed between .EQ and .EN.
 
 Used with the dummy document class, it can be used to add an abstract block to
 any of the memorandum type. The internal type is presented for
-reference. Absract text must be placed betwen .AS and .AE. 
+reference. Absract text must be placed betwen .AS and .AE.
 
 *** Known Limitations
 The following limitations are known at the time of release. They will be
-looked at and addressed  in subsequent releases if they are technically 
-solvable. 
+looked at and addressed  in subsequent releases if they are technically
+solvable.
 
-  - Images :: Image support is limited to PIC, PS and EPS. 
+  - Images :: Image support is limited to PIC, PS and EPS.
   - Links :: There is no support for document linking or grefer. Most
              links will be just written. The only exception are for
              supported image and files with a .groff extension. The
              former will be embedded in the exported file, the later
-             will be included through the use of a .so command. 
+             will be included through the use of a .so command.
   - Abstracts :: Abstract support is only available through the use of
                  embedded Groff.
   - Equations :: Equations support is only available through the use of
@@ -583,36 +590,33 @@ solvable.
        interest. The reason is that MOM seems to be the up and coming
        substitute for MM and its similarities with LaT_eX makes it a
        very attractive alternative to MM. It also allows the use of the
-       macros available in the WWW set. 
+       macros available in the WWW set.
   - Gnuplot :: Gnuplot plots can be included if the following conditions
                are met:
       1. Output type  must be set to =gpic= (GnuPIC). Using Lat_eX EPS
-         will result in an incomplete graph. 
+         will result in an incomplete graph.
       2. For images generated directly from an Org mode table will have
          to be included afterwards after its generation.  For example:
-#+BEGIN_EXAMPLE
-  #+PLOT: title "X" ... set:"term gpic" "set:output 'table.pic'"
-  | a | b | c |
-  | 1 | 2 | 3 |
-  [[file:table.pic]]
-#+END_EXAMPLE
+         #+BEGIN_EXAMPLE
+           #+PLOT: title "X" ... set:"term gpic" "set:output 'table.pic'"
+           | a | b | c |
+           | 1 | 2 | 3 |
+           [[file:table.pic]]
+         #+END_EXAMPLE
       3. While using Org Babel, gpic output specification needs to be
          stated. Otherwise, the image will not be included on export.
-#+BEGIN_EXAMPLE
-  #+begin_src gnuplot :file salida.pic
-    set term gpic
-    plot sin(x)
-  #+end_src
-#+END_EXAMPLE
+         #+BEGIN_EXAMPLE
+           #+begin_src gnuplot :file salida.pic
+             set term gpic
+             plot sin(x)
+           #+end_src
+         #+END_EXAMPLE
   - PlantUML :: Plantuml is supported but the output type must be
                 EPS. This is done by using /.eps/ as the file suffix.
-#+BEGIN_EXAMPLE
-   #+begin_src plantuml :file x.eps
-      [A] --> [B]
-   #+end_src
-#+END_EXAMPLE
+    #+BEGIN_EXAMPLE
+       #+begin_src plantuml :file x.eps
+          [A] --> [B]
+       #+end_src
+    #+END_EXAMPLE
   - Other Babel Graphics :: Other babel graphics should be supported if
        either PS, EPS or GnuPIC are used as their output format.
-
-
-
