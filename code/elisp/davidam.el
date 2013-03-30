@@ -37,6 +37,42 @@
   (insert "#+BEGIN_SRC " msg)
   (insert "\n#+END_SRC\n"))
 
+(defun davidam-org-license-cc-by ()
+  (interactive)
+  (insert "* Licencia
+Esta página está bajo una [[http://creativecommons.org/licenses/by/3.0/deed.es_ES][Licencia Creative Commons Reconocimiento Unported 3.0]]
+[[file:http://i.creativecommons.org/l/by/3.0/88x31.png]]"))
+
+(defun davidam-org-license-cc-by-nd ()
+  (interactive)
+  (insert "* Licencia
+Esta página está bajo una [[http://creativecommons.org/licenses/by-nd/3.0/es/deed.es][Licencia Creative Commons
+Atribución-SinDerivadas 3.0]]
+[[file:http://i.creativecommons.org/l/by-nd/3.0/88x31.png]]"))
+
+(defun davidam-happy-birthday(person)
+  (interactive "MWrite the person name: ")
+  (message (concat "Happy birthday to you. Happy birthday to you. Happy birthday, dear " person ". Happy birthday to you")))
+
+(defun davidam-fibonacci (n)
+  (interactive "nEscribe un numero: " n)
+  (message (number-to-string (fibonacci-aux n))))
+
+(defun fibonacci-aux (n)
+;;  (interactive "dEscribe un numero: " n)
+  (if (or (= n 0) (= n 1))
+      1
+    (+ (fibonacci-aux (- n 1)) (fibonacci-aux (- n 2)))))
+
+(defun davidam-torres-de-hanoi (discos)
+  (interactive "nDime tus discos y te digo cuantos pasos tienes que dar: " discos)
+  (message (number-to-string (torres-de-hanoi-aux discos))))
+
+(defun torres-de-hanoi-aux (discos)
+  (if (= discos 1)
+      1
+    (+ 1 (* 2 (torres-de-hanoi-aux (- discos 1))))))
+
 (defun davidam-insert-output (command)
    (interactive "sCommand: ")
    (insert (shell-command-to-string command)))
@@ -52,3 +88,15 @@
   (get-buffer-create "rsync")
   (call-process "/home/davidam/scripts/rsync-rmail.sh" nil "rsync")
   (switch-to-buffer (get-buffer "rsync")))
+
+(defun davidam-multiply-two (number1 number2)
+  (interactive "nNumber 1: \nnNumber 2: " number1 number2)
+  (message "The result is %d" (* number1 number2)))
+
+(defun davidam-triangle-using-dotimes (number-of-rows)
+  "Using dotimes, add up the number of pebbles in a triangle."
+  (interactive "nNumber of rows: " number-of-rows) 
+  (let ((total 0))  ; otherwise a total is a void variable
+    (dotimes (number number-of-rows total)
+      (setq total (+ total (1+ number))))
+    (message "Number of pebbles: %d" total)))
