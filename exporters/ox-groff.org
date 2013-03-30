@@ -45,13 +45,13 @@ In such order:
         as Cover Pages (COVER/COVEND pairs).
 
 * Groff export commands
- - M-x org-groff-export-to-groff :: Converts buffer to Groff under
-      the assumptions that it was Org mode syntax. For an Org file like
-      =myfile.org= the Groff file will be =myfile.groff=. The file will
-      be overwritten without warning.
- - M-x org-groff-export-to-pdf :: Converts buffer to a PDF file under
-      the assumptions that it was Org mode syntax. It uses Groff as its
-      typesetter engine.
+- M-x org-groff-export-to-groff :: Converts buffer to Groff under
+     the assumptions that it was Org mode syntax. For an Org file like
+     =myfile.org= the Groff file will be =myfile.groff=. The file will
+     be overwritten without warning.
+- M-x org-groff-export-to-pdf :: Converts buffer to a PDF file under
+     the assumptions that it was Org mode syntax. It uses Groff as its
+     typesetter engine.
 
 * Header and sectioning structure
 By default, the Groff export uses the =internal= (.MT 0) Memorandum Type
@@ -100,24 +100,24 @@ list. The element of the list are:
      include statement (.so) with the path of the custom file is used.
 - document options :: This is a property list containing the document
      options. These are:
-   - :type :: Document type. Defines if the header information is created
-             or not. Options are "memo" for full header, "cover" for
-             full header plus COVER/COVENT statement, "custom" for no
-             header[1]
-   - :heading :: Defines the command to invoke each of the section
-                 heading. Options are 'default for the MM defaults and a
-                 pointer to a function that will return a format string
-                 containing the heading command. The format string takes
-                 the =level= and the result of the =numberp= predicate that
-                 indicates if the heading is a numbered one or not.
-   - :last-section :: Defines what is the last item to print. Options
-                      are "toc" for table of content and "sign" for
-                      signature.
-   - :paragraph :: Defines the command to invoke each of the paragraph
-                   commands. Options are 'default or a pointer to a
-                   function that will return a format string containing
-                   the paragraph formatting commands before writing the
-                   paragraph.
+  - :type :: Document type. Defines if the header information is created
+            or not. Options are "memo" for full header, "cover" for
+            full header plus COVER/COVENT statement, "custom" for no
+            header[1]
+  - :heading :: Defines the command to invoke each of the section
+                heading. Options are 'default for the MM defaults and a
+                pointer to a function that will return a format string
+                containing the heading command. The format string takes
+                the =level= and the result of the =numberp= predicate that
+                indicates if the heading is a numbered one or not.
+  - :last-section :: Defines what is the last item to print. Options
+                     are "toc" for table of content and "sign" for
+                     signature.
+  - :paragraph :: Defines the command to invoke each of the paragraph
+                  commands. Options are 'default or a pointer to a
+                  function that will return a format string containing
+                  the paragraph formatting commands before writing the
+                  paragraph.
 
 [1] All memorandum and letter types are defined by default. This command is useful
 for new types of covers or when a custom file is being invoked.
@@ -139,9 +139,7 @@ Example:
          ".so myclassfile.groff"
          (:heading org-groff--colored-heading :type
           "memo" :last-section "toc")))
-
 #+end_src
-
 
 The =#+GROFF_CLASS_OPTIONS= option is used to add additional information
 that changes the document structure or adds additional information that
@@ -186,13 +184,13 @@ a business letter. The following special tags are in use by the
 - BODY :: Defines the body part of a letter.
 
 Special tags have several rules to follow. These are:
-  1. It must be the first tag of a list of tags, or a single tag.
-  2. It should be placed on first level headlines only
-  3. Items will be placed in their location and not written as part of
-     the document.
-The use of these is described in detail in the following sections.
+1. it must be the first tag of a list of tags, or a single tag,
+2. it should be placed on first level headlines only,
+3. items will be placed in their location and not written as part of
+   the document.
+Use of tags is described in detail in the following sections.
 
-** Tags used for Letter types.
+** Tags used for Letter types
 Letter types use the FROM, TO, BODY and NS tags for placing content in
 a document class of letter.  Letter types are the ones defined as:
 block, semiblock, simplified and fullblock.
@@ -321,14 +319,14 @@ be more suitable to use than the one prescribed in the manual page. This
 is because it does not follow the Bell Labs nomenclature.
 
 This alternate ordering is:
-  1. Initials
-  2. Building Name or Location
-  3. Room
-  4. Extension
-  5. Main telephone switch number
-  6. Street
-  7. City, State, Province, Postal code
-  8. Email address
+1. Initials
+2. Building Name or Location
+3. Room
+4. Extension
+5. Main telephone switch number
+6. Street
+7. City, State, Province, Postal code
+8. Email address
 
 This ordering places the author information in the following order:
 
@@ -438,28 +436,27 @@ of GNU's source highlight
 ([[http://www.gnu.org/software/src-highlite/]]). The steps needed to use
 this feature are as follows:
 
- 1. Install source highlight according to the instruction in the
-    distribution. Source highlight requires the Boost [[www.boost.org]]
-    libraries installed and available as well. See their respective
-    documentation for details.
- 2. Make sure that the source highlight binary is available in your
-    PATH.
- 3. Download the groff language files from
-    [[http://www.github.com/papoanaya/emacs_utils/source-highlight]]. Place
-    them in the source-highlight configuration directory, usually under
-    =share/source-highlight=. Note that the outlang.map will replace the
-    one in the configuration directory. If you have custom outlang.map
-    entries, they have to be merged with the ones from the Groff
-    language files.
- 4. Set the custom variable =org-groff-source-highlight= to
-    *t* in your .emacs file (i. e. =(setq org-groff-source-highlight t)=)
+1. Install source highlight according to the instruction in the
+   distribution. Source highlight requires the Boost [[www.boost.org]]
+   libraries installed and available as well. See their respective
+   documentation for details.
+2. Make sure that the source highlight binary is available in your
+   PATH.
+3. Download the groff language files from
+   [[http://www.github.com/papoanaya/emacs_utils/source-highlight]]. Place
+   them in the source-highlight configuration directory, usually under
+   =share/source-highlight=. Note that the outlang.map will replace the
+   one in the configuration directory. If you have custom outlang.map
+   entries, they have to be merged with the ones from the Groff
+   language files.
+4. Set the custom variable =org-groff-source-highlight= to
+   *t* in your .emacs file (i. e. =(setq org-groff-source-highlight t)=)
 
 When the #+begin_src line is used with a supported language, the Groff
 export process will submit the block to source-highlight for
 processing.
 
 For example:
-
 #+begin_example
    #+begin_src emacs-lisp
      (message "Hello World")
@@ -472,7 +469,6 @@ the highlighted code. This code will be surrounded with a Display Static pair
 /Exhibit/ caption at the bottom of the highlighted source.
 
 The following languages are supported by default:
-
 | <l20>                | <l20>                |
 | begin_src tag        | source highlight language |
 |----------------------+----------------------|
@@ -581,48 +577,48 @@ The following limitations are known at the time of release. They will be
 looked at and addressed  in subsequent releases if they are technically
 solvable.
 
-  - Images :: Image support is limited to PIC, PS and EPS.
-  - Links :: There is no support for document linking or grefer. Most
-             links will be just written. The only exception are for
-             supported image and files with a .groff extension. The
-             former will be embedded in the exported file, the later
-             will be included through the use of a .so command.
-  - Abstracts :: Abstract support is only available through the use of
-                 embedded Groff.
-  - Equations :: Equations support is only available through the use of
-                 embedded Groff.
-  - Alternate Macro Set :: There are plans to create export for MOM
-       macros. No plans for the MS set unless there is enough
-       interest. The reason is that MOM seems to be the up and coming
-       substitute for MM and its similarities with LaT_eX makes it a
-       very attractive alternative to MM. It also allows the use of the
-       macros available in the WWW set.
-  - Gnuplot :: Gnuplot plots can be included if the following conditions
-               are met:
-      1. Output type  must be set to =gpic= (GnuPIC). Using Lat_eX EPS
-         will result in an incomplete graph.
-      2. For images generated directly from an Org mode table will have
-         to be included afterwards after its generation.  For example:
-         #+BEGIN_EXAMPLE
-           #+PLOT: title "X" ... set:"term gpic" "set:output 'table.pic'"
-           | a | b | c |
-           | 1 | 2 | 3 |
-           [[file:table.pic]]
-         #+END_EXAMPLE
-      3. While using Org Babel, gpic output specification needs to be
-         stated. Otherwise, the image will not be included on export.
-         #+BEGIN_EXAMPLE
-           #+begin_src gnuplot :file salida.pic
-             set term gpic
-             plot sin(x)
-           #+end_src
-         #+END_EXAMPLE
-  - PlantUML :: Plantuml is supported but the output type must be
-                EPS. This is done by using /.eps/ as the file suffix.
-    #+BEGIN_EXAMPLE
-       #+begin_src plantuml :file x.eps
-          [A] --> [B]
-       #+end_src
-    #+END_EXAMPLE
-  - Other Babel Graphics :: Other babel graphics should be supported if
-       either PS, EPS or GnuPIC are used as their output format.
+- Images :: Image support is limited to PIC, PS and EPS.
+- Links :: There is no support for document linking or grefer. Most
+           links will be just written. The only exception are for
+           supported image and files with a .groff extension. The
+           former will be embedded in the exported file, the later
+           will be included through the use of a .so command.
+- Abstracts :: Abstract support is only available through the use of
+               embedded Groff.
+- Equations :: Equations support is only available through the use of
+               embedded Groff.
+- Alternate Macro Set :: There are plans to create export for MOM
+     macros. No plans for the MS set unless there is enough
+     interest. The reason is that MOM seems to be the up and coming
+     substitute for MM and its similarities with LaT_eX makes it a
+     very attractive alternative to MM. It also allows the use of the
+     macros available in the WWW set.
+- Gnuplot :: Gnuplot plots can be included if the following conditions
+             are met:
+    1. Output type  must be set to =gpic= (GnuPIC). Using Lat_eX EPS
+       will result in an incomplete graph.
+    2. For images generated directly from an Org mode table will have
+       to be included afterwards after its generation.  For example:
+       #+BEGIN_EXAMPLE
+         #+PLOT: title "X" ... set:"term gpic" "set:output 'table.pic'"
+         | a | b | c |
+         | 1 | 2 | 3 |
+         [[file:table.pic]]
+       #+END_EXAMPLE
+    3. While using Org Babel, gpic output specification needs to be
+       stated. Otherwise, the image will not be included on export.
+       #+BEGIN_EXAMPLE
+         #+begin_src gnuplot :file salida.pic
+           set term gpic
+           plot sin(x)
+         #+end_src
+       #+END_EXAMPLE
+- PlantUML :: Plantuml is supported but the output type must be
+              EPS. This is done by using /.eps/ as the file suffix.
+  #+BEGIN_EXAMPLE
+     #+begin_src plantuml :file x.eps
+        [A] --> [B]
+     #+end_src
+  #+END_EXAMPLE
+- Other Babel Graphics :: Other babel graphics should be supported if
+     either PS, EPS or GnuPIC are used as their output format.
