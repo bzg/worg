@@ -14,6 +14,44 @@ For a complete header argument reference see the Org-mode manual's
 page which lists all [[http://orgmode.org/manual/Specific-header-arguments.html][Specific-header-arguments]].  This page holds
 ancillary notes and tricks which have not made it into the manual.
 
+* Generally use =verbatim= when using =drawer=, =raw= or =org=
+We often want to add =verbatim= (which inhibits interpretation as a
+value, which can often result in a list or table result), when
+inserting results directly into the buffer using =drawer=, =raw= or
+=org= which don't do tabular interpretation.
+
+An example w/o =verbatim=.
+: #+begin_src sh :results drawer
+: cat <<EOF
+: | 1 | 2
+: |--
+: | a | b
+: EOF
+: #+end_src
+: 
+: #+RESULTS:
+: :RESULTS:
+: |   |    | 1 |   |   | 2 |
+: |   | -- |   |   |   |   |
+: |   |    | a |   |   | b |
+: :END:
+
+The same block /with/ the =verbatim= flag.
+: #+begin_src sh :results verbatim drawer
+: cat <<EOF
+: | 1 | 2
+: |--
+: | a | b
+: EOF
+: #+end_src
+: 
+: #+RESULTS:
+: :RESULTS:
+: | 1 | 2 |
+: |---+---|
+: | a | b |
+: :END:
+
 * Common combinations of header-args and result types
    Many combinations of header arguments and result types are
    supported by Org Babel. Individual languages may even define
@@ -25,7 +63,6 @@ ancillary notes and tricks which have not made it into the manual.
    result types that might be considered reasonable for many
    programming languages.
 
-    #+tblname: header-args-combinations
     | evaluation | collection | type              |
     | (:session) | (:results) | (:results)        |
     |------------+------------+-------------------|
@@ -62,12 +99,9 @@ ancillary notes and tricks which have not made it into the manual.
     |            |            | code              |
     |            |            | pp                |
 
-     
     More special header arguments and their possible values are
     summarized in the next table:
    
-    #+tblname: other-header-args
-    
     | header-arg |          | values  |          |         |
     |------------+----------+---------+----------+---------|
     | :results   | silent   | replace | append   | prepend |
@@ -86,7 +120,6 @@ ancillary notes and tricks which have not made it into the manual.
     | :rownames  | no       | yes     |          |         |
     | :shebang   | "string" |         |          |         |
     | :eval      | never    | query   |          |         |
-
 
 * Setting language and file specific default header argument values
 This may be useful to e.g., have all Python code blocks in a file use
