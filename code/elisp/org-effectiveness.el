@@ -60,14 +60,16 @@
     (message "Number of Canceled: %d" (count-matches "* CANCELED"))))
 
 (defun org-effectiveness()
-  "Returns the effectiveness in the current org file"
+  "Returns the effectiveness in the current org buffer"
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (let ((done (float (count-matches "* DONE")))
-	  (canc (float (count-matches "* CANCELED")))
-	  (effectiveness (* 100 (/ done (+ done canc)))))
-      (message "Effectiveness: %f" effectiveness))))
+    (let ((done (float (count-matches "* DONE.*\n.*")))
+	  (canc (float (count-matches "* CANCELED.*\n.*"))))
+      (if (and (= done canc) (zerop done))
+	  (setq effectiveness 0)
+	(setq effectiveness (* 100 (/ done (+ done canc)))))
+      (message "Effectiveness: %f %f %f" effectiveness done canc))))
 
 (defun org-keywords-in-date(keyword date)
   (interactive "sKeyword: \nsDate: " keyword date)
