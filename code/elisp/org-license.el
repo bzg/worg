@@ -97,12 +97,17 @@ Reconocimiento-NoComercial-SinObraDerivada 3.0] Unported]")))
   (interactive "MLanguage: " language)
   (cond ((equal language "es")
 	 (insert "* Licencia
-Este documento está bajo la [[https://www.gnu.org/copyleft/fdl.html][GNU Free Documentation License]]"))
-	(insert (concat "* License
-Copyright (C)  2013" full-name "
-    Permission is granted to copy, distribute and/or modify this document
+Copyright (C)  2013 " user-full-name
+"\n    Se permite copiar, distribuir y/o modificar este documento
+    bajo los términos de la GNU Free Documentation License, Version 1.3
+    o cualquier versión publicada por la Free Software Foundation;
+    sin Secciones Invariantes y sin Textos de Portada o Contraportada.
+    Una copia de la licencia está incluida en [[https://www.gnu.org/copyleft/fdl.html][GNU Free Documentation License]]."))
+	(t (insert (concat "* License
+Copyright (C)  2013 " user-full-name
+"\n    Permission is granted to copy, distribute and/or modify this document
     under the terms of the GNU Free Documentation License, Version 1.3
     or any later version published by the Free Software Foundation;
     with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
-    A copy of the license is included in [[https://www.gnu.org/copyleft/fdl.html][GNU Free Documentation License]].")))
+    A copy of the license is included in [[https://www.gnu.org/copyleft/fdl.html][GNU Free Documentation License]]."))))
   (insert "\n\n[[file:https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/GFDL_Logo.svg/200px-GFDL_Logo.svg.png]]"))
