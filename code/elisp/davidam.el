@@ -37,31 +37,6 @@
   (insert "#+BEGIN_SRC " msg)
   (insert "\n#+END_SRC\n"))
 
-(defun davidam-org-license-cc-by ()
-  (interactive)
-  (insert "* Licencia
-Esta página está bajo una [[http://creativecommons.org/licenses/by/3.0/deed.es_ES][Licencia Creative Commons Reconocimiento Unported 3.0]]
-[[file:http://i.creativecommons.org/l/by/3.0/88x31.png]]"))
-
-(defun davidam-org-license-cc-by-nd ()
-  (interactive)
-  (insert "* Licencia
-Esta página está bajo una [[http://creativecommons.org/licenses/by-nd/3.0/es/deed.es][Licencia Creative Commons
-Atribución-SinDerivadas 3.0]]
-[[file:http://i.creativecommons.org/l/by-nd/3.0/88x31.png]]"))
-
-(defun davidam-org-license-cc-by-nc ()
-  (interactive)
-  (insert "* Licencia
-Esta página está bajo una [[http://creativecommons.org/licenses/by-nc/3.0/deed.es_ES][Licencia Creative Commons
-Reconocimiento-NoComercial 3.0] Unported]"))
-
-(defun davidam-org-license-cc-by-nc-nd ()
-  (interactive)
-  (insert "* Licencia
-Esta página está bajo una [[http://creativecommons.org/licenses/by-nc-nd/3.0/deed.es_ES][Licencia Creative Commons
-Reconocimiento-NoComercial-SinObraDerivada 3.0] Unported]"))
-
 (defun davidam-happy-birthday(person)
   (interactive "MWrite the person name: ")
   (message (concat "Happy birthday to you. Happy birthday to you. Happy birthday, dear " person ". Happy birthday to you")))
