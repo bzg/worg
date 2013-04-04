@@ -12,8 +12,8 @@
 [[file:../index.org][{Back to Worg's index}]]
 
 This document is aimed at back-end developers for the generic export
-engine =org-export.el=.  It assumes a good understanding of [[./org-syntax.org][Org syntax]]
-from the reader.
+engine =ox.el=.  It assumes a good understanding of [[./org-syntax.org][Org syntax]] from
+the reader.
 
 It covers [[#back-end][back-end creation]] process, all [[#attributes][attributes]] associated to each
 element or object type, properties offered by the [[#communication][communication
@@ -434,15 +434,12 @@ end-users are explained in the last part of this document.
    /Note relative to export:/ Each back-end should, as far as
    possible, support a number of common keywords.  These include:
 
-   - Back-end relative keyword (i.e. "LATEX" for =e-latex=), which
+   - Back-end relative keyword (i.e. "LATEX" for =ox-latex=), which
      should always return its value as-is.
 
-   - "TARGET" keyword, which should always return a nil value.
-
-   - "TOC" keyword.  It accepts four common values: "headlines",
-     "tables", "figures", "listings".  Also, "headlines" value can
-     have an optional numeric argument to specify depth of the
-     contents.
+   - "TOC" keyword.  It accepts three common values: "headlines",
+     "tables" and "listings".  Also, "headlines" value can have an
+     optional numeric argument to specify depth of the contents.
 
      See [[#collect-headlines][~org-export-collect-headlines~]], [[#collect-tables][~org-export-collect-tables~]],
      [[#collect-figures][~org-export-collect-figures~]] and [[#collect-listings][~org-export-collect-listings~]].
@@ -490,8 +487,8 @@ end-users are explained in the last part of this document.
      - ~coderef~ :: Line in some source code,
      - ~custom-id~ :: Specific headline's custom-id,
      - ~file~ :: External file,
-     - ~fuzzy~ :: Target, target keyword, a named element or an
-                  headline in the current parse tree,
+     - ~fuzzy~ :: Target, referring to a target object, a named
+                  element or a headline in the current parse tree,
      - ~id~ :: Specific headline's id,
      - ~radio~ :: Radio-target.
      It can also be any ~org-link-types~ element.
@@ -499,25 +496,22 @@ end-users are explained in the last part of this document.
 
    /Notes relative to export:/
 
-   - A fuzzy link leading to a target keyword should be ignored during
-     export: it's an invisible target.
+   A fuzzy link with no description should display the cross-reference
+   number of its target.  This number can be:
 
-   - A fuzzy link with no description should display the
-     cross-reference number of its target.  This number can be:
+   - If link's destination is a target object within a footnote, it
+     will be footnote's number.
 
-     - If link's destination is a target object within a footnote, it
-       will be footnote's number.
+   - If link's destination is a target object in a list, it will be an
+     item number.
 
-     - If link's destination is a target object in a list, it will be
-       an item number.
+   - If link leads to a named element, it will be the sequence number
+     of that element among named elements of the same type.
 
-     - If link leads to a named element, it will be the sequence number
-       of that element among named elements of the same type.
+   - Otherwise, it will be the number of the headline containing
+     link's destination.
 
-     - Otherwise, it will be the number of the headline containing
-       link's destination.
-
-     See [[#get-ordinal][~org-export-get-ordinal~]] function.
+    See [[#get-ordinal][~org-export-get-ordinal~]] function.
 
 ** Macro
 
@@ -1528,6 +1522,23 @@ end-users are explained in the last part of this document.
 
    See also: [[#resolve-coderef][~org-export-resolve-coderef~]].
 
+** ~org-export-get-date~
+   :PROPERTIES:
+   :CUSTOM_ID: get-date
+   :END:
+
+   Returns a date, as a string or a secondary string.  It handles
+   ~org-export-date-timestamp-format~.
+
+   Note that ~:with-date~ property in [[#communication][communication channel]] should be
+   checked prior to use this, as shown in the following example
+   extracted from ~ox-latex.el~:
+
+   #+BEGIN_SRC emacs-lisp :exports code
+   (let ((date (and (plist-get info :with-date) (org-export-get-date info))))
+     (format "\\date{%s}\n" (org-export-data date info)))
+   #+END_SRC
+
 ** ~org-export-get-footnote-definition~
    :PROPERTIES:
    :CUSTOM_ID: get-footnote-definition
@@ -1640,15 +1651,13 @@ end-users are explained in the last part of this document.
       ;; Do not apply a special syntax on fuzzy links pointing to targets.
       ((string= type "fuzzy")
        (let ((destination (org-export-resolve-fuzzy-link link info)))
-         ;; Ignore invisible "#+TARGET: path".
-         (unless (eq (org-element-type destination) 'keyword)
-           ;; If link has a description, use it.
-           (if (org-string-nw-p desc) desc
-             (when destination
-               (let ((number (org-export-get-ordinal destination info)))
-                 (when number
-                   (if (atom number) (number-to-string number)
-                     (mapconcat 'number-to-string number ".")))))))))
+         ;; If link has a description, use it.
+         (if (org-string-nw-p desc) desc
+           (when destination
+             (let ((number (org-export-get-ordinal destination info)))
+               (when number
+                 (if (atom number) (number-to-string number)
+                   (mapconcat 'number-to-string number "."))))))))
       ...))
    #+END_SRC
 
