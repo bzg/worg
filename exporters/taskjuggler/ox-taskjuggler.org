@@ -1,0 +1,625 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE:      Exporting Gantt charts with Taskjuggler v3 (tj3)
+#+AUTHOR:     John Henderson
+#+EMAIL:      jw DOT hendy AT gmail DOT com
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+[[file:index.org][{Back to Worg's index}]]
+
+
+* Introduction
+
+This article discusses the use of [[http://orgmode.org/][Org-mode]] for project planning using [[http://www.taskjuggler.org/][Taskjuggler]],
+self-described as follows (from the project website):
+
+#+begin_quote
+TaskJuggler is a modern and powerful, Free and Open Source Software project management
+tool. Its new approach to project planning and tracking is more flexible and superior to
+the commonly used Gantt chart editing tools. 
+#+end_quote
+
+A [[http://orgmode.org/worg/org-tutorials/org-taskjuggler.html][tutorial already exists]] for the use of Org-mode and Taskjuggler v2.4.3, the last release of the
+v2.x.x series. Taskjuggler Version 3 (often referred to as simply "tj3"), was rebuilt using [[http://www.ruby-lang.org/en/][Ruby]], and no
+longer features the former [[http://qt-project.org/][Qt]]-based GUI for task/timeline management of a project.
+
+It should also be mentioned that the project is now [[http://www.taskjuggler.org/manual/change_log.html#version_1_0_0][10 years old]], and, as a result, is
+[[http://taskjuggler.org/tj3/manual/toc.html][fantastically documented]]. 
+
+The [[http://orgmode.org/manual/TaskJuggler-export.html][Org-mode manual coverage of Taskjuggler]] covers Taskjuggler export to some extent,
+however the defaults assume the use of version 2.x.x. This tutorial will lay out
+the changes required to successfully export with tj3.
+
+* Installation and Setup
+
+*Preface:* If you have not recently (and successfully) used tj3, it is recommended that you
+try compiling the example =.tjp= file as described below to rule out any issues with the
+tj3 installation itself before moving on integrating tj3 with Org mode.
+
+Please refer to the [[http://taskjuggler.org/tj3/manual/Installation.html#Installation][installation section]] of the Taskjuggler manual for instructions. For
+the high level overview, you will need to install =ruby= and possibly =ruby-gems=. The
+easiest method is probably to install =ruby-gems= and simply type, from a
+terminal/command-line interface (you may need to run this as the =root= user or with =sudo=):
+
+#+begin_example
+
+gem install taskjuggler
+
+#+end_example
+
+For Linux users, you may have a distro-specific package available if you would rather choose that
+route. For example, the Arch Linux User Repository ([[https://aur.archlinux.org/][AUR]]) has a [[https://aur.archlinux.org/packages/taskjuggler3/][Taskjuggler 3 package]] available.
+
+Once installed, you should check functionality by typing:
+
+#+begin_example 
+
+tj3 --version
+
+#+end_example
+
+If you just can't wait to see what tj3 can do, try compiling their [[http://taskjuggler.org/tj3/examples/Tutorial/tutorial.tjp][sample file]]:
+
+- Copy/paste into a file called =something.tjp=. Alternatively, 
+
+#+begin_example
+
+http://taskjuggler.org/tj3/examples/Tutorial/tutorial.tjp
+
+#+end_example
+
+- Save the file and then issue:[fn:1]
+
+#+begin_example
+
+$ cd /path/to/something.tjp
+$ tj3 something.tjp
+
+#+end_example
+
+Now check out the generated =Overview.html= in a browser!
+
+* Using tj3 with Org mode
+
+To activate the Taskjuggler exporter in Org-mode, add this line to =~/.emacs=:
+
+#+begin_example
+
+(require 'ox-taskjuggler)
+
+#+end_example
+
+Either restart Emacs or issue =M-x load-file RET ~/.emacs RET= and we're ready to create
+our project managment =.org= file!
+
+/This document is a work in progress; more details to come [shortly]!/
+
+* Footnotes
+
+[fn:1] You may run into compilation issues due to special characters in that file on
+lines 37 (a copyright symbol), 79, and 83 (two accented characters in resource names). If
+this happens, just replace those three characters with something else, or delete them,
+and the file should compile. [[https://github.com/taskjuggler/TaskJuggler/issues/105][An issue has been filed]] inquiring about whether or not this
+is a system setup issue and, if not, suggesting that the characters be replaced.
+
+* TODO Fill in the details!					   :noexport:
+** Plan your project
+You start out as you normally would by breaking down the project into
+tasks. Let's take the following example where you have a project to
+create an accounting software:
+
+#+BEGIN_SRC org
+,* Accounting Software
+
+,** Specification
+
+,** Software Development
+,*** Database coupling
+,*** Back-End Functions
+,*** Graphical User Interface
+
+,** Software testing
+,*** Alpha Test
+,*** Beta Test
+
+,** Manual
+
+,** Milestones
+,*** Project start
+,*** Technology Preview
+,*** Beta version
+,*** Ship Product to Customer
+#+END_SRC
+
+** Estimate the effort
+Now that you've figured out the tasks it's time to estimate the
+efforts for each task. By using column view this can be done very
+efficiently. It also helps to define the =COLUMNS= and default values
+for the Effort property as shown in the following screen shot:
+
+#+CAPTION: Estimating effort using column view 
+#+ATTR_HTML: alt="Estimating effort using column view"
+[[file:../images/taskjuggler/effort-estimation.png]]
+
+Your resulting Org mode project file will look somewhat like the
+following:
+
+#+BEGIN_SRC org
+,#+PROPERTY: Effort_ALL 2d 5d 10d 20d 30d 35d 50d 
+,#+COLUMNS: %70ITEM(Task) %Effort
+
+,* Accounting Software
+
+,** Specification
+   :PROPERTIES:
+   :Effort:   20d
+   :END:
+
+,** Software Development
+
+,*** Database coupling
+    :PROPERTIES:
+    :Effort:   20d
+    :END:
+
+,*** Back-End Functions
+    :PROPERTIES:
+    :Effort:   30d
+    :END:
+
+,*** Graphical User Interface
+    :PROPERTIES:
+    :Effort:   35d
+    :END:
+
+,** Software testing
+,*** Alpha Test
+    :PROPERTIES:
+    :Effort:   5d
+    :END:
+
+,*** Beta Test
+    :PROPERTIES:
+    :Effort:   20d
+    :END:
+
+,** Manual
+   :PROPERTIES:
+   :Effort:   50d
+   :END:
+
+,** Milestones
+,*** Project start
+,*** Technology Preview
+,*** Beta version
+,*** Ship Product to Customer
+#+END_SRC
+
+** Generate a Gantt chart
+Before you now export the project to TaskJuggler you need to tell the
+exporter in which tree it can find the tasks. You do this by adding
+the tag ~taskjuggler_project~ to the node "Accounting Software"[fn:2].
+Do this by moving to the "Accounting Software" headline and typing the
+following:
+
+: C-c C-c taskjuggler_project RET
+
+This allows you to have other nodes for this project such as an
+introduction or general notes.
+
+To export the project to TaskJuggler you simply type 
+
+: M-x org-export-as-taskjuggler-and-open
+
+This will open your project in TaskJugglerUI as illustrated below
+
+#+CAPTION: Gantt chart in TaskJugglerUI
+#+ATTR_HTML: alt="Gantt chart in TaskJugglerUI"
+[[file:../images/taskjuggler/TaskJugglerUI1.png]]
+
+Since we have not assigned any resources to work on the project the
+exporter assumes that you will be the one working on it and has
+assigned all tasks to you. The tasks have been serialized so that you
+will not have to many things to do at once, i.e. the resources will be
+leveled.
+
+** Assign resources
+The next step is to list all the resources working on the project and
+assign the tasks to them. Create a node for the resources. You can
+group the resources by creating hierarchies. Tag the resource tree
+with the tag ~taskjuggler_resource~ so that the exporter knows where to
+look for resource definitions[fn:3].
+
+#+BEGIN_SRC org
+,* Resources                                         :taskjuggler_resource:
+,** Developers
+   :PROPERTIES:
+   :resource_id: dev
+   :END:
+,*** Paul Smith
+    :PROPERTIES:
+    :resource_id: paul
+    :END:
+,*** Sébastien Bono
+    :PROPERTIES:
+    :resource_id: seb
+    :END:
+,*** Klaus Müller
+
+,** Others
+,*** Peter Murphy
+    :PROPERTIES:
+    :resource_id: doc
+    :END:
+,*** Dim Sung
+    :PROPERTIES:
+    :resource_id: test
+    :END:
+#+END_SRC
+
+As you'll note I also added some ~resource_id~ properties to some of
+the resources (or resource groups). I will use these identifiers to
+allocate the resources to the tasks. The exporter will create unique
+ids for the resources automatically[fn:4], but if you want to use
+short forms it's better to define ~resource_id~ properties for your
+resources. This will also allow you to define default values for the
+allocation as follows:
+
+: #+PROPERTY: allocate_ALL dev doc test
+
+The easiest way to assign resources is again the column view mode.
+There is no need to allocate a resource to every task, as allocations
+are inherited in TaskJuggler[fn:5]. You'll note in the screen shot
+below that some tasks have more than one resource assigned to them.
+TaskJuggler will calculate the duration of the task based on the
+effort and the resources working on this task.
+
+#+CAPTION: Assign resources
+#+ATTR_HTML: alt="Assign resources"
+[[file:../images/taskjuggler/assign-resources.png]]
+
+If we now export the project you'll see that TaskJuggler scheduled
+some tasks in parallel (as there are several resources now which can
+work in parallel). See the screen shot below:
+
+#+CAPTION: Gantt Chart with multiple resources
+#+ATTR_HTML: alt="Gantt Chart with multiple resources"
+[[file:../images/taskjuggler/TaskJugglerUI2.png]]
+
+Obviously we need to define dependencies between the tasks.
+
+** Define dependencies
+There are several ways to define dependencies between tasks. When
+coming from an Org mode background you probably want to define them
+using the facilities provided by Org mode, which are either 
+
+  - The =ORDERED= property which allows you to state that the child
+    tasks have to be completed in the order they appear (top most
+    first).
+
+  - The =BLOCKER= property which allows you to state that a task
+    depends on either
+    - a previous sibling ("previous-sibling") or 
+    - any other task by stating the ~task_id~ property of the
+      predecessor
+
+Again, it is probably easiest to define the dependencies using the
+column view as shown below in the screen shot:
+
+#+CAPTION: Defining dependencies using column view 
+#+ATTR_HTML: alt="Defining dependencies using column view"
+[[file:../images/taskjuggler/define-dependencies.png]]
+
+Lastly there is also the ~depends~ property which corresponds to the
+TaskJuggler terminology. It can be used the same way as the =BLOCKER=
+property. This is illustrated below where the "Software Development"
+for example is blocked by the task "Specification", i.e. it has to
+wait until the specification is done. The task "Software Development"
+is defined as =ORDERED=, i.e. all the subtasks of it have to be
+completed in sequence. Another example is the milestone "Ship Product
+to Customer" which is waiting until the Beta test and the Manual are
+done.
+
+#+BEGIN_SRC org
+,#+PROPERTY: Effort_ALL 2d 5d 10d 20d 30d 35d 50d 
+,#+PROPERTY: allocate_ALL dev doc test
+,#+COLUMNS: %30ITEM(Task) %Effort %allocate %BLOCKER %ORDERED
+
+,* Accounting Software                                        :taskjuggler_project:
+
+,** Specification
+   :PROPERTIES:
+   :Effort:   20d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+,** Software Development
+   :PROPERTIES:
+   :ORDERED:  t
+   :BLOCKER:  previous-sibling
+   :priority: 1000
+   :allocate: dev
+   :END:
+
+,*** Database coupling
+    :PROPERTIES:
+    :Effort:   20d
+    :END:
+
+,*** Back-End Functions
+    :PROPERTIES:
+    :Effort:   30d
+    :task_id:  back_end
+    :END:
+
+,*** Graphical User Interface
+    :PROPERTIES:
+    :Effort:   35d
+    :allocate: paul, seb
+    :END:
+
+,** Software testing
+   :PROPERTIES:
+   :ORDERED:  t
+   :BLOCKER:  previous-sibling
+   :allocate: test
+   :END:
+,*** Alpha Test
+    :PROPERTIES:
+    :Effort:   5d
+    :task_id:  alpha
+    :END:
+
+,*** Beta Test
+    :PROPERTIES:
+    :Effort:   20d
+    :task_id:  beta
+    :allocate: test, paul
+    :END:
+
+,** Manual
+   :PROPERTIES:
+   :Effort:   50d
+   :task_id:  manual
+   :BLOCKER:  start
+   :allocate: doc
+   :END:
+
+,** Milestones
+,*** Project start
+    :PROPERTIES:
+    :task_id:  start
+    :END:
+
+,*** Technology Preview
+    :PROPERTIES:
+    :BLOCKER:  back_end
+    :END:
+
+,*** Beta version
+    :PROPERTIES:
+    :BLOCKER:  alpha
+    :END:
+
+,*** Ship Product to Customer
+    :PROPERTIES:
+    :BLOCKER:  beta manual
+    :END:
+
+
+,* Resources                                         :taskjuggler_resource:
+,** Developers
+   :PROPERTIES:
+   :resource_id: dev
+   :END:
+,*** Paul Smith
+    :PROPERTIES:
+    :resource_id: paul
+    :END:
+,*** Sébastien Bono
+    :PROPERTIES:
+    :resource_id: seb
+    :END:
+,*** Klaus Müller
+
+,** Others
+,*** Peter Murphy
+    :PROPERTIES:
+    :resource_id: doc
+    :limits:   { dailymax 6.4h }
+    :END:
+,*** Dim Sung
+    :PROPERTIES:
+    :resource_id: test
+    :END:
+#+END_SRC
+
+If you export the example above you'll TaskJuggler will schedule the
+tasks as shown in the screen shot below
+
+#+CAPTION: Gantt Chart with dependencies
+#+ATTR_HTML: alt="Gantt Chart with dependencies"
+[[file:../images/taskjuggler/TaskJugglerUI3.png]]
+
+Also TaskJuggler will give you a overview how busy youre resources
+will be and what they are working on. See below for a screen shot:
+
+#+CAPTION: Resource usage chart
+#+ATTR_HTML: alt="Resource usage chart"
+[[file:../images/taskjuggler/resource-graph.png]]
+
+Finally you can generate [[file:../images/taskjuggler/project-plan.pdf][good-looking project plans]] in PDF by printing
+from TaskJuggler. This will make any [[http://en.wikipedia.org/wiki/Pointy-haired_Boss][Pointy-haired Boss]] happy.
+
+** Export of other properties
+Generally the exporter writes a node property that is known to
+TaskJuggler (such as ~shift~, ~booking~, ~efficiency~, ~journalentry~,
+~rate~ for resources or ~account~, ~start~, ~note~, ~duration~, ~end~,
+~journalentry~, ~milestone~, ~reference~, ~responsible~, ~scheduling~,
+etc for tasks) as is to the TaskJuggler file.
+
+Other properties such as completeness or priority are derived from
+implicit information in the Org mode file. The TODO state for example
+determines the completeness. A task will be exported with 100%
+complete (~complete 100~) if it is marked as done. The priority of a
+task will be determined through its priority cookie.
+
+
+** Old footnotes
+[fn:2] You can customize this tag
+
+[fn:3] Again, of course this tag can be customized
+
+[fn:4] by downcasing the headline, replacing non-ascii characters with
+'_' and picking the first word if it is unique
+
+[fn:5] In TaskJuggler the allocations are cumulative, the exporter
+however adds some code so that inherited allocation are ignored when
+explicitly assigning a resource.
+* TODO Incorporate/update old material into this file		   :noexport:
+
+This is from ./exporters/taskjuggler.org from Bastien and needs to be added into this
+document. It comes from the 7.9.3f version of the manual.
+
+** Introduction
+
+[[http://www.taskjuggler.org/][TaskJuggler]] is a project management tool.  It provides an optimizing
+scheduler that computes your project time lines and resource assignments
+based on the project outline and the constraints that you have provided.
+
+The TaskJuggler exporter is a bit different from other exporters, such as
+the =HTML= and @LaTeX{} exporters for example, in that it does not export
+all the nodes of a document or strictly follow the order of the nodes in
+the document.
+
+Instead the TaskJuggler exporter looks for a tree that defines the tasks
+and optionally trees that define the resources and reports for this
+project.  It then creates a TaskJuggler file based on these trees and the
+attributes defined in all the nodes.
+
+** TaskJuggler export commands
+
+You need to have Org's =contrib/= in your Emacs =load-path= and to
+=(require 'ox-taskjuggler)= to add the TaskJuggler export.  See also the
+docstring of =org-export-backends= on how to add new backends by default.
+
+When ox-taskjuggler.el is loaded, it defines two new handlers within =C-c
+C-e= (=org-export-dispatch=):
+
+| Keybinding  |                                    |                                                                                                     |
+|-------------+------------------------------------+-----------------------------------------------------------------------------------------------------|
+| C-c C-e j J | org-export-as-taskjuggler          | Export as a TaskJuggler file                                                                        |
+| C-c C-e j o | org-export-as-taskjuggler-and-open | Export as a TaskJuggler file and then open the file with TaskJugglerUI (only for TaskJugglerUI 2.x) |
+
+** Tasks
+
+#+index: org-export-taskjuggler-project-tag
+
+Create your tasks as you usually do with Org mode.  Assign efforts to each
+task using properties (it is easiest to do this in the column view).  You
+should end up with something similar to the example by Peter Jones in
+http://www.contextualdevelopment.com/static/artifacts/articles/2008/project-planning/project-planning.org.
+Now mark the top node of your tasks with a tag named
+=:taskjuggler_project:= (or whatever you customized
+=org-export-taskjuggler-project-tag= to).  You are now ready to export the
+project plan with =C-c C-e J= which will export the project plan and
+open a gantt chart in TaskJugglerUI.
+
+** Resources
+
+#+index: org-export-taskjuggler-resource-tag
+
+Next you can define resources and assign those to work on specific tasks.
+You can group your resources hierarchically.  Tag the top node of the
+resources with =:taskjuggler_resource:= (or whatever you customized
+=org-export-taskjuggler-resource-tag= to).  You can optionally assign an
+identifier (named ~resource_id~) to the resources (using the standard Org
+properties commands, see the [[http://orgmode.org/org.html#Property-syntax][Property syntax]] section of the manual) or you
+can let the exporter generate identifiers automatically (the exporter picks
+the first word of the headline as the identifier as long as it is
+unique---see the documentation of =org-taskjuggler-get-unique-id=).  Using
+that identifier you can then allocate resources to tasks.  This is again
+done with the ~allocate~ property on the tasks.  Do this in column view or
+when on the task type =C-c C-x p allocate RET <resource_id> RET=.
+
+Once the allocations are done you can again export to TaskJuggler and check
+in the Resource Allocation Graph which person is working on what task at
+what time.
+
+** Export of properties
+
+The exporter also takes TODO state information into consideration, i.e., if
+a task is marked as done it will have the corresponding attribute in
+TaskJuggler (~complete 100~).  Scheduling information is also taken into
+account to set start/end dates for tasks.
+
+The exporter will also export any property on a task resource or resource
+node which is known to TaskJuggler, such as ~limits~, ~vacation~, ~shift~,
+~booking~, ~efficiency~, ~journalentry~, ~rate~ for resources or ~account~,
+~start~, ~note~, ~duration~, ~end~, ~journalentry~, ~milestone~,
+~reference~, ~responsible~, ~scheduling~, etc.@: for tasks.
+
+** Dependencies
+
+The exporter will handle dependencies that are defined in the tasks either
+with the ~ORDERED~ attribute (@pxref{TODO dependencies}), with the
+~BLOCKER~ attribute (see @file{org-depend.el}) or alternatively with a
+~depends~ attribute.  Both the ~BLOCKER~ and the ~depends~ attribute can be
+either ~previous-sibling~ or a reference to an identifier (named ~task_id~)
+which is defined for another task in the project.  ~BLOCKER~ and the
+~depends~ attribute can define multiple dependencies separated by either
+space or comma.  You can also specify optional attributes on the dependency
+by simply appending it.  The following examples should illustrate this:
+
+#+BEGIN_EXAMPLE:
+** Preparation
+   :PROPERTIES:
+   :task_id:  preparation
+   :ORDERED:  t
+   :END:
+** Training material
+   :PROPERTIES:
+   :task_id:  training_material
+   :ORDERED:  t
+   :END:
+*** Markup Guidelines
+    :PROPERTIES:
+    :Effort:   2d
+    :END:
+*** Workflow Guidelines
+    :PROPERTIES:
+    :Effort:   2d
+    :END:
+** Presentation
+  :PROPERTIES:
+  :Effort:   2d
+  :BLOCKER:  training_material @{ gapduration 1d @} preparation
+  :END:
+#+END_EXAMPLE:
+
+#+index: org-export-taskjuggler-default-reports
+
+TaskJuggler can produce many kinds of reports (e.g., gantt chart, resource
+allocation, etc).  The user defines what kind of reports should be
+generated for a project in the TaskJuggler file.  By default, the exporter
+will automatically insert some pre-set reports in the file.  These defaults
+are defined in =org-export-taskjuggler-default-reports=.  They can be
+modified using customize along with a number of other options.  For a more
+complete list, see =M-x customize-group RET org-export-taskjuggler RET=.
+
+Alternately, the user can tag a tree with
+=org-export-taskjuggler-report-tag=, and define reports in sub-nodes,
+similarly to what is done with tasks or resources.  The properties used for
+report generation are defined in
+=org-export-taskjuggler-valid-report-attributes=. In addition, a special
+property named ~report-kind~ is used to define the kind of report one wants
+to generate (by default, a ~taskreport~).
+
+For more information and examples see the Org-taskjuggler tutorial at
+http://orgmode.org/worg/org-tutorials/org-taskjuggler.html.
+

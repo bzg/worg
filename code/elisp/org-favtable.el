@@ -6,7 +6,7 @@
 ;; Keywords: hypermedia, matching
 ;; Requires: org
 ;; Download: http://orgmode.org/worg/code/elisp/org-favtable.el
-;; Version: 2.2.0
+;; Version: 2.2.1
 
 ;;; License:
 
@@ -30,13 +30,17 @@
 ;; Purpose:
 ;;
 ;;  Mark and find your favorite things and locations in org easily: Create
-;;  and update a lookup table of your references and links. Often used
-;;  entries bubble to the top and entering some keywords displays only the
-;;  matching entries. That way the right entry one can be picked easily.
+;;  and update a lookup table of references and links. Often used entries
+;;  bubble to the top and entering some keywords narrows down to matching
+;;  entries only, so that the right one can be spotted easily.
 ;;
 ;;  References are essentially small numbers (e.g. "R237" or "-455-"),
 ;;  which are created by this package; they are well suited to be used
 ;;  outside of org. Links are just normal org-mode links.
+;;
+;;  For more documentation and working examples, see:
+;;
+;;    http://orgmode.org/worg/org-contrib/org-favtable.html
 ;;
 ;;
 ;; Setup:
@@ -106,7 +110,7 @@
 (require 'org-table)
 (require 'cl)
 
-(defvar org-favtable--version "2.2.0")
+(defvar org-favtable--version "2.2.1")
 (defvar org-favtable--preferred-command nil)
 
 (defvar org-favtable--commands '(occur head ref link enter leave goto + help reorder fill sort update highlight unhighlight missing statistics)
@@ -652,6 +656,8 @@ An example would be:
       ;; Clean up and examine search string
       (if search (setq search (org-trim search)))
       (if (string= search "") (setq search nil))
+      (if (string-match "^[0-9]+$" search)
+          (setq search (concat head search tail)))
       (setq search-is-ref (string-match ref-regex search))
 
       ;; Check for special case
@@ -1266,8 +1272,6 @@ An example would be:
     (setq initial-point (point))
     (org-favtable--goto-top)
     (setq top (point))
-    
-    (goto-char top)
     
     ;; count columns
     (org-table-goto-column 100)

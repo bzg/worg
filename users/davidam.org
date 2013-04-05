@@ -4,69 +4,24 @@
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
 #+TITLE:      David Arroyo Menéndez's Worg Page
 #+AUTHOR:     David Arroyo Menéndez
-#+EMAIL:      
-#+LANGUAGE:   es
+#+EMAIL:      davidam@es.gnu.org
+#+LANGUAGE:   en
 #+PRIORITIES: A C B
 #+CATEGORY:   worg
 
 [[file:../worgers.org][{Volver a Worgers}]]
 
-Mis contribuciones a org-mode han sido:
+My contributions to org-mode are:
 
-+ [[file:../org-tutorials/orgtutorial_dto-es.org][Traducción al español del Tutorial de David O'Toole]]
-+ [[http://www.davidam.com/docu/orgguide.es.html][Traducción al español de la Guía Compacta de Org-Mode]]
++ [[file:../org-tutorials/orgtutorial_dto-es.org][Translate to spanish the David O'Toole Tutorial]]
++ [[http://www.davidam.com/docu/orgguide.es.html][Translate to spanish the Compact Guide of Org-Mode]]
++ [[http://orgmode.org/worg/code/elisp/org-effectiveness.el][Org Effectiveness Mode]]
++ [[http://orgmode.org/worg/code/elisp/org-license.el][Org License Mode]]
 
-Puedes encontrar más sobre mi en [[http://www.davidam.com][mi web personal]].
+I maintain too: 
 
-También comparto algunas funciones que me ayudan cotidianamente:
++ [[http://orgmode.org/worg/code/elisp/davidam.el][A Sandbox of personal functions]]
++ [[http://www.davidam.com/emacs/drupal.el][An incipient drupal mode for emacs]]
 
-#+BEGIN_SRC lisp
-(defun davidam-org-envolve-src(msg)
-  "Envolve source between org tags"
-  (interactive "sChoose your programming language: " msg)
-  (if (equal nil msg) 
-      (setq msg "lisp"))
-  (goto-char (point))
-  (insert "\n#+END_SRC")
-  (goto-char (mark))
-  (insert "#+BEGIN_SRC " msg))
+You can find more about me in [[http://www.davidam.com][my personal website]].
 
-(defun davidam-org-src(msg)
-  "Insert org source tags"
-  (interactive "sChoose your programming language: " msg)
-  (if (equal nil msg) 
-      (setq msg "lisp"))
-  (insert "#+BEGIN_SRC " msg)
-  (insert "\n#+END_SRC\n"))
-
-(defun davidam-num-todo()
-  "Print a message with the number of todo tasks in the current buffer"
-  (interactive)
-  (goto-char (point-min))
-  (message "Number of TODO: %d" (count-matches "* TODO"))
-  (goto-char (mark)))
-									     
-(defun davidam-num-done()
-  "Print a message with the number of done tasks in the current buffer"
-  (interactive)
-  (goto-char (point-min))
-  (message "Number of DONE: %d" (count-matches "* DONE"))
-  (goto-char (mark)))
-
-(defun davidam-num-canceled()
-  "Print a message with the number of canceled tasks in the current buffer"
-  (interactive)
-  (goto-char (point-min))
-  (message "Number of Canceled: %d" (count-matches "* CANCELED"))
-  (goto-char (mark)))
-
-(defun davidam-effectiveness()
-  "Returns the effectiveness in the current org file"
-  (interactive)
-  (goto-char (point-min))
-  (message "Effectiveness: %f" 
-	   ( * 100 
-	       (/ (float (count-matches "* DONE")) 
-		  (+ (float (count-matches "* DONE")) (float (count-matches "* CANCELED"))))))
-  (goto-char (mark)))
-#+END_SRC

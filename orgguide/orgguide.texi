@@ -13,9 +13,9 @@
 @c Version and Contact Info
 @set MAINTAINERSITE @uref{http://orgmode.org,maintainers webpage}
 @set AUTHOR Carsten Dominik
-@set MAINTAINER Carsten Dominik
-@set MAINTAINEREMAIL @email{carsten at orgmode dot org}
-@set MAINTAINERCONTACT @uref{mailto:carsten at orgmode dot org,contact the maintainer}
+@set MAINTAINER Bastien Guerry
+@set MAINTAINEREMAIL @email{bzg at gnu dot org}
+@set MAINTAINERCONTACT @uref{mailto:bzg at gnu dot org,contact the maintainer}
 @c %**end of header
 @finalout
 
@@ -39,7 +39,7 @@
 @end macro
 @copying
 
-Copyright @copyright{} 2010-2012 Free Software Foundation
+Copyright @copyright{} 2010--2013 Free Software Foundation
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -50,13 +50,7 @@ and with the Back-Cover Texts as in (a) below.  A copy of the license
 is included in the section entitled ``GNU Free Documentation License.''
 
 (a) The FSF's Back-Cover Text is: ``You have the freedom to copy and
-modify this GNU manual.  Buying copies from the FSF supports it in
-developing GNU and promoting software freedom.''
-
-This document is part of a collection distributed under the GNU Free
-Documentation License.  If you want to distribute this document
-separately from the collection, you can do so by adding a copy of the
-license to the document, as described in section 6 of the license.
+modify this GNU manual.''
 @end quotation
 @end copying
 
@@ -103,6 +97,8 @@ license to the document, as described in section 6 of the license.
 * Publishing::			Create a web site of linked Org files
 * Working With Source Code::	Source code snippets embedded in Org
 * Miscellaneous::		All the rest which did not fit elsewhere
+
+* GNU Free Documentation License::  This manual license.
 
 @detailmenu
  --- The Detailed Node Listing ---
@@ -152,6 +148,7 @@ Tags
 * Tag inheritance::		Tags use the tree structure of the outline
 * Setting tags::		How to assign tags to a headline
 * Tag searches::		Searching for combinations of tags
+* Tag searches::		Searching for combinations of tags
 
 Dates and Times
 
@@ -162,7 +159,7 @@ Dates and Times
 
 Capture - Refile - Archive
 
-* Capture::			
+* Capture::			Capturing new stuff
 * Refile and copy::		Moving a tree from one place to another
 * Archiving::			What to do with finished projects
 
@@ -213,7 +210,7 @@ Exporting
 * HTML export::			Exporting to HTML
 * @LaTeX{} and PDF export::	Exporting to @LaTeX{}, and processing to PDF
 * DocBook export::		Exporting to DocBook
-* iCalendar export::		
+* iCalendar export::
 
 Miscellaneous
 
@@ -933,7 +930,7 @@ like this:
 The keywords should all be different, this helps Org mode to keep track of
 which subsequence should be used for a given entry.  The example also shows
 how to define keys for fast access of a particular state, by adding a letter
-in parenthesis after each keyword - you will be prompted for the key after
+in parenthesis after each keyword---you will be prompted for the key after
 @kbd{C-c C-t}.
 
 To define TODO keywords that are valid only in a single file, use the
@@ -953,7 +950,7 @@ the line to make the changes known to Org mode.
 
 Org mode can automatically record a timestamp and possibly a note when
 you mark a TODO item as DONE, or even each time you change the state of
-a TODO item.  This system is highly configurable, settings can be on a
+a TODO item.  This system is highly configurable; settings can be on a
 per-keyword basis and can be localized to a file or even a subtree.  For
 information on how to clock working time for a task, see @ref{Clocking
 work time}.
@@ -1060,7 +1057,7 @@ cookie.  For example:
 @section Checkboxes
 
 Every item in a plain list (@pxref{Plain lists}) can be made into a checkbox
-by starting it with the string @samp{[ ]}.  Checkboxes are not included into
+by starting it with the string @samp{[ ]}.  Checkboxes are not included in
 the global TODO list, so they are often great to split a task into a number
 of simple steps.
 Here is an example of a checkbox list.
@@ -1113,6 +1110,7 @@ Tags will by default be in bold face with the same color as the headline.
 @menu
 * Tag inheritance::		Tags use the tree structure of the outline
 * Setting tags::		How to assign tags to a headline
+* Tag searches::		Searching for combinations of tags
 * Tag searches::		Searching for combinations of tags
 @end menu
 
@@ -1193,7 +1191,46 @@ can instead set the TAGS option line as:
 #+TAGS: @@work(w)  @@home(h)  @@tennisclub(t)  laptop(l)  pc(p)
 @end smallexample
 
-@node Tag searches,  , Setting tags, Tags
+@node Tag searches, Tag searches, Setting tags, Tags
+@section Tag groups
+
+@cindex group tags
+@cindex tags, groups
+In a set of mutually exclusive tags, the first tag can be defined as a
+@emph{group tag}.  When you search for a group tag, it will return matches
+for all members in the group.  In an agenda view, filtering by a group tag
+will display headlines tagged with at least one of the members of the
+group.  This makes tag searches and filters even more flexible.
+
+You can set group tags by inserting a colon between the group tag and other
+tags, like this:
+
+@example
+#+TAGS: @{ @@read : @@read_book  @@read_ebook @}
+@end example
+
+In this example, @samp{@@read} is a @emph{group tag} for a set of three
+tags: @samp{@@read}, @samp{@@read_book} and @samp{@@read_ebook}.
+
+You can also use the @code{:grouptags} keyword directly when setting
+@var{org-tag-alist}:
+
+@lisp
+(setq org-tag-alist '((:startgroup . nil) 
+                      ("@@read" . nil)
+                      (:grouptags . nil)
+                      ("@@read_book" . nil)
+                      ("@@read_ebook" . nil)
+                      (:endgroup . nil)))
+@end lisp
+
+@kindex C-c C-x q
+@vindex org-group-tags
+If you want to ignore group tags temporarily, toggle group tags support
+with @command{org-toggle-tags-groups}, bound to @kbd{C-c C-x q}.  If you
+want to disable tag groups completely, set @var{org-group-tags} to nil.
+
+@node Tag searches,  , Tag searches, Tags
 @section Tag searches
 
 Once a system of tags has been set up, it can be used to collect related
@@ -1229,7 +1266,7 @@ Sacha Chua's article about tagging in Org-mode}}
 @node Properties, Dates and Times, Tags, Top
 @chapter Properties
 
-Properties are key-value pairs associates with and entry.  They live in a
+Properties are key-value pairs associated with an entry.  They live in a
 special drawer with the name @code{PROPERTIES}.  Each
 property is specified on a single line, with the key (surrounded by colons)
 first, and the value after it:
@@ -1522,7 +1559,7 @@ projects need to be moved around.  Moving completed project trees to an
 archive file keeps the system compact and fast.
 
 @menu
-* Capture::			
+* Capture::			Capturing new stuff
 * Refile and copy::		Moving a tree from one place to another
 * Archiving::			What to do with finished projects
 @end menu
@@ -1531,8 +1568,8 @@ archive file keeps the system compact and fast.
 @section Capture
 
 Org's method for capturing new items is heavily inspired by John Wiegley
-excellent remember package.  It lets you store quick notes with little
-interruption of your work flow.  Org lets you define templates for new
+excellent @file{remember.el} package.  It lets you store quick notes with
+little interruption of your work flow.  Org lets you define templates for new
 entries and associate them with different targets for storing notes.
 
 @menu
@@ -1609,7 +1646,7 @@ allow dynamic insertion of content.  Here is a small selection of the
 possibilities, consult the manual for more.
 @smallexample
 %a          @r{annotation, normally the link created with @code{org-store-link}}
-%i          @r{initial content, the region when remember is called with C-u.}
+%i          @r{initial content, the region when capture is called with C-u.}
 %t          @r{timestamp, date only}
 %T          @r{timestamp with date and time}
 %u, %U      @r{like the above, but inactive timestamps}
@@ -1673,8 +1710,6 @@ setting this variable, for example
 @seealso{
 @uref{http://orgmode.org/manual/Capture-_002d-Refile-_002d-Archive.html#Capture-_002d-Refile-_002d-Archive,
 Chapter 9 of the manual}@*
-@uref{http://members.optusnet.com.au/~charles57/GTD/remember.html, Charles
-Cave's remember tutorial}@*
 @uref{http://orgmode.org/worg/org-tutorials/org-protocol-custom-handler.php,
 Sebastian Rose's tutorial for capturing from a web browser}}@uref{}@*
 
@@ -1952,7 +1987,7 @@ Narrow the current agenda filter by an additional condition.
 
 @tsubheading{Remote editing (see the manual for many more commands)}
 
-@item 0-9
+@item 0--9
 Digit argument.
 @c
 @item t
@@ -2294,7 +2329,7 @@ that planning information can be incorporated into desktop calendars.
 * HTML export::			Exporting to HTML
 * @LaTeX{} and PDF export::	Exporting to @LaTeX{}, and processing to PDF
 * DocBook export::		Exporting to DocBook
-* iCalendar export::		
+* iCalendar export::
 @end menu
 
 @node Export options, The export dispatcher, Exporting, Exporting
@@ -2318,8 +2353,6 @@ Insert template with export options, see example below.
 #+DESCRIPTION: the page description, e.g.@: for the XHTML meta tag
 #+KEYWORDS:    the page keywords, e.g.@: for the XHTML meta tag
 #+LANGUAGE:    language for HTML, e.g.@: @samp{en} (@code{org-export-default-language})
-#+TEXT:        Some descriptive text to be inserted at the beginning.
-#+TEXT:        Several lines may be given.
 #+OPTIONS:     H:2 num:t toc:t \n:nil @@:t ::t |:t ^:t f:t TeX:t ...
 #+LINK_UP:     the ``up'' link of an exported page
 #+LINK_HOME:   the ``home'' link of an exported page
@@ -2393,7 +2426,7 @@ Export as @LaTeX{} and then process to PDF, then open the resulting PDF file.
 
 By default, the @LaTeX{} output uses the class @code{article}.  You can
 change this by adding an option like @code{#+LaTeX_CLASS: myclass} in your
-file.  The class must be listed in @code{org-export-latex-classes}.
+file.  The class must be listed in @code{org-latex-classes}.
 
 Embedded @LaTeX{} as described in @ref{Embedded @LaTeX{}}, will be correctly
 inserted into the @LaTeX{} file.  Similarly to the HTML exporter, you can use
@@ -2596,7 +2629,7 @@ Chapter 11.3 of the manual}@*
 @uref{http://orgmode.org/worg/org-contrib/babel/index.php,
 The Babel site on Worg}}
 
-@node Miscellaneous,  , Working With Source Code, Top
+@node Miscellaneous, GNU Free Documentation License, Working With Source Code, Top
 @chapter Miscellaneous
 
 @menu
@@ -2680,6 +2713,12 @@ of the manual}@*
 @uref{http://orgmode.org/manual/MobileOrg.html#MobileOrg, Appendix B of the
 manual}@*
 @uref{http://orgmode.org/orgcard.pdf,Key reference card}}
+
+
+@node GNU Free Documentation License,  , Miscellaneous, Top
+@appendix GNU Free Documentation License
+@include doclicense.texi
+
 
 @bye
 

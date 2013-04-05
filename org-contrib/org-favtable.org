@@ -1,0 +1,658 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:nil -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck lognotestate
+#+TITLE:      org-favtable.el --- Lookup table of favorite references and links
+#+AUTHOR:     Marc-Oliver Ihm
+#+EMAIL:      org-favtable@ferntreffer.de
+#+LANGUAGE:   en
+#+CATEGORY:   worg-tutorial
+
+* Introduction and Overview
+
+  org-favtable helps you to create and update a table of favorite locations
+  in org, keeping the most frequently visited lines right at the top. This
+  table is called "favtable".
+
+  Or, citing from its documentation:
+
+#+BEGIN_EXAMPLE
+
+  Mark and find your favorite things and locations in org easily: Create
+  and update a lookup table of references and links. Often used entries
+  bubble to the top and entering some keywords narrows down to matching
+  entries only, so that the right one can be spotted easily.
+
+  References are essentially small numbers (e.g. "R237" or "-455-"),
+  which are created by this package; they are well suited to be used
+  outside of org. Links are just normal org-mode links.
+
+#+END_EXAMPLE
+
+  org-favtable helps to find a selected set of locations in org and other
+  things very quickly; you may see it as your private, adaptive index or
+  search engine; inside and outside of org.
+
+* Three scenarios of typical usage
+
+  See also [[id:7ab63909-1f2a-4131-ae5c-f30a53f840c9][A working example]] for complete examples, that you can readily try out.
+
+** Taking notes in a meeting
+
+   Lets say, you have a meeting for a project for which you already have a
+   node in org-mode. Now as the meeting starts, you want to go to that
+   node, open it an start taking notes. However, the process of going to
+   that node takes to long for your taste and you want to accelerate it.
+
+   For this, use org-favtable and create a line for this meeting in your
+   table of favorites. This line contains a link to the node, where you want
+   to take your meeting-notes and additionally some keywords that you
+   associate with this meeting (e.g. its name).
+
+   Next time, that you want to find this node, simply:
+
+   - Invoke org-favtable with a keystroke (typically "C-+") and choose the
+     command "occur" (see [[id:940a8103-55a1-4d72-9d56-6ee6851c46ec][The commands of org-favtable]] for a list of
+     commands and their description).
+   - Type one or more keyword, specific for the project.
+   - From the list of results, choose the entry you are looking for.
+     - Remark: Your entry will probably appear at the top of the list,
+       because this list is sorted by frequency of usage.
+   - Type RET to go to this entry and start taking notes.
+   
+   This procedure is always the same, regardless of where in org-mode you
+   have stored your notes.
+
+** Finding the right folder for incoming mail
+   
+   This assumes that, in your mail program, you have created folders for
+   your favorite projects. An example would be an email folder for a
+   project "R624 Moving to a new internet provider". "R624" in this example
+   is a reference; see [[id:da8b6a60-5b02-4fa6-81de-8a3d9dee0267][References]] for an explanation.
+
+   Now, when a new mail arrives for this project, you may follow these
+   steps to find the correct folder:
+
+   - Invoke org-favtable with a keystroke (typically "C-+") and choose the
+     command "occur".
+   - Type a keyword (e.g. "internet").
+   - From the list of results, it is easy to spot the right reference
+     ("R624"); more frequent used entries appear at the top.
+   - With this reference it is easy to find the associated folder within
+     your email-client.
+
+   This works, because references, like "R624", can easily be used within
+   the names of email-folders.
+   
+** Marking printed documents with references
+
+   By paper mail or in a meeting you receive a printed document, that you
+   want to keep, associate with a certain project and keep around for
+   later. You could proceed like this:
+
+   - Invoke org-favtable with a keystroke (typically "C-+") and choose the
+     command "ref", which gives you a new reference (e.g. "R237"). Type
+     some keywords into this new line within your table of favorites.
+   - If you want, you may also record the location, where you keep the document.
+   - Take a pen and write down this reference onto the printed document.
+
+   Some day later, you might want to read the document again and wonder,
+   where you have kept it:
+
+   - Invoke org-favtable and choose the command "occur".
+   - Enter some keywords for this document; they should overlap with
+     those, that you enterd when creating the line within the favtable.
+   - You see the matching lines from your favtable, pick the right one and
+     read the location information, that you recorded initially.
+
+   Later again, you might find this document in one of your desk drawers
+   and ask yourself, which project it is be associated with. For an answer,
+   you just need the handwritten reference from the document (e.g. "R237"):
+
+   - Invoke org-favtable and choose the command "goto".
+   - Enter the reference number "237".
+   - This brings you to the matching line within your favtable, where you
+     can read, what you have entered previously.
+   - Typing RET brings you to the org-mode node linked to the document or
+     project (if any).
+
+   This shows, how org-favtable might help to bridge the gap between
+   org-mode and the paper-world.
+   
+* Some concepts of org-favtable
+** References
+   :PROPERTIES:
+   :ID:       da8b6a60-5b02-4fa6-81de-8a3d9dee0267
+   :END:
+
+   References (as used within org-favtable) are small numbers with
+   decorations; examples are "R237", "-455-" or "<<323>>". You are free, to
+   choose the text before or after the number; org-favtable inspects the
+   already existing references and creates new references along the same
+   lines. So the next reference after "R237" would be "R238".
+
+   References are meant to be easy to type, to write down and remember; you
+   can use them everywhere (not only within org !), where you want to refer
+   to a line within your table of favorites. In the favtable more
+   information can be stored, including links to org-mode nodes.
+
+** The table of favorites
+
+   The table of favorites (or "favtable" for short) keeps all your
+   references and links. It counts, how often they have been
+   used. Additionally it also records the date of creation and last
+   access. Moreover it is highly useful to keep some description or a set
+   of keywords within your table of favorites, which can then be searched
+   with the command "occur".
+
+   See the comand "help" for more information on how the table can be
+   constructed or see the example below: [[id:62e632e9-38ff-4210-acd5-133d7b13db07][A working example]].
+
+   Here is the actual table from this example:
+
+#+BEGIN_EXAMPLE
+
+   |     | Type    | description    | Keywords       |         |      |                 |                       |
+   | Ref |         | ;c             |                | count;s | link | created         | last-accessed         |
+   |     |         |                |                |         | <4>  |                 |                       |
+   |-----+---------+----------------+----------------+---------+------+-----------------+-----------------------|
+   | R2  | project | bar            | support, legal |       8 |      | [2012-12-07 Fr] | [2013-03-16 Sa 10:24] |
+   | R3  | paper   | printed report |                |       3 |      | [2012-12-04 Di] | [2013-03-15 Fr 22:07] |
+   | R5  | project | baz            | financial      |       5 |      | [2012-12-05 Mi] | [2012-12-08 Sa 23:03] |
+   | R6  | project | qux            | sport          |       3 |      | [2012-12-08 Sa] | [2012-12-08 Sa 23:01] |
+   | R1  | project | foo            | support        |       3 |      | [2012-12-03 Mo] | [2013-03-15 Fr 19:26] |
+   | R4  | folder  | directory      |                |       2 |      | [2012-12-08 Sa] | [2012-12-08 Sa 23:04] |
+
+#+END_EXAMPLE
+   
+** Links
+
+   org-favtable also supports links, which are just normal org-mode links as
+   described in the documentation of org-mode.
+
+* Installation and setup
+  :PROPERTIES:
+  :ID:       8ac78731-6c7d-432e-901f-741a804236b6
+  :END:
+
+  Please note, that the working example below brings its own, non-permanent
+  setup instructions: [[id:579ca3fc-1b42-4f0b-adde-e52f8d495fe0][Setting up things for this example]]
+
+  But, if you want to install org-favtable permanently, please read on.
+
+  Instructions on how to install org-favtable and how to setup things are
+  also in org-favtable.el itself.  They can either be accessed through the
+  documentation of the variable org-favtable-id or through the command
+  "help" of org-favtable.
+
+** Obtaining
+
+   org-favtable can be found on worg:
+
+   http://orgmode.org/worg/code/elisp/org-favtable.el
+
+   You should put it into one of your directories of your load-path.
+
+** Modifying your .emacs
+
+   Citing from org-favtables own documentation:
+
+#+BEGIN_EXAMPLE
+
+Here are the lines, you need to add to your .emacs:
+
+  (require 'org-favtable)
+
+  ;; Good enough to start, but later you should probably 
+  ;; change this id, as will be explained below !
+  (setq org-favtable-id "00e26bef-1929-4110-b8b4-7eb9c9ab1fd4")
+
+
+  ;; Optionally assign a key. Pick your own favorite.
+  (global-set-key (kbd "C-+") 'org-favtable)
+
+Do not forget to restart emacs to make these lines effective.
+
+#+END_EXAMPLE
+
+   As described in the elisp-comments above, you should set org-favtable-id
+   to a value, that links to the node with your table of
+   favorites. However, if you just copy the table from this documentation
+   without changing anything, things will just work fine; its more or less
+   a question of personal taste.
+   
+** Creating your own table of favorites
+
+   The cited documentation below is quite detailed; for a starting however,
+   you do not need to read it in full extend. Simply copying the node with
+   the table is probably enough.
+
+#+BEGIN_EXAMPLE
+
+As a second step you need to create the org-mode node, where your
+reference numbers and links will be stored. It may look like
+this:
+
+  * org-favtable
+    :PROPERTIES:
+    :ID:       00e26bef-1929-4110-b8b4-7eb9c9ab1fd4
+    :END:
+
+
+    |     |      | Comment, description, details |         |         |               |
+    | ref | link | ;c                            | count;s | created | last-accessed |
+    |     | <4>  | <30>                          |         |         |               |
+    |-----+------+-------------------------------+---------+---------+---------------|
+    | R1  |      | My first reference            |         |         |               |
+
+
+You may just copy this node into one of your org-files.  Many
+things however can or should be adjusted:
+
+ - The node needs not be a top level node.
+
+ - Its name is completely at you choice. The node is found
+   through its ID.
+
+ - There are three lines of headings above the first hline. The
+   first one is ignored by org-favtable, and you can use them to
+   give meaningful names to columns; the second line contains
+   configuration information for org-favtable; please read
+   further below for its format. The third line is optional and
+   may contain width-informations (e.g. <30>) only.
+
+ - The sequence of columns does not matter. You may reorder them
+   any way you like; e.g. make the comment-column the last
+   columns within the table. Columns ar found by their name,
+   which appears in the second heading-line.
+
+ - You can add further columns or even remove the
+   "Comment"-column. All other columns from the
+   example (e.g. "ref", "link", "count", "created" and
+   "last-accessed") are required.
+
+ - Your references need not start at "R1"; However, having an
+   initial row is required (it serves as a template for subsequent
+   references).
+
+ - Your reference need not have the form "R1"; you may just as
+   well choose any text, that contains a single number,
+   e.g. "reference-{1}" or "#7" or "++17++" or "-344-". The
+   function `org-favtable' will inspect your first reference and
+   create all subsequent references in the same way.
+    
+ - You may want to change the ID-Property of the node above and
+   create a new one, which is unique (and not just a copy of
+   mine). You need to change it in the lines copied to your .emacs
+   too. However, this is not strictly required to make things
+   work, so you may do this later, after trying out this package.
+
+
+Optionally you may tweak the second header line to adjust
+`org-favtable' a bit. In the example above it looks like this
+ (with spaces collapsed):
+
+
+    | ref | link | ;c | count;s | created | last-accessed |
+
+
+The different fields have different meanings:
+
+ - ref : This denotes the column which contains you references
+
+ - link : Column for org-mode links, which can be used to access
+   locations within your files.
+
+ - ;c : The flag "c" ("c" for "copy") denotes this column
+   as the one beeing copied on command "leave". In the example
+   above, it is also the comment-column.
+
+ - count;s : this is the column which counts, how many time this
+   line has been accessed (which is the key-feature of this
+   package). The flag "s" stands for "sort", so the table is
+   sorted after this column. You may also sort after columns
+   "ref" or "last-accessed".
+
+ - created : Date when this line was created.
+
+ - last-accessed : Date and time, when this line was last accessed.
+
+
+After this two-step setup process you may invoke `org-favtable'
+to create a new favorite. Read the help option "usage" for
+instructions on normal usage, read the help option "commands"
+for help on single commands.
+
+#+END_EXAMPLE
+
+* A working example
+  :PROPERTIES:
+  :ID:       7ab63909-1f2a-4131-ae5c-f30a53f840c9
+  :END:
+
+  This node contains a simple setup, which can be used to explore
+  org-favtable. Further below there is also [[id:848c6d2a-6e8b-4c93-8481-19e6db7e6ca8][A sample table of favorites]].
+
+  These examples revolve around the few most common usecases and only
+  employ a very limited set of commands (mainly "occur" and "ref"). Below
+  at [[id:940a8103-55a1-4d72-9d56-6ee6851c46ec][The commands of org-favtable]] you will find much more commands
+  (e.g. "sort" or "highlight") that become quite helpful, once you have
+  mastered the basic functionality.
+
+** Setting up things for this example
+   :PROPERTIES:
+   :ID:       579ca3fc-1b42-4f0b-adde-e52f8d495fe0
+   :END:
+
+   To really try out the things described here, you need to go through some
+   minimal preperations: Open two files in your browser, copy-and-paste
+   them into emacs and execute two lines of elisp-code.
+
+   These instructions are non-permanent; after your next emacs restart you
+   wont be able to use org-favtable. To install it persistently follow
+   these slightly different instructions: [[id:8ac78731-6c7d-432e-901f-741a804236b6][Installation and setup]]
+
+*** Get org-favtable.org
+
+    Read this text within org-mode in emacs; reading in a browser is still
+    instructive but does not give you the full hands-on experience. So, if
+    you are reading the browser-version of org-favtable.org, open:
+
+    http://orgmode.org/worg/org-contrib/org-favtable.org
+
+    in your browser. Mark the whole page and copy-and-paste it into your
+    emacs: Create a new buffer "org-favtable.org", do "M-x org-mode" and
+    paste. Continue reading within this new emacs-buffer.
+
+*** Get org-favtable-el
+
+    Open
+
+    http://orgmode.org/worg/code/elisp/org-favtable.el
+  
+    in your browser. Mark the whole page and copy-and-paste it into your
+    emacs: Create a new buffer "org-favtable.el", do "M-x emacs-lisp-mode"
+    and paste.
+
+    To make emacs read and evaluate the the elisp-code you need to "M-x
+    eval-buffer" within the new buffer.
+
+*** Configuration
+
+    Finally, you have to execute two lines of elisp: place your cursor at
+    the end of each line and type "C-x C-e" (which runs "eval-last-sexp").
+
+#+BEGIN_EXAMPLE
+
+    (setq org-favtable-id "848c6d2a-6e8b-4c93-8481-19e6db7e6ca8")
+    (global-set-key (kbd "C-+") 'org-favtable)
+
+#+END_EXAMPLE
+
+** First example: Finding a node by its name
+
+   Say, your are in a meeting about project "bar" and want to take
+   notes. For this you need to visit the node for project "bar".
+
+   Type "C-+" to invoke org-favtable and then type "bar" and RET.
+   This is what you will see:
+
+#+BEGIN_EXAMPLE
+
+   | R2 | project | bar | support, legal | 8 |   | [2012-12-07 Fr] | [2012-12-08 Sa 23:37] |
+
+#+END_EXAMPLE
+
+   Just place your cursor at this line in the occur/buffer and type RET to
+   go to this node.
+
+   Remark: even though the initial prompt of org-favtable offers only a
+   fixed set of choices, you may just as well type something else
+   (e.g. "bar") to implicitly accept the first choice (here: "occur").
+
+** Secound example: Finding a node by keyword
+
+   Later you want to take some notes for project "bar" but do not recall
+   its name. However, you know that the project is related with "support".
+
+   So you type "C-+" to invoke org-favtable. Then type "support" and RET.
+
+   After this you will see these two lines (R2 and R1) from your favtable,
+   which contain the keyword "support":
+
+#+BEGIN_EXAMPLE
+
+   | R2 | project | bar | support, legal | 8 |   | [2012-12-07 Fr] | [2012-12-08 Sa 23:37] |
+   | R1 | project | foo | support        | 3 |   | [2012-12-03 Mo] |                       |
+
+#+END_EXAMPLE
+   
+   The first line "R2" is the one with the highest access count (8),
+   because the table is kept sorted for this. And this is already your
+   project "bar".  Now just need to hit RET, to visit this node.
+
+** Third example: Find the right folder for an incoming mail
+
+   This example assumes, that within your email-client you have organised
+   messages in folders, the names of which start with a reference, e.g. "R2
+   bar". 
+
+   Compared to the straightforward approach of naming the folder just
+   "bar", the overhead related with including the reference within the name
+   allows you to use org-favtable as your search-engine for email-folders.
+
+   This is especially helpful, if you have dozens or even hundreds of
+   folders, too many to spot the right one easily.
+
+   Now you get an email related to project "bar" and want to put it into
+   the right folder.
+
+   So you type "C-+" to invoke org-favtable and then "bar" and RET.
+
+   Just as in the first example, this is what you get:
+
+#+BEGIN_EXAMPLE
+
+   | R2 | project | bar | support, legal | 8 |   | [2012-12-07 Fr] | [2012-12-08 Sa 23:37] |
+
+#+END_EXAMPLE
+
+   From this line you can easily spot the reference "R2" and can find the
+   right folder in your email-client.
+
+** Fourth example: Create a new reference for a new piece of paper
+
+   In a meeting, you get handed over a printout; a discussion starts and
+   you want to keep track of it. And within your org-mode notes you want to
+   refer to the printout, that is the focus of the discussion.
+
+   For this you can create a new reference: Type "C-+" to invoke
+   org-favtable and then "ref" and RET.
+
+   This will create a new row within your table of favorites with a new
+   reference already filled in (if you try it out yourself, it will
+   probably be "R7"). Now, you can fill out the other columns, especially
+   description and keyboard. 
+
+   The new reference (e.g. "R7") can be written onto the printout, so that
+   later on (see the next example) you will be able to look it up.
+   
+   Once you are done, leave the favtable by typing "C-+" and "leave" RET.
+
+   Remark: The closely related example below assumes reference "R3"; it is
+   just as good as "R7".
+
+** Fifth example: Looking up a reference you find on a piece of paper
+
+   Lets assume, that in one of your drawers you find a lengthy printout. On
+   its cover page you spot the handwritten reference "R3".
+   
+   Remark: If you worked throught the example above, you have created a new
+   reference "R7"; it is just as good as "R3".
+
+   First you would like to know the date, when you received this
+   document. For this, simply type "C-+", then "3" and RET.
+
+   As a result you will see something similar to the lines below: 
+
+#+BEGIN_EXAMPLE
+
+4 matches total for "\bRiii\b":
+4 matches in buffer: org-favtable.org
+    330:   page you one of your handwritten references: "Riii". 
+    345:   Which is a multi-occur for reference Riii.
+    352:    - [ ] Read paper Riii
+    377:   | Riii  | paper   | printed report |      |    8 |      | [2012-12-04 Di] | [2013-03-15 Fr 22:07] | 
+
+#+END_EXAMPLE
+
+   Which is a multi-occur for reference "R3". 
+
+   Please note, that in the cited example output above, the reference "R3"
+   has been replaced with "Riii". This avoids, that this citation itself
+   appears in your output again, if you try yourself.
+
+   The output tells you, where in all your org-mode files, you have used
+   reference "R3"; that way it should be easy, to find your org-mode notes
+   about this paper. The list also includes the matching line from your
+   favtable, which tells you, when this reference has once been created.
+
+** Example nodes 
+
+   The subnodes below are made up to be used within the examples
+   above. Their contents is therefore fictous.
+  
+*** TODO R1 Project foo
+
+    - [ ] Read paper R3
+
+*** TODO R2 Project bar
+
+    - [ ] Talk to Jim
+
+*** DONE R5 Project baz
+    CLOSED: [2012-12-08 Sa 23:01]
+
+     - [X] Clean up directory R4
+
+*** TODO R6 Project qux
+
+    - [ ] Clean running shoes
+
+** A sample table of favorites
+   :PROPERTIES:
+   :ID:       848c6d2a-6e8b-4c93-8481-19e6db7e6ca8
+   :END:
+
+#+BEGIN_EXAMPLE
+
+   |     | Type    | description    | Keywords       |         |      |                 |                       |
+   | Ref |         | ;c             |                | count;s | link | created         | last-accessed         |
+   |     |         |                |                |         | <4>  |                 |                       |
+   |-----+---------+----------------+----------------+---------+------+-----------------+-----------------------|
+   | R2  | project | bar            | support, legal |       8 |      | [2012-12-07 Fr] | [2013-03-16 Sa 10:24] |
+   | R5  | project | baz            | financial      |       5 |      | [2012-12-05 Mi] | [2012-12-08 Sa 23:03] |
+   | R6  | project | qux            | sport          |       3 |      | [2012-12-08 Sa] | [2012-12-08 Sa 23:01] |
+   | R3  | paper   | printed report |                |       3 |      | [2012-12-04 Di] | [2013-03-15 Fr 22:07] |
+   | R1  | project | foo            | support        |       3 |      | [2012-12-03 Mo] | [2013-03-15 Fr 19:26] |
+   | R4  | folder  | directory      |                |       2 |      | [2012-12-08 Sa] | [2012-12-08 Sa 23:04] |
+
+#+END_EXAMPLE
+
+* The commands of org-favtable
+  :PROPERTIES:
+  :ID:       940a8103-55a1-4d72-9d56-6ee6851c46ec
+  :END:
+
+  When you invoke org-favtable, it prompts you to choose one from a fixed
+  set of commands:
+  
+#+BEGIN_EXAMPLE
+
+  occur: If you supply a keyword (text): Apply emacs standard
+    occur operation on the table of favorites; ask for a
+    string (keyword) to select lines. Occur will only show you
+    lines which contain the given keyword, so you can easily find
+    the right one. You may supply a list of words seperated by
+    comma (\",\"), to select lines that contain any or all of the
+    given words.
+
+    If you supply a reference number: Apply emacs standard
+    multi-occur operation all org-mode buffers to search for a
+    specific reference.
+
+    You may also read the note at the end of this help on saving
+    the keystroke RET to accept this frequent default command.
+
+  head: If invoked outside the table of favorites, ask for a
+    reference number and search for a heading containing it. If
+    invoked within favtable dont ask; rather use the reference or
+    link from the current line.
+
+  ref: Create a new reference, copy any previously selected text.
+    If already within reftable, fill in ref-column.
+
+  link: Create a new line in reftable with a link to the current node. 
+    Do not populate the ref column; this can later be populated by
+    calling the \"fill\" command from within the reftable.
+
+  leave: Leave the table of favorites. If the last command has
+    been \"ref\", the new reference is copied and ready to yank.
+    This \"org-mark-ring-goto\" and can be called several times
+    in succession.
+
+  enter: Just enter the node with the table of favorites.
+
+  goto: Search for a specific reference within the table of
+    favorites.
+
+  help: Show this list of commands.
+
+  +: Show all commands including the less frequently used ones
+    given below. If \"+\" is followd by enough letters of such a
+    command (e.g. \"+fi\"), then this command is invoked
+    directly.
+
+  reorder: Temporarily reorder the table of favorites, e.g. by
+    count, reference or last access.
+
+  fill: If either ref or link is missing, fill it.
+
+  sort: Sort a set of lines (either the active region or the
+    whole buffer) by the references found in each line.
+
+  update: For the given reference, update the line in the
+    favtable.
+
+  highlight: Highlight references in region or buffer.
+
+  unhighlight: Remove highlights.
+
+  missing : Search for missing reference numbers (which do not
+    appear in the reference table). If requested, add additional
+    lines for them, so that the command \"new\" is able to reuse
+    them.
+
+  statistics : Show some statistics (e.g. minimum and maximum
+    reference) about favtable.
+
+#+END_EXAMPLE
+
+  Please note, that you are not required to explicitly choose one. Simply
+  typing something else (e.g. "237") accepts the default-command and
+  supplies your input as an argument.
+  
+* Further Reading, Version, Contact
+
+  org-favtable.el itself contains embedded documentation, which can be
+  easily accessed through the command "help".  Most, but not all of it has
+  already been cited within this document.
+
+
+  As of [2013-03-17 So] this document describes version 2.2 of org-favtable.
+
+
+  Remaining questions can be directed to: 
+
+    org-favtable@ferntreffer.de
+
+  I would be glad to help.
+
