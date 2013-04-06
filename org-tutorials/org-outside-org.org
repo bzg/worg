@@ -148,7 +148,7 @@ code into my Emacs init file to have the same functionality/keybindings
 available in Org-mode too:
 
 #+begin_src emacs-lisp
-(when (require 'outline-mode-easy-bindings nil 'NOERROR)
+(when (try-require 'outline-mode-easy-bindings)
   (add-hook 'org-mode-hook
             (lambda ()
               ;; Redefine arrow keys, since promoting/demoting and moving
@@ -334,6 +334,7 @@ in your .emacs and you are done.
 
 /outorg's/ main command is
 
+<<<<<<< variant A
 :  ,---------------------------
 :  | C-c ' (outorg-edit-as-org)
 :  `---------------------------
@@ -350,6 +351,23 @@ has `outorg-edit-minor-mode' activated, a minor-mode with only 2 commands:
 If you want to insert Org-mode source-code or example blocks in
 comment-sections, simply outcomment them in the outorg-edit buffer before
 calling `outorg-copy-edits-and-exit'.
+>>>>>>> variant B
+: ,------
+: | C-c ' 
+: `------
+
+(C-c and single quote), used for both =outorg-edit-as-org= (as a globally
+defined command in the source-code buffer) and =outorg-copy-edits-and-exit=
+(in the edit-buffer, as a key defined in =outorg-edit-mode=).
+####### Ancestor
+,------
+| C-c ' |
+`------
+
+(C-c and single quote), used for both =outorg-edit-as-org= (as a globally
+defined command in the source-code buffer) and =outorg-copy-edits-and-exit=
+(in the edit-buffer, as a key defined in =outorg-edit-mode=).
+======= end
 
 Thus, with point inside a subtree or on a subtree header, pressing =C-c '
 (outorg-edit-as-org)= will open this subtree in a temporary Org-mode edit
