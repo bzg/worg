@@ -140,25 +140,33 @@ Use this in your '.emacs' to get started:
 (add-hook ‘outline-minor-mode-hook ‘outshine-hook-function)
 #+end_src
 
-Add this for Org-mode style visibility-cycling with TAB and arrow-key
-structure-editing:
+Download [[https://raw.github.com/andreas-marschke/dotfiles/master/elisp/outline-mode-easy-bindings.el][outline-mode-easy-bindings.el]] and put it in a place where Emacs can
+find it. `outshine' loads this library if it is able to successfully require
+it. The functions and keybindings (for 'M -<<arrow-key>>' navigation and
+visibility cycling) defined there are so convenient that I put the following
+code into my Emacs init file to have the same functionality/keybindings
+available in Org-mode too:
 
 #+begin_src emacs-lisp
-(add-hook ‘outline-minor-mode-hook
+(when (try-require 'outline-mode-easy-bindings)
+  (add-hook 'org-mode-hook
             (lambda ()
-            (define-key outline-minor-mode-map
-              (kbd "<tab>") 'outline-cycle)
-            (define-key outline-minor-mode-map
-              (kbd "<M-left>") 'outline-promote)
-            (define-key outline-minor-mode-map
-              (kbd "<M-right>") 'outline-demote)
-            (define-key outline-minor-mode-map
-              (kbd "<M-up>") 'outline-move-subtree-up)
-            (define-key outline-minor-mode-map
-              (kbd "<M-down>") 'outline-move-subtree-down)))
+              ;; Redefine arrow keys, since promoting/demoting and moving
+              ;; subtrees up and down are less frequent tasks then
+              ;; navigation and visibility cycling
+                (org-defkey org-mode-map
+                            (kbd "M-<left>") 'outline-hide-more)
+                (org-defkey org-mode-map
+                            (kbd "M-<right>") 'outline-show-more)
+                (org-defkey org-mode-map
+                            (kbd "M-<up>") 'outline-previous-visible-heading)
+                (org-defkey org-mode-map
+                            (kbd "M-<down>") 'outline-next-visible-heading))
+            'append))
 #+end_src
 
-Add this if you (e.g.) always want outline/outshine for emacs-lisp buffers:
+Add this if you (e.g.) always want outline/outshine for emacs-lisp buffers
+(recommended):
 
 #+begin_src emacs-lisp
 (add-hook ‘emacs-lisp-mode-hook ‘outline-minor-mode)  
@@ -235,11 +243,12 @@ general Org-mode style counterparts are available:
 | key       | binding                          |
 |-----------+----------------------------------|
 | C-c       | PrefixCommand                    |
-| <M-down>  | outline-move-subtree-down        |
-| <M-left>  | outline-promote                  |
-| <M-right> | outline-demote                   |
-| <M-up>    | outline-move-subtree-up          |
-| <tab>     | outline-cycle                    |
+| <M-down>  | outline-next-visible-heading     |
+| <M-left>  | outline-hide-more                |
+| <M-right> | outline-show-more                |
+| <M-up>    | outline-previous-visible-heading |
+| <tab>     | outshine-cycle-subtree           |
+| <backtab> | outshine-cycle-buffer            |
 | C-c C-a   | show-all                         |
 | C-c C-b   | outline-backward-same-level      |
 | C-c C-c   | hide-entry                       |
@@ -325,13 +334,22 @@ in your .emacs and you are done.
 
 /outorg's/ main command is
 
-: ,------
-: | C-c ' 
-: `------
+:  ,---------------------------
+:  | C-c ' (outorg-edit-as-org)
+:  `---------------------------
 
-(C-c and single quote), used for both =outorg-edit-as-org= (as a globally
-defined command in the source-code buffer) and =outorg-copy-edits-and-exit=
-(in the edit-buffer, as a key defined in =outorg-edit-mode=).
+used in source-code buffers where `outline-minor-mode' is activated with
+`outshine' extensions. The Org-mode edit-buffer popped up by this command
+has `outorg-edit-minor-mode' activated, a minor-mode with only 2 commands:
+
+: ,----------------------------------------
+: | M-# (outorg-copy-edits-and-exit)
+: | C-x C-s (outorg-save-edits-to-tmp-file)
+: `----------------------------------------
+
+If you want to insert Org-mode source-code or example blocks in
+comment-sections, simply outcomment them in the outorg-edit buffer before
+calling `outorg-copy-edits-and-exit'.
 
 Thus, with point inside a subtree or on a subtree header, pressing =C-c '
 (outorg-edit-as-org)= will open this subtree in a temporary Org-mode edit
@@ -353,10 +371,10 @@ saved as usual with =save-buffer= via  =C-x C-s=. Even when killed by
 accident, that last state of the outorg-edit-buffer will be saved and can be
 recovered. 
 
-When done with editing in Org-mode, =C-c ' (C-c and single quote)= is used
-again to call =outorg-copy-edits-and-exit=, a command that orderly exits the
-edit-buffer by converting the (modified) comment-sections back to comments
-and extracting the source-code parts out of the Org-mode source-code blocks. 
+When done with editing in Org-mode, =M-# (Meta-key and #)= is used to call
+=outorg-copy-edits-and-exit=, a command that orderly exits the edit-buffer by
+converting the (modified) comment-sections back to comments and extracting the
+source-code parts out of the Org-mode source-code blocks.
 
 Please note: /outorg/ is line-based, it only works with 'one-line' comments,
 i.e. with comment-sections like those produced by `comment-region' (a command
@@ -695,9 +713,10 @@ exclusively for navigation and high-level structure editing of the associated
 original-buffer, can be even more convenient. 
 
 Enters /navi-mode/, a major-mode by /Thorsten Jolitz/ derived from and
-inspired by /occur-mode/ (and, to a certain extend,  the =org-goto= command).
+inspired by /occur-mode/ (and, to a certain extend, the =org-goto= command).
 Just like /outorg/, /navi-mode/ depends on /outshine/ and works only with
-files structured with 'outshine-style' outline-headers.
+source-code files structured with 'outshine-style' outline-headers. It does
+work with org-mode files too, though. 
 
 A /navi-buffer/ is a kind of "remote-control" for its associated
 /original-buffer/. It offers a vast amount of views on the /original-buffer/
