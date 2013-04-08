@@ -39,7 +39,7 @@
 Este documento está bajo una [[http://creativecommons.org/licenses/by/3.0/deed][Licencia Creative Commons Reconocimiento Unported 3.0]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by/3.0/deed][Creative Commons Attribution Unported 3.0]]")))
-  (insert "\n\n[[file:http://i.creativecommons.org/l/by/3.0/88x31.png]]"))
+  (insert "\n\n[[http://creativecommons.org/licenses/by/3.0/deed][file:http://i.creativecommons.org/l/by/3.0/80x15.png]]"))
 
 (defun org-license-cc-by-sa (language)
   (interactive "MLanguage: " language)
@@ -48,7 +48,7 @@ This document is under a [[http://creativecommons.org/licenses/by/3.0/deed][Crea
 Este documento está bajo una [[http://creativecommons.org/licenses/by-sa/3.0/deed][Licencia Creative Commons Reconocimiento Unported 3.0]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-sa/3.0/deed][Creative Commons Reconocimiento Unported 3.0]]")))
-  (insert "\n\n[[file:http://i.creativecommons.org/l/by-sa/3.0/88x31.png]]"))
+  (insert "\n\n[[http://creativecommons.org/licenses/by-sa/3.0/deed][file:http://i.creativecommons.org/l/by-sa/3.0/80x15.png]]"))
 
 (defun org-license-cc-by-nd (language)
   (interactive "MLanguage: " language)
@@ -58,7 +58,7 @@ Este documento está bajo una [[http://creativecommons.org/licenses/by-nd/3.0/es
 Atribución-SinDerivadas 3.0]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nd/3.0/deed][Creative Commons Reconocimiento Unported 3.0]]")))
-  (insert "\n\n[[file:http://i.creativecommons.org/l/by-nd/3.0/88x31.png]]"))
+  (insert "\n\n[[http://creativecommons.org/licenses/by-nd/3.0/deed][file:http://i.creativecommons.org/l/by-nd/3.0/80x15.png]]"))
 ;;"))
 
 (defun org-license-cc-by-nc (language)
@@ -69,7 +69,7 @@ Este documento está bajo una [[http://creativecommons.org/licenses/by-nc/3.0/es
 Reconocimiento-NoComercial 3.0]]"))
 	(t (insert "* License 
 This document is under a [[http://creativecommons.org/licenses/by-nc/3.0/deed][Creative Commons Attribution-NonCommercial 3.0 Unported]]")))
-  (insert "\n\n[[file:http://i.creativecommons.org/l/by-nc/3.0/88x31.png]]"))
+  (insert "\n\n[[http://creativecommons.org/licenses/by-nc/3.0/deed][file:http://i.creativecommons.org/l/by-nc/3.0/80x15.png]]"))
 
 
 (defun org-license-cc-by-nc-sa (language)
@@ -80,7 +80,7 @@ Este documento está bajo una [[http://creativecommons.org/licenses/by-nc-sa/3.0
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][License Creative Commons
 Reconocimiento-NoComercial 3.0] Unported]")))
-  (insert "\n\n[[file:http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png]]"))
+  (insert "\n\n[[http://creativecommons.org/licenses/by-nc-sa/3.0/es/deed][file:http://i.creativecommons.org/l/by-nc-sa/3.0/80x15.png]]"))
 
 (defun org-license-cc-by-nc-nd (language)
   (interactive "MLanguage: " language)
@@ -91,7 +91,7 @@ Reconocimiento-NoComercial-SinObraDerivada 3.0 Unported]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][License Creative Commons
 Reconocimiento-NoComercial-SinObraDerivada 3.0] Unported]")))
-  (insert "\n\n[[file:http://i.creativecommons.org/l/by-nc-nd/3.0/88x31.png]]"))
+  (insert "\n\n[[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][file:http://i.creativecommons.org/l/by-nc-nd/3.0/80x15.png]]"))
 
 (defun org-license-gfdl (language)
   (interactive "MLanguage: " language)
