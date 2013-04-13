@@ -242,6 +242,14 @@ See the [[http://orgmode.org/manual/Table-of-contents.html][Table of contents]] 
    : #+attr_beamer :options width=5cm
    : #+attr_html: :width 200px
 
+  *TIP:* To upgrade from old =attr_html= lines with verbatim HTML
+  attribute syntax, you could try a Perl one-liner like the following,
+  replacing =filename.org= with your file (or a bunch of files with
+  =*.org= if you're feeling adventurous -- no warranty, make sure
+  you're backed up first!).
+  
+   : perl -i.bak -pe "s/([a-z]+)=(\"|')(.*?)\2/:\1 \3/g if /^#\+attr_html/i" filename.org
+
 - Beamer backend now interprets nested headline levels as blocks instead
   of lists.  For more guidance, see [[file:exporters/beamer/ox-beamer.org][this page]].
 
