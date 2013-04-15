@@ -31,6 +31,8 @@
 
 ;;; Code:
 
+(require 'org)
+
 (defun org-count-keyword(keyword)
   "Print a message with the number of keyword outline in the current buffer"
   (interactive "sKeyword: ")
@@ -69,7 +71,7 @@
       (if (and (= done canc) (zerop done))
 	  (setq effectiveness 0)
 	(setq effectiveness (* 100 (/ done (+ done canc)))))
-      (message "Effectiveness: %f %f %f" effectiveness done canc))))
+      (message "Effectiveness: %f" effectiveness))))
 
 (defun org-keywords-in-date(keyword date)
   (interactive "sKeyword: \nsDate: " keyword date)
