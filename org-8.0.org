@@ -145,27 +145,28 @@ setq org-export-backends (quote (
 For users who used the new exporter prior to its integration into the current master
 branch, here are some additional steps you may need to do in order to upgrade properly:
 
-1. If you had already been using the new exporter from contrib, you should
+1. Issue =make clean= before =git pull= and any changes to your
+   configuration.
+
+2. If you had already been using the new exporter from contrib, you should
    remove the following lines from your local.mk:
    : ORG_ADD_CONTRIB = org-e-*
 
-2. Next, issue =make clean= before =git pull=.
+3. Export engine renamed from =org-export= to =ox=
 
-2. Export engine renamed from =org-export= to =ox=
+4. Backend requires renamed =org-e-*= to =ox-*=
 
-3. Backend requires renamed =org-e-*= to =ox-*=
-
-4. All backend specific variables and functions renamed:
+5. All backend specific variables and functions renamed:
    - =org-export-*= to =org-*= (e.g. org-html-xml-declaration, ..)
    - =org-e-*= to =org-*= (e.g. org-latex-classes, org-ascii-bullets, ..)
 
-5. Generic export variables retain the name =org-export-*=,
+6. Generic export variables retain the name =org-export-*=,
    (e.g. org-export-dispatch-use-expert-ui,
    org-export-filter-headline-functions, ..)
 
-6. =org-latex-to-pdf-process= renamed =org-latex-pdf-process=
+7. =org-latex-to-pdf-process= renamed =org-latex-pdf-process=
 
-7. This is a guess, export snippets and backend symbols renamed:
+8. This is a guess, export snippets and backend symbols renamed:
    - =e-<backend>= to =<backend>=
 
 Again, please refer to [[http://mid.gmane.org/876229nrxf.fsf@gmail.com][Nicolas' announcement]] about the merge for more details.
