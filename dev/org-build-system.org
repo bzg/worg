@@ -263,10 +263,10 @@ default customization template has a commented out example for
 including the new exporter, you just need to remove the comment
 marker:
 
-#+BEGIN_SRC Makefile
-# Define if you want to include some (or all) files from contrib/lisp
-# just the filename please (no path prefix, no .el suffix), maybe with globbing
-ORG_ADD_CONTRIB = ox-* # e.g. the contributed exporter
+#+BEGIN_SRC makefile-gmake
+  # Define if you want to include some (or all) files from contrib/lisp
+  # just the filename please (no path prefix, no .el suffix), maybe with globbing
+  ORG_ADD_CONTRIB = ox-* # e.g. the contributed exporter
 #+END_SRC
 
 You just give the base name of the file to include (much like you do
@@ -277,8 +277,8 @@ by the build system.  To include all of =contrib/lisp/= (some of these
 aren't really meant to be used together, so this isn't recommended)
 you'd say:
 
-#+BEGIN_SRC Makefile
-ORG_ADD_CONTRIB = org* ox*
+#+BEGIN_SRC makefile-gmake
+  ORG_ADD_CONTRIB = org* ox*
 #+END_SRC
 
 Or if that was just a one-time install (with quoting for a POSIX
@@ -298,18 +298,18 @@ customization to enable htmlize installed from ELPA in users' home
 directory and ESS (for R) in the system =/usr/share/emacs/site-lisp/=
 and all Babel languages activated for testing.
 
-#+BEGIN_SRC Makefile
-up2::	# default target
-EMACS   = /usr/local/bin/emacs-24.3
-prefix  = /usr/local/share
-lispdir = $(prefix)/emacs/site-lisp/org
-datadir = $(prefix)/emacs/etc/org
-infodir = $(prefix)/info
-
-BTEST_EXTRA = ess-site 
-BTEST_OB_LANGUAGES = awk C fortran maxima lilypond octave python sh R
-BTEST_POST = -L ~/.emacs.d/elpa/htmlize-1.39 \
-	     -L /usr/share/emacs/site-lisp/emacs-ess-12.04.4
+#+BEGIN_SRC makefile-gmake
+  up2::   # default target
+  EMACS   = /usr/local/bin/emacs-24.3
+  prefix  = /usr/local/share
+  lispdir = $(prefix)/emacs/site-lisp/org
+  datadir = $(prefix)/emacs/etc/org
+  infodir = $(prefix)/info
+  
+  BTEST_EXTRA = ess-site 
+  BTEST_OB_LANGUAGES = awk C fortran maxima lilypond octave python sh R
+  BTEST_POST = -L ~/.emacs.d/elpa/htmlize-1.39 \
+               -L /usr/share/emacs/site-lisp/emacs-ess-12.04.4
 #+END_SRC
 
 *** XEmacs
@@ -319,21 +319,21 @@ for XEmacs testing will not work and has been disabled.  The default
 target is set to =up0 doc uncompiled= (pull from Git and update
 documentation and autoload files).
 
-#+BEGIN_SRC Makefile
-.PHONY:	xemacs
-xemacs:	up0 doc uncompiled
-EMACS   = xemacs
-prefix  = /usr/local/share
-lispdir = $(prefix)/xemacs/site-lisp/org
-datadir = $(prefix)/xemacs/etc/org
-infodir = $(prefix)/info
-
-BTEST = /bin/true
-BATCH = $(EMACS) -batch -q -vanilla # XEmacs
-# How to byte-compile the whole source directory
-ELCDIR	= $(BATCH) \
-		--eval '(add-to-list '"'"'load-path ".")' \
-		--eval '(byte-recompile-directory "." 0)'
+#+BEGIN_SRC makefile-gmake
+  .PHONY: xemacs
+  xemacs: up0 doc uncompiled
+  EMACS   = xemacs
+  prefix  = /usr/local/share
+  lispdir = $(prefix)/xemacs/site-lisp/org
+  datadir = $(prefix)/xemacs/etc/org
+  infodir = $(prefix)/info
+  
+  BTEST = /bin/true
+  BATCH = $(EMACS) -batch -q -vanilla # XEmacs
+  # How to byte-compile the whole source directory
+  ELCDIR  = $(BATCH) \
+                  --eval '(add-to-list '"'"'load-path ".")' \
+                  --eval '(byte-recompile-directory "." 0)'
 #+END_SRC
 
 *** Emacs on Windows
@@ -345,17 +345,17 @@ instead of "Program Files", if you already installed the applications
 in such a location. Babel languages have been stripped down for
 testing and the default target is again set to =up2=.
 
-#+BEGIN_SRC Makefile
-up2::
-CYGWIN += nodosfilewarning
-prefix  = C:/Freeware/Emacs-24.3
-EMACS   = SHELL=sh $(prefix)/bin/emacs
-lispdir = $(prefix)/site-lisp/org
-datadir = $(prefix)/etc/org
-infodir = $(prefix)/info
-
-BTEST_OB_LANGUAGES = octave
-SUDO =
+#+BEGIN_SRC makefile-gmake
+  up2::
+  CYGWIN += nodosfilewarning
+  prefix  = C:/Freeware/Emacs-24.3
+  EMACS   = SHELL=sh $(prefix)/bin/emacs
+  lispdir = $(prefix)/site-lisp/org
+  datadir = $(prefix)/etc/org
+  infodir = $(prefix)/info
+  
+  BTEST_OB_LANGUAGES = octave
+  SUDO =
 #+END_SRC
 
 ** Advanced Customization
@@ -398,12 +398,12 @@ is error prone.  Here's a (hopefully better) suggestion: put each
 customization into a file named =local-<pattern>.mk= and create a
 =local.mk= that looks like this:
 
-#+BEGIN_SRC Makefile
-ifdef LOCALMK
-  include local-$(LOCALMK).mk
-else
-  include local-emacs24.mk
-endif
+#+BEGIN_SRC makefile-gmake
+  ifdef LOCALMK
+    include local-$(LOCALMK).mk
+  else
+    include local-emacs24.mk
+  endif
 #+END_SRC
 
 Now switching between your different customizations is as easy as
@@ -425,32 +425,32 @@ control of Git and maybe even register it as a submodule in your local
 branch of the Org repository.
 
 #+NAME: local.mk
-#+BEGIN_SRC Makefile
-LOCALMK ?= loc
-# split into words
-_LMK_:=$(subst -, ,$(LOCALMK))
-# what's the current trunk?
-_LMK_:=$(subst trunk,24.3.50,$(_LMK_))
-# specific Emacs version requested?
-_VER_:=$(filter 2%,$(_LMK_))
-ifdef _VER_
-  _LMK_:=$(subst $(_VER_),loc,$(_LMK_))
-  _MAJ_:=$(word 1,$(subst ., ,$(_VER_)))
-  _VER_:=$(_VER_:2%=-2%)
-else
-  _MAJ_:=24
-endif
-# lets us just specify which emacs to use
-ifeq ($(words $(_LMK_)),1)
-  _LMK_+=testall tmp extra
-endif
-ifneq ($(origin DEBUG),undefined)
-  $(info LMK[$(words $(_LMK_))]: $(_LMK_))
-  $(info VER: $(_VER_) major $(_MAJ_))
-endif
-# remember this file is used from the org-mode directory via link,
-# so we have to prepend localmk/
-$(foreach part,$(subst -, ,$(_LMK_)),$(eval include localmk/$(part).mk))
+#+BEGIN_SRC makefile-gmake
+  LOCALMK ?= loc
+  # split into words
+  _LMK_:=$(subst -, ,$(LOCALMK))
+  # what's the current trunk?
+  _LMK_:=$(subst trunk,24.3.50,$(_LMK_))
+  # specific Emacs version requested?
+  _VER_:=$(filter 2%,$(_LMK_))
+  ifdef _VER_
+    _LMK_:=$(subst $(_VER_),loc,$(_LMK_))
+    _MAJ_:=$(word 1,$(subst ., ,$(_VER_)))
+    _VER_:=$(_VER_:2%=-2%)
+  else
+    _MAJ_:=24
+  endif
+  # lets us just specify which emacs to use
+  ifeq ($(words $(_LMK_)),1)
+    _LMK_+=testall tmp extra
+  endif
+  ifneq ($(origin DEBUG),undefined)
+    $(info LMK[$(words $(_LMK_))]: $(_LMK_))
+    $(info VER: $(_VER_) major $(_MAJ_))
+  endif
+  # remember this file is used from the org-mode directory via link,
+  # so we have to prepend localmk/
+  $(foreach part,$(subst -, ,$(_LMK_)),$(eval include localmk/$(part).mk))
 #+END_SRC
 
 So, what does this do?  First, it splits =LOCALMK= on =-= characters.
@@ -462,57 +462,57 @@ includes each of the customization files it inferred from =LOCALMK= to
 arrive at the final customization.
 
 #+NAME: loc.mk
-#+BEGIN_SRC Makefile
-# Name of your emacs binary
-EMACS   := /usr/local/bin/emacs$(_VER_)
-
-# Where local software is found
-prefix  := /usr/local/share
-
-# Where local lisp files go.
-lispdir := $(prefix)/emacs/site-lisp/org
-
-# Where local data files go.
-datadir := $(prefix)/emacs/etc/org
-
-# Where info files go.
-infodir := $(prefix)/info
+#+BEGIN_SRC makefile-gmake
+  # Name of your emacs binary
+  EMACS   := /usr/local/bin/emacs$(_VER_)
+  
+  # Where local software is found
+  prefix  := /usr/local/share
+  
+  # Where local lisp files go.
+  lispdir := $(prefix)/emacs/site-lisp/org
+  
+  # Where local data files go.
+  datadir := $(prefix)/emacs/etc/org
+  
+  # Where info files go.
+  infodir := $(prefix)/info
 #+END_SRC
 
 #+NAME: testall.mk
-#+BEGIN_SRC Makefile
-BTEST_OB_LANGUAGES = perl awk C fortran maxima lilypond octave perl python sh
-BTEST_POST = --eval '(add-to-list '"'"'load-path "~/.emacs.d/elpa/htmlize-1.39")'
-ifeq ($(_MAJ_),24)
-  BTEST_EXTRA += ess-site
-  BTEST_OB_LANGUAGES += R
-  BTEST_POST += --eval '(add-to-list '"'"'load-path "/usr/share/emacs/site-lisp/emacs-ess-12.04.4")'
-else
-  BTEST_PRE += --eval '(add-to-list '"'"'load-path "testing/ert")'
-endif
+#+BEGIN_SRC makefile-gmake
+  BTEST_OB_LANGUAGES = perl awk C fortran maxima lilypond octave perl python sh
+  BTEST_POST = --eval '(add-to-list '"'"'load-path "~/.emacs.d/elpa/htmlize-1.39")'
+  ifeq ($(_MAJ_),24)
+    BTEST_EXTRA += ess-site
+    BTEST_OB_LANGUAGES += R
+    BTEST_POST += --eval '(add-to-list '"'"'load-path "/usr/share/emacs/site-lisp/emacs-ess-12.04.4")'
+  else
+    BTEST_PRE += --eval '(add-to-list '"'"'load-path "testing/ert")'
+  endif
 #+END_SRC
 
 #+NAME: tmp.mk
-#+BEGIN_SRC Makefile
-# where to create temporary files for the testsuite
-TMPDIR ?= /tmp
-testdir = $(TMPDIR)/tmp-orgtest
+#+BEGIN_SRC makefile-gmake
+  # where to create temporary files for the testsuite
+  TMPDIR ?= /tmp
+  testdir = $(TMPDIR)/tmp-orgtest
 #+END_SRC
 
 #+NAME: extra
-#+BEGIN_SRC Makefile
-# extra targets
-.PHONY:	testclean
-testclean:	test clean
+#+BEGIN_SRC makefile-gmake
+  # extra targets
+  .PHONY: testclean
+  testclean:      test clean
 #+END_SRC
 
 #+NAME: testmin.mk
-#+BEGIN_SRC Makefile
-BTEST_OB_LANGUAGES = 
-BTEST_POST = --eval '(add-to-list '"'"'load-path "~/.emacs.d/elpa/htmlize-1.39")'
-ifneq ($(_MAJ_),24)
-  BTEST_PRE += --eval '(add-to-list '"'"'load-path "testing/ert")'
-endif
+#+BEGIN_SRC makefile-gmake
+  BTEST_OB_LANGUAGES = 
+  BTEST_POST = --eval '(add-to-list '"'"'load-path "~/.emacs.d/elpa/htmlize-1.39")'
+  ifneq ($(_MAJ_),24)
+    BTEST_PRE += --eval '(add-to-list '"'"'load-path "testing/ert")'
+  endif
 #+END_SRC
 
 * Support for Installers
