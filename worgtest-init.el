@@ -5,6 +5,11 @@
 (require 'org)
 (require 'htmlize)
 
+;; to have things work correctly in batch-mode
+(require 'font-lock)
+(require 'cc-mode)
+(c-after-font-lock-init)
+
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
