@@ -94,20 +94,20 @@
 	   :base-directory ,worg-base-code-directory
 	   :base-extension "html\\|css\\|png\\|js\\|bz2\\|el\\|sty\\|awk\\|pl"
 	   :html-extension "html"
-	   :publishing-directory (concat worg-htmlroot "/code/")
+	   :publishing-directory ,(concat worg-htmlroot "/code/")
 	   :recursive t
 	   :publishing-function org-publish-attachment)
 	  ("worg-color-themes"
 	   :base-directory ,worg-base-color-themes-directory
 	   :base-extension "el"
 	   :html-extension "html"
-	   :publishing-directory (concat worg-htmlroot "/color-themes/")
+	   :publishing-directory ,(concat worg-htmlroot "/color-themes/")
 	   :recursive t
 	   :publishing-function org-publish-attachment)
 	  ("worg-images-dir"
 	   :base-directory ,worg-base-images-directory
 	   :base-extension "png\\|jpg\\|gif\\|pdf\\|cvs\\|css"
-	   :publishing-directory (concat worg-htmlroot "/images/")
+	   :publishing-directory ,(concat worg-htmlroot "/images/")
 	   :recursive t
 	   :publishing-function org-publish-attachment)
 	  ("worg-images"
@@ -119,7 +119,7 @@
 	  ("worg-sources"
 	   :base-directory ,worg-base-directory
 	   :base-extension "org"
-	   :publishing-directory (concat worg-htmlroot "/sources/")
+	   :publishing-directory ,(concat worg-htmlroot "/sources/")
 	   :recursive t
 	   :publishing-function org-publish-attachment)
 	  ("worg-extra"
@@ -128,9 +128,9 @@
 	   :publishing-directory ,worg-publish-directory
 	   :publishing-function org-publish-attachment)
 	  ("worg-bibtex"
-	   :base-directory (concat worg-base "org-contrib/bibtex/")
+	   :base-directory ,(concat worg-base "org-contrib/bibtex/")
 	   :base-extension "bib"
-	   :publishing-directory (concat worg-htmlroot "/org-contrib/bibtex/")
+	   :publishing-directory ,(concat worg-htmlroot "/org-contrib/bibtex/")
 	   :recursive nil
 	   :publishing-function org-publish-attachment)
 	  )))
@@ -139,7 +139,7 @@
 (setq worg-base-code-directory (concat worg-base "code/"))
 (setq worg-base-color-themes-directory (concat worg-base "color-themes/"))
 (setq worg-base-images-directory (concat worg-base "images/"))
-(setq worg-publish-directory (concat worg-htmlroot "/"))
+(setq worg-publish-directory worg-htmlroot)
 (set-org-publish-project-alist)
 
 (defun worg-fix-symbol-table ()
@@ -157,7 +157,7 @@
 	 (worg-base-code-directory (concat worg-base "code/"))
 	 (worg-base-color-themes-directory (concat worg-base "color-themes/"))
 	 (worg-base-images-directory (concat worg-base "images/"))
-	 (worg-publish-directory (concat worg-htmlroot "/")))
+	 (worg-publish-directory worg-htmlroot))
      (set-org-publish-project-alist)
      (org-publish-project "worg")))
 
@@ -170,7 +170,7 @@
 	 (worg-base-code-directory (concat worg-base "code/"))
 	 (worg-base-color-themes-directory (concat worg-base "color-themes/"))
 	 (worg-base-images-directory (concat worg-base "images/"))
-	 (worg-publish-directory (concat worg-htmlroot "/")))
+	 (worg-publish-directory worg-htmlroot))
      (set-org-publish-project-alist)
      (message "Emacs %s" emacs-version)
      (org-version)
