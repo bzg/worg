@@ -1,0 +1,285 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc todo:nil
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE:      Creating letters with KOMA =scrlttr2=
+#+AUTHOR:     Viktor Rosenfeld
+#+EMAIL:      v.rosenfeld@gmx.de
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://orgmode.org/worg/style/worg.css" />
+
+
+This tutorial describes the necessary steps to produce beautiful
+letters using Org-mode's LaTeX exporter and KOMA-Script's =scrlttr2=
+class.
+
+* DONE Quick start guide
+
+** DONE Requirements
+
+The code in this tutorial depends on the following:
+
+- Org-mode version 8.0 or greater.
+- A LaTeX installation including KOMA-Script, e.g., [[http://www.tug.org/texlive/][TeX Live]].
+
+** DONE Optionally download an up-to-date KOMA letter exporter
+
+The KOMA letter exporter is included in Org-mode's =contrib/lisp=
+directory since version 8.0. However, some information in this
+tutorial may depend on an updated version. You can [[http://orgmode.org/cgit.cgi/org-mode.git/plain/contrib/lisp/ox-koma-letter.el][download the latest
+version of the KOMA letter exporter]] from Org-mode's git repository.
+
+** DONE Minimal configuration of the KOMA letter exporter
+
+To use the KOMA letter exporter, you have to add it to Emacs' load
+path, activate it, and configure a LaTeX class for the LaTeX exporter
+(the KOMA letter exporter uses the LaTeX exporter internally).
+
+1. Add the path containing =ox-koma-letter.el= to Emacs' load
+   path. For example, if you use the version contained in the
+   directory =contrib/lisp= of Org-mode, add the following to your
+   Emacs configuration:
+
+   #+BEGIN_SRC emacs-lisp
+   (add-to-list 'load-path "~/path/to/org-mode/contrib/lisp" t)
+   #+END_SRC
+
+2. Activate the KOMA letter exporter by adding the following to your
+   Emacs configuration:
+
+   #+BEGIN_SRC emacs-lisp
+   (require 'ox-koma-letter)
+   #+END_SRC
+
+3. Configure a LaTeX class for the LaTeX exporter to use for the
+   export of KOMA letters by adding the following to your Emacs
+   configuration:
+
+   #+BEGIN_SRC emacs-lisp
+(add-to-list 'org-latex-classes
+             '("my-letter"
+               "\\documentclass\{scrlttr2\}
+\\usepackage[english]{babel}
+\[NO-DEFAULT-PACKAGES]
+\[NO-PACKAGES]
+\[EXTRA]"))
+   #+END_SRC
+
+   For more information about this step, refer to the documentation of
+   the variables [[http://orgmode.org/worg/doc.html#org-latex-classes][org-latex-classes]], [[http://orgmode.org/worg/doc.html#org-latex-default-packages-alist][org-latex-default-packages-alist]],
+   and [[http://orgmode.org/worg/doc.html#org-latex-packages-alist][org-latex-packages-alist]].
+
+** DONE A simple letter example
+
+Printed below is a minimal Org file that can be exported to a KOMA
+letter. In this file, press =C-c C-e= to bring up the exporter
+dispatcher and then press =k o= to export the Org file to a PDF file
+containing the letter. For your convenience, you can [[file:koma-letter-example.org][download the KOMA
+letter example]] and you can also [[file:koma-letter-example.pdf][download the example PDF letter]].
+
+#+INCLUDE: "koma-letter-example.org" src org
+
+The first line selects the [[*Minimal%20configuration%20of%20the%20KOMA%20letter%20exporter][letter LaTeX class]] we defined above. The
+following lines configure the letter's sender and recipient and other
+information of the letter. These settings are described in the next
+section. Finally, the content of the letter is written as plain text.
+
+* DONE Configuration guide
+
+In addition to the actual content a typical letter also contains
+additional information, such as the sender's and recipient's
+addresses, a date, and so on. From now on we refer to this additional
+data as /letter meta data/.
+
+A special group of letter meta data control the appearance of the
+letter, such as the presence of foldmarks or a back address. These are
+called /letter options/.
+
+** DONE Setting letter meta data and letter options
+
+Letter meta data can be configured in one of three ways, listed below
+from the most specific to the most general:
+
+1. Using Org option lines, as show in the [[*A%20simple%20letter%20example][simple letter example]] above,
+2. By setting Emacs variables, or
+3. In a KOMA-Script Letter Class Option file (LCO file).
+
+*** DONE Setting letter meta data in Org option lines
+
+The simplest way to set letter meta data is by using Org option lines
+as used in the [[*A%20simple%20letter%20example][simple letter example]] above. In the example, these
+lines are used to set the subject and the date of the letter, the
+sender's and the recipient's addresses, the opening and closing lines
+of the letter, and, finally, the sender's signature.
+
+Note that the first option line, =#+LATEX_CLASS: my-letter=, does not
+set letter meta but instead is used to select the [[*Minimal%20configuration%20of%20the%20KOMA%20letter%20exporter][letter LaTeX class]]
+we defined above. /The/ =#+LATEX_CLASS:= /option line is mandatory
+for the KOMA letter exporter./
+
+Letter options are set using an =#+OPTIONS:= line in the same manner
+as other [[http://orgmode.org/manual/Export-options.html][Org mode export options]].
+
+A full [[*List%20of%20KOMA%20letter%20meta%20data%20settings][list of KOMA letter meta data settings]] is provided below.
+
+Setting letter meta data by Org option lines take precedence over the
+other two ways of setting letter meta data. Thus, you can set default
+letter meta data using Emacs variables or in an LCO file (see below)
+and overwrite these defaults for an individual letter using Org option
+lines.
+
+If you define a letter below an Org heading, you must use Org
+properties inside a =:PROPERTIES:= drawer and prefix every option
+property with the string =EXPORT_=. See the [[http://orgmode.org/manual/Export-options.html][chapter Export options in
+the Org manual]] for details.
+
+*** DONE Setting letter meta data in Emacs variables
+
+Letter meta data can also be set using Emacs variables. For example,
+the Emacs Lisp snippet below sets the letter's closing line:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-koma-letter-closing "See you soon,")
+#+END_SRC
+
+A full [[*List%20of%20KOMA%20letter%20meta%20data%20settings][list of KOMA letter meta data settings]] is provided below.
+
+Letter meta data set by Emacs variables take precedence over letter
+meta data defined in LCO files but can be overwritten for an
+individual letter (or a file) by [[*Setting%20letter%20meta%20data%20in%20Org%20option%20lines][setting letter meta data in Org
+option lines]].
+
+*** DONE Setting letter meta data in LCO files
+
+As a third way, letter meta data can be set in so-called letter class
+option files (LCO files) . LCO files are regular TeX files which are
+included in the TeX source of the letter. Consequently, one has access
+to the entirety of KOMA options in LCO files and can also include
+other LaTeX code. For more information about LCO files, see the
+[[http://www.ctan.org/pkg/koma-script][KOMA-Script documentation]].
+
+LCO files are set by the =#+LCO:= option line or the Emacs variable
+=org-koma-letter-class-option-file=. KOMA-Script comes with a variety
+of pre-made LCO files, such as =DIN= for German letters, =NF= for
+French letters, or =UScommercial9= for US-American letters.
+
+Letter meta data set in LCO files can be overwritten globally by
+[[*Setting%20letter%20meta%20data%20in%20Emacs%20variables][setting letter meta data in Emacs variables]] or for an individual
+letter or file by [[*Setting%20letter%20meta%20data%20in%20Org%20option%20lines][setting letter meta data in Org option lines]].
+
+LCO files are especially convenient for setting letter meta data
+which is fairly constant across multiple letters, e.g., the sender's
+address and banking information.
+
+The following LCO file, called =DefaultAddress.lco=, sets the default
+address. It can loaded using the Org option line =#+LCO: DefaultAddress= 
+(without the =.lco= extension).
+
+#+BEGIN_SRC latex :exports code
+% Default letter configuration file
+\ProvidesFile{DefaultAddress.lco}
+
+% Default address
+\setkomavar{fromname}{Jane Doe}
+\setkomavar{fromaddress}{Some Street 1\\12345 Some City}
+\setkomavar{fromemail}{jane.doe@email.com}
+\setkomavar{fromphone}{(555) 526-3363}
+\setkomavar{signature}{\usekomavar{fromname}}
+#+END_SRC
+
+The following LCO file, called =Banking.lco=, configures a footer with
+banking information. To load it together with the default address
+defined above one can use the Org option line =#+LCO: DefaultAddress
+Banking=.
+
+#+BEGIN_SRC latex :exports code
+% Letter configuration file for signed letters
+\ProvidesFile{Banking.lco}
+
+% banking information in the footer
+\setkomavar{frombank}{Jane Doe\\Account number: 12\,345\,678\\Somebank\\Bank code number: 876\,543\,21}
+\setkomavar{firstfoot}{% 
+  \footnotesize
+  \parbox[b]{\linewidth}{%
+    \centering\def\\{ \textbullet{} }\usekomavar{frombank}% 
+  }%
+}
+#+END_SRC
+
+Custom LCO files must be placed in a directory where LaTeX will find
+them. On Linux, this defaults to =~/texmf/tex/latex=. On OS X, use
+=~/Library/texmf/tex/latex= instead. These paths can be configured
+using the following command:
+
+#+BEGIN_SRC sh
+tlmgr conf texmf TEXMFHOME /some/path
+#+END_SRC
+
+** DONE List of KOMA letter meta data settings
+
+This section lists all Org option lines, Emacs variables, and the
+corresponding KOMA variables or options that control the behavior of
+the KOMA letter exporter.
+
+*** DONE List of KOMA letter meta data
+
+The following letter meta data can be set by respective Org option
+lines. In general, they correspond to a LaTeX command such as:
+
+#+BEGIN_SRC latex :exports code
+\setkomavar{<KOMA variable>}{<value>}
+#+END_SRC
+
+| Option line       | Emacs variable                      | KOMA variable | Default value | Description                           |
+|-------------------+-------------------------------------+---------------+---------------+---------------------------------------|
+| =#+LCO:=          | =org-koma-letter-class-option-file= |               | =DIN=         | The default LCO file.                 |
+| =#+TITLE:=        |                                     | =subject=     | Empty[fn:1]   | The letter's subject.                 |
+| =#+DATE:=         |                                     | =date=        | Today's date  | The letter's date stamp.              |
+| =#+PLACE:=        | =org-koma-letter-place=             | =place=       | =nil=         | The letter's place stamp.             |
+| =#+SENDER:=       | =org-koma-letter-sender=            | =fromname=    | =nil=         | The sender's name.                    |
+| =#+FROM_ADDRESS:= | =org-koma-letter-from-address=      | =fromaddress= | =nil=         | The sender's address.[fn:2]           |
+| =#+PHONE_NUMBER:= | =org-koma-letter-phone=             | =fromphone=   | =nil=         | The sender's phone number.            |
+| =#+EMAIL:=        | =org-koma-letter-email=             | =fromemail=   | =nil=         | The sender's email.                   |
+| =#+TO_ADDRESS:=   |                                     |               |               | The recipient's address.[fn:2][fn:3]  |
+| =#+OPENING:=      | =org-koma-letter-opening=           |               | =nil=         | The opening line of the letter.[fn:4] |
+| =#+CLOSING:=      | =org-koma-letter-closing=           |               | =nil=         | The closing line of the letter.[fn:4] |
+| =#+SIGNATURE:=    | =org-koma-letter-signature=         | =signature=   | =nil=         | The sender's signature.               |
+
+*** DONE List of KOMA letter options
+
+The following letter options can be set in an =#+OPTIONS:= line. In
+general, they correspond to a LaTeX command such as:
+
+#+BEGIN_SRC latex :exports code
+\KOMAoption{<KOMA option>}{<value>}
+#+END_SRC
+
+| Option        | Emacs variable                    | KOMA option   | Default value | Accepted values           | Description                                                               |
+|---------------+-----------------------------------+---------------+---------------+---------------------------+---------------------------------------------------------------------------|
+| =backaddress= | =org-koma-letter-use-backaddress= | =backaddress= | =t=           | =t= or =nil=              | Print the sender's address in a small line above the recipient's address. |
+| =phone=       | =org-koma-letter-use-phone=       | =fromphone=   | =t=           | =t= or =nil=              | Print the sender's phone.                                                 |
+| =email=       | =org-koma-letter-use-email=       | =fromemail=   | =t=           | =t= or =nil=              | Print the sender's email.                                                 |
+| =foldmarks=   | =org-koma-letter-use-foldmarks=   | =foldmarks=   | =t=           | =t= or =nil=              | Print foldmarks.                                                          |
+| =subject=     | =org-koma-letter-use-subject=     | =subject=     | =untitled=    | any string[fn:5] or =nil= | If and how to print the letter's subject line.                            |
+| =place=       | =org-koma-letter-use-place=       |               | =t=           | =t= or =nil=              | Print the letter's place stamp.                                           |
+
+* Footnotes
+
+[fn:1] If the letter is exported below an Org headline, the default
+subject contains the Org headline text.
+
+[fn:2] The options lines =#+FROM_ADDRESS:= and =#+TO_ADDRESS:= can be
+used multiple times.
+
+[fn:3] The recipient's address must be different for every
+letter. Therefore one cannot set a default value using Emacs variables
+or LCO files.
+
+[fn:4] The options lines =#+OPENING:= and =#+CLOSING:= cannot be set
+in an LCO file.
+
+[fn:5] See the [[http://www.komascript.de/][KOMA script documentation]] for a list of accepted
+values.
+
