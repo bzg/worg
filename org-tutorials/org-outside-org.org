@@ -40,8 +40,8 @@
 
   Last not least, anybody who has used =C-c C-j (org-goto)= for looking up a
   different location in the current org-file, keeping current visibility,
-  might have wondered if a kind of 'remote-buffer-control' via a temporary
-  indirect buffer might not be a generally useful idea.
+  might have wondered if a kind of 'remote-buffer-control' via an associated
+  read-only buffer might not be a generally useful idea.
 
 * Org-mode everywhere
   :PROPERTIES:
@@ -112,6 +112,10 @@ outline-magic and out-xtra anymore. However, outshine does not make either of
 these two libraries obsolete, since it has a more specialized approach and
 might not be able to replace them in all cases.
 
+Furthermore, `outshine.el' includes functions and keybindings from
+[[http://emacswiki.org/emacs/OutlineMinorMode][outline-mode-easy-bindings]]. Unfortunately, no author is given for that
+library, so I cannot credit the person who wrote it.
+
 So what is /outshine/? It's an extension library for outline-minor-mode that
 gives buffers in different major-modes the 'look-and-feel' of Org-mode buffers
 and enables the use of /outorg/ and /navi-mode/ on them.
@@ -140,15 +144,15 @@ Use this in your '.emacs' to get started:
 (add-hook 'outline-minor-mode-hook 'outshine-hook-function)
 #+end_src
 
-Download [[https://raw.github.com/andreas-marschke/dotfiles/master/elisp/outline-mode-easy-bindings.el][outline-mode-easy-bindings.el]] and put it in a place where Emacs can
-find it. `outshine' loads this library if it is able to successfully require
-it. The functions and keybindings (for 'M -<<arrow-key>>' navigation and
-visibility cycling) defined there are so convenient that I put the following
-code into my Emacs init file to have the same functionality/keybindings
-available in Org-mode too:
+If you like the functions and keybindings for 'M -<<arrow-key>>' navigation
+and visibility cycling copied from `outline-mode-easy-bindings', you might
+want to put the following code into your Emacs init file to have the same
+functionality/keybindings available in Org-mode too, overriding the less
+frequently used commands for moving and promoting/demoting subtrees (but
+clashing with 'org-table' keybindings):
 
 #+begin_src emacs-lisp
-(when (require 'outline-mode-easy-bindings nil 'NOERROR)
+(when (require 'outshine nil 'NOERROR)
   (add-hook 'org-mode-hook
             (lambda ()
               ;; Redefine arrow keys, since promoting/demoting and moving
@@ -188,7 +192,7 @@ loaded.
      :CUSTOM_ID: fundamental-idea
      :END:
 
-/outshine/ is based on a very simple but powerfull idea, that enables its use
+/outshine/ is based on a very simple yet powerful idea, that enables its use
 in any Emacs major-mode (in theory at least):
 
 #+begin_verse
@@ -313,7 +317,9 @@ general Org-mode style counterparts are available:
 
 *outorg* is a library written by /Thorsten Jolitz/ on top of his /outshine/
 library. Thus, /outorg/ needs /outshine/, and files that are structured with
-outshine-style headers, otherwise it won't work. 
+outshine-style headers, otherwise it won't work (note that 'oldschool' Emacs
+Lisp files with headers matched by =^;;;+ = are a special case where outorg
+works too). 
 
 You can download the file (or clone the github-repo) here:
 
@@ -347,10 +353,6 @@ has `outorg-edit-minor-mode' activated, a minor-mode with only 2 commands:
 : | M-# (outorg-copy-edits-and-exit)
 : | C-x C-s (outorg-save-edits-to-tmp-file)
 : `----------------------------------------
-
-If you want to insert Org-mode source-code or example blocks in
-comment-sections, simply outcomment them in the outorg-edit buffer before
-calling `outorg-copy-edits-and-exit'.
 
 If you want to insert Org-mode source-code or example blocks in
 comment-sections, simply outcomment them in the outorg-edit buffer before
@@ -396,11 +398,11 @@ undefined behaviour.
 
 One advantage of this is that there is always a complete subtree (-hierarchy)
 in the outorg-edit-buffer, thus not only the Orgmode editing functionality can
-be applied, but also its export facilities. As an example, in order to produce
-the nice README.txt files for the github-repos of /outshine/, /outorg/ and
-/navi-mode/, I simply called =outorg-edit-as-org= on the first
-1st-level-headline of the source-code files (the file header comment-sections)
-and exported the subtree to ASCII.
+be applied, but also its export facilities and many other commands that act on
+headlines or subtrees. As an example, in order to produce the nice README.txt
+files for the github-repos of /outshine/, /outorg/ and /navi-mode/, I simply
+called =outorg-edit-as-org= on the first 1st-level-headline of the source-code
+files (the file header comment-sections) and exported the subtree to ASCII.
 
 One disadvantage of this is that comment-strings of (e.g. emacs-lips)
 functions cannot be edited comfortably, since after transformation of the
@@ -713,15 +715,15 @@ within the introduction (that is, before the first header).
 
 While visibility-cycling and outline-navigation commands make it very
 convenient to work even with big Org-mode or outshine buffers, it can't be
-denied that an indirect read-only buffer with one-key command-bindings,
+denied that a read-only "twin-buffer" with one-key command-bindings,
 exclusively for navigation and high-level structure editing of the associated
-original-buffer, can be even more convenient. 
+original-buffer, can be even more convenient.
 
 Enters /navi-mode/, a major-mode by /Thorsten Jolitz/ derived from and
 inspired by /occur-mode/ (and, to a certain extend, the =org-goto= command).
 Just like /outorg/, /navi-mode/ depends on /outshine/ and works only with
 source-code files structured with 'outshine-style' outline-headers. It does
-work with org-mode files too, though. 
+work with Org-mode files and 'oldschool' Emacs Lisp files too, though. 
 
 A /navi-buffer/ is a kind of "remote-control" for its associated
 /original-buffer/. It offers a vast amount of views on the /original-buffer/
@@ -756,12 +758,12 @@ more predefined sets of keyword searches there are, the easier to use
      :CUSTOM_ID: about-navi-mode
      :END:
 
-This file implements extensions for occur-mode. You can think of a navi-buffer
-as a kind of 'remote-control' for an (adecuately) outline-structured
-original-buffer. It enables quick navigation and basic structure editing in
-the original-buffer without (necessarily) leaving the navi-buffer. When
-switching to the original-buffer and coming back after some modifications, the
-navi-buffer is always reverted (thus up-to-date).
+/navi-mode/ implements extensions for occur-mode. You can think of a
+navi-buffer as a kind of 'remote-control' for an (adecuately)
+outline-structured original-buffer. It enables quick navigation and basic
+structure editing in the original-buffer without (necessarily) leaving the
+navi-buffer. When switching to the original-buffer and coming back after some
+modifications, the navi-buffer is always reverted (thus up-to-date).
 
 Besides the fundamental outline-heading-searches (8 outline-levels) and the 5
 basic keyword-searches (:FUN, :VAR, :DB, :OBJ and :ALL), all languages can
@@ -797,11 +799,12 @@ to your .emacs file.
 
 For /navi-mode/ to work, the original-buffer must be outline-structured 'the
 outshine way', i.e. with the headlines being proper Org-mode headlines, marked
-and outcommented with /comment-region/. 
+and outcommented with /comment-region/ (but oldschool Emacs Lisp headers like
+=;;; header level 1= work too) . 
 
 The second assumption is that /outline-minor-mode/ is activated in the
 original-buffer and /outshine.el/ loaded like described in its installation
-instructions.
+instructions (except for Org-mode files). 
 
 When these pre-conditions are fullfilled (/outorg.el/ must be loaded too), you
 can use =M-s n (navi-search-and-switch)= to open a /navi-buffer/ and
