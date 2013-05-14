@@ -51,9 +51,9 @@ path, activate it, and configure a LaTeX class for the LaTeX exporter
    (require 'ox-koma-letter)
    #+END_SRC
 
-3. Configure a LaTeX class for the LaTeX exporter to use for the
-   export of KOMA letters by adding the following to your Emacs
-   configuration:
+3. <<letter-class-definition>> Configure a LaTeX class for the LaTeX
+   exporter to use for the export of KOMA letters by adding the
+   following to your Emacs configuration:
 
    #+BEGIN_SRC emacs-lisp
 (add-to-list 'org-latex-classes
@@ -74,12 +74,12 @@ path, activate it, and configure a LaTeX class for the LaTeX exporter
 Printed below is a minimal Org file that can be exported to a KOMA
 letter. In this file, press =C-c C-e= to bring up the exporter
 dispatcher and then press =k o= to export the Org file to a PDF file
-containing the letter. For your convenience, you can [[file:koma-letter-example.org][download the KOMA
+containing the letter. For your convenience, you can [[http://orgmode.org/worg/sources/org-tutorials/koma-letter-example.org][download the KOMA
 letter example]] and you can also [[file:koma-letter-example.pdf][download the example PDF letter]].
 
 #+INCLUDE: "koma-letter-example.org" src org
 
-The first line selects the [[*Minimal%20configuration%20of%20the%20KOMA%20letter%20exporter][letter LaTeX class]] we defined above. The
+The first line selects the [[letter-class-definition][letter LaTeX class]] we defined above. The
 following lines configure the letter's sender and recipient and other
 information of the letter. These settings are described in the next
 section. Finally, the content of the letter is written as plain text.
@@ -113,7 +113,7 @@ sender's and the recipient's addresses, the opening and closing lines
 of the letter, and, finally, the sender's signature.
 
 Note that the first option line, =#+LATEX_CLASS: my-letter=, does not
-set letter meta but instead is used to select the [[*Minimal%20configuration%20of%20the%20KOMA%20letter%20exporter][letter LaTeX class]]
+set letter meta but instead is used to select the [[letter-class-definition][letter LaTeX class]]
 we defined above. /The/ =#+LATEX_CLASS:= /option line is mandatory
 for the KOMA letter exporter./
 
@@ -193,10 +193,10 @@ defined above one can use the Org option line =#+LCO: DefaultAddress
 Banking=.
 
 #+BEGIN_SRC latex :exports code
-% Letter configuration file for signed letters
+% Banking information configuration file
 \ProvidesFile{Banking.lco}
 
-% banking information in the footer
+% Banking information in the footer
 \setkomavar{frombank}{Jane Doe\\Account number: 12\,345\,678\\Somebank\\Bank code number: 876\,543\,21}
 \setkomavar{firstfoot}{% 
   \footnotesize
@@ -259,7 +259,7 @@ general, they correspond to a LaTeX command such as:
 | =backaddress= | =org-koma-letter-use-backaddress= | =backaddress= | =t=           | =t= or =nil=              | Print the sender's address in a small line above the recipient's address. |
 | =phone=       | =org-koma-letter-use-phone=       | =fromphone=   | =t=           | =t= or =nil=              | Print the sender's phone.                                                 |
 | =email=       | =org-koma-letter-use-email=       | =fromemail=   | =t=           | =t= or =nil=              | Print the sender's email.                                                 |
-| =foldmarks=   | =org-koma-letter-use-foldmarks=   | =foldmarks=   | =t=           | =t= or =nil=              | Print foldmarks.                                                          |
+| =foldmarks=   | =org-koma-letter-use-foldmarks=   | =foldmarks=   | =t=           | any string[fn:5] or =nil=   | Print foldmarks.                                                          |
 | =subject=     | =org-koma-letter-use-subject=     | =subject=     | =untitled=    | any string[fn:5] or =nil= | If and how to print the letter's subject line.                            |
 | =place=       | =org-koma-letter-use-place=       |               | =t=           | =t= or =nil=              | Print the letter's place stamp.                                           |
 
