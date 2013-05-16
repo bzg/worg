@@ -22,12 +22,10 @@ The code in this tutorial depends on the following:
 - Org-mode version 8.0 or greater.
 - A LaTeX installation including KOMA-Script, e.g., [[http://www.tug.org/texlive/][TeX Live]].
 
-** DONE Optionally download an up-to-date KOMA letter exporter
-
-The KOMA letter exporter is included in Org-mode's =contrib/lisp=
-directory since version 8.0. However, some information in this
-tutorial may depend on an updated version. You can [[http://orgmode.org/cgit.cgi/org-mode.git/plain/contrib/lisp/ox-koma-letter.el][download the latest
-version of the KOMA letter exporter]] from Org-mode's git repository.
+*Note*: The information in this tutorial depends on functionality that
+has not yet been released. You can either [[http://orgmode.org/worg/org-faq.html#keeping-current-with-Org-mode-development][use the latest development
+version from the Org-mode git repository]] or [[http://orgmode.org/cgit.cgi/org-mode.git/plain/contrib/lisp/ox-koma-letter.el][download a current version
+of the KOMA letter exporter]] and install it in =contrib/lisp=.
 
 ** DONE Minimal configuration of the KOMA letter exporter
 
@@ -74,8 +72,8 @@ path, activate it, and configure a LaTeX class for the LaTeX exporter
 Printed below is a minimal Org file that can be exported to a KOMA
 letter. In this file, press =C-c C-e= to bring up the exporter
 dispatcher and then press =k o= to export the Org file to a PDF file
-containing the letter. For your convenience, you can [[http://orgmode.org/worg/sources/org-tutorials/koma-letter-example.org][download the KOMA
-letter example]] and you can also [[file:koma-letter-example.pdf][download the example PDF letter]].
+containing the letter. For your convenience, you can [[http://orgmode.org/worg/sources/exporters/koma-letter-example.org][download the KOMA
+letter example]] and you can also [[file:~/Desktop/worg/images/ox-koma-letter/koma-letter-example.pdf][download the example PDF letter]].
 
 #+INCLUDE: "koma-letter-example.org" src org
 
@@ -89,42 +87,47 @@ section. Finally, the content of the letter is written as plain text.
 In addition to the actual content a typical letter also contains
 additional information, such as the sender's and recipient's
 addresses, a date, and so on. From now on we refer to this additional
-data as /letter meta data/.
+data as /letter metadata/.
 
-A special group of letter meta data control the appearance of the
+A special group of letter metadata control the appearance of the
 letter, such as the presence of foldmarks or a back address. These are
 called /letter options/.
 
-** DONE Setting letter meta data and letter options
+** DONE Setting letter metadata and letter options
 
-Letter meta data can be configured in one of three ways, listed below
+Letter metadata can be configured in one of three ways, listed below
 from the most specific to the most general:
 
 1. Using Org option lines, as show in the [[*A%20simple%20letter%20example][simple letter example]] above,
 2. By setting Emacs variables, or
 3. In a KOMA-Script Letter Class Option file (LCO file).
 
-*** DONE Setting letter meta data in Org option lines
+It is also possible to define multiple LaTeX classes for different
+letters in addition to the [[letter-class-definition][letter LaTeX class]] shown above. For
+example, one could have separate classes for private and business
+letters.
 
-The simplest way to set letter meta data is by using Org option lines
+*** DONE Setting letter metadata in Org option lines
+
+The simplest way to set letter metadata is by using Org option lines
 as used in the [[*A%20simple%20letter%20example][simple letter example]] above. In the example, these
 lines are used to set the subject and the date of the letter, the
 sender's and the recipient's addresses, the opening and closing lines
 of the letter, and, finally, the sender's signature.
 
 Note that the first option line, =#+LATEX_CLASS: my-letter=, does not
-set letter meta but instead is used to select the [[letter-class-definition][letter LaTeX class]]
-we defined above. /The/ =#+LATEX_CLASS:= /option line is mandatory
-for the KOMA letter exporter./
+set letter metadata but instead is used to select the [[letter-class-definition][letter LaTeX
+class]] we defined above. /The/ =#+LATEX_CLASS:= /option line is
+mandatory for the KOMA letter exporter./
 
 Letter options are set using an =#+OPTIONS:= line in the same manner
 as other [[http://orgmode.org/manual/Export-options.html][Org mode export options]].
 
-A full [[*List%20of%20KOMA%20letter%20meta%20data%20settings][list of KOMA letter meta data settings]] is provided below.
+A full [[*List%20of%20KOMA%20letter%20meta%20data%20settings][list of KOMA letter metadata settings]] is provided below.
 
-Setting letter meta data by Org option lines take precedence over the
-other two ways of setting letter meta data. Thus, you can set default
-letter meta data using Emacs variables or in an LCO file (see below)
+Setting letter metadata by Org option lines take precedence over the
+other two ways of setting letter metadata. Thus, you can set default
+letter metadata using Emacs variables or in an LCO file (see below)
 and overwrite these defaults for an individual letter using Org option
 lines.
 
@@ -133,25 +136,25 @@ properties inside a =:PROPERTIES:= drawer and prefix every option
 property with the string =EXPORT_=. See the [[http://orgmode.org/manual/Export-options.html][chapter Export options in
 the Org manual]] for details.
 
-*** DONE Setting letter meta data in Emacs variables
+*** DONE Setting letter metadata in Emacs variables
 
-Letter meta data can also be set using Emacs variables. For example,
+Letter metadata can also be set using Emacs variables. For example,
 the Emacs Lisp snippet below sets the letter's closing line:
 
 #+BEGIN_SRC emacs-lisp
 (setq org-koma-letter-closing "See you soon,")
 #+END_SRC
 
-A full [[*List%20of%20KOMA%20letter%20meta%20data%20settings][list of KOMA letter meta data settings]] is provided below.
+A full [[*List%20of%20KOMA%20letter%20meta%20data%20settings][list of KOMA letter metadata settings]] is provided below.
 
-Letter meta data set by Emacs variables take precedence over letter
-meta data defined in LCO files but can be overwritten for an
-individual letter (or a file) by [[*Setting%20letter%20meta%20data%20in%20Org%20option%20lines][setting letter meta data in Org
+Letter metadata set by Emacs variables take precedence over letter
+metadata defined in LCO files but can be overwritten for an
+individual letter (or a file) by [[*Setting%20letter%20meta%20data%20in%20Org%20option%20lines][setting letter metadata in Org
 option lines]].
 
-*** DONE Setting letter meta data in LCO files
+*** DONE Setting letter metadata in LCO files
 
-As a third way, letter meta data can be set in so-called letter class
+As a third way, letter metadata can be set in so-called letter class
 option files (LCO files) . LCO files are regular TeX files which are
 included in the TeX source of the letter. Consequently, one has access
 to the entirety of KOMA options in LCO files and can also include
@@ -163,13 +166,13 @@ LCO files are set by the =#+LCO:= option line or the Emacs variable
 of pre-made LCO files, such as =DIN= for German letters, =NF= for
 French letters, or =UScommercial9= for US-American letters.
 
-Letter meta data set in LCO files can be overwritten globally by
-[[*Setting%20letter%20meta%20data%20in%20Emacs%20variables][setting letter meta data in Emacs variables]] or for an individual
-letter or file by [[*Setting%20letter%20meta%20data%20in%20Org%20option%20lines][setting letter meta data in Org option lines]].
+Letter metadata set in LCO files can be overwritten globally by
+[[*Setting%20letter%20meta%20data%20in%20Emacs%20variables][setting letter metadata in Emacs variables]] or for an individual
+letter or file by [[*Setting%20letter%20meta%20data%20in%20Org%20option%20lines][setting letter metadata in Org option lines]].
 
-LCO files are especially convenient for setting letter meta data
-which is fairly constant across multiple letters, e.g., the sender's
-address and banking information.
+LCO files are especially convenient for setting letter metadata which
+is fairly constant across multiple letters, e.g., the sender's address
+and banking information.
 
 The following LCO file, called =DefaultAddress.lco=, sets the default
 address. It can loaded using the Org option line =#+LCO: DefaultAddress= 
@@ -215,15 +218,19 @@ using the following command:
 tlmgr conf texmf TEXMFHOME /some/path
 #+END_SRC
 
-** DONE List of KOMA letter meta data settings
+You can test whether =foo.lco= is recognized by TeX Live by running
+the commmand =kpsewhich foo.lco=. After adding a file to the TeX Live
+path you may have to run =mktexlsr=.
+
+** DONE List of KOMA letter metadata settings
 
 This section lists all Org option lines, Emacs variables, and the
 corresponding KOMA variables or options that control the behavior of
 the KOMA letter exporter.
 
-*** DONE List of KOMA letter meta data
+*** DONE List of KOMA letter metadata
 
-The following letter meta data can be set by respective Org option
+The following letter metadata can be set by respective Org option
 lines. In general, they correspond to a LaTeX command such as:
 
 #+BEGIN_SRC latex :exports code
@@ -259,7 +266,7 @@ general, they correspond to a LaTeX command such as:
 | =backaddress= | =org-koma-letter-use-backaddress= | =backaddress= | =t=           | =t= or =nil=              | Print the sender's address in a small line above the recipient's address. |
 | =phone=       | =org-koma-letter-use-phone=       | =fromphone=   | =t=           | =t= or =nil=              | Print the sender's phone.                                                 |
 | =email=       | =org-koma-letter-use-email=       | =fromemail=   | =t=           | =t= or =nil=              | Print the sender's email.                                                 |
-| =foldmarks=   | =org-koma-letter-use-foldmarks=   | =foldmarks=   | =t=           | any string[fn:5] or =nil=   | Print foldmarks.                                                          |
+| =foldmarks=   | =org-koma-letter-use-foldmarks=   | =foldmarks=   | =true=        | any string[fn:5] or =nil= | Print foldmarks.                                                          |
 | =subject=     | =org-koma-letter-use-subject=     | =subject=     | =untitled=    | any string[fn:5] or =nil= | If and how to print the letter's subject line.                            |
 | =place=       | =org-koma-letter-use-place=       |               | =t=           | =t= or =nil=              | Print the letter's place stamp.                                           |
 
