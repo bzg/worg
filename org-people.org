@@ -3,17 +3,24 @@
 #+AUTHOR:    Worg people
 #+LANGUAGE:  en
 #+STARTUP:   overview
-#+OPTIONS:   H:3 num:nil toc:t \n:nil @:t ::t |:t ^:{} -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+OPTIONS:   H:3 num:nil toc:t \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc ':t
 #+INFOJS_OPT: view:info toc:1 path:http://orgmode.org/org-info.js tdepth:1 ftoc:t buttons:0 mouse:underline
 
-#+MACRO: person @<br style="clear:both;" />\n#+ATTR_HTML: width="300" #+ATTR_HTML: style="float:right;margin:0px 0px 20px 20px;"\n* $1\n[[$2]]\n
-#+MACRO: person100 @<br style="clear:both;" />\n#+ATTR_HTML: width="100" #+ATTR_HTML: style="float:right;margin:0px 0px 20px 20px;"\n* $1\n[[$2]]\n
-#+MACRO: person150 @<br style="clear:both;" />\n#+ATTR_HTML: width="150" #+ATTR_HTML: style="float:right;margin:0px 0px 20px 20px;"\n* $1\n[[$2]]\n
-#+MACRO: person200 @<br style="clear:both;" />\n#+ATTR_HTML: width="200" #+ATTR_HTML: style="float:right;margin:0px 0px 20px 20px;"\n* $1\n[[$2]]\n
-#+MACRO: person300 @<br style="clear:both;" />\n#+ATTR_HTML: width="300" #+ATTR_HTML: style="float:right;margin:0px 0px 20px 20px;"\n* $1\n[[$2]]\n
-#+MACRO: person400 @<br style="clear:both;" />\n#+ATTR_HTML: width="400" #+ATTR_HTML: style="float:right;margin:0px 0px 20px 20px;"\n* $1\n[[$2]]\n
-#+MACRO: person500 @<br style="clear:both;" />\n#+ATTR_HTML: width="500" #+ATTR_HTML: style="float:right;margin:0px 0px 20px 20px;"\n* $1\n[[$2]]\n
+#+name: person-template
+#+BEGIN_SRC org :var name="name" url="url" width="300" :exports none
+,#+html: <br style="clear:both;" />
+,* $name
+,#+attr_html: :width $width :style float:right;margin:0px 0px 20px 20px;
+[[$url]]
+#+END_SRC
 
+#+MACRO: person call_person-template(name="$1",url="$2",width="300")[:results raw]
+#+MACRO: person100 call_person-template(name="$1",url="$2",width="100")[:results raw]
+#+MACRO: person150 call_person-template(name="$1",url="$2",width="150")[:results raw]
+#+MACRO: person200 call_person-template(name="$1",url="$2",width="200")[:results raw]
+#+MACRO: person300 call_person-template(name="$1",url="$2",width="300")[:results raw]
+#+MACRO: person400 call_person-template(name="$1",url="$2",width="400")[:results raw]
+#+MACRO: person500 call_person-template(name="$1",url="$2",width="500")[:results raw]
 
 # Instructions
 # ============
@@ -376,7 +383,7 @@ http://twitter.com/andrewhyatt.
 
 # Shidai Liu (aka Leo) ------------------------------------------------------------------
 
-{{{person(Shidai Liu (aka Leo),http://orgmode.org/img/people/leo.jpg)}}}
+{{{person(Shidai Liu\, aka Leo,http://orgmode.org/img/people/leo.jpg)}}}
 
 =Planner= got me started on =Emacs= in late 2005 after seeing some of
 it's cool features.  One year later (October 2006) I moved to =Org=,
@@ -750,6 +757,6 @@ I am really excited about org-mode, and can't wait to see what the future
 brings.
 
 # Keep the following line at the end of the buffer
-@<br style="clear:both;" />
+@@html:<br style="clear:both;" />@@
 
 
