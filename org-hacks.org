@@ -1,7 +1,7 @@
 #+TITLE:      Org ad hoc code, quick hacks and workarounds
 #+AUTHOR:     Worg people
 #+EMAIL:      mdl AT imapmail DOT org
-#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c)
@@ -408,7 +408,7 @@ nil if before the first headline."
 #+END_SRC
 
 *** Count words in an Org buffer
-#FIXME: Does not fit too well under Structure. Any idea where to put it?
+# FIXME: Does not fit too well under Structure. Any idea where to put it?
 Paul Sexton [[http://article.gmane.org/gmane.emacs.orgmode/38014][posted]] this function to count words in an Org buffer:
 
 #+begin_src emacs-lisp
@@ -506,8 +506,8 @@ The =SCHEDULED= and =DEADLINE= cookies should be used on the line *right
 below* the headline -- like this:
 
 #+begin_src org
-  ,* A headline
-  ,  SCHEDULED: <2012-04-09 lun.>
+,* A headline
+  SCHEDULED: <2012-04-09 lun.>
 #+end_src
 
 This is what =org-scheduled= and =org-deadline= (and other similar
@@ -682,10 +682,10 @@ Nick Dokos [[http://article.gmane.org/gmane.emacs.orgmode/15694][suggested]]:
 
 Try the following:
 
-| Start Date |   End Date | Duration |
-|------------+------------+----------|
-| 2004.08.07 | 2005.07.08 |      335 |
-:#+TBLFM: $3=(date(<$2>)-date(<$1>))
+: | Start Date |   End Date | Duration |
+: |------------+------------+----------|
+: | 2004.08.07 | 2005.07.08 |      335 |
+: #+TBLFM: $3=(date(<$2>)-date(<$1>))
 
 See [[http://thread.gmane.org/gmane.emacs.orgmode/7741][this thread]] as well as [[http://article.gmane.org/gmane.emacs.orgmode/7753][this post]] (which is really a followup on the
 above).  The problem that this last article pointed out was solved in [[http://article.gmane.org/gmane.emacs.orgmode/8001][this
@@ -1025,7 +1025,7 @@ I consider this as only a hack for several reasons:
 (Note: this hack is likely out of date due to the development of
 [[org-capture]].)
 
-#FIXME: gmane link?
+# FIXME: gmane link?
 On emacs-orgmode, Ryan C. Thompson suggested this:
 
 #+begin_quote
@@ -1437,8 +1437,8 @@ changed.
 In the setup part in my org-files I put:
 
 #+begin_src org
-  ,#+LINK: attach elisp:(org-open-file (org-attach-expand "%s"))
-#+end_src org
+,#+LINK: attach elisp:(org-open-file (org-attach-expand "%s"))
+#+end_src
 
 Now I can use the "attach" link type, but org will ask me if I want to
 allow executing the elisp code.  To avoid this you can even set
@@ -2057,7 +2057,7 @@ after the placement options. During LaTeX export using the
 ~#+ATTR_LaTeX:~ line below:
 
 #+begin_src org
-  ,#+ATTR_LaTeX: placement=[<options>]\footnotesize
+,#+ATTR_LaTeX: placement=[<options>]\footnotesize
 #+end_src
 
 exports the associated floating environment as shown in the following
@@ -2074,12 +2074,12 @@ tables since the =table= environment is not used. As an ugly
 workaround, one can use the following:
 
 #+begin_src org
-  ,#+LATEX: {\footnotesize
-  ,#+ATTR_LaTeX: align=rr
-  ,| some | table |
-  ,|------+-------|
-  ,| ..   | ..    |
-  ,#+LATEX: }
+,#+LATEX: {\footnotesize
+,#+ATTR_LaTeX: align=rr
+| some | table |
+|------+-------|
+| ..   | ..    |
+,#+LATEX: }
 #+end_src
 
 *** Styling code sections with CSS
@@ -2111,6 +2111,25 @@ top of each kind of code box:
 
 Additionally, we use color to distinguish code output (the =.example=
 class) from input (all the =.src-*= classes).
+
+** Babel
+
+*** How do I preview LaTeX fragments when in a LaTeX source block?
+
+When editing =LaTeX= source blocks, you may want to preview LaTeX fragments
+just like in an Org-mode buffer.  You can do this by using the usual
+keybinding =C-c C-x C-l= after loading this snipped:
+
+#+BEGIN_SRC emacs-lisp
+(define-key org-src-mode-map "\C-c\C-x\C-l" 'org-edit-preview-latex-fragment)
+
+(defun org-edit-preview-latex-fragment ()
+  "Write latex fragment from source to parent buffer and preview it."
+  (interactive)
+  (org-src-in-org-buffer (org-preview-latex-fragment)))
+#+END_SRC
+
+Thanks to Sebastian Hofer for sharing this.
 
 * Hacking Org: Working with Org-mode and other Emacs Packages.
 ** org-remember-anything
@@ -2375,6 +2394,21 @@ the copy in the last group."
   'ulf-message-send-and-org-gnus-store-link)
 #+end_src
 
+** Link to visit a file and run occur
+#+index: Link!Visit a file and run occur
+Add the following bit of code to your startup (after loading org),
+and you can then use links like =occur:my-file.txt#regex= to open a
+file and run occur with the regex on it.
+
+#+BEGIN_SRC emacs-lisp
+  (defun org-occur-open (uri)
+    "Visit the file specified by URI, and run `occur' on the fragment
+    \(anything after the first '#') in the uri."
+    (let ((list (split-string uri "#")))
+      (org-open-file (car list) t)
+      (occur (mapconcat 'identity (cdr list) "#"))))
+  (org-add-link-type "occur" 'org-occur-open)
+#+END_SRC
 ** Send html messages and attachments with Wanderlust
   -- David Maus
 
@@ -2560,7 +2594,7 @@ strings are in message-mode and modify the functions accordingly.
 The diary package provides the function =diary-sunrise-sunset= which can be used
 in a diary s-expression in some agenda file like this:
 
-#+begin_src org-mode
+#+begin_src org
 %%(diary-sunrise-sunset)
 #+end_src
 
@@ -2611,7 +2645,7 @@ The diary entry can contain `%s' which will be replaced with
 You also need to add a couple of diary s-expressions in one of your agenda
 files:
 
-#+begin_src org-mode
+#+begin_src org
 %%(diary-sunrise)Sunrise in %s
 %%(diary-sunset)
 #+end_src
@@ -2646,9 +2680,9 @@ following function:
 
 Add the following line to an agenda file:
 
-#+begin_src org-mode
-* Lunar phase
-#+CATEGORY: Lunar
+#+begin_src org
+,* Lunar phase
+,#+CATEGORY: Lunar
 %%(org-lunar-phases)
 #+end_src
 

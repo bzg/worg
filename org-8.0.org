@@ -1,0 +1,256 @@
+#+TITLE: Upgrading to Org 8.0 or the current master branch
+#+AUTHOR: Bastien Guerry
+#+EMAIL: bzg @ gnu DOT org
+#+LANGUAGE:  en
+#+OPTIONS: toc:t
+#+html_head: <link rel="stylesheet" title="Standard" href="./style/worg.css" type="text/css" />
+
+* Introduction
+
+#+INDEX: 8.0
+#+INDEX: exporter
+#+INDEX: migrating
+
+The release of Org-mode 8.0 (and the git repository master branch, as of [[http://orgmode.org/cgit.cgi/org-mode.git/commit/?id%3D1cac3127c2f810e83fcc1203f1dd2b15250a687e][commit 1cac3127c]])
+uses a new export framework, developed by Nicolas Goaziou. This document provides
+information on general changes to Org, as well as the steps needed to update your
+configuration properly.
+
+If the instructions below do not help solving your problem, please ask any
+question on the [[http://orgmode.org/community.html][mailing list]]. Keep in mind that the new export framework is under heavy
+development, and posting to the mailing list will help not only to resolve your issues,
+but also make sure that documentation is properly udpated for the benefit of others with
+similar issues.
+
+This page serves as an upgrade guide for the changes widely affecting users. /Please/
+refer to the [[file:exporters/ox-overview.org][new exporter overview]], which contains an up to date list of
+Org-mode exporters, and links to backend-specific setup and usage details.
+
+* Files moved to =contrib/=
+
+These files have been moved to the =contrib/= directory.
+
+- =org-colview-xemacs.el=
+- =org-mew.el=
+- =org-wl.el=
+- =org-w3m.el=
+- =org-vm.el=
+- =ox-taskjuggler.el= (was org-taskjuggler.el)
+- =ox-freemind.el= (was org-freemind.el)
+
+If you were using them, you need to [[http://orgmode.org/manual/Installation.html][add the =contrib/lisp= directory]]
+of the Org distribution to the Emacs =load-path=.
+
+
+* Original announcement of the new exporter
+
+The most comprehensive overview of the new exporter may be found in Nicolas' merge
+announcement [[http://article.gmane.org/gmane.emacs.orgmode/65574][in this email]] to the mailing list. Please scan the post, as you may find
+answers to your questions there.
+
+* Updating global export configuration options
+
+Global export options start with the =org-export-*= prefix, most of them
+are in the =ox.el= file.
+
+Most generic export options should not require any changes. If
+you find that a generic option is useless or broken or badly documented in
+the manual, please report it to the list.
+
+* Backend-specific configuration options
+
+Backend-specific options are now defined via the convention =ox-backend-*=. For example:
+
+- =org-html-*= for =HTML= and live in =ox-html.el=
+- =org-latex-*= for =LaTeX= and live in =ox-latex.el=
+- Etc.
+
+There is a new variable =org-export-backends= which controls what backends
+are loaded when you lauch Org.  By default, the =ASCII=, =HTML= and =LaTeX=
+are loaded; in contrast with the old exporter behavior, others will need to be explicitly
+loaded in order to use them. See the [[Upgrading your setup][upgrade]] section for instructions.
+
+** HTML-specific changes
+
+Some html-specific options were renamed more signficantly or deleted. Examine this
+table and update accordingly: 
+
+| Org 7.9.3f (maint)                     | Master (8.0)                           |
+|----------------------------------------+----------------------------------------|
+| org-export-html-style                  | org-html-head                          |
+| org-export-html-style-extra            | org-html-head-extra                    |
+| org-export-html-style-default          | org-html-head-include-default-style    |
+| org-export-html-style-include-scripts  | org-html-head-include-scripts          |
+| org-export-htmlized-org-css-url        | org-org-htmlized-css-url (in ox-org.el |
+|----------------------------------------+----------------------------------------|
+| org-export-html-headline-anchor-format | Deleted                                |
+| org-export-html-date-format-string     | Deleted                                |
+| org-export-html-content-div            | Deleted                                |
+| org-export-html-html-helper-timestamp  | Deleted                                |
+
+** Org publishing specific changes
+Some changes also specifically affect =org-publish-project-alist= settings. The publishing
+functions are not loaded until the corresponding backend has been loaded.  You need to
+update =org-publish-project-alist= and to use the function from the new publishing engine
+in the table below: 
+
+| Old publishing engine    | New publishing engine      |
+|--------------------------+----------------------------|
+| org-publish-org-to-html  | org-html-publish-to-html   |
+| org-publish-org-to-org   | org-org-publish-to-org     |
+| org-publish-org-to-latex | org-latex-publish-to-latex |
+| ...                      | ...                        |
+
+
+To specify a style for the project =:style= keyword changes to =:html-head=
+
+If something does not work, please report it on the mailing list.
+
+
+
+* Upgrading your setup
+
+The practical implication for users upgrading from Org-mode < version 7.9.4f is two-fold:
+
+- You must search your configuration for the existence of varaibles starting with
+  =org-export-= and change their names (e.g. =org-export-html-validation-link= is now
+  =org-html-validation-link=). /See sections below changes specific to the HTML and
+  Publishing backends/. 
+
+- If you use exporters in addition to =ASCII=, =HTML=, and/or =LaTeX=, you need to load them
+  explicitly in your config via one of two ways (refer to  [[http://article.gmane.org/gmane.emacs.orgmode/65574][Nicolas' announcement]], section
+  3 on Installation, for explanation of the two methods): 
+
+*1: Load exporter upon first export execution per session*
+#+begin_example
+setq org-export-backends (quote (
+       beamer
+       md
+       ...
+       taskjuggler)))
+#+end_example
+
+*2: Loading all listed exporters upon Emacs startup*
+#+begin_example
+(require 'ox-beamer)
+(require 'ox-md)
+...
+(require 'ox-taskjuggler)
+#+end_example
+
+*Note:* Please stick to /one/ of the above two methods!
+
+** Using Org 7.9.3f or earlier versions of Org
+
+For users who used the new exporter prior to its integration into the current master
+branch, here are some additional steps you may need to do in order to upgrade properly:
+
+1. Issue =make clean= before =git pull= and any changes to your
+   configuration.
+
+2. If you had already been using the new exporter from contrib, you should
+   remove the following lines from your local.mk:
+   : ORG_ADD_CONTRIB = org-e-*
+
+3. Export engine renamed from =org-export= to =ox=
+
+4. Backend requires renamed =org-e-*= to =ox-*=
+
+5. All backend specific variables and functions renamed:
+   - =org-export-*= to =org-*= (e.g. org-html-xml-declaration, ..)
+   - =org-e-*= to =org-*= (e.g. org-latex-classes, org-ascii-bullets, ..)
+
+6. Generic export variables retain the name =org-export-*=,
+   (e.g. org-export-dispatch-use-expert-ui,
+   org-export-filter-headline-functions, ..)
+
+7. =org-latex-to-pdf-process= renamed =org-latex-pdf-process=
+
+8. This is a guess, export snippets and backend symbols renamed:
+   - =e-<backend>= to =<backend>=
+
+Again, please refer to [[http://mid.gmane.org/876229nrxf.fsf@gmail.com][Nicolas' announcement]] about the merge for more details.
+
+
+* New global keywords
+  
+** New #+TOC keyword
+
+In the exporting of a table of contents, options only allowed for setting the
+level of the deepest table of contents headline, like so:
+
+#+begin_src org
+  ,#+OPTIONS: TOC:2
+#+end_src
+
+Upon export, only first and second level headlines would be included in the generated
+table of contents. With the new exporter, a dedicated =#+TOC= now exists which allows for
+futher customization: adding table of contents, lists of tables, and lists of listings at
+specific locations during export. 
+
+#+BEGIN_SRC org
+  ,#+TOC: headlines 2
+  ,#+TOC: tables
+  ,#+TOC: listings
+#+END_SRC
+
+See the [[http://orgmode.org/manual/Table-of-contents.html][Table of contents]] section in the manual for more information.
+
+* Syntax changes
+
+** Export snippets
+
+   Export snippets are a generalization of ~@<tag>~ concept, which has
+   been removed, and the inline version of ~#+begin_backend...#+end_backend~ blocks.
+
+   Their syntax is ~@@backend:value~ where ~backend~ is the targetted
+   export backend (e.g. ~html~) and ~value~ can contain anything but
+   ~@@~.
+
+   When export is done with ~backend~, the snippet is replaced with
+   ~value~, otherwise it is removed.  Whitespace characters around
+   the construct are never deleted.
+
+** Footnote definitions
+
+   A footnote definition (not inline) can now be ended with two
+   consecutive blank lines.
+
+   As a consequence, multiple paragraphs inside can be written
+   normally, separated with blank lines, instead of relying on the
+   ~\par~ command.
+
+** Org-mode per-file options
+
+- The =#+STYLE= option is now specified with =#+HTML_HEAD=
+
+- Using =#+SETUPFILE: file= versus =#+INCLUDE: "file".=
+
+   =#+INCLUDE:= keyword requires quotes around the file name. Those
+  are optional in =#+SETUPFILE:=.
+
+  There is now also a clear difference between these two statements.
+  The first will only read keyword statements like =#+TODO:= and use
+  this to set up the current file. The second will pull in the entire
+  content of the file during export. The =#+INCLUDE:= statement will
+  make every headline in the included file will be a child of the
+  headline containing the include keyword. You can overwrite this
+  behaviour with =:minlevel= num parameter.
+
+- Attribute lines now take plists (similar to [[http://orgmode.org/worg/org-contrib/babel/][Babel code block syntax]]):
+
+   : #+attr_latex :width 5cm
+   : #+attr_beamer :options width=5cm
+   : #+attr_html: :width 200px
+
+  *TIP:* To upgrade from old =attr_html= lines with verbatim HTML
+  attribute syntax, you could try a Perl one-liner like the following,
+  replacing =filename.org= with your file (or a bunch of files with
+  =*.org= if you're feeling adventurous -- no warranty, make sure
+  you're backed up first!).
+  
+   : perl -i.bak -pe "s/([a-z]+)=(\"|')(.*?)\2/:\1 \3/g if /^#\+attr_html/i" filename.org
+
+- Beamer backend now interprets nested headline levels as blocks instead
+  of lists.  For more guidance, see [[file:exporters/beamer/ox-beamer.org][this page]].
+

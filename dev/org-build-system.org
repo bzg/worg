@@ -7,7 +7,7 @@
 #+LANGUAGE:   en
 #+PRIORITIES: A C B
 #+CATEGORY:   worg
-#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc ':t
 
 * Introduction
 
@@ -63,12 +63,13 @@ created that copies some settings that most commonly would need to be
 changed from =mk/default.mk=.  The template includes some comments
 that are hopefully self-documenting.  As long as all necessary
 programs are available, the customization should in most cases be
-limited to setting $prefix correctly.
+limited to setting =prefix= correctly.
 
 If you need to do more extensive changes, copy the relevant parts from
-=mk/default.mk= to =local.mk= (or maybe even the whole file if that seems
-easier to you).  Please look at some of the [[Customization][Customization Examples]] to
-get an idea of what is possible.
+=mk/default.mk= to =local.mk= (or maybe even the whole file if that
+seems easier to you, but you'll have to remember to check =local.mk=
+whenever =default.mk= changes in the repository).  Please look at some
+of the [[Customization][Customization Examples]] to get an idea of what is possible.
 
 ** Second Level =Makefile=
 
@@ -80,18 +81,19 @@ since they rely on the definitions that have been made there.
 *Never change anything in* =mk/default.mk= *— always do your changes in*
  =local.mk= *!*
 
-The defaults will work on a typical GNU/Linux system.  For system-wide
-installation as assumed by the build system the user must be able to
-obtain administrative privileges via sudo.  If sudo is not available,
-the user running make must have the necessary privileges to do the
-install (i.e. full access to the build and install directories).
-Besides Emacs, the following programs must be available in PATH:
+The defaults are designed to work on a typical GNU/Linux system.  For
+system-wide installation as assumed by the build system the user must
+be able to obtain administrative privileges via sudo.  If sudo is not
+available, the user running make must have the necessary privileges to
+do the install (i.e. full access to the build and install
+directories).  Besides Emacs, the following programs must be available
+in PATH:
 
 - find
 - install
 - rm
 
-The following programs are optional, when loss of functionality can be
+The following programs are optional when loss of functionality can be
 tolerated:
 
 - install-info
@@ -103,8 +105,8 @@ tolerated:
 ** Make Targets =mk/targets.mk=
 
 All targets that the Org build system can build are defined here.
-Most of the actual work will be handed off to the second level of
-=Makefile=s in their respective subdirectories.  It is possible to
+Most of the actual work will be handed off to the second level
+=Makefile= in their respective subdirectories.  It is possible to
 override some parts of the build system by defining some variables.
 This is largely untested and consequently unsupported, but may still
 be useful in some situations.  The following variables are considered
@@ -159,7 +161,6 @@ moniker (called a /phony target/) that has the files to build as
 
 ** Configuration Check
 
-- =check= :: Show the main customization.
 - =config-test= :: Show the test customization.
 - =config-cmd= :: Show what commands will be used.
 - =config-all= :: Show all customization.
@@ -183,6 +184,7 @@ moniker (called a /phony target/) that has the files to build as
 ** Test
 
 - =test= :: runs =compile= and then the full testsuite.[fn:3]
+- =check= :: An alias for =test=, to be compatible with GNU style.
 - =test-dirty= :: Run the full testsuite on whatever currently is
                   available, compiled or not.
 
@@ -190,7 +192,7 @@ moniker (called a /phony target/) that has the files to build as
 
 - =install= :: Build all of Org and install it.
 - =install-etc= :: Install only the =etc/= part of Org.
-- =install-lisp= :: Install only the =lisp= part of Org.
+- =install-lisp= :: Install only the =lisp/= part of Org.
 - =install-info= :: Build the documentation and install only the info
                     documentation.
 
@@ -209,11 +211,8 @@ moniker (called a /phony target/) that has the files to build as
 - =cleanall= :: Cleans everything that can be cleaned, including
                 several types of backup files, so do not use this when
                 you have active edit sessions!
-- =clean-install= :: Removes a previous Org installation.  The build
-     system doesn't really know where your previous installation is,
-     of course: it tries to remove Org from where it would install it,
-     based on the current customization.
-- =cleantest= :: Removes a test directory if it exists.[fn:4]
+- =clean-install= :: Removes a previous Org installation.[fn:4]
+- =cleantest= :: Removes a test directory if it exists.[fn:5]
 
 ** Compatibility and Convenience
 
@@ -225,7 +224,7 @@ moniker (called a /phony target/) that has the files to build as
 - =update2= :: Does =update= and then installs.  This is not
                recommended, since there is no way of telling whether
                the just built Org has errors.
-- =uncompiled= :: Removes any bytecompiled files and then creates the
+- =uncompiled= :: Removes any byte-compiled files and then creates the
                   autoload files.  You can then use the Git worktree
                   almost like an installed version of Org.  Not
                   recommended for normal use of Org.
@@ -257,35 +256,37 @@ that you want to become the default target or even define a new one
 
 If you just want to try out some of the things in =contrib/=, you can
 simply add the directory to =load-path=.  But if you want to include
-some files in an installed version of Org, this has been more
-difficult.  There is now an easier way to do this: simply specify in
-the customization variable =ORG_ADD_CONTRIB= which files you want
+some files in an installed version of Org: simply specify in the
+customization variable =ORG_ADD_CONTRIB= which files you want
 included, then build and install in the usual way.  Your =local.mk=
 default customization template has a commented out example for
 including the new exporter, you just need to remove the comment
 marker:
 
-#+BEGIN_SRC Makefile
-# Define if you want to include some (or all) files from contrib/lisp
-# just the filename please (no path prefix, no .el suffix), maybe with globbing
-ORG_ADD_CONTRIB = org-e-* org-md org-export # e.g. the new exporter
+#+BEGIN_SRC makefile-gmake
+  # Define if you want to include some (or all) files from contrib/lisp
+  # just the filename please (no path prefix, no .el suffix), maybe with globbing
+  ORG_ADD_CONTRIB = ox-* # e.g. the contributed exporter
 #+END_SRC
 
 You just give the base name of the file to include (much like you do
 in a =require= form), only that you can use a shell globbing pattern
 to specify many similar names at ones.  You do not need to specify the
 path prefix =contrib/lisp/= nor the file suffix =.el=, these are added
-by the build system.  To include all of =contrib/lisp/= you'd say:
+by the build system.  To include all of =contrib/lisp/= (some of these
+aren't really meant to be used together, so this isn't recommended)
+you'd say:
 
-#+BEGIN_SRC Makefile
-ORG_ADD_CONTRIB = org*
+#+BEGIN_SRC makefile-gmake
+  ORG_ADD_CONTRIB = org* ox*
 #+END_SRC
 
-Or if that was just a one-time install (with quoting for POSIX shell):
+Or if that was just a one-time install (with quoting for a POSIX
+shell):
 
-: make ORG_ADD_CONTRIB="org*" install
+: make ORG_ADD_CONTRIB="ox-*" install
 
-A simple =*= would also include =htmlize.el=, which is currently
+Note: A simple =*= would also include =htmlize.el=, which is currently
 bundled in contrib.  It is recommended to install that seperately, it
 is available for instance in GNU ELPA.
 
@@ -295,20 +296,20 @@ Customization for using a self-compiled Emacs 24 installed in
 =/usr/local= and the default target changed to =up2=.  Additional
 customization to enable htmlize installed from ELPA in users' home
 directory and ESS (for R) in the system =/usr/share/emacs/site-lisp/=
-and all Babel languages for testing.
+and all Babel languages activated for testing.
 
-#+BEGIN_SRC Makefile
-up2::	# default target
-EMACS   = /usr/local/bin/emacs-24.1
-prefix  = /usr/local/share
-lispdir = $(prefix)/emacs/site-lisp/org
-datadir = $(prefix)/emacs/etc/org
-infodir = $(prefix)/info
-
-BTEST_EXTRA = ess-site 
-BTEST_OB_LANGUAGES = awk C fortran maxima lilypond octave python sh R
-BTEST_POST = -L ~/.emacs.d/elpa/htmlize-1.39 \
-	     -L /usr/share/emacs/site-lisp/emacs-ess-12.04.4
+#+BEGIN_SRC makefile-gmake
+  up2::   # default target
+  EMACS   = /usr/local/bin/emacs-24.3
+  prefix  = /usr/local/share
+  lispdir = $(prefix)/emacs/site-lisp/org
+  datadir = $(prefix)/emacs/etc/org
+  infodir = $(prefix)/info
+  
+  BTEST_EXTRA = ess-site 
+  BTEST_OB_LANGUAGES = awk C fortran maxima lilypond octave python sh R
+  BTEST_POST = -L ~/.emacs.d/elpa/htmlize-1.39 \
+               -L /usr/share/emacs/site-lisp/emacs-ess-12.04.4
 #+END_SRC
 
 *** XEmacs
@@ -318,21 +319,21 @@ for XEmacs testing will not work and has been disabled.  The default
 target is set to =up0 doc uncompiled= (pull from Git and update
 documentation and autoload files).
 
-#+BEGIN_SRC Makefile
-.PHONY:	xemacs
-xemacs:	up0 doc uncompiled
-EMACS   = xemacs
-prefix  = /usr/local/share
-lispdir = $(prefix)/xemacs/site-lisp/org
-datadir = $(prefix)/xemacs/etc/org
-infodir = $(prefix)/info
-
-BTEST = /bin/true
-BATCH = $(EMACS) -batch -q -vanilla # XEmacs
-# How to byte-compile the whole source directory
-ELCDIR	= $(BATCH) \
-		--eval '(add-to-list '"'"'load-path ".")' \
-		--eval '(byte-recompile-directory "." 0)'
+#+BEGIN_SRC makefile-gmake
+  .PHONY: xemacs
+  xemacs: up0 doc uncompiled
+  EMACS   = xemacs
+  prefix  = /usr/local/share
+  lispdir = $(prefix)/xemacs/site-lisp/org
+  datadir = $(prefix)/xemacs/etc/org
+  infodir = $(prefix)/info
+  
+  BTEST = /bin/true
+  BATCH = $(EMACS) -batch -q -vanilla # XEmacs
+  # How to byte-compile the whole source directory
+  ELCDIR  = $(BATCH) \
+                  --eval '(add-to-list '"'"'load-path ".")' \
+                  --eval '(byte-recompile-directory "." 0)'
 #+END_SRC
 
 *** Emacs on Windows
@@ -344,17 +345,17 @@ instead of "Program Files", if you already installed the applications
 in such a location. Babel languages have been stripped down for
 testing and the default target is again set to =up2=.
 
-#+BEGIN_SRC Makefile
-up2::
-CYGWIN += nodosfilewarning
-prefix  = C:/Freeware/Emacs-24.1
-EMACS   = SHELL=sh $(prefix)/bin/emacs
-lispdir = $(prefix)/site-lisp/org
-datadir = $(prefix)/etc/org
-infodir = $(prefix)/info
-
-BTEST_OB_LANGUAGES = octave
-SUDO =
+#+BEGIN_SRC makefile-gmake
+  up2::
+  CYGWIN += nodosfilewarning
+  prefix  = C:/Freeware/Emacs-24.3
+  EMACS   = SHELL=sh $(prefix)/bin/emacs
+  lispdir = $(prefix)/site-lisp/org
+  datadir = $(prefix)/etc/org
+  infodir = $(prefix)/info
+  
+  BTEST_OB_LANGUAGES = octave
+  SUDO =
 #+END_SRC
 
 ** Advanced Customization
@@ -387,6 +388,8 @@ been warned.
 
 *** Multiple Emacsen
 
+**** Method 1
+
 If you're a developer (or a system administrator that serves a diverse
 set of users) you'll likely have to deal with the need to build and
 test Org for different versions of Emacs.  Having to copy or link the
@@ -395,18 +398,122 @@ is error prone.  Here's a (hopefully better) suggestion: put each
 customization into a file named =local-<pattern>.mk= and create a
 =local.mk= that looks like this:
 
-#+BEGIN_SRC Makefile
-ifdef LOCALMK
-  include local-$(LOCALMK).mk
-else
-  include local-emacs24.mk
-endif
+#+BEGIN_SRC makefile-gmake
+  ifdef LOCALMK
+    include local-$(LOCALMK).mk
+  else
+    include local-emacs24.mk
+  endif
 #+END_SRC
 
 Now switching between your different customizations is as easy as
 : make LOCALMK=emacs23
 (which assumes that there is a customization file =local-emacs23.mk=
 available).
+
+**** Method 2
+
+If you need a more flexible structure, say to test different versions
+of Emacs with different configurations, then you quickly end up with
+lots of customization files.  Worse, if you then need to change a
+customization that has been copied into many such files, you'll have
+to remember to change it in all of them.  The idea from Method 1 can
+be extended to split the name into different parts and then use these
+parts seperately to customize a single aspect only.  To keep this
+tidy, you can put all of these files into a directory =localmk= under
+control of Git and maybe even register it as a submodule in your local
+branch of the Org repository.
+
+#+CAPTION: local.mk
+#+BEGIN_SRC makefile-gmake
+  LOCALMK ?= loc
+  # split into words
+  _LMK_:=$(subst -, ,$(LOCALMK))
+  # what's the current trunk?
+  _LMK_:=$(subst trunk,24.3.50,$(_LMK_))
+  # specific Emacs version requested?
+  _VER_:=$(filter 2%,$(_LMK_))
+  ifdef _VER_
+    _LMK_:=$(subst $(_VER_),loc,$(_LMK_))
+    _MAJ_:=$(word 1,$(subst ., ,$(_VER_)))
+    _VER_:=$(_VER_:2%=-2%)
+  else
+    _MAJ_:=24
+  endif
+  # lets us just specify which emacs to use
+  ifeq ($(words $(_LMK_)),1)
+    _LMK_+=testall tmp extra
+  endif
+  ifneq ($(origin DEBUG),undefined)
+    $(info LMK[$(words $(_LMK_))]: $(_LMK_))
+    $(info VER: $(_VER_) major $(_MAJ_))
+  endif
+  # remember this file is used from the org-mode directory via link,
+  # so we have to prepend localmk/
+  $(foreach part,$(subst -, ,$(_LMK_)),$(eval include localmk/$(part).mk))
+#+END_SRC
+
+So, what does this do?  First, it splits =LOCALMK= on =-= characters.
+It then checks if something looks like an Emacs version number and
+tries to make sense of that, otherwise it's using a default version.
+If it only got an Emacs version to use, it tacks on a default set of
+standard customizations: =testall=, =tmp=, =extra=.  Finally, it
+includes each of the customization files it inferred from =LOCALMK= to
+arrive at the final customization.
+
+#+CAPTION: loc.mk
+#+BEGIN_SRC makefile-gmake
+  # Name of your emacs binary
+  EMACS   := /usr/local/bin/emacs$(_VER_)
+  
+  # Where local software is found
+  prefix  := /usr/local/share
+  
+  # Where local lisp files go.
+  lispdir := $(prefix)/emacs/site-lisp/org
+  
+  # Where local data files go.
+  datadir := $(prefix)/emacs/etc/org
+  
+  # Where info files go.
+  infodir := $(prefix)/info
+#+END_SRC
+
+#+CAPTION: testall.mk
+#+BEGIN_SRC makefile-gmake
+  BTEST_OB_LANGUAGES = perl awk C fortran maxima lilypond octave perl python sh
+  BTEST_POST = --eval '(add-to-list '"'"'load-path "~/.emacs.d/elpa/htmlize-1.39")'
+  ifeq ($(_MAJ_),24)
+    BTEST_EXTRA += ess-site
+    BTEST_OB_LANGUAGES += R
+    BTEST_POST += --eval '(add-to-list '"'"'load-path "/usr/share/emacs/site-lisp/emacs-ess-12.04.4")'
+  else
+    BTEST_PRE += --eval '(add-to-list '"'"'load-path "testing/ert")'
+  endif
+#+END_SRC
+
+#+CAPTION: tmp.mk
+#+BEGIN_SRC makefile-gmake
+  # where to create temporary files for the testsuite
+  TMPDIR ?= /tmp
+  testdir = $(TMPDIR)/tmp-orgtest
+#+END_SRC
+
+#+CAPTION: extra
+#+BEGIN_SRC makefile-gmake
+  # extra targets
+  .PHONY: testclean
+  testclean:      test clean
+#+END_SRC
+
+#+CAPTION: testmin.mk
+#+BEGIN_SRC makefile-gmake
+  BTEST_OB_LANGUAGES = 
+  BTEST_POST = --eval '(add-to-list '"'"'load-path "~/.emacs.d/elpa/htmlize-1.39")'
+  ifneq ($(_MAJ_),24)
+    BTEST_PRE += --eval '(add-to-list '"'"'load-path "testing/ert")'
+  endif
+#+END_SRC
 
 * Support for Installers
 
@@ -439,7 +546,7 @@ To make the autoloads file and byte-compile all of Org again:
 
 If =git= is also unavailable, fake version strings need to be provided.
 : emacs -batch -Q -L lisp -l ../mk/org-fixup \
-: --eval '(let ((org-fake-release "7.8.11")(org-fake-git-version "7.8.11-fake"))\
+: --eval '(let ((org-fake-release "8.0.1")(org-fake-git-version "8.0.1-fake"))\
 : (org-make-autoloads))'
 
 The above assumes a POSIX shell for its quoting, Windows =CMD.exe= has
@@ -451,8 +558,8 @@ then paste the following into the =*scratch*= buffer:
 #+BEGIN_SRC emacs-lisp
   ; replace the version strings with something sensible that can't be
   ; confused with a real Git version
-  (let ((org-fake-release     "7.8.11")
-        (org-fake-git-version "7.8.11-fake"))
+  (let ((org-fake-release     "8.0.1")
+        (org-fake-git-version "8.0.1-fake"))
     (org-make-autoloads))
 #+END_SRC
 
@@ -472,11 +579,18 @@ influenced via the configuration variable =ORG_MAKE_DOC=.
 [fn:2] If you just want to re-compile all lisp sources without doing
 anything else, you can run =make cleanelc compile-dirty=.
 
-[fn:3] The build systems' notion of "full testsuite can be configured
+[fn:3] The build systems' notion of "full testsuite" can be configured
 with =BTEST_OB_LANGUAGES=.
 
-[fn:4] The test directory is generally removed after testing, but this
+[fn:5] The test directory is generally removed after testing, but this
 may not happen when there are test errors.  Also, the automatic
 removal of the test directory can be prevented (for debugging
 purposes) by defining a variable =TEST_NO_AUTOCLEAN=.
+
+[fn:4] The build system doesn't really know where your previous
+installation is, of course: it tries to remove Org from where it would
+install it, based on the current customization.  So if you want to
+move your Org installation, you need to first uninstall it using the
+old customization, then change the costomization and then do a fresh
+install.
 

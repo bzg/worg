@@ -1,7 +1,7 @@
 #+TITLE:      Org-mode Import/Export Tools
 #+AUTHOR:     Worg people
 #+EMAIL:      mdl AT imapmail DOT org
-#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c)
@@ -17,42 +17,42 @@
 This page lists the various conversion tools that have been written to
 export Org-mode data and import external data into the Org-mode system.
 
-** Org-mode Export Tools
+* Org-mode Export Tools
 
-   - [[http://www.cognition.ens.fr/~guerry/u/org2rem.el][From Org-mode to remind]] by [[http://www.cognition.ens.fr/~guerry/][Bastien Guerry]].
-     
-   - From Org-mode to Freemind by Marco Vezzoli, this is available in
-     the contrib directory of the distribution.
-
-** Org-mode Import Tools
-
-   - [[http://www.olafdietsche.de/palm/palm2orgmode.pl][From Palm TODO database to Orgmode]].  This Translator was
-     written by [[http://www.olafdietsche.de/][Olaf Dietsche]].
-
-   - From [[http://thread.gmane.org/gmane.emacs.orgmode/5073][Remind to Org]] by Detlef Steuer.
-
-   - From [[http://bitbucket.org/legoscia/of2org][OmniFocus to Org]] by Magnus Henoch.
-
-   - From [[http://www.hogbaysoftware.com/products/taskpaper][TaskPaper]] to Org by Carsten Dominik.  A quite complete
-     translation can be achieved by a compact Perl program:
-
-     #+begin_src perl
-       #!/usr/bin/perl
-       /^(\t*)-(.*?)((@\w+ *)*)$/;
-       @u=grep{$_ ne'@done'}(@t=split/ +/,$3);
-       @v=@u?('',@u,''):();
-       $t{$_}++for@u;
-       $_="*"x(2+length$1).(@t==@u?" TODO":" DONE").$2.join(":",@v)."\n"if$&;
-       s/^\w.*:\s*$/* $&/;
-       END{printf "* Setup\n#+TAGS: %s\n",join' ',keys%t}
-     #+end_src
-
-     This program is quite unreadable because it resulted from a
-     [[http://thread.gmane.org/gmane.emacs.orgmode/6224/focus%3D6266][contest for the most compact translator]] - but it works very well
-     anyway.
-
-   - From [[https://bitbucket.org/josemaria.alkala/odt2org/wiki/Home][ODT to Org]], by Jose Maria Alkala.
-
-** Bi-directional
+  - [[http://www.cognition.ens.fr/~guerry/u/org2rem.el][From Org-mode to remind]] by [[http://www.cognition.ens.fr/~guerry/][Bastien Guerry]].
     
-   Unfortunately nothing so far.
+  - From Org-mode to Freemind by Marco Vezzoli, this is available in
+    the contrib directory of the distribution.
+
+* Org-mode Import Tools
+
+  - [[http://www.olafdietsche.de/palm/palm2orgmode.pl][From Palm TODO database to Orgmode]].  This Translator was
+    written by [[http://www.olafdietsche.de/][Olaf Dietsche]].
+
+  - From [[http://thread.gmane.org/gmane.emacs.orgmode/5073][Remind to Org]] by Detlef Steuer.
+
+  - From [[http://bitbucket.org/legoscia/of2org][OmniFocus to Org]] by Magnus Henoch.
+
+  - From [[http://www.hogbaysoftware.com/products/taskpaper][TaskPaper]] to Org by Carsten Dominik.  A quite complete
+    translation can be achieved by a compact Perl program:
+
+    #+begin_src perl
+      #!/usr/bin/perl
+      /^(\t*)-(.*?)((@\w+ *)*)$/;
+      @u=grep{$_ ne'@done'}(@t=split/ +/,$3);
+      @v=@u?('',@u,''):();
+      $t{$_}++for@u;
+      $_="*"x(2+length$1).(@t==@u?" TODO":" DONE").$2.join(":",@v)."\n"if$&;
+      s/^\w.*:\s*$/* $&/;
+      END{printf "* Setup\n#+TAGS: %s\n",join' ',keys%t}
+    #+end_src
+
+    This program is quite unreadable because it resulted from a
+    [[http://thread.gmane.org/gmane.emacs.orgmode/6224/focus%3D6266][contest for the most compact translator]] - but it works very well
+    anyway.
+
+  - From [[https://bitbucket.org/josemaria.alkala/odt2org/wiki/Home][ODT to Org]], by Jose Maria Alkala.
+
+* Bi-directional
+   
+  Unfortunately nothing so far.

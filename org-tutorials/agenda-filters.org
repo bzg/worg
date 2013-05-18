@@ -1,0 +1,151 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+TITLE:      Agenda Filters and Limits
+#+AUTHOR:     Bastien Guerry
+#+EMAIL:      bzg AT gnu DOT org
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+#+OrgVersion: 8.0
+
+[[file:index.org][{Back to Worg's index}]]
+
+* Introduction
+
+This tutorial describes some useful agenda manipulations.
+
+The central notions are /filters/ and /limits/.  Filters are a way to
+/hide/ some agenda entries (depending on tags, categories or regular
+expressions).  /Limits/ are a way to limit the list of agenda entries
+(depending on a number of tagged entries, a number of entries with =TODO=
+keywords, an effort value, or a number of entries.)
+
+Filters only act on the /appearence/ of the agenda, limits act on the list
+of agenda entries itself.
+
+* Agenda filters
+#+index: filtering, in agenda
+
+** Filtering by tags
+#+index: filtering, by tag
+
+Here is a list of keybinding available in the agenda buffer:
+
+- =/= :: Only show entries matching a tag.  This prompts for a tag to
+     filter by, which you can choose by hitting a selection letter (if
+     configured), or the first letter of the tag, or by hitting =TAB= and
+     then expand a tag.
+
+- =C-u /= :: Hide entries matching a tag.  You can successively call this
+     command to hide several tags.
+
+- =/ /= :: Reset tag filters: set tag filters to their default value, which
+     is usually =nil=, unless a tag filter has been preset.
+
+** Filtering by category
+#+index: filtering, by category
+
+
+- =<= :: Only show agenda entries that are from the same category than the
+     headline at point.  Hitting =<= again when a category filter is active
+     will deactivate it.  This kind of filtering is /not/ cumulative, as
+     headlines cannot have several categories.
+
+- =C-u <= :: Hide agenda entries that are from the same category than the
+     headline at point.
+
+** Filtering by top parent headline
+#+index: filtering, by top parent headline
+
+
+- =^= :: Only show siblings of the agenda entry at point.  This is useful
+     when there are many agenda entries and you want to process siblings in
+     priority.  Hitting =^= again when a top headline filter is active will
+     deactivate it.  This kind of filtering is /not/ cumulative, as
+     headlines cannot have several topmost parents.
+
+** Filtering by regular expressions
+#+index: filtering, by regular expressions
+
+- ~=~ :: Prompt for a regular expression and only show agenda entries that
+     match match the regular expression.  You can successively filter by
+     regexps.
+
+- =C-u == :: Filter out entries that match a regexp.  You can successively
+     filter out by regexps.
+
+- =C-u C-u == :: Remove all regexps filters.
+
+** Combining and removing filters
+#+index: filters, combining
+#+index: filters, removing
+
+You can filter by tags, then by regexps, than by category, then by topmost
+parent -- in *any* order.
+
+To remove all filters from the current agenda view, hit =|=.
+
+** COMMENT TODO Pre-filtering
+
+* Agenda limits
+#+index: limits, in agenda
+#+index: org-agenda-max-entries
+#+index: org-agenda-max-effort 
+#+index: org-agenda-max-todos
+#+index: org-agenda-max-tags
+
+Here is a list of options that you can set, either globally, or locally in
+your custom agenda:
+
+- =org-agenda-max-entries= :: Limit the number of entries.
+- =org-agenda-max-effort= :: Limit the duration of accumulated efforts (as minutes).
+- =org-agenda-max-todos= :: Limit the number of entries with TODO keywords.
+- =org-agenda-max-tags= :: Limit the number of tagged entries.
+
+When set to a positive integer, each option will exclude entries from other
+catogories: for example, =(setq org-agenda-max-effort 100)= will limit the
+agenda to 100 minutes of effort and exclude any entry that as no effort
+property.  If you want to include entries with no effort property, use a
+negative value for =org-agenda-max-effort=.
+
+One useful setup is to use =org-agenda-max-entries= locally in a custom
+command.  For example, this custom command will display the next five
+entries with a =NEXT= TODO keyword.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      '(("n" todo "NEXT"
+         ((org-agenda-max-entries 5)))))
+#+END_SRC
+
+Once you mark one of these five entry as =DONE=, rebuilding the agenda will
+again the next five entries again, including the first entry that was
+excluded so far.
+
+You can also dynamically set temporary limits by pressing =~= (or =M-x
+org-agenda-limit-interactively RET=).  Those temporary limits are lost when
+rebuilding the agenda.
+
+* Dimming blocked task
+
+#+INDEX: dimming blocked tasks in agenda
+#+INDEX: blocked tasks, dimming in agenda
+
+Blocked tasks are dimmed by default in the agenda.
+
+You can turn this feature off with this in your =.emacs.el= file:
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-dim-blocked-tasks nil)
+#+END_SRC
+
+This will actually speed up the agenda generation (see [[file:../agenda-optimization.org][the Worg page on
+Agenda optimization]]).
+
+Then, if you want to turn this feature on temporarily for the current
+agenda, just enter =M-x org-agenda-dim-blocked-tasks RET= interactively.
+
+
+
+
+

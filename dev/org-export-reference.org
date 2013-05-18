@@ -1,7 +1,7 @@
 #+TITLE:      Org Export Reference Documentation
 #+AUTHOR:     Nicolas Goaziou
 #+EMAIL:      n.goaziou AT gmail DOT com
-#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc ':t
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) NEW(n)
@@ -12,8 +12,8 @@
 [[file:../index.org][{Back to Worg's index}]]
 
 This document is aimed at back-end developers for the generic export
-engine =org-export.el=.  It assumes a good understanding of Org
-syntax --- as specified by /Org Elements/ --- from the reader.
+engine =ox.el=.  It assumes a good understanding of [[./org-syntax.org][Org syntax]] from
+the reader.
 
 It covers [[#back-end][back-end creation]] process, all [[#attributes][attributes]] associated to each
 element or object type, properties offered by the [[#communication][communication
@@ -24,10 +24,10 @@ end-users are explained in the last part of this document.
 
 * Defining a Back-End
 
-  A back-end is defined with ~org-export-define-backend~ macro.  It
-  requires two mandatory arguments: the back-end name and its
-  translation table, an alist that associates element and object types
-  to translator functions.  According to the macro doc-string:
+  A back-end is defined with ~org-export-define-backend~ function.  It
+  requires two mandatory arguments: the back-end name and its translation
+  table, an alist that associates element and object types to translator
+  functions.  According to the doc-string:
 
   #+BEGIN_QUOTE
   These functions should return a string without any trailing space,
@@ -60,25 +60,24 @@ end-users are explained in the last part of this document.
   appropriate place to protect special chars relative to the back-end.
   #+END_QUOTE
 
-  Optionally, the macro can set-up back-end specific properties (like
-  values from specific buffer keywords) accessible from every
-  translator function with the ~:options-alist~ keyword.  See
-  ~org-export-options-alist~ for details on the structure of the
-  value.
+  Optionally, the function can set-up back-end specific properties (like
+  values from specific buffer keywords) accessible from every translator
+  function with the ~:options-alist~ keyword.  See
+  ~org-export-options-alist~ for details on the structure of the value.
 
   As an example, the following excerpt from ~latex~ back-end
   definition introduces three new buffer keywords (and their
   headline's property counterpart), and redefine ~DATE~ default value:
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-backend latex
+  (org-export-define-backend 'latex
     ...
-    :options-alist ((:date "DATE" nil "\\today" t)
-                    (:date-format nil nil org-latex-date-timestamp-format)
-                    (:latex-class "LATEX_CLASS" nil org-latex-default-class t)
-                    (:latex-class-options "LATEX_CLASS_OPTIONS" nil nil t)
-                    (:latex-header-extra "LATEX_HEADER" nil nil newline)
-                    (:latex-hyperref-p nil "texht" org-latex-with-hyperref t)))
+    :options-alist '((:date "DATE" nil "\\today" t)
+                     (:date-format nil nil org-latex-date-timestamp-format)
+                     (:latex-class "LATEX_CLASS" nil org-latex-default-class t)
+                     (:latex-class-options "LATEX_CLASS_OPTIONS" nil nil t)
+                     (:latex-header-extra "LATEX_HEADER" nil nil newline)
+                     (:latex-hyperref-p nil "texht" org-latex-with-hyperref t)))
   #+END_SRC
 
   It is also possible, with ~:export-block~ keyword, to associate
@@ -91,10 +90,10 @@ end-users are explained in the last part of this document.
   contents as-is, and ignores any other export block.
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-backend html
-    (...
-     (export-block . org-html-export-block)
-     ... )
+  (org-export-define-backend 'html
+    '(...
+      (export-block . org-html-export-block)
+      ... )
     :export-block "HTML")
 
   (defun org-html-export-block (export-block contents info)
@@ -110,19 +109,19 @@ end-users are explained in the last part of this document.
   information.
 
   If the new back-end shares most properties with another one,
-  ~org-export-define-derived-backend~ macro can be used to simplify
-  the process.  In the example below, we implement a new back-end
-  which behaves like ~latex~ excepted for headlines and the template.
+  ~org-export-define-derived-backend~ can be used to simplify the
+  process.  In the example below, we implement a new back-end which behaves
+  like ~latex~ excepted for headlines and the template.
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-derived-backend my-latex latex
-    :translate-alist ((headline . my-latex-headline-translator)
-                      (template . my-latex-template)))
+  (org-export-define-derived-backend 'my-latex 'latex
+    :translate-alist '((headline . my-latex-headline-translator)
+                       (template . my-latex-template)))
   #+END_SRC
 
-  Back-ends defined with either function can be registered in the
-  export dispatcher using special keyword =:menu-entry=.  See macros
-  docstrings for more information.
+  Back-ends defined with either function can be registered in the export
+  dispatcher using special keyword =:menu-entry=.  See defuns docstrings
+  for more information.
 
 * Elements Attributes
   :PROPERTIES:
@@ -147,9 +146,9 @@ end-users are explained in the last part of this document.
   the buffer position after any affiliated keyword, when applicable.
 
   In addition to these properties, each element can optionally get
-  some more from affiliated keywords, namely: ~:attr_ascii~,
-  ~:attr_docbook~, ~:attr_html~, ~:attr_latex~, ~:attr_odt~,
-  ~:caption~, ~:header~, ~:name~, ~:plot~, and ~:results~.
+  some more from affiliated keywords, namely: ~:caption~, ~:header~,
+  ~:name~, ~:plot~, ~:results~ or ~:attr_NAME~ where =NAME= stands for
+  the name of an export back-end.
 
   At the lowest level, a ~:parent~ property is also attached to any
   string, as a text property.
@@ -435,15 +434,12 @@ end-users are explained in the last part of this document.
    /Note relative to export:/ Each back-end should, as far as
    possible, support a number of common keywords.  These include:
 
-   - Back-end relative keyword (i.e. "LATEX" for =e-latex=), which
+   - Back-end relative keyword (i.e. "LATEX" for =ox-latex=), which
      should always return its value as-is.
 
-   - "TARGET" keyword, which should always return a nil value.
-
-   - "TOC" keyword.  It accepts four common values: "headlines",
-     "tables", "figures", "listings".  Also, "headlines" value can
-     have an optional numeric argument to specify depth of the
-     contents.
+   - "TOC" keyword.  It accepts three common values: "headlines",
+     "tables" and "listings".  Also, "headlines" value can have an
+     optional numeric argument to specify depth of the contents.
 
      See [[#collect-headlines][~org-export-collect-headlines~]], [[#collect-tables][~org-export-collect-tables~]],
      [[#collect-figures][~org-export-collect-figures~]] and [[#collect-listings][~org-export-collect-listings~]].
@@ -491,8 +487,8 @@ end-users are explained in the last part of this document.
      - ~coderef~ :: Line in some source code,
      - ~custom-id~ :: Specific headline's custom-id,
      - ~file~ :: External file,
-     - ~fuzzy~ :: Target, target keyword, a named element or an
-                  headline in the current parse tree,
+     - ~fuzzy~ :: Target, referring to a target object, a named
+                  element or a headline in the current parse tree,
      - ~id~ :: Specific headline's id,
      - ~radio~ :: Radio-target.
      It can also be any ~org-link-types~ element.
@@ -500,25 +496,22 @@ end-users are explained in the last part of this document.
 
    /Notes relative to export:/
 
-   - A fuzzy link leading to a target keyword should be ignored during
-     export: it's an invisible target.
+   A fuzzy link with no description should display the cross-reference
+   number of its target.  This number can be:
 
-   - A fuzzy link with no description should display the
-     cross-reference number of its target.  This number can be:
+   - If link's destination is a target object within a footnote, it
+     will be footnote's number.
 
-     - If link's destination is a target object within a footnote, it
-       will be footnote's number.
+   - If link's destination is a target object in a list, it will be an
+     item number.
 
-     - If link's destination is a target object in a list, it will be
-       an item number.
+   - If link leads to a named element, it will be the sequence number
+     of that element among named elements of the same type.
 
-     - If link leads to a named element, it will be the sequence number
-       of that element among named elements of the same type.
+   - Otherwise, it will be the number of the headline containing
+     link's destination.
 
-     - Otherwise, it will be the number of the headline containing
-       link's destination.
-
-     See [[#get-ordinal][~org-export-get-ordinal~]] function.
+    See [[#get-ordinal][~org-export-get-ordinal~]] function.
 
 ** Macro
 
@@ -808,6 +801,14 @@ end-users are explained in the last part of this document.
    - category :: option
    - type :: list of strings
 
+** ~:export-options~
+
+   List of export options available for current process.
+
+   - category :: none
+   - type :: list of symbols, among ~subtree~, ~body-only~ and
+             ~visible-only~.
+
 ** ~:exported-data~
 
    Hash table used to memoize results from [[#data][~org-export-data~]].
@@ -1050,7 +1051,7 @@ end-users are explained in the last part of this document.
    - category :: option
    - type :: symbol (~verbatim~, nil, t)
 
-** ~:with-plannings~
+** ~:with-planning~
 
    Non-nil means transcoding should include planning info.
 
@@ -1224,10 +1225,10 @@ end-users are explained in the last part of this document.
   headlines end with two blank lines:
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-backend ascii
+  (org-export-define-backend 'ascii
     ...
-    :filters-alist ((:filter-headline . org-ascii-filter-headline-blank-lines)
-                    (:filter-section . org-ascii-filter-headline-blank-lines)))
+    :filters-alist '((:filter-headline . org-ascii-filter-headline-blank-lines)
+                     (:filter-section . org-ascii-filter-headline-blank-lines)))
 
   (defun org-ascii-filter-section-blank-lines (headline back-end info)
     "Filter controlling number of blank lines after a section."
@@ -1460,6 +1461,16 @@ end-users are explained in the last part of this document.
    See also: [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]],
    [[#unravel-code][~org-export-unravel-code~]].
 
+** ~org-export-get-alt-title~
+   :PROPERTIES:
+   :CUSTOM_ID: get-alt-title
+   :END:
+
+   Return the alternative title for a given headline as a secondary
+   string.  If no such title is found, it will return its main title.
+
+   This function is useful when building a table of contents.
+
 ** ~org-export-get-caption~
    :PROPERTIES:
    :CUSTOM_ID: get-caption
@@ -1510,6 +1521,23 @@ end-users are explained in the last part of this document.
    Return an appropriate format string for code reference links.
 
    See also: [[#resolve-coderef][~org-export-resolve-coderef~]].
+
+** ~org-export-get-date~
+   :PROPERTIES:
+   :CUSTOM_ID: get-date
+   :END:
+
+   Returns a date, as a string or a secondary string.  It handles
+   ~org-export-date-timestamp-format~.
+
+   Note that ~:with-date~ property in [[#communication][communication channel]] should be
+   checked prior to use this, as shown in the following example
+   extracted from ~ox-latex.el~:
+
+   #+BEGIN_SRC emacs-lisp :exports code
+   (let ((date (and (plist-get info :with-date) (org-export-get-date info))))
+     (format "\\date{%s}\n" (org-export-data date info)))
+   #+END_SRC
 
 ** ~org-export-get-footnote-definition~
    :PROPERTIES:
@@ -1623,15 +1651,13 @@ end-users are explained in the last part of this document.
       ;; Do not apply a special syntax on fuzzy links pointing to targets.
       ((string= type "fuzzy")
        (let ((destination (org-export-resolve-fuzzy-link link info)))
-         ;; Ignore invisible "#+TARGET: path".
-         (unless (eq (org-element-type destination) 'keyword)
-           ;; If link has a description, use it.
-           (if (org-string-nw-p desc) desc
-             (when destination
-               (let ((number (org-export-get-ordinal destination info)))
-                 (when number
-                   (if (atom number) (number-to-string number)
-                     (mapconcat 'number-to-string number ".")))))))))
+         ;; If link has a description, use it.
+         (if (org-string-nw-p desc) desc
+           (when destination
+             (let ((number (org-export-get-ordinal destination info)))
+               (when number
+                 (if (atom number) (number-to-string number)
+                   (mapconcat 'number-to-string number "."))))))))
       ...))
    #+END_SRC
 

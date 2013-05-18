@@ -1,7 +1,7 @@
 #+TITLE:      How to contribute to Org?
 #+AUTHOR:     Worg people
 #+EMAIL:      mdl AT imapmail DOT org
-#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+#+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
@@ -51,35 +51,67 @@ your contribution will be useful:
 
 * Copyright issues when contributing to Emacs org-mode
 
-Org is made of many files.  Most of them are also distributed as part of
-GNU Emacs.  These files are called the /Org core/, and they are all
+Org is made of many files.  Most of them are also distributed as part
+of GNU Emacs.  These files are called the /Org core/, and they are all
 copyrighted by the [[http://www.fsf.org][Free Software Foundation, Inc]].  If you consider
-contributing to these files, your first need to grant the right to include
-your works in GNU Emacs to the FSF.  For this you need to complete [[http://orgmode.org/request-assign-future.txt][this
-form]], send it to [[mailto:assign@gnu.org][assign@gnu.org]], and tell the Org-mode maintainer when this
-process is complete.  Some people consider this a hassle.  I don't want to
-discuss this in detail here - there are some good reasons for getting the
-copyright registered, an example is discussed in this [[http://twit.tv/floss117][FLOSS weekly podcast]].
-Furthermore, by playing according to the Emacs rules, we gain the fantastic
-advantage that every version of Emacs ships with Org-mode already fully
-built in.  So please consider doing this - it makes our work as maintainers
-so much easier, because we can then take your patches without any
-additional work.
+contributing to these files, your first need to grant the right to
+include your works in GNU Emacs to the FSF.  For this you need to
+complete [[http://orgmode.org/request-assign-future.txt][this form]], and send it to [[mailto:assign@gnu.org][assign@gnu.org]].  The FSF will send
+you the assignment contract that both you and the FSF will sign.
+Please let the Org-mode maintainer know when this process is complete.
+Some people consider this assignment process a hassle.  I don't want
+to discuss this in detail here - there are some good reasons for
+getting the copyright registered, an example is discussed in this
+[[http://twit.tv/floss117][FLOSS weekly podcast]].  Furthermore, by playing according to the Emacs
+rules, we gain the fantastic advantage that every version of Emacs
+ships with Org-mode already fully built in.  So please consider doing
+this - it makes our work as maintainers so much easier, because we can
+then take your patches without any additional work.
 
 If you want to learn more about /why/ copyright assignments are
 collected, read this: [[http://www.gnu.org/licenses/why-assign.html][Why the FSF gets copyright assignments from
 contributors?]]
+
+By submitting patches to emacs-orgmode@gnu.org, or by pushing changes
+to the Org-mode repository, you are placing these changes under the
+same licensing terms as those under which GNU Emacs is published.
+
+#+begin_example
+ ;; GNU Emacs is free software: you can redistribute it and/or modify
+ ;; it under the terms of the GNU General Public License as published by
+ ;; the Free Software Foundation, either version 3 of the License, or
+ ;; (at your option) any later version.
+#+end_example
+
+If at the time you submit or push these changes you do have active
+copyright assignment papers with the FSF, for future changes to either
+Org-mode or to Emacs, this means that copyright to these changes is
+automatically transferred to the FSF.  The Org-mode repository is seen
+as upstream repository for Emacs, anything contained in it can
+potentially end up in Emacs.  If you do not have signed papers with
+the FSF, only changes to files in the =contrib/= part of the repository
+will be accepted, as well as very minor changes (so-called /tiny
+changes/) to core files.  We will ask you to sign FSF papers at the
+moment we attempt to move a =contrib/= file into the Org core, or into
+Emacs.
 
 * For Org developers
 :PROPERTIES:
 :CUSTOM_ID: devs
 :END:
 
-1. Send your public key to [[mailto:jasondunsmore%20AT%20gmail%20DOT%20com][Jason Dunsmore]].
+1. Send your public key to [[mailto:jasondunsmore%20AT%20gmail%20DOT%20com][Jason Dunsmore]] or Org's maintainer.
+
 2. Wait for confirmation that your public key has been added to the server.
+
 3. Clone =org-mode.git= repository like this:
    : ~$ git clone orgmode@orgmode.org:org-mode.git
-4. Commit your changes and push them.
+
+4. Commit your changes.
+
+5. Run =make test=
+
+6. If the tests pass, push your changes.
 
 If you are undertaking big changes, please create a dedicated branch for
 them.
@@ -101,26 +133,6 @@ and minor changes.
 When sending a patch (either using =git diff= or =git format-patch=) please
 *always add a properly formatted Emacs ChangeLog entry*.  See [[id:c526dfd7-2b0c-4b66-9deb-6e442e48708c][this section]]
 for details on how to create such a ChangeLog.
-
-** Patches get caught on patchwork
-
-As long as these patches are formatted properly, they will be automatically
-registered at [[http://patchwork.newartisans.com/project/org-mode][John Wiegley's patchwork server]] and will then be accepted,
-rejected, or sent back to the author with a request for modification.
-
-Patchwork assumes there is *only one patch per email* and will not catch
-more than one patch -- so please send multiple patches in separate emails.
-
-In this context, "formatted properly" means that the patches are included
-either plainly in the mail text, or as text attachments (mime-type text,
-subtypes "x-patch", "x-diff", or "plain").  In particular, binary types or,
-even worse, "application/octet-stream" (the asinine default of some mail
-programs) are *not* going to be recognized.  Please find out how to
-convince your mail program to send proper attachments.  Also, if you
-include the patch inline, please make sure that your mail program does not
-reformat it (although there are plenty of places further down the line
-where that can happen, unfortunately). If you attach the patch, then
-reformatting is not a problem.
 
 ** Sending commits
 
@@ -145,7 +157,7 @@ Here is the suggested workflow:
 :   ~$ git format-patch master             # Creates two patches
 
   ... Then two patches for your two commits are ready to be sent to the
-  list and detected by the patchwork server.
+  list.
 #+end_quote
 
 Write useful commit messages: please provide 1) a reason for it in your
@@ -230,6 +242,10 @@ through public branches of your repository clone.
    : git branch -d NEWTOPIC
    : git push REMOTE :NEWTOPIC
 
+The instructions above are generally useful to let people test new features
+before sending the patch series to the mailing list, but the patches remain
+the preferred way of receiving contributions.
+
 * Commit messages and ChangeLog entries
   :PROPERTIES:
   :ID:       c526dfd7-2b0c-4b66-9deb-6e442e48708c
@@ -243,30 +259,43 @@ and it is the main cause of merge conflicts.
 Instead, the change log entry should be part of the commit message.  A
 commit message should be constructed in the following way:
 
-- Line 1 of the commit message should always be a short description of
-  the overall change.  Line 1 does /not/ get a dot at the end.
-- Line 2 is an empty line
-- In line 3, the ChangeLog entry should start, in a similar format as
-  in the old ChangeLog files, but without the author information
-  (which is part of the commit anyway).
-- After the changelog, another empty line should come before any
-  additional information that the committer wishes to provide in order
-  to explain the patch.
-- If the change is a minor change made by a committer without
-  copyright assignment to the FSF, the commit message should also
-  contain the cookie =TINYCHANGE= (anywhere in the message).  When we
-  later produce the ChangeLog file for Emacs, the change will be
-  marked appropriately.
+- Line 1 of the commit message should always be a short description of the
+  overall change.  Line 1 does /not/ get a dot at the end and does not
+  start with a star.
 
-Here is an example for such a message
+- Line 2 is an empty line.
+
+- In line 3, the ChangeLog entry should start, in a similar format as in
+  the old ChangeLog files, but without the author information (which is
+  part of the commit anyway).
+
+- After the changelog, another empty line should come before any additional
+  information that the committer wishes to provide in order to explain the
+  patch.
+
+- If the change is a minor change made by a committer without copyright
+  assignment to the FSF, the commit message should also contain the cookie
+  =TINYCHANGE= (anywhere in the message).  When we later produce the
+  ChangeLog file for Emacs, the change will be marked appropriately.
+
+- Variables and functions names are quoted like =`this'= (backquote and
+  single quote).
+
+- Sentences should be separated by two spaces.
+
+- Sentences should start with an uppercase letter.
+
+- Avoid the passive form: i.e., use "change" instead of "changed".
+
+Here is an example for such a message:
 
 #+begin_example
   Capture: Fix the case of using a template file
       
-  ,* lisp/org-capture.el (org-capture-set-plist): Make sure txt is a string
-  before calling `string-match'.
+  ,* lisp/org-capture.el (org-capture-set-plist): Make sure txt is a
+  string before calling `string-match'.
   (org-capture-templates): Fix customization type.
-  ,* doc/org.texi (Capture): Document using a file for a template
+  ,* doc/org.texi (Capture): Document using a file for a template.
       
   The problem here was that a wrong keyword was given in the
   customization type.  This let to a string-match against a list value.
@@ -299,120 +328,131 @@ Here is the list of people who signed the papers with the Free Software
 Foundation and can now freely submit code to Org files that are included
 within GNU Emacs:
 
-1. Abdó Roig-Maranges
-2. Achim Gratz
-3. Adam Elliott
-4. Adam Spiers
-5. Alan Schmitt
-6. Andreas Burtzlaff
-7. Andreas Leha
-8. Andrew Hyatt
-9. Andrzej Lichnerowicz
-10. Andy Steward
-11. Anthony John Day
-12. Anthony Lander
-13. Baoqiu Cui
-14. Barry Leonard Gidden
-15. Bastien Guerry
-16. Benjamin Andresen
-17. Bernd Grobauer
-18. Bernt Hansen
-19. Brian James Gough
-20. Carsten Dominik
-21. Charles Sebold
-22. Christian Egli
-23. Christian Moe
-24. Christopher League
-25. Christopher Miles Gray
-26. Christopher Schmidt
-27. Christopher Suckling
-28. Dan Davison
-29. Daniel M German
-30. Daniel M. Hackney
-31. David Maus
-32. David O'Toole
-33. Dmitry Antipov
-34. Eric S. Fraga
-35. Eric Schulte
-36. Erik Iverson
-37. Ethan Ligon
-38. Feng Shu
-39. Gary Oberbrunner
-40. George Kettleborough
-41. Giovanni Ridolfi
-42. Henning Dietmar Weiss
-43. Ian Barton
-44. Ilya Shlyakhter
-45. Ippei Furuhashi
-46. James TD Smith
-47. Jan Böcker
-48. Jarmo Hurri
-49. Jason Riedy
-50. Jeffrey Ryan Horn
-51. Joel Boehland
-52. John Wiegley
-53. Jonas Bernoulli
-54. Jonathan Leech-Pepin
-55. Juan Pechiar
-56. Julian Gehring
-57. Julien Barnier
-58. Julien Danjou
-59. Justus Piater
-60. Konstantin Antipin
-61. Lawrence Mitchell
-62. Le Wang
-63. Lennart Borgman
-64. Luis Anaya
-65. Lukasz Stelmach
-66. Madan Ramakrishnan
-67. Magnus Henoch
-68. Manuel Giraud
-69. Martin Pohlack
-70. Martyn Jago
-71. Matt Lundin
-72. Max Mikhanosha
-73. Michael Brand
-74. Michael Gauland
-75. Michael Sperber
-76. Miguel A. Figueroa-Villanueva
-77. Mikael Fornius
-78. Moritz Ulrich
-79. Nathan Neff
-80. Nicolas Goaziou
-81. Nicolas Richard
-82. Niels Giessen
-83. Noorul Islam K M
-84. Paul Sexton
-85. Peter Jones
-86. Phil Jackson
-87. Philip Rooke
-88. Pieter Praet
-89. Piotr Zielinski
-90. Puneeth Chaganti
-91. Richard Klinda
-92. Richard Riley
-93. Rick Frankel
-94. Ross Patterson
-95. Russel Adams
-96. Sacha Chua
-97. Sebastian Rose
-98. Sebastien Vauban
-99. Sergey Litvinov
-100. Seweryn Kokot
-101. Stephen Eglen
-102. Tassilo Horn
-103. Thomas Baumann
-104. Thomas Holst
-105. Thomas S. Dye
-106. Thorsten Jolitz
-107. Toby Cubitt
-108. Tokuya Kameshima
-109. Tom Breton
-110. Tomas Hlavaty
-111. Tony Day
-112. Ulf Stegemann
-113. Yann Hodique
-114. Zhang Weize
+1. Aaron Ecay
+2. Abdó Roig-Maranges
+3. Achim Gratz
+4. Adam Elliott
+5. Adam Spiers
+6. Alan Schmitt
+7. Andreas Burtzlaff
+8. Andreas Leha
+9. Andrew Hyatt
+10. Andrzej Lichnerowicz
+11. Andy Steward
+12. Anthony John Day
+13. Anthony Lander
+14. Baoqiu Cui
+15. Barry Leonard Gidden
+16. Bastien Guerry
+17. Benjamin Andresen
+18. Bernd Grobauer
+19. Bernt Hansen
+20. Brian James Gough
+21. Carsten Dominik
+22. Charles Sebold
+23. Christian Egli
+24. Christian Moe
+25. Christopher League
+26. Christopher Miles Gray
+27. Christopher Schmidt
+28. Christopher Suckling
+29. Dan Davison
+30. Daniel M German
+31. Daniel M. Hackney
+32. David Maus
+33. David O'Toole
+34. Dmitry Antipov
+35. Eric Abrahamsen
+36. Eric S. Fraga
+37. Eric Schulte
+38. Erik Iverson
+39. Ethan Ligon
+40. Feng Shu
+41. Francesco Pizzolante
+42. Gary Oberbrunner
+43. George Kettleborough
+44. Giovanni Ridolfi
+45. Grégoire Jadi (aka Daimrod)
+46. Henning Dietmar Weiss
+47. Ian Barton
+48. Ilya Shlyakhter
+49. Ippei Furuhashi
+50. James TD Smith
+51. Jan Böcker
+52. Jarmo Hurri
+53. Jason Riedy
+54. Jay Kerns
+55. Jeffrey Ryan Horn
+56. Joel Boehland
+57. John Wiegley
+58. Jonas Bernoulli
+59. Jonathan Leech-Pepin
+60. Juan Pechiar
+61. Julian Gehring
+62. Julien Barnier
+63. Julien Danjou
+64. Justus Piater
+65. Konstantin Antipin
+66. Lawrence Mitchell
+67. Le Wang
+68. Lennart Borgman
+69. Luis Anaya
+70. Lukasz Stelmach
+71. Madan Ramakrishnan
+72. Magnus Henoch
+73. Manuel Giraud
+74. Martin Pohlack
+75. Martyn Jago
+76. Matt Lundin
+77. Max Mikhanosha
+78. Michael Brand
+79. Michael Gauland
+80. Michael Sperber
+81. Miguel A. Figueroa-Villanueva
+82. Mikael Fornius
+83. Moritz Ulrich
+84. Nathan Neff
+85. Nicolas Goaziou
+86. Nicolas Richard
+87. Niels Giessen
+88. Noorul Islam K M
+89. Paul Sexton
+90. Peter Jones
+91. Phil Jackson
+92. Philip Rooke
+93. Pieter Praet
+94. Piotr Zielinski
+95. Puneeth Chaganti
+96. Richard Klinda
+97. Richard Riley
+98. Rick Frankel
+99. Ross Patterson
+100. Russel Adams
+101. Ryo Takaishi
+102. Sacha Chua
+103. Samuel Loury
+104. Sebastian Rose
+105. Sebastien Vauban
+106. Sergey Litvinov
+107. Seweryn Kokot
+108. Stephen Eglen
+109. Suvayu Ali
+110. T.F. Torrey
+111. Tassilo Horn
+112. Thomas Baumann
+113. Thomas Holst
+114. Thomas S. Dye
+115. Thorsten Jolitz
+116. Tim Burt
+117. Toby Cubitt
+118. Tokuya Kameshima
+119. Tom Breton
+120. Tomas Hlavaty
+121. Tony Day
+122. Ulf Stegemann
+123. Yann Hodique
+124. Yasushi Shoji
+125. Zhang Weize
 
 ** Processing
 
@@ -420,10 +460,7 @@ These people have been asked to sign the papers, and they are
 currently considering it or a request is being processed by the FSF.
 
 - Bill Wishon
-- Samuel Loury (as of 2013-01-14)
-- Ryo TAKAISHI (as of 2013-01-01)
-- Daimrod (Greg) (as of 2013-01-11)
-- Francesco Pizzolante (as of 2013-01-31)
+- Mats Kindahl (as of 2013-04-06) for [[http://mid.gmane.org/513BAB7D.1000603%2540oracle.com][this patch]]
 
 ** Tiny Changes
 
@@ -439,10 +476,9 @@ change lines.  Details are given in [[http://www.gnu.org/prep/maintain/maintain.
 5. Myles English
 6. Rafael Laboissiere
 7. Robert P. Goldman
-8. Ryo Takaishi
 9. Muchenxuan Tong
 
-(this list may be incomplete - please help to complete it)
+(This list may be incomplete - please help completing it.)
 
 ** No FSF assignment
 
