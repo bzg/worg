@@ -2,15 +2,15 @@
 #+AUTHOR:    Arun Persaud
 #+EMAIL:     arun@nubati.net
 #+DATE:      <2011-02-28 Mon>
-#+DESCRIPTION: 
-#+KEYWORDS: 
+#+DESCRIPTION:
+#+KEYWORDS:
 #+LANGUAGE:  en
 #+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
 #+SELECT_TAGS: export
 #+EXCLUDE_TAGS: noexport
-#+LINK_UP:   
-#+LINK_HOME: 
+#+LINK_UP:
+#+LINK_HOME:
 
 * Overview
   To get a real synchronization between org-mode and Google Calendar
@@ -25,20 +25,20 @@
   something usable for org-mode. For this conversion there luckily
   already exists a script written by Eric S. Fraga[fn:1]. This is the latest version:
 
-#+INCLUDE: "../code/awk/ical2org.awk" src sh
+#+INCLUDE: "../code/awk/ical2org.awk" src awk
 
 With this you can test your Google Calendar to org-mode
 synchronization by following these steps:
 
 1. Download the above script and save it as 'ical2org'.
    Make sure that the script is in your PATH and don't forget to set
-   the executable flag (chmod u+x ical2org). You can also customize the 
+   the executable flag (chmod u+x ical2org). You can also customize the
    script a bit by changing the variables in the config section of the script.
 2. Find your private URL for your calendar
   + Log into Google Calendar
   + Goto Settings
   + Click on the calendar you want to export to org-mode
-  + At the bottom of the page find the 'private address' section and your ical link 
+  + At the bottom of the page find the 'private address' section and your ical link
     Use the 'reset private urls' if you need to, that is if you don't
     see a unique url.
 3. Download the url
@@ -93,7 +93,7 @@ This will sync every 15 minutes starting at 5 minutes past the hour.
   your "main" calendar and therefore you can't easily share them with
   others. Nevertheless, this route is relatively easy and therefore
   we'll discuss it below.  The second option (as described in the link)
-  should work well, if you don't need to change things. 
+  should work well, if you don't need to change things.
 
   Also keep in mind that your mileage will vary, since everything
   described on this page works for some people, but perhaps not for
@@ -143,9 +143,9 @@ This will sync every 15 minutes starting at 5 minutes past the hour.
       (setq mycatp (member mycategory org-export-exclude-category))
       ; return t if ok, nil when not ok
       (if (and myresult (not mycatp)) t nil)))
-  
+
   ;;; activate filter and call export function
-  (defun org-mycal-export () 
+  (defun org-mycal-export ()
     (let ((org-icalendar-verify-function 'org-mycal-export-limit))
       (org-export-icalendar-combine-agenda-files)))
 #+end_src
@@ -155,16 +155,16 @@ This will sync every 15 minutes starting at 5 minutes past the hour.
 
 #+begin_src sh
   emacsclient -e "(save-excursion (org-mycal-export))"
-#+end_src 
- 
+#+end_src
+
   in your shell to generate the .ics file.
-  
+
   If you want to export also TODO items that have a SCHEDULED timestamp, you can set
 
 #+begin_src sh
   (setq org-icalendar-use-scheduled '(todo-start event-if-todo))
 #+end_src
-  
+
   in your .emacs.
 
   Another Emacs variable that you might want to look into is:
