@@ -26,7 +26,7 @@
 #   the author is not responsible for any erroneous conversions nor the
 #   consequence of such conversions
 #
-# - does process RRULE recurring events, except if COUNT specified iso UNTIL
+# - does process RRULE recurring events, but ignores COUNT specifiers
 #
 # - does not process EXDATE to exclude date(s) from recurring events
 #
@@ -45,7 +45,7 @@
 # repository...
 #
 # Updated by: Guido Van Hoecke <guivhoATgmailDOTcom>
-# Last change: 2013.05.26 13:22:04
+# Last change: 2013.05.26 14:28:33
 #----------------------------------------------------------------------------------
 
 BEGIN {
