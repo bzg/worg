@@ -93,7 +93,7 @@
    (setq count (count-matches (concat "TODO.*\n.*" date)))
    (message "CANCELEDS: %d" count))
 
-(defun org-effectiveness-in-date(date)
+(defun org-effectiveness-in-date(date &optional notmessage)
   (interactive "sGive me a date: " date)
   (save-excursion
     (goto-char (point-min))
@@ -102,6 +102,50 @@
       (if (and (= done canc) (zerop done))
 	  (setq effectiveness 0)
 	(setq effectiveness (* 100 (/ done (+ done canc)))))
-      (message "Effectiveness: %d " effectiveness))))
+      (if (eq notmessage 1)
+	  (message "%d" effectiveness)
+	(message "Effectiveness: %d " effectiveness)))))
+
+(defun org-effectiveness-month-to-string (m)
+  (if (< m 10)
+      (concat "0" (number-to-string m))
+    (number-to-string m)))
+
+(org-effectiveness-month-to-string 9)
+
+(defun org-effectiveness-plot(startdate enddate)
+  (interactive "sGive me the start date: \nsGive me the end date: " startdate enddate)
+;; Checking the format of the dates
+  (if (not (string-match "[0-9][0-9][0-9][0-9]-[0-9][0-9]" startdate)) 
+      (message "The start date must have the next format YYYY-MM"))
+  (if (not (string-match "[0-9][0-9][0-9][0-9]-[0-9][0-9]" enddate)) 
+      (message "The end date must have the next format YYYY-MM"))
+;; Checking if startdate < enddate
+  (if (string-match "^[0-9][0-9][0-9][0-9]" startdate)
+      (setq startyear (string-to-number (match-string 0 startdate))))
+  (if (string-match "[0-9][0-9]$" startdate)
+      (setq startmonth (string-to-number (match-string 0 startdate))))
+  (if (string-match "^[0-9][0-9][0-9][0-9]" enddate)
+      (setq endyear (string-to-number (match-string 0 enddate))))
+  (if (string-match "[0-9][0-9]$" enddate)
+      (setq endmonth (string-to-number (match-string 0 enddate))))
+  (if (> startyear endyear)
+       (message "The start date must be before that end date"))
+  (if (and (= startyear endyear) (> startmonth endmonth))
+      (message "The start date must be before that end date"))
+;; Create a file 
+  (let ((month startmonth)
+	(year startyear)
+	(str ""))
+    (while (and (>= endyear year) (>= endmonth month))
+      (setq str (concat str (number-to-string year) "-" (org-effectiveness-month-to-string month) " " (org-effectiveness-in-date (concat (number-to-string year) "-" (org-effectiveness-month-to-string month)) 1) "\n"))
+      (if (= month 12)
+	  (progn 
+	    (setq year (+ 1 year))
+	    (setq month 1))
+	(setq month (+ 1 month))))
+      (write-region str nil "/tmp/org-effectiveness"))
+;; Create the bar graph 
+  (call-process "/bin/bash" nil t nil "-c" "/usr/bin/gnuplot -e 'plot \"/tmp/org-effectiveness\" using 2:xticlabels(1) with histograms' -p"))
 
 (provide 'org-effectiveness)
