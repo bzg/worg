@@ -110,4 +110,4 @@ Copyright (C)  2013 " user-full-name
     or any later version published by the Free Software Foundation;
     with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
     A copy of the license is included in [[https://www.gnu.org/copyleft/fdl.html][GNU Free Documentation License]]."))))
-  (insert "\n\n[[file:https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/GFDL_Logo.svg/200px-GFDL_Logo.svg.png]]"))
+  (insert "\n\n[[https://www.gnu.org/copyleft/fdl.html][file:https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/GFDL_Logo.svg/200px-GFDL_Logo.svg.png]]"))
