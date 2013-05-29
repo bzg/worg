@@ -33,28 +33,28 @@
 
 (require 'org)
 
-(defun org-count-keyword(keyword)
+(defun org-effectiveness-count-keyword(keyword)
   "Print a message with the number of keyword outline in the current buffer"
   (interactive "sKeyword: ")
   (save-excursion
     (goto-char (point-min))
     (message "Number of %s: %d" keyword (count-matches (concat "* " keyword)))))
 
-(defun org-count-todo()
+(defun org-effectiveness-count-todo()
   "Print a message with the number of todo tasks in the current buffer"
   (interactive)
   (save-excursion 
     (goto-char (point-min))
     (message "Number of TODO: %d" (count-matches "* TODO"))))
 									     
-(defun org-count-done()
+(defun org-effectiveness-count-done()
   "Print a message with the number of done tasks in the current buffer"
   (interactive)
   (save-excursion
     (goto-char (point-min))
     (message "Number of DONE: %d" (count-matches "* DONE"))))
 
-(defun org-count-canceled()
+(defun org-effectiveness-count-canceled()
   "Print a message with the number of canceled tasks in the current buffer"
   (interactive)
   (save-excursion
