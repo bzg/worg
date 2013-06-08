@@ -111,8 +111,6 @@
       (concat "0" (number-to-string m))
     (number-to-string m)))
 
-(org-effectiveness-month-to-string 9)
-
 (defun org-effectiveness-plot(startdate enddate)
   (interactive "sGive me the start date: \nsGive me the end date: " startdate enddate)
 ;; Checking the format of the dates
@@ -146,6 +144,36 @@
 	(setq month (+ 1 month))))
       (write-region str nil "/tmp/org-effectiveness"))
 ;; Create the bar graph 
-  (call-process "/bin/bash" nil t nil "-c" "/usr/bin/gnuplot -e 'plot \"/tmp/org-effectiveness\" using 2:xticlabels(1) with histograms' -p"))
+  (if (file-exists-p "/usr/bin/gnuplot")
+      (call-process "/bin/bash" nil t nil "-c" "/usr/bin/gnuplot -e 'plot \"/tmp/org-effectiveness\" using 2:xticlabels(1) with histograms' -p")
+    (message "gnuplot is not installed"))
+)
+
+(defun org-effectiveness-ascii-bar(n)
+  "Print a bar with the percentage from 0 to 100 printed in ascii"
+  (interactive "nPercentage: ")
+  (if (or (< n 0) (> n 100))
+      (message "The percentage must be between 0 to 100")
+    (let ((x 0)
+	  (y 0)
+	  (z 0))
+      (insert "\n-")
+      (while (< x n)
+	(insert "-")
+	(setq x (+ x 1)))
+      (insert "+\n")
+      (insert (format "%d" n))
+      (if (> n 10)
+	  (setq y (+ y 1)))
+      (while (< y n)
+	(insert " ")
+	(setq y (+ y 1)))
+      (insert "|\n")
+      (insert "-")
+      (while (< z n)
+	(insert "-")
+	(setq z (+ z 1)))
+      (insert "+"))))
 
 (provide 'org-effectiveness)
+
