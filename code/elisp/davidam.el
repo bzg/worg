@@ -18,16 +18,16 @@
 ;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 ;; Boston, MA 02110-1301 USA,
 
-
 (defun davidam-org-envolve-src(msg)
   "Envolve source between org tags"
   (interactive "sChoose your programming language: " msg)
-  (if (equal nil msg) 
+  (if (equal nil msg)
       (setq msg "lisp"))
   (goto-char (point))
-  (insert "\n#+END_SRC")
+  (insert "#+END_SRC")
   (goto-char (mark))
-  (insert "#+BEGIN_SRC " msg))
+  (insert "#+BEGIN_SRC " msg "\n"))
+
 
 (defun davidam-org-src(msg)
   "Insert org source tags"
@@ -36,6 +36,11 @@
       (setq msg "lisp"))
   (insert "#+BEGIN_SRC " msg)
   (insert "\n#+END_SRC\n"))
+
+(defun davidam-org-display-date ()
+  (interactive)
+  (setq item-time (org-get-scheduled-time (point)))
+  (message "%s" item-time))
 
 (defun davidam-happy-birthday(person)
   (interactive "MWrite the person name: ")
@@ -87,3 +92,16 @@
     (dotimes (number number-of-rows total)
       (setq total (+ total (1+ number))))
     (message "Number of pebbles: %d" total)))
+
+
+
+;;(get 'i 'vecinos)
+
+;; (defun davidam-extend (trayectoria)
+;;   (interactive "eList to extend: " trayectoria)
+;;   (mapcar #'(lambda (nuevo-nodo) (cons nuevo-nodo trayectoria))
+;; 	  (remove-if #' (lambda (vecino) (member vecino trayectoria)
+;; 			  (get (first trayectoria) 'vecinos)))))
+
+;;(davidam-extend '(i))
+
