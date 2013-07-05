@@ -161,7 +161,7 @@ less than this but that's not likely:
 % Package longtable omitted
 % Package float omitted
 % Package wrapfig omitted
-\usepackage{soul}
+\usepackage[normalem]{ulem}
 \usepackage{textcomp}
 \usepackage{marvosym}
 \usepackage{wasysym}
@@ -259,7 +259,7 @@ package because of the necessity of running this separate program. It
 is considered a security risk.  There are various ways to convince
 latex to abandon its scruples in this regard.  The most convenient
 (and therefore most commonly used) is to run it with the
-=--shell-escape= option.
+=-shell-escape= option.
 
 So, let's assume that you like minted over listings and have decided
 to use it for latex export. You read the documentation for the relevant
@@ -273,7 +273,7 @@ suggests:
 #+END_SRC
 
 You also have to make sure that =org-latex-pdf-process= calls
-latex (or pdflatex or xelatex or ...) with the =--shell-escape=
+latex (or pdflatex or xelatex or ...) with the =-shell-escape=
 option.
 
 You *export* your articles to LaTeX and produce output that includes
@@ -286,19 +286,19 @@ the =\usepackage{minted}= line to latex files produced by either latex
 export *or* latex preview. If you've set up preview to use the
 imagemagick method, then everything should work, because it uses
 =org-latex-pdf-process= and that has been set up already to use the
-=--shell-escape= option (otherwise export would not work), so using
+=-shell-escape= option (otherwise export would not work), so using
 minted is not a problem.
 
 But if you have set up preview to use the dvipng method, you are in
 trouble: that method calls latex directly, the call is hardwired
-and it does *not* use the =--shell-escape= option. LaTeX refuses to
+and it does *not* use the =-shell-escape= option. LaTeX refuses to
 run the external program that minted used, no DVI file is produced
 and dvipng cannot produce a PNG file.
 
 One way out of this predicament is to change the latex call. That
 requires modifying the org mode code and that's not really a good
 idea. Adding an option that can be set by the user (so that one can
-pass the =--shell-escape= option to the latex call) is under
+pass the =-shell-escape= option to the latex call) is under
 consideration at this time ([2013-06-10 Mon 00:00]), but it's not there yet.
 
 Probably the best solution currently is to include minted for latex export
