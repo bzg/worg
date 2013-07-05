@@ -34,11 +34,11 @@ e^{i\pi} = -1
 \]
 #+END_EXAMPLE
 
-If you press C-c C-x C-l on one of these (or C-u C-c C-x C-l to
-preview everything in the subtree), you should see something like this
-(the placement on the page and the size of the equations are probably
-going to be different, but the formulas should be recognizably the
-same):
+If you press C-c C-x C-l here (or C-u C-c C-x C-l to preview
+everything in the subtree, or C-u C-u C-c C-x C-l to preview
+everything in the buffer), you should see something like this (the
+placement on the page and the size of the equations are probably going
+to be different, but the formulas should be recognizably the same):
 
 \[
 e^{i\pi} = -1
@@ -47,7 +47,6 @@ e^{i\pi} = -1
 \[
 \int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}
 \]
-
 
 Generally speaking, the preview mechanism looks for LaTeX environments
 in the current region of applicability and processes one or more of
@@ -146,7 +145,7 @@ There is one variable in org that needs to be set up:
 In addition, you might want to customize the set of latex
 packages that will be needed in order to produce the preview.
 Most of these are probably already included. Here is the current
-(as of [2013-05-25 Sat]) list. You might have more than this
+(as of [2013-07-05 Fri]) list. You might have more than this
 because of customizations in your setup. You also might have
 less than this but that's not likely:
 
@@ -167,11 +166,13 @@ less than this but that's not likely:
 \usepackage{wasysym}
 \usepackage{latexsym}
 \usepackage{amssymb}
+% Package amstext omitted
+% Package hyperref omitted
 
 #+END_EXAMPLE
 
 The set of packages is specified using the variables
-org-latex-default-packages-alist and org-latex-packages-alist. The
+=org-latex-default-packages-alist= and =org-latex-packages-alist=. The
 documentation strongly recommends that you leave the first one as is
 (unless you really know what you are doing - and even then, it's easy
 to shoot yourself in the foot). The second one is normally empty, but
@@ -299,7 +300,7 @@ One way out of this predicament is to change the latex call. That
 requires modifying the org mode code and that's not really a good
 idea. Adding an option that can be set by the user (so that one can
 pass the =-shell-escape= option to the latex call) is under
-consideration at this time ([2013-06-10 Mon 00:00]), but it's not there yet.
+consideration at this time ([2013-07-05]), but it's not there yet.
 
 Probably the best solution currently is to include minted for latex export
 but exclude it for latex preview. Remember the list of packages
