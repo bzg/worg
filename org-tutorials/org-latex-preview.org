@@ -15,7 +15,7 @@ summarize in this note.
 
 * Basic usage
 
-Once the facility has been setup, it can be used very simply.  One
+Once the facility has been set up, it can be used very simply.  One
 writes LaTeX code and invokes the command =org-preview-latex-fragment=
 (bound to C-c C-x C-l). The command processes the latex code and
 produces a PNG image that is overlaid on the LaTeX code that was used
@@ -25,8 +25,6 @@ C-c C-c gets rid of the overlay.
 Here's an example:
 
 #+BEGIN_EXAMPLE
-* Euler
-
 \[
 e^{i\pi} = -1
 \]
@@ -35,6 +33,21 @@ e^{i\pi} = -1
 \int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}
 \]
 #+END_EXAMPLE
+
+If you press C-c C-x C-l on one of these (or C-u C-c C-x C-l to
+preview everything in the subtree, you should see something like this
+(the placement on the page and the size of the equations are probably
+going to be different, but the formulas should be recognizably the
+same):
+
+\[
+e^{i\pi} = -1
+\]
+
+\[
+\int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}
+\]
+
 
 Generally speaking, the preview mechanism looks for LaTeX environments
 in the current region of applicability and processes one or more of
@@ -84,6 +97,7 @@ installed with the command =apt-get install dvipng=.
 
 To test the installation, create a small TeX file:
 
+#+BEGIN_EXAMPLE
 #+BEGIN_SRC latex :tangle /tmp/example.tex
 \documentclass{article}
 
@@ -100,14 +114,18 @@ e^{i\pi} = -1
 \end{document}
 
 #+END_SRC
+#+END_EXAMPLE
 
-You can tangle the above code block with C-u C-c C-v C-t into the file
-/tmp/example.tex and process that through latex and dvipng. The following
-code uses the ``display'' program (part of the imagemagick family) to show
-the PNG file, but there are many such programs. Use what you have or can
-get easily.
+If you are looking at this on the web, you can cut and paste the latex
+program to /tmp/example.tex and process it through latex and dvipng,
+as shown below.  If you are looking at the org file of this tutorial,
+you can tangle the above code block with C-u C-c C-v C-t into the file
+/tmp/example.tex and process that through latex and dvipng. The
+following code uses the ``display'' program (part of the imagemagick
+family) to show the PNG file, but there are many such programs. Use
+what you have or can get easily.
 
-#+BEGIN_SRC sh :results silent
+#+BEGIN_SRC sh :exports code :results silent
 cd /tmp
 latex /tmp/example.tex
 dvipng -o /tmp/example.png /tmp/example.dvi
@@ -199,9 +217,11 @@ The package stuff is identical.
 So choose a method, add a LaTeX fragment of your favorite
 mathematics, e.g.
 
+#+BEGIN_EXAMPLE
 \[
 e^{i\pi} = -1
 \]
+#+END_EXAMPLE
 
 and press C-c C-x C-l in the fragment. Does the preview show
 properly? If so, congratulations. Press C-c C-c to make it go away.
