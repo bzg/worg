@@ -208,7 +208,6 @@ functionality largely overlaps with the export facilities in Org
 Mode.  
 
 * Examples of Use
-
 ** "Hello World"
 
 At its simplest, Org Mode evaluation of LaTeX source code blocks with
@@ -324,6 +323,46 @@ illustrative purposes.
 : \end{tikzpicture}
 : #+END_LaTeX
 
+** Backend dependent execution -- conditionally export tikz to SVG on HTML export
+This example demonstrates the handling of a LaTeX code block
+differently depending on the export backend.  If the following file is
+exported to HTML the tikz code block will be converted to an SVG
+images, while on export to pdf (through LaTeX) the tikz code will
+simply be inserted into the document verbatim.
+
+: #+LATEX_HEADER: \usepackage{tikz}
+: 
+: First execute the second code block, to define the convenience macro
+: and to set the required new variables in ob-latex.el.  Then export to
+: HTML and to pdf to see the tree exported as an SVG image and as
+: embedded tikz respectively.
+: 
+: * Tikz test
+: Here's a tree, exported to both html and pdf.
+: 
+: #+header: :file (by-backend (html "tree.svg") (t 'nil))
+: #+header: :imagemagick
+: #+header: :results (by-backend (pdf "latex") (t "raw"))
+: #+begin_src latex
+:   \usetikzlibrary{trees}
+:   \begin{tikzpicture}
+:     \node [circle, draw, fill=red!20] at (0,0) {1}
+:     child { node [circle, draw, fill=blue!30] {2}
+:       child { node [circle, draw, fill=green!30] {3} }
+:       child { node [circle, draw, fill=yellow!30] {4} }};
+:   \end{tikzpicture}
+: #+end_src
+: 
+: * COMMENT setup
+: #+begin_src emacs-lisp :results silent
+:   (setq org-babel-latex-htlatex "htlatex")
+:   (defmacro by-backend (&rest body)
+:     `(case (if (boundp 'backend) (org-export-backend-name backend) nil) ,@body))
+: #+end_src
+
+This allows for the automatic composition of beautiful scalable
+graphics across both HTML and pdf from a single document and image
+source.
 
 ** Latex Options                                                   :noexport:
 #+LATEX_HEADER: \usepackage{tikz}
