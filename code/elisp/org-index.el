@@ -1,4 +1,4 @@
-;;; org-index.el --- An index for org links and references
+;;; org-index.el --- A personal index for org links and references
 
 ;; Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
