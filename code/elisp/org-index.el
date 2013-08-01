@@ -1,4 +1,4 @@
-;;; org-index.el --- A personal index for org links and references
+;;; org-index.el --- A personal index for org and beyond
 
 ;; Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
@@ -29,7 +29,7 @@
 
 ;; Purpose:
 ;;
-;;  Mark and find your favorite things and org-locations easily: Create
+;;  Mark and find your favorite org-locations and things easily: Create
 ;;  and update a lookup table of references and links. Often used entries
 ;;  bubble to the top; entering some keywords narrows down to matching
 ;;  entries only, so that the right one can be spotted easily.
@@ -1645,6 +1645,7 @@ An example would be:
         after-inserted                ; in occur-buffer
         lines-visible                 ; in occur-buffer
         below-hline-bol               ; below-hline and at bol
+        exit-gracefully               ; true if normal exit
         in-c-backspace                ; true while processing C-backspace
         ret from to key)
         
@@ -1684,10 +1685,6 @@ An example would be:
             (setq left-off-at (cons (car ret) nil))
             (setq after-inserted (cons (point) nil)))
 
-          ;; fill stacks initially
-          ;;          (setq left-off-at (cons below-hline-bol nil))
-          ;;          (setq after-inserted (cons (point) nil))
-
           ;; read keys
           (while 
               (progn
@@ -1706,9 +1703,11 @@ An example would be:
                     (setq key (read-event
                                (format "%s %s" 
                                        prompt 
-                                       (mapconcat 'identity (reverse (cons word words)) ","))))))
+                                       (mapconcat 'identity (reverse (cons word words)) ","))))
+
+                    (setq exit-gracefully (memq key (list 'return 'up 'down 'left 'right)))))
                 
-                (not (memq key (list 'return 'up 'down 'left 'right))))
+                (not exit-gracefully))
             
             (cond 
 
@@ -1745,7 +1744,6 @@ An example would be:
                   (setq left-off-at (cdr left-off-at)))
 
                 ;; go through buffer and check, if any invisible line should now be shown
-                (setq total-lines 0)
                 (goto-char start-of-lines)
                 (while (< (point) (point-max))
                   (if (outline-invisible-p)
@@ -1762,8 +1760,7 @@ An example would be:
                     ;; already visible, just count
                     (incf lines-visible))
 
-                  (forward-line 1)
-                  (incf total-lines))
+                  (forward-line 1))
 
                 ;; highlight shorter word
                 (unless (= (length word) 0)
@@ -1834,22 +1831,21 @@ An example would be:
           (message "Getting all matches ...")
           (setq ret (org-index--get-matching-lines (cons word words) 0 (car left-off-at)))
           (message "done.")
-          (insert (cdr ret))
-
-          ;; replace previous heading
-          (let ((numlines (count-lines (point) start-of-lines)))
-            (goto-char start-of-lines)
-            (forward-line -1)
-            (delete-region (point-min) (point))
-            (insert (format  (concat "Search is done; showing all %d matchs.\n"
-                                     "Use cursor keys to move, press RET to find heading.\n")
-                             numlines))
-
-            ;; during testing: Check if number of lines found is okay
-            (org-index--get-matching-lines (cons word words) lines-to-show below-hline-bol))
-
-          (forward-line))
-      (setq cursor-type t))
+          (insert (cdr ret)))
+      
+      ;; postprocessing even for non graceful exit
+      (setq cursor-type t)
+      ;; replace previous heading
+      (let ((numlines (count-lines (point) start-of-lines)))
+        (goto-char start-of-lines)
+        (forward-line -1)
+        (delete-region (point-min) (point))
+        (insert (format  (concat (if exit-gracefully 
+                                     "Search is done; showing all %d matchs.\n"
+                                   "Search aborted; showing only some matches.\n")
+                                 "Use cursor keys to move, press RET to find heading.\n")
+                         numlines)))
+      (forward-line))
 
     ;; install keyboard-shortcuts within occur-buffer
     (let ((keymap (make-sparse-keymap))
