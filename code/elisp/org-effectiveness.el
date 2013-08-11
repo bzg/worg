@@ -211,12 +211,12 @@
   (setq syear (cadr (assoc 'startyear dates)))
   (setq smonth (cadr (assoc 'startmonth dates)))
   (setq eyear (cadr (assoc 'endyear dates)))
-  (setq emonth (assoc 'endmonth dates))
-;; Create a file 
-  (let ((month startmonth)
-  	(year startyear)
+  (setq emonth (cadr (assoc 'endmonth dates)))
+;;  (switch-to-buffer "*org-effectiveness*")
+  (let ((month smonth)
+  	(year syear)
   	(str ""))
-    (while (and (>= endyear year) (>= endmonth month))
+    (while (and (>= eyear year) (>= emonth month))
       (org-effectiveness-ascii-bar (string-to-number (org-effectiveness-in-date (concat (number-to-string year) "-" (org-effectiveness-month-to-string month)) 1)) (format "%s-%s" year month))
       (if (= month 12)
   	  (progn 
