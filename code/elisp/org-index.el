@@ -6,7 +6,7 @@
 ;; Keywords: hypermedia, matching
 ;; Requires: org
 ;; Download: http://orgmode.org/worg/code/elisp/org-index.el
-;; Version: 2.3.0
+;; Version: 2.3.1
 
 ;; This file is not part of GNU Emacs.
 
@@ -156,7 +156,7 @@ References are essentially small numbers (e.g. \"R237\" or \"-455-\"),
 which are created by this package; they are well suited to be used
 outside of org. Links are normal org-mode links.
 
-This is version 2.3.0 of org-index.
+This is version 2.3.1 of org-index.
 
 The function `org-index' operates on a dedicated table, the index
 table, which lives within its own Org-mode node. The table and
@@ -730,8 +730,11 @@ An example would be:
           (if (and link
                    (not (string= link "")))
               (progn 
-                (org-id-goto link)
                 (org-index--update-line search)
+                (org-id-goto link)
+                (org-reveal)
+                (if (eq (current-buffer) org-index--buffer)
+                    (setq org-index--point-before nil))
                 (setq message-text "Followed link"))
 
             (message (format "Scanning headlines for '%s' ..." search))

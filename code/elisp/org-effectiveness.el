@@ -113,6 +113,11 @@
 
 (defun org-effectiveness-plot(startdate enddate)
   (interactive "sGive me the start date: \nsGive me the end date: " startdate enddate)
+  (setq dates (org-effectiveness-check-dates startdate enddate))
+  (setq syear (cadr (assoc 'startyear dates)))
+  (setq smonth (cadr (assoc 'startmonth dates)))
+  (setq eyear (cadr (assoc 'endyear dates)))
+  (setq emonth (assoc 'endmonth dates))
 ;; Checking the format of the dates
   (if (not (string-match "[0-9][0-9][0-9][0-9]-[0-9][0-9]" startdate)) 
       (message "The start date must have the next format YYYY-MM"))
@@ -146,17 +151,17 @@
 ;; Create the bar graph 
   (if (file-exists-p "/usr/bin/gnuplot")
       (call-process "/bin/bash" nil t nil "-c" "/usr/bin/gnuplot -e 'plot \"/tmp/org-effectiveness\" using 2:xticlabels(1) with histograms' -p")
-    (message "gnuplot is not installed"))
-)
+    (message "gnuplot is not installed")))
 
-(defun org-effectiveness-ascii-bar(n)
+(defun org-effectiveness-ascii-bar(n &optional label)
   "Print a bar with the percentage from 0 to 100 printed in ascii"
-  (interactive "nPercentage: ")
+  (interactive "nPercentage: \nsLabel: ")
   (if (or (< n 0) (> n 100))
       (message "The percentage must be between 0 to 100")
     (let ((x 0)
 	  (y 0)
 	  (z 0))
+      (insert (format "\n### %s ###" label))
       (insert "\n-")
       (while (< x n)
 	(insert "-")
@@ -174,6 +179,50 @@
 	(insert "-")
 	(setq z (+ z 1)))
       (insert "+"))))
+
+(defun org-effectiveness-check-dates (startdate enddate)
+  "Generate a list with ((startyear startmonth) (endyear endmonth))"
+  (setq str nil)
+  (if (not (string-match "[0-9][0-9][0-9][0-9]-[0-9][0-9]" startdate)) 
+      (setq str "The start date must have the next format YYYY-MM"))
+  (if (not (string-match "[0-9][0-9][0-9][0-9]-[0-9][0-9]" enddate)) 
+      (setq str "The end date must have the next format YYYY-MM"))
+;; Checking if startdate < enddate
+  (if (string-match "^[0-9][0-9][0-9][0-9]" startdate)
+      (setq startyear (string-to-number (match-string 0 startdate))))
+  (if (string-match "[0-9][0-9]$" startdate)
+      (setq startmonth (string-to-number (match-string 0 startdate))))
+  (if (string-match "^[0-9][0-9][0-9][0-9]" enddate)
+      (setq endyear (string-to-number (match-string 0 enddate))))
+  (if (string-match "[0-9][0-9]$" enddate)
+      (setq endmonth (string-to-number (match-string 0 enddate))))
+  (if (> startyear endyear)
+      (setq str "The start date must be before that end date"))
+  (if (and (= startyear endyear) (> startmonth endmonth))
+      (setq str "The start date must be before that end date"))
+  (if str
+      (message str)
+;;    (list (list startyear startmonth) (list endyear endmonth))))
+    (list (list 'startyear startyear) (list 'startmonth startmonth) (list 'endyear endyear) (list 'endmonth endmonth))))
+
+(defun org-effectiveness-plot-ascii (startdate enddate)
+  (interactive "sGive me the start date: \nsGive me the end date: " startdate enddate)
+  (setq dates (org-effectiveness-check-dates startdate enddate))
+  (setq syear (cadr (assoc 'startyear dates)))
+  (setq smonth (cadr (assoc 'startmonth dates)))
+  (setq eyear (cadr (assoc 'endyear dates)))
+  (setq emonth (assoc 'endmonth dates))
+;; Create a file 
+  (let ((month startmonth)
+  	(year startyear)
+  	(str ""))
+    (while (and (>= endyear year) (>= endmonth month))
+      (org-effectiveness-ascii-bar (string-to-number (org-effectiveness-in-date (concat (number-to-string year) "-" (org-effectiveness-month-to-string month)) 1)) (format "%s-%s" year month))
+      (if (= month 12)
+  	  (progn 
+  	    (setq year (+ 1 year))
+  	    (setq month 1))
+  	(setq month (+ 1 month))))))
 
 (provide 'org-effectiveness)
 
