@@ -31,8 +31,10 @@
 
 ;;; Code:
 
-;;(setq images-directory "")
-
+;; (setq images-directory "")
+;;
+;; You can download the images from http://www.davidam/img/licenses.tar.gz
+;;
 
 (defun org-license-cc-by (language)
   (interactive "MLanguage: " language)
