@@ -31,10 +31,13 @@
 
 ;;; Code:
 
-;; (setq images-directory "")
+;; 
 ;;
 ;; You can download the images from http://www.davidam/img/licenses.tar.gz
 ;;
+
+
+(defvar org-license-images-directory "")
 
 (defun org-license-cc-by (language)
   (interactive "MLanguage: " language)
@@ -43,9 +46,9 @@
 Este documento está bajo una [[http://creativecommons.org/licenses/by/3.0/deed][Licencia Creative Commons Reconocimiento Unported 3.0]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by/3.0/deed][Creative Commons Attribution Unported 3.0]]")))
-  (if (string= "" images-directory)
+  (if (string= "" org-license-images-directory)
       (insert "\n\n[[http://creativecommons.org/licenses/by/3.0/deed][file:http://i.creativecommons.org/l/by/3.0/80x15.png]]")
-    (insert (concat "\n\n[[http://creativecommons.org/licenses/by/3.0/deed][file:" images-directory "/by/3.0/80x15.png]]"))))
+    (insert (concat "\n\n[[http://creativecommons.org/licenses/by/3.0/deed][file:" org-license-images-directory "/by/3.0/80x15.png]]"))))
 
 (defun org-license-cc-by-sa (language)
   (interactive "MLanguage: " language)
@@ -54,9 +57,9 @@ This document is under a [[http://creativecommons.org/licenses/by/3.0/deed][Crea
 Este documento está bajo una [[http://creativecommons.org/licenses/by-sa/3.0/deed][Licencia Creative Commons Reconocimiento Unported 3.0]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-sa/3.0/deed][Creative Commons Reconocimiento Unported 3.0]]")))
-  (if (string= "" images-directory)
+  (if (string= "" org-license-images-directory)
       (insert "\n\n[[http://creativecommons.org/licenses/by/3.0/deed][file:http://i.creativecommons.org/l/by/3.0/80x15.png]]")
-    (insert (concat "\n\n[[http://creativecommons.org/licenses/by-sa/3.0/deed][file:" images-directory "/by-sa/3.0/80x15.png]]"))))
+    (insert (concat "\n\n[[http://creativecommons.org/licenses/by-sa/3.0/deed][file:" org-license-images-directory "/by-sa/3.0/80x15.png]]"))))
 
 (defun org-license-cc-by-nd (language)
   (interactive "MLanguage: " language)
@@ -66,9 +69,9 @@ Este documento está bajo una [[http://creativecommons.org/licenses/by-nd/3.0/es
 Atribución-SinDerivadas 3.0]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nd/3.0/deed][Creative Commons Reconocimiento Unported 3.0]]")))
-  (if (string= "" images-directory)
+  (if (string= "" org-license-images-directory)
       (insert "\n\n[[http://creativecommons.org/licenses/by-nd/3.0/deed][file:http://i.creativecommons.org/l/by-nd/3.0/80x15.png]]")
-    (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nd/3.0/deed][file:" images-directory "/by-nd/3.0/80x15.png]]"))))
+    (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nd/3.0/deed][file:" org-license-images-directory "/by-nd/3.0/80x15.png]]"))))
 ;;"))
 
 (defun org-license-cc-by-nc (language)
@@ -79,9 +82,9 @@ Este documento está bajo una [[http://creativecommons.org/licenses/by-nc/3.0/es
 Reconocimiento-NoComercial 3.0]]"))
 	(t (insert "* License 
 This document is under a [[http://creativecommons.org/licenses/by-nc/3.0/deed][Creative Commons Attribution-NonCommercial 3.0 Unported]]")))
-  (if (string= "" images-directory)
+  (if (string= "" org-license-images-directory)
       (insert "\n\n[[http://creativecommons.org/licenses/by-nc/3.0/deed][file:http://i.creativecommons.org/l/by-nc/3.0/80x15.png]]")
-    (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nc/3.0/deed][file:" images-directory "/by-nc/3.0/80x15.png]]"))))
+    (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nc/3.0/deed][file:" org-license-images-directory "/by-nc/3.0/80x15.png]]"))))
 
 
 (defun org-license-cc-by-nc-sa (language)
@@ -92,9 +95,9 @@ Este documento está bajo una [[http://creativecommons.org/licenses/by-nc-sa/3.0
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][License Creative Commons
 Reconocimiento-NoComercial 3.0] Unported]")))
-  (if (string= "" images-directory)
+  (if (string= "" org-license-images-directory)
       (insert "\n\n[[http://creativecommons.org/licenses/by-nc-sa/3.0/es/deed][file:http://i.creativecommons.org/l/by-nc-sa/3.0/80x15.png]]")
-    (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][file:" images-directory "/by-nc-sa/3.0/80x15.png]]"))))
+    (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][file:" org-license-images-directory "/by-nc-sa/3.0/80x15.png]]"))))
 
 (defun org-license-cc-by-nc-nd (language)
   (interactive "MLanguage: " language)
@@ -105,9 +108,9 @@ Reconocimiento-NoComercial-SinObraDerivada 3.0 Unported]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][License Creative Commons
 Reconocimiento-NoComercial-SinObraDerivada 3.0] Unported]")))
-  (if (string= "" images-directory)
+  (if (string= "" org-license-images-directory)
       (insert "\n\n[[http://creativecommons.org/licenses/by-nc-nd/3.0/deed][file:http://i.creativecommons.org/l/by-nc-nd/3.0/80x15.png]]"))
-    (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nc-nd/3.0/deed][file:" images-directory "/by-nc-nd/3.0/80x15.png]]")))
+    (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nc-nd/3.0/deed][file:" org-license-images-directory "/by-nc-nd/3.0/80x15.png]]")))
 
 
 
@@ -128,7 +131,7 @@ Copyright (C)  2013 " user-full-name
     or any later version published by the Free Software Foundation;
     with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
     A copy of the license is included in [[https://www.gnu.org/copyleft/fdl.html][GNU Free Documentation License]]."))))
-  (if (string= "" images-directory)
+  (if (string= "" org-license-images-directory)
       (insert "\n\n[[https://www.gnu.org/copyleft/fdl.html][file:https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/GFDL_Logo.svg/200px-GFDL_Logo.svg.png]]")
-    (insert (concat "\n\n[[https://www.gnu.org/copyleft/fdl.html][file:" images-directory "/gfdl.png]]"))))
+    (insert (concat "\n\n[[https://www.gnu.org/copyleft/fdl.html][file:" org-license-images-directory "/gfdl/gfdl.png]]"))))
 
