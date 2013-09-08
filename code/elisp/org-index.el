@@ -29,15 +29,15 @@
 
 ;; Purpose:
 ;;
-;;  Mark and find your favorite org-locations and other things easily:
-;;  Create and update a lookup table of references and links. Frequently
-;;  used entries bubble to the top. Entering some keywords narrows down the
-;;  displayed results to matching entries only, so that the right one can
-;;  be spotted easily.
+;;  Mark and find your favorite org-locations and other points of interest
+;;  easily; create and update a lookup table of references and links. When
+;;  searching, frequently used entries appear at the the top and entering
+;;  some keywords narrows down to matching entries only; so the right one
+;;  can be spotted easily.
 ;;
 ;;  References are essentially small numbers (e.g. "R237" or "-455-"),
 ;;  which are created by this package; they are well suited to be used
-;;  outside org. Links are normal org-mode links.;;
+;;  outside org. Links are normal org-mode links.
 ;;
 ;; Setup:
 ;;
