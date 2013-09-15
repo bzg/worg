@@ -248,6 +248,46 @@ environment, although it can be forced at any point by setting the
 =BEAMER_env= property to =columns=.  This might be handy if you want
 to pass special options.
 
+* Migrating from the old to the new exporter
+  :PROPERTIES:
+  :CUSTOM_ID: migration
+  :END:
+
+** Configuration
+Many configuration variables have been renamed, some might even have
+slightly different meanings.  For a summary of these changes take a
+look at the following entries:
+- [[file:~/org/Worg/org-8.0.org::*Updating%20global%20export%20configuration%20options][Global export configuration options]]
+- [[file:~/org/Worg/org-8.0.org::*Backend-specific%20configuration%20options][Backend-specific configuration options]]
+If there is information missing from the above entries, please do not
+hesitate to report on the Org mode mailing list.
+
+Besides configuration variables, the earlier version allowed more
+generic configuration of export using hooks.  This has been replaced
+by export filters.  There is a nice [[file:~/org/Worg/exporters/filter-markup.org][article]] on how you could explore
+available filters by Charles Berry.  A few simple examples were also
+shown above.
+
+That said, two old-style hooks are still available:
+=org-export-before-parsing-hook=, and
+=org-export-before-processing-hook=.  Take a look at their
+documentation strings for more details.
+
+** Backwards incompatible changes
+   :PROPERTIES:
+   :CUSTOM_ID: backwards-compatibility
+   :END:
+The new exporter has a few backwards incompatible changes.  The most
+visible change is the export behaviour of headlines deeper than the
+exported headline level.  You can configure the headline levels that
+are exported with the =#+OPTIONS:= line ~H:n~ (as explained [[#frame-level][earlier]]).
+If there are any headlines deeper than ~n~, they are exported as
+blocks during beamer export.  For the old exporter, these were
+exported as unordered lists.  [[http://thread.gmane.org/gmane.emacs.orgmode/76446][This thread]] from the mailing list
+archive has some discussion on how to deal with this change.  If you
+have anything to add to that discussion, please share on the mailing
+list.
+
 * New features available with the new exporter
   :PROPERTIES:
   :CUSTOM_ID: new-features
@@ -294,13 +334,3 @@ http://mid.gmane.org/87hapz3na9.fsf@gmail.com
 7) [ ] Footnotes and references
 8) [X] Backup slides with =\appendix=
 9) [ ] Caveats about using alternate TeX binaries
-
-* TODO Migrating from the old to the new exporter
-  :PROPERTIES:
-  :CUSTOM_ID: migration
-  :END:
-
-- Backwards incompatible changes in the new exporter
-- Configuration:
-  1. variable name changes,
-  2. filters instead of hooks (except for two)
