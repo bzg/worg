@@ -54,11 +54,11 @@ This document is under a [[http://creativecommons.org/licenses/by/3.0/deed][Crea
   (interactive "MLanguage: " language)
   (cond ((equal language "es") 
 	 (insert "* Licencia
-Este documento está bajo una [[http://creativecommons.org/licenses/by-sa/3.0/deed][Licencia Creative Commons Reconocimiento Unported 3.0]]"))
+Este documento está bajo una [[http://creativecommons.org/licenses/by-sa/3.0/deed][Licencia Creative Commons Atribución Compartir Igual Unported 3.0]]"))
 	(t (insert "* License
-This document is under a [[http://creativecommons.org/licenses/by-sa/3.0/deed][Creative Commons Reconocimiento Unported 3.0]]")))
+This document is under a [[http://creativecommons.org/licenses/by-sa/3.0/deed][License Creative Commons Attribution-ShareAlike Unported 3.0]]")))
   (if (string= "" org-license-images-directory)
-      (insert "\n\n[[http://creativecommons.org/licenses/by/3.0/deed][file:http://i.creativecommons.org/l/by/3.0/80x15.png]]")
+      (insert "\n\n[[http://creativecommons.org/licenses/by-sa/3.0/deed][file:http://i.creativecommons.org/l/by/3.0/80x15.png]]")
     (insert (concat "\n\n[[http://creativecommons.org/licenses/by-sa/3.0/deed][file:" org-license-images-directory "/by-sa/3.0/80x15.png]]"))))
 
 (defun org-license-cc-by-nd (language)
