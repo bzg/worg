@@ -35,7 +35,8 @@
 ;;
 ;; You can download the images from http://www.davidam/img/licenses.tar.gz
 ;;
-
+;; TODO: extract localized url as variable and introduce it in image
+;; TODO: create a function to test all combinations of licenses
 
 (defvar org-license-images-directory "")
 
@@ -43,9 +44,12 @@
   (interactive "MLanguage: " language)
   (cond ((equal language "es")
 	 (insert "* Licencia
-Este documento está bajo una [[http://creativecommons.org/licenses/by/3.0/deed][Licencia Creative Commons Reconocimiento Unported 3.0]]"))
+Este documento está bajo una [[http://creativecommons.org/licenses/by/3.0/es/deed.es][Licencia Creative Commons Atribución 3.0]]"))
+	((equal language "de")
+	 (insert "* Lizenz
+Dieses Dokument ist unter ein [[http://creativecommons.org/licenses/by/3.0/de/deed.de][Lizenz Creative Commons Namensnennung 3.0]]"))
 	(t (insert "* License
-This document is under a [[http://creativecommons.org/licenses/by/3.0/deed][Creative Commons Attribution Unported 3.0]]")))
+This document is under a [[http://creativecommons.org/licenses/by/3.0/deed][Creative Commons Attribution 3.0]]")))
   (if (string= "" org-license-images-directory)
       (insert "\n\n[[http://creativecommons.org/licenses/by/3.0/deed][file:http://i.creativecommons.org/l/by/3.0/80x15.png]]")
     (insert (concat "\n\n[[http://creativecommons.org/licenses/by/3.0/deed][file:" org-license-images-directory "/by/3.0/80x15.png]]"))))
@@ -54,19 +58,24 @@ This document is under a [[http://creativecommons.org/licenses/by/3.0/deed][Crea
   (interactive "MLanguage: " language)
   (cond ((equal language "es") 
 	 (insert "* Licencia
-Este documento está bajo una [[http://creativecommons.org/licenses/by-sa/3.0/deed][Licencia Creative Commons Atribución Compartir Igual Unported 3.0]]"))
+Este documento está bajo una [[http://creativecommons.org/licenses/by-sa/3.0/deed.es][Licencia Creative Commons Atribución Compartir Igual Unported 3.0]]"))
+	((equal language "de")
+	 (insert "* Lizenz
+Dieses Dokument ist unter ein [[http://creativecommons.org/licenses/by-sa/3.0/deed.de][Namensnennung - Weitergabe unter gleichen Bedingungen 3.0 Unported]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-sa/3.0/deed][License Creative Commons Attribution-ShareAlike Unported 3.0]]")))
   (if (string= "" org-license-images-directory)
-      (insert "\n\n[[http://creativecommons.org/licenses/by-sa/3.0/deed][file:http://i.creativecommons.org/l/by/3.0/80x15.png]]")
+      (insert "\n\n[[http://creativecommons.org/licenses/by-sa/3.0/deed][file:http://i.creativecommons.org/l/by-sa/3.0/80x15.png]]")
     (insert (concat "\n\n[[http://creativecommons.org/licenses/by-sa/3.0/deed][file:" org-license-images-directory "/by-sa/3.0/80x15.png]]"))))
 
 (defun org-license-cc-by-nd (language)
   (interactive "MLanguage: " language)
   (cond ((equal language "es")
 	 (insert "* Licencia
-Este documento está bajo una [[http://creativecommons.org/licenses/by-nd/3.0/es/deed][Licencia Creative Commons
-Atribución-SinDerivadas 3.0]]"))
+Este documento está bajo una [[http://creativecommons.org/licenses/by-nd/3.0/es/deed.es][Licencia Creative Commons Atribución-SinDerivadas 3.0]]"))
+	((equal language "de")
+	 (insert "* Lizenz
+Dieses Dokument ist unter ein [[http://creativecommons.org/licenses/by-nd/3.0/de/deed.de][Namensnennung-Keine Bearbeitung 3.0 Deutschland]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nd/3.0/deed][Creative Commons Reconocimiento Unported 3.0]]")))
   (if (string= "" org-license-images-directory)
@@ -78,8 +87,10 @@ This document is under a [[http://creativecommons.org/licenses/by-nd/3.0/deed][C
   (interactive "MLanguage: " language)
   (cond ((equal language "es")
 	 (insert "* Licencia
-Este documento está bajo una [[http://creativecommons.org/licenses/by-nc/3.0/es/deed][Licencia Creative Commons
-Reconocimiento-NoComercial 3.0]]"))
+Este documento está bajo una [[http://creativecommons.org/licenses/by-nc/3.0/es/deed.es][Licencia Creative Commons Reconocimiento-NoComercial 3.0]]"))
+	((equal language "de")
+	 (insert "* Lizenz
+Dieses Dokument ist unter ein [[http://creativecommons.org/licenses/by-nc/3.0/de/deed.de][Namensnennung-Nicht-kommerziell 3.0 Deutschland]]"))
 	(t (insert "* License 
 This document is under a [[http://creativecommons.org/licenses/by-nc/3.0/deed][Creative Commons Attribution-NonCommercial 3.0 Unported]]")))
   (if (string= "" org-license-images-directory)
@@ -91,28 +102,31 @@ This document is under a [[http://creativecommons.org/licenses/by-nc/3.0/deed][C
   (interactive "MLanguage: " language)
   (cond ((equal language "es")
 	 (insert "* Licencia
-Este documento está bajo una [[http://creativecommons.org/licenses/by-nc-sa/3.0/es/deed][Licencia Creative Commons Reconocimiento-NoComercial 3.0]]"))
+Este documento está bajo una [[http://creativecommons.org/licenses/by-nc-sa/3.0/es/deed.es][Licencia Creative Commons Reconocimiento-NoComercial 3.0]]"))
+	((equal language "de")
+	 (insert "* Lizenz
+Dieses Dokument ist unter ein [[http://creativecommons.org/licenses/by-nc-sa/3.0/deed.de][Namensnennung - Weitergabe unter gleichen Bedingungen 3.0 Unported]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][License Creative Commons
 Reconocimiento-NoComercial 3.0] Unported]")))
   (if (string= "" org-license-images-directory)
-      (insert "\n\n[[http://creativecommons.org/licenses/by-nc-sa/3.0/es/deed][file:http://i.creativecommons.org/l/by-nc-sa/3.0/80x15.png]]")
+      (insert "\n\n[[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][file:http://i.creativecommons.org/l/by-nc-sa/3.0/80x15.png]]")
     (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][file:" org-license-images-directory "/by-nc-sa/3.0/80x15.png]]"))))
 
 (defun org-license-cc-by-nc-nd (language)
   (interactive "MLanguage: " language)
   (cond ((equal language "es")
 	 (insert "* Licencia 
-Este documento está bajo una [[http://creativecommons.org/licenses/by-nc-nd/3.0/deed][Licencia Creative Commons
-Reconocimiento-NoComercial-SinObraDerivada 3.0 Unported]]"))
+Este documento está bajo una [[http://creativecommons.org/licenses/by-nc-nd/3.0/es/deed.es][Licencia Creative Commons Reconocimiento-NoComercial-SinObraDerivada 3.0]]"))
+	((equal language "de")
+	 (insert "* Lizenz
+Dieses Dokument ist unter ein [[http://creativecommons.org/licenses/by-nc-nd/3.0/de/deed.de][Namensnennung-NichtKommerziell-KeineBearbeitung 3.0 Deutschland]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][License Creative Commons
 Reconocimiento-NoComercial-SinObraDerivada 3.0] Unported]")))
   (if (string= "" org-license-images-directory)
       (insert "\n\n[[http://creativecommons.org/licenses/by-nc-nd/3.0/deed][file:http://i.creativecommons.org/l/by-nc-nd/3.0/80x15.png]]"))
     (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nc-nd/3.0/deed][file:" org-license-images-directory "/by-nc-nd/3.0/80x15.png]]")))
-
-
 
 (defun org-license-gfdl (language)
   (interactive "MLanguage: " language)
