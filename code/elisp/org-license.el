@@ -35,7 +35,6 @@
 ;;
 ;; You can download the images from http://www.davidam/img/licenses.tar.gz
 ;;
-;; TODO: extract localized url as variable and introduce it in image
 ;; TODO: create a function to test all combinations of licenses
 
 (defvar org-license-images-directory "")
@@ -57,6 +56,9 @@ Ce(tte) œuvre est mise à disposition selon les termes de la [[http://creativec
 	((equal language "eo")
 	 (insert "* Licenco
 Ĉi tiu verko estas disponebla laŭ la permesilo [[http://creativecommons.org/licenses/by/3.0/eo/deed.eo][Krea Komunaĵo Atribuite 3.0 Neadaptita]]"))
+	((equal language "eu")
+	 (insert "* Licenzua
+Testua [[http://creativecommons.org/licenses/by/3.0/es/deed.eu][Aitortu 3.0 Espainia]] lizentziari jarraituz erabil daiteke"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by/3.0/deed][Creative Commons Attribution 3.0]]")))
   (if (string= "" org-license-images-directory)
@@ -80,6 +82,9 @@ Ce(tte) œuvre est mise à disposition selon les termes de la [[http://creativec
 ;; 	((equal language "eo")
 ;; 	 (insert "* Licenco
 ;; Ĉi tiu verko estas disponebla laŭ la permesilo [[http://creativecommons.org/licenses/by-sa/3.0/eo/deed.eo][Krea Komunaĵo Atribuite 3.0 Neadaptita]]"))
+	((equal language "eu")
+	 (insert "* Licenzua
+Testua [[http://creativecommons.org/licenses/by-sa/3.0/es/deed.eu][Aitortu-PartekatuBerdin 3.0 Espainia]] lizentziari jarraituz erabil daiteke"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-sa/3.0/deed][License Creative Commons Attribution-ShareAlike Unported 3.0]]")))
   (if (string= "" org-license-images-directory)
@@ -103,6 +108,9 @@ Ce(tte) œuvre est mise à disposition selon les termes de la [[http://creativec
 ;; 	((equal language "eo")
 ;; 	 (insert "* Licenco
 ;; Ĉi tiu verko estas disponebla laŭ la permesilo [[http://creativecommons.org/licenses/by-nd/3.0/eo/deed.eo][Krea Komunaĵo Atribuite 3.0 Neadaptita]]"))
+	((equal language "eu")
+	 (insert "* Licenzua
+Testua [[http://creativecommons.org/licenses/by-sa/3.0/es/deed.eu][Aitortu-LanEratorririkGabe 3.0 Espainia]] lizentziari jarraituz erabil daiteke"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nd/3.0/deed][Creative Commons Reconocimiento Unported 3.0]]")))
   (if (string= "" org-license-images-directory)
@@ -124,6 +132,9 @@ Quest'opera e distribuita con Licenza [[http://creativecommons.org/licenses/by-n
 	((equal language "fr")
 	 (insert "* Licence
 Ce(tte) œuvre est mise à disposition selon les termes de la [[http://creativecommons.org/licenses/by-nc/3.0/fr/deed.fr][Licence Creative Commons Attribution - Pas d'Utilisation Commerciale 3.0 France]]"))
+	((equal language "eu")
+	 (insert "* Licenzua
+Testua [[http://creativecommons.org/licenses/by-nc/3.0/es/deed.eu][Aitortu-EzKomertziala 3.0 Espainia]] lizentziari jarraituz erabil daiteke"))
 	(t (insert "* License 
 This document is under a [[http://creativecommons.org/licenses/by-nc/3.0/deed][Creative Commons Attribution-NonCommercial 3.0 Unported]]")))
   (if (string= "" org-license-images-directory)
@@ -145,6 +156,9 @@ Quest'opera e distribuita con Licenza [[http://creativecommons.org/licenses/by-n
 	((equal language "fr")
 	 (insert "* Licence
 Ce(tte) œuvre est mise à disposition selon les termes de la [[http://creativecommons.org/licenses/by-nc-sa/3.0/fr/deed.fr][Licence Creative Commons Attribution - Pas d’Utilisation Commerciale - Partage dans les Mêmes Conditions 3.0 France]]"))
+	((equal language "eu")
+	 (insert "* Licenzua
+Testua [[http://creativecommons.org/licenses/by-nc-sa/3.0/es/deed.eu][Aitortu-EzKomertziala-PartekatuBerdin 3.0 Espainia]] lizentziari jarraituz erabil daiteke"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][License Creative Commons
 Reconocimiento-NoComercial 3.0] Unported]")))
@@ -153,10 +167,13 @@ Reconocimiento-NoComercial 3.0] Unported]")))
     (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][file:" org-license-images-directory "/by-nc-sa/3.0/80x15.png]]"))))
 
 (defun org-license-cc-by-nc-nd (language)
-  (interactive "MLanguage (en | es | de | it | fr ): " language)
+  (interactive "MLanguage (en | es | eu | de | it | fr ): " language)
   (cond ((equal language "es")
 	 (insert "* Licencia 
 Este documento está bajo una [[http://creativecommons.org/licenses/by-nc-nd/3.0/es/deed.es][Licencia Creative Commons Reconocimiento-NoComercial-SinObraDerivada 3.0]]"))
+	((equal language "eu")
+	 (insert "* Licenzua
+Testua [[http://creativecommons.org/licenses/by-nd/3.0/es/deed.eu][Aitortu-LanEratorririkGabe 3.0 Espainia]] lizentziari jarraituz erabil daiteke"))
 	((equal language "de")
 	 (insert "* Lizenz
 Dieses Werk bzw. Inhalt steht unter einer [[http://creativecommons.org/licenses/by-nc-nd/3.0/de/deed.de][Namensnennung-NichtKommerziell-KeineBearbeitung 3.0 Deutschland]]"))
@@ -182,15 +199,15 @@ Copyright (C)  2013 " user-full-name
     bajo los términos de la GNU Free Documentation License, Version 1.3
     o cualquier versión publicada por la Free Software Foundation;
     sin Secciones Invariantes y sin Textos de Portada o Contraportada.
-    Una copia de la licencia está incluida en [[https://www.gnu.org/copyleft/fdl.html][GNU Free Documentation License]]."))
+    Una copia de la licencia está incluida en [[https://www.gnu.org/copyleft/fdl.html][GNU Free Documentation License]].\n"))
 	(t (insert (concat "* License
 Copyright (C)  2013 " user-full-name
 "\n    Permission is granted to copy, distribute and/or modify this document
     under the terms of the GNU Free Documentation License, Version 1.3
     or any later version published by the Free Software Foundation;
     with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
-    A copy of the license is included in [[https://www.gnu.org/copyleft/fdl.html][GNU Free Documentation License]]."))))
+    A copy of the license is included in [[https://www.gnu.org/copyleft/fdl.html][GNU Free Documentation License]].\n"))))
   (if (string= "" org-license-images-directory)
-      (insert "\n\n[[https://www.gnu.org/copyleft/fdl.html][file:https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/GFDL_Logo.svg/200px-GFDL_Logo.svg.png]]")
-    (insert (concat "\n\n[[https://www.gnu.org/copyleft/fdl.html][file:" org-license-images-directory "/gfdl/gfdl.png]]"))))
+      (insert "\n[[https://www.gnu.org/copyleft/fdl.html][file:https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/GFDL_Logo.svg/200px-GFDL_Logo.svg.png]]\n")
+    (insert (concat "\n\n[[https://www.gnu.org/copyleft/fdl.html][file:" org-license-images-directory "/gfdl/gfdl.png]]\n"))))
 
