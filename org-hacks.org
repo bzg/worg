@@ -875,7 +875,7 @@ table as the starting point for each example:
 **** Move in row left
 
 1) place point at "10" in original table
-2) result of M-x my-org-table-move-column-in-row-left:
+2) result of M-x f-org-table-move-column-in-row-left:
    : | a | b  | c | d  |
    : | e | 10 | 9 | 11 |
    : | f | g  | h | i  |
@@ -883,7 +883,7 @@ table as the starting point for each example:
 **** Move in row right
 
 1) place point at "9" in original table
-2) result of M-x my-org-table-move-column-in-row-right:
+2) result of M-x f-org-table-move-column-in-row-right:
    : | a | b  | c | d  |
    : | e | 10 | 9 | 11 |
    : | f | g  | h | i  |
@@ -891,7 +891,7 @@ table as the starting point for each example:
 **** Rotate in row left
 
 1) place point at "9" in original table
-2) result of M-x my-org-table-rotate-column-in-row-left:
+2) result of M-x f-org-table-rotate-column-in-row-left:
    : | a | b  | c  | d |
    : | e | 10 | 11 | 9 |
    : | f | g  | h  | i |
@@ -899,7 +899,7 @@ table as the starting point for each example:
 **** Rotate in row right
 
 1) place point at "9" in original table
-2) result of M-x my-org-table-rotate-column-in-row-right:
+2) result of M-x f-org-table-rotate-column-in-row-right:
    : | a | b  | c | d  |
    : | e | 11 | 9 | 10 |
    : | f | g  | h | i  |
@@ -907,16 +907,16 @@ table as the starting point for each example:
 **** The functions
 
 #+BEGIN_SRC emacs-lisp
-(defun my-org-table-move-column-in-row-right ()
+(defun f-org-table-move-column-in-row-right ()
   "Move column to the right, limited to the current row."
   (interactive)
-  (my-org-table-move-column-in-row nil))
-(defun my-org-table-move-column-in-row-left ()
+  (f-org-table-move-column-in-row nil))
+(defun f-org-table-move-column-in-row-left ()
   "Move column to the left, limited to the current row."
   (interactive)
-  (my-org-table-move-column-in-row 'left))
+  (f-org-table-move-column-in-row 'left))
 
-(defun my-org-table-move-column-in-row (&optional left)
+(defun f-org-table-move-column-in-row (&optional left)
   "Move the current column to the right, limited to the current row.
 With arg LEFT, move to the left.  For repeated invocation the point follows
 the value and changes to the target colum.  Does not fix formulas."
@@ -940,16 +940,16 @@ the value and changes to the target colum.  Does not fix formulas."
     (org-table-goto-column colpos)
     (org-table-align)))
 
-(defun my-org-table-rotate-column-in-row-right ()
+(defun f-org-table-rotate-column-in-row-right ()
   "Rotate column to the right, limited to the current row."
   (interactive)
-  (my-org-table-rotate-column-in-row nil))
-(defun my-org-table-rotate-column-in-row-left ()
+  (f-org-table-rotate-column-in-row nil))
+(defun f-org-table-rotate-column-in-row-left ()
   "Rotate column to the left, limited to the current row."
   (interactive)
-  (my-org-table-rotate-column-in-row 'left))
+  (f-org-table-rotate-column-in-row 'left))
 
-(defun my-org-table-rotate-column-in-row (&optional left)
+(defun f-org-table-rotate-column-in-row (&optional left)
   "Rotate the current column to the right, limited to the current row.
 With arg LEFT, rotate to the left.  The boundaries of the rotation range are
 the current and the most right column for both directions.  For repeated
@@ -977,9 +977,9 @@ behavior with C-c C-c on one of the three snippets:
 : - move in row:
 :   #+begin_src emacs-lisp :results silent
 :     (org-defkey org-mode-map [(meta left)]
-:                 'my-org-table-move-column-in-row-left)
+:                 'f-org-table-move-column-in-row-left)
 :     (org-defkey org-mode-map [(meta right)]
-:                 'my-org-table-move-column-in-row-right)
+:                 'f-org-table-move-column-in-row-right)
 :     (org-defkey org-mode-map [(left)]  'org-table-previous-field)
 :     (org-defkey org-mode-map [(right)] 'org-table-next-field)
 :   #+end_src
@@ -987,9 +987,9 @@ behavior with C-c C-c on one of the three snippets:
 : - rotate in row:
 :   #+begin_src emacs-lisp :results silent
 :     (org-defkey org-mode-map [(meta left)]
-:                 'my-org-table-rotate-column-in-row-left)
+:                 'f-org-table-rotate-column-in-row-left)
 :     (org-defkey org-mode-map [(meta right)]
-:                 'my-org-table-rotate-column-in-row-right)
+:                 'f-org-table-rotate-column-in-row-right)
 :     (org-defkey org-mode-map [(left)]  'org-table-previous-field)
 :     (org-defkey org-mode-map [(right)] 'org-table-next-field)
 :   #+end_src
@@ -1019,6 +1019,25 @@ I consider this as only a hack for several reasons:
   - left-right, up-down
   - move, rotate with range to end, rotate with range to begin
   - whole column/row, only in-row/in-column
+
+*** Change the row sequence in one column only
+#+index: Table!Editing
+    :PROPERTIES:
+    :CUSTOM_ID: row-sequence-in-column
+    :END:
+
+-- Michael Brand
+
+`f-org-table-move-row-in-column-down' and
+`f-org-table-move-row-in-column-up' are not yet implemented. To me they seem
+more complicated, even with the help of Emacs Rectangles. I suggest to
+interactively or programmatically simply:
+1) Transpose the table, see
+   [[http://orgmode.org/worg/org-hacks.html#transpose-table][Org hacks]].
+2) Use `f-org-table-move-column-in-row-*', see
+   [[http://orgmode.org/worg/org-hacks.html#column-sequence-in-row][previous
+   section]].
+3) Transpose the table.
 
 ** Capture and Remember
 *** Customize the size of the frame for remember
