@@ -40,8 +40,11 @@
 (defvar org-license-images-directory "")
 
 (defun org-license-cc-by (language)
-  (interactive "MLanguage ( ca | de | en | es | eo | eu | fr | gl | it | pt ): " language)
-  (cond ((equal language "ca")
+  (interactive "MLanguage ( br | ca | de | en | es | eo | eu | fr | gl | it | pt ): " language)
+  (cond ((equal language "br")
+	 (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[https://creativecommons.org/licenses/by-sa/3.0/br/deed.pt_BR][Atribuição 3.0 Brasil]]"))
+	((equal language "ca")
 	 (insert "* Licència
 El text està disponible sota la [[http://creativecommons.org/licenses/by/3.0/es/deed.ca][Reconeixement 3.0 Espanya]]"))
 	((equal language "de")
@@ -75,8 +78,11 @@ This document is under a [[http://creativecommons.org/licenses/by/3.0/deed][Crea
     (insert (concat "\n\n[[http://creativecommons.org/licenses/by/3.0/deed][file:" org-license-images-directory "/by/3.0/80x15.png]]\n\n"))))
 
 (defun org-license-cc-by-sa (language)
-  (interactive "MLanguage ( ca | de | en | es | eu | fr | it ): " language)
-  (cond ((equal language "ca")
+  (interactive "MLanguage ( br | ca | de | en | es | eu | fr | it | pt ): " language)
+  (cond ((equal language "br")
+	 (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[https://creativecommons.org/licenses/by-sa/3.0/br/deed.pt_BR][Atribuição Compartil ha Igual 3.0 Brasil]]"))
+	((equal language "ca")
 	 (insert "* Licència
 El text està disponible sota la [[http://creativecommons.org/licenses/by-sa/3.0/es/deed.ca][Reconeixement-CompartirIgual 3.0 Espanya]]"))
 	((equal language "de")
@@ -107,8 +113,11 @@ This document is under a [[http://creativecommons.org/licenses/by-sa/3.0/deed][L
     (insert (concat "\n\n[[http://creativecommons.org/licenses/by-sa/3.0/deed][file:" org-license-images-directory "/by-sa/3.0/80x15.png]]\n\n"))))
 
 (defun org-license-cc-by-nd (language)
-  (interactive "MLanguage (ca | de | en | es | eu | fr | it ): " language)
-  (cond ((equal language "ca")
+  (interactive "MLanguage ( br | ca | de | en | es | eu | fr | it | pt ): " language)
+  (cond ((equal language "br")
+	 (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[https://creativecommons.org/licenses/by-nd/3.0/br/deed.pt_BR][Atribuição Compartil ha Igual 3.0 Brasil]]"))
+	((equal language "ca")
 	 (insert "* Licència
 El text està disponible sota la [[http://creativecommons.org/licenses/by-nd/3.0/es/deed.ca][Reconeixement-SenseObraDerivada 3.0 Espanya]]"))
 	((equal language "de")
@@ -140,8 +149,11 @@ This document is under a [[http://creativecommons.org/licenses/by-nd/3.0/deed][C
 ;;"))
 
 (defun org-license-cc-by-nc (language)
-  (interactive "MLanguage (ca | de | en | es | eu | fr | it ): " language)
-  (cond ((equal language "ca")
+  (interactive "MLanguage ( br | ca | de | en | es | eu | fr | it | pt ): " language)
+  (cond ((equal language "br")
+	 (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[https://creativecommons.org/licenses/by-nc/3.0/br/deed.pt_BR][Atribuição Não Comercial 3.0 Brasil]]"))
+	((equal language "ca")
 	 (insert "* Licència
 El text està disponible sota la [[http://creativecommons.org/licenses/by-nc/3.0/es/deed.ca][Reconeixement-NoComercial 3.0 Espanya]]"))
 	((equal language "de")
@@ -173,8 +185,11 @@ This document is under a [[http://creativecommons.org/licenses/by-nc/3.0/deed][C
 
 
 (defun org-license-cc-by-nc-sa (language)
-  (interactive "MLanguage (ca | de | en | es | eu | fr | gl | it ): " language)
-  (cond ((equal language "ca")
+  (interactive "MLanguage ( br | ca | de | en | es | eu | fr | gl | it | pt ): " language)
+  (cond ((equal language "br")
+	 (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[https://creativecommons.org/licenses/by-nc-sa/3.0/br/deed.pt_BR][Atribuição Não Comercial - Compartil ha Igual 3.0 Brasil]]"))
+	((equal language "ca")
 	 (insert "* Licència
 El text està disponible sota la [[http://creativecommons.org/licenses/by-nc-sa/3.0/es/deed.ca][Reconeixement-NoComercial 3.0 Espanya]]"))
 	((equal language "de")
@@ -206,8 +221,11 @@ Reconocimiento-NoComercial 3.0 Unported]]")))
     (insert (concat "\n\n[[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][file:" org-license-images-directory "/by-nc-sa/3.0/80x15.png]]\n\n"))))
 
 (defun org-license-cc-by-nc-nd (language)
-  (interactive "MLanguage (ca | de | en | es | eu | fr | gl | it ): " language)
-  (cond ((equal language "ca")
+  (interactive "MLanguage ( br | ca | de | en | es | eu | fr | gl | it | pt ): " language)
+  (cond ((equal language "br")
+	 (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[https://creativecommons.org/licenses/by-nc-nd/3.0/br/deed.pt_BR][Atribuição Não Comercial Sem Derivados 3.0 Brasil]]"))
+	((equal language "ca")
 	 (insert "* Licència
 El text està disponible sota la [[http://creativecommons.org/licenses/by-nc-nd/3.0/es/deed.ca][Reconeixement-NoComercial-SenseObraDerivada 3.0 Espanya]]"))
 	((equal language "de")
@@ -264,6 +282,7 @@ Copyright (C)  2013 " user-full-name
   (interactive)
   (org-license-gfdl "es")
   (org-license-gfdl "en")
+  (org-license-cc-by "br")
   (org-license-cc-by "ca")
   (org-license-cc-by "de")
   (org-license-cc-by "es")
@@ -273,6 +292,8 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by "fr")
   (org-license-cc-by "gl")
   (org-license-cc-by "it")
+  (org-license-cc-by "pt")
+  (org-license-cc-by-sa "br")
   (org-license-cc-by-sa "ca")
   (org-license-cc-by-sa "de")
   (org-license-cc-by-sa "es")
@@ -282,6 +303,8 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by-sa "fr")
   (org-license-cc-by-sa "gl")
   (org-license-cc-by-sa "it")
+  (org-license-cc-by-sa "pt")
+  (org-license-cc-by-nd "br")
   (org-license-cc-by-nd "ca")
   (org-license-cc-by-nd "de")
   (org-license-cc-by-nd "es")
@@ -291,6 +314,8 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by-nd "fr")
   (org-license-cc-by-nd "gl")
   (org-license-cc-by-nd "it")
+  (org-license-cc-by-nd "pt")
+  (org-license-cc-by-nc "br")
   (org-license-cc-by-nc "ca")
   (org-license-cc-by-nc "de")
   (org-license-cc-by-nc "es")
@@ -300,6 +325,8 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by-nc "fr")
   (org-license-cc-by-nc "gl")
   (org-license-cc-by-nc "it")
+  (org-license-cc-by-nc "pt")
+  (org-license-cc-by-nc-sa "br")
   (org-license-cc-by-nc-sa "ca")
   (org-license-cc-by-nc-sa "de")
   (org-license-cc-by-nc-sa "es")
@@ -309,6 +336,8 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by-nc-sa "fr")
   (org-license-cc-by-nc-sa "gl")
   (org-license-cc-by-nc-sa "it")
+  (org-license-cc-by-nc-sa "pt")
+  (org-license-cc-by-nc-nd "br")
   (org-license-cc-by-nc-nd "ca")
   (org-license-cc-by-nc-nd "de")
   (org-license-cc-by-nc-nd "es")
@@ -318,5 +347,6 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by-nc-nd "fr")
   (org-license-cc-by-nc-nd "gl")
   (org-license-cc-by-nc-nd "it")
+  (org-license-cc-by-nc-nd "pt")
 )
 
