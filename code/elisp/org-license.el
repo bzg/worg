@@ -40,7 +40,7 @@
 (defvar org-license-images-directory "")
 
 (defun org-license-cc-by (language)
-  (interactive "MLanguage ( ca | de | en | es | eo | eu | fr | gl | it ): " language)
+  (interactive "MLanguage ( ca | de | en | es | eo | eu | fr | gl | it | pt ): " language)
   (cond ((equal language "ca")
 	 (insert "* Licència
 El text està disponible sota la [[http://creativecommons.org/licenses/by/3.0/es/deed.ca][Reconeixement 3.0 Espanya]]"))
@@ -65,6 +65,9 @@ Todo o texto está dispoñible baixo a [[http://creativecommons.org/licenses/by/
 	 ((equal language "it")
 	  (insert "* Licenza
 Quest'opera e distribuita con Licenza [[http://creativecommons.org/licenses/by/3.0/it/deed.it][Licenza Creative Commons Attribuzione 3.0 Italia]]"))
+	 ((equal language "pt")
+	  (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[http://creativecommons.org/licenses/by/3.0/pt/deed.pt][Atribuição 3.0 Portugal]]"))
 	 (t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by/3.0/deed][Creative Commons Attribution 3.0]]")))
   (if (string= "" org-license-images-directory)
@@ -94,6 +97,9 @@ Todo o texto está dispoñible baixo a [[http://creativecommons.org/licenses/by-
 	((equal language "it")
 	 (insert "* Licenza
 Quest'opera e distribuita con Licenza [[http://creativecommons.org/licenses/by-sa/3.0/it/deed.it][Licenza Creative Commons Attribuzione - Condividi allo stesso modo 3.0 Italia]]"))
+	((equal language "pt")
+	  (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[http://creativecommons.org/licenses/by-sa/3.0/pt/deed.pt][Atribuição-CompartilhaIgual 3.0 Portugal]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-sa/3.0/deed][License Creative Commons Attribution-ShareAlike Unported 3.0]]")))
   (if (string= "" org-license-images-directory)
@@ -123,6 +129,9 @@ Todo o texto está dispoñible baixo a [[http://creativecommons.org/licenses/by-
 	((equal language "it")
 	 (insert "* Licenza
 Quest'opera e distribuita con Licenza [[http://creativecommons.org/licenses/by-nd/3.0/it/deed.it][Licenza Creative Commons Attribuzione - Non opere derivate 3.0 Italia]]"))
+	((equal language "pt")
+	  (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[http://creativecommons.org/licenses/by-nd/3.0/pt/deed.pt][Atribuição Sem Derivados 3.0 Portugal]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nd/3.0/deed][Creative Commons Reconocimiento Unported 3.0]]")))
   (if (string= "" org-license-images-directory)
@@ -153,6 +162,9 @@ Todo o texto está dispoñible baixo a [[http://creativecommons.org/licenses/by-
 	((equal language "it")
 	 (insert "* Licenza
 Quest'opera e distribuita con Licenza [[http://creativecommons.org/licenses/by-nc/3.0/it/deed.it][Licenza Creative Commons Attribuzione - Non commerciale 3.0 Italia]]"))
+	((equal language "pt")
+	  (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[http://creativecommons.org/licenses/by-nc/3.0/pt/deed.pt][Atribuição Não Comercial 3.0 Portugal]]"))
 	(t (insert "* License 
 This document is under a [[http://creativecommons.org/licenses/by-nc/3.0/deed][Creative Commons Attribution-NonCommercial 3.0 Unported]]")))
   (if (string= "" org-license-images-directory)
@@ -183,6 +195,9 @@ Todo o texto está dispoñible baixo a [[http://creativecommons.org/licenses/by-
 	((equal language "it")
 	 (insert "* Licenza
 Quest'opera e distribuita con Licenza [[http://creativecommons.org/licenses/by-nc-sa/3.0/it/deed.it][Licenza Creative Commons Attribuzione - Non opere derivate 3.0 Italia]]"))
+	((equal language "pt")
+	  (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[http://creativecommons.org/licenses/by-nc/3.0/pt/deed.pt][Atribuição NãoComercial Compartil ha Igual 3.0 Portugal]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nc-sa/3.0/deed][License Creative Commons
 Reconocimiento-NoComercial 3.0 Unported]]")))
@@ -213,6 +228,9 @@ Todo o texto está dispoñible baixo a [[http://creativecommons.org/licenses/by-
 	((equal language "it")
 	 (insert "* Licenza
 Quest'opera e distribuita con Licenza [[http://creativecommons.org/licenses/by-nc-nd/3.0/it/deed.it][Licenza Creative Commons Attribuzione - Non opere derivate 3.0 Italia]]"))
+	((equal language "pt")
+	  (insert "* Licença
+Este texto é disponibilizado nos termos da licença [[http://creativecommons.org/licenses/by-nc-nd/3.0/pt/deed.pt][Atribuição Não Comercial Sem Derivados 3.0 Portugal]]"))
 	(t (insert "* License
 This document is under a [[http://creativecommons.org/licenses/by-nc-nd/3.0/deed][License Creative Commons
 Reconocimiento-NoComercial-SinObraDerivada 3.0 Unported]]")))
