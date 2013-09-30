@@ -40,7 +40,7 @@
 (defvar org-license-images-directory "")
 
 (defun org-license-cc-by (language)
-  (interactive "MLanguage ( br | ca | de | en | es | eo | eu | fr | gl | it | pt ): " language)
+  (interactive "MLanguage ( br | ca | de | en | es | eo | eu | fi | fr | gl | it | pt ): " language)
   (cond ((equal language "br")
 	 (setq org-license-cc-url "https://creativecommons.org/licenses/by-sa/3.0/br/deed.pt_BR")
 	 (insert (concat "* Licença
@@ -65,6 +65,11 @@ Este documento está bajo una [[" org-license-cc-url "][Licencia Creative Common
 	  (setq org-license-cc-url "http://creativecommons.org/licenses/by/3.0/es/deed.eu")
 	  (insert (concat "* Licenzua
 Testua [[" org-license-cc-url "][Aitortu 3.0 Espainia]] lizentziari jarraituz erabil daiteke\n")))
+	 ((equal language "fi")
+	  (setq org-license-cc-url "http://creativecommons.org/licenses/by/1.0/fi/deed.fi")
+	  (insert (concat "* Lisenssi
+Teksti on saatavilla [[" org-license-cc-url "][Nimeä 1.0 Suomi]] lisenssillä\n")))
+;;Nimeä 1.0 Suomi
 	 ((equal language "fr")
 	  (setq org-license-cc-url "http://creativecommons.org/licenses/by/3.0/fr/deed.fr")
 	  (insert (concat "* Licence
@@ -88,7 +93,7 @@ This document is under a [[" org-license-cc-url "][Creative Commons Attribution 
     (insert (concat "\n[[" org-license-cc-url "][file:" org-license-images-directory "/by/3.0/80x15.png]]\n"))))
 
 (defun org-license-cc-by-sa (language)
-  (interactive "MLanguage ( br | ca | de | en | es | eu | fr | it | pt ): " language)
+  (interactive "MLanguage ( br | ca | de | en | es | eu | fi | fr | it | pt ): " language)
   (cond ((equal language "br")
 	 (setq org-license-cc-url "https://creativecommons.org/licenses/by-sa/3.0/br/deed.pt_BR")
 	 (concat (insert "* Licença
@@ -109,6 +114,10 @@ Este documento está bajo una [[" org-license-cc-url "][Licencia Creative Common
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-sa/3.0/es/deed.eu")
 	 (concat (insert "* Licenzua
 Testua [[" org-license-cc-url "][Aitortu-PartekatuBerdin 3.0 Espainia]] lizentziari jarraituz erabil daiteke\n")))
+	((equal language "fi")
+	  (setq org-license-cc-url "http://creativecommons.org/licenses/by-sa/1.0/fi/deed.fi")
+	  (insert (concat "* Lisenssi
+Teksti on saatavilla [[" org-license-cc-url "][Nimeä-JaaSamoin 1.0 Suomi]] lisenssillä\n")))
 	((equal language "fr")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-sa/3.0/fr/deed.fr")
 	 (concat (insert "* Licence
@@ -134,7 +143,7 @@ This document is under a [[" org-license-cc-url "][License Creative Commons Attr
     (insert (concat "\n[[" org-license-cc-url "][file:" org-license-images-directory "/by-sa/3.0/80x15.png]]\n"))))
 
 (defun org-license-cc-by-nd (language)
-  (interactive "MLanguage ( br | ca | de | en | es | eu | fr | it | pt ): " language)
+  (interactive "MLanguage ( br | ca | de | en | es | eu | fi | fr | it | pt ): " language)
   (cond ((equal language "br")
 	 (setq org-license-cc-url "https://creativecommons.org/licenses/by-nd/3.0/br/deed.pt_BR")
 	 (insert (concat "* Licença
@@ -155,6 +164,10 @@ Este documento está bajo una [[" org-license-cc-url "][Licencia Creative Common
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-sa/3.0/es/deed.eu")
 	 (insert (concat "* Licenzua
 Testua [[" org-license-cc-url "][Aitortu-LanEratorririkGabe 3.0 Espainia]] lizentziari jarraituz erabil daiteke\n")))
+	((equal language "fi")
+	  (setq org-license-cc-url "http://creativecommons.org/licenses/by-sa/1.0/fi/deed.fi")
+	  (insert (concat "* Lisenssi
+Teksti on saatavilla [[" org-license-cc-url "][Nimeä-JaaSamoin 1.0 Suomi]] lisenssillä\n")))
 	((equal language "fr")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nd/3.0/fr/deed.fr")
 	 (insert (concat "* Licence
@@ -181,7 +194,7 @@ This document is under a [[" org-license-cc-url "][Creative Commons Reconocimien
 
 
 (defun org-license-cc-by-nc (language)
-  (interactive "MLanguage ( br | ca | de | en | es | eu | fr | it | pt ): " language)
+  (interactive "MLanguage ( br | ca | de | en | es | eu | fi | fr | it | pt ): " language)
   (cond ((equal language "br")
 	 (setq org-license-cc-url "https://creativecommons.org/licenses/by-nc/3.0/br/deed.pt_BR")
 	 (insert (concat "* Licença
@@ -202,6 +215,10 @@ Este documento está bajo una [[" org-license-cc-url "][Licencia Creative Common
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc/3.0/es/deed.eu")
 	 (insert "* Licenzua
 Testua [[" org-license-cc-url "][Aitortu-EzKomertziala 3.0 Espainia]] lizentziari jarraituz erabil daiteke\n"))
+	((equal language "fi")
+	  (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc/1.0/fi/deed.fi")
+	  (insert (concat "* Lisenssi
+Teksti on saatavilla [[" org-license-cc-url "][Nimeä-Epäkaupallinen 1.0 Suomi]] lisenssillä\n")))
 	((equal language "fr")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc/3.0/fr/deed.fr")
 	 (insert (concat "* Licence
@@ -227,7 +244,7 @@ This document is under a [[" org-license-cc-url "][Creative Commons Attribution-
     (insert (concat "\n[[" org-license-cc-url "][file:" org-license-images-directory "/by-nc/3.0/80x15.png]]\n"))))
 
 (defun org-license-cc-by-nc-sa (language)
-  (interactive "MLanguage ( br | ca | de | en | es | eu | fr | gl | it | pt ): " language)
+  (interactive "MLanguage ( br | ca | de | en | es | eu | fi | fr | gl | it | pt ): " language)
   (cond ((equal language "br")
 	 (setq org-license-cc-url "https://creativecommons.org/licenses/by-nc-sa/3.0/br/deed.pt_BR")
 	 (insert (concat "* Licença
@@ -248,6 +265,10 @@ Este documento está bajo una [[" org-license-cc-url "][Licencia Creative Common
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-sa/3.0/es/deed.eu")
 	 (insert "* Licenzua
 Testua [[" org-license-cc-url "][Aitortu-EzKomertziala-PartekatuBerdin 3.0 Espainia]] lizentziari jarraituz erabil daiteke\n"))
+	((equal language "fi")
+	  (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-sa/1.0/fi/deed.fi")
+	  (insert (concat "* Lisenssi
+Teksti on saatavilla [[" org-license-cc-url "][Nimeä-Epäkaupallinen-JaaSamoin 1.0 Suomi]] lisenssillä\n")))
 	((equal language "fr")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-sa/3.0/fr/deed.fr")
 	 (insert (concat "* Licence
@@ -274,7 +295,7 @@ Reconocimiento-NoComercial 3.0 Unported]]\n"))))
     (insert (concat "\n[[" org-license-cc-url "][file:" org-license-images-directory "/by-nc-sa/3.0/80x15.png]]\n"))))
 
 (defun org-license-cc-by-nc-nd (language)
-  (interactive "MLanguage ( br | ca | de | en | es | eu | fr | gl | it | pt ): " language)
+  (interactive "MLanguage ( br | ca | de | en | es | eu | fi | fr | gl | it | pt ): " language)
   (cond ((equal language "br")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-nd/3.0/pt/deed.pt")
 	 (insert (concat "* Licença
@@ -295,6 +316,10 @@ Este documento está bajo una [[" org-license-cc-url "][Licencia Creative Common
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-nd/3.0/es/deed.eu")
 	 (insert (concat "* Licenzua
 Testua [[" org-license-cc-url "][Aitortu-LanEratorririkGabe 3.0 Espainia]] lizentziari jarraituz erabil daiteke\n")))
+	((equal language "fi")
+	  (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-nd/1.0/fi/deed.fi")
+	  (insert (concat "* Lisenssi
+Teksti on saatavilla [[" org-license-cc-url "][Nimeä-Ei muutoksia-Epäkaupallinen 1.0 Suomi]] lisenssillä\n")))
 	((equal language "fr")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-nd/3.0/fr/deed.fr")
 	 (insert (concat "* Licence
