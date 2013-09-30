@@ -76,12 +76,12 @@ Teksti on saatavilla [[" org-license-cc-url "][Nimeä 1.0 Suomi]] lisenssillä\n
 Ce(tte) œuvre est mise à disposition selon les termes de la [[" org-license-cc-url "][Licence Creative Commons Attribution 3.0 France]]\n")))
 	 ((equal language "gl")
 	  (setq org-license-cc-url "http://creativecommons.org/licenses/by/3.0/es/deed.gl")
-	  (insert "* Licenza
-Todo o texto está dispoñible baixo a [[http://creativecommons.org/licenses/by/3.0/es/deed.gl][licenza Creative Commons recoñecemento compartir igual 3.0]]\n"))
+	  (insert (concat "* Licenza
+Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creative Commons recoñecemento compartir igual 3.0]].\n")))
 	 ((equal language "it")
 	  (setq org-license-cc-url "http://creativecommons.org/licenses/by/3.0/it/deed.it")
-	  (insert "* Licenza
-Quest'opera e distribuita con Licenza [[http://creativecommons.org/licenses/by/3.0/it/deed.it][Licenza Creative Commons Attribuzione 3.0 Italia]]\n"))
+	  (insert (concat "* Licenza
+Quest'opera e distribuita con Licenza [[" org-license-cc-url "][Licenza Creative Commons Attribuzione 3.0 Italia]]\n")))
 	 ((equal language "pt")
 	  (setq org-license-cc-url "http://creativecommons.org/licenses/by/3.0/pt/deed.pt")
 	  (insert (concat "* Licença
@@ -125,7 +125,7 @@ Ce(tte) œuvre est mise à disposition selon les termes de la [[" org-license-cc
 	((equal language "gl")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-sa/3.0/es/deed.gl")
 	 (insert (concat "* Licenza
-Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creative Commons recoñecemento compartir igual 3.0]]\n.")))
+Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creative Commons recoñecemento compartir igual 3.0]].\n")))
 	((equal language "it")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-sa/3.0/it/deed.it")
 	 (insert (concat "* Licenza
@@ -175,7 +175,7 @@ Ce(tte) œuvre est mise à disposition selon les termes de la [[" org-license-cc
 	((equal language "gl")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nd/3.0/es/deed.gl")
 	 (insert (concat "* Licenza
-Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creative Commons recoñecemento compartir igual 3.0]]\n.")))
+Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creative Commons recoñecemento compartir igual 3.0]].\n")))
 	((equal language "it")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nd/3.0/it/deed.it")
 	 (insert (concat "* Licenza
@@ -226,7 +226,7 @@ Ce(tte) œuvre est mise à disposition selon les termes de la [[" org-license-cc
 	((equal language "gl")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc/3.0/es/deed.gl")
 	 (insert (concat "* Licenza
-Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creative Commons recoñecemento compartir igual 3.0]]\n.")))
+Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creative Commons recoñecemento compartir igual 3.0]].\n")))
 	((equal language "it")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc/3.0/it/deed.it")
 	 (insert (concat "* Licenza
@@ -238,7 +238,7 @@ Este texto é disponibilizado nos termos da licença [[" org-license-cc-url "][A
 	(t 
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc/3.0/deed")
 	 (insert (concat "* License 
-This document is under a [[" org-license-cc-url "][Creative Commons Attribution-NonCommercial 3.0 Unported]]"))))
+This document is under a [[" org-license-cc-url "][Creative Commons Attribution-NonCommercial 3.0 Unported]]\n"))))
   (if (string= "" org-license-images-directory)
       (insert (concat "\n[[" org-license-cc-url "][file:http://i.creativecommons.org/l/by-nc/3.0/80x15.png]]\n"))
     (insert (concat "\n[[" org-license-cc-url "][file:" org-license-images-directory "/by-nc/3.0/80x15.png]]\n"))))
@@ -276,7 +276,7 @@ Ce(tte) œuvre est mise à disposition selon les termes de la [[" org-license-cc
 	((equal language "gl")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-sa/3.0/es/deed.gl")
 	 (insert (concat "* Licenza
-Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creative Commons recoñecemento compartir igual 3.0]]\n.")))
+Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creative Commons recoñecemento compartir igual 3.0]].\n")))
 	((equal language "it")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-sa/3.0/it/deed.it")
 	 (insert (concat "* Licenza
@@ -327,7 +327,7 @@ Ce(tte) œuvre est mise à disposition selon les termes de la [[" org-license-cc
 	((equal language "gl")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-nd/3.0/es/deed.gl")
 	 (insert (concat "* Licenza
-Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creative Commons recoñecemento compartir igual 3.0]]\n.")))
+Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creative Commons recoñecemento compartir igual 3.0]].\n")))
 	((equal language "it")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-nd/3.0/it/deed.it")
 	 (insert (concat "* Licenza
@@ -378,6 +378,7 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by "en")
   (org-license-cc-by "eo")
   (org-license-cc-by "eu")
+  (org-license-cc-by "fi")
   (org-license-cc-by "fr")
   (org-license-cc-by "gl")
   (org-license-cc-by "it")
@@ -389,6 +390,7 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by-sa "en")
 ;;  (org-license-cc-by-sa "eo")
   (org-license-cc-by-sa "eu")
+  (org-license-cc-by-sa "fi")
   (org-license-cc-by-sa "fr")
   (org-license-cc-by-sa "gl")
   (org-license-cc-by-sa "it")
@@ -400,6 +402,7 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by-nd "en")
 ;;  (org-license-cc-by-nd "eo")
   (org-license-cc-by-nd "eu")
+  (org-license-cc-by-nd "fi")
   (org-license-cc-by-nd "fr")
   (org-license-cc-by-nd "gl")
   (org-license-cc-by-nd "it")
@@ -411,6 +414,7 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by-nc "en")
 ;;  (org-license-cc-by-nc "eo")
   (org-license-cc-by-nc "eu")
+  (org-license-cc-by-nc "fi")
   (org-license-cc-by-nc "fr")
   (org-license-cc-by-nc "gl")
   (org-license-cc-by-nc "it")
@@ -422,6 +426,7 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by-nc-sa "en")
 ;;  (org-license-cc-by-nc-sa "eo")
   (org-license-cc-by-nc-sa "eu")
+  (org-license-cc-by-nc-sa "fi")
   (org-license-cc-by-nc-sa "fr")
   (org-license-cc-by-nc-sa "gl")
   (org-license-cc-by-nc-sa "it")
@@ -433,6 +438,7 @@ Copyright (C)  2013 " user-full-name
   (org-license-cc-by-nc-nd "en")
 ;;  (org-license-cc-by-nc-nd "eo")
   (org-license-cc-by-nc-nd "eu")
+  (org-license-cc-by-nc-nd "fi")
   (org-license-cc-by-nc-nd "fr")
   (org-license-cc-by-nc-nd "gl")
   (org-license-cc-by-nc-nd "it")
