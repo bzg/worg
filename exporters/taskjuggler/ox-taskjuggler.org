@@ -93,10 +93,138 @@ To activate the Taskjuggler exporter in Org-mode, add this line to =~/.emacs=:
 
 #+end_example
 
-Either restart Emacs or issue =M-x load-file RET ~/.emacs RET= and we're ready to create
-our project managment =.org= file!
+In addition, here are a list of current variables you can customize:
 
-/This document is a work in progress; more details to come [shortly]!/
+- org-taskjuggler-default-global-header
+- org-taskjuggler-default-global-properties
+- org-taskjuggler-default-project-duration
+- org-taskjuggler-default-project-version
+- ~org-taskjuggler-default-reports~: sets a report file to use. This may be written in
+     text format (as in, the variable set to the full report text string), or (perhaps
+     easier) to a [[http://www.taskjuggler.org/tj3/manual/include.properties.html][=.tji= file containing the report definition]]. 
+- org-taskjuggler-extension
+- org-taskjuggler-final-hook
+- org-taskjuggler-keep-project-as-task
+- org-taskjuggler-process-command
+- org-taskjuggler-project-tag
+- org-taskjuggler-report-tag
+- org-taskjuggler-reports-directory
+- org-taskjuggler-resource-tag
+- ~org-taskjuggler-target-version~: should be set to the output of the command =tj3
+     --version=, e.g. =(setq org-taskjuggler-target-version 3.4)=
+- org-taskjuggler-valid-report-attributes
+- org-taskjuggler-valid-resource-attributes
+- org-taskjuggler-valid-task-attributes
+
+After customizing variables (at least if changing them in .emacs vs. the
+=customize-variable= interface, restart Emacs or issue =M-x load-file RET ~/.emacs RET=
+and we're ready to create our project managment =.org= file!
+
+* Familiarizing yourself with Taskjuggler
+
+Before diving in, it would be helpful to familiarize yourself with Taskjuggler if you
+aren't already.
+
+- Take a look at their [[http://www.taskjuggler.org/tj3/examples/Tutorial/tutorial.tjp][example file]] to get a sense for what a full Taskjuggler project
+  looks like in tj3 syntax. You may not understand it, but skimming the various commands
+  will give you an understanding for how the project is setup:
+  - Basic project information (start date, duration (=+4m=), date/time syntax, timezone, etc.)
+  - Accounts (not applicable if you aren't tracking finances)
+  - Available resources with wage, vacation, working-hours/day information, etc.
+  - Top level milestones
+  - Tasks, divided up by major project area
+  - A report definition
+
+In addition to the general format of a Taskjuggler file, understanding of the following is
+particularly helpful:
+- Task time definitions: [[http://www.taskjuggler.org/tj3/manual/start.html][start]], [[http://www.taskjuggler.org/tj3/manual/end.html][end]], [[http://www.taskjuggler.org/tj3/manual/depends.html][depends]], [[http://www.taskjuggler.org/tj3/manual/maxstart.html][maxstart]], and [[http://www.taskjuggler.org/tj3/manual/maxend.html][maxend]]
+- Task durations: [[http://www.taskjuggler.org/tj3/manual/effort.html][effort]], [[http://www.taskjuggler.org/tj3/manual/duration.html][duration]], [[http://www.taskjuggler.org/tj3/manual/length.html][length]]. For example, duration will use consecutive
+  days, length observes definitions of work weeks (so a length of =7d= with a 5-day work
+  week specified translates to =9d= calendar time. Effort requires at least one resource
+  defined and assigned to the task, and will use his/her available work time/day to figure
+  out how long the task will take. 
+
+  
+* Mapping of Taskjuggler syntax to Org-mode
+
+If you are familiar with Taskjuggler, it may be helpful to understand how Taskjuggler
+syntax is mapped to Org-mode. This is done via [[http://orgmode.org/manual/Property-syntax.html#Property-syntax][property drawers]], a simple key-value pair
+beneath the headline to which the properties apply.
+
+The bulk of the actual Taskjuggler project consists of tasks, which can be given various
+attributes. You can view the full list of allowed attributes in the
+[[http://www.taskjuggler.org/tj3/manual/task.html][task syntax specification]] in the tj3 manual. Thus, a task in Taskjuggler might look
+something like this:
+
+#+begin_example
+
+task entry_door "Install entry door" {
+  depends buy_door
+  effort 4h
+}  
+
+#+end_example
+
+In this example =task= defines the following text as a task for Taskjuggler
+compilation. The text =entry_door= is the task's ID, which must be unique within the
+current subtree. The test within quotes is the "plain language" name for the task you
+would like to appear in your report.
+
+This task has two attributes: =depends= and =effort=. In this example, installing the
+door, =entry_door=, depends on another task, =buy_door=, and the estimated effort required
+is 4 hours.
+
+In Org-mode, the equivalent task would be created like so:
+
+#+BEGIN_SRC org
+
+,* Install entry door
+  :PROPERTIES:
+  :task_id:  entry_door
+  :depends:  buy_door
+  :Effort:   4h
+  :END:
+
+#+END_SRC
+
+
+Some attributes may be set via two methods. For example, the start of a task can be
+defined by a =SCHEDULED= tag or a =:start:= property; the following are equivalent:
+
+#+BEGIN_SRC org
+
+,* Install entry door
+   SCHEDULED: <2013-07-15 Mon>
+
+,* Install entry door
+  :PROPERTIES:
+  :start:    2013-07-15
+  :END:
+
+#+END_SRC
+
+Similarly =DEADLINE= timestamps and the =:end:= property function the same way.
+
+* Example
+
+Let's begin with a simple example project consisting of a home renovation project. To
+start our file, we need a top level headline to tell Org-mode that this headline and
+everything inside it should be considered a taskjuggler project. Thus, we can create a new
+file, =home-renovation.org= and create a top level headline to contain our tasks:
+
+#+BEGIN_SRC org
+
+,* Home renovation 					:taskjuggler_project:
+
+#+END_SRC
+
+* References
+- [[http://www.taskjuggler.org/tj3/manual/toc.html][Taskjuggler (tj3) user manual]]
+- [[http://orgmode.org/manual/TaskJuggler-export.html][Taskjuggler in the Org-mode manual]]
+- [[http://orgmode.org/worg/org-tutorials/org-taskjuggler.html][Taskjuggler (v2) guide on Worg]] (though some functionality is out of date for using tj3,
+  most of the specifications still work, and the guide is excellent overall for getting a
+  feel for using Org-mode with Taskjuggler.
+
 
 * Footnotes
 

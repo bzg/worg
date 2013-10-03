@@ -1,0 +1,110 @@
+#+TITLE:     Synchronizing org files with Unison
+#+AUTHOR:     Alan Schmitt
+#+EMAIL:      alan.schmitt@polytechnique.org
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+#+OPTIONS:    H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:t skip:nil d:(HIDE) tags:not-in-toc
+
+* Introduction.
+
+This describes how to synchronize org files using the [[http://www.cis.upenn.edu/~bcpierce/unison/][Unison file synchronizer]],
+as well as how to configure it to use an external tool to merge conflicting
+edits.
+
+* Prerequisites.
+
+You should have Unison up and running. Binaries can be found [[http://www.cis.upenn.edu/~bcpierce/unison/download.html][here]] and the
+documentation is [[http://www.cis.upenn.edu/~bcpierce/unison/download/releases/stable/unison-manual.html][here]].
+
+* Synchronization.
+
+Unison is a file synchronizer, thus it may be used to synchronize org files. To
+configure Unison, one uses a /profile/ which states where the things to
+synchronize are as well as some options. Assuming I want to synchronize the
+files in ~/Users/schmitta/dir1~ and ~/Users/schmitta/dir2~, the profile would
+look like this
+
+#+BEGIN_EXAMPLE
+root = /Users/schmitta/dir1
+root = /Users/schmitta/dir2
+#+END_EXAMPLE
+
+In most cases Unison will be used with a remote machine. The local machine is
+called the /client/ and the remote one the /server/. For such remote
+synchronization, the ~unison~ binary must be installed in the server as
+well. The simplest way to connect to the machine is using ssh. One should check
+that unison can be found there by doing ~ssh user@remote unison -version~. If
+~unison~ cannot be found in the path, one may set the ~servercmd~ option as
+indicated in the next example.
+
+(Please see the [[http://www.cis.upenn.edu/~bcpierce/unison/download/releases/stable/unison-manual.html#roots][manual section on roots]] for further details.)
+
+#+BEGIN_EXAMPLE
+root = /Users/schmitta/dir1
+root = ssh://user@remote/relative/path/to/dir2
+
+servercmd = /usr/bin/unison
+#+END_EXAMPLE
+
+* Merging.
+
+As Unison works on the level of files, it will trigger a /conflict/ if both
+files have changed since the last synchronization. In that case one can only
+choose which file to keep, which is not satisfactory. Unison offers the
+possibility to use external tools to merge the files. There is an [[http://www.cis.upenn.edu/~bcpierce/unison/download/releases/stable/unison-manual.html#merge][extensive
+manual section]] regarding this, we'll just describe how to use emacs and ediff to
+do it.
+
+For better merging, we will ask unison to keep the last synchronized version of
+every org file on the client; this way we can use ediff with ancestor. These
+~currentbackup~ files may live alongside the synchronized files (with names of
+the form ~.bak.version.name~, which is configurable) or in a central location.
+
+Here is the modified configuration file.
+
+#+BEGIN_EXAMPLE
+root = /Users/schmitta/dir1
+root = ssh://user@remote/relative/path/to/dir2
+
+servercmd = /usr/bin/unison
+
+backupcurrent = Name *.org
+backuplocation = local
+maxbackups = 0
+
+merge = Name *.org -> emacsclient -c --eval '(ediff-merge-files-with-ancestor "CURRENT1" "CURRENT2" "CURRENTARCH" nil "NEW")'
+
+#+END_EXAMPLE
+
+The ~backupcurrent~ option tells unison to keep a backup of the last
+synchronized version of every file with an ~org~ extension. The location of the
+backup should be local (alongside the file). Finally, no other backup should be
+created.
+
+Next follows the merge command. For every org file in conflict, use the command
+that launches a new emacs frame calling the ediff with ancestor function. The
+~CURRENT1~, ~CURRENT2~, and ~CURRENTARCH~ strings are  replaced with the file
+from the first root, the file from the second root, and the last synchronized
+version. The ~NEW~ file is where Unison expects the file to be saved (which will
+be done by the ediff session).
+
+Thus, when an org file has been modified on both hosts, an ediff session will be
+launched in a new frame. Closing the frame will make Unison commit the merge (it
+waits until the command has finished).
+
+If one does not want to use backups, it's possible to use the simpler ediff
+(without ancestor) command as follows.
+
+#+BEGIN_EXAMPLE
+root = /Users/schmitta/dir1
+root = ssh://user@remote/relative/path/to/dir2
+
+servercmd = /usr/bin/unison
+
+merge = Name *.org -> emacsclient -c --eval '(ediff-merge-files "CURRENT1" "CURRENT2" nil "NEW")'
+
+#+END_EXAMPLE

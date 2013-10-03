@@ -1,0 +1,98 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org-babel-abc
+#+AUTHOR:     William Waites
+#+LANGUAGE:   en
+#+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Babel support for
+  <a href="http://abcnotation.com/">ABC Notation</a>
+  </p>
+  </div>
+#+end_html
+
+* Introduction
+
+An /Emacs Org Babel language/ - provided to allow [[http://abcnotation.com/][ABC Notation]] Music
+Score generation.
+
+* Usage
+  Generating output in various formats (PostScript, Encapsulated
+  PostScript, PDF, SVG) is done by naming the =:file= parameter
+  correctly and passing the command-line options to /abcm2ps/ using
+  the =:cmdline= parameter.
+
+* Examples
+** PDF generation
+:   #+begin_src abc :file congress.pdf
+:   T: The Congress
+:   R: reel
+:   M: 4/4
+:   L: 1/8
+:   K: Ador
+:   eAAG A2 (3Bcd | eaaf gedg | eA ~A2 eAcA | BdGB dG (3Bcd |
+:   eAAG A2 (3Bcd | eaaf gedB | ~c3 d (3efg ed | cdBc A2(3Bcd |
+:   eA ~A2 EAcd | eAaf gafg | ea ~a2 AecA | BG ~G2 B,DGB |
+:   AE ~E2 cA (3Bcd | eaaf gedB | ~c3 d eged | cdBc A2Bd |
+:   eaa^g ~a3 =g | eaaf gedg | (3efg dg (3efg dg | eaaf gabg |
+:   eaa^g aba=g | eaaf gedB | ~c3 d (3efg ed | cdBc A2(3Bcd |
+:   eaa^g  ~a3 =g | eaaf gedg | (3efg dg cgBg | eaaf gabg |
+:   eaa^g ab=ga | eaaf gedB | ~c3 d eged | cd (3efg agfg |
+:   #+end_src
+
+** SVG generation for inclusion in web pages
+:   #+begin_src abc :file john_maccol_kilbowie.svg :cmdline -g
+:   T: John MacColl's March To Kilbowie Cottage
+:   R: March
+:   M: 4/4
+:   L: 1/8
+:   K: Amix
+:   A>B|: c4 c>B A>c | e4 f>e c<e | A>B c<f e>c A>B | c<f e>c B2 A>B |
+:   c4 c>B A>c | e4 f>e c<e | f>e f>c e>A B<c |1 A2 A2 A2 A>B :|2 A2 A2 A2 f>=g ||
+:   a2-a>f e>c B<c | A>c e>=g f>c e>c | a>f e<f ~A2-A>B | c<f e>c B2 f>=g |
+:   a2-a>f e>c B<c | A>c e>=g f>c e>c | f<a c<e e>A B<c | A2 A2 A2 f>=g |
+:   a2-a>f e>c B<c | A>c e>=g f>c e>c | a>f e<f ~A2-A>B | c<f e>c B2 A>B |
+:   c4 c>B A>c | e4 f>e c<e | f>e f>c e>A B<c | A2 A2 A2 c>B |
+:  | : A>c B<c A>f e<f | a>e f<a e>f c<e | A>c B<c A>f e<f | a>f e>c B2 c>B |
+:   A>c B<c A>f e<f | a>e f<a e>f c<e | f>e f>c e>A B<c |1 A2 A2 A2 c>B :|2 A2 A2 A2 e>d ||
+:   c<e B>c A>c e>A | c<e a>e f>e c>d | e>c B<c A2 A>B | c<f e>c B2 e>d|
+:   c<e B>c A>c e>A | c<e a>e f>e c>d | e>f c<e e>A B<c | A2 A2 A2 e>d |
+:   c<e B>c A>c e>A | c<e a>e f>e c>d | e>c B<c A2 A>B | c<f e>c B2 A>B |
+:   c4 c>B A>c | e4 f>e c<e | f>e f>c e>A B<c | A2 A2 A4 |
+:   #+end_src
+
+* Compiling ABC Blocks
+In *basic-mode* the key sequence =C-c C-c= within an ABC block
+will compile the block. Exporting of all blocks and Org file contents
+is initialted with the sequence =C-c C-e= (standard Org-mode export keys).
+
+* Setup
+
+Simply add =abc= to your list of babel languages (in your init
+file):
+
+: (org-babel-do-load-languages
+:   'org-babel-load-languages
+:   '(
+:     (emacs-lisp . t)
+:     (sh t)
+:     (org t)
+:     (abc t)))  <==== This is the line to add
+
+* Requirements
+
+  - [[http://moinejf.free.fr/][abcm2ps]], a program that generates PostScript files from ABC Notation
+  - [[https://github.com/mkjunker/abc-mode][abc-mode]], an Emacs mode for editing ABC Notation
+  - [[http://ghostscript.com/doc/current/Ps2pdf.htm][ps2pdf]], a program to create PDF files from PostScript files
+
+* Issues
+
+Issues should be reported to the [[http://orgmode.org][Org-mode Mailing-list]].
+

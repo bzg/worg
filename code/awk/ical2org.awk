@@ -26,6 +26,10 @@
 #   the author is not responsible for any erroneous conversions nor the
 #   consequence of such conversions
 #
+# - does process RRULE recurring events, but ignores COUNT specifiers
+#
+# - does not process EXDATE to exclude date(s) from recurring events
+#
 # Eric S Fraga
 # 20100629 - initial version
 # 20100708 - added end times to timed events
@@ -41,7 +45,7 @@
 # repository...
 #
 # Updated by: Guido Van Hoecke <guivhoATgmailDOTcom>
-# Last change: 2013.05.17 19:34:27
+# Last change: 2013.05.26 14:28:33
 #----------------------------------------------------------------------------------
 
 BEGIN {
@@ -50,8 +54,7 @@ BEGIN {
     # maximum age in days for entries to be output: set this to -1 to
     # get all entries or to N>0 to only get enties that start or end
     # less than N days ago
-    max_age = -1;
-    max_age =  7;
+    max_age = 7;
 
     # set to 1 or 0 to yes or not output a header block with TITLE,
     # AUTHOR, EMAIL etc...
@@ -74,7 +77,6 @@ BEGIN {
     # an org file: it gives the unfortunate impression that an
     # expanded entry is still collapsed; value 1 will trim those
     # ... and value 0 doesn't touch them
-    trimdots = 0;
     trimdots = 1;
 
     # change this to your name
@@ -91,15 +93,8 @@ BEGIN {
     # we only need to preserve the original entry lines if either the
     # preamble or original options are true
     preserve = preamble || original
-
-    date = "";
-    entry = ""
     first = 1;      # true until an event has been found
-    headline = ""
-    icalentry = ""  # the full entry for inspection
-    id = ""
-    indescription = 0;
-    lasttimestamp = -1;
+    max_age_seconds = max_age*24*60*60
 
     if (header) {
         print "#+TITLE:       Main Google calendar entries"
@@ -128,23 +123,37 @@ BEGIN {
 }
 
 /^BEGIN:VEVENT/ {
-    # start of an event.
+    # start of an event: initialize global velues used for each event
+    date = "";
+    entry = ""
+    headline = ""
+    icalentry = ""  # the full entry for inspection
+    id = ""
+    indescription = 0;
+    insummary = 0
+    intfreq = "" # the interval and frequency for repeating org timestamps
+    lasttimestamp = -1;
+    location = ""
+    rrend = ""
+    status = ""
+    summary = ""
+
+    # if this is the first event, output the preamble from the iCal file
     if (first) {
-        # if this is the first event, output the preamble from the iCal file
         if(preamble) {
             print "* COMMENT original iCal preamble"
             print gensub("\r", "", "g", icalentry)
         }
         if (preserve)
             icalentry = ""
+        first = false;
     }
-    first = false;
 }
 
 # any line that starts at the left with a non-space character is a new data field
 
 /^[A-Z]/ {
-    # we ignore DTSTAMP lines as they change every time you download
+    # we do not copy DTSTAMP lines as they change every time you download
     # the iCal format file which leads to a change in the converted
     # org file as I output the original input.  This change, which is
     # really content free, makes a revision control system update the
@@ -165,8 +174,8 @@ BEGIN {
 
 /^DTEND;VALUE=DATE/ {
     time2 = datestring($2, 1);
-    if ( ! issameday ) # && substr(date,1,10) != substr(time2,1,10))
-        date = date ">--<" time2;
+    if ( issameday )
+        time2 = ""
 }
 
 # this represents a timed entry with date and time stamp YYYYMMDDTHHMMSS
@@ -181,12 +190,28 @@ BEGIN {
 
 /^DTEND[:;][^V]/ {
     time2 = datetimestring($2);
-    if (substr(date,1,10) == substr(time2,1,10))
+    if (substr(date,1,10) == substr(time2,1,10)) {
         # timespan within same date, use one date with a time range
         date = date "-" substr(time2, length(time2)-4)
-    else
-        # timespan extends over at least two dates
-        date = date ">--<" time2;
+        time2 = ""
+    }
+}
+
+# repetition rule
+
+/^RRULE:FREQ=(DAILY|WEEKLY|MONTHLY|YEARLY)/ {
+    # get the d, w, m or y value
+    freq = tolower(gensub(/.*FREQ=(.).*/, "\\1", $0))
+    # get the interval, and use 1 if none specified
+    interval =  $2 ~ /INTERVAL=/ ? gensub(/.*INTERVAL=([0-9]+);.*/, "\\1", $2) : 1
+    # get the enddate of the rule and use "" if none specified
+    rrend = $2 ~ /UNTIL=/ ? datestring(gensub(/.*UNTIL=([0-9]{8}).*/, "\\1", $2)) : ""
+    # build the repetitor vale as understood by org
+    intfreq =  " +" interval freq
+    # if the repetition is daily, and there is an end date, drop the repetitor
+    # as that is the default
+    if (intfreq == " +1d" && time2 =="" && rrend != "")
+        intfreq = ""
 }
 
 # The description will the contents of the entry in org-mode.
@@ -230,8 +255,16 @@ BEGIN {
 
 /^END:VEVENT/ {
     #output event
-    if(max_age<0 || ( lasttimestamp>0 && systime()<lasttimestamp+max_age*24*60*60 ) )
+    if(max_age<0 || ( lasttimestamp>0 && systime()<lasttimestamp+max_age_seconds ) )
     {
+        # build org timestamp
+        if (intfreq != "")
+            date = date intfreq
+        if (time2 != "")
+            date = date ">--<" time2
+        else if (rrend != "")
+            date = date ">--<" rrend
+
         # translate \n sequences to actual newlines and unprotect commas (,)
         if (condense)
             print "* <" date "> " gensub("^[ ]+", "", "", gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary)))
@@ -254,16 +287,9 @@ BEGIN {
         if (original)
             print "** COMMENT original iCal entry\n", gensub("\r", "", "g", icalentry)
     }
-    summary = ""
-    date = ""
-    location = ""
-    status = ""
-    entry = ""
-    icalentry = ""
-    indescription = 0
-    insummary = 0
-    lasttimestamp = -1
 }
+
+
 
 # funtion to convert an iCal time string 'yyyymmddThhmmss[Z]' into a
 # date time string as used by org, preferably including the short day
@@ -330,10 +356,9 @@ function datestring(input, isenddate)
 
         # register whether the end date is same as the start date
         issameday = lasttimestamp == stamp
-    } else {
-        # save timestamp of start date to allow for check of end date
-        lasttimestamp = stamp
     }
+    # save timestamp to allow for check of max_age
+    lasttimestamp = stamp
 
     if (stamp < 0) {
         # this date is before the epoch;
@@ -343,7 +368,7 @@ function datestring(input, isenddate)
         if (isenddate) {
             # we really should return the date before the input date, but strftime
             # does not work with negative timestamp values; so we can not use it
-            # to obtain the string representation of the carrected timestamp;
+            # to obtain the string representation of the corrected timestamp;
             # we have to return the date specified in the iCal input and we
             # add time 00:00 to clarify this
             return spec = gensub("([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9]).*[\r]*", "\\1-\\2-\\3 00:00", "g", input);
