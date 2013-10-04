@@ -6,7 +6,7 @@
 ;; Keywords: hypermedia, matching
 ;; Requires: org
 ;; Download: http://orgmode.org/worg/code/elisp/org-index.el
-;; Version: 2.3.1
+;; Version: 2.3.2
 
 ;; This file is not part of GNU Emacs.
 
@@ -66,13 +66,16 @@
 
 ;;; Change Log:
 
+;;   [2013-10-04 Fr] Version 2.3.2:
+;;   - Bugfix: index-table created by assistant is found after 
+;;     restart of emacs instead of invoking assistent again
+;;
 ;;   [2013-07-20 Sa] Version 2.3.0:
 ;;    - Renamed from "org-favtable" to "org-index"
 ;;    - Added an assistent to set up the index table
 ;;    - occur is now incremental, searching as you type
 ;;    - simplified the documentation and help-system
 ;;    - Saving keystrokes, as "+g237" is now valid input
-
 ;;    - Many bugfixes
 ;;
 ;;   [2013-02-28 Th] Version 2.2.0:
@@ -131,8 +134,7 @@
 (defcustom org-index-id nil 
   "Id of the Org-mode node, which contains the index table."
   :group 'org
-  :group 'org-index
-  :set (lambda (var val)))
+  :group 'org-index)
 
 
 (defvar org-index--text-to-yank nil)
@@ -156,7 +158,7 @@ References are essentially small numbers (e.g. \"R237\" or \"-455-\"),
 which are created by this package; they are well suited to be used
 outside of org. Links are normal org-mode links.
 
-This is version 2.3.1 of org-index.
+This is version 2.3.2 of org-index.
 
 The function `org-index' operates on a dedicated table, the index
 table, which lives within its own Org-mode node. The table and
