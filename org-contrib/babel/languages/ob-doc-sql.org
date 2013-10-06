@@ -1,0 +1,150 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      SQL Source Code Blocks in Org Mode
+#+AUTHOR:     Thomas S. Dye
+#+EMAIL:      tsd@tsdye.com
+#+LANGUAGE:   en
+#+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="http://en.wikipedia.org/wiki/SQL">SQL</a>
+  </p>
+  </div>
+#+end_html
+``
+* Template Checklist [10/12]                                       :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [ ] Describe [[Result%20Types][Result Types]]
+  - [ ] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+
+* Introduction
+Structured Query Language, or SQL, is an ANSI and ISO standard
+programming language for managing data held in a relational database
+management system (RDBMS). SQL implementations vary in their adherence
+to the standard and how they attempt to extend the language, so that
+it is often not possible to port code across implementations without
+modification. Consequently, Org mode supports several SQL
+implementations.
+
+An alternative is sqlite.
+
+* Requirements and Setup
+In order to evaluate an SQL source code block you must have a properly
+installed RDBMS. Org mode supports the following implementations:
+
+  - dbi :: the DBI shell command-line tool, [[http://search.cpan.org/~tlowery/DBI-Shell-11.93/dbish.PL][dbish]], used by Perl programmers;
+
+  - monetdb :: a [[http://www.monetdb.org/][column storage technology]] designed to work with very
+               large databases uses an executable names =mclient=;
+
+  - msosql :: the [[http://technet.microsoft.com/en-us/library/aa214012(v%3Dsql.80).aspx][Microsoft osql Utility]] that uses ODBC to connect to
+              an RDBMS server;
+
+  - mysql :: [[http://www.mysql.com/][MySQL]] advertises itself as the world's most popular open
+             source database--the executable expected by Org mode is =mysql=;
+
+  - postgresql ::  [[http://www.enterprisedb.com/products-services-training/products/postgresql-overview&ls%3DSEM?gclid%3DCMqe0bP7groCFQeCQgodTSwAcQ][PostgreSQL]] advertises itself as the world's most
+                   advanced open source database--the executable
+                   expected by Org mode is =psql=.
+
+Emacs has shipped with[[http://www.emacswiki.org/emacs/SqlMode][ SQL mode]] since version 21.4.
+
+You'll need to activate SQL source code blocks in =.emacs=.
+
+#+begin_example
+;; active Babel languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((sql . t)))
+;; add additional languages with '((language . t)))
+#+end_example
+
+* Org Mode Features for SQL Source Code Blocks
+** Header Arguments
+
+The =:colnames= header argument defaults to "yes".
+
+There are several SQL-specific header arguments:
+
+  - :engine :: one of "dbi", "monetdb", "msosql", "mysql", "postgresql";
+  - :cmdline :: extra command line arguments for the RDBMS executable;
+  - :dbhost :: the host name;
+  - :dbuser :: the user name;
+  - :dbpassword :: the user's password;
+  - :database :: the database name;
+ 
+** Sessions
+There is currently no support for sessions.
+
+* Examples of Use
+
+** Use SQL Source Code Blocks to Prepare Query Strings
+
+Support for SQL is also available in several languages. Typically in
+these languages, an SQL query is represented by a string. One use of
+SQL source code blocks is for editing SQL queries for use in those
+languages. The advantage is that editing can be done with SQL mode,
+instead of as a generic string in the mode of the parent language.
+
+The source code block, =quote=blks=, was posted to the Org mode
+mailing list by Charles Berry. The =blk= argument takes a string of
+comma separated source code block names, and the optional =sep=
+argument is a separator used in the output when there is more than one
+source code block.
+
+#+name: quote-blks
+#+BEGIN_SRC emacs-lisp :var blk="abc" :var sep="\"\n\""
+    (save-excursion
+      (replace-regexp-in-string "\"\"" ""
+       (mapconcat
+        (lambda (x) 
+          (org-babel-goto-named-src-block x)
+          (format "%S" (cadr  (org-babel-get-src-block-info  t))))
+        (split-string blk "," t)
+        sep)
+       t t))
+#+END_SRC
+
+The query is written in a named SQL source code block:
+
+#+name: my-query
+#+begin_src sql
+  SELECT * FROM mytable
+  WHERE id > 500
+#+end_src
+
+Then, the query can be used in a source code block for a language,
+such as R, with SQL support:
+
+#+begin_src R :colnames yes :noweb yes
+  library(RMySQL)
+  con <- dbConnect(MySQL(), user="user", password="pwd", dbname="dbname", host="host")
+  q <- 
+  <<quote-blks("my-query")>>
+  c <- dbGetQuery(con, q)
+  dbDisconnect(con)
+  c
+#+end_src
+
+Note that the noweb reference must be on its own line.
