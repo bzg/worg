@@ -40,56 +40,6 @@ processor that actually runs.
 http://thread.gmane.org/gmane.emacs.orgmode/75555
    
 
-** DELEGATED Colored tags generate an error when C-x C-w ing the agenda	   :#24:
-:LOGBOOK:
-- State "DELEGATED"  from "TODO"       [2013-09-25 Mi 09:58] \\
-  Sebastien Vauban
-:END:
-*** Reported by Sebastien Vauban on <2013-09-11 Mi>
-#+begin_example
-Hello,
-
-If you have colors for tags:
-
---8<---------------cut here---------------start------------->8---
- ;; faces for specific tags
- (setq org-tag-faces
-       '(("home" .
-          (:slant italic
-           :foreground "#5C88D3" :background "#BBDDFF"))
-         ("work" .
-          (:slant italic
-           :foreground "#5F7C43" :background "#C1D996"))))
---8<---------------cut here---------------end--------------->8---
-
-you can't export the agenda views anymore; they all generate the following
-error:
-
-#+begin_src text
- Debugger entered--Lisp error: (wrong-type-argument listp "#5C88D3")
-   ps-face-attributes("#5C88D3")
-   ps-face-attribute-list((:slant italic :foreground "#5C88D3" :background "#BBDDFF"))
-   ps-plot-with-face(459 463 (:slant italic :foreground "#5C88D3" :background "#BBDDFF"))
-   ps-generate-postscript-with-faces1(1 6850)
-   ps-generate-postscript-with-faces(1 6850)
-   ps-generate(#<buffer Agenda View> 1 6850 ps-generate-postscript-with-faces)
-   ps-spool-with-faces(1 6850 nil)
-   ps-print-with-faces(1 6850 "~/agenda.ps")
-   ps-print-buffer-with-faces("~/agenda.ps")
-   ...
-   command-execute(org-agenda-write)
-#+end_src
-
-Best regards,
- Seb
-
--- 
-Sebastien Vauban
-
-#+end_example
-
-
-
 ** TODO Duplicate agenda entries when enabling archives-mode		   :#23:
 http://thread.gmane.org/gmane.emacs.orgmode/76282
 
@@ -257,4 +207,63 @@ http://thread.gmane.org/gmane.emacs.orgmode/74213
 :ARCHIVE_TODO: RESOLVED
 :END:
 http://thread.gmane.org/gmane.emacs.orgmode/73597
+
+*** RESOLVED Colored tags generate an error when C-x C-w ing the agenda  :#24:
+:LOGBOOK:
+- State "RESOLVED"   from "DELEGATED"  [2013-09-27 Fr 09:24] \\
+  This is a bug in ps-print, hopefully Sebastien will report it to Emacs
+- State "DELEGATED"  from "TODO"       [2013-09-25 Mi 09:58] \\
+  Sebastien Vauban
+:END:
+:PROPERTIES:
+:ARCHIVE_TIME: 2013-09-27 Fr 09:24
+:ARCHIVE_FILE: ~/lib/emacs/work/Worg/org-issues.org
+:ARCHIVE_OLPATH: Open issues
+:ARCHIVE_CATEGORY: worg
+:ARCHIVE_TODO: RESOLVED
+:END:
+**** Reported by Sebastien Vauban on <2013-09-11 Mi>
+#+begin_example
+Hello,
+
+If you have colors for tags:
+
+--8<---------------cut here---------------start------------->8---
+ ;; faces for specific tags
+ (setq org-tag-faces
+       '(("home" .
+          (:slant italic
+           :foreground "#5C88D3" :background "#BBDDFF"))
+         ("work" .
+          (:slant italic
+           :foreground "#5F7C43" :background "#C1D996"))))
+--8<---------------cut here---------------end--------------->8---
+
+you can't export the agenda views anymore; they all generate the following
+error:
+
+#+begin_src text
+ Debugger entered--Lisp error: (wrong-type-argument listp "#5C88D3")
+   ps-face-attributes("#5C88D3")
+   ps-face-attribute-list((:slant italic :foreground "#5C88D3" :background "#BBDDFF"))
+   ps-plot-with-face(459 463 (:slant italic :foreground "#5C88D3" :background "#BBDDFF"))
+   ps-generate-postscript-with-faces1(1 6850)
+   ps-generate-postscript-with-faces(1 6850)
+   ps-generate(#<buffer Agenda View> 1 6850 ps-generate-postscript-with-faces)
+   ps-spool-with-faces(1 6850 nil)
+   ps-print-with-faces(1 6850 "~/agenda.ps")
+   ps-print-buffer-with-faces("~/agenda.ps")
+   ...
+   command-execute(org-agenda-write)
+#+end_src
+
+Best regards,
+ Seb
+
+-- 
+Sebastien Vauban
+
+#+end_example
+
+
 

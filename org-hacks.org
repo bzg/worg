@@ -571,6 +571,10 @@ equivalent function after =C-c ^ f=, use this one instead:
 *** Adding Licenses to org files
   You can add pretty standard licenses, such as creative commons or gfdl to org articles using [[file:code/elisp/org-license.el][org-license.el]].
 ** Org Table
+   :PROPERTIES:
+   :CUSTOM_ID: Tables
+   :END:
+
 *** Align all tables in a file
 
 Andrew Young provided this function in [[http://thread.gmane.org/gmane.emacs.orgmode/58974/focus%3D58976][this thread]]:
@@ -855,131 +859,183 @@ which is the Emacs Calc implementation of the equation
 
 where /i/ is the current time and /a/ is the length of the preceding period.
 
-*** Change the column sequence in one row only
+*** Rearrange one or more field within the same row or column
 #+index: Table!Editing
     :PROPERTIES:
-    :CUSTOM_ID: column-sequence-in-row
+    :CUSTOM_ID: field-same-row-or-column
     :END:
 
 -- Michael Brand
 
-The functions below can be used to change the column sequence in one row
-only, without affecting the other rows above and below like with M-<left> or
-M-<right> (org-table-move-column). Please see the docstring of the functions
-for more explanations. Below is one example per function, with this original
-table as the starting point for each example:
+**** Rearrange the column sequence in one row only
+#+index: Table!Editing
+     :PROPERTIES:
+     :CUSTOM_ID: column-sequence-in-row
+     :END:
+
+The functions below can be used to change the column sequence in one
+row only, without affecting the other rows above and below like with
+=M-<left>= or =M-<right>= (=org-table-move-column=).  See also the
+docstring of the functions for more explanations.  The original table
+that serves as the starting point for the examples:
+
 : | a | b | c  | d  |
 : | e | 9 | 10 | 11 |
 : | f | g | h  | i  |
 
-**** Move in row left
+***** Move current field in row
+****** Left
 
 1) place point at "10" in original table
-2) result of M-x my-org-table-move-column-in-row-left:
-   : | a | b  | c | d  |
-   : | e | 10 | 9 | 11 |
-   : | f | g  | h | i  |
+2) =M-x f-org-table-move-field-in-row-left=
+3) point is at moved "10"
 
-**** Move in row right
+: | a | b  | c | d  |
+: | e | 10 | 9 | 11 |
+: | f | g  | h | i  |
 
-1) place point at "9" in original table
-2) result of M-x my-org-table-move-column-in-row-right:
-   : | a | b  | c | d  |
-   : | e | 10 | 9 | 11 |
-   : | f | g  | h | i  |
-
-**** Rotate in row left
+****** Right
 
 1) place point at "9" in original table
-2) result of M-x my-org-table-rotate-column-in-row-left:
-   : | a | b  | c  | d |
-   : | e | 10 | 11 | 9 |
-   : | f | g  | h  | i |
+2) =M-x f-org-table-move-field-in-row-right=
+3) point is at moved "9"
 
-**** Rotate in row right
+: | a | b  | c | d  |
+: | e | 10 | 9 | 11 |
+: | f | g  | h | i  |
+
+***** Rotate rest of row (range from current field to end of row)
+****** Left
+
+1) place point at @2$2 in original table
+2) =M-x f-org-table-rotate-rest-of-row-left=
+3) point is still at @2$2
+
+: | a | b  | c  | d |
+: | e | 10 | 11 | 9 |
+: | f | g  | h  | i |
+
+****** Right
+
+1) place point at @2$2 in original table
+2) =M-x f-org-table-rotate-rest-of-row-right=
+3) point is still at @2$2
+
+: | a | b  | c | d  |
+: | e | 11 | 9 | 10 |
+: | f | g  | h | i  |
+
+***** Open field in row (table size grows)
+
+This is just for completeness, interactively the same as typing =|
+S-TAB=.
+
+1) place point at @2$2 in original table
+2) =M-x f-org-table-open-field-in-row-grow=
+3) point is still at @2$2
+
+: | a | b | c | d  |    |
+: | e |   | 9 | 10 | 11 |
+: | f | g | h | i  |    |
+
+**** Rearrange the row sequence in one column only
+#+index: Table!Editing
+     :PROPERTIES:
+     :CUSTOM_ID: row-sequence-in-column
+     :END:
+
+The functions below can be used to change the column sequence in one
+column only, without affecting the other columns left and right like
+with =M-<up>= or =M-<down>= (=org-table-move-row=).  See also the
+docstring of the functions for more explanations.  The original table
+that serves as the starting point for the examples:
+
+: | a |  b | c |
+: |---+----+---|
+: | d |  9 | e |
+: | f | 10 | g |
+: |---+----+---|
+: | h | 11 | i |
+
+***** Move current field in column
+****** Up
+
+1) place point at "10" in original table
+2) =M-x f-org-table-move-field-in-column-up=
+3) point is at moved "10"
+
+: | a |  b | c |
+: |---+----+---|
+: | d | 10 | e |
+: | f |  9 | g |
+: |---+----+---|
+: | h | 11 | i |
+
+****** Down
 
 1) place point at "9" in original table
-2) result of M-x my-org-table-rotate-column-in-row-right:
-   : | a | b  | c | d  |
-   : | e | 11 | 9 | 10 |
-   : | f | g  | h | i  |
+2) =M-x f-org-table-move-field-in-column-down=
+3) point is at moved "9"
 
-**** The functions
+: | a |  b | c |
+: |---+----+---|
+: | d | 10 | e |
+: | f |  9 | g |
+: |---+----+---|
+: | h | 11 | i |
 
-#+BEGIN_SRC emacs-lisp
-(defun my-org-table-move-column-in-row-right ()
-  "Move column to the right, limited to the current row."
-  (interactive)
-  (my-org-table-move-column-in-row nil))
-(defun my-org-table-move-column-in-row-left ()
-  "Move column to the left, limited to the current row."
-  (interactive)
-  (my-org-table-move-column-in-row 'left))
+***** Rotate rest of column (range from current field to end of column)
+****** Up
 
-(defun my-org-table-move-column-in-row (&optional left)
-  "Move the current column to the right, limited to the current row.
-With arg LEFT, move to the left.  For repeated invocation the point follows
-the value and changes to the target colum.  Does not fix formulas."
-  ;; derived from `org-table-move-column'
-  (interactive "P")
-  (if (not (org-at-table-p))
-      (error "Not at a table"))
-  (org-table-find-dataline)
-  (org-table-check-inside-data-field)
-  (let* ((col (org-table-current-column))
-         (col1 (if left (1- col) col))
-         ;; Current cursor position
-         (colpos (if left (1- col) (1+ col))))
-    (if (and left (= col 1))
-        (error "Cannot move column further left"))
-    (if (and (not left) (looking-at "[^|\n]*|[^|\n]*$"))
-        (error "Cannot move column further right"))
-    (org-table-goto-column col1 t)
-    (and (looking-at "|\\([^|\n]+\\)|\\([^|\n]+\\)|")
-         (replace-match "|\\2|\\1|"))
-    (org-table-goto-column colpos)
-    (org-table-align)))
+1) place point at @2$2 in original table
+2) =M-x f-org-table-rotate-rest-of-column-up=
+3) point is still at @2$2
 
-(defun my-org-table-rotate-column-in-row-right ()
-  "Rotate column to the right, limited to the current row."
-  (interactive)
-  (my-org-table-rotate-column-in-row nil))
-(defun my-org-table-rotate-column-in-row-left ()
-  "Rotate column to the left, limited to the current row."
-  (interactive)
-  (my-org-table-rotate-column-in-row 'left))
+: | a |  b | c |
+: |---+----+---|
+: | d | 10 | e |
+: | f | 11 | g |
+: |---+----+---|
+: | h |  9 | i |
 
-(defun my-org-table-rotate-column-in-row (&optional left)
-  "Rotate the current column to the right, limited to the current row.
-With arg LEFT, rotate to the left.  The boundaries of the rotation range are
-the current and the most right column for both directions.  For repeated
-invocation the point stays on the current column.  Does not fix formulas."
-  ;; derived from `org-table-move-column'
-  (interactive "P")
-  (if (not (org-at-table-p))
-      (error "Not at a table"))
-  (org-table-find-dataline)
-  (org-table-check-inside-data-field)
-  (let ((col (org-table-current-column)))
-    (org-table-goto-column col t)
-    (and (looking-at (if left
-                         "|\\([^|\n]+\\)|\\([^\n]+\\)|$"
-                       "|\\([^\n]+\\)|\\([^|\n]+\\)|$"))
-         (replace-match "|\\2|\\1|"))
-    (org-table-goto-column col)
-    (org-table-align)))
-#+END_SRC
+****** Down
 
-**** Key bindings
+1) place point at @2$2 in original table
+2) =M-x f-org-table-rotate-rest-of-column-down=
+3) point is still at @2$2
 
-As hack I have this in an Org buffer to change temporarily to the desired
-behavior with C-c C-c on one of the three snippets:
+: | a |  b | c |
+: |---+----+---|
+: | d | 11 | e |
+: | f |  9 | g |
+: |---+----+---|
+: | h | 10 | i |
+
+***** Open field in column (table size grows)
+
+1) place point at @2$2 in original table
+2) =M-x f-org-table-open-field-in-column-grow=
+3) point is still at @2$2
+
+: | a |  b | c |
+: |---+----+---|
+: | d |    | e |
+: | f |  9 | g |
+: |---+----+---|
+: | h | 10 | i |
+: |   | 11 |   |
+
+**** Key bindings for some of the functions
+
+I have this in an Org buffer to change temporarily to the desired
+behavior with =C-c C-c= on one of the three code snippets:
+
 : - move in row:
 :   #+begin_src emacs-lisp :results silent
 :     (org-defkey org-mode-map [(meta left)]
-:                 'my-org-table-move-column-in-row-left)
+:                 'f-org-table-move-field-in-row-left)
 :     (org-defkey org-mode-map [(meta right)]
-:                 'my-org-table-move-column-in-row-right)
+:                 'f-org-table-move-field-in-row-right)
 :     (org-defkey org-mode-map [(left)]  'org-table-previous-field)
 :     (org-defkey org-mode-map [(right)] 'org-table-next-field)
 :   #+end_src
@@ -987,9 +1043,9 @@ behavior with C-c C-c on one of the three snippets:
 : - rotate in row:
 :   #+begin_src emacs-lisp :results silent
 :     (org-defkey org-mode-map [(meta left)]
-:                 'my-org-table-rotate-column-in-row-left)
+:                 'f-org-table-rotate-rest-of-row-left)
 :     (org-defkey org-mode-map [(meta right)]
-:                 'my-org-table-rotate-column-in-row-right)
+:                 'f-org-table-rotate-rest-of-row-right)
 :     (org-defkey org-mode-map [(left)]  'org-table-previous-field)
 :     (org-defkey org-mode-map [(right)] 'org-table-next-field)
 :   #+end_src
@@ -1002,23 +1058,139 @@ behavior with C-c C-c on one of the three snippets:
 :     (org-defkey org-mode-map [(right)] 'forward-char)
 :   #+end_src
 
-**** reasons why this is not put into the Org core
+**** Implementation
+
+The functions
+
+: f-org-table-move-field-in-column-up
+: f-org-table-move-field-in-column-down
+: f-org-table-rotate-rest-of-column-up
+: f-org-table-rotate-rest-of-column-down
+
+are not yet implemented.  They could be done similar to
+=f-org-table-open-field-in-column-grow=.  A workaround without keeping
+horizontal separator lines is to interactively or programmatically
+simply:
+
+1) Transpose the table, see
+   [[http://orgmode.org/worg/org-hacks.html#transpose-table][Org hacks]].
+2) Use =f-org-table-*-column-in-row-*=, see
+   [[http://orgmode.org/worg/org-hacks.html#column-sequence-in-row][previous
+   section]].
+3) Transpose the table.
+
+The other functions:
+
+#+BEGIN_SRC emacs-lisp
+  (defun f-org-table-move-field-in-row-left ()
+    "Move current field in row to the left."
+    (interactive)
+    (f-org-table-move-field-in-row 'left))
+  (defun f-org-table-move-field-in-row-right ()
+    "Move current field in row to the right."
+    (interactive)
+    (f-org-table-move-field-in-row nil))
+
+  (defun f-org-table-move-field-in-row (&optional left)
+    "Move current field in row to the right.
+  With arg LEFT, move to the left.  For repeated invocation the
+  point follows the moved field.  Does not fix formulas."
+    ;; Derived from `org-table-move-column'
+    (interactive "P")
+    (if (not (org-at-table-p))
+        (error "Not at a table"))
+    (org-table-find-dataline)
+    (org-table-check-inside-data-field)
+    (let* ((col (org-table-current-column))
+           (col1 (if left (1- col) col))
+           ;; Current cursor position
+           (colpos (if left (1- col) (1+ col))))
+      (if (and left (= col 1))
+          (error "Cannot move column further left"))
+      (if (and (not left) (looking-at "[^|\n]*|[^|\n]*$"))
+          (error "Cannot move column further right"))
+      (org-table-goto-column col1 t)
+      (and (looking-at "|\\([^|\n]+\\)|\\([^|\n]+\\)|")
+           (replace-match "|\\2|\\1|"))
+      (org-table-goto-column colpos)
+      (org-table-align)))
+
+  (defun f-org-table-rotate-rest-of-row-left ()
+    "Rotate rest of row to the left."
+    (interactive)
+    (f-org-table-rotate-rest-of-row 'left))
+  (defun f-org-table-rotate-rest-of-row-right ()
+    "Rotate rest of row to the right."
+    (interactive)
+    (f-org-table-rotate-rest-of-row nil))
+
+  (defun f-org-table-rotate-rest-of-row (&optional left)
+    "Rotate rest of row to the right.
+  With arg LEFT, rotate to the left.  For both directions the
+  boundaries of the rotation range are the current field and the
+  field at the end of the row.  For repeated invocation the point
+  stays on the original current field.  Does not fix formulas."
+    ;; Derived from `org-table-move-column'
+    (interactive "P")
+    (if (not (org-at-table-p))
+        (error "Not at a table"))
+    (org-table-find-dataline)
+    (org-table-check-inside-data-field)
+    (let ((col (org-table-current-column)))
+      (org-table-goto-column col t)
+      (and (looking-at (if left
+                           "|\\([^|\n]+\\)|\\([^\n]+\\)|$"
+                         "|\\([^\n]+\\)|\\([^|\n]+\\)|$"))
+           (replace-match "|\\2|\\1|"))
+      (org-table-goto-column col)
+      (org-table-align)))
+
+  (defun f-org-table-open-field-in-row-grow ()
+    "Open field in row, move fields to the right by growing table."
+    (interactive)
+    (insert "|")
+    (backward-char)
+    (org-table-align))
+
+  (defun f-org-table-open-field-in-column-grow ()
+    "Open field in column, move all fields downwards by growing table."
+    (interactive)
+    (let ((col (org-table-current-column))
+          (p   (point)))
+      ;; Cut all fields downwards in same column
+      (goto-char (org-table-end))
+      (forward-line -1)
+      (while (org-at-table-hline-p) (forward-line -1))
+      (org-table-goto-column col)
+      (org-table-cut-region p (point))
+      ;; Paste at one field below
+      (goto-char p)
+      (forward-line)
+      (org-table-goto-column col)
+      (org-table-paste-rectangle)
+      (goto-char p)
+      (org-table-align)))
+#+END_SRC
+
+**** Reasons why this is not put into the Org core
 
 I consider this as only a hack for several reasons:
-- Generalization:  The existing org-table-move-column function could be
-  enhanced with additional optional parameters to incorporate these
+
+- Generalization: The existing function =org-table-move-column= could
+  be enhanced with additional optional parameters to incorporate these
   functionalities and could be used as the only function for better
   maintainability.  Now it's only a copy/paste hack of several similar
   functions with simple modifications.
-- Bindings:  Should be convenient for repetition like M-<right>.  What
-  should be bound where, what has to be left unbound?
+- Bindings: Should be convenient for repetition like =M-<right>=.
+  What should be bound where, what has to be left unbound?
 - Does not fix formulas.  Could be resolved for field formulas but
-  most probably not for column or range formulas and this can lead
-  to confusion.  AFAIK all "official" table manipulations fix formulas.
-- Completeness:  Not all variations and combinations are covered yet
+  most probably not for column or range formulas and this can lead to
+  confusion.  AFAIK all table manipulations found in Org core fix
+  formulas.
+- Completeness: Not all variations and combinations are covered yet
+  - move, rotate with range to end, rotate with range to begin, rotate
+    all
   - left-right, up-down
-  - move, rotate with range to end, rotate with range to begin
-  - whole column/row, only in-row/in-column
 
 ** Capture and Remember
 *** Customize the size of the frame for remember
