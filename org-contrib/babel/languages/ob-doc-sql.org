@@ -19,7 +19,7 @@
   </p>
   </div>
 #+end_html
-``
+
 * Template Checklist [10/12]                                       :noexport:
   - [X] Revise #+TITLE:
   - [X] Indicate #+AUTHOR:
@@ -107,11 +107,28 @@ SQL source code blocks is for editing SQL queries for use in those
 languages. The advantage is that editing can be done with SQL mode,
 instead of as a generic string in the mode of the parent language.
 
-The source code block, =quote=blks=, was posted to the Org mode
+The source code block, =quote-blks=, was posted to the Org mode
 mailing list by Charles Berry. The =blk= argument takes a string of
 comma separated source code block names, and the optional =sep=
 argument is a separator used in the output when there is more than one
 source code block.
+
+
+#+name: quote-blks
+#+header: :exports none
+#+BEGIN_SRC emacs-lisp :var blk="abc" :var sep="\"\n\""
+    (save-excursion
+      (replace-regexp-in-string "\"\"" ""
+       (mapconcat
+        (lambda (x) 
+          (org-babel-goto-named-src-block x)
+          (format "%S" (cadr  (org-babel-get-src-block-info  t))))
+        (split-string blk "," t)
+        sep)
+       t t))
+#+END_SRC
+
+#+begin_example
 
 #+name: quote-blks
 #+BEGIN_SRC emacs-lisp :var blk="abc" :var sep="\"\n\""
@@ -126,7 +143,11 @@ source code block.
        t t))
 #+END_SRC
 
+#+end_example
+
 The query is written in a named SQL source code block:
+
+#+begin_example
 
 #+name: my-query
 #+begin_src sql
@@ -134,8 +155,20 @@ The query is written in a named SQL source code block:
   WHERE id > 500
 #+end_src
 
+#+end_example
+
+#+name: my-query
+#+header: :exports none
+#+begin_src sql
+  SELECT * FROM mytable
+  WHERE id > 500
+#+end_src
+
 Then, the query can be used in a source code block for a language,
-such as R, with SQL support:
+such as R, with SQL support.  The following code block, with its noweb
+reference to =quote-blkes= and the SQL source code block name
+
+#+begin_example
 
 #+begin_src R :colnames yes :noweb yes
   library(RMySQL)
@@ -147,4 +180,36 @@ such as R, with SQL support:
   c
 #+end_src
 
+#+end_example
+
+expands to this:
+
+#+header: :exports code
+#+begin_src R :colnames yes :noweb yes
+  library(RMySQL)
+  con <- dbConnect(MySQL(), user="user", password="pwd", dbname="dbname", host="host")
+  q <- 
+  <<quote-blks("my-query")>>
+  c <- dbGetQuery(con, q)
+  dbDisconnect(con)
+  c
+#+end_src
+
 Note that the noweb reference must be on its own line.
+
+Alternatively, the query could be set up to run on its own:
+
+#+begin_example
+
+#+name: my-query
+#+header: :engine mysql
+#+header: :dbhost host
+#+header: :dbuser user
+#+header: :dbpassword pwd
+#+header: :database dbname
+#+begin_src sql
+  SELECT * FROM mytable
+  WHERE id > 500
+#+end_src
+
+#+end_example
