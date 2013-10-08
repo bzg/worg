@@ -84,8 +84,8 @@ Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creativ
 Quest'opera e distribuita con Licenza [[" org-license-cc-url "][Licenza Creative Commons Attribuzione 3.0 Italia]]\n")))
 	 ((equal language "jp")
 	  (setq org-license-cc-url "http://creativecommons.org/licenses/by/2.1/jp/deed.en")
-	  (insert (concat "* License
-This document is under a [[" org-license-cc-url "][Creative Commons Attribution 2.1 Japan]]\n")))
+	  (insert (concat "* ライセンス
+この文書は [[" org-license-cc-url "][Creative Commons Attribution 2.1 ]] ライセンスの下である\n")))
 	 ((equal language "nl")
 	  (setq org-license-cc-url "http://creativecommons.org/licenses/by/3.0/nl/deed.nl")
 	  (insert (concat "* Licentie
@@ -140,8 +140,8 @@ Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creativ
 Quest'opera e distribuita con Licenza [[" org-license-cc-url "][Licenza Creative Commons Attribuzione - Condividi allo stesso modo 3.0 Italia]]\n")))
 	((equal language "jp")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-sa/2.1/jp/deed.en")
-	 (insert (concat "* License
-This document is under a [[" org-license-cc-url "][Creative Commons Attribution 2.1 Japan]]\n")))
+	 (insert (concat "* ライセンス
+この文書は、[[" org-license-cc-url "][Creative Commons Attribution 2.1 ]] ライセンスの下である\n")))
 	((equal language "nl")
 	  (setq org-license-cc-url "http://creativecommons.org/licenses/by-sa/3.0/nl/deed.nl")
 	  (insert (concat "* Licentie
@@ -198,8 +198,8 @@ Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creativ
 Quest'opera e distribuita con Licenza [[" org-license-cc-url "][Licenza Creative Commons Attribuzione - Non opere derivate 3.0 Italia]]\n")))
 	((equal language "jp")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nd/2.1/jp/deed.en")
-	 (insert (concat "* License
-This document is under a [[" org-license-cc-url "][Creative Commons No Derivatives 2.1 Japan]]\n")))
+	 (insert (concat "* ライセンス
+この文書は、[[" org-license-cc-url "][Creative Commons No Derivatives 2.1]] ライセンスの下である\n")))
 	((equal language "nl")
 	  (setq org-license-cc-url "http://creativecommons.org/licenses/by-nd/3.0/nl/deed.nl")
 	  (insert (concat "* Licentie
@@ -257,8 +257,8 @@ Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creativ
 Quest'opera e distribuita con Licenza [[" org-license-cc-url "][Licenza Creative Commons Attribuzione - Non commerciale 3.0 Italia]]\n")))
 	((equal language "jp")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc/2.1/jp/deed.en")
-	 (insert (concat "* License
-This document is under a [[" org-license-cc-url "][Creative Commons Attribution-NonCommercial 2.1 Japan]]\n")))
+	 (insert (concat "* ライセンス
+この文書は、[[" org-license-cc-url "][Creative Commons Attribution-NonCommercial 2.1 ]] ライセンスの下である\n")))
 	((equal language "nl")
 	  (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc/3.0/nl/deed.nl")
 	  (insert (concat "* Licentie
@@ -315,8 +315,8 @@ Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creativ
 Quest'opera e distribuita con Licenza [[" org-license-cc-url "][Licenza Creative Commons Attribuzione - Non opere derivate 3.0 Italia]]\n")))
 	((equal language "jp")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-sa/2.1/jp/deed.en")
-	 (insert (concat "* License
-This document is under a [[" org-license-cc-url "][License Creative Commons Attribution Non Commercial Share Alike 2.1 Japan]]\n")))
+	 (insert (concat "* ライセンス
+この文書は、[[" org-license-cc-url "][License Creative Commons Attribution Non Commercial Share Alike 2.1 ]] ライセンスの下である\n")))
 	((equal language "nl")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-sa/3.0/nl/deed.nl")
 	 (insert (concat "* Licentie
@@ -373,8 +373,8 @@ Todo o texto está dispoñible baixo a [[" org-license-cc-url "][licenza Creativ
 Quest'opera e distribuita con Licenza [[" org-license-cc-url "][Licenza Creative Commons Attribuzione - Non opere derivate 3.0 Italia]]\n")))
 	((equal language "jp")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-nd/2.1/jp/deed.en")
-	 (insert (concat "* License
-This document is under a [[" org-license-cc-url "][License Creative Commons Attribution Non Commercial - No Derivs 2.1 Japan]]\n")))
+	 (insert (concat "* ライセンス
+この文書は [[" org-license-cc-url "][License Creative Commons Attribution Non Commercial - No Derivs 2.1]] ライセンスの下である\n")))
 	((equal language "nl")
 	 (setq org-license-cc-url "http://creativecommons.org/licenses/by-nc-nd/3.0/nl/deed.nl")
 	 (insert (concat "* Licentie
