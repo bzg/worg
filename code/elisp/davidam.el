@@ -21,13 +21,19 @@
 (defun davidam-org-envolve-src(msg)
   "Envolve source between org tags"
   (interactive "sChoose your programming language: " msg)
-  (if (equal nil msg)
+  (if (string= "" msg)
       (setq msg "lisp"))
-  (goto-char (point))
-  (insert "#+END_SRC")
-  (goto-char (mark))
-  (insert "#+BEGIN_SRC " msg "\n"))
-
+  (if (> (point) (mark))
+      (progn 
+	(goto-char (point))
+	(insert "#+END_SRC")
+	(goto-char (mark))
+	(insert "#+BEGIN_SRC " msg "\n"))
+    (progn
+      (goto-char (point))
+      (insert "#+BEGIN_SRC " msg "\n")
+      (goto-char (mark))
+      (insert "#+END_SRC"))))
 
 (defun davidam-org-src(msg)
   "Insert org source tags"
