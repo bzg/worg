@@ -915,13 +915,13 @@ Unless specified otherwise, case is not significant.
    There are seven possible patterns for timestamps:
    
    #+BEGIN_EXAMPLE
-   <%%(SEXP)>                                     (diary)
-   <DATE TIME REPEATER>                         (active)
-   [DATE TIME REPEATER]                         (inactive)
-   <DATE TIME REPEATER>--<DATE TIME REPEATER>   (active range)
-   <DATE TIME-TIME REPEATER>                    (active range)
-   [DATE TIME REPEATER]--[DATE TIME REPEATER]   (inactive range)
-   [DATE TIME-TIME REPEATER]                    (inactive range)
+   <%%(SEXP)>                                   (diary)
+   <DATE TIME REPEATER-OR-DELAY>                                  (active)
+   [DATE TIME REPEATER-OR-DELAY]                                  (inactive)
+   <DATE TIME REPEATER-OR-DELAY>--<DATE TIME REPEATER-OR-DELAY>   (active range)
+   <DATE TIME-TIME REPEATER-OR-DELAY>                             (active range)
+   [DATE TIME REPEATER-OR-DELAY]--[DATE TIME REPEATER-OR-DELAY]   (inactive range)
+   [DATE TIME-TIME REPEATER-OR-DELAY]                             (inactive range)
    #+END_EXAMPLE
 
    SEXP can contain any character excepted ~>~ and ~\n~.
@@ -938,14 +938,15 @@ Unless specified otherwise, case is not significant.
    TIME follows the pattern =H:MM~.  H can be one or two digit long
    and can start with 0.
 
-   REPEATER follows the patter:
+   REPEATER-OR-DELAY follows the pattern:
 
    #+BEGIN_EXAMPLE
    MARK VALUE UNIT
    #+END_EXAMPLE
 
    MARK is ~+~ (cumulate type), ~++~ (catch-up type) or ~.+~ (restart
-   type).
+   type) for a repeater, and ~-~ (all type) or ~--~ (first type) for
+   warning delays.
 
    VALUE is a number.
 
@@ -953,6 +954,9 @@ Unless specified otherwise, case is not significant.
    (month), ~y~ (year).
 
    MARK, VALUE and UNIT are not separated by whitespace characters.
+
+   There can be two REPEATER-OR-DELAY in the timestamp: one as
+   a repeater and one as a warning delay.
 
 ** Text Markup
    :PROPERTIES:
