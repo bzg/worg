@@ -53,7 +53,9 @@ Version 1.3 o posteriores versiones publicadas por la Free Software
 Foundation; sin secciones invariantes, con texto al inicio de la
 cubierta de portada 'A GNU Manual', y con el texto de contraportada
 como se muestra abajo (a). Una copia de esta licencia est@'a incluida
-en la secci@'on titulada 'GNU Free Documentation License''.
+en la secci@'on titulada 'GNU Free Documentation License'' en el
+manual de Org completo que est@'a distribuido junto con la
+gu@'{@dotless{i}}a compacta.
 
 (a) El texto de contraportada de la FSF es: ``Tu tienes la libertad
 para copiar y modificar este manual de GNU''.
@@ -249,8 +251,7 @@ Exportando
 * Exportaci@'on ASCII/Latin-1/UTF-8::  Exporta a ficheros con codificaci@'on
 * HTML export::              Exportando a HTML
 * Exportar @LaTeX{} y PDF::  Exportando a @LaTeX{}, y procesando a PDF
-* Exportar DocBook::         Exportando a DocBook
-* Exportar iCalendar::       
+* Exportar iCalendar::       Exportando a iCalendar
 
 Miscel@'anea
 
@@ -276,10 +277,11 @@ Miscel@'anea
 @node Prefacio, Instalaci@'on, Introducci@'on, Introducci@'on
 @section Prefacio
 
-Org es un modo para guardar notas, manteniendo listas TODO (por
-hacer), y haciendo planes de proyectos con un r@'apido y efectivo
-sistema de texto plano. Es adem@'as un sistema de publicaci@'on y
-autor@'{@dotless{i}}a.
+Org es un modo para guardar notas, manteniendo listas TODO, y haciendo
+planificaci@'on de proyectos con un r@'apido y efectivo sistema de
+texto plano. Es tambi@'en un sistema de publicaci@'on y
+autor@'{@dotless{i}}a, y soporta trabajar con c@'odigo fuente para
+programaci@'on literal e investigaci@'on reproducible.
 
 @i{Este documento es un resumen derivado del
 @uref{http://orgmode.org/index.html#sec-4-1, manual completo de
@@ -307,34 +309,32 @@ l@'{@dotless{i}}nea al archivo @file{.emacs}:
 (setq load-path (cons "~/path/to/orgdir/contrib/lisp" load-path))
 @end smallexample
 
-@noindent For speed you should byte-compile the Lisp files with the shell
-comando:
+@noindent If you have been using git or a tar ball to get Org, you need to
+ejecuta el siguiente comando para generar informaci@'on de
+autocarga. Comando:
 
 @smallexample
-make
-@end smallexample
+crear autocargas\n@end smallexample
 
 @node Activaci@'on, Realimentaci@'on, Instalaci@'on, Introducci@'on
 @section Activaci@'on
 
 A@~nada las siguientes l@'{@dotless{i}}neas a su archivo
-@file{.emacs}. Las @'ultimas tres l@'{@dotless{i}}neas definen las
+@file{.emacs}. Las @'ultimas cuatro l@'{@dotless{i}}neas definen las
 claves @emph{global} de algunos comandos ---por favor, elija claves
 apropiadas por s@'{@dotless{i}} mismo.
 
 @smalllisp
-;; Las siguientes l@'{@dotless{i}}neas son siempre necesarias.
-;; Elija sus propias claves.
-(add-to-list 'auto-mode-alist '(".org'" . org-mode))
-(add-hook 'org-mode-hook 'turn-on-font-lock)
-;; no es necesario cuando global-font-lock-mode est@'a activado
+;; Las siguiente l@'{@dotless{i}}neas son siempre necesarias. Elige
+;; tus propias claves
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
 @end smalllisp
 
-Con esta configuraci@'on, todos los archivos con extensi@'on
-@samp{.org} ser@'an tratados en modo Org. 
+Los ficheros con extensi@'on @samp{.org} llevar@'an el modo Org
+autom@'aticamente.
 
 @node Realimentaci@'on, , Activaci@'on, Introducci@'on
 @section Realimentaci@'on
@@ -347,7 +347,7 @@ enviar informes de error, lea el manual principal.
 @node Estructura del documento, Tablas, Introducci@'on, Top
 @chapter Estructura del documento
 
-Org est@'a basado en el modo Outline y suministra flexibles comandos
+Org est@'a basado en el modo Outline y suministra comandos flexibles
 para editar la estructura de un documento.
 
 @menu
@@ -364,7 +364,7 @@ para editar la estructura de un documento.
 @node Outlines, Cabeceras, Estructura del documento, Estructura del documento
 @section Outlines
 
-Org est@'a implementado en lo alto del modo outline. Los
+Org est@'a implementado aprovechando el modo outline. Los
 @'{@dotless{i}}tems de contenido (outlines) permiten a un documento
 organizarse en una estructura jer@'arquica, lo cual (al menos para
 m@'{@dotless{i}}) es la mejor forma para representar notas y
@@ -937,19 +937,17 @@ Cap@'{@dotless{i}}tulo 4 del manual}}
 @node Elementos TODO, Etiquetas, Hiperenlaces, Top
 @chapter Elementos TODO
 
-El modo Org no mantiene listas TODO (tareas por hacer) como documentos
-separados@footnote{De acuerdo, puede crear un documento que contenga
-solo largas listas de @'{@dotless{i}}tems TODO, pero esto no se
-requiere.}. En vez de eso, los @'{@dotless{i}}tems TODO son una parte
-integral de los ficheros de notas, porque ¡los @'{@dotless{i}}tems TODO
-normalmente aparecen mientras tomas notas!. De este modo, la
-informaci@'on no est@'a duplicada, y el contexto entero desde el que
-el @'{@dotless{i}}tem TODO emergi@'o est@'a siempre presente.
+Org mode no requiere listas TODO que est@'en en documentos
+separados. En vez de eso, los @'{@dotless{i}}tems TODO son parte de
+ficheros de notas, porque los @'{@dotless{i}}tems TODO normalmente
+llegan mientras se toman notas. Con Org mode, simplemente marca
+cualquier entrada en un @'arbol siendo un @'{@dotless{i}}tem TODO. De
+este modo, la informaci@'on no est@'a duplicada, y los
+@'{@dotless{i}}tems TODO permanecen en el contexto que
+emerg@'{@dotless{i}}an.
 
-De acuerdo, esta t@'ecnica sirve para gestionar @'{@dotless{i}}tems
-TODO esparcidos a trav@'es de tu fichero de notas. Org mode compensa
-esto proveyendo m@'etodos para darte una visi@'on de alto nivel de
-todas las cosas que tu tienes que hacer.
+Org mode provee m@'etodos para darte un visi@'on de todas las cosas
+que tienes que haces, recoge desde muchos ficheros.
 
 @menu
 * Usando los estados TODO::  Poniendo y cambiado estados
@@ -979,9 +977,7 @@ Los comandos m@'as importantes para trabajar con entradas TODO son:
 Rotar el estado TODO del @'{@dotless{i}}tem actual
 
 @smallexample
-,-> (no marcado) -> TODO -> DONE --.
-'----------------------------------'
-@end smallexample
+(no marcado) -> TODO -> DONE -> (no marcado)\n@end smallexample
 
 La misma rotaci@'on puede tambi@'en ser hecha ``de manera remota''
 desde los buffers de agenda y l@'{@dotless{i}}nea de tiempo con la
@@ -1011,8 +1007,7 @@ activar cambios de etiqueta. Ver el docstring de la opci@'on
 @section Flujos de trabajo multi-estado
 
 Se pueden usar palabras reservadas TODO para indicar diferentes
-estados @emph{secuenciales} en el proceso de trabajo con respecto a un
-@'{@dotless{i}}tem, por ejemplo:
+estados @emph{secuenciales} en el proceso de trabajo:
 
 @smalllisp
 (setq org-todo-keywords
@@ -1024,21 +1019,12 @@ La barra vertical separa las palabras reservadas TODO (estados que
 @emph{no necesitan m@'as acci@'on}). Si no se proporciona la barra
 separadora, el @'ultimo estado es usado como estado DONE. Con esta
 configuraci@'on, el comando @kbd{C-c C-t} rotar@'a una entrada desde
-TODO a FEEDBACK, despu@'es a VERIFY y finalmente a DONE y DELEGATED.  
-
-Algunas veces se puede querer usar diferentes configuraciones de
-palabras reservadas TODO en paralelo. Por ejemplo, se puede querer
-tener el b@'asico @code{TODO}/@code{DONE}, pero tambi@'en un flujo de
-trabajo para la correcci@'on de errores, y un estado separando el
-estado que indica que un @'{@dotless{i}}tem ha sido cancelado
-(as@'{@dotless{i}} no est@'a DONE, pero tampoco requiere acci@'on). La
-configuraci@'on ser@'{@dotless{i}}a la siguiente:
+TODO a FEEDBACK, despu@'es a VERIFY y finalmente a DONE y DELEGATED.
 
 @smalllisp
 (setq org-todo-keywords
       '((sequence "TODO(t)" "|" "DONE(d)")
-        (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)")
-        (sequence "|" "CANCELED(c)")))
+        (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)")))
 @end smalllisp
 
 Las palabras reservadas son todas diferentes, esto ayuda a Org mode a
@@ -1158,8 +1144,7 @@ agenda.
 Pone una prioridad a la actual cabecera. Presionando @samp{A},
 @samp{B} o @samp{C} se selecciona la prioridad, o @key{SPC} para
 eliminar la marca.
-@item S-@key{up}
-@itemx S-@key{down}
+@item S-@key{up}/@key{dwn}
 Incremente/decrementa la prioridad de la cabecera actual
 @end table
 
@@ -1363,16 +1348,8 @@ conjunto de tres etiquetas: @samp{@@read}, @samp{@@read_book} y
 @samp{@@read_ebook}.
 
 Puede tambi@'en usar las palabras clave @code{:grouptags} directamente
-cuando se configure @var{org-tag-alist}:
-
-@lisp
-(setq org-tag-alist '((:startgroup . nil) 
-                      ("@@read" . nil)
-                      (:grouptags . nil)
-                      ("@@read_book" . nil)
-                      ("@@read_ebook" . nil)
-                      (:endgroup . nil)))
-@end lisp
+cuando se configure @var{org-tag-alist}, ver la documentaci@'on de
+esta variable.
 
 @kindex C-c C-x q
 @vindex org-group-tags
@@ -1733,11 +1710,9 @@ cronomentrar de Bernt Hansen}}
 Una parte importante de cualquier organizaci@'on de sistemas es la
 habilidad para r@'apidamente capturar nuevas ideas y tareas, y asociar
 material de referencia con ellas. Org define un proceso de captura
-para crear tareas. Esto almacena ficheros relacionados a una tarea
-(@i{adjuntos}) en un directorio especial. Una vez en el sistema,
-tareas y proyectos necesitan ser movidos alrededor. Moviendo @'arboles
-de proyectos completados a un fichero de archivo guarda el sistema
-compacto y r@'apido.
+para crear tareas. Una vez en el sistema, tareas y proyectos necesitan
+ser movidas alrededor. Moviendo @'arboles de proyectos completos a un
+archivo deja el sistema compacto y r@'apido.
 
 @menu
 * Capturar::                 Capturando nuevas cosas
@@ -1748,12 +1723,9 @@ compacto y r@'apido.
 @node Capturar, Rellenar y copiar, Capturar - Rellenar - Archivar, Capturar - Rellenar - Archivar
 @section Capturar
 
-El m@'etodo de Org para capturar nuevos @'{@dotless{i}}tems est@'a
-fuertemente inspirado por el excelente paquete @file{remember.el} de
-John Wiegley. Esto permite almacenar r@'apidas notas con peque@~nas
-interrupciones de tu flujo de trabajo. Org te permite definir
-plantillas para nuevas entradas y asociarlas con diferentes objetivos
-para almacenar notas.
+Org permite almacenar notas r@'apidas con peque@~nas interrupciones de
+tu flujo. Tu puedes definir plantillas para nuevas entradas y
+asociarlos con diferentes objetivos para almacenar notas.
 
 @menu
 * Poniendo una posici@'on de captura::  Donde ser@'an almacenadas las notas
@@ -1766,10 +1738,8 @@ para almacenar notas.
 
 La siguiente personalizaci@'on configura un fichero objetivo por
 defecto@footnote{Usando plantillas de captura, se pueden definir
-localizaciones de grano m@'as fino, ver @ref{Plantillas de
-capturas}.} para notas y define un atajo global@footnote{Por favor,
-selecciona tu propio atajo, @kbd{C-c c} es solo una sugerencia.} para
-capturar nuevas cosas.
+localizaciones de grano m@'as fino, ver @ref{Plantillas de capturas}.}
+para notas y define un atajo global para capturar nuevas cosas.
 
 @example
 (setq org-default-notes-file (concat org-directory "/notes.org"))
@@ -1781,8 +1751,8 @@ capturar nuevas cosas.
 
 @table @kbd
 @item C-c c
-Comienza un proceso de captura. Ser@'a emplazado dentro de un estrecho
-buffer para editar el @'{@dotless{i}}tem.
+Comienza un proceso de captura. dej@'andolo dentro de un estrecho
+buffer indirecto para editar.
 @item C-c C-c
 Una vez que tu has introducido informaci@'on dentro del buffer de
 captura, @kbd{C-c C-c} devolver@'a a la ventana de configuraci@'on
@@ -1790,7 +1760,7 @@ antes de que el proceso capture, as@'{@dotless{i}} tu puedes resumir
 tu trabajo sin distracci@'on.
 @item C-c C-w
 Finaliza moviendo la entrada a una nueva localizaci@'on
-(@pxref{Rellenar y copiar}). 
+(ver secci@'on 9.2).
 @item C-c C-k
 Abortar el proceso de captura y devolver el estado previo.
 @end table
@@ -1837,8 +1807,7 @@ selecci@'on de las posibilidades, consulta el manual para m@'as.
 @smallexample
 %a          @r{anotaci@'on, normalmente el enlace creado con @code{org-store-link}}
 %i          @r{contenido inicial, la regi@'on cuando la capturas se llama con C-u.}
-%t          @r{marca de tiempo, solo fecha}
-%T          @r{marca de tiempo con fecha y hora}
+%t, %T      @r{marca de tiempo, solo fecha, o fecha y tiempo}
 %u, %U      @r{como el de debajo, pero con marcas de tiempo inactivas}
 @end smallexample
 
@@ -1849,7 +1818,7 @@ Cuando se revisa el dato capturado, se puede querer rellenar o copiar
 algunas de las entradas dentro de una lista diferente, por ejemplo,
 dentro de un proyecto. Cortando, encontrando la localizaci@'on
 correcta y entonces pegando la nota es complejo. Para simplificar este
-proceso, se puede usar el siguiente comando especial:
+proceso, se pueden usar los siguientes comandos:
 
 @table @kbd
 @item C-c M-x
@@ -2443,10 +2412,10 @@ l@'{@dotless{i}}nea que consista de solo dashes, y al menos 5 de ellos.
 
 Las l@'{@dotless{i}}neas empezando cero o m@'as car@'acteres de
 espacios en blanco seguidos por @samp{#} son tratados como comentarios
-y nunca ser@'an exportados. Tambi@'en sub@'arboles enteros empezando
-con la palabra @samp{COMMENT} nunca ser@'an exportados. Finalmente,
+y nunca ser@'an exportados. Tampoco se exportar@'an sub@'arboles
+enteros empezando con la palabra @samp{COMMENT}. Finalmente,
 regiones alrededor por @samp{#+BEGIN_COMMENT} ... @samp{#+END_COMMENT}
-no ser@'an exportados.
+no ser@'an exportadas.
 
 @table @kbd
 @item C-c ;
@@ -2473,10 +2442,10 @@ puede referir para el objeto con @code{\\ref@{tab:basic-data@}}:
 Algunos lenguajes de marcado permiten directamente incluir im@'agenes
 dentro del documento exportado. Org hace esto, si un enlace a ficheros
 de im@'agenes no tiene una parte de descripci@'on, por ejemplo
-@code{[[./img/a.jpg]]}. Si se desea definir un caption para la imagen
-y puede ser una etiqueta para referencias cruzadas, se debe asegurar
-que el enlace est@'a en una l@'{@dotless{i}}nea por s@'{@dotless{i}}
-misma precedida con:
+@code{[[./img/a.jpg]]}. Si se desea definir una captura para la imagen
+y puede ser una etiqueta para referencias cruzadas internas, se debe
+asegurar que el enlace est@'a en una l@'{@dotless{i}}nea por
+s@'{@dotless{i}} misma precedida con:
 
 @smallexample
 #+CAPTION: Este es el t@'{@dotless{i}}tulo para la siguiente enlace figura (o tabla)
@@ -2589,8 +2558,7 @@ planificaci@'on puede ser incorporada a calendarios de escritorio.
 * Exportaci@'on ASCII/Latin-1/UTF-8::  Exporta a ficheros con codificaci@'on
 * HTML export::              Exportando a HTML
 * Exportar @LaTeX{} y PDF::  Exportando a @LaTeX{}, y procesando a PDF
-* Exportar DocBook::         Exportando a DocBook
-* Exportar iCalendar::       
+* Exportar iCalendar::       Exportando a iCalendar
 @end menu
 
 @node Opciones de exportaci@'on, El dispensador de exportaci@'on, Exportando, Exportando
@@ -2616,21 +2584,16 @@ Inserta plantilla con opciones de exportaciones, ver ejemplo de debajo.
 #+KEYWORDS:    la p@'agina keywords, e.g.@: para la meta etiqueta XHTML
 #+LANGUAGE:    lenguaje para HTML, por ej.@: @samp{en} (@code{org-export-default-language})
 #+OPTIONS:     H:2 num:t toc:t \n:nil @@:t ::t |:t ^:t f:t TeX:t ...
-#+LINK_UP:     el enlace ``arriba'' de una p@'agina exportada.
-#+LINK_HOME:   el enlace ``inicio'' de una p@'agina exportada.
-#+LATEX_HEADER: l@'{@dotless{i}}neas extra para la cabecera @LaTeX{}, como \usepackage@{xyz@}
 @end smallexample
 
 @node El dispensador de exportaci@'on, Exportaci@'on ASCII/Latin-1/UTF-8, Opciones de exportaci@'on, Exportando
 @section El dispensador de exportaci@'on
 
 Todos los comandos de exportaci@'on pueden ser logrados usando el
-disparador de exportaci@'on, que es una clave prefija que pronto para
-una clave adicional especificando el comando.  Normalmente el fichero
-entero est@'a exportado, pero si hay una regi@'on activa que contiene
-un @'arbol de @'{@dotless{i}}tems (outlines), la primera cabecera
-est@'a usado como t@'{@dotless{i}}tulo de documento y los sub@'arboles
-est@'an exportados.
+disparador de exportaci@'on, que es una clave prefija que muestra una
+clave adicional especificando el comando.  Normalmente el fichero
+entero es exportado, pero si hay una regi@'on se activa ser@'a
+exportada
 
 @table @kbd
 @item C-c C-e
@@ -2646,11 +2609,11 @@ exporta aumentar el fichero con car@'acteres especiales y
 s@'{@dotless{i}}mbolos disponibles en estas codificaciones.
 
 @table @kbd
-@item C-c C-e a
-Exportar como un fichero ASCII
-@item C-c C-e n @ @ @r{y} @ @ C-c C-e N
+@item C-c C-e t a @ @ @r{y} @ @ C-c C-e t A
+Exportar como un fichero ASCII o b@'uffer temporal.
+@item C-c C-e t n @ @ @r{y} @ @ C-c C-e t N
 Como comandos de debajo, pero usa codificaci@'on Latin-1.
-@item C-c C-e u @ @ @r{y} @ @ C-c C-e U
+@item C-c C-e t u @ @ @r{y} @ @ C-c C-e t U
 Como los comandos de arriba, pero usa codificaci@'on UTF-8.
 @end table
 
@@ -2658,9 +2621,9 @@ Como los comandos de arriba, pero usa codificaci@'on UTF-8.
 @section HTML export
 
 @table @kbd
-@item C-c C-e h
+@item C-c C-e h h
 Exportar como un fichero HTML @file{myfile.html}.
-@item C-c C-e b
+@item C-c C-e h o
 Exportar como fichero HTML e inmediatamente lo abre con un navegador.
 @end table
 
@@ -2678,22 +2641,22 @@ literalmente
 #+END_HTML
 @end smallexample
 
-@node Exportar @LaTeX{} y PDF, Exportar DocBook, HTML export, Exportando
+@node Exportar @LaTeX{} y PDF, Exportar iCalendar, HTML export, Exportando
 @section Exportar @LaTeX{} y PDF
 
 @table @kbd
-@item C-c C-e l
+@item C-c C-e l l
 Exporta como fichero @LaTeX{} @file{myfile.tex}.
-@item C-c C-e p
+@item C-c C-e l p
 Exportando a @LaTeX{} y procesando a PDF
-@item C-c C-e d
+@item C-c C-e l o
 Exportando a @LaTeX{} y procesando a PDF, entonces se abre el fichero PDF
 resultante.
 @end table
 
 Por defecto, la salida @LaTeX{}] usa la clase @code{article}. Se puede
 cambiar esto para a@~nadir una opci@'on como @code{#+LaTeX_CLASS:
-myclass} en su fichero. La clase debe ser listado en
+myclass} en su fichero. La clase debe ser listada en
 @code{org-export-latex-classes}.
 
 El @LaTeX{} embebido como se describe en @ref{@LaTeX{} embebido},
@@ -2702,28 +2665,16 @@ similar, al exportador HTML, se puede usar @code{#+LaTeX:} y la
 construcci@'on @code{#+BEGIN_LaTeX ... #+END_LaTeX} para a@~nadir
 c@'odigo @LaTeX{} literal.
 
-@node Exportar DocBook, Exportar iCalendar, Exportar @LaTeX{} y PDF, Exportando
-@section Exportar DocBook
-
-@table @kbd
-@item C-c C-e D
-Exportando como un fichero DocBook
-@end table
-
-De forma similar al exportador HTML, se puede emplear los
-constructores @code{#+DOCBOOK:} y @code{#+BEGIN_DOCBOOK
-... #+END_DOCBOOK} para a@~nadir c@'odigo @LaTeX{}.
-
-@node Exportar iCalendar, , Exportar DocBook, Exportando
+@node Exportar iCalendar, , Exportar @LaTeX{} y PDF, Exportando
 @section Exportar iCalendar
 
 @table @kbd
-@item C-c C-e i
+@item C-c C-e c f
 Crea entradas iCalendar para el fichero actual en un fichero @file{.ics}.
-@item C-c C-e c
+@item C-c C-e c c
 Crea un fichero simple y largo iCalendar desde todos los ficheros en
 @code{org-agenda-files} y lo escribe al fichero dado por
-@code{org-combined-agenda-icalendar-file}.
+@code{org-icalendar-combined-agenda-file}.
 @end table
 
 @seealso{ @uref{http://orgmode.org/manual/Exporting.html#Exporting,
@@ -2761,14 +2712,14 @@ Aqu@'{@dotless{i}} hay un ejemplo:
 @end smalllisp
 
 @table @kbd
-@item C-c C-e C
+@item C-c C-e P x
 Pregunta por un proyecto espec@'{@dotless{i}}fico y publica todos los
 ficheros que pertenecen a él.
-@item C-c C-e P
+@item C-c C-e P p
 Publica el proyecto que contiene el fichero actual.
-@item C-c C-e F
+@item C-c C-e P f
 Elimina la columna actual.
-@item C-c C-e E
+@item C-c C-e P a
 Publica cada proyecto
 @end table
 
@@ -3006,9 +2957,9 @@ Cap@'{@dotless{i}}tulo 15 del manual}@*
 del manual}@* @uref{http://orgmode.org/orgcard.pdf,tarjeta de referencia}}
 
 
-@node Licencia de Documentaci@'on Libre de GNU, , Miscel@'anea, Top
-@appendix Licencia de Documentaci@'on Libre de GNU
-@include doclicense.texi
+@c @node GNU Free Documentation License,  , Miscellaneous, Top
+@c @appendix GNU Free Documentation License
+@c @include doclicense.texi
 
 
 @bye
