@@ -515,6 +515,20 @@ arrive at the final customization.
   endif
 #+END_SRC
 
+* Selective Testing
+
+Sometimes you only want to run a set of specific tests instead of all.
+This is especially useful if you are trying to bisect a large range of
+commits with a run script.  Instead of checking if the failing test
+was perhaps a different one than the one you wanted to check for,
+running just these test (or tests) makes that task much easier.  For
+instance,
+: make BTEST_RE='^test-org/forward-element$' test-dirty
+would run _only_ the test for forward-element and nothing else, which
+is also much faster than running the almost 500 other tests as well.
+Keep in mind that the test selector is a regular expression, the
+default value of =\(org\|ob\)= matches all tests.
+
 * Support for Installers
 
 The Org build system supports staged installs via =DESTDIR=.  If
