@@ -90,6 +90,7 @@ Maxima produces the full range of result types.
 
 * Examples of Use
 
+** Calculator
 The following source code block uses =maxima= as a calculator for
 powers of 12, where the powers are passed with a variable.
 
@@ -114,6 +115,7 @@ powers of 12, where the powers are passed with a variable.
 #+results: test-maxima
 : 26.06280316745402
 
+** Solver
 Of course, =maxima= is more than a calculator.
 
 #+begin_example
@@ -136,12 +138,7 @@ Of course, =maxima= is more than a calculator.
   print(solution);
 #+end_src
 
-#+results: solve-maxima
-: solve: solution:
-:                                     x = - 4
-:                                      x = 4
-: [%t1, %t2] 
-
+** 3D plots
 With =gnuplot= installed (4.0 or higher), 3D graphics are possible.
 This example is from [[http://maxima.sourceforge.net/maxima-gnuplot.html][a tutorial on the maxima/gnuplot interface]].
 
@@ -167,4 +164,51 @@ This example is from [[http://maxima.sourceforge.net/maxima-gnuplot.html][a tuto
 
 #+results: 3d-maxima
 [[file:images/maxima-3d.png]]
+
+** Inline Display of Maxima LaTeX Output
+  [[http://maxima.sourceforge.net/][Maxima]] code can be evaluated and displayed inline in Org mode
+  through babel [fn:1] as in the example below, based on RS initial
+  example.
+
+#+begin_example
+,#+NAME: solve-maxima
+,#+HEADER: :exports none
+,#+BEGIN_SRC maxima :results raw
+  tex(exp(-x)/x);
+,#+END_SRC
+#+end_example
+
+#+NAME: solve-maxima
+#+HEADER: :exports results
+#+BEGIN_SRC maxima :results raw
+  tex(exp(-x)/x);
+#+END_SRC
+
+*** Toggle inline display of latex code
+    Latex code in org mode can be displayed inline by 'C-c C-x
+    C-l'. To remove the inline display 'C-c C-c' is used. This is
+    described further in the manual [fn:2].
+*** Set scale of output
+    If the inline display of the equations are illegible, the scale
+    can be set by customising the variable 'org-format-latex-options',
+    by setting the :scale variable to a value >1.
+*** Export
+    This exports nicely to both html (C-c C-e b) and pdf (C-c C-e
+    d). See [fn:3] and [fn:4] in the manual.
+*** Noweb expansion
+    _NOTE:_ I have not tested this yet, but as Eric Schulte noted on
+    the mailing list: "Alternately, if you really want to get fancy
+    you could use noweb expansion [fn:5] to insert the results of the
+    imaxima code block into a latex code block, and then use the
+    existing latex code block functionality to convert the imaxima
+    output to images of different types depending on the export
+    target."
+
+*** Footnotes
+[fn:1] (info "(org)Library of Babel")
+[fn:2] (info "(org)Previewing LaTeX fragments")
+[fn:3] (info "(org)Exporting code blocks")
+[fn:4] (info "(org)The export dispatcher")
+[fn:5] (info "(org)noweb")
+
 
