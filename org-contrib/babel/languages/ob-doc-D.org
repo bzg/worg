@@ -1,0 +1,331 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Language Source Code Blocks for D Language in Org Mode
+#+AUTHOR:     Thierry Banel
+#+EMAIL:      tbanelwebmin[at]free[dot]fr
+#+LANGUAGE:   en
+#+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="http://dlang.org/">D Language</a>
+  </p>
+  <p>
+  <a href="http://dlang.org/">
+  <img src="http://dlang.org/images/dlogo.png"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* Template Checklist [12/12] 					   :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result%20Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+D is a C++-like language made by Digital Mars (http://dlang.org/).
+It features:
+  - C++ syntax
+  - Built-in garbage collector
+  - Strong type system
+  - Meta-programming
+  - Seamless assembler support
+  - Usable as a scripting language
+  - C binary compatibility
+  - and much more.
+
+The scripting feature of D is leveraged in Babel-Org-mode.
+Basically, we call =rdmd= instead of the =dmd= compiler.
+This transparently compiles, caches, and run the script.
+
+D may be used like many other script languages (Perl, Awk, Elisp and
+so on) to process data within Org files, without worrying about memory
+management, with the help of a strong type system, and enjoying the
+speed of a compiled language.
+
+* Requirements and Setup
+
+1- The D runtime must be installed on your plateform.
+   Look at http://dlang.org/ for downloading and instructions.
+   Eventually, the =dmd= and =rdmd= compilers must be in the =PATH=.
+   A separate =d-mode.el= package is available, for syntax higlighting.
+   It is not required.
+2- Add =ob-D.el= in the =lisp/org/= source tree.
+   For now, this file is attached at the end of this page.
+3- In the =org.el= file, find a line which says:
+                : (const :tag "C" C)
+   add a similar line for D:
+  		: (const :tag "D" D)
+4- byte-compile the 2 modified =*.el=
+5- customize the variable =org-babel-load-languages= enabling D
+   - either through =M-x customize-variable=
+     (you may need a restart of Emacs prior to customization)
+   - or in your =.emacs=
+
+* Org Mode Features for D Source Code Blocks
+** Header Arguments
+  - =:results output=
+    (only output presently)
+  - =:var VARIABLE=VALUE=
+    A global D variable named VARIABLE will be declared
+    and initialized with VALUE
+    Possible types for VARIABLE may be:
+      =int, double, string, string[][]=
+    The later type, =string[][]=, is used for variables storing
+    Org tables
+  - =:import package=
+    An import statement will be declared in the D source
+    before the source code
+
+** Sessions
+   There is no support for sessions
+
+** Result Types
+   Presently, only output result is supported
+   =:results output=
+
+** Other
+   D support is quite similar to C and C++ support.
+
+   One difference though, is that in D compilation is cached. Only
+   the first run incures compile time, up to the next change in the
+   source.
+
+* Examples of Use
+Here is Hello World!
+
+#+begin_src D
+  import std.stdio;
+  writefln ("Hello World!");
+#+end_src
+
+#+RESULTS:
+: Hello World!
+
+
+Another example. We take an Org-table as input, process it, and output
+a new Org-table.
+
+This table will be input in the D script, and iterated row by row
+#+tblname: somedata
+| nb | sqr | noise |
+|----+-----+-------|
+|  0 |   0 |  0.23 |
+|  1 |   1 |  1.31 |
+|  2 |   4 |  4.61 |
+|  3 |   9 |  9.05 |
+|  4 |  16 | 16.55 |
+
+#+begin_src D :results output :var somedata=somedata :var TT="321" :var QQ=3.14
+  import std.stdio;
+  import std.conv;
+
+  void main()
+  {
+    foreach (i, row; somedata) {
+      writef ("|%2s ", i);
+      foreach (cell; row)
+        writef ("| %5s | %5s ", cell, 1000*to!real(cell));
+      writefln ("| %7s |", to!real(TT)*to!real(QQ));
+    }
+  }
+#+end_src
+
+#+RESULTS:
+: | 0 |     0 |     0 |     0 |     0 |  0.23 |   230 | 1007.94 |
+: | 1 |     1 |  1000 |     1 |  1000 |  1.31 |  1310 | 1007.94 |
+: | 2 |     2 |  2000 |     4 |  4000 |  4.61 |  4610 | 1007.94 |
+: | 3 |     3 |  3000 |     9 |  9000 |  9.05 |  9050 | 1007.94 |
+: | 4 |     4 |  4000 |    16 | 16000 | 16.55 | 16550 | 1007.94 |
+
+* Raw file
+The =ob-D.el= file is stored here for the time being.
+It will eventually move to an appropriate directory.
+
+#+begin_src elisp
+;;; ob-D.el --- org-babel functions for the D language
+
+;; Copyright (C) 2013 Thierry Banel
+
+;; Author: Thierry Banel, derived from the Eric Schulte work
+;; Keywords: literate programming, reproducible research
+
+;; This file is NOT (yet) part of GNU Emacs.
+
+;; ob-D.el is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; ob-D.el is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; the GNU General Public License can be obtained here:
+;; <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+;; Org-Babel support for evaluating Digital Mars D Language code.
+;; The D language home page is here:
+;; http://dlang.org/
+
+;;; Code:
+(require 'ob)
+(require 'ob-eval)
+;;(require 'd-mode)
+
+(declare-function org-entry-get "org"
+		  (pom property &optional inherit literal-nil))
+
+(defvar org-babel-tangle-lang-exts)
+(add-to-list 'org-babel-tangle-lang-exts '("D" . "D"))
+
+(defvar org-babel-default-header-args:D '())
+
+(defvar org-babel-D-compiler "rdmd"
+  "Command used to compile and run a D source code file into an
+  executable.")
+
+(defun org-babel-execute:D (body params)
+  "Execute a block of D code with org-babel.  This function is
+called by `org-babel-execute-src-block'."
+  (org-babel-D-execute body params))
+
+(defun org-babel-D-execute (body params)
+  "This function should only be called by `org-babel-execute:D'"
+  (let* ((tmp-src-file (org-babel-temp-file "Dsrc" ".d"))
+         (cmdline (cdr (assoc :cmdline params)))
+         (flags (cdr (assoc :flags params)))
+	 (rdmd (format "%s %s %s"
+		       org-babel-D-compiler
+		       (mapconcat 'identity
+				  (if (listp flags) flags (list flags)) " ")
+
+		       ;; On Unix, keep directory separator
+		       (org-babel-process-file-name tmp-src-file)))
+	 
+		       ;; On Windows, directory separator must be fixed
+		       ;;(replace-regexp-in-string
+		       ;;	"/" "\\\\"
+		       ;;	(org-babel-process-file-name tmp-src-file))))
+		       
+	 (full-body (org-babel-D-expand body params)))
+    (with-temp-file tmp-src-file (insert full-body))
+
+    ;; add path to D binaries if not already there
+    ;;(let ((bin "c:/DLang/dmd2/windows/bin;")
+    ;;	  (path (getenv "PATH")))
+    ;;  (unless (string-match bin path)
+    ;;	(setenv "PATH" (concat bin path))))
+
+    (org-babel-eval rdmd "")))
+
+(defun org-babel-D-expand (body params)
+  "Expand a block of D code with org-babel according to
+its header arguments."
+  (let ((vars (mapcar #'cdr (org-babel-get-header params :var)))
+	(colname-names (cdr (car (org-babel-get-header params :colname-names))))
+        (main-p (not (string= (cdr (assoc :main params)) "no")))
+        (imports (mapcar #'cdr (org-babel-get-header params :import))))
+     (mapconcat 'identity
+		(list
+		 "module aaa;\n"
+		 ;; imports
+		 (mapconcat
+		  (lambda (inc) (format "import %s;" inc))
+		  imports "\n")
+		 ;; variables
+		 (mapconcat 'org-babel-D-var-to-D vars "\n")
+		 (mapconcat 'org-babel-D-colnames-to-D colname-names "\n")
+		 ;; body
+		 (if main-p
+		     (org-babel-D-ensure-main-wrap body)
+		   body) "\n") "\n")))
+
+(defun org-babel-D-ensure-main-wrap (body)
+  "Wrap body in a \"main\" function call if none exists."
+  (if (string-match "^[ \t]*[intvod]+[ \t\n\r]*main[ \t]*(.*)" body)
+      body
+    (format "int main() {\n%s\nreturn(0);\n}\n" body)))
+
+(defun org-babel-prep-session:D (session params)
+  "This function does nothing as D is a compiled language with no
+support for sessions"
+  (error "D is a compiled languages -- no support for sessions"))
+
+(defun org-babel-load-session:D (session body params)
+  "This function does nothing as D is a compiled language with no
+support for sessions"
+  (error "D is a compiled languages -- no support for sessions"))
+
+;; helper functions
+
+(defun org-babel-D-var-to-D (pair)
+  "Convert an elisp value into a string of D code specifying a variable
+of the same value."
+  (let ((var (car pair))
+        (val (cdr pair)))
+    (when (symbolp val)
+      (setq val (symbol-name val))
+      (when (= (length val) 1)
+        (setq val (string-to-char val))))
+    (cond
+     ((integerp val)
+      (format "int %S = %S;" var val))
+     ((floatp val)
+      (format "double %S = %S;" var val))
+     ((stringp val)
+      (format "string %S = \"%s\";" var val))
+     ((listp val)
+      (if (assoc var colname-names) ()
+	(setq colname-names
+	      (cons (cons
+		     var
+		     (let ((i 0)) (mapcar (lambda (x) (setq i (1+ i)) (format "$%s" i))
+					  (car val))))
+		    colname-names)))
+      (format "string[][] %S = [\n[%s]];" var
+	      (mapconcat (lambda (row)
+			   (if (listp row)
+			       (mapconcat (lambda (v) (format "\"%s\"" v))
+					  row
+					  ",")))
+			 val
+			 "],\n[")))
+     (t
+      (format "u32 %S = %S;" var val)))))
+
+(defun org-babel-D-colnames-to-D (pair)
+  "Convert an elisp list of header table into a D vector
+specifying a variable with the name of the table"
+  (let ((table (car pair))
+	(headers (cdr pair)))
+    (format "string[] %S_headers = [%s];"
+	    table
+	    (mapconcat (lambda (h) (format "%S" h)) headers ","))))
+
+(provide 'ob-D)
+
+;;; ob-D.el ends here
+#+end_src
