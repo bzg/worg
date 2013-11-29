@@ -70,13 +70,17 @@ speed of a compiled language.
    Eventually, the =dmd= and =rdmd= compilers must be in the =PATH=.
    A separate =d-mode.el= package is available, for syntax higlighting.
    It is not required.
+
 2- Add =ob-D.el= in the =lisp/org/= source tree.
    For now, this file is attached at the end of this page.
+
 3- In the =org.el= file, find a line which says:
                 : (const :tag "C" C)
    add a similar line for D:
   		: (const :tag "D" D)
+
 4- byte-compile the 2 modified =*.el=
+
 5- customize the variable =org-babel-load-languages= enabling D
    - either through =M-x customize-variable=
      (you may need a restart of Emacs prior to customization)
@@ -84,16 +88,16 @@ speed of a compiled language.
 
 * Org Mode Features for D Source Code Blocks
 ** Header Arguments
-  - =:results output=
+  - =:results output= ::
     (only output presently)
-  - =:var VARIABLE=VALUE=
+  - =:var VARIABLE=VALUE= ::
     A global D variable named VARIABLE will be declared
     and initialized with VALUE
     Possible types for VARIABLE may be:
-      =int, double, string, string[][]=
+      : int, double, string, string[][]
     The later type, =string[][]=, is used for variables storing
     Org tables
-  - =:import package=
+  - =:import package= ::
     An import statement will be declared in the D source
     before the source code
 
@@ -119,8 +123,12 @@ Here is Hello World!
   writefln ("Hello World!");
 #+end_src
 
-#+RESULTS:
-: Hello World!
+: #+begin_src D
+:   import std.stdio;
+:   writefln ("Hello World!");
+: #+end_src
+
+Hello World!
 
 
 Another example. We take an Org-table as input, process it, and output
@@ -151,12 +159,26 @@ This table will be input in the D script, and iterated row by row
   }
 #+end_src
 
-#+RESULTS:
-: | 0 |     0 |     0 |     0 |     0 |  0.23 |   230 | 1007.94 |
-: | 1 |     1 |  1000 |     1 |  1000 |  1.31 |  1310 | 1007.94 |
-: | 2 |     2 |  2000 |     4 |  4000 |  4.61 |  4610 | 1007.94 |
-: | 3 |     3 |  3000 |     9 |  9000 |  9.05 |  9050 | 1007.94 |
-: | 4 |     4 |  4000 |    16 | 16000 | 16.55 | 16550 | 1007.94 |
+: #+begin_src D :results output :var somedata=somedata :var TT="321" :var QQ=3.14
+:   import std.stdio;
+:   import std.conv;
+: 
+:   void main()
+:   {
+:     foreach (i, row; somedata) {
+:       writef ("|%2s ", i);
+:       foreach (cell; row)
+:         writef ("| %5s | %5s ", cell, 1000*to!real(cell));
+:       writefln ("| %7s |", to!real(TT)*to!real(QQ));
+:     }
+:   }
+: #+end_src
+
+| 0 |     0 |     0 |     0 |     0 |  0.23 |   230 | 1007.94 |
+| 1 |     1 |  1000 |     1 |  1000 |  1.31 |  1310 | 1007.94 |
+| 2 |     2 |  2000 |     4 |  4000 |  4.61 |  4610 | 1007.94 |
+| 3 |     3 |  3000 |     9 |  9000 |  9.05 |  9050 | 1007.94 |
+| 4 |     4 |  4000 |    16 | 16000 | 16.55 | 16550 | 1007.94 |
 
 * Raw file
 The =ob-D.el= file is stored here for the time being.
