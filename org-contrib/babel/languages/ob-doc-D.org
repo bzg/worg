@@ -2,7 +2,7 @@
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
-#+TITLE:      Language Source Code Blocks for D Language in Org Mode
+#+TITLE:      D Source Code Blocks in Org Mode
 #+AUTHOR:     Thierry Banel
 #+EMAIL:      tbanelwebmin[at]free[dot]fr
 #+LANGUAGE:   en
@@ -15,7 +15,7 @@
 #+begin_html
   <div id="subtitle" style="float: center; text-align: center;">
   <p>
-  Org Mode support for <a href="http://dlang.org/">D Language</a>
+  Org Mode support for <a href="http://dlang.org/">D</a>
   </p>
   <p>
   <a href="http://dlang.org/">
@@ -43,7 +43,7 @@
   - [X] Describe [[Other]] differences from supported languages
   - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
 * Introduction
-D is a C++-like language made by Digital Mars (http://dlang.org/).
+[[http://dlang.org/][D]] is a C++-like language made by [[http://dlang.org/][Digital Mars]].
 It features:
   - C++ syntax
   - Built-in garbage collector
@@ -54,37 +54,37 @@ It features:
   - C binary compatibility
   - and much more.
 
-The scripting feature of D is leveraged in Babel-Org-mode.
-Basically, we call =rdmd= instead of the =dmd= compiler.
+The scripting feature of [[http://dlang.org/][D]] is leveraged in Org mode.
+Basically, we call [[http://dlang.org/rdmd.html][=rdmd=]] instead of the =dmd= compiler.
 This transparently compiles, caches, and run the script.
 
-D may be used like many other script languages (Perl, Awk, Elisp and
-so on) to process data within Org files, without worrying about memory
+D may be used like many other script languages (Perl, Awk, Emacs Lisp,
+etc.) to process data within Org files, without worrying about memory
 management, with the help of a strong type system, and enjoying the
 speed of a compiled language.
 
 * Requirements and Setup
 
-1- The D runtime must be installed on your plateform.
+  1. The D runtime must be installed on your platform.
    Look at http://dlang.org/ for downloading and instructions.
    Eventually, the =dmd= and =rdmd= compilers must be in the =PATH=.
    A separate =d-mode.el= package is available, for syntax higlighting.
    It is not required.
 
-2- Add =ob-D.el= in the =lisp/org/= source tree.
+  2. Add =ob-D.el= in the =lisp/org/= source tree.
    For now, this file is attached at the end of this page.
 
-3- In the =org.el= file, find a line which says:
+  3. In the =org.el= file, find a line which says:
                 : (const :tag "C" C)
    add a similar line for D:
   		: (const :tag "D" D)
 
-4- byte-compile the 2 modified =*.el=
+  4. byte-compile the 2 modified =*.el=
 
-5- customize the variable =org-babel-load-languages= enabling D
-   - either through =M-x customize-variable=
+  5. customize the variable =org-babel-load-languages= enabling D
+     - either through =M-x customize-variable=
      (you may need a restart of Emacs prior to customization)
-   - or in your =.emacs=
+     - or in your =.emacs=
 
 * Org Mode Features for D Source Code Blocks
 ** Header Arguments
@@ -116,25 +116,35 @@ speed of a compiled language.
    source.
 
 * Examples of Use
+** Hello World
 Here is Hello World!
 
-#+begin_src D
+#+name: d-hello
+#+begin_src D :exports results
   import std.stdio;
   writefln ("Hello World!");
 #+end_src
 
-: #+begin_src D
-:   import std.stdio;
-:   writefln ("Hello World!");
-: #+end_src
+This source code block:
 
+#+begin_example
+#+begin_src D
+   import std.stdio;
+   writefln ("Hello World!");
+#+end_src
+#+end_example
+
+yields this result:
+
+#+results: d-hello
 Hello World!
 
+** Process an Org Mode Table
+We take an Org mode table as input, process it, and output
+a new Org mode table.
 
-Another example. We take an Org-table as input, process it, and output
-a new Org-table.
+This table will be input in the D script, and iterated row by row:
 
-This table will be input in the D script, and iterated row by row
 #+tblname: somedata
 | nb | sqr | noise |
 |----+-----+-------|
@@ -144,6 +154,8 @@ This table will be input in the D script, and iterated row by row
 |  3 |   9 |  9.05 |
 |  4 |  16 | 16.55 |
 
+#+name: d-table
+#+header: :exports results
 #+begin_src D :results output :var somedata=somedata :var TT="321" :var QQ=3.14
   import std.stdio;
   import std.conv;
@@ -159,26 +171,31 @@ This table will be input in the D script, and iterated row by row
   }
 #+end_src
 
-: #+begin_src D :results output :var somedata=somedata :var TT="321" :var QQ=3.14
-:   import std.stdio;
-:   import std.conv;
-: 
-:   void main()
-:   {
-:     foreach (i, row; somedata) {
-:       writef ("|%2s ", i);
-:       foreach (cell; row)
-:         writef ("| %5s | %5s ", cell, 1000*to!real(cell));
-:       writefln ("| %7s |", to!real(TT)*to!real(QQ));
-:     }
-:   }
-: #+end_src
+#+begin_example
+#+begin_src D :results output :var somedata=somedata :var TT="321" :var QQ=3.14
+  import std.stdio;
+  import std.conv;
 
-| 0 |     0 |     0 |     0 |     0 |  0.23 |   230 | 1007.94 |
-| 1 |     1 |  1000 |     1 |  1000 |  1.31 |  1310 | 1007.94 |
-| 2 |     2 |  2000 |     4 |  4000 |  4.61 |  4610 | 1007.94 |
-| 3 |     3 |  3000 |     9 |  9000 |  9.05 |  9050 | 1007.94 |
-| 4 |     4 |  4000 |    16 | 16000 | 16.55 | 16550 | 1007.94 |
+  void main()
+  {
+    foreach (i, row; somedata) {
+      writef ("|%2s ", i);
+      foreach (cell; row)
+        writef ("| %5s | %5s ", cell, 1000*to!real(cell));
+      writefln ("| %7s |", to!real(TT)*to!real(QQ));
+    }
+  }
+#+end_src
+#+end_example
+
+yields this result:
+
+#+results: d-table
+| 0 | 0 |    0 |  0 |     0 |  0.23 |   230 | 1007.94 |
+| 1 | 1 | 1000 |  1 |  1000 |  1.31 |  1310 | 1007.94 |
+| 2 | 2 | 2000 |  4 |  4000 |  4.61 |  4610 | 1007.94 |
+| 3 | 3 | 3000 |  9 |  9000 |  9.05 |  9050 | 1007.94 |
+| 4 | 4 | 4000 | 16 | 16000 | 16.55 | 16550 | 1007.94 |
 
 * Raw file
 The =ob-D.el= file is stored here for the time being.
