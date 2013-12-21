@@ -105,14 +105,130 @@ All in Emacs, without any external package.
 : | # | 17 | 0.058823529 | h            |
 : #+TBLFM: $3=1/$x::$4='(orgtbl-ascii-draw $3 0 1)
 
-* A Unicode example
+* How to
 
-Here are the three looks.
-Unicode block characters are used.
+1- Execute the Lisp code hereafter.
+   Type =C-c C-c= with the cursor on the lisp code.
 
+2- Put the cursor on the column to plot.
+
+3- Type
+   - either =C-c p=
+   - or =M-x orgtbl-ascii-plot=
+   This adds a new ascii-art column.
+
+4- The width in characters of the plot may be specified
+   with a numeric prefix:
+   - =Esc 30 C-c p=
+   - =Esc 30 M-x orgtbl-ascii-plot=
+
+* Additional details
+
+The column containing the plot has a column formula.
+When the data column changes, refresh the plot with =C-u C-c *=.
+
+The plotting column may be handled in the same way as any other:
+- remove with =M-S-left=
+- moved left with =M-left=
+- moved right with =M-right=
+
+The column formula may be changed. Here is how it works:
+  : '(orgtbl-ascii-draw $3 15 75 12)
+  - =$3= is the reference to the data column, here the third column.
+  - =15= is the minimum value to be displayed
+    (values lower than that will display "too small")
+  - =75= is the maximum value to be displayed
+    (values higher than that will display "too large")
+  - =12= is the width of the column,
+    it is optional, and defaults to =12=
+
+* Lisp code (pure ascii)
+
+#+BEGIN_SRC elisp :results none
+  (defun orgtbl-ascii-draw (value min max &optional width characters)
+    "Draws an ascii bar in a table.
+    VALUE is a the value to plot, the width of the bar to draw.
+    A value equal to MIN will be displayed as empty (zero width bar).
+    A value equal to MAX will draw a bar filling all the WIDTH.
+    WIDTH is the expected width in characters of the column.
+    CHARACTERS is a string of characters that will compose the bar,
+    with shades of grey from pure white to pure black.
+    It defaults to a 10 characters string of regular ascii characters.
+    "
+    (unless characters (setq characters " .:;c!lhVHW"))
+    (unless width (setq width 12))
+    (if (stringp value)
+        (setq value (string-to-number value)))
+    (setq value (* (/ (- (+ value 0.0) min) (- max min)) width))
+    (cond
+     ((< value     0) "too small")
+     ((> value width) "too large")
+     (t
+      (let ((len (1- (length characters))))
+        (concat
+         (make-string (floor value) (elt characters len))
+         (string (elt characters
+                      (floor (* (- value (floor value)) len)))))))))
+  
+  (defun orgtbl-ascii-plot (&optional ask)
+    "Draws an ascii bars plot in a column, out of values found in another column.
+  A numeric prefix may be given to override the default 12 characters wide plot.
+    "
+    (interactive "P")
+    (let ((col (org-table-current-column))
+          (min  1e999)
+          (max -1e999)
+          (length 12)
+          (table (org-table-to-lisp)))
+      (cond ((consp ask)
+             (setq length
+                   (or
+                    (read-string "Length of column [12] " nil nil 12)
+                    12)))
+            ((numberp ask)
+             (setq length ask)))
+      (mapc
+       (lambda (x)
+         (when (consp x)
+           (setq x (nth (1- col) x))
+           (when (string-match
+                  "^[-+]?\\([0-9]*[.]\\)?[0-9]*\\([eE][+-]?[0-9]+\\)?$"
+                  x)
+             (setq x (string-to-number x))
+             (if (> min x) (setq min x))
+             (if (< max x) (setq max x)))))
+       (or (memq 'hline table) table)) ;; skip table header if any
+      (org-table-insert-column)
+      (org-table-move-column-right)
+      (org-table-store-formulas
+       (cons
+        (cons
+         (number-to-string (1+ col))
+         (format "'(%s $%s %s %s %s)"
+                 "orgtbl-ascii-draw" col min max length))
+        (org-table-get-stored-formulas)))
+      (org-table-recalculate t)))
+  
+  (org-defkey org-mode-map "\C-cp" 'orgtbl-ascii-plot)
+#+END_SRC
+
+* Example of extension: unicode characters
+Here are two examples of different styles.
+
+Unicode block characters are used to give a smooth effect.
 See http://en.wikipedia.org/wiki/Block_Elements
+Use one of those drawing functions
+- =orgtbl-ascii-draw= (the default ascii)
+- =orgtbl-uc-draw-grid= (unicode with a grid effect)
+- =orgtbl-uc-draw-cont= (smooth unicode)
 
-This is best viewed with the "DejaVu Sans Mono" font (use =M-x set-default-font=)
+This is best viewed with the "DejaVu Sans Mono" font (use =M-x set-default-font=).
+
+Be aware that unicode support is not available everywhere.
+For instance, LaTex export will not work.
+If you plan to export your Org document,
+either draw pure ascii plots,
+or use ascii plots only for quick and throwable visualization.
 
 : | ! |  x |    sin(x/4) | ascii        | uc grid      | uc cont      |
 : |---+----+-------------+--------------+--------------+--------------|
@@ -150,158 +266,28 @@ This is best viewed with the "DejaVu Sans Mono" font (use =M-x set-default-font=
 : | # | 31 | -0.78861628 | W:           | ▉▏           | █▎           |
 : #+TBLFM: $3=sin($x/3);R::$5='(orgtbl-uc-draw-grid $3 -0.99895492 0.99540796 12)::$6='(orgtbl-uc-draw-cont $3 -0.99895492 0.99540796 12)::$4='(orgtbl-ascii-draw $3 -0.99895492 0.99540796 12)
 
-* How to
-
-1- Execute the Lisp code hereafter.
-   This can be done
-   - either by typing =C-c C-c= with the cursor on the code
-   - or typing =C-x C-e= after the last parenthesis.
-
-2- Put the cursor on the column to plot.
-
-3- Type
-   - either =C-c p=
-   - or =M-x orgtbl-ascii-plot=
-   This adds a new ascii-art column.
-
-4- For more options, prefix the command with =C-u=
-   - =C-u C-c p=
-   - =C-u M-x orgtbl-ascii-plot=
-   This asks for parameters:
-   - the variant
-     - ascii: bars are drawn with standard ascii characters
-     - uc grid: use unicode block characters, with a grid look
-     - uc cont: use unicode block characters, with a solid look
-   - the width in characters of the new column.
-
-Note that unicode characters rendering is not the same for all fonts.
-The best looking is "DejaVu Sans Mono" (use =M-x set-default-font=).
-
-* Additional details
-
-The column with the plot has a column formula.
-When the data column changes, refresh the plot with =C-u C-c *=.
-
-The column may be handled in the same way as any other:
-- remove with =M-S-left=
-- moved left with =M-left=
-- moved right with =M-right=
-
-The column formula may be changed. Here is how it works:
-  : '(orgtbl-ascii-draw   $3 15 75 12)
-  : '(orgtbl-uc-draw-cont $3 15 75 12)
-  : '(orgtbl-uc-draw-grid $3 15 75 12)
-  - =$3= is the reference to the data column, here the third.
-  - =15= is the minimum value to be displayed
-    (values lower than that will display "too small")
-  - =75= is the maximum value to be displayed
-    (values higher than that will display "too large")
-  - =12= is the width of the column,
-    it is optional, and defaults to =12=
-
-* Lisp code
-
 #+BEGIN_SRC elisp :results none
-       (progn
-    
-         (defun orgtbl-uc-draw-grid (value min max &optional width)
-           "Draws an ascii bar in a table.
+  (defun orgtbl-uc-draw-grid (value min max &optional width)
+    "Draws an ascii bar in a table.
     It is a variant of orgtbl-ascii-draw with Unicode block characters,
     for a smooth display.
     Bars appear as grids (to the extend the font allows).
     "
-           ;; http://en.wikipedia.org/wiki/Block_Elements
-           ;; best viewed with the "DejaVu Sans Mono" font
-           (orgtbl-ascii-draw value min max width " \u258F\u258E\u258D\u258C\u258B\u258A\u2589"))
-    
-         (defun orgtbl-uc-draw-cont (value min max &optional width)
-           "Draws an ascii bar in a table.
+    ;; http://en.wikipedia.org/wiki/Block_Elements
+    ;; best viewed with the "DejaVu Sans Mono" font
+    (orgtbl-ascii-draw value min max width " \u258F\u258E\u258D\u258C\u258B\u258A\u2589"))
+  
+  (defun orgtbl-uc-draw-cont (value min max &optional width)
+    "Draws an ascii bar in a table.
     It is a variant of orgtbl-ascii-draw with Unicode block characters,
     for a smooth display.
     Bars are solid (to the extend the font allows).
     "
-           (orgtbl-ascii-draw value min max width " \u258F\u258E\u258D\u258C\u258B\u258A\u2589\u2588"))
-    
-         (defun orgtbl-ascii-draw (value min max &optional width characters)
-           "Draws an ascii bar in a table.
-    VALUE is a the value to plot, the width of the bar to draw.
-    A value equal to MIN will be displayed as empty (zero width bar).
-    A value equal to MAX will draw a bar filling all the WIDTH.
-    WIDTH is the expected width in characters of the column.
-    CHARACTERS is a string of characters that will compose the bar,
-    with shades of grey from pure white to pure black.
-    It defaults to a 10 characters string of regular ascii characters.
-    "
-           (unless characters (setq characters " .:;c!lhVHW"))
-           (unless width (setq width 12))
-           (if (stringp value)
-               (setq value (string-to-number value)))
-           (setq value (* (/ (- (+ value 0.0) min) (- max min)) width))
-           (cond
-            ((< value     0) "too small")
-            ((> value width) "too large")
-            (t
-             (let ((len (1- (length characters))))
-               (concat
-                (make-string (floor value) (elt characters len))
-                (string (elt characters
-                             (floor (* (- value (floor value)) len)))))))))
-    
-         (defun orgtbl-ascii-plot (&optional ask)
-           "Draws an ascii bars plot in a column, out of values found in another column.
-  With a C-u prefix, asks for additional parameters:
-  VARIANT: the lisp function to call
-     orgtbl-ascii-draw    default ascii plotter
-     orgtbl-uc-draw-cont  unicode block characters to draw a continuous black bar
-     orgtbl-uc-draw-grid  unicode block characters to draw a black bar with white ticks
-    "
-           (interactive "P")
-           (let ((col (org-table-current-column))
-                 (min  1e999)
-                 (max -1e999)
-                 (length 12)
-                 (table (org-table-to-lisp))
-                 (variant 'orgtbl-ascii-draw)
-                 (variants '("orgtbl-ascii-draw" "orgtbl-uc-draw-cont" "orgtbl-uc-draw-grid")))
-             (cond ((consp ask)
-                    (setq variant
-                          (read-string
-                           "Variant " nil
-                           '(variants . 1)
-                           'orgtbl-ascii-draw))
-                    (setq length
-                          (or
-                           (read-string "Length of column [12] " nil nil 12)
-                           12)))
-                   ((numberp ask)
-                    (setq length ask)))
-             (mapc
-              (lambda (x)
-                (when (consp x)
-                  (setq x (nth (1- col) x))
-                  (when (string-match
-                         "^[-+]?\\([0-9]*[.]\\)?[0-9]+\\([eE][+-]?[0-9]+\\)?$"
-                         x)
-                    (setq x (string-to-number x))
-                    (if (> min x) (setq min x))
-                    (if (< max x) (setq max x)))))
-              (or (memq 'hline table) table)) ;; skip table header if any
-             (org-table-insert-column)
-             (org-table-move-column-right)
-             (org-table-store-formulas
-              (cons
-               (cons
-                (number-to-string (1+ col))
-                (format "'(%s $%s %s %s %s)"
-                        variant col min max length))
-               (org-table-get-stored-formulas)))
-             (org-table-recalculate t)))
-         
-         (org-defkey org-mode-map "\C-cp" 'orgtbl-ascii-plot)
-       )
+    (orgtbl-ascii-draw value min max width " \u258F\u258E\u258D\u258C\u258B\u258A\u2589\u2588"))
+  
 #+END_SRC
 
-* License (GNU GPL of course)
+* License (GNU GPL)
 Copyright (C) 2013 Thierry Banel, Michael Brand
 
 Authors: Thierry Banel, Michael Brand
