@@ -1,0 +1,253 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      J Source Code Blocks in Org Mode
+#+AUTHOR:     Oleh Krehel
+#+EMAIL:      ohwoeowho at gmail dot com
+#+LANGUAGE:   en
+#+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="http://www.jsoftware.com/">J</a>
+  </p>
+  <p>
+  <a href="http://www.jsoftware.com/">
+  <img src="http://www.jsoftware.com/jwiki/moin_static194/common/jwlogo.png"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* Template Checklist [12/12] 							      :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result%20Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+J is a modern, high-level, general-purpose, high-performance
+programming language. J is portable and runs on Windows, Unix, Mac,
+both as a GUI and in a console. J systems can be installed and
+distributed for free.
+
+J source code blocks in Org Mode can be used to perform calculations,
+plot graphs and produce reproducible research papers.
+
+* Requirements and Setup
+J source code blocks in Org Mode require a working J installation.
+Precompiled binary distributions for Gnu/Linux, Mac OS X, and Windows
+are available at the http://www.jsoftware.com/stable.htm.
+The source can be found at http://www.jsoftware.com/source.htm.
+After the installation, make sure that =jconsole= executable is in
+your path (and that it's actually the J console, not some Java thing).
+
+For :session evaluation, =j-mode= package is required.
+It's available in MELPA and links to https://github.com/zellio/j-mode.
+Note that the package in Marmalade is different at the moment.
+
+Finally, you'll need to ensure that =org-babel-load-languages=
+includes an entry for J.  Typically, =org-babel-load-languages=
+will contain many entries.  The example below omits other languages.
+
+#+begin_src emacs-lisp :tangle yes
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((J . t)))
+#+end_src
+
+* Org Mode Features for J Source Code Blocks
+** Header Arguments
+
+There are no J-specific default header arguments.
+
+There are no J-specific header arguments.
+** Sessions
+Sessions are fully supported by J source code blocks.  They can be
+used as one way to preserve state accessed by several source code
+blocks.  Sessions are also useful for debugging, since it is possible
+to view the values of variables created during the session.
+** Result Types
+Only basic text output is supported.
+* Examples of Use
+** Hello World!
+: #+begin_src J :exports both
+: 'Hello , World!'
+: #+end_src
+
+: #+RESULTS:
+: : Hello , World!
+
+** Common uses
+*** plot a graph
+Note that in order for this to work, =plot= libarary has to be
+installed. You can install it on Linux by running =jgtk= and selecting
+the menu Tools/Package Manager. Afterwards, the experience is similar
+to =synaptic=.
+This should plot a sine. On my system, it creates a /plot.png/ file
+and opens it in a browser.
+
+: #+begin_src J
+: load 'plot'
+: plot 1 o. 0.1 * i.200
+: #+end_src
+
+*** mini-SQL
+Suppose we have two tables
+
+: #+begin_src SQL
+: CREATE TABLE Customers (ID INT, Name TEXT, Age INT, Salary INT)
+: CREATE TABLE Orders (OID INT,  Date  DATETIME,  CustomerID INT, Amount INT)
+: #+end_src
+
+And here's the query that we'd like to perform:
+
+: #+begin_src SQL
+: SELECT * FROM Orders o
+: INNER JOIN Customers c ON o.CustomerID = c.ID AND o.Amount < 2000
+: #+end_src
+
+**** API implementation
+: #+begin_src J :session
+: createTable =: [:|:,.&a:
+: union =: ([:{.[),:[:([:<[:;]#~~:&a:)"1([:{:[),.([:{:]){~([:{.])i.[:{.[
+: insert =: [union[:({.,:([:([:<[:(]$~[:1&,#)>)"0{:))[:|:[:>]
+: rows =: {.([:<,:)"1 1[:|:[:([:<"1[:,.>)"0{:
+: value =: [:(]`{.@.([:1&=#))[:,[:>[((([:<[)=[:{.])#[:{:])[:>]
+: pr =: [:,[:(([:>[)(([:<([:>[),.[:>])"0 0)"0 1[:>])/[:([:<[:rows>)"0]
+: join =: 1 : '((([:{.[:>{.),:[:([:<(>"0))"1[:{:[:1 2 0&|:[:>([:,u"0)#]) (pr y))'
+: #+end_src
+
+**** Create and fill the tables
+: #+begin_src J :session :exports both
+: [Customers =: createTable 'ID';'Name';'Age';'Salary'
+: [Orders =: createTable 'OID';'Date';'CustomerID';'Amount'
+:
+: Customers =: Customers insert (<'ID'; 1),(<'Name'; 'Ramesh'),(<'Age'; 32),(<'Salary'; 2000)
+: Customers =: Customers insert (<'ID'; 2),(<'Name'; 'Khilan'),(<'Age'; 25),(<'Salary'; 1500)
+: Customers =: Customers insert (<'ID'; 3),(<'Name'; 'kaushik'),(<'Age'; 23),(<'Salary'; 2000)
+: Customers =: Customers insert (<'ID'; 4),(<'Name'; 'Chaitali'),(<'Age'; 25),(<'Salary'; 6500)
+: Customers =: Customers insert (<'ID'; 5),(<'Name'; 'Hardik'),(<'Age'; 27),(<'Salary'; 8500)
+: Customers =: Customers insert (<'ID'; 6),(<'Name'; 'Komal'),(<'Age'; 22),(<'Salary'; 4500)
+: Customers =: Customers insert (<'ID'; 7),(<'Name'; 'Muffy'),(<'Age'; 24),(<'Salary'; 10000)
+:
+: Orders =: Orders insert (<'OID'; 102),(<'Date'; '2009-10-08'),(<'CustomerID'; 3),(<'Amount'; 3000)
+: Orders =: Orders insert (<'OID'; 100),(<'Date'; '2009-10-08'),(<'CustomerID'; 3),(<'Amount'; 1500)
+: Orders =: Orders insert (<'OID'; 101),(<'Date'; '2009-11-20'),(<'CustomerID'; 2),(<'Amount'; 1560)
+: Orders =: Orders insert (<'OID'; 103),(<'Date'; '2008-05-20'),(<'CustomerID'; 4),(<'Amount'; 2060)
+: Customers
+: Orders
+: #+end_src
+
+: #+RESULTS:
+: #+begin_example
+: ┌──┬────┬───┬──────┐
+: │ID│Name│Age│Salary│
+: ├──┼────┼───┼──────┤
+: │  │    │   │      │
+: └──┴────┴───┴──────┘
+:
+: ┌───┬────┬──────────┬──────┐
+: │OID│Date│CustomerID│Amount│
+: ├───┼────┼──────────┼──────┤
+: │   │    │          │      │
+: └───┴────┴──────────┴──────┘
+:
+: ┌──┬────────┬───┬──────┐
+: │ID│Name    │Age│Salary│
+: ├──┼────────┼───┼──────┤
+: │1 │Ramesh  │32 │ 2000 │
+: │2 │Khilan  │25 │ 1500 │
+: │3 │kaushik │23 │ 2000 │
+: │4 │Chaitali│25 │ 6500 │
+: │5 │Hardik  │27 │ 8500 │
+: │6 │Komal   │22 │ 4500 │
+: │7 │Muffy   │24 │10000 │
+: └──┴────────┴───┴──────┘
+:
+: ┌───┬──────────┬──────────┬──────┐
+: │OID│Date      │CustomerID│Amount│
+: ├───┼──────────┼──────────┼──────┤
+: │102│2009-10-08│3         │3000  │
+: │100│2009-10-08│3         │1500  │
+: │101│2009-11-20│2         │1560  │
+: │103│2008-05-20│4         │2060  │
+: └───┴──────────┴──────────┴──────┘
+: #+end_example
+
+**** The query
+: #+begin_src J :session :exports both
+: (([:2000&>'Amount'&value)*.'CustomerID'&value='ID'&value) join Customers; < Orders
+: #+end_src
+
+: #+RESULTS:
+: ┌──┬────────┬───┬──────┬───┬──────────┬──────────┬──────┐
+: │ID│Name    │Age│Salary│OID│Date      │CustomerID│Amount│
+: ├──┼────────┼───┼──────┼───┼──────────┼──────────┼──────┤
+: │2 │Khilan  │25 │1500  │101│2009-11-20│2         │1560  │
+: │3 │kaushik │23 │2000  │100│2009-10-08│3         │1500  │
+: └──┴────────┴───┴──────┴───┴──────────┴──────────┴──────┘
+
+*** Sudoku solver
+Note that this takes a few seconds to solve.  Hence this example not
+suitable for :session use, since session has a set limit of 0.1
+seconds to wait for jconsole to print something and then copy that
+output to org.
+: #+begin_src J :exports both
+: i =: ,((,|:)i.9 9),,./,./i.4$3
+: c =: (#=[:#~.)@-.&0
+: t =: [:(([:*/_9:c\])"1#])i&{+"1 1(>:i.9)*/[:i&=i.&0
+: r =: [:,`$:@.(0:e.,)[:;(<@t)"1
+: s =: 9 9&$@r@,
+: ]m =: 9 9 $"."0'200370009009200007001004002050000800008000900006000040900100500800007600400089001'
+: s m
+: #+end_src
+
+: #+RESULTS:
+: #+begin_example
+: 2 0 0 3 7 0 0 0 9
+: 0 0 9 2 0 0 0 0 7
+: 0 0 1 0 0 4 0 0 2
+: 0 5 0 0 0 0 8 0 0
+: 0 0 8 0 0 0 9 0 0
+: 0 0 6 0 0 0 0 4 0
+: 9 0 0 1 0 0 5 0 0
+: 8 0 0 0 0 7 6 0 0
+: 4 0 0 0 8 9 0 0 1
+:
+: 2 8 4 3 7 5 1 6 9
+: 6 3 9 2 1 8 4 5 7
+: 5 7 1 9 6 4 3 8 2
+: 1 5 2 4 9 6 8 7 3
+: 3 4 8 7 5 2 9 1 6
+: 7 9 6 8 3 1 2 4 5
+: 9 6 7 1 4 3 5 2 8
+: 8 1 3 5 2 7 6 9 4
+: 4 2 5 6 8 9 7 3 1
+: #+end_example
+
+** Links to tutorials and other resources
+*** J tutorials/books
+- http://www.jsoftware.com/docs/help701/primer/contents.htm
+- http://www.jsoftware.com/docs/help701/learning/contents.htm
+- http://www.jsoftware.com/help/learning/lj.pdf
+*** Emacs packages for J
+- https://github.com/zellio/j-mode
+- https://github.com/abo-abo/helm-j-cheatsheet
