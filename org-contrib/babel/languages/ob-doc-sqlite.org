@@ -1,0 +1,155 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      SQLite Source Code Blocks in Org Mode
+#+AUTHOR:     Thomas S. Dye
+#+EMAIL:      tsd[at]tsdye[dot]com
+#+LANGUAGE:   en
+#+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="http://www.sqlite.org/index.html">SQLite</a>
+  </p>
+  <p>
+  <a href="http://www.sqlite.org/index.html">
+  <img src="http://www.sqlite.org/images/sqlite370_banner.gif"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* Template Checklist [12/12] 					   :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise [[banner]] source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result%20Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+
+SQLite is a software library that implements a self-contained,
+serverless, zero-configuration, transactional SQL database engine.
+Unlike most other SQL databases, SQLite does not have a separate
+server process. SQLite reads and writes directly to ordinary disk
+files. A complete SQL database with multiple tables, indices,
+triggers, and views, is contained in a single disk file.
+
+* Requirements and Setup
+
+** Installation and configuration of SQLite software
+
+See [[http://www.sqlite.org/download.html][the SQLite download page]] for installation and configuration
+instructions.
+
+** Emacs configuration
+
+Emacs' [[http://www.emacswiki.org/emacs/SqlMode][SQL mode]] supports the SQLite server. [[http://www.emacswiki.org/emacs/SqlMode][SQL mode]] is used to edit
+SQLite source code blocks.
+
+** Org-mode configuration (org-babel-do-load-languages)
+
+The =ob-sqlite.el= file is part of Emacs. To activate SQLite as
+a Babel language, simply add =(sqlite . t)= to the
+=org-babel-do-load-languages= function in your Emacs configuration file,
+as shown below:
+
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages (quote ((emacs-lisp . t)
+                                      (sqlite . t)
+                                      (R . t)
+                                      (python . t))))
+#+END_SRC
+
+Babel uses the SQLite command line shell =sqlite3= to evaluate SQL
+statements. The name of the shell is held in the variable
+=org-babel-sqlite3-command=. 
+
+* Org Mode Features for SQLite Source Code Blocks
+** Header Arguments
+*** Language-specific default values
+There are no language-specific default header arguments for SQLite.
+
+*** Language-specific header arguments
+
+There are 11 SQLite-specific header arguments.
+
+ - db :: a string with the name of the file that holds the SQLite
+         database. Babel requires this header argument. 
+ - header :: if present, turn on headers in the output format. Headers
+             are also output with the header argument =:colnames yes=.
+ - echo :: if present, set the SQLite dot command =.echo= to =ON=.
+ - bail :: if present, set the SQLite dot command =.bail= to =ON=.
+ - csv :: the default SQLite output format for Babel SQLite source
+          code blocks.
+ - column :: an SQLite output format that outputs a table-like form
+             with whitespace between columns.
+ - html :: an SQLite output format that outputs query results as
+           simple HTML tables.
+ - line :: an SQLite output format that outputs query results with one
+           value per line.
+ - list :: an SQLite output format that outputs query results with the
+           separator character between fields.
+ - separator :: a string that specifies the separator character used by the
+                SQLite `list' output mode and by the SQLite dot command
+                =.import=. 
+ - nullvalue :: a string to use in place of NULL values.
+
+
+** Sessions
+SQLite sessions are not supported.
+
+** Result Types
+
+SQLite source code blocks typically return the results of a query. The
+header arguments =:csv=, =:column=, =:line=, =:list=, and =:html=
+determine the output format.
+
+* Examples of Use
+** Hello World!
+
+#+begin_example
+,#+name: sqlite-populate-test
+,#+header: :results silent
+,#+header: :dir ~/temp/
+,#+header: :db test-sqlite.db
+,#+begin_src sqlite
+create table greeting(one varchar(10), two varchar(10));
+insert into greeting values('Hello', 'world!');
+,#+end_src
+
+,#+name: sqlite-hello
+,#+header: :list
+,#+header: :separator \ 
+,#+header: :results raw
+,#+header: :dir ~/temp/
+,#+header: :db test-sqlite.db
+,#+begin_src sqlite
+select * from greeting;
+,#+end_src
+
+,#+results: sqlite-hello
+Hello world!
+#+end_example
+
+Note that =db= and =dir= together specify the path to the file
+that holds the SQLite database.
+
+
