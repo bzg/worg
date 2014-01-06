@@ -1,0 +1,129 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE:      Connecting your Org files with Owncloud
+#+AUTHOR:     Giménez, Christian Nelson
+#+EMAIL:      
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+[[file:index.org][{Back to Worg's index}]]
+
+* TODO Fast and simple
+  This section is for people in a hurry. 
+
+* Downloading from Owncloud
+Here I will explain how to download the ICS files and translate it into Org file
+
+** Downloading 
+   Using WGet or Curl at the following URL:
+
+   https://the-server-site.com/owncloud/remote.php/caldav/calendars/USERNAME/CALENDAR-NAME
+
+   Take a look at the [[*sync-download.sh][sync-download script]].
+   
+** Translating ICalendar to Org
+   Using ics2org AWK script into the directory pointed by the ~org-directory~ variable or some other place.
+   
+   You may need to tune this (for example, ~max_age= -1;~ instead the default value). 
+
+   Take a look at the [[*sync-download.sh][sync-download script]].
+
+   There's a [[*ics2org%20-%20modified%20version][modified version]] that you can use for distinguish between past jobs and futures by translating differents TODO states.
+
+** Integrating everything
+   
+   We must create a simple script for calling the [[*sync-download.sh][sync-download script]] with all the required information. This will be necessary for adding into the cron process and updating for every 15 or more minutes.
+
+   This script must be edited with your username, password, the location of the sync-download script and the url needed.
+
+   You may like to add more actions like moving or copying the file into your own org directory.
+
+   You can use the [[*integration%20script%20for%20downloading][integration script]] as a model.
+   
+** Cron
+   
+   Tell cron to execute the [[*integration%20script%20for%20downloading][integration bash script]] every 15 minutes or more: 
+   
+   : crontab -e 
+   
+   Add the following line:
+
+   : */15 * * * * $HOME/path-to-script/sync-owncloud.sh
+   
+   Save and check with ~crontab -l~.
+
+* Uploading to Owncloud
+** Basics Concepts
+   CalDav stores all the ICalendar files into a directory, there you can change and manipulate everything you need.
+
+   Usually the URL is https://the-server-site.com/owncloud/remote.php/caldav/calendars/USERNAME/CALENDAR-NAME
+
+** Export using the org-export command
+*** Some Variables First
+   ~org-icalendars~ needs some variables sets before starting, and you have to test that the exporting goes well.
+
+   This are the variable needed: 
+   
+   - ~org-icalendar-include-todo~ :: You must set this to ~t~ if you want the TODOs entries exported.
+   - ~org-icalendar-store-UID~ :: This is needed for exporting the same VEVENT/VTODO and don't create duplicates entries into the calendars.
+
+   You can set this variables using the "file-local variables" feature (use ~M-x add-file-local-variable~ or ~M-x add-file-local-variable-prop-line~) or pasting this at the end of your org file
+
+#+BEGIN_SRC: org
+# Local Variables:
+# org-icalendar-include-todo: t
+# org-icalendar-store-UID: t
+# End:
+#+END_SRC
+*** Exporting
+    Open your org file and press ~C-c C-e i~ for exporting the current file, or use the ~org-export-icalendar-this-file~ interactive function.
+
+*** Importing with Kontact
+    Kontact, the KDE personal information manager, can import ICS and combine it with the current calendar. If you have configured the program to sync with owncloud, you can use this for manual importing. 
+
+*** From the Terminal
+    Remember that Emacs can execute elisp scripts for terminal with one of these parameters:
+    
+    - ~--eval~ to eval an expresino given by parameter.
+    - ~--load~ to load a file.
+    - ~--script~ to run a file as an emacs script.
+** Correcting the ICS file
+   Owncloud doesn't accept a lot of things:
+
+   - Owncloud don't know what a VTODO is.
+   - DUE neither, it should be changed into DTEND
+   - DTSTART is exported by org into the actual date and time, it should be changed to the same of the DUE(DTEND) date. It cannot be ignored or deleted.
+
+   The [[*correct-ical.awk][correct-ical.awk]] script can be used for solve all these problems automatically.
+     
+** Spliting the ICS file
+   
+   Owncloud only accepts ICS files with only one event inside. The script [[*split-ics.awk][split-ics.awk]] can be used for this purpose: it separates each event into a new file.
+** Renaming ICS files
+   Each file has to have its own name, and what is a better choice than the UID of each event?
+   
+** Uploading files
+   
+   Using ~cadaver~ you can upload and download files. You need to upload the ics file into the server by the "PUT" HTTP request.
+
+   Remember to set the username and password writing it at the .cadaverrc file.
+
+** Automatic
+   
+   Using the sync-pull-owncloud
+
+* Scripts needed
+
+** sync-download.sh
+   
+** ics2org - modified version
+
+
+** correct-ical.awk
+
+** split-ics.awk
+
+** integration script for downloading
