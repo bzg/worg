@@ -2,41 +2,362 @@
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
-#+TITLE:      Using C and C++ code with Babel
-#+AUTHOR:     Worg People
-#+EMAIL:      schulte.eric at gmail dot com, davison at stats dot ox dot ac dot uk
+#+TITLE:      C, C++, D Source Code Blocks in Org Mode
+#+AUTHOR:     Worg People, Eric Schulte, Thierry Banel, Thomas S. Dye
+#+EMAIL:      schulte.eric at gmail dot com, davison at stats dot ox dot ac dot uk, tbanelwebmin at free dot fr
 #+LANGUAGE:   en
 #+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
 #+LINK_UP:    ../languages.html
 #+LINK_HOME:  http://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
 
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for
+    <br><a href="http://www.gnu.org/software/gcc/">C, C++</a>
+    <br><a href="http://dlang.org/">D</a>
+  </p>
+  <p>
+  <a href="http://www.gnu.org/software/gcc/"><img src="http://www.gnu.org/software/gcc/img/gccegg-65.png"/></a>
+  <a href="http://dlang.org/"><img src="http://dlang.org/images/dlogo.png"/></a>
+  </p>
+  </div>
+#+end_html
+
+* Template Checklist [10/12] 					   :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [ ] Describe [[Result%20Types][Result Types]]
+  - [ ] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
 * Introduction
-Babel can evaluate C and C++ code.  As opposed to interpreted
-languages, which can be evaluated directly, C or C++ code is first
-compiled to an executable which is then run.  If a =main= method is
-not present in a code block then the entire block is wrapped in a
-trivial =main= function call.
 
-So, for example, the following simple code block can be evaluated and
-the results of evaluation inserted into the buffer.
+Babel can evaluate C, C++, and D code.
 
-: #+begin_src c++ :includes <stdio.h>
-:   int a=1;
-:   int b=1;
-:   printf("%d\n", a+b);
-: #+end_src
-: 
-: #+results:
-: : 2
+As opposed to interpreted languages, which can be evaluated directly,
+C, C++, and D code is first compiled to an executable which is then
+run.
 
-* Language Specific Header Arguments
-Babel provides the following C and C++ specific header arguments:
+If a =main= method is not present in a code block then the entire
+block is wrapped in a trivial =main= function call.
+
+Note: there used to be two separate library files, =ob-C.el= and
+=ob-D.el=. They have been merged in a single =ob-C.el= file which
+handle all three languages.
+
+** About C
+C dates back in the 1970.
+It was devised by Kernighan & Ritchie.
+It was used to create the Unix kernel, and many of its utilities.
+Today it is still the base of the Linux & Unix kernel.
+
+** About C++
+C++ was devised by Stroustrup in the 1980.
+The purpose was to enhance C with object programming.
+Among the features introduced by C++, there are:
+  - templates and the Standard Template Library,
+  - object programming, with class definition and inheritance,
+  - functions and operators overloading
+  - exceptions
+
+** About D
+[[http://dlang.org/][D]] is a C++-like language made by [[http://dlang.org/][Digital Mars]].
+It features:
+  - C++ syntax
+  - Built-in garbage collector
+  - Strong type system
+  - Meta-programming
+  - Seamless assembler support
+  - Usable as a scripting language
+  - C binary compatibility
+  - and much more.
+
+* Requirements and Setup
+
+1- You must have the compilers available on your computer.
+   You may use only one of the three languages:
+   there is no requirement to have all three installed.
+   - C and C++ often come pre-installed.
+     Popular compilers are the GNU ones, called =gcc= and =g++=.
+     But others are usable as well.
+   - For D, look at http://dlang.org/ for downloading and instructions.
+     The compilers are called =dmd= and =rdmd=.
+
+   Eventually, the compilers must be in the =PATH=.
+
+2- Make any or all languages available to Babel.
+   Type:
+   : M-x customize-variable org-babel-load-languages
+   and add the language of your choice.
+
+* Org Mode Features for D Source Code Blocks
+** Header Arguments
+
+- =:var VARIABLE=VALUE= ::
+  A global C, C++, or D variable named VARIABLE will be declared
+  and initialized with VALUE
+
+  Possible types for VARIABLE may be:
+    : int,
+    : double,
+    : string or const char*,
+    : type[]    // type = int, double, string, const char*
+    : type[][]  // type = int, double, string, const char*
+
+  The later type, =type[][]=, is used for variables storing Org tables
+
+  The =type[]= is used for lists or vectors declared in the header
+
 - =:cmdline= :: command line arguments to pass to the executable
      compiled from the code block
-- =:flags= :: flags to pass to the C compiler
+
+- =:flags= :: flags to pass to the compiler
+
 - =:main= :: can be set to "no" to inhibit wrapping of the code block
      in a =main= function call
-- =:includes= :: accepts either a single string name, or a list of
+
+- =:includes= (C & CC+ only):: accepts either a single string name, or a list of
      names of files to =#include= in the execution of the code block
-- =:defines= :: just like =:includes= but for =#defines= lines at the
+
+- =:import package= (D only) ::
+  An import statement will be declared in the D source before the source code
+
+- =:defines= (C & C++ only):: just like =:includes= but for =#defines= lines at the
      top of the code
+
+** Sessions
+   There is no support for sessions
+
+* Examples of Use
+** Hello World in C & C++
+Here is Hello World!
+
+#+name: c-hello
+#+begin_src C :exports results
+  #include "stdio.h"
+  printf ("Hello World!");
+#+end_src
+
+This source code block:
+
+#+begin_example
+#+begin_src C
+  #include "stdio.h"
+  printf ("Hello World!");
+#+end_src
+#+end_example
+
+Note that:
+- no =main()= is declared, a trivial one is automatically provided,
+
+** Hello World in D
+Here is Hello World!
+
+#+name: d-hello
+#+begin_src D :exports results
+  import std.stdio;
+  writefln ("Hello World!");
+#+end_src
+
+This source code block:
+
+#+begin_example
+#+begin_src D
+  import std.stdio;
+  writefln ("Hello World!");
+#+end_src
+#+end_example
+
+yields this result:
+
+#+results: d-hello
+Hello World!
+
+** Scalar variables
+Variables may be declared outside the script.
+They are automatically inserted at the top of the script.
+Three types are supported, based on the look of the value:
+  - =string= or =const char*=
+  - =int=
+  - =double=
+
+Example in C or C++:
+
+#+header: :var mystring="Sunday" :var myint=145 :var mydouble=3.14
+#+BEGIN_SRC C
+  #include "stdio.h"
+  printf ("mystring %s\n", mystring);
+  printf ("myint    %d\n", myint);
+  printf ("mydouble %g\n", mydouble);
+#+END_SRC
+
+This source code block:
+
+#+begin_example
+#+header: :var mystring="Sunday" :var myint=145 :var mydouble=3.14
+#+BEGIN_SRC C
+  #include "stdio.h"
+  printf ("mystring %s\n", mystring);
+  printf ("myint    %d\n", myint);
+  printf ("mydouble %g\n", mydouble);
+#+END_SRC
+#+end_example
+
+yields this result:
+
+#+RESULTS:
+| mystring | Sunday |
+| myint    |    145 |
+| mydouble |   3.14 |
+
+Example in D:
+
+#+header: :var mystring="Sunday" :var myint=145 :var mydouble=3.14
+#+BEGIN_SRC D
+  import std.stdio;
+  writefln ("mystring %s", mystring);
+  writefln ("myint    %d", myint);
+  writefln ("mydouble %g", mydouble);
+#+END_SRC
+
+#+begin_example
+#+header: :var mystring="Sunday" :var myint=145 :var mydouble=3.14
+#+BEGIN_SRC D
+  import std.stdio;
+  writefln ("mystring %s", mystring);
+  writefln ("myint    %d", myint);
+  writefln ("mydouble %g", mydouble);
+#+END_SRC
+#+end_example
+
+#+RESULTS:
+| mystring | Sunday |
+| myint    |    145 |
+| mydouble |   3.14 |
+
+** Process an Org Mode Table
+
+*** How to handle a table
+
+Example of input table:
+
+#+tblname: somedata
+| nb    | day       |
+|-------+-----------|
+| zero  | Sunday    |
+| one   | Monday    |
+| two   | Tuesday   |
+| three | Wednesday |
+| four  | Thursday  |
+| five  | Friday    |
+| six   | Saturday  |
+
+The table is converted to a variable in the script:
+  - =const char* somedata[7][2] = {...};=  // in C & C++
+  - =string      somedata[7][2] = [...];=  // in D
+
+Beware that in the current version, input tables must be homogeneous:
+they must contain only integers, or only doubles, or only strings.
+This constraint will be removed in a future release.
+
+*** Example in C & C++
+
+#+header: :exports results
+#+begin_src C++ :var somedata=somedata
+  #include "stdio.h"
+  int main()
+  {
+    for (int i=0; i<7; i++) {
+      for (int j=0; j<2; j++)
+        printf ("%s ", somedata[i][j]);
+      printf("%d\n", i);
+    }
+    return 0;
+  }
+#+end_src
+
+This code:
+
+#+begin_example
+#+header: :exports results
+#+begin_src C++ :var somedata=somedata
+  #include "stdio.h"
+  int main()
+  {
+    for (int i=0; i<7; i++) {
+      for (int j=0; j<2; j++)
+        printf ("%s ", somedata[i][j]);
+      printf("%d\n", i);
+    }
+    return 0;
+  }
+#+end_src
+#+end_example
+
+yields this result:
+
+#+RESULTS:
+| zero  | Sunday    | 0 |
+| one   | Monday    | 1 |
+| two   | Tuesday   | 2 |
+| three | Wednesday | 3 |
+| four  | Thursday  | 4 |
+| five  | Friday    | 5 |
+| six   | Saturday  | 6 |
+
+*** Example in D
+
+#+header: :exports results
+#+begin_src D :var somedata=somedata
+  import std.stdio;
+  void main()
+  {
+    foreach (i, row; somedata) {
+      foreach (j, cell; row)
+        writef ("%s ", cell);
+      writefln ("%s", i);
+    }
+  }
+#+end_src
+
+This code:
+
+#+begin_example
+#+header: :exports results
+#+begin_src D :var somedata=somedata
+  import std.stdio;
+  void main()
+  {
+    foreach (i, row; somedata) {
+      foreach (j, cell; row)
+        writef ("%s ", cell);
+      writefln ("%s", i);
+    }
+  }
+#+end_src
+#+end_example
+
+yields this result:
+
+#+RESULTS:
+| zero  | Sunday    | 0 |
+| one   | Monday    | 1 |
+| two   | Tuesday   | 2 |
+| three | Wednesday | 3 |
+| four  | Thursday  | 4 |
+| five  | Friday    | 5 |
+| six   | Saturday  | 6 |
+
