@@ -57,7 +57,6 @@ as
 
 :  This text should be in <bold>\textbf{BOLD}</bold>.
 
-
 * A Complete Set of Filter Functions
 Here is a complete set of filter functions to provide markup tags. 
 
@@ -153,9 +152,6 @@ Here is a complete set of filter functions to provide markup tags.
   (defun ox-mrkup-filter-link
     (text back-end info)
     (format "<link>%s</link>" text))
-  (defun ox-mrkup-filter-macro
-    (text back-end info)
-    (format "<macr>%s</macr>" text))
   (defun ox-mrkup-filter-node-property
     (text back-end info)
     (format "<nd-p>%s</nd-p>" text))
@@ -179,9 +175,6 @@ Here is a complete set of filter functions to provide markup tags.
   (defun ox-mrkup-filter-quote-block
     (text back-end info)
     (format "<qt-b>%s</qt-b>" text))
-  (defun ox-mrkup-filter-quote-section
-    (text back-end info)
-    (format "<qt-s>%s</qt-s>" text))
   (defun ox-mrkup-filter-radio-target
     (text back-end info)
     (format "<rd-t>%s</rd-t>" text))
@@ -250,7 +243,7 @@ could be edited to leave only those filters that are wanted.
 #+begin_src emacs-lisp
   (require 'ox-latex)
   (org-export-define-derived-backend 'latex2 'latex
-    :filters-alist 
+    :filters-alist
     '((:filter-bold . ox-mrkup-filter-bold)
      (:filter-babel-call . ox-mrkup-filter-babel-call)
      (:filter-center-block . ox-mrkup-filter-center-block)
@@ -281,19 +274,17 @@ could be edited to leave only those filters that are wanted.
      (:filter-latex-fragment . ox-mrkup-filter-latex-fragment)
      (:filter-line-break . ox-mrkup-filter-line-break)
      (:filter-link . ox-mrkup-filter-link)
-     (:filter-macro . ox-mrkup-filter-macro)
      (:filter-node-property . ox-mrkup-filter-node-property)
-     ;;   omit filter with different args  
+     ;;   omit filter with different args
      ;;   (:filter-options . ox-mrkup-filter-options)
      (:filter-paragraph . ox-mrkup-filter-paragraph)
-     ;;   omit filter with different args  
+     ;;   omit filter with different args
      ;;   (:filter-parse-tree . ox-mrkup-filter-parse-tree)
      (:filter-plain-list . ox-mrkup-filter-plain-list)
      (:filter-plain-text . ox-mrkup-filter-plain-text)
      (:filter-planning . ox-mrkup-filter-planning)
      (:filter-property-drawer . ox-mrkup-filter-property-drawer)
      (:filter-quote-block . ox-mrkup-filter-quote-block)
-     (:filter-quote-section . ox-mrkup-filter-quote-section)
      (:filter-radio-target . ox-mrkup-filter-radio-target)
      (:filter-section . ox-mrkup-filter-section)
      (:filter-special-block . ox-mrkup-filter-special-block)
@@ -311,8 +302,6 @@ could be edited to leave only those filters that are wanted.
      (:filter-verbatim . ox-mrkup-filter-verbatim)
      (:filter-verse-block . ox-mrkup-filter-verse-block)))
 #+END_SRC
-
-
 
 * Options for Adding Filters
 Users can add filter functions to the lists in ~org-export-filters-alist~
