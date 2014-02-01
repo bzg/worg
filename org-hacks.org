@@ -2286,6 +2286,84 @@ top of each kind of code box:
 Additionally, we use color to distinguish code output (the =.example=
 class) from input (all the =.src-*= classes).
 
+*** Including external text fragments
+
+#+index: Export!including external text fragments
+
+I recently had to document some source code but could not modify the
+source files themselves. Here is a setup that lets you refer to
+fragments of external files, such that the fragments are inserted as
+source blocks in the current file during evaluation of the ~call~
+lines (thus during export as well).
+
+#+BEGIN_SRC org
+  ,* Setup                                                            :noexport:
+  ,#+name: fetchsrc
+  ,#+BEGIN_SRC emacs-lisp :results raw :var f="foo" :var s="Definition" :var e="\\. *$" :var b=()
+    (defvar coqfiles nil)
+  
+    (defun fetchlines (file-path search-string &optional end before)
+      "Searches for the SEARCH-STRING in FILE-PATH and returns the
+        matching line. If the optional argument END is provided as a
+        number, then this number of lines is printed. If END is a
+        string, then it is a regular expression indicating the end of
+        the expression to print. If END is omitted, then 10 lines are
+        printed. If BEFORE is set, then one fewer line is
+        printed (this is useful when END is a string matching the
+        first line that should not be printed)."
+      (let ((myBuffer (get-buffer-create "fetchTemp")) result)
+        (set-buffer myBuffer)
+        (insert-file-contents file-path nil nil nil t)
+        (goto-char 1)
+        
+        (setq result
+              (if (search-forward search-string nil t)
+                  (let ((pos-beg (line-beginning-position))
+                        (pos-end
+                         (if end
+                             (cond
+                              ((integerp end)
+                               (line-end-position (if before (- end 1) end)))
+                              ((stringp end)
+                               (let ((point (re-search-forward end nil t)))
+                                 (if before (line-end-position 0) point)))
+                              (t (line-end-position 10)))
+                           (line-end-position 10))))
+                    (buffer-substring pos-beg pos-end))
+                ""))
+        
+        (kill-buffer myBuffer)
+        result))
+    
+    (fetchlines (concat coqfiles f ".v") s e b)
+  ,#+END_SRC
+  
+  ,#+name: wrap-coq
+  ,#+BEGIN_SRC emacs-lisp :var text="" :results raw
+  (concat "#+BEGIN_SRC coq\n" text "\n#+END_SRC")
+  ,#+END_SRC
+#+END_SRC
+
+This is specialized for Coq files (hence the ~coq~ language in the
+~wrap-coq~ function, the ~.v~ extension in the ~fetch~ function, and
+the default value for ~end~ matching the syntax ending definitions in
+Coq). To use it, you need to:
+- set the ~coqfiles~ variable to where your source files reside;
+- call the function using lines of the form
+  #+BEGIN_SRC org
+    ,#+call: fetchsrc(f="JsSyntax", s="Inductive expr :=", e="^ *$", b=1) :results drawer :post wrap-coq(text=*this*)
+  #+END_SRC
+  In this example, we look inside the file ~JsSyntax.v~ in ~coqfiles~,
+  search for a line matching ~Inductive expr :=~, and include the
+  fragment until the first line consisting only of white space,
+  excluded (as ~b=1~).
+
+I use drawers to store the results to avoid a bug leading to
+duplication during export when the code has already been evaluated in
+the buffer (see [[http://thread.gmane.org/gmane.emacs.orgmode/79520][this thread]] for a description of the problem). This
+has been fixed in recent versions of org-mode, so alternative
+approaches are possible.
+
 ** Babel
 
 *** How do I preview LaTeX fragments when in a LaTeX source block?
