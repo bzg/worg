@@ -73,21 +73,14 @@ The above code will load the development version of org-mode upon emacs invocati
 
 ** Configure Org-mode
 
-Add these lines to your .emacs file to configure org-mode for Clojure code blocks:
+Add these lines to your .emacs file to configure org-mode for Clojure code blocks.
+Note that emacs lisp code blocks are turned on by default in org.
 
 #+BEGIN_SRC emacs-lisp
-(require 'org)
-
-;; We only need Emacs Lisp and Clojure in this tutorial:
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (clojure . t)))
-
-(require 'ob-clojure)
-
-;; Use CIDER as the Clojure execution backend
-(setq org-babel-clojure-backend 'cider)
+  (require 'org)
+  (require 'ob-clojure)
+  ;;; Use CIDER as the Clojure execution backend
+  (setq org-babel-clojure-backend 'cider)
 #+END_SRC
 
 ** Configure CIDER
@@ -95,8 +88,8 @@ Add these lines to your .emacs file to configure org-mode for Clojure code block
 Add these lines to your .emacs file to configure CIDER:
 
 #+BEGIN_SRC emacs-lisp :tangle emacs.el
-;; Cider configuration
-(require 'cider)
+  (setq org-babel-clojure-backend 'cider)
+  (require 'cider)
 #+END_SRC
 
 ** Create a Clojure Project with Leiningen
@@ -124,7 +117,7 @@ From within the Leiningen project directory, begin editing an org file:
 Copy the following into the Org buffer:
 #+begin_example
 #+BEGIN_SRC emacs-lisp
-(message "Yeah!")
+  (message "Yeah!")
 #+END_SRC
 #+end_example
 
@@ -138,6 +131,8 @@ This is the simplest possible example.  There are numerous options
 available for output and format of the result of code evaluation.
 Options are added to the =#+BEGIN_SRC= line.
 Please refer to the org-mode manual for usage of these options.
+Another source for information on options is this page at Worg:
+[[http://orgmode.org/worg/org-contrib/babel/header-args.html][Header arguments and result types in Org Babel]]
  
 Next, a similar process for executing code will be used with Clojure.
 
@@ -152,7 +147,7 @@ To connect the current Org buffer to a REPL:
 A second buffer (window) should open, and a CIDER REPL prompt should appear.
 
 * Examples
-The following are several Clojure code block examples.
+The following are Clojure code block examples.
 ** Basic Functionality
 
 Let's start really simple. We will test the evaluation of a
@@ -160,7 +155,7 @@ simple Clojure form. Insert the following into the org file:
 
 #+begin_example
 #+begin_src clojure :results silent
-(+ 1 4)
+  (+ 1 4)
 #+end_src
 #+end_example
     
@@ -175,7 +170,7 @@ block. Insert the following into your org file:
 
 #+begin_example
 #+begin_src clojure :results value
-[ 1 2 3 4]
+  [ 1 2 3 4]
 #+end_src
 #+end_example
 
@@ -195,8 +190,8 @@ The result of the last form evaluated will be inserted into the results block.
 Here is another simple example, with the results of evaluation included:
 #+begin_example
 #+begin_src clojure :results value
-(def small-map {:a 2 :b 4 :c 8})
-(:b small-map)
+  (def small-map {:a 2 :b 4 :c 8})
+  (:b small-map)
 #+end_src
 
 #+RESULTS:
@@ -230,27 +225,28 @@ used to create an x-y line plot.  The =view= function will display the plot.
 The plot is also saved to both PDF and PNG format image files.
 #+begin_example
 #+begin_src clojure
-(use '(incanter core charts pdf))
-;;; Create the x and y data:
-(def x-data [0.0 1.0 2.0 3.0 4.0 5.0])
-(def y-data [2.3 9.0 2.6 3.1 8.1 4.5])
-(def xy-line (xy-plot x-data y-data))
-(view xy-line)
-(save-pdf xy-line "incanter-xy-line.pdf")
-(save xy-line "incanter-xy-line.png")
+  (use '(incanter core charts pdf))
+  ;;; Create the x and y data:
+  (def x-data [0.0 1.0 2.0 3.0 4.0 5.0])
+  (def y-data [2.3 9.0 2.6 3.1 8.1 4.5])
+  (def xy-line (xy-plot x-data y-data))
+  (view xy-line)
+  (save-pdf xy-line "incanter-xy-line.pdf")
+  (save xy-line "incanter-xy-line.png")
 #+end_src
 #+end_example
 
 To insert the image into the exported document, add this code:
 #+begin_example
-#+CAPTION: A basic x-y line plot
-#+NAME: fig:xy-line
-[[./incanter-xy-line.pdf]]
+  #+CAPTION: A basic x-y line plot
+  #+NAME: fig:xy-line
+  [[./incanter-xy-line.pdf]]
 #+end_example
 
 Note that the file will be saved to the highest level of the Leiningen project.
 Depending on where you created the org file, the path to the file may have to be different
 than shown.
+** Export to LaTeX or HTML
 
 To export to LaTeX, =C-c C-e l l=.
 To export to HTML, =C-c C-e h h=.
@@ -260,14 +256,22 @@ to embed the image in the HTML, switch to the PNG image file.
 The exported LaTeX (.tex) file will embed either the PDF or PNG file.
 Graphical quality will be superior with the PDF file.
 
+* Session Evaluation
+
+By default, each individual code block will execute by starting a Clojure process.
+Each code block will execute in isolation from the others.  Due to the start-up
+time of a Java virtual machine, this can make execution of many blocks slow.
+The :session option will allow control of the process assigned to each code block.
+Please refer to the org manual for details on :session usage.
+
 * Additional Examples
 
 The above set-up and examples were intended for the beginner to achieve success
-with Clojure code blocks in org mode documents.  Additional features can be added to
-the system, mostly via changes to the .emacs configuration file.
+with Clojure code blocks in org mode documents.
 
 Please refer to the documentation for emacs, Clojure-mode, and CIDER which are
-referenced in the requirements session for details on how to enhance the system.
+referenced in the requirements session for details on how to enhance the system
+beyond the basics described in this tutorial.
 
 More examples of Clojure code blocks can be found at these sites:
  * [[http://bzg.fr/emacs-org-babel-overtone-intro.html][Emacs Org and Overtone]]
