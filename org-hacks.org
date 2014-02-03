@@ -2303,37 +2303,30 @@ lines (thus during export as well).
     (defvar coqfiles nil)
   
     (defun fetchlines (file-path search-string &optional end before)
-      "Searches for the SEARCH-STRING in FILE-PATH and returns the
-        matching line. If the optional argument END is provided as a
-        number, then this number of lines is printed. If END is a
-        string, then it is a regular expression indicating the end of
-        the expression to print. If END is omitted, then 10 lines are
-        printed. If BEFORE is set, then one fewer line is
-        printed (this is useful when END is a string matching the
-        first line that should not be printed)."
-      (let ((myBuffer (get-buffer-create "fetchTemp")) result)
-        (set-buffer myBuffer)
+      "Searches for the SEARCH-STRING in FILE-PATH and returns the matching line.
+    If the optional argument END is provided as a number, then this
+    number of lines is printed.  If END is a string, then it is a
+    regular expression indicating the end of the expression to print.
+    If END is omitted, then 10 lines are printed.  If BEFORE is set,
+    then one fewer line is printed (this is useful when END is a
+    string matching the first line that should not be printed)."
+      (with-temp-buffer
         (insert-file-contents file-path nil nil nil t)
-        (goto-char 1)
-        
-        (setq result
-              (if (search-forward search-string nil t)
-                  (let ((pos-beg (line-beginning-position))
-                        (pos-end
-                         (if end
-                             (cond
-                              ((integerp end)
-                               (line-end-position (if before (- end 1) end)))
-                              ((stringp end)
-                               (let ((point (re-search-forward end nil t)))
-                                 (if before (line-end-position 0) point)))
-                              (t (line-end-position 10)))
-                           (line-end-position 10))))
-                    (buffer-substring pos-beg pos-end))
-                ""))
-        
-        (kill-buffer myBuffer)
-        result))
+        (goto-char (point-min))
+        (let ((result
+               (if (search-forward search-string nil t)
+                   (buffer-substring
+                    (line-beginning-position)
+                    (if end
+                        (cond
+                         ((integerp end)
+                          (line-end-position (if before (- end 1) end)))
+                         ((stringp end)
+                          (let ((point (re-search-forward end nil t)))
+                            (if before (line-end-position 0) point)))
+                         (t (line-end-position 10)))
+                      (line-end-position 10))))))
+          (or result ""))))
     
     (fetchlines (concat coqfiles f ".v") s e b)
   ,#+END_SRC
