@@ -19,8 +19,8 @@ letters using the Org-mode LaTeX exporter and the KOMA-Script
 
 The code in this tutorial depends on the following:
 
-- Org-mode version 8.0 or greater (part of Emacs 24.4).
-- A LaTeX installation including [[http://www.ctan.org/pkg/koma-script][KOMA-Script]], e.g., [[http://www.tug.org/texlive/][TeX Live]].
+- org-mode version 8.0 or greater (part of Emacs 24.4);
+- a LaTeX installation including [[http://www.ctan.org/pkg/koma-script][KOMA-Script]], e.g., [[http://www.tug.org/texlive/][TeX Live]].
 
 *Note*: The information in this tutorial depends on functionality that
 has not yet been released and it not part of Emacs. You can either [[http://orgmode.org/worg/org-faq.html#keeping-current-with-Org-mode-development][use
@@ -76,7 +76,7 @@ exporter internally).
    of [[http://orgmode.org/cgit.cgi/org-mode.git/plain/contrib/lisp/ox-koma-letter.el][=ox-koma-script.el=]].
 
    Note that you may have to add the LaTeX Babel package to you
-   preamble, e.g. as
+   preamble, e.g., as
    #+BEGIN_SRC emacs-lisp
      (eval-after-load 'ox-latex
        '(add-to-list 'org-latex-packages-alist '("AUTO" "babel" t) t))
@@ -107,20 +107,20 @@ the =:to:= tag.  Note that the headline text is arbitrary and ignored.
 The main letter is the first non-special heading[fn:1].  Notice that
 the text of this headline also serves as the opening of the letter.
 
-Finally, the 'backmatter' printed after the esignature are defined in
+Finally, the 'backmatter' printed after the signature are defined in
 the tree [[*%20List%20of%20special%20headings][special heading]] with the tags =ps=, =cc= and =encl=.  With
 the =OPTION= =after-closing-order= we can reorder the ordering of the
 'backmatter'.  The content of the =after_letter= heading is inserted
 after =\end{letter}=.  This is useful executing arbitrary latex
 commands.  For instance, we may want to include PDFs via the
-=[[http://www.ctan.org/pkg/pdfpages][pdfpages=]].
+=[[http://www.ctan.org/pkg/pdfpages][pdfpages]]= package.
 
 =ox-koma-letter.el= also supports an alternative syntax that relies
 less on headings as illustrated by the example in this [[http://orgmode.org/worg/sources/exporters/koma-letter-example.org][Org-file]] and
 the corresponding [[http://orgmode.org/worg/images/ox-koma-letter/koma-letter-example.pdf][pdf]].
 
-When composing new letters it may be useful to start with the template
-access by typing =C-c C-e
+When composing new letters it may be useful to start with template
+by typing =C-c C-e #= and choosing =koma-letter=.
 
 * DONE Configuration guide
 
@@ -129,13 +129,13 @@ additional information, such as the sender's and recipient's
 addresses, a date, and so on. From now on we refer to this additional
 data as /letter metadata/.
 
-A special group of letter metadata control the appearance of the
+A special group of letter metadata controls the appearance of the
 letter, such as the presence of foldmarks or a back address. These are
 called /letter options/.
 
 ** DONE Setting letter metadata and letter options
 
-Letter metadata can be configured in one of three ways, listed below
+Letter metadata can be configured in one of four ways, listed below
 from the most specific to the most general:
 
 1. using Org option lines, as show in the [[*A%20simple%20letter%20example][simple letter example]] above,
@@ -146,7 +146,7 @@ from the most specific to the most general:
 We cover these in turn.
 
 *** DONE Multiple LaTeX Classes
-It is also possible to define multiple LaTeX classes for different
+It is possible to define multiple LaTeX classes for different
 types of letters using the method used [[letter-class-definition][above]].  For example one could
 add a special Org LaTeX class, say =foo-copr=, for sending letters to
 the stakeholders of Foo Corp, that loads the Foo Logo, specifies the
@@ -166,19 +166,18 @@ A [[*List%20of%20KOMA%20letter%20meta%20data%20settings][list of KOMA letter met
 
 Metadata set in the file takes the highest priority. Thus, you can set
 default letter metadata using Emacs variables or in an LCO file (see
-below).  Therefor, you can tweak your default letter options in the
-fil.e
+below).  Then, you can tweak your letter options in the file itself.
 
-If you define a letter below an Org heading, you must use Org
+If you write a letter as a subtree of an Org heading, you must use Org
 properties inside a =:PROPERTIES:= drawer and prefix every option
 property with the string =EXPORT_=. See the [[http://orgmode.org/manual/Export-options.html][chapter Export options in
 the Org manual]] for details.
 
 *** DONE Setting letter metadata in Emacs variables
 
-Letter metadata can also be set using Emacs variables, e.g. in your
+Letter metadata can also be set using Emacs variables, e.g., in your
 init-file. For example, the Emacs Lisp snippet below sets the letter's
-closing line and the location:
+closing line and the location.
 
 #+BEGIN_SRC emacs-lisp
   (setq org-koma-letter-closing "See you soon,"
@@ -207,7 +206,7 @@ Emacs variables]] but not [[*Setting%20letter%20meta%20data%20in%20Org%20option%
 
 LCO files are convenient as modules that can be loaded to access
 particular setups across letters.  Examples include the sender's
-address, the first footer and header, and banking information, or the
+address, the first footer and header, banking information, or the
 inclusion of a scanned signature.  A particularly useful LaTeX command
 is =\ifkomavarempty{KOMAVAR}{TRUE}{FALSE}= that can be used to
 condition the printed output depending on whether =KOMAVAR= is set or
@@ -267,7 +266,7 @@ the behavior of the KOMA-Script letter exporter.
 To get a complete list of variables please use the Customize
 interface, e.g. by typing
 #+BEGIN_EXAMPLE
-M-x custromize-group org-export-koma-letter.
+M-x custromize-group org-export-koma-letter
 #+END_EXAMPLE
 
 
