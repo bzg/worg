@@ -1,0 +1,217 @@
+#+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TITLE: Weaving a budget with Org & ledger
+#+AUTHOR:     Erik Hetnzer
+#+EMAIL:      egh@e6h.org
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+* Weaving a budget with Org & ledger
+
+Since I am intending this tutorial for worg, I will assume that the
+reader is familiar with Org. If you are not, but are an emacs user, I
+encourage you to explore Org. It is an invaluable piece of software.
+
+Now, assuming that you are familiar (or have familiarized yourself)
+with Org, you might also be interested in using ledger. If you already
+are using it, this tutorial is for you. If you are new to ledger, you
+might find the [[http://www.ledger-cli.org/3.0/doc/ledger3.html][manual]] useful. The [[http://hledger.org/step-by-step][hledger step-by-step]] guide is also
+useful, though intended for hledger (a close cousin of ledger). I
+don’t intend to introduce the reader to ledger in this document.
+
+Now, ledger comes with a built in budget system, but I wanted to get
+an “envelope” style budget working. While this was easy to do in
+theory, in practice it proved more difficult. The theory is pretty
+simple; enevelope budgeting merely requires you to create new accounts
+to keep track of each “envelope” of money, and assign all of your
+income to those separate accounts. But in practice, it requires a huge
+amount of duplicate data-entry, even when using ledger’s automatic
+transactions, because each month’s budget tends to *mostly* but not
+*exactly* the same as the last month’s. This quickly becomes a
+nightmare when you want to change your monthly food budget over the
+past six months. The following document describes how I managed to get
+something working, with nice reporting, using Org’s babel and noweb
+features.
+
+** The theory
+
+In theory, ledger can easily be used to manage an envelope budget. The
+basic idea is that you will place all your money in different
+=Budgeted= accounts. For instance, if you earn $1000/mo and want to
+place half of that money in your food budget and the other half in
+your bars budget, you would use:
+
+#+BEGIN_EXAMPLE
+2014/01/01 Income
+  Assets:Checking         $1000
+  Income                 -$1000
+  Budgeted:Expenses:Food   $500
+  Budgeted:Expenses:Bars   $500
+  Budget                 -$1000
+#+END_EXAMPLE
+
+(The =Budget= account is to ensure things balance; it should be equal
+to your income.)
+
+Now, you will use automated transactions to deplete your budget as you
+move money to your =Expenses= accounts. Here is an automated
+transaction that will work for all your expenses in 2014 and
+afterwards:
+
+#+BEGIN_EXAMPLE
+= expr (date>=[2014] and account =~ /^Expenses:/)
+  Budgeted:$account        -1
+  Budget                    1
+#+END_EXAMPLE
+
+Now, given expense transactions that look like:
+
+#+BEGIN_EXAMPLE
+2014/01/02 Foo
+  Assets:Checking      -$100
+  Expenses:Food         $100
+#+END_EXAMPLE
+
+this will add, for every posting that starts with =Expenses=, a
+posting to =Budgeted:Expenses= and to =Budget=. This will result in
+the automated equivalent of having entered:
+
+#+BEGIN_EXAMPLE
+2014/01/02 Foo
+  Assets:Checking         -$100
+  Expenses:Food            $100
+  Budgeted:Expenses:Foo   -$100
+  Budget                   $100
+#+END_EXAMPLE
+
+The automated transaction saves us a great deal of repetetive work, as
+you can see.
+
+Now, this solution will work. Each month, you will replenish your
+budget accounts by an amount equaling your income for that month, and
+as you spend money the budget accounts will be depleted as you spend
+money. But the trickiest part, I found, was in adjusting your budget
+as needed. For instance, I found that I needed a base budget for
+things like food and gas, but that other items might suddenly stop.
+For instance, you might cancel your cable, or take up a new hobby. You
+can copy and paste your base budget, but then when you go back to
+retroactively change your food budget (as you will probably need to,
+to adjust to the fact that you are spending more or less than
+anticipated), you need to go back and change all those budget entries.
+This quickly becomes a hassle.
+
+** The practice (Org enters the picture)
+
+This is where Org, and particularly babel’s noweb features come in.
+But first, let’s look at how you can use Org to generate some useful
+reports. Here is how I generate last month’s expenses:
+
+: * Last month's expenses
+: #+begin_src ledger :cmdline bal -p "last month" ^Expenses: :results output :exports results
+: !include /path/to/ledger.lgr
+: #+end_src
+
+(You may need to ensure that =ob-ledger= is loaded into your Org;
+see the [[file:../org-contrib/babel/languages/ob-doc-ledger.org][ob-ledger doc]] for details.) Now, if you type =C-c C-c= on this
+entry, it will generate a report of your expenses last month, which
+will be placed after the source block, and will look like:
+
+: #+RESULTS:
+: #+begin_example
+:             $150.00  Expenses
+:             $100.00    Food
+:              $50.00    Bars
+: --------------------
+:             $150.00
+: #+end_example
+
+By using babel, you can generate a lot of useful reports and keep them
+up-to-date, exporting them to HTML or PDF for printing, etc.
+
+But some of the really useful features come when you use Org’s noweb
+to weave a budget together. noweb allows, among other things, you to
+include source blocks in other blocks. First, you’ll set up your base
+budget, which will be included in every budget. Say you know that
+every month you will spend $500 on food. You create a ledger source
+block with a name, =base-budget=:
+
+: #+name: base-budget
+: #+begin_src ledger
+:   ; :BUDGET:
+:   Budgeted:Expenses:Food  $500
+:   Budgeted:Savings
+: #+end_src
+
+This means that you want $500 to go to food, and the balance to
+savings. (The first line =; :BUDGET:= is a tag to let you identify
+this as a budget; this helps with some reports.) Now, you can set up
+your budget block:
+
+: #+name: budget
+: #+begin_src ledger :noweb yes
+: = expr (date>=[2014] and account =~ /^Expenses:/)
+:   Budgeted:$account        -1
+:   Budget  1
+:
+: 2014/01/01 * Budget
+:  <<base-budget>>
+:  Budget  -$1000
+: #+end_src
+
+What you have done here is set up your automated transaction, as
+above, and set up your first month’s budget. You have assumed that
+your first month’s income is $1000, and you have included your base
+budget. When this is woven by noweb, =<<base-budget>>= will be
+replaced with the =base-budget= source block, and Org will pass the
+following on to ledger:
+
+: 2014/01/01 * Budget
+:   Budgeted:Expenses:Food  $500
+:   Budgeted:Savings
+:   Budget                -$1000
+
+This will set up $500 in your food budget, and the balance ($500) for
+savings.
+
+Now, to generate a report, you can use the following:
+
+: #+begin_src ledger :cmdline bal -p "this year" ^Budgeted:Expenses -E :results output :exports results :noweb yes
+: <<budget>>
+: !include /path/to/ledger.lgr
+: #+end_src
+
+Running this report (=C-c C-c=) will tell you your budget balance for
+each expense. If you budgeted $500 for food and spent $600, your
+balance will be -$100. If you spend $300, your balance will be $200.
+
+Each month, month, you will create a new budget entry in your =budget=
+source block, with the =Budget= account equaling your income that
+month. You will include your =<<base-budget>>=, and any adjustments
+you want to make.
+
+For example, say that in June you take up cycling. You want to budget
+$100 per month for this, but you want to start in June, not January.
+You will add the following entry to your =budget= source block:
+
+: 2014/06/01 * Budget
+:  <<base-budget>>
+:  Budgeted:Expenses:Cycling  $100
+:  Budget                   -$1000
+
+This means that for June your budget will be $500 for food, $100 for
+cycling, and $400 for savings.
+
+Now, you will need to keep adding the cycling budget line every time
+from now on, so you might want, at some point, to get complicated. You
+could define a new source block with the name =base-budget-new=,
+include your old =base-budget=, using =<<base-budget>>=, and then
+include that in your budget entries going forward, to avoid duplicate
+typing. noweb should allow you to structure your budget entries
+however you like.
+
+I’ve found this solution to be flexible enough to allow me to manage a
+budget that is contantly being adjusted, and easy to generate
+printable reports. ledger and Org make an excellent pair.
