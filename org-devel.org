@@ -470,14 +470,14 @@ The following notes should be taken into consideration before using Fireforg:
                               org-mail-htmlize-mime-delimiter-alist)))
          (if (eq type 'multipart)
              (format (nth 3 delimlst) subtype
-                     (mapconcat '(lambda (b)
+                     (mapconcat (lambda (b)
                                    (apply 'org-mail-htmlize-mime-entity
                                           (car b) (cadr b) (cddr b)))
                                 body "")
                      subtype)
            (format (nth 1 delimlst)
                    type subtype
-                   (mapconcat '(lambda (h)
+                   (mapconcat (lambda (h)
                                  (format (nth 2 delimlst) (car h) (cdr h)))
                               cont-head "")
                    body))))

@@ -737,7 +737,7 @@ element of TYPE.  TEST should be a predicate."
   ;; Returns a gensym named `ert-form-evaluation-aborted-XXX', but
   ;; that's a wart, so let's not document it.
   (unless type (setq type ''error))
-  (unless test (setq test '(lambda (condition) t)))
+  (unless test (setq test (lambda (condition) t)))
   (ert-expand-should
    `(should-error ,form ,@keys)
    form env

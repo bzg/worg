@@ -1423,14 +1423,14 @@ headline or the #+FILETAGS: statement.
     (when (eq major-mode 'org-mode)
       (save-excursion
         (org-map-entries
-         '(lambda ()
-            (let ((alltags (split-string (or (org-entry-get (point) "ALLTAGS") "") ":"))
-                  local inherited tag)
-              (dolist (tag alltags)
-                (if (get-text-property 0 'inherited tag)
-                    (push tag inherited) (push tag local)))
-              (dolist (tag local)
-                (if (member tag inherited) (org-toggle-tag tag 'off)))))
+         (lambda ()
+           (let ((alltags (split-string (or (org-entry-get (point) "ALLTAGS") "") ":"))
+                 local inherited tag)
+             (dolist (tag alltags)
+               (if (get-text-property 0 'inherited tag)
+                   (push tag inherited) (push tag local)))
+             (dolist (tag local)
+               (if (member tag inherited) (org-toggle-tag tag 'off)))))
          t nil))))
 #+END_SRC
 
@@ -1592,7 +1592,7 @@ changed.
           'ba/org-adjust-tags-column-maybe)
 (add-hook 'before-save-hook 'ba/org-adjust-tags-column-before-save)
 (add-hook 'after-save-hook 'ba/org-adjust-tags-column-after-save)
-(add-hook 'org-agenda-mode-hook '(lambda ()
+(add-hook 'org-agenda-mode-hook (lambda ()
                                   (setq org-agenda-tags-column (- (window-width)))))
 
 ; between invoking org-refile and displaying the prompt (which
@@ -1764,7 +1764,7 @@ containing the filetag. To release the restriction, type C-c C-x >
 This is useful to make sure what task you are operating on.
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'org-agenda-mode-hook '(lambda () (hl-line-mode 1)))
+(add-hook 'org-agenda-mode-hook (lambda () (hl-line-mode 1)))
 #+END_SRC
 
 Under XEmacs:
@@ -1772,7 +1772,7 @@ Under XEmacs:
 #+BEGIN_SRC emacs-lisp
 ;; hl-line seems to be only for emacs
 (require 'highline)
-(add-hook 'org-agenda-mode-hook '(lambda () (highline-mode 1)))
+(add-hook 'org-agenda-mode-hook (lambda () (highline-mode 1)))
 
 ;; highline-mode does not work straightaway in tty mode.
 ;; I use a black background
