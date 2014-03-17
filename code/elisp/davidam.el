@@ -18,6 +18,23 @@
 ;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 ;; Boston, MA 02110-1301 USA,
 
+(defun davidam-org-envolve-numbered-list()
+  "Itemize some lines as a numbered list"
+  (interactive)
+  (if (< (point) (mark)) 
+      (progn      
+	(setq count (count-lines 1 (point)))
+	(setq end (count-lines 1 (mark))))
+    (progn
+      (setq count (count-lines 1 (mark)))
+      (setq end (count-lines 1 (point)))))
+  (goto-line count)
+  (while (< count end)
+    (move-beginning-of-line count)
+    (insert (concat (number-to-string count) ". "))
+    (setq count (1+ count))
+    (goto-line count)))
+
 (defun davidam-org-envolve-src(msg)
   "Envolve source between org tags"
   (interactive "sChoose your programming language: " msg)
@@ -99,15 +116,4 @@
       (setq total (+ total (1+ number))))
     (message "Number of pebbles: %d" total)))
 
-
-
-;;(get 'i 'vecinos)
-
-;; (defun davidam-extend (trayectoria)
-;;   (interactive "eList to extend: " trayectoria)
-;;   (mapcar #'(lambda (nuevo-nodo) (cons nuevo-nodo trayectoria))
-;; 	  (remove-if #' (lambda (vecino) (member vecino trayectoria)
-;; 			  (get (first trayectoria) 'vecinos)))))
-
-;;(davidam-extend '(i))
 
