@@ -63,11 +63,11 @@
   (message "%s" item-time))
 
 (defun davidam-happy-birthday(person)
-37.   (interactive "MWrite the person name: ")
+  (interactive "MWrite the person name: ")
   (message (concat "Happy birthday to you. Happy birthday to you. Happy birthday, dear " person ". Happy birthday to you")))
-38. 38. 
+
 (defun davidam-fibonacci (n)
-39.   (interactive "nEscribe un numero: " n)
+  (interactive "nEscribe un numero: " n)
   (message (number-to-string (fibonacci-aux n))))
 
 (defun fibonacci-aux (n)
