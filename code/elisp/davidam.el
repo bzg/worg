@@ -32,6 +32,20 @@
     (setq num (+ 1 num))
     (forward-line)))
 
+(defun davidam-org-envolve-check-list()
+  "Itemize some lines as a checked list"
+  (interactive)
+  (setq num 1)
+  (setq max (+ 1 (count-lines (point) (mark))))
+  (if (> (point) (mark))
+      (goto-line (+ 1 (count-lines 1 (mark))))
+    (goto-line (+ 1 (count-lines 1 (point)))))
+  (while (< num max)
+    (move-beginning-of-line nil)
+    (insert (concat "+ [ ] "))
+    (setq num (+ 1 num))
+    (forward-line)))
+
 (defun davidam-org-envolve-src(msg)
   "Envolve source between org tags"
   (interactive "sChoose your programming language: " msg)
