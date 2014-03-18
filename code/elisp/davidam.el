@@ -21,19 +21,16 @@
 (defun davidam-org-envolve-numbered-list()
   "Itemize some lines as a numbered list"
   (interactive)
-  (if (< (point) (mark)) 
-      (progn      
-	(setq count (count-lines 1 (point)))
-	(setq end (count-lines 1 (mark))))
-    (progn
-      (setq count (count-lines 1 (mark)))
-      (setq end (count-lines 1 (point)))))
-  (goto-line count)
-  (while (< count end)
-    (move-beginning-of-line count)
-    (insert (concat (number-to-string count) ". "))
-    (setq count (1+ count))
-    (goto-line count)))
+  (setq num 1)
+  (setq max (+ 1 (count-lines (point) (mark))))
+  (if (> (point) (mark))
+      (goto-line (+ 1 (count-lines 1 (mark))))
+    (goto-line (+ 1 (count-lines 1 (point)))))
+  (while (< num max)
+    (move-beginning-of-line nil)
+    (insert (concat (number-to-string num) ". "))
+    (setq num (+ 1 num))
+    (forward-line)))
 
 (defun davidam-org-envolve-src(msg)
   "Envolve source between org tags"
@@ -66,11 +63,11 @@
   (message "%s" item-time))
 
 (defun davidam-happy-birthday(person)
-  (interactive "MWrite the person name: ")
+37.   (interactive "MWrite the person name: ")
   (message (concat "Happy birthday to you. Happy birthday to you. Happy birthday, dear " person ". Happy birthday to you")))
-
+38. 38. 
 (defun davidam-fibonacci (n)
-  (interactive "nEscribe un numero: " n)
+39.   (interactive "nEscribe un numero: " n)
   (message (number-to-string (fibonacci-aux n))))
 
 (defun fibonacci-aux (n)
