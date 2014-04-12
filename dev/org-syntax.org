@@ -736,31 +736,33 @@ Unless specified otherwise, case is not significant.
    There are 4 major types of links:
 
    #+BEGIN_EXAMPLE
-   RADIO                     ("radio" link)
+   PRE1 RADIO POST1          ("radio" link)
    <PROTOCOL:PATH>           ("angle" link)
-   PRE PROTOCOL:PATH2 POST   ("plain" link)
+   PRE2 PROTOCOL:PATH2 POST2 ("plain" link)
    [[PATH3]DESCRIPTION]      ("regular" link)
    #+END_EXAMPLE
 
-   RADIO is a string matched by some [[#Targets_and_Radio_Targets][radio target]].  It can contain
-   [[#Entities_and_LaTeX_Fragments][entities]], [[#Entities_and_LaTeX_Fragments][latex fragments]], [[#Subscript_and_Superscript][subscript]] and [[#Subscript_and_Superscript][superscript]] only.
+   PRE1 and POST1, when they exist, are non alphanumeric characters.
+
+   RADIO is a string matched by some [[#Targets_and_Radio_Targets][radio target]].  It may contain
+   [[#Entities_and_LaTeX_Fragments][entities]], [[#Entities_and_LaTeX_Fragments][latex fragments]], [[#Subscript_and_Superscript][subscript]] and [[#Subscript_and_Superscript][superscript]].
 
    PROTOCOL is a string among ~org-link-types~.
 
    PATH can contain any character but ~]~, ~<~, ~>~ and ~\n~.
 
-   PRE and POST are non word constituent.  They can be, respectively,
-   the beginning or the end of a line.
+   PRE2 and POST2, when they exist, are non word constituent
+   characters.
 
    PATH2 can contain any non-whitespace character excepted ~(~, ~)~,
    ~<~ and ~>~.  It must end with a word-constituent character, or any
    non-whitespace non-punctuation character followed by ~/~.
 
    DESCRIPTION must be enclosed within square brackets.  It can
-   contain any character but square brackets.  Object-wise, it can
-   contain any object found in a paragraph excepted a [[#Footnote_References][footnote
-   reference]], a [[#Targets_and_Radio_Targets][radio target]] and a [[#Line_Breaks][line break]].  It cannot contain
-   another link either, unless it is a plain link.
+   contain any character but square brackets.  It can contain any
+   object found in a paragraph excepted a [[#Footnote_References][footnote reference]], a [[#Targets_and_Radio_Targets][radio
+   target]] and a [[#Line_Breaks][line break]].  It cannot contain another link either,
+   unless it is a plain link.
 
    DESCRIPTION is optional.
 
@@ -769,6 +771,7 @@ Unless specified otherwise, case is not significant.
    #+BEGIN_EXAMPLE
    FILENAME           ("file" type)
    PROTOCOL:PATH4     ("PROTOCOL" type)
+   PROTOCOL://PATH4   ("PROTOCOL" type)
    id:ID              ("id" type)
    #CUSTOM-ID         ("custom-id" type)
    (CODEREF)          ("coderef" type)
