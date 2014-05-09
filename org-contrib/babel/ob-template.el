@@ -97,8 +97,8 @@
 ;; arguments which you feel may be useful -- all header arguments
 ;; specified by the user will be available in the PARAMS variable.
 (defun org-babel-execute:template (body params)
-  "Execute a block of Template code with org-babel.  This function is
-called by `org-babel-execute-src-block'"
+  "Execute a block of Template code with org-babel.
+This function is called by `org-babel-execute-src-block'"
   (message "executing Template source code block")
   (let* ((processed-params (org-babel-process-params params))
          ;; set the session if the session variable is non-nil
@@ -144,8 +144,8 @@ Emacs-lisp table, otherwise return the results as a string."
   )
 
 (defun org-babel-template-initiate-session (&optional session)
-  "If there is not a current inferior-process-buffer in SESSION
-then create.  Return the initialized session."
+  "If there is not a current inferior-process-buffer in SESSION then create.
+Return the initialized session."
   (unless (string= session "none")
     ))
 
