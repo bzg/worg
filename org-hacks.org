@@ -2190,6 +2190,36 @@ security risk associated with completely disabling the prompting
 before you proceed.
 
 ** Exporting org files
+*** Ignoring headlines during export
+    :PROPERTIES:
+    :CUSTOM_ID: ignoreheadline
+    :END:
+#+index: Export!ignore headlines
+Sometimes users want to ignore the headline text during export.  In
+the old exporter one would use a export hook.  From Org 8.0 onwards,
+the export filter mechanism is used (see: =org-export-filters-alist=).
+
+To ignore a headline during export using special tags, you can use the
+following filter.
+#+begin_src emacs-lisp
+  (defun sa-ignore-headline (contents backend info)
+    "Ignore headlines with tag `ignoreheading'."
+    (when (and (org-export-derived-backend-p backend 'latex 'html 'ascii)
+                    (string-match "\\`.*ignoreheading.*\n"
+                                  (downcase contents)))
+      (replace-match "" nil nil contents)))
+
+  (add-to-list 'org-export-filter-headline-functions 'sa-ignore-headline)
+#+end_src
+Adding this to your configuration, you can ignore headlines by tagging
+them with =ignoreheading=.  In the above snippet, this works for
+LaTeX, HTML, and ASCII backends.  You can add more backends to the
+list by just appending the appropriate name like this: =\'backend=.
+If you would rather have this feature in all backends, then simply
+remove the =when= condition.
+
+You can find the latest version of the filter in [[https://github.com/suvayu/.emacs.d/blob/master/org-mode-config.el][my setup on github]].
+
 *** Export Org to Org and handle includes.
 #+index: Export!handle includes
 Nick Dokos came up with this useful function:
