@@ -2195,30 +2195,52 @@ before you proceed.
     :CUSTOM_ID: ignoreheadline
     :END:
 #+index: Export!ignore headlines
-Sometimes users want to ignore the headline text during export.  In
-the old exporter one would use a export hook.  From Org 8.0 onwards,
-the export filter mechanism is used (see: =org-export-filters-alist=).
+Sometimes users want to ignore the headline text during export like in
+the Beamer exporter (=ox-beamer=).  In the [[http://orgmode.org/manual/Beamer-export.html#Beamer-export][Beamer exporter]] one can use
+the tag =ignoreheading= to disable the export of a certain headline,
+whilst still retaining the content of the headline.  We can imitate
+this feature in other export backends.  Note that this is not a
+particularly easy problem, as the Org exporter creates a static
+representation of section numbers, table of contents etc.
 
-To ignore a headline during export using special tags, you can use the
-following filter.
-#+begin_src emacs-lisp
-  (defun sa-ignore-headline (contents backend info)
-    "Ignore headlines with tag `ignoreheading'."
-    (when (and (org-export-derived-backend-p backend 'latex 'html 'ascii)
-                    (string-match "\\`.*ignoreheading.*\n"
-                                  (downcase contents)))
-      (replace-match "" nil nil contents)))
+Consider the following document
+#+BEGIN_SRC org
+  ,* head 1                                                           :noexport:
+  ,* head 2                                                      :ignoreheading:
+  ,* head 3
+  ,* =head 4=                                                    :ignoreheading:
 
-  (add-to-list 'org-export-filter-headline-functions 'sa-ignore-headline)
-#+end_src
-Adding this to your configuration, you can ignore headlines by tagging
-them with =ignoreheading=.  In the above snippet, this works for
-LaTeX, HTML, and ASCII backends.  You can add more backends to the
-list by just appending the appropriate name like this: =\'backend=.
-If you would rather have this feature in all backends, then simply
-remove the =when= condition.
+#+END_SRC
+We want to remove heading 2 and 4.
 
-You can find the latest version of the filter in [[https://github.com/suvayu/.emacs.d/blob/master/org-mode-config.el][my setup on github]].
+There are different strategies to accomplish this:
+1. The best option is to remove headings tagged with =ignoreheading=
+   before export starts.  This can be accomplished with the hook
+   =org-export-before-parsing-hook= that runs before the buffer has
+   been parsed.  In the example above, however, =head 2= would not be
+   exported as it becomes part of =head 1= which is not exporter.  To
+   overcome this move perhaps =head 1= can be moved to the end of the
+   buffer.  An example of a hook that removes headings is before
+   parsing is available [[https://lists.gnu.org/archive/html/emacs-orgmode/2014-03/msg01459.html][here]].  Note, this solution is compatible with
+   /all/ export formats!
+2. The problem is simple when exporting to LaTeX, as the LaTeX
+   compiler determines numbers.  We can thus use
+   =org-export-filter-headline-functions= to remove the offending
+   headlines.  One regexp-based solution that looks for the word
+   =ignoreheading= is available on [[https://stackoverflow.com/questions/10295177/is-there-an-equivalent-of-org-modes-b-ignoreheading-for-non-beamer-documents][StackOverflow]] for both the legacy
+   exporter Org v7 exporter and the current Org v8 exporter.  Note,
+   however, that this filter will only work with LaTeX (numbering and
+   the table of content may break in other exporters).  In the example
+   above, this filer will work flawlessly in LaTeX, it will not work
+   at all in HTML and it will fail to update section numbers, TOC and
+   leave some auxiliary lines behind when exporting to plain text.
+3. Another solution that tries to recover the Org element
+   representation is available [[https://lists.gnu.org/archive/html/emacs-orgmode/2014-03/msg01480.html][here]].  In the example above this filter
+   will not remove =head 4= exporting to any backend, since verbatim
+   strings do not retain the Org element representation.  It will
+   remove the extra heading line when exporting to plain text, but
+   will also fail to update section numbers.  It should be fairly
+   simple to also make it work with HTML.
 
 *** Export Org to Org and handle includes.
 #+index: Export!handle includes
@@ -3846,4 +3868,3 @@ hydrometer correction, abv calculation, priming sugar for a given CO_2
 volume, etc. More integration with org-mode should be possible: for
 instance it would be nice to be able to use a lookup table (of ingredients)
 to calculate target original gravity, IBUs, etc.
-
