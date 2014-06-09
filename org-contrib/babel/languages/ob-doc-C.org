@@ -45,9 +45,6 @@
   - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
 * Introduction
 
-*Note*: a new version of both the software and the documentation
-is under evaluation. It is available here: [[ob-doc-C-new.org][ob-doc-C-new]]
-
 Babel can evaluate C, C++, and D code.
 
 As opposed to interpreted languages, which can be evaluated directly,
@@ -61,6 +58,18 @@ Note: there used to be two separate library files, =ob-C.el= and
 =ob-D.el=. They have been merged in a single =ob-C.el= file which
 handle all three languages.
 
+So, for example, the following simple code block can be evaluated and
+the results of evaluation inserted into the buffer.
+
+: #+begin_src C++ :includes <stdio.h>
+:   int a=1;
+:   int b=1;
+:   printf("%d\n", a+b);
+: #+end_src
+: 
+: #+results:
+: : 2
+
 ** About C
 C dates back in the 1970.
 It was devised by Kernighan & Ritchie.
@@ -73,8 +82,8 @@ The purpose was to enhance C with object programming.
 Among the features introduced by C++, there are:
   - templates and the Standard Template Library,
   - object programming, with class definition and inheritance,
-  - functions and operators overloading
-  - exceptions
+  - functions and operators overloading,
+  - exceptions.
 
 ** About D
 [[http://dlang.org/][D]] is a C++-like language made by [[http://dlang.org/][Digital Mars]].
@@ -86,7 +95,6 @@ It features:
   - Seamless assembler support
   - Usable as a scripting language
   - C binary compatibility
-  - and much more.
 
 * Requirements and Setup
 
@@ -104,9 +112,9 @@ It features:
 2- Make any or all languages available to Babel.
    Type:
    : M-x customize-variable org-babel-load-languages
-   and add the language of your choice.
+   and add the C language (capital "C", which gives access to C, C++, D)
 
-* Org Mode Features for D Source Code Blocks
+* Org Mode Features for C, C++, D Source Code Blocks
 ** Header Arguments
 
 - =:var VARIABLE=VALUE= ::
@@ -122,7 +130,7 @@ It features:
 
   The later type, =type[][]=, is used for variables storing Org tables
 
-  The =type[]= is used for lists or vectors declared in the header
+  The =type[]= is used for lists or vectors declared in the header.
 
 - =:cmdline= :: command line arguments to pass to the executable
      compiled from the code block
@@ -132,11 +140,12 @@ It features:
 - =:main= :: can be set to "no" to inhibit wrapping of the code block
      in a =main= function call
 
-- =:includes= (C & CC+ only):: accepts either a single string name, or a list of
+- =:includes= :: (C & CC+ only)
+     accepts either a single string name, or a list of
      names of files to =#include= in the execution of the code block
 
-- =:import package= (D only) ::
-  An import statement will be declared in the D source before the source code
+- =:import package=:: (D only)
+     An import statement will be declared in the D source before the source code
 
 - =:defines= (C & C++ only):: just like =:includes= but for =#defines= lines at the
      top of the code
@@ -144,50 +153,56 @@ It features:
 ** Sessions
    There is no support for sessions
 
+** TODO Result Types
+   - Which result types are supported?
+** TODO Other
+   - Differences from other supported languages
 * Examples of Use
 ** Hello World in C & C++
+
 Here is Hello World!
 
 #+name: c-hello
 #+begin_src C :exports results
-  #include "stdio.h"
   printf ("Hello World!");
 #+end_src
 
 This source code block:
-
 #+begin_example
 #+begin_src C
-  #include "stdio.h"
   printf ("Hello World!");
 #+end_src
 #+end_example
 
-Note that:
-- no =main()= is declared, a trivial one is automatically provided,
+yields this result (type =C-c C-c= in the source block):
+#+results: c-hello
+Hello World!
 
 ** Hello World in D
 Here is Hello World!
 
 #+name: d-hello
 #+begin_src D :exports results
-  import std.stdio;
   writefln ("Hello World!");
 #+end_src
 
 This source code block:
-
 #+begin_example
 #+begin_src D
-  import std.stdio;
   writefln ("Hello World!");
 #+end_src
 #+end_example
 
-yields this result:
-
+yields this result (type =C-c C-c= in the source block):
 #+results: d-hello
 Hello World!
+
+Note that:
+- if no =main()= is declared, a trivial one is automatically provided,
+- there is no directive like:
+  + =#include "stdio.h"= (in C or C++)
+  + =import std.stdio;= (in D)
+  because those libraries are so common that they are always included.
 
 ** Scalar variables
 Variables may be declared outside the script.
@@ -198,28 +213,16 @@ Three types are supported, based on the look of the value:
   - =double=
 
 Example in C or C++:
-
-#+header: :var mystring="Sunday" :var myint=145 :var mydouble=3.14
-#+BEGIN_SRC C
-  #include "stdio.h"
-  printf ("mystring %s\n", mystring);
-  printf ("myint    %d\n", myint);
-  printf ("mydouble %g\n", mydouble);
-#+END_SRC
-
-This source code block:
-
 #+begin_example
 #+header: :var mystring="Sunday" :var myint=145 :var mydouble=3.14
 #+BEGIN_SRC C
-  #include "stdio.h"
   printf ("mystring %s\n", mystring);
   printf ("myint    %d\n", myint);
   printf ("mydouble %g\n", mydouble);
 #+END_SRC
 #+end_example
 
-yields this result:
+yields this result (type =C-c C-c=):
 
 #+RESULTS:
 | mystring | Sunday |
@@ -227,66 +230,85 @@ yields this result:
 | mydouble |   3.14 |
 
 Example in D:
-
-#+header: :var mystring="Sunday" :var myint=145 :var mydouble=3.14
-#+BEGIN_SRC D
-  import std.stdio;
-  writefln ("mystring %s", mystring);
-  writefln ("myint    %d", myint);
-  writefln ("mydouble %g", mydouble);
-#+END_SRC
-
 #+begin_example
 #+header: :var mystring="Sunday" :var myint=145 :var mydouble=3.14
 #+BEGIN_SRC D
-  import std.stdio;
   writefln ("mystring %s", mystring);
   writefln ("myint    %d", myint);
   writefln ("mydouble %g", mydouble);
 #+END_SRC
 #+end_example
+
+yields this result (type =C-c C-c=):
 
 #+RESULTS:
 | mystring | Sunday |
 | myint    |    145 |
 | mydouble |   3.14 |
 
+If you want to see the expanded source code, without compiling a running it,
+just type =C-c C-v v=".
+
 ** Process an Org Mode Table
 
 *** How to handle a table
+We take an Org mode table as input, process it, and output
+a new Org mode table.
 
-Example of input table:
+This table will be input in the script, and iterated row by row:
 
 #+tblname: somedata
-| nb    | day       |
-|-------+-----------|
-| zero  | Sunday    |
-| one   | Monday    |
-| two   | Tuesday   |
-| three | Wednesday |
-| four  | Thursday  |
-| five  | Friday    |
-| six   | Saturday  |
+| nb    | sqr | noise |
+|-------+-----+-------|
+| zero  |   0 |  0.23 |
+| one   |   1 |  1.31 |
+| two   |   4 |  4.61 |
+| three |   9 |  9.05 |
+| four  |  16 | 16.55 |
 
 The table is converted to a variable in the script:
-  - =const char* somedata[7][2] = {...};=  // in C & C++
-  - =string      somedata[7][2] = [...];=  // in D
+  : const char* somedata[5][3] = {...};  // in C & C++
+  : string      somedata[5][3] = [...];  // in D
 
-Beware that in the current version, input tables must be homogeneous:
-they must contain only integers, or only doubles, or only strings.
-This constraint will be removed in a future release.
+The header, if any, is available to the script as well:
+  : const char* somedata_header[3] = { "nb", "sqr", "noise" };  // in C & C++
+  : string      somedata_header[3] = [ "nb", "sqr", "noise" ];  // in D
+
+The dimensions of the table are available:
+  : int somedata_rows = 5;
+  : int somedata_cols = 3;
+
+Additionnally, an accessor function retrives a cell using the column
+name as found in the header:
+  : const char* cell = somedata_h(3,"noise"); // "9.05" in C & C++
+  : string      cell = somedata_h(3,"noise"); // "9.05" in D
+
+Type =C-c C-v v= to look at the generate code without running it.
+
+Note that table contents are (almost) always strings
+(as opposed to integers or floating point numbers).
+This allows to easily handle heterogeneous tables,
+and tables with missing values.
+To convert a string cell to a numeric value on the fly, use standard convertors:
+  : int    cell = atoi(somedata_h(4,"sqr"));        // integer conversion in C & C++
+  : double cell = atof(somedata_h(4,"noise"));      //  double conversion in C & C++
+  : int    cell = to!int(somedata_h(4,"sqr"));      // integer conversion in D
+  : double cell = to!double(somedata_h(4,"noise")); //  double conversion in D
 
 *** Example in C & C++
 
+#+name: c-table
 #+header: :exports results
 #+begin_src C++ :var somedata=somedata
-  #include "stdio.h"
   int main()
   {
-    for (int i=0; i<7; i++) {
-      for (int j=0; j<2; j++)
-        printf ("%s ", somedata[i][j]);
-      printf("%d\n", i);
+    for (int i=0; i<somedata_rows; i++) {
+      printf ("%2d %7s ", i, somedata_h(i,"nb"));
+      for (int j=1; j<somedata_cols; j++) {
+        const char* cell = somedata[i][j];
+        printf ("%5s %5g ", cell, 1000*atof(cell));
+      }
+      printf("\n");
     }
     return 0;
   }
@@ -297,13 +319,16 @@ This code:
 #+begin_example
 #+header: :exports results
 #+begin_src C++ :var somedata=somedata
-  #include "stdio.h"
+  #include "stdlib.h"
   int main()
   {
-    for (int i=0; i<7; i++) {
-      for (int j=0; j<2; j++)
-        printf ("%s ", somedata[i][j]);
-      printf("%d\n", i);
+    for (int i=0; i<somedata_rows; i++) {
+      printf ("%2d ", i);
+      for (int j=1; j<somedata_cols; j++) {
+        const char* cell = somedata[i][j];
+        printf ("%5s %5g ", cell, 1000*atof(cell));
+      }
+      printf("\n");
     }
     return 0;
   }
@@ -312,42 +337,40 @@ This code:
 
 yields this result:
 
-#+RESULTS:
-| zero  | Sunday    | 0 |
-| one   | Monday    | 1 |
-| two   | Tuesday   | 2 |
-| three | Wednesday | 3 |
-| four  | Thursday  | 4 |
-| five  | Friday    | 5 |
-| six   | Saturday  | 6 |
+#+RESULTS: c-table
+| 0 | zero  |  0 |     0 |  0.23 |   230 |
+| 1 | one   |  1 |  1000 |  1.31 |  1310 |
+| 2 | two   |  4 |  4000 |  4.61 |  4610 |
+| 3 | three |  9 |  9000 |  9.05 |  9050 |
+| 4 | four  | 16 | 16000 | 16.55 | 16550 |
 
 *** Example in D
 
+#+name: d-table
 #+header: :exports results
 #+begin_src D :var somedata=somedata
-  import std.stdio;
   void main()
   {
     foreach (i, row; somedata) {
+      writef ("%2s %7s ", i, somedata_h(i,"nb"));
       foreach (j, cell; row)
-        writef ("%s ", cell);
-      writefln ("%s", i);
+        if (j) // skip 1st column
+          writef ("%5s %5s ", cell, 1000*to!double(cell));
+      writeln();
     }
   }
 #+end_src
 
-This code:
-
 #+begin_example
-#+header: :exports results
-#+begin_src D :var somedata=somedata
-  import std.stdio;
+#+begin_src D :results output :var somedata=somedata :var TT="321" :var QQ=3.14
   void main()
   {
     foreach (i, row; somedata) {
+      writef ("%2s %7s ", i, somedata_h(i,"nb"));
       foreach (j, cell; row)
-        writef ("%s ", cell);
-      writefln ("%s", i);
+        if (j) // skip 1st column
+          writef ("%5s %5s ", cell, 1000*to!double(cell));
+      writeln();
     }
   }
 #+end_src
@@ -355,12 +378,43 @@ This code:
 
 yields this result:
 
-#+RESULTS:
-| zero  | Sunday    | 0 |
-| one   | Monday    | 1 |
-| two   | Tuesday   | 2 |
-| three | Wednesday | 3 |
-| four  | Thursday  | 4 |
-| five  | Friday    | 5 |
-| six   | Saturday  | 6 |
+#+results: d-table
+| 0 | zero  |  0 |     0 |  0.23 |   230 |
+| 1 | one   |  1 |  1000 |  1.31 |  1310 |
+| 2 | two   |  4 |  4000 |  4.61 |  4610 |
+| 3 | three |  9 |  9000 |  9.05 |  9050 |
+| 4 | four  | 16 | 16000 | 16.55 | 16550 |
 
+
+*** Pure numeric table
+
+This table is a pure numeric table.
+| 3 | 3.3 |
+| 4 | 4.1 |
+| 5 | 5.9 |
+| 6 | 6.5 |
+
+In this special case, it is translated to a numeric table:
+: double MyTable[4][2] = { {3,3.3}, {4,4.1}, {5,5.9}, {6,6.5} };
+
+If there is a blank cell among numeric cells,
+then the whole table falls back to the string case,
+where the blank cell is translated to the empty string "".
+
+** TODO Lists and vectors in the header
+
+* Shortcomings and known bugs
+** C++ vs. cpp
+After the =#+begin_src= block header, both =C++= and =cpp= are
+accepted to specify C++ language.
+However only =C++= works for generated code visualization
+through =C-c C-v v=.
+
+** Pure numeric + header  cast error
+A type mismatch between strings  and double cause an error
+when attempting to use the cell accessor with column name
+when the table is pure numeric.
+
+** Compilers customization
+There is no customization of the compilers paths or names
+through the standard Emacs customization facility.
