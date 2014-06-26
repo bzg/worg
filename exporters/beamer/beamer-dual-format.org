@@ -1,0 +1,552 @@
+#+TITLE:     Using Beamer export to produce slideshows and article-style handouts from the same org source
+#+AUTHOR:    James Harkins
+#+EMAIL:     
+#+DATE:      
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t
+#+OPTIONS:   tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:   fold
+#+CATEGORY:   worg
+
+* Project overview
+
+The project is training material for a one-week intensive workshop in audio 
+synthesis and live-performance control in the SuperCollider programming 
+language. The workshop was commissioned by CHEARS, the China 
+ElectroAcoustic Resource Survey, and will be given first in Shenyang, PRC.
+
+I wanted to have thorough presentation slides available, for some kinds of 
+explanation that are difficult otherwise, and also give a PDF book to 
+workshop attendees for their future reference. During the writing process, 
+the book became more important, as a way to provide copyright-free 
+tutorials for translation into Chinese. The book eventually grew to 237 
+pages (with, admittedly, more white space per page than a standard prose 
+layout), rendered from 10849 lines of LaTeX code, all of which were 
+generated directly by the org Beamer exporter with no manual edits to any 
+of the =tex= files.
+
+Achieving that required some ingenuity in both org mode and LaTeX. This 
+worg page documents the project's design and implementation.
+
+* Requirements
+
+- One org source to produce slideshows and printed material.
+  - Beamer export for both formats.
+    - Normal /beamer/ document class for slides.
+    - Document class /article/ for the book, with
+      =\usepackage{beamerarticle}= in the preamble.
+  - Header files to determine PDF layout.
+  - Additional explanatory text that will be omitted from slideshows.
+    - Use the beamer class option /ignorenonframetext/ for slides.
+    - Put notes under frame-level headings, with the beamer tag
+      =B_ignoreheading=.
+
+- Indexed glossaries of terms, classes and methods, without writing
+  cumbersome LaTeX syntax for the glossaries package.
+  - Keep glossary definitions in org tables.
+  - Convert to LaTeX syntax using emacs-lisp source blocks.
+  - Convert only once in the book combining all chapters, but once per slideshow.
+
+- Extract captioned source blocks into plain-text files for SuperCollider.
+  - =org-element-map= did all the hard work.
+
+* Implementation
+
+** One source: File structure
+The LaTeX preamble controls the output format; so, to have different output 
+from the same org source, the preamble must be separate from the content. 
+Here, we have two headers:
+
+- =slidehead.org=, which specifies the document class /beamer/ with
+  the /presentation/ option.
+- =printhead2.org=, which specifies the /article/ class and adds the
+  /beamerarticle/ package so that the article class can interpret
+  beamer formatting commands.
+
+Other formatting differences are implemented here. For instance, inline 
+code fragments are colored green in the slides, but remain black in the 
+article.
+
+Header files contain nothing specific to any chapter, and content files are 
+strictly content, no formatting definitions. Neither of these are exported 
+directly. The export files provide the title and author fields, and include 
+(=#+INCLUDE:=) the appropriate header and content files. They also include 
+the glossary file; details to follow.
+
+#+name: slidehead
+#+caption: Primary export options for slideshow format.
+#+begin_src org
+  ,#+startup: beamer
+  ,#+LaTeX_CLASS: beamer
+  ,#+LaTeX_CLASS_OPTIONS: [ignorenonframetext,presentation]
+  ,#+BEAMER_THEME: default
+#+end_src
+
+#+name: printhead
+#+caption: Primary export options for article format.
+#+begin_src org
+  ,#+startup: beamer
+  ,#+LaTeX_CLASS: article
+  ,#+LaTeX_CLASS_OPTIONS: [a4paper,twoside,11pt]
+  ,#+BEAMER_THEME: default
+  ,#+LATEX_HEADER: \usepackage{beamerarticle}
+#+end_src
+
+#+name: contents
+#+caption: Beginning of one of the contents files.
+#+begin_src org
+  ,#+startup: beamer
+  
+  ,* Workshop introduction
+  ,** Workshop introduction
+  ,*** Workshop goals
+  ,**** Teach synthesis techniques by experimentation
+       - SC lets us take apart synthesizer components, and put them back together.
+       - SC's /Just-In-Time library/ makes it easy to re-patch components interactively.
+  ,**** Teach techniques for live control and performance
+       - Control by graphic interfaces and external devices.
+       - End goal: A group composition, to perform together.
+  ,**** *Have fun programming!*
+       - Emphasis on /play/ over /correctness/.
+#+end_src
+
+#+name: slideExport
+#+caption: The slideshow document that is actually exported.
+#+begin_src org
+  ,#+startup: beamer
+  
+  ,#+TITLE: SuperCollider Week, Day 1 \\ Introductory SC, Synthesis and Sequencing
+  ,#+DATE: \today
+  ,#+AUTHOR: H. James Harkins
+  
+  ,#+INCLUDE: "../slidehead.org"
+  ,#+include: "../glossary.org"
+  
+  ,#+include: "./01-contents.org" :minlevel 1
+#+end_src
+
+I settled on a project layout like this:
+
+- =shows/= directory
+  - =slidehead.org=: LaTeX preamble for Beamer's presentation style
+  - =printhead2.org=: Preamble for the article document class, with the beamerarticle package
+  - =glossaries.org=: Tables of glossary definitions, and emacs-lisp source blocks for conversion
+  - =01-intro/= directory
+    - =01-contents.org=: Slide contents, no header info at all
+    - =01-slideshow.org=: Defines this chapter's header (title,
+      author, etc.), includes =slidehead.org=, =glossaries.org= and
+      =01-contents.org=
+    - =img/= directory (png and PDF files for Part I)
+  - =02-synth/= directory, structured like =01=
+    Similar directories for chapters 3--6
+  - =full-article/= directory
+    - =full-article.org=: Defines title etc., includes
+      =printhead2.org=, =glossaries.org=, /all/ content files and
+      additional sections at the end for glossaries
+
+To render the slides for day 1, I visit =01-slideshow.org= in Emacs
+and export to Beamer. The print- or tablet-ready book comes from
+=full-article.org=. This should also be exported by the Beamer
+backend, even though the document class is /article/. This makes
+sense, however; the org source uses Beamer-specific markup which the
+normal LaTeX backend will not understand. It's LaTeX itself that
+"converts" the format to article through inclusion of the
+/beamerarticle/ package.
+
+*** Explanatory prose
+Slides minimize the amount of text on one screen, by using shorter, simpler 
+sentences in outline layouts. Some issues call for a narrative discussion 
+in prose. Prose should /not/ be shown in a slide presentation!
+
+Beamer can omit text from a presentation using the document class option 
+/ignorenonframetext/. Text that appears outside of a /frame/ environment 
+will be suppressed. The trick is to get org to export text outside of a 
+frame, without affecting sectioning.
+
+Org creates a frame when it encounters a headline at the level defined by 
+the =H:= export option, and it closes the frame at the next headline at 
+this level or higher. This project uses =H:3=, so normally, the contents 
+under every third-level headline will be enclosed in begin/end frame tags.
+
+If the headline has the Beamer-specific tag =:B_ignoreheading:=, then the 
+heading /and/ the begin/end frame commands are suppressed, but all the 
+content appears.
+
+#+name: prose_source
+#+caption: Org source, including a paragraph that should appear outside of a frame.
+#+begin_src org
+  ,#+OPTIONS: H:3 texht:t
+  ,#+LaTeX_CLASS: beamer
+  ,#+LaTeX_CLASS_OPTIONS: [ignorenonframetext,presentation]
+  
+  ,* Section head
+  ,** Subsection head
+  ,*** Frame title
+  ,**** Block header
+       Text.
+       - Bullet point.
+  ,*** More explanation coming                                 :B_ignoreheading:
+      :PROPERTIES:
+      :BEAMER_env: ignoreheading
+      :END:
+      Here, we explain points from the previous frame in more
+      detail. This text will always appear in the exported LaTeX, but
+      the /ignorenonframetext/ class option will prevent it from being
+      rendered in the presentation.
+#+end_src
+
+#+name: prose_exported
+#+caption: The LaTeX export result. Note the absence of begin/end frame commands around the free-standing paragraph.
+#+begin_src latex
+% Created 2014-05-01 Thu 16:05
+\documentclass[ignorenonframetext,presentation]{beamer}
+\begin{document}
+
+\section{Section head}
+\label{sec-1}
+\subsection{Subsection head}
+\label{sec-1-1}
+\begin{frame}[label=sec-1-1-1]{Frame title}
+\begin{block}{Block header}
+Text.
+\begin{itemize}
+\item Bullet point.
+\end{itemize}
+\end{block}
+\end{frame}
+
+Here, we explain points from the previous frame in more
+detail. This text will always appear in the exported \LaTeX{}, but
+the \emph{ignorenonframetext} class option will prevent it from being
+rendered in the presentation.
+\end{document}
+#+end_src
+
+*** Problem: Position of =\maketitle= command
+
+Because of /ignorenonframetext/, the LaTeX =\maketitle= command must appear 
+in a frame for the slideshows. But, it should /not/ be in a frame for the 
+article. Further, we can't distinguish between presentation and article 
+based on the org export backend, because both are exported by the Beamer 
+backend.
+
+In my environment, I used a hack that assumes Beamer has been added to
+=org-latex-classes= under the exact string "beamer." This is not
+ideal, because a user might have added a custom class under a
+different name. Nicolas Goaziou proposed an alternate approach using
+regular expressions, but I didn't implement it in my environment.
+
+This code snippet should replace the expression following the comment
+=;; 10. Title command= in the function =org-beamer-template=, defined
+in ox-beamer.el.
+
+#+name: maketitlehack
+#+caption: Hack to put the maketitle command in a frame for the beamer class only.
+#+begin_src emacs-lisp
+       ;; 10. Title command.
+       (let ((titlecmd (org-element-normalize-string
+        (cond ((string= "" title) nil)
+              ((not (stringp org-latex-title-command)) nil)
+              ((string-match "\\(?:[^%]\\|^\\)%s"
+                             org-latex-title-command)
+               (format org-latex-title-command title))
+              (t org-latex-title-command)))))
+         (if (string= (plist-get info :latex-class) "beamer")
+             (format "\\begin{frame}%s\\end{frame}" titlecmd)
+           titlecmd))
+#+end_src
+
+*** Problem: Relative links to images
+
+Image files are stored in =img/= directories under the directory for each 
+part. The images must also be accessible from =full-article/=, so simple 
+links of the form =./img/filename= will not work. Instead, this form of 
+link handles both export locations: =../01-intro/img/filename=.
+
+** Glossaries
+The LaTeX /glossaries/ package handled all my requirements: multiple 
+glossaries for different categories of terms and automatic indexing of 
+references to terms in the text. The syntax of the \newglossaryentry 
+command is more verbose than I wanted to manage by hand. Org tables are a 
+useful alternative.
+
+I divided glossary entries into four categories: terms and concepts, unit 
+generators, other classes, and methods. I used two table structures:
+
+- For UGens: Category (not used), name, description, and list of inputs.
+- Others: Term, plural form, description.
+
+The two structures called for two lisp functions; they are essentially the 
+same except for the strings generated and the handling of table rows. The 
+non-UGen function includes arguments for the table and identifiers to embed 
+in the LaTeX syntax, to be supplied in the =#+CALL= lines.
+
+#+name: glossaryTable
+#+caption: Part of a glossary table.
+#+begin_src org
+  ,#+name: gloss
+  | Term  | Plural  | Description                                                                                              |
+  |-------+---------+----------------------------------------------------------------------------------------------------------|
+  | ADSR  |         | An Attack-Decay-Sustain-Release envelope                                                                 |
+  | proxy | proxies | A placeholder that allows you to define connections between modules independent of each module's content |
+#+end_src
+
+#+name: glossaryFunction
+#+caption: Function to convert a normal (non-UGen) glossary table into LaTeX markup.
+#+begin_src org
+  ,#+name: makegloss
+  ,#+begin_src emacs-lisp :var tbl=gloss glosstype='nil :exports none :results value latex
+    (let ((str "")
+          (gltype (if glosstype (format "type=%s," glosstype) "")))
+      (pop tbl)
+      (pop tbl)
+      (while tbl
+        (let ((item (pop tbl)))
+          (setq str
+                (concat str
+                        (format "\\newglossaryentry{%s}{%sname={%s},%sdescription={%s}}\n"
+                                (car item)
+                                gltype
+                                (pop item)
+                                (let ((plural (pop item)))
+                                  (if (string= plural "")
+                                      ""
+                                    (format "plural={%s}," plural)))
+                                (car item))))))
+      str)
+  ,#+end_src
+#+end_src
+
+*** Problem: Redundant glossary export in the full article
+
+The two output styles raise some conflicting requirements:
+
+- *Presentation style:* Because of the /ignorenonframetext/ class
+  option, the =\newglossaryentry= commands must appear within a
+  frame. They cannot go into =slidehead.org=. Each separate contents
+  file must include its own calls to the glossary functions.
+
+- *Article style:* The contents files are included in the same export
+  file -- which would produce redundant copies of the glossary
+  entries.
+
+This calls for /conditional execution/ of the Babel calls. A
+not-quite-obvious feature of Babel properties is that they may be
+Emacs-lisp expressions. That leads to a solution: Use a code block at
+the beginning of the =0*-slideshow.org= and =full-article.org= files
+to set a flag, =hjh-exporting-slides=.
+
+#+name: setflag-slides
+#+caption: Setting the slideshow flag for slideshows.
+#+begin_src org
+  ,#+name: set-slide-flag
+  ,#+begin_src emacs-lisp :exports results :results value latex
+  (setq hjh-exporting-slides 't)
+  ""
+  ,#+end_src
+#+end_src
+
+#+name: setflag-article
+#+caption: Setting the slideshow flag for the article.
+#+begin_src org
+  ,#+name: set-slide-flag
+  ,#+begin_src emacs-lisp :exports results :results value latex
+  (setq hjh-exporting-slides nil)
+  ""
+  ,#+end_src
+#+end_src
+
+Then, the =#+CALL:= lines can use an =(if...)= expression to decide
+whether the =:exports= property should be "results" or "none." If this
+result is "none," then Babel skips that call. So, each glossary
+section evaluates only once per export, no matter how many contents
+files are included.
+
+#+name: call-slides
+#+caption: Calling the glossary function in a slideshow.
+#+begin_src org
+  ,#+call: makegloss :exports (if hjh-exporting-slides "results" "none") :results value latex
+  ,#+results: makegloss
+#+end_src
+
+#+name: call-article
+#+caption: Calling the glossary function in the article.
+#+begin_src org
+  ,#+name: makegloss_art
+  ,#+call: makegloss :exports (if hjh-exporting-slides "none" "results") :results value latex
+  ,#+results: makegloss_art
+#+end_src
+
+*** Output format
+By default, org treats CALL results as example blocks. In LaTeX
+export, example blocks are wrapped in a /verbatim/ environment. These
+functions return LaTeX syntax, to embed into the LaTeX document as
+is. Adding "value latex" to the =:results= property takes care of
+that.
+
+** Extraction of captioned source code blocks
+I also wanted to provide SuperCollider code files containing the
+numbered examples from the text. That means iterating over the source
+code blocks, and collecting the code from every block that has a
+caption. (Code blocks without a caption do not receive a listing
+number.)
+
+The Swiss-army-knife function =org-element-map= handles the iteration
+in a way that is absurdly simple to use: first, use
+=org-element-parse-buffer= to get an object structure for the org
+buffer's contents, and then call =org-element-map= on the parsed tree,
+filtering on ='src-block=.
+
+Each element identified this way is rather complex. Extensive tests
+with Emacs step debugging helped me find several processing steps:
+
+1. The interesting bit of the source-block element is the second item
+   in the list: =(car (cdr element))=.
+
+2. =plist-get= finds the relevant strings in this second item. But
+   this function returns not only the string, but several other
+   properties. The string we need is at the head of the list, but this
+   may be buried within several nested lists. So I wrote a function,
+   =hjh-get-string-from-nested-thing=, that keeps stripping off "car"
+   from the object, until it finds a string.
+
+3. This string itself also includes formatting properties, so I had to
+   use =substring-no-properties= on these items.
+
+To generate the aggregate code file, then, I simply do =M-x
+hjh-src-blocks-to-buffer=, type in the starting listing number for
+this chapter, and in a few seconds, I get a buffer containing
+SuperCollider code separated by comments holding the captions, e.g.:
+
+#+begin_src {SuperCollider} -i
+/**************
+ Listing 6. A very simple synth.
+ **************/
+
+a = { SinOsc.ar(440, 0, 0.1).dup }.play;
+
+// To make it stop:
+a.release;
+#+end_src
+
+#+name: extract
+#+caption: Emacs-lisp functions to find captioned source blocks within a buffer.
+#+begin_src emacs-lisp -i
+(defun hjh-get-string-from-nested-thing (thing)
+  "Peel off 'car's from a nested list until the car is a string."
+  (while (and thing (not (stringp thing)))
+    (setq thing (car thing)))
+  thing
+)
+
+(defun hjh-src-blocks-to-string (counter get-some)
+  "Iterate src blocks from org-element and add them to a string."
+  (interactive "nStarting listing number: \nP")
+  (when (not counter) (setq counter 1))
+  (let ((tree (org-element-parse-buffer))
+	(string "")
+	(get-all (not get-some)))
+    (org-element-map tree 'src-block
+      (lambda (element)
+	(setq element (car (cdr element)))
+	(let ((caption (hjh-get-string-from-nested-thing (plist-get element :caption)))
+	      (source (hjh-get-string-from-nested-thing (plist-get element :value))))
+	  (when caption
+	    (when (or get-all 
+		      (let ((parms
+			     (hjh-get-string-from-nested-thing (plist-get element :parameters))))
+			(and (stringp parms) (string-match-p "extract" parms))))
+	      (setq string (concat string (format "/**************
+ Listing %d. %s
+ **************/
+
+%s\n\n"
+					  counter
+					  (substring-no-properties caption)
+					  (substring-no-properties source)))))
+	    ; always increment if there was a caption
+	    (setq counter (1+ counter))))))
+    string))
+
+(defun hjh-src-blocks-to-buffer (counter get-some)
+  "Put all the captioned source blocks from a buffer into another buffer."
+  (interactive "nStarting listing number: \nP")
+  (let* ((contents (hjh-src-blocks-to-string counter get-some))
+	 (bufpath (buffer-file-name))
+	 (newname (concat (file-name-sans-extension bufpath) ".scd"))
+	 (bufname (file-name-nondirectory newname))
+	 (newbuf (get-buffer-create bufname)))
+    (with-current-buffer newbuf
+      (erase-buffer)
+      (insert contents)
+      (set-visited-file-name newname))
+    (switch-to-buffer-other-window newbuf)))
+#+end_src
+
+# #+begin_comment
+# #+name: 
+# #+caption: 
+# #+begin_src org
+# #+end_src
+# #+end_comment
+
+** Partitioning the article export
+Rather than create a document class to turn top-level headings into =\part= 
+commands, I embedded the LaTeX code for it directly into the full-article 
+template. The trick is closing the environments for the previous sections. 
+This requires a top-level heading, which should not start a new section. I 
+found that =:B_ignoreheading:= did not work for this, but an [[http://stackoverflow.com/questions/10295177/is-there-an-equivalent-of-org-modes-b-ignoreheading-for-non-beamer-documents][export filter]]
+by Suvayu Ali did exactly what I needed.
+
+#+name: articleParts
+#+caption: Part of the full-article export document, with embedded LaTeX \part syntax.
+#+begin_src org
+  ,#+startup: beamer
+  
+  ,#+TITLE: Workshop: Synthesis and Performance in SuperCollider
+  ,#+DATE: \today
+  ,#+AUTHOR: H. James Harkins
+  
+  ,#+INCLUDE: "../printhead2.org"
+  ,#+include: "../glossary.org"
+  ,* Part 1                                                      :ignoreheading:
+  ,#+latex: \clearpage\part{Introductory SC, Synthesis and Sequencing}
+  ,#+include: "../01-intro/01-contents.org" :minlevel 1
+  
+  ,* Part 2                                                      :ignoreheading:
+  ,#+latex: \clearpage\part{Sequencing with Patterns; Synthesis Techniques}
+  ,#+include: "../02-synth/02-contents.org" :minlevel 1
+#+end_src
+
+* Weaknesses
+** Reliance on LaTeX-specific markup
+
+One significant problem, which this project did not attempt to solve,
+is to reconcile the LaTeX's /semantic markup/ with org's ideal of
+backend-independent markup. In LaTeX, it's common to define different
+markup commands for different types of text. This project, for
+instance, uses =\cd{}= for in-line code snippets and =\ci{}= for code
+keywords and identifiers. Both render in the monospace font, in the
+same color; by marking them up differently, I can easily change the
+formatting of one or the other by changing the command's
+definition. (In fact, there is a slight difference: =\ci= identifiers
+are put into an =\mbox=, to suppress hyphenation.)
+
+Org's formatting markup is visual: asterisks for bold, slashes for
+italics and so on.
+
+I think [[http://orgmode.org/manual/Macro-replacement.html#Macro-replacement][export macros]] could support semantic markup that could export
+to LaTeX or HTML equally well, but I didn't investigate that in this
+project. Here, I just embedded LaTeX commands directly into the org
+files: free standing for simple uses, and using export snippets[fn:448d1164] for
+more intricate cases (such as code examples including curly braces,
+which LaTeX export treats specially).
+
+* Footnotes
+
+[fn:448d1164] Export snippets look like this:
+=@@backendname:text...@@=. They will export only to that backend. You
+can write several of them in a row for different backends:
+=@@latex:\emph{italic}@@@@html:<i>italic</i>@@= and each export style
+receives the right snippet.
+
