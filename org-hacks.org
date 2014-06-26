@@ -177,7 +177,17 @@ in old Org's list of known percent escapes.
             (goto-char end))))))
 #+end_src
 
-** Structure Movement and Editing 
+** Structure Movement and Editing
+*** Go back to the previous top-level heading
+
+#+BEGIN_SRC emacs-lisp
+(defun org-back-to-top-level-heading ()
+  "Go back to the current top level heading."
+  (interactive)
+  (or (re-search-backward "^\* " nil t)
+      (goto-char (point-min))))
+#+END_SRC
+
 *** Show next/prev heading tidily
 
 #+index: Navigation!Heading
