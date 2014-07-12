@@ -39,7 +39,7 @@
 @end macro
 @copying
 
-Copyright @copyright{} 2010--2013 Free Software Foundation
+Copyright @copyright{} 2010--2014 Free Software Foundation
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -211,7 +211,7 @@ Exporting
 * ASCII/Latin-1/UTF-8 export::	Exporting to flat files with encoding
 * HTML export::			Exporting to HTML
 * @LaTeX{} and PDF export::	Exporting to @LaTeX{}, and processing to PDF
-* iCalendar export::            Exporting to iCalendar
+* iCalendar export::		Exporting to iCalendar
 
 Miscellaneous
 
@@ -2169,10 +2169,14 @@ consisting of only dashes, and at least 5 of them.
 @subheading Comment lines
 
 Lines starting with zero or more whitespace characters followed by @samp{#}
-and a whitespace are treated as comments and will never be exported.  Also
-entire subtrees starting with the word @samp{COMMENT} will never be exported.
-Finally, regions surrounded by @samp{#+BEGIN_COMMENT}
-... @samp{#+END_COMMENT} will not be exported.
+and a whitespace are treated as comments and, as such, are not exported.
+
+Likewise, regions surrounded by @samp{#+BEGIN_COMMENT}
+... @samp{#+END_COMMENT} are not exported.
+
+Finally, a @samp{COMMENT} keyword at the beginning of an entry, but after any
+other keyword or priority cookie, comments out the entire subtree.  The
+command below helps changing the comment status of a headline.
 
 @table @kbd
 @item C-c ;
@@ -2257,11 +2261,11 @@ include your @file{.emacs} file, you could use:
 #+INCLUDE: "~/.emacs" src emacs-lisp
 @end smallexample
 @noindent
-The optional second and third parameter are the markup (e.g.@: @samp{quote},
-@samp{example}, or @samp{src}), and, if the markup is @samp{src}, the
-language for formatting the contents.  The markup is optional, if it is not
-given, the text will be assumed to be in Org mode format and will be
-processed normally. @kbd{C-c '} will visit the included file.
+The optional second and third parameter are the markup (i.e., @samp{example}
+or @samp{src}), and, if the markup is @samp{src}, the language for formatting
+the contents.  The markup is optional, if it is not given, the text will be
+assumed to be in Org mode format and will be processed normally. @kbd{C-c '}
+will visit the included file.
 
 @node Embedded @LaTeX{},  , Include files, Markup
 @section Embedded @LaTeX{}
@@ -2303,7 +2307,7 @@ that planning information can be incorporated into desktop calendars.
 * ASCII/Latin-1/UTF-8 export::	Exporting to flat files with encoding
 * HTML export::			Exporting to HTML
 * @LaTeX{} and PDF export::	Exporting to @LaTeX{}, and processing to PDF
-* iCalendar export::            Exporting to iCalendar
+* iCalendar export::		Exporting to iCalendar
 @end menu
 
 @node Export options, The export dispatcher, Exporting, Exporting
