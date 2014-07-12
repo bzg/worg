@@ -107,8 +107,15 @@ All in Emacs, without any external package.
 
 * How to
 
-1- Execute the Lisp code hereafter.
-   Type =C-c C-c= with the cursor on the lisp code.
+1- Install it.
+   - Through the Emacs package system. Add the repository to your =.emacs=:
+     : (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+     List all packages with =M-x packages-list-packages=,
+     look for =orgtbl-ascii-plot= and install it.
+   - Alternatively, download the lisp file
+     https://github.com/tbanel/orgtblasciiplot/blob/master/orgtbl-ascii-plot.el
+     and load it (for example by typing
+     =M-x load-file RET orgtbl-ascii-plot.el RET=)
 
 2- Put the cursor on the column to plot.
 
@@ -116,6 +123,10 @@ All in Emacs, without any external package.
    - either =C-c p=
    - or =M-x orgtbl-ascii-plot=
    This adds a new ascii-art column.
+
+   Beware that the =C-c p= key bindind does not work the first time
+   the package is installed through the package system. Later on it
+   works properly. Does anyone has a fix ?
 
 4- The width in characters of the plot may be specified
    with a numeric prefix:
@@ -144,81 +155,16 @@ The column formula may be changed. Here is how it works:
 
 * Lisp code (pure ascii)
 
-#+BEGIN_SRC elisp :results none
-  (defun orgtbl-ascii-draw (value min max &optional width characters)
-    "Draws an ascii bar in a table.
-    VALUE is a the value to plot, the width of the bar to draw.
-    A value equal to MIN will be displayed as empty (zero width bar).
-    A value equal to MAX will draw a bar filling all the WIDTH.
-    WIDTH is the expected width in characters of the column.
-    CHARACTERS is a string of characters that will compose the bar,
-    with shades of grey from pure white to pure black.
-    It defaults to a 10 characters string of regular ascii characters.
-    "
-    (unless characters (setq characters " .:;c!lhVHW"))
-    (unless width (setq width 12))
-    (if (stringp value)
-        (setq value (string-to-number value)))
-    (setq value (* (/ (- (+ value 0.0) min) (- max min)) width))
-    (cond
-     ((< value     0) "too small")
-     ((> value width) "too large")
-     (t
-      (let ((len (1- (length characters))))
-        (concat
-         (make-string (floor value) (elt characters len))
-         (string (elt characters
-                      (floor (* (- value (floor value)) len)))))))))
-  
-  (defun orgtbl-ascii-plot (&optional ask)
-    "Draws an ascii bars plot in a column, out of values found in another column.
-  A numeric prefix may be given to override the default 12 characters wide plot.
-    "
-    (interactive "P")
-    (let ((col (org-table-current-column))
-          (min  1e999)
-          (max -1e999)
-          (length 12)
-          (table (org-table-to-lisp)))
-      (cond ((consp ask)
-             (setq length
-                   (or
-                    (read-string "Length of column [12] " nil nil 12)
-                    12)))
-            ((numberp ask)
-             (setq length ask)))
-      (mapc
-       (lambda (x)
-         (when (consp x)
-           (setq x (nth (1- col) x))
-           (when (string-match
-                  "^[-+]?\\([0-9]*[.]\\)?[0-9]*\\([eE][+-]?[0-9]+\\)?$"
-                  x)
-             (setq x (string-to-number x))
-             (if (> min x) (setq min x))
-             (if (< max x) (setq max x)))))
-       (or (memq 'hline table) table)) ;; skip table header if any
-      (org-table-insert-column)
-      (org-table-move-column-right)
-      (org-table-store-formulas
-       (cons
-        (cons
-         (number-to-string (1+ col))
-         (format "'(%s $%s %s %s %s)"
-                 "orgtbl-ascii-draw" col min max length))
-        (org-table-get-stored-formulas)))
-      (org-table-recalculate t)))
-  
-  (org-defkey org-mode-map "\C-cp" 'orgtbl-ascii-plot)
-#+END_SRC
+Moved here:
+https://github.com/tbanel/orgtblasciiplot/blob/master/orgtbl-ascii-plot.el
 
 * Example of extension: unicode characters
 Here are two examples of different styles.
 
 Unicode block characters are used to give a smooth effect.
-See http://en.wikipedia.org/wiki/Block_Elements
-Use one of those drawing functions
-- =orgtbl-ascii-draw= (the default ascii)
+See http://en.wikipedia.org/wiki/Block_Elements.
+Use one of those drawing functions:
+- =orgtbl-ascii-draw=   (the default ascii)
 - =orgtbl-uc-draw-grid= (unicode with a grid effect)
 - =orgtbl-uc-draw-cont= (smooth unicode)
 
@@ -266,35 +212,12 @@ or use ascii plots only for quick and throwable visualization.
 : | # | 31 | -0.78861628 | W:           | ▉▏           | █▎           |
 : #+TBLFM: $3=sin($x/3);R::$5='(orgtbl-uc-draw-grid $3 -0.99895492 0.99540796 12)::$6='(orgtbl-uc-draw-cont $3 -0.99895492 0.99540796 12)::$4='(orgtbl-ascii-draw $3 -0.99895492 0.99540796 12)
 
-#+BEGIN_SRC elisp :results none
-  (defun orgtbl-uc-draw-grid (value min max &optional width)
-    "Draws an ascii bar in a table.
-    It is a variant of orgtbl-ascii-draw with Unicode block characters,
-    for a smooth display.
-    Bars appear as grids (to the extend the font allows).
-    "
-    ;; http://en.wikipedia.org/wiki/Block_Elements
-    ;; best viewed with the "DejaVu Sans Mono" font
-    (orgtbl-ascii-draw value min max width " \u258F\u258E\u258D\u258C\u258B\u258A\u2589"))
-  
-  (defun orgtbl-uc-draw-cont (value min max &optional width)
-    "Draws an ascii bar in a table.
-    It is a variant of orgtbl-ascii-draw with Unicode block characters,
-    for a smooth display.
-    Bars are solid (to the extend the font allows).
-    "
-    (orgtbl-ascii-draw value min max width " \u258F\u258E\u258D\u258C\u258B\u258A\u2589\u2588"))
-  
-#+END_SRC
-
 * License (GNU GPL)
-Copyright (C) 2013 Thierry Banel, Michael Brand
+Copyright (C) 2013-2014 Thierry Banel, Michael Brand
 
 Authors: Thierry Banel, Michael Brand
 
 Keywords: table, plot, ascii, unicode
-
-This file is NOT (yet) part of GNU Emacs.
 
 orgtbl-ascii-plot.el is free software: you can redistribute it
 and/or modify it under the terms of the GNU General Public License
@@ -308,4 +231,3 @@ GNU General Public License for more details.
 
 the GNU General Public License can be obtained here:
 <http://www.gnu.org/licenses/>.
-
