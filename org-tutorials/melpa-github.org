@@ -1,0 +1,240 @@
+# -*- mode: org; -*-
+#+TITLE: GitHub + MELPA + Worg
+#+OPTIONS: ^:{} author:Thierry Banel
+
+[[file:index.org][{Back to Worg's index}]]
+
+Want to contribute ?
+
+GitHub + MELPA + Worg is one popular way to publish your contribution.
+
+I wrote this tutorial because I went this path and it was not so
+obvious before starting.
+
+(You may also want to look at [[file:../org-contribute.org][How to Contribute to Org]]
+for a tighter integration of your contribution with Org-mode)
+
+* So what are those beasts ?
+
+** MELPA
+This is a repository of Emacs packages contributed by many people.
+To get a taste of it, do that:
+
+1. Add those lines to your ~.emacs~ 
+: (require 'package)
+: (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+
+2. Execute those lines by typing ~C-x C-e~ at the end of both lines.
+
+3. Type
+: M-x package-list-packages
+
+After a few seconds you should get a never-ending list of packages,
+right available for you to use. Just click on one and hit the "install" button.
+
+There are several ELPA repositories, MELPA being a
+popular at the time of writing.
+
+** GitHub
+
+It is a code repository, open to all. Browse it here:
+https://github.com
+
+It is based on ~GIT~, wihch is a "version control system".
+There are many version control systems: CVS, SVN, Bazaar, to name a few.
+
+On GitHub, you manage your own GIT repositories.
+
+** Worg
+
+It is a collaborative website for everything about Emacs Org-mode.
+GIT is used as its versionning backend.
+You may request commit-rights on it, as explained here:
+http://orgmode.org/worg/worg-git.html
+
+* General workflow
+
+1. Create your Emacs package,
+2. Register to GitHub (it is free),
+3. Put your package under version control on GitHub,
+4. Make it compliant with ELPA,
+5. Submit your package to MELPA through a "pull request",
+6. Type ~M-x package-list-packages~ and try installing your own package,
+7. Ask for commit rights on Worg,
+8. Document your package on Worg,
+9. Announce its availability on the mailing list,
+10. Your package starts its life with possible contributions from others.
+
+You may change the ordering of items.
+For instance, putting 9. on position 1. is done quite often,
+and it could save you a few iterations.
+
+* Creating your package
+
+Well, you know, you write a bunch of Emacs-lisp files, and possibly
+other kinds of files. I will take my own example: I wrote
+~orgtbl-ascii-plot.el~.
+
+* Registering to GitHub
+
+Go to https://github.com/,
+choose a user name, a password, and create an account.
+Go for a free, publicly visible account.
+I choosed tbanel, so I was given this url: https://github.com/tbanel
+
+Under a single account, you can create as many GIT repositories as you
+want.
+
+Go ahead, create one using the drop down menu under the "+" sign at the
+upper right side of the screen. Play a little bit. No worries, you can
+delete it.
+
+* Put your package under version control
+
+There are many ways to do that.
+My advice is to let GitHub create a skeletton.
+
+1. Create a repository
+   (drop down menu under the "+" sign at the upper right side of the screen).
+2. Choose the GPL V3 license for your package
+   (or any other license). GitHub creates the license file for you.
+3. Clone the repository to your local drive.
+   In my case I did that:
+   : git clone https://github.com/tbanel/orgtblasciiplot.git
+   This will create a directory with the name of your repository,
+   ready to accept GIT commands.
+   You will mainly develop in this local directory.
+4. Copy the files of your package in this directory.
+   For me it was something like:
+   : cp orgtbl-ascii-plot.el orgtblasciiplot/
+5. Add your files to GIT. I typed:
+   : git add orgtbl-ascii-plot.el
+   : git commit
+6. Synchronize your local drive with GitHub servers.
+   : git push
+   This will "push" changes in your local drive to GitHub.
+7. On the GitHub web interface, click on ~README.md~ and the ~Edit~ button.
+   Explain what your package do.
+   Play with the markup facility, use the ~Preview~ button.
+   When done, commit.
+
+Now you have two repositories, one on your local drive, and one on GitHub.
+You may change either, as you want, maintaining both in sync
+with the commands:
+: git push
+: git pull
+
+* Make your package compliant with ELPA
+
+You need to tag your elisp file in a way that ELPA can leverage automatically.
+A simple way to do that is to create an empty ~orgtbl-ascii-plot.el~ file
+under Emacs (replace with the actual name of your package).
+If ~auto-insert-mode~ is enabled, a template is inserted.
+
+Then go to the Emacs info page for details:
+[[info:elisp#Packaging]]
+
+* Submit your package to MELPA through a "pull request"
+
+Submissions to MELPA work this way:
+
+1. Fork the MELPA project under GitHub.
+   Login to your GitHub account,
+   go to https://github.com/milkypostman/melpa,
+   click on the ~Fork~ button.
+   This will add a "copy" of the MELPA repository into your account.
+   This copy is yours, you can do whaterver you want with it,
+   it does not interfer with the original one.
+2. Clone it to your local drive.
+   : git clone https://github.com/tbanel/melpa
+   (do not forget to change tbanel to your actual GitHub account)
+3. Change it as explained in the ~README.md~
+   of https://github.com/milkypostman/melpa
+   under the "Contributing New Recipes" section.
+   Basically, this involves writting a new file:
+   : recipes/orgtbl-ascii-plot
+   (change the name of the file according to the name of your package).
+   Mine looks like this:
+   : (orgtbl-ascii-plot :fetcher github :repo "tbanel/orgtblasciiplot")
+4. Commit:
+   : cd melpa
+   : git add recipes/orgtbl-ascii-plot
+   : git commit
+5. Check that your package builds and installs properly
+   : make recipes/orgtbl-ascii-plot
+   : emacs & M-x package-install-file recipes/orgtbl-ascii-plot
+   Be sure to read detailed instruction in
+   https://github.com/milkypostman/melpa, section "Testing"
+6. Send a "pull request" to the MELPA maintainer team.
+   Eventually they will pull your changes out of your copy of melpa.
+   - Go to https://github.com/milkypostman/melpa,
+   - click on "Pull Request"
+   - click on "New pull request"
+   - fill in the comment section with relevant information. For me this was:
+   ___
+    I would like to submit orgtbl-ascii-plot package to Melpa.
+    > orgtbl-ascii-plot adds plotting capabilities to Org-mode tables,
+      all in Emacs without external dependencies.
+    > full documentation here:
+      http://orgmode.org/worg/org-contrib/orgtbl-ascii-plot.html
+    > GitHub home here:
+      https://github.com/tbanel/orgtblasciiplot
+    > I am the author and maintainer.
+
+    This is my first contribution to Melpa.
+    I may miss something, so please tell me, I will fix it.
+
+    Regards
+   ___
+7. Answer queries from the MELPA team.
+   They are very friendly.
+   They do a good job at ensuring that your package is fully compliant
+   with the ELPA process.
+   They may also check additional details, like possible redundancy with
+   another package, or simpler lisp style.
+
+* Install your own package !
+
+A few hours after your "pull request" has been accepted, il will show up
+in the list of packages. Under Emacs type:
+: M-x package-list-packages
+
+Install your own package. Wooow !
+
+* Register to Worg
+
+http://orgmode.org/worg is the community web site for documentation.
+
+The site is maintained under... GIT.
+
+The site is authored using... Emacs + Org-mode.
+
+An org-mode page committed to the Worg GIT repository gets translated
+into Html, and is visible a few seconds latter.
+
+Ask for commit-right on Worg.
+Instructions are here: http://orgmode.org/worg/worg-git.html
+
+This involves creating an SSH key, and cloning the GIT repository.
+
+* Document your package on Worg
+
+Create a file to document your package. I wrote this one:
+: worg/org-contrib/orgtbl-ascii-plot.org
+which is translated on the web site here:
+http://orgmode.org/worg/org-contrib/orgtbl-ascii-plot.html
+
+Commit and push it. I did that:
+: git add org-contrib/orgtbl-ascii-plot.org
+: git commit
+: git push
+
+* Announce availability of your package
+
+There is a mailing list dedicated to Org-mode. Look here:
+http://orgmode.org/worg/org-mailing-list.html
+https://lists.gnu.org/mailman/listinfo/emacs-orgmode
+
+Use it to announce your package. You will receive good feedbacks. It
+is even advisable to announce it *before* going all the path down to the
+publication.
