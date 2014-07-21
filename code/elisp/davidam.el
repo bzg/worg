@@ -76,6 +76,18 @@
   (setq item-time (org-get-scheduled-time (point)))
   (message "%s" item-time))
 
+(define-skeleton davidam-org-bibliography
+  "A skeleton to bibliography for org-mode"
+  ""
+  '(setq author (skeleton-read "Author (Surname, Initials): ")) \n
+  '(setq year (skeleton-read "Year: ")) \n 
+  '(setq title (skeleton-read "Title: ")) \n
+  '(setq publisher (skeleton-read "Publisher: ")) \n
+  '(setq pages (skeleton-read "Pages Number: ")) \n
+  > "+ " author " (" year "). " "\"/" title "/\" " publisher ". pp " pages "." \n
+)
+
+
 (defun davidam-happy-birthday(person)
   (interactive "MWrite the person name: ")
   (message (concat "Happy birthday to you. Happy birthday to you. Happy birthday, dear " person ". Happy birthday to you")))
@@ -84,11 +96,16 @@
   (interactive "nEscribe un numero: " n)
   (message (number-to-string (fibonacci-aux n))))
 
-(defun fibonacci-aux (n)
+ (defun fibonacci-aux (n)
 ;;  (interactive "dEscribe un numero: " n)
   (if (or (= n 0) (= n 1))
       1
     (+ (fibonacci-aux (- n 1)) (fibonacci-aux (- n 2)))))
+
+(defun davidam-org-todo-subtree (&optional ARG)
+  "Change the state, such as org-todo, but for all the subtree"
+  (interactive "P")
+  (org-with-limited-levels (org-todo "DONE")))
 
 (defun davidam-torres-de-hanoi (discos)
   (interactive "nDime tus discos y te digo cuantos pasos tienes que dar: " discos)
