@@ -268,13 +268,6 @@ end-users are explained in the last part of this document.
                       line number (boolean).
    - ~:value~ :: Contents (string).
 
-** Export Block
-
-   Element.
-
-   - ~:type~ :: Related back-end's name (string).
-   - ~:value~ :: Contents (string).
-
 ** Export Snippet
 
    Object.
@@ -563,6 +556,7 @@ end-users are explained in the last part of this document.
    Greater element.
 
    - ~:type~ :: Block's name (string).
+   - ~:raw-value~ :: Raw contents in block (string).
 
 ** Src Block
 
@@ -1159,7 +1153,6 @@ end-users are explained in the last part of this document.
   - ~:filter-dynamic-block~
   - ~:filter-entity~
   - ~:filter-example-block~
-  - ~:filter-export-block~
   - ~:filter-export-snippet~
   - ~:filter-final-output~
   - ~:filter-fixed-width~
@@ -1811,6 +1804,35 @@ end-users are explained in the last part of this document.
    numbering for headlines and numbered lists.
 
    See also: [[#get-headline-number][~org-export-get-headline-number~]].
+
+** ~org-export-raw-special-block-p~
+   :PROPERTIES:
+   :CUSTOM_ID: raw-special-block-p
+   :END:
+
+   Non nil when a given special block should be inserted as-is in the
+   final output.
+
+   This fuction should be used as a first check in a special block
+   translator, in order to know if contents are to be processed or
+   not. In the latter case, one can extract raw contents through
+   ~:raw-value~ property, as shown in the following excerpt from
+   ~latex~ back-end:
+
+   #+BEGIN_SRC emacs-lisp
+   (defun org-latex-special-block (special-block contents info)
+     "Transcode a SPECIAL-BLOCK element from Org to LaTeX.
+   CONTENTS holds the contents of the block.  INFO is a plist
+   holding contextual information."
+     (if (org-export-raw-special-block-p special-block info)
+         (org-remove-indentation (org-element-property :raw-value special-block))
+       (let ((type (downcase (org-element-property :type special-block)))
+             (opt (org-export-read-attribute :attr_latex special-block :options)))
+         (concat (format "\\begin{%s}%s\n" type (or opt ""))
+                 (org-latex--caption/label-string special-block info)
+                 contents
+                 (format "\\end{%s}" type)))))
+   #+END_SRC
 
 ** ~org-export-read-attribute~
    :PROPERTIES:
