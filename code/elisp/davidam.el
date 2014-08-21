@@ -63,9 +63,28 @@
       (goto-char (mark))
       (insert "#+END_SRC"))))
 
+(defun davidam-xml-envolve(tag)
+  "Envolve source between xml tags"
+  (interactive "sChoose your tag: " tag)
+  (if (string= "" tag)
+      (message "You must write a tag")
+    (if (> (point) (mark))
+	(progn 
+	  (goto-char (point))
+	  (insert (concat "</" tag ">"))
+	  (goto-char (mark))
+	  (insert (concat "<" tag ">")))
+      (progn
+	(goto-char (point))
+	(insert (concat "<" tag ">"))
+	(goto-char (mark))
+	(insert (concat "</" tag ">"))))))
+
+
 (defun davidam-org-src(msg)
   "Insert org source tags"
   (interactive "sChoose your programming language: " msg)
+;; TODO: Meter name en interactive. Ej: #+name: myconcat
   (if (equal nil msg) 
       (setq msg "lisp"))
   (insert "#+BEGIN_SRC " msg)
