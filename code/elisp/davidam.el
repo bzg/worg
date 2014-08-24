@@ -106,6 +106,17 @@
   > "+ " author " (" year "). " "\"/" title "/\" " publisher ". pp " pages "." \n
 )
 
+(define-skeleton davidam-org-bibliography-url
+  "A skeleton to bibliography for org-mode"
+  ""
+  '(setq author (skeleton-read "Author (Surname, Initials): ")) \n
+  '(setq year (skeleton-read "Year: ")) \n 
+  '(setq date-seen (skeleton-read "Date seen: ")) \n 
+  '(setq title (skeleton-read "Title: ")) \n
+  '(setq publisher (skeleton-read "Publisher: ")) \n
+  '(setq url (skeleton-read "Url: ")) \n
+  > "+ " author " (" year "). " "\"/" title "/\" " publisher ". Visto el " date-seen " <" url  ">." \n
+)
 
 (defun davidam-happy-birthday(person)
   (interactive "MWrite the person name: ")
