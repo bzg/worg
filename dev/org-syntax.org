@@ -9,9 +9,9 @@ This document describes and comments Org syntax as it is currently
 read by its parser (Org Elements) and, therefore, by the export
 framework.  It also includes a few comments on that syntax.
 
-A core concept in this syntax is that only headlines and sections are
-context-free[fn:1][fn:2].  Every other syntactical part only exists
-within specific environments.
+A core concept in this syntax is that only headlines, sections and
+planning lines are context-free[fn:1][fn:2].  Every other syntactical
+part only exists within specific environments.
 
 Three categories are used to classify these environments: "Greater
 elements", "elements", and "objects", from the broadest scope to the
@@ -432,8 +432,15 @@ Unless specified otherwise, case is not significant.
    A diary sexp is a line starting at column 0 with "%%(" string.  It
    can then contain any character besides a new line.
 
-   A planning is a line filled with at most three INFO parts, where
-   each of them follows the pattern:
+   A planning is an element with the following pattern:
+
+   #+BEGIN_EXAMPLE
+   HEADLINE
+   PLANNING
+   #+END_EXAMPLE
+
+   where PLANNING is a line filled with at most three INFO parts,
+   where each of them follows the pattern:
 
    #+BEGIN_EXAMPLE
    KEYWORD: TIMESTAMP
@@ -442,9 +449,8 @@ Unless specified otherwise, case is not significant.
    KEYWORD is either "DEADLINE", "SCHEDULED" or "CLOSED".  TIMESTAMP
    is is a [[#Timestamp][timestamp]] object.
 
-   Even though a planning element can exist anywhere in a section or
-   a greater element, it will only affect the headline containing the
-   section if it is put on the line following that headline.
+   In particular, no blank line is allowed between PLANNING and
+   HEADLINE.
 
 ** Comments
    :PROPERTIES:
@@ -1010,7 +1016,9 @@ Unless specified otherwise, case is not significant.
 quoted by a comma when they do not define a headline.
 
 [fn:2] It also means that only headlines and sections can be
-recognized just by looking at the beginning of the line.
+recognized just by looking at the beginning of the line.  Planning
+lines can be recognize by looking at the beginning of the current line
+and the previous one.
 
 As a consequence, using ~org-element-at-point~ or
 ~org-element-context~ will move up to the parent headline, and parse
