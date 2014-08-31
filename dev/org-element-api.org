@@ -1,0 +1,718 @@
+#+TITLE:      Org Element API
+#+AUTHOR:     Nicolas Goaziou
+#+EMAIL:      mail@nicolasgoaziou.fr
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) NEW(n)
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+
+[[file:../index.org][{Back to Worg's index}]]
+
+=org-element.el= implements a parser according to Org's [[./org-syntax.org][syntax
+specification]].
+
+The library contains tools to generate an abstract syntax tree (AST)
+from an Org buffer, to analyze the syntactical object at point.
+[[#parsing][Parsing functions]] are detailed in the first part of the document,
+along with their relative accessors and setters.
+
+Upon parsing, each token in an Org document gets a type and some
+properties attached to it.  An exhaustive list is given in section
+[[#attributes]].
+
+* Parsing functions
+  :PROPERTIES:
+  :CUSTOM_ID: parsing
+  :END:
+
+  There are two ways to parse a buffer using this library: either
+  locally or globally.
+
+  [[#local][Local parsing]] gives information about the structure at point.
+  Depending on the level of detail required, ~org-element-at-point~
+  and ~org-element-context~ fullfill that role.
+
+  [[#global][Global parsing]] is done with ~org-element-parse-buffer~, which
+  returns the AST representing the document.
+
+** Analyzing the structure at point
+   :PROPERTIES:
+   :CUSTOM_ID: local
+   :END:
+
+   ~org-element-at-point~ offers a glimpse into the local structure of
+   the document.  However, it stops at the element level.  It doesn't,
+   for example, analyze the contents of a paragraph.  While this is
+   sufficient for many use cases, ~org-element-context~ allows to go
+   deeper, down to the object level.  The following example
+   illustrates the difference between the two functions.
+
+   #+name: context-vs-at-point
+   #+BEGIN_SRC org
+   ,*Lorem ipsum dolor* sit amet, consectetur adipisicing elit, sed do
+   eiusmod tempor incididunt ut labore et dolore magna aliqua.
+   #+END_SRC
+
+   Indeed, calling ~org-element-at-point~ at the beginning of the
+   paragraph returns a ~paragraph~ structure, whereas calling
+   ~org-element-context~ returns a ~bold~ object.
+
+   Unless point is on a headline, both functions indirectly return all
+   parents of the value within the current section[fn:1], through
+   ~:parent~ property.  For example, when point is at =(X)=
+
+   #+name: full-hierarchy
+   #+BEGIN_SRC org
+   ,* Headline
+
+     ,#+BEGIN_CENTER
+     Paragraph(X)
+     ,#+END_CENTER
+   #+END_SRC
+
+   ~org-element-at-point~ returns a ~paragraph~ element, whose
+   ~:parent~ property contains a ~center-block~ element, which, in
+   turn, has no ~:parent~ since the next ancestor is the section
+   itself.
+
+** Creating a snapshot of the document
+   :PROPERTIES:
+   :CUSTOM_ID: global
+   :END:
+
+   ~org-element-parse-buffer~ completely parses a (possibly narrowed)
+   buffer into an AST.  The virtual root node has type ~org-data~ and
+   no properties attached to it.
+
+   Unlike to local parsing functions, data obtained through
+   ~org-element-parse-buffer~ can be altered to your heart's content.
+   See [[#setters]] for a list of related tools.
+
+* Accessors
+
+  Type and properties of a given element or object are obtained with,
+  respectively, ~org-element-type~ and ~org-element-property~.
+
+  ~org-element-contents~ returns an ordered (by buffer position) list
+  of all elements or objects within a given element or object.  Since
+  local parsing ignores contents, it only makes sense to use this
+  function on a part of an AST.
+
+  Eventually, ~org-element-map~ operates on an AST, a part of it, or
+  any list of elements or objects.  It is a versatile function.
+
+  For example, it can be used to collect data from an AST.  Hence the
+  following snippet returns all paragraphs beginning a section in the
+  current document.  Note that equality between elements is tested
+  with ~eq~.
+
+  #+name: collect
+  #+BEGIN_SRC emacs-lisp
+  (org-element-map (org-element-parse-buffer) 'paragraph
+    (lambda (paragraph)
+      (let ((parent (org-element-property :parent paragraph)))
+        (and (eq (org-element-type parent) 'section)
+             (let ((first-child (car (org-element-contents parent))))
+               (eq first-child paragraph))
+             ;; Return value.
+             paragraph))))
+  #+END_SRC
+
+  It can also be used as a predicate.  Thus, the following snippet
+  returns a non-nil value when the document contains a checked item.
+
+  #+name: checkedp
+  #+BEGIN_SRC emacs-lisp
+  (org-element-map (org-element-parse-buffer) 'item
+    (lambda (item) (eq (org-element-property :checkbox item) 'on))
+    nil t)
+  #+END_SRC
+  
+  See ~org-element-map~'s docstring for more examples.
+
+* Setters
+  :PROPERTIES:
+  :CUSTOM_ID: setters
+  :END:
+
+  ~org-element-put-property~ modifies any property of a given element
+  or object.
+
+  Note that, even though structures obtained with local parsers are
+  mutable, it is good practice to consider them immutable.  In
+  particular, destructively changing properties relative to buffer
+  positions is likely to break the caching mechanism running in the
+  background.  If, for example, you need to slightly alter an element
+  obtained using these functions, first copy it (e.g., with
+  ~copy-sequence~) before modifying it by side effect.  There is no
+  such restriction for elements grabbed from a complete AST.
+
+  The library also provides tools to manipulate the parse tree.  Thus,
+  ~org-element-extract-element~ removes an element or object from an
+  AST, ~org-element-set-element~ replaces one with another, whereas
+  ~org-element-insert-before~ and ~org-element-adopt-element~ insert
+  elements within the tree, respectively before a precise location or
+  after all children.
+
+* Types and Attributes
+  :PROPERTIES:
+  :CUSTOM_ID: attributes
+  :END:
+
+  Each greater element, element and object has a variable set of
+  properties attached to it.  Among them, four are shared by all
+  types: ~:begin~ and ~:end~, which refer to the beginning and ending
+  buffer positions of the considered element or object, ~:post-blank~,
+  which holds the number of blank lines, or white spaces, at its
+  end[fn:2] and ~:parent~, which refers to the element or object
+  containing it.
+
+  Greater elements containing objects on the one hand, and elements or
+  objects containing objects on the other hand also have
+  ~:contents-begin~ and ~:contents-end~ properties to delimit
+  contents.
+
+  In addition to these properties, each element can optionally get
+  some more from affiliated keywords, namely: ~:caption~, ~:header~,
+  ~:name~, ~:plot~, ~:results~ or ~:attr_NAME~ where =NAME= stands for
+  the name of an export back-end.
+
+  Also, ~:post-affiliated~ property is attached to all elements.  It
+  refers to the buffer position after any affiliated keyword, when
+  applicable, or to the beginning of the element otherwise.
+
+  The following example illustrates the relationship between position
+  properties.
+
+  #+name: position-properties
+  #+BEGIN_SRC org -n -r
+  ,#+NAME: dont-do-this-at-home (ref:begin)
+  ,#+BEGIN_SRC emacs-lisp       (ref:post)
+  (/ 1 0)
+  ,#+END_SRC
+
+  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do (ref:end)
+  eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  #+END_SRC
+
+  The first element's type is ~src-block~.  Its ~:begin~ property
+  (respectively ~:end~ property) is the buffer position at the
+  beginning of line [[(begin)]] (respectively line [[(end)]]).
+  ~:post-affiliated~ is the buffer position at the beginning of line
+  [[(post)]].  Since source blocks cannot contain other elements or
+  objects, both ~:contents-begin~ and ~:contents-end~ are
+  nil. ~:post-blank~ is 1.
+
+  Other properties, specific to each element or object type, are
+  listed below.
+
+** Babel Call
+
+   Element.
+
+   - ~:value~ :: Raw call, as Org syntax (string).
+
+** Bold
+
+   Recursive object.
+
+   No specific property.
+
+** Center Block
+
+   Greater element.
+
+   No specific property.
+
+** Clock
+
+   Element.
+
+   - ~:duration~ :: Clock duration for a closed clock, or nil (string
+                    or nil).
+   - ~:status~ :: Status of current clock (symbol: ~closed~ or
+                  ~running~).
+   - ~:value~ :: Timestamp associated to clock keyword (timestamp
+                 object).
+
+** Code
+
+   Object.
+
+   - ~:value~ :: Contents (string).
+
+** Comment
+
+   Element.
+
+   - ~:value~ :: Comments, with pound signs (string).
+
+** Comment Block
+
+   Element.
+
+   - ~:value~ :: Comments, without block's boundaries (string).
+
+** Diary Sexp
+
+   Element.
+
+   - ~:value~ :: Full Sexp (string).
+
+** Drawer
+
+   Greater element.
+
+   - ~:drawer-name~ :: Drawer's name (string).
+
+** Dynamic Block
+
+   Greater element.
+
+   - ~:arguments~ :: Block's parameters (string).
+   - ~:block-name~ :: Block's name (string).
+   - ~:drawer-name~ :: Drawer's name (string).
+
+** Entity
+
+   Object.
+
+   - ~:ascii~ :: Entity's ASCII representation (string).
+   - ~:html~ :: Entity's HTML representation (string).
+   - ~:latex~ :: Entity's LaTeX representation (string).
+   - ~:latex-math-p~ :: Non-nil if entity's LaTeX representation
+        should be in math mode (boolean).
+   - ~:latin1~ :: Entity's Latin-1 encoding representation (string).
+   - ~:name~ :: Entity's name, without backslash nor brackets
+                (string).
+   - ~:use-brackets-p~ :: Non-nil if entity is written with optional
+        brackets in original buffer (boolean).
+   - ~:utf-8~ :: Entity's UTF-8 encoding representation (string).
+
+** Example Block
+
+   Element.
+
+   - ~:label-fmt~ :: Format string used to write labels in current
+                     block, if different from
+                     ~org-coderef-label-format~ (string or nil).
+   - ~:language~ :: Language of the code in the block, if specified
+                    (string or nil).
+   - ~:number-lines~ :: Non-nil if code lines should be numbered.
+        A ~new~ value starts numbering from 1 wheareas ~continued~
+        resume numbering from previous numbered block (symbol: ~new~,
+        ~continued~ or nil).
+   - ~:options~ :: Block's options located on the block's opening line
+                   (string).
+   - ~:parameters~ :: Optional header arguments (string or nil).
+   - ~:preserve-indent~ :: Non-nil when indentation within the block
+        mustn't be modified upon export (boolean).
+   - ~:retain-labels~ :: Non-nil if labels should be kept visible upon
+        export (boolean).
+   - ~:switches~ :: Optional switches for code block export (string or
+                    nil).
+   - ~:use-labels~ :: Non-nil if links to labels contained in the
+                      block should display the label instead of the
+                      line number (boolean).
+   - ~:value~ :: Contents (string).
+
+** Export Snippet
+
+   Object.
+
+   - ~:back-end~ :: Relative back-end's name (string).
+   - ~:value~ :: Export code (string).
+
+** Fixed Width
+
+   Element.
+
+   - ~:value~ :: Contents, with colons (string).
+
+** Footnote Definition
+
+   Greater element.
+
+   - ~:label~ :: Label used for references (string).
+
+** Footnote Reference
+
+   Recursive object.
+
+   - ~:label~ :: Footnote's label, if any (string or nil).
+   - ~:type~ :: Determine whether reference has its definition inline,
+                or not (symbol: ~inline~, ~standard~).
+
+** Headline
+
+   Greater element.
+
+   In addition to the following list, any property specified in
+   a property drawer attached to the headline will be accessible as an
+   attribute (with an uppercase name, e.g. ~:CUSTOM_ID~).
+
+   - ~:archivedp~ :: Non-nil if the headline has an archive tag
+                     (boolean).
+   - ~:closed~ :: Headline's CLOSED reference, if any (timestamp
+                  object or nil)
+   - ~:commentedp~ :: Non-nil if the headline has a comment keyword
+                      (boolean).
+   - ~:deadline~ :: Headline's DEADLINE reference, if any (timestamp
+                    object or nil).
+   - ~:footnote-section-p~ :: Non-nil if the headline is a footnote
+        section (boolean).
+   - ~:level~ :: Reduced level of the headline (integer).
+   - ~:pre-blank~ :: Number of blank lines between the headline and
+                     the first non-blank line of its contents
+                     (integer).
+   - ~:priority~ :: Headline's priority, as a character (integer).
+   - ~:quotedp~ :: Non-nil if the headline contains a quote keyword
+                   (boolean).
+   - ~:raw-value~ :: Raw headline's text, without the stars and the
+                     tags (string).
+   - ~:scheduled~ :: Headline's SCHEDULED reference, if any (timestamp
+                     object or nil).
+   - ~:tags~ :: Headline's tags, if any, without the archive
+                tag. (list of strings).
+   - ~:title~ :: Parsed headline's text, without the stars and the
+                 tags (secondary string).
+   - ~:todo-keyword~ :: Headline's TODO keyword without quote and
+        comment strings, if any (string or nil).
+   - ~:todo-type~ :: Type of headline's TODO keyword, if any (symbol:
+                     ~done~, ~todo~).
+
+** Horizontal Rule
+
+   Element.
+
+   No specific property.
+
+** Inline Babel Call
+
+   Object.
+
+   - ~:value~ :: Raw call, as Org syntax (string).
+
+** Inline Src Block
+
+   Object.
+
+   - ~:language~ :: Language of the code in the block (string).
+   - ~:parameters~ :: Optional header arguments (string or nil).
+   - ~:value~ :: Source code (string).
+
+** Inlinetask
+
+   Greater element.
+
+   In addition to the following list, any property specified in
+   a property drawer attached to the headline will be accessible as an
+   attribute (with an uppercase name, e.g. ~:CUSTOM_ID~).
+
+   - ~:closed~ :: Inlinetask's CLOSED reference, if any (timestamp
+                  object or nil)
+   - ~:deadline~ :: Inlinetask's DEADLINE reference, if any (timestamp
+                    object or nil).
+   - ~:level~ :: Reduced level of the inlinetask (integer).
+   - ~:priority~ :: Headline's priority, as a character (integer).
+   - ~:raw-value~ :: Raw inlinetask's text, without the stars and the
+                     tags (string).
+   - ~:scheduled~ :: Inlinetask's SCHEDULED reference, if any
+                     (timestamp object or nil).
+   - ~:tags~ :: Inlinetask's tags, if any (list of strings).
+   - ~:title~ :: Parsed inlinetask's text, without the stars and the
+                 tags (secondary string).
+   - ~:todo-keyword~ :: Inlinetask's TODO keyword, if any (string or
+        nil).
+   - ~:todo-type~ :: Type of inlinetask's TODO keyword, if any
+                     (symbol: ~done~, ~todo~).
+
+** Italic
+
+   Recursive object.
+
+   No specific property.
+
+** Item
+
+   Greater element.
+
+   - ~:bullet~ :: Item's bullet (string).
+   - ~:checkbox~ :: Item's check-box, if any (symbol: ~on~, ~off~,
+                    ~trans~, nil).
+   - ~:counter~ :: Item's counter, if any.  Literal counters become
+                   ordinals (integer).
+   - ~:raw-tag~ :: Uninterpreted item's tag, if any (string or nil).
+   - ~:tag~ :: Parsed item's tag, if any (secondary string or nil).
+   - ~:structure~ :: Full list's structure, as returned by
+                     ~org-list-struct~ (alist).
+
+** Keyword
+
+   Element.
+
+   - ~:key~ :: Keyword's name (string).
+   - ~:value~ :: Keyword's value (string).
+
+** LaTeX Environment
+
+   Element.
+
+   - ~:begin~ :: Buffer position at first affiliated keyword or at the
+                 beginning of the first line of environment (integer).
+   - ~:end~ :: Buffer position at the first non-blank line after last
+               line of the environment, or buffer's end (integer).
+   - ~:post-blank~ :: Number of blank lines between last environment's
+                      line and next non-blank line or buffer's end
+                      (integer).
+   - ~:value~ :: LaTeX code (string).
+
+** LaTeX Fragment
+
+   Object.
+
+   - ~:value~ :: LaTeX code (string).
+
+** Line Break
+
+   Element.
+
+   No specific property.
+
+** Link
+
+   Recursive object.
+
+   - ~:application~ :: Name of application requested to open the link
+                       in Emacs (string or nil). It only applies to
+                       "file" type links.
+   - ~:path~ :: Identifier for link's destination.  It is usually the
+                link part with type, if specified, removed (string).
+   - ~:raw-link~ :: Uninterpreted link part (string).
+   - ~:search-option~ :: Additional information for file location
+        (string or nil). It only applies to "file" type links.
+   - ~:type~ :: Link's type.  Possible types (string) are:
+
+                - ~coderef~ :: Line in some source code,
+                - ~custom-id~ :: Specific headline's custom-id,
+                - ~file~ :: External file,
+                - ~fuzzy~ :: Target, referring to a target object, a named
+                             element or a headline in the current parse tree,
+                - ~id~ :: Specific headline's id,
+                - ~radio~ :: Radio-target.
+
+                It can also be any type defined in ~org-link-types~.
+
+** Macro
+
+   Object.
+
+   - ~:args~ :: Arguments passed to the macro (list of strings).
+   - ~:key~ :: Macro's name (string).
+   - ~:value~ :: Replacement text (string).
+
+** Paragraph
+
+   Element containing objects.
+
+   No specific property.
+
+** Plain List
+
+   Greater element.
+
+   - ~:structure~ :: Full list's structure, as returned by
+                     ~org-list-struct~ (alist).
+   - ~:type~ :: List's type (symbol: ~descriptive~, ~ordered~,
+                ~unordered~).
+
+** Planning
+
+   Element.
+
+   - ~:closed~ :: Timestamp associated to closed keyword, if any
+                  (timestamp object or nil).
+   - ~:deadline~ :: Timestamp associated to deadline keyword, if any
+                    (timestamp object or nil).
+   - ~:scheduled~ :: Timestamp associated to scheduled keyword, if any
+                     (timestamp object or nil).
+
+** Property Drawer
+
+   Element.
+
+   - ~:properties~ :: Properties defined in the drawer (alist).
+
+** Quote Block
+
+   Greater element.
+
+** Radio Target
+
+   Recursive object.
+
+   - ~:raw-value~ :: Uninterpreted contents (string).
+
+** Section
+
+   Greater element.
+
+   No specific property.
+
+** Special Block
+
+   Greater element.
+
+   - ~:type~ :: Block's name (string).
+   - ~:raw-value~ :: Raw contents in block (string).
+
+** Src Block
+
+   Element.
+
+   - ~:label-fmt~ :: Format string used to write labels in current
+                     block, if different from
+                     ~org-coderef-label-format~ (string or nil).
+   - ~:language~ :: Language of the code in the block, if specified
+                    (string or nil).
+   - ~:number-lines~ :: Non-nil if code lines should be numbered.
+        A ~new~ value starts numbering from 1 wheareas ~continued~
+        resume numbering from previous numbered block (symbol: ~new~,
+        ~continued~ or nil).
+   - ~:parameters~ :: Optional header arguments (string or nil).
+   - ~:preserve-indent~ :: Non-nil when indentation within the block
+        mustn't be modified upon export (boolean).
+   - ~:retain-labels~ :: Non-nil if labels should be kept visible upon
+        export (boolean).
+   - ~:switches~ :: Optional switches for code block export (string or
+                    nil).
+   - ~:use-labels~ :: Non-nil if links to labels contained in the
+                      block should display the label instead of the
+                      line number (boolean).
+   - ~:value~ :: Source code (string).
+
+** Statistics Cookie
+
+   Object.
+
+   - ~:value~ :: Full cookie (string).
+
+** Strike Through
+
+   Recursive object.
+
+   No specific property.
+
+** Subscript
+
+   Recursive object.
+
+   - ~:use-brackets-p~ :: Non-nil if contents are enclosed in curly
+        brackets (t, nil).
+
+** Superscript
+
+   Recursive object.
+
+   - ~:use-brackets-p~ :: Non-nil if contents are enclosed in curly
+        brackets (t, nil).
+
+** Table
+
+   Greater element.
+
+   - ~:tblfm~ :: Formulas associated to the table, if any (string or
+                 nil).
+   - ~:type~ :: Table's origin (symbol: ~table.el~, ~org~).
+   - ~:value~ :: Raw ~table.el~ table or nil (string or nil).
+
+** Table Cell
+
+   Recursive object.
+
+   No specific property.
+
+** Table Row
+
+   Element containing objects.
+
+   - ~:type~ :: Row's type (symbol: ~standard~, ~rule~).
+
+** Target
+
+   Object.
+
+   - ~:value~ :: Target's ID (string).
+
+** Timestamp
+
+   Object.
+
+   - ~:day-end~ :: Day part from timestamp end.  If no ending date is
+                   defined, it defaults to start day part (integer).
+   - ~:day-start~ :: Day part from timestamp start (integer).
+   - ~:hour-start~ :: Hour part from timestamp end. If no ending date
+                      is defined, it defaults to start hour part, if
+                      any (integer or nil).
+   - ~:hour-start~ :: Hour part from timestamp start, if specified
+                      (integer or nil).
+   - ~:minute-start~ :: Minute part from timestamp end. If no ending
+        date is defined, it defaults to start minute part, if any
+        (integer or nil).
+   - ~:minute-start~ :: Minute part from timestamp start, if specified
+        (integer or nil).
+   - ~:month-end~ :: Month part from timestamp end.  If no ending date
+                     is defined, it defaults to start month part
+                     (integer).
+   - ~:month-start~ :: Month part from timestamp start (integer).
+   - ~:raw-value~ :: Raw timestamp (string).
+   - ~:repeater-type~ :: Type of repeater, if any (symbol: ~catch-up~,
+        ~restart~, ~cumulate~ or nil)
+   - ~:repeater-unit~ :: Unit of shift, if a repeater is defined
+        (symbol: ~year~, ~month~, ~week~, ~day~, ~hour~ or nil).
+   - ~:repeater-value~ :: Value of shift, if a repeater is defined
+        (integer or nil).
+   - ~:type~ :: Type of timestamp (symbol: ~active~, ~active-range~,
+                ~diary~, ~inactive~, ~inactive-range~).
+   - ~:warning-type~ :: Type of warning, if any (symbol: ~all~,
+        ~first~ or nil)
+   - ~:warning-unit~ :: Unit of delay, if one is defined (symbol:
+        ~year~, ~month~, ~week~, ~day~, ~hour~ or nil).
+   - ~:warning-value~ :: Value of delay, if one is defined (integer or
+        nil).
+   - ~:year-end~ :: Year part from timestamp end.  If no ending date
+                    is defined, it defaults to start year part
+                    (integer).
+   - ~:year-start~ :: Year part from timestamp start (integer).
+
+** Underline
+
+   Recursive object.
+
+   No specific property.
+
+** Verbatim
+
+   Object.
+
+   - ~:value~ :: Contents (string).
+
+** Verse Block
+
+   Element containing objects.
+
+   No specific property.
+
+* Footnotes
+
+[fn:1] Thus, ~org-element-at-point~ cannot return the parent of
+a headline.  Nevertheless, headlines are context free elements: it is
+efficient to move to parent headline (e.g., with
+~org-up-heading-safe~) before analyzing it.
+
+[fn:2] As a consequence whitespaces or newlines after an element or
+object still belong to it.  To put it differently, ~:end~ property of
+an element matches ~:begin~ property of the following one at the same
+level, if any.
