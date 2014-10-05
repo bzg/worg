@@ -671,34 +671,34 @@ average value of a few numbers. First, let's make some data. The
 following source block creates an Org-mode table filled with five random
 numbers between 0 and 1.
 
-: #+name: tbl-example-data()
+: #+name: tbl-example-data
 : #+begin_src R 
 : runif(n=5, min=0, max=1)
 : #+end_src
 
-#+resname: tbl-example-data
+#+name: tbl-example-data
 | 0.836685163900256 |
 | 0.696652316721156 |
 | 0.382423302158713 |
 | 0.987541858805344 |
 | 0.994794291909784 |
 
-Now we define a source block to calculate the mean.
+Now we define a source block to calculate the mean of a table column.
 
 In the Org-mode file:
-: #+name: R-mean(x)
-: #+begin_src R 
-: mean(x)
+: #+name: R-mean
+: #+begin_src R :var x=""
+: colMeans(x)
 : #+end_src
 
 HTML export of code:
-#+name: R-mean(x=0)
-#+begin_src R 
-mean(x)
+#+name: R-mean
+#+begin_src R :var x=""
+colMeans(x)
 #+end_src
 
 Finally, we create the table which is going to make use of the R
-code. This is done using the =sbe= ('source block evaluate') macro in
+code. This is done using the =org-sbe= ('source block evaluate') macro in
 the table formula line.
 
 In the Org-mode file:
@@ -706,14 +706,14 @@ In the Org-mode file:
 : |              mean |
 : |-------------------|
 : | 0.779619386699051 |
-: #+TBLFM: @2$1='(sbe "R-mean" (x "tbl-example-data()"))
+: #+TBLFM: @2$1='(org-sbe "R-mean" (x "tbl-example-data()"))
 
 HTML export of code:
 #+tblname: summaries
 | mean |
 |------|
-| 0.78 |
-#+TBLFM: @2$1='(sbe R-mean (x tbl-example-data));%.2f
+| 0.00 |
+#+TBLFM: @2$1='(org-sbe "R-mean" (x "tbl-example-data()"));%.2f
 
 To recalculate the table formula, use C-u C-c C-c in the
 table. Notice that as things stand the calculated value doesn't
