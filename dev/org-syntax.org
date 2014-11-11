@@ -9,9 +9,9 @@ This document describes and comments Org syntax as it is currently
 read by its parser (Org Elements) and, therefore, by the export
 framework.  It also includes a few comments on that syntax.
 
-A core concept in this syntax is that only headlines, sections and
-planning lines are context-free[fn:1][fn:2].  Every other syntactical
-part only exists within specific environments.
+A core concept in this syntax is that only headlines, sections,
+planning lines and property drawers are context-free[fn:1][fn:2].
+Every other syntactical part only exists within specific environments.
 
 Three categories are used to classify these environments: "Greater
 elements", "elements", and "objects", from the broadest scope to the
@@ -157,7 +157,7 @@ Unless specified otherwise, case is not significant.
   any other element or greater element excepted:
 
   - elements of their own type,
-  - [[#Node_Properties][node properties]], which can only be found in [[#Drawers_and_Property_Drawers][property drawers]],
+  - [[#Node_Properties][node properties]], which can only be found in [[#Property_Drawers][property drawers]],
   - [[#Plain_Lists_and_Items][items]], which can only be found in [[#Plain_Lists_and_Items][plain lists]].
 
 ** Greater Blocks
@@ -190,7 +190,7 @@ Unless specified otherwise, case is not significant.
 
 ** Drawers and Property Drawers
    :PROPERTIES:
-   :CUSTOM_ID: Drawers_and_Property_Drawers
+   :CUSTOM_ID: Drawers
    :END:
 
    Pattern for drawers is:
@@ -204,12 +204,7 @@ Unless specified otherwise, case is not significant.
    NAME can contain word-constituent characters, hyphens and
    underscores.
 
-   If NAME is "PROPERTIES", the drawer will become a "property
-   drawer".
-
-   In a property drawer, CONTENTS can only contain [[#Node_Properties][node property]]
-   elements.  Otherwise it can contain any element but another drawer
-   or property drawer.
+   CONTENTS can contain any element but another drawer.
 
 ** Dynamic Blocks
    :PROPERTIES:
@@ -318,6 +313,34 @@ Unless specified otherwise, case is not significant.
      (descriptive-plain-list
       (item))))
    #+END_EXAMPLE
+
+** Property Drawers
+   :PROPERTIES:
+   :CUSTOM_ID: Property_Drawers
+   :END:
+
+   Property drawers are a special type of drawer containing properties
+   attached to a headline.  They are located right after a [[#Headlines_and_Sections][headline]]
+   and its [[#Clock,_Diary_Sexp_and_Planning][planning]] information.
+
+   #+BEGIN_EXAMPLE
+   HEADLINE
+   PROPERTYDRAWER
+
+   HEADLINE
+   PLANNING
+   PROPERTYDRAWER
+   #+END_EXAMPLE
+
+   PROPERTYDRAWER follows the pattern
+
+   #+BEGIN_EXAMPLE
+   :PROPERTIES:
+   CONTENTS
+   :END:
+   #+END_EXAMPLE
+
+   where CONTENTS consists of zero or more [[#Node_Properties][node properties]].
 
 ** Tables
    :PROPERTIES:
@@ -443,8 +466,7 @@ Unless specified otherwise, case is not significant.
    #+END_EXAMPLE
 
    where HEADLINE is a [[#Headlines_and_Sections][headline]] element and PLANNING is a line filled
-   with at most three INFO parts, where each of them follows the
-   pattern:
+   with INFO parts, where each of them follows the pattern:
 
    #+BEGIN_EXAMPLE
    KEYWORD: TIMESTAMP
@@ -524,16 +546,23 @@ Unless specified otherwise, case is not significant.
    :CUSTOM_ID: Node_Properties
    :END:
 
-   Patter for node properties is:
+   Node properties can only exist in [[#Drawers_and_Property_Drawers][property drawers]].  Their pattern
+   is any of the following
 
    #+BEGIN_EXAMPLE
-   :PROPERTY: VALUE
+   :NAME: VALUE
+
+   :NAME+: VALUE
+
+   :NAME:
+
+   :NAME+:
    #+END_EXAMPLE
 
-   PROPERTY can contain any non-whitespace character.  VALUE can
-   contain any character but a new line.
+   NAME can contain any non-whitespace character but cannot end with
+   a plus sign.  It cannot be the empty string.
 
-   Node properties can only exist in a [[#Drawers_and_Property_Drawers][property drawers]].
+   VALUE can contain anything but a newline character.
 
 ** Paragraphs
    :PROPERTIES:
@@ -1021,8 +1050,8 @@ quoted by a comma when they do not define a headline.
 
 [fn:2] It also means that only headlines and sections can be
 recognized just by looking at the beginning of the line.  Planning
-lines can be recognize by looking at the beginning of the current line
-and the previous one.
+lines and property drawers can be recognized by looking at one or two
+lines above.
 
 As a consequence, using ~org-element-at-point~ or
 ~org-element-context~ will move up to the parent headline, and parse

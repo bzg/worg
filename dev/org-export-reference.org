@@ -128,8 +128,22 @@ document.
   :CUSTOM_ID: communication
   :END:
 
+  During export process, every function has access to a number of
+  properties.  They are of two types:
+
+  1. Environment options are collected once at the very beginning of
+     the process, out of the original buffer and configuration.
+     Collecting them is handled by ~org-export-get-environment~
+     function.
+
+     Most environment options are defined through the
+     ~org-export-options-alist~ variable.
+
+  2. Tree properties are extracted directly from the parsed tree, just
+     before export, by ~org-export-collect-tree-properties~.
+
   This is the full list of properties available during transcode
-  process, with their category (~option~ or ~tree~) and their value
+  process, with their category (=option= or =tree=) and their value
   type.
 
 ** ~:author~
@@ -539,9 +553,9 @@ document.
   :CUSTOM_ID: filter-system
   :END:
 
-  Filters sets are lists of functions.  They allow to pre-process
-  parse tree before export and to post-process output of each
-  transcoded object or element.
+  Filters sets are lists of functions.  They allow to alter parse tree
+  before export and to post-process output of each transcoded object
+  or element.
 
   Each function in a set must accept three arguments: a string (or
   a parse tree as a special case), a symbol representing the current
