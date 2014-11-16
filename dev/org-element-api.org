@@ -19,8 +19,12 @@ from an Org buffer, to analyze the syntactical object at point.
 along with their relative accessors and setters.
 
 Upon parsing, each token in an Org document gets a type and some
-properties attached to it.  An exhaustive list is given in section
-[[#attributes]].
+properties attached to it.  This information can be extracted and
+modified with provided [[#accessors][accessors]] and [[#setters][setters]].  An exhaustive list of
+all tyes and attributes is given in section [[#attributes]].
+
+Eventually, the library is packed with a few useful functions,
+described in the [[#other-tools][last section]] of the document.
 
 * Parsing functions
   :PROPERTIES:
@@ -91,6 +95,9 @@ properties attached to it.  An exhaustive list is given in section
    See [[#setters]] for a list of related tools.
 
 * Accessors
+  :PROPERTIES:
+  :CUSTOM_ID: accesors
+  :END:
 
   Type and properties of a given element or object are obtained with,
   respectively, ~org-element-type~ and ~org-element-property~.
@@ -711,6 +718,37 @@ properties attached to it.  An exhaustive list is given in section
    Element containing objects.
 
    No specific property.
+
+* Other Tools
+  :PROPERTIES:
+  :CUSTOM_ID:       other-tools
+  :END:
+
+** Turning an AST into an Org document
+
+   ~org-element-interpret-data~ is the reciprocal operation of
+   ~org-element-parse-buffer~.  When provided an element, object, or
+   even a full parse tree, it generates an equivalent string in Org
+   syntax.
+
+   More precisely, output is a normalized document: it preserves
+   structure and blank spaces but it removes indentation and
+   capitalize keywords.  As a consequence it is equivalent, but not
+   equal, to the original document the AST comes from.
+
+   When called on an element or object obtained through
+   ~org-element-at-point~ or ~org-element-context~, its contents will
+   not appear, since this information is not available.
+
+** Examining genealogy of an element or object
+
+   ~org-element-lineage~ produces a list of all ancestors of a given
+   element or object.  However, when these come from a [[#local][local parsing
+   function]], lineage is limited to the section containing them.
+
+   With optional arguments, it is also possible to check for
+   a particular type of ancestor.  See function's docstring for more
+   information.
 
 * Footnotes
 
