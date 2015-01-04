@@ -2499,9 +2499,9 @@ and is continued in the [[#table-float-fraction][next FAQ entry]].
 
 #+index: Table!Center
 
-Set the `org-export-latex-tables-centered' to `t':
+Set the `org-latex-tables-centered' to `t':
 
-: (defcustom org-export-latex-tables-centered t
+: (defcustom org-latex-tables-centered t
 :   "When non-nil, tables are exported in a center environment."
 :   :group 'org-export-latex
 :   :type 'boolean)
@@ -3831,13 +3831,13 @@ customization.
   (require 'org-latex)
 
   ;; tell org to use listings
-  (setq org-export-latex-listings t)
+  (setq org-latex-listings t)
 
   ;; you must include the listings package
-  (add-to-list 'org-export-latex-packages-alist '("" "listings"))
+  (add-to-list 'org-latex-packages-alist '("" "listings"))
 
   ;; if you want colored source code then you need to include the color package
-  (add-to-list 'org-export-latex-packages-alist '("" "color"))
+  (add-to-list 'org-latex-packages-alist '("" "color"))
 #+end_src
 
 The listings package will now be used to fontify source code in your
@@ -3882,9 +3882,9 @@ beamer.
 
 Add the following to your Emacs initialization file.
 #+begin_src emacs-lisp
-  (unless (boundp 'org-export-latex-classes)
-    (setq org-export-latex-classes nil))
-  (add-to-list 'org-export-latex-classes
+  (unless (boundp 'org-latex-classes)
+    (setq org-latex-classes nil))
+  (add-to-list 'org-latex-classes
                '("beamer"
                  "\\documentclass[11pt]{beamer}\n\\usepackage[utf8]{inputenc}\n\\usepackage[T1]{fontenc}\n\\usepackage{hyperref}\n\\usepackage{verbatim}\n"
                  ("\\section{%s}" . "\\section*{%s}")
@@ -4101,7 +4101,7 @@ put the following in your =~/.emacs.d/= or equivalent:
 
 #+begin_src emacs-lisp
   (require 'org-latex)
-  (setq org-export-latex-listings t)
+  (setq org-latex-listings t)
 
   ;; Originally taken from Bruno Tavernier: http://thread.gmane.org/gmane.emacs.orgmode/31150/focus=31432
   ;; but adapted to use latexmk 4.20 or higher.
@@ -4124,7 +4124,7 @@ put the following in your =~/.emacs.d/= or equivalent:
 
 
   ;; Specify default packages to be included in every tex file, whether pdflatex or xelatex
-  (setq org-export-latex-packages-alist
+  (setq org-latex-packages-alist
         '(("" "graphicx" t)
               ("" "longtable" nil)
               ("" "float" nil)))
@@ -4132,7 +4132,7 @@ put the following in your =~/.emacs.d/= or equivalent:
   (defun my-auto-tex-parameters ()
         "Automatically select the tex packages to include."
         ;; default packages for ordinary latex or pdflatex export
-        (setq org-export-latex-default-packages-alist
+        (setq org-latex-default-packages-alist
               '(("AUTO" "inputenc" t)
                 ("T1"   "fontenc"   t)
                 (""     "fixltx2e"  nil)
@@ -4147,7 +4147,7 @@ put the following in your =~/.emacs.d/= or equivalent:
 
         ;; Packages to include when xelatex is used
         (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-            (setq org-export-latex-default-packages-alist
+            (setq org-latex-default-packages-alist
                   '(("" "fontspec" t)
                     ("" "xunicode" t)
                     ("" "url" t)
@@ -4159,7 +4159,7 @@ put the following in your =~/.emacs.d/= or equivalent:
                     )))
 
         (if (string-match "LATEX_CMD: xelatex" (buffer-string))
-            (setq org-export-latex-classes
+            (setq org-latex-classes
                   (cons '("article"
                           "\\documentclass[11pt,article,oneside]{memoir}"
                           ("\\section{%s}" . "\\section*{%s}")
@@ -4167,7 +4167,7 @@ put the following in your =~/.emacs.d/= or equivalent:
                           ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                           ("\\paragraph{%s}" . "\\paragraph*{%s}")
                           ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-                        org-export-latex-classes))))
+                        org-latex-classes))))
 
   (add-hook 'org-export-latex-after-initial-vars-hook 'my-auto-tex-parameters)
 #+end_src
@@ -4181,14 +4181,14 @@ it takes care of figuring things out so that the references and citations
 are correct.
 
 The second half of the code above specifies the latex packages that will be
-included in the =.tex= file. The variable =org-export-latex-packages-alist=
+included in the =.tex= file. The variable =org-latex-packages-alist=
 specifies a list of packages that are always included in the header of
 latex documents, regardless of how they are compiled. The variable
-=org-export-latex-default-packages-alist= adds additional packages
+=org-latex-default-packages-alist= adds additional packages
 depending on whether latex/pdflatex or xelatex is being used. You can
 change the content of these as needed.
 
-Finally, the =org-export-latex-classes= variable redefines elements of the
+Finally, the =org-latex-classes= variable redefines elements of the
 =.tex= file's preamble for the xelatex case. These can also be customized
 as needed.
 
@@ -4206,7 +4206,7 @@ contain the following header:
 
 If you always want to have the same font setup in your xelatex documents,
 the =fontspec= commands setting the font choices can be put in the
-=org-export-latex-classes= setting instead.
+=org-latex-classes= setting instead.
 
 The upshot is that when you want to export an =.org= file using XeLaTeX,
 you can now simply make sure the line =LATEX_CMD: xelatex= is in your
