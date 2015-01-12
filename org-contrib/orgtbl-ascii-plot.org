@@ -120,13 +120,13 @@ All in Emacs, without any external package.
 2- Put the cursor on the column to plot.
 
 3- Type
-   - either =C-c p=
+   - either =C-c " a=
    - or =M-x orgtbl-ascii-plot=
    This adds a new ascii-art column.
 
 4- The width in characters of the plot may be specified
    with a numeric prefix:
-   - =Esc 30 C-c p=
+   - =Esc 30 C-c " a=
    - =Esc 30 M-x orgtbl-ascii-plot=
 
 * Additional details
@@ -207,6 +207,25 @@ or use ascii plots only for quick and throwable visualization.
 : | # | 30 | -0.54402111 | WWh          | ▉▉▋          | ██▋          |
 : | # | 31 | -0.78861628 | W:           | ▉▏           | █▎           |
 : #+TBLFM: $3=sin($x/3);R::$5='(orgtbl-uc-draw-grid $3 -0.99895492 0.99540796 12)::$6='(orgtbl-uc-draw-cont $3 -0.99895492 0.99540796 12)::$4='(orgtbl-ascii-draw $3 -0.99895492 0.99540796 12)
+
+* Related work 
+
+Below is a unicode ASCII art solution with Zach Holman's shell script
+package Spark: https://github.com/holman/spark
+
+: | Measurement | t0 | t1 | t2 | t3 |  t4 | t5 | t6 | t7 | Sparkline |
+: |-------------+----+----+----+----+-----+----+----+----+-----------|
+: |           1 |  1 | 20 | 12 | 13 | 141 | 13 | 24 | 90 | ▁▁▁▁█▁▂▅  |
+: |           2 |  0 |  1 |  2 |  3 |   4 |  5 |  6 |  7 | ▁▂▃▄▅▆▇█  |
+: |           3 |  0 |  2 |  4 |  6 |   8 | 10 | 12 | 14 | ▁▂▃▄▅▆▇█  |
+: |           4 | -7 | -6 | -5 | -4 |  -3 | -2 | -1 |  0 | ▁▂▃▄▅▆▇█  |
+: |           5 |  0 |  0 |  0 |  0 |   0 |  0 |  0 |  0 | ▅▅▅▅▅▅▅▅  |
+: #+TBLFM: $10 = '(org-trim (shell-command-to-string "spark $2..$9")); L
+
+An ongoing discussion [2015-01-08] is taking place on the Org mailing list about
+/sparlines/ (http://en.wikipedia.org/wiki/Sparkline) by Willem Rein
+Oudshoorn and Michael Brand which could end in yet another way of
+plotting Org tables.
 
 * License (GNU GPL)
 Copyright (C) 2013-2014 Thierry Banel, Michael Brand
