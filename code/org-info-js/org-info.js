@@ -79,7 +79,7 @@ d<f.length;++d){if("footnotes"==f[d].className){a=f[d];break;}}var e=k.S.length;
 };a.style.cursor="pointer";if(k.MOUSE_HINT){a.onmouseover=function(){org_html_manager.hH(""+e);
 };a.onmouseout=function(){org_html_manager.unhH(""+e);};}var g="javascript:org_html_manager.go("+e+")";
 var l=new OrgNode(h,a,g,1,k.R,"footnotes");k.S.push(l);}if(k.TOC_DEPTH){k.cutToc(j,1);
-}k.T=k.PREA.getElementsByTagName("h1")[0];if(k.IT&&!k.FIXED_TOC&&k.VIEW!=k.SLIDE_VIEW){k.IT=k.T.cloneNode(true);
+}k.T=document.getElementsByClassName("title")[0];if(k.IT&&!k.FIXED_TOC&&k.VIEW!=k.SLIDE_VIEW){k.IT=k.T.cloneNode(true);
 k.S[0].D.insertBefore(k.IT,k.S[0].D.firstChild);OrgNode.hE(k.T);}k.build();k.N=k.S[0];
 k.B.insertBefore(k.W,k.N.D);return true;},ulToOutlines:function(b){if(b.hasChildNodes()&&!b.scanned_for_org){for(var a=0;
 a<b.childNodes.length;++a){if(false==this.liToOutlines(b.childNodes[a])){return false;
