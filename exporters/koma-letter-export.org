@@ -122,6 +122,29 @@ the corresponding [[http://orgmode.org/worg/images/ox-koma-letter/koma-letter-ex
 When composing new letters it may be useful to start with template
 by typing =C-c C-e #= and choosing =koma-letter=.
 
+** TODO Learning more about KOMA-Script Letter
+~org-koma-letter.el~ exports a LaTeX document utilizing the ~scrlttr2~
+class of KOMA-Script.  The document class is described in great
+details in chapter 4 of the [[http://mirrors.ctan.org/macros/latex/contrib/koma-script/doc/scrguien.pdf][KOMA-Script manual]].  If you have TeXLive
+you can open the manual with the command ~texdoc KOMA-Script~ and with
+MiKTeX one might call ~mthelp KOMA-Script~.
+
+Elements such as the address-field is automatically typeset using
+user-provided /metadata/, or /variables/, such as address, sender name
+etc.  A full list of variables are available in table 4.1 and an
+illustration of placement of variables is shown in figure 4.9, both
+the in KOMA-Script manual.  A subset of these are supported directly
+by ~ox-koma-letter.el~.
+
+Placement of elements is typically defined by a LCO file.  If, for
+instance, the ~DIN~ LCO file is loaded, letters are typeset to fit
+German DIN envelopes.  See table 4.18 in the KOMA-Script manual for
+default classes.
+
+You can customize the look of your letter by writing your own LCO
+files and including them with the ~#+LCO:~ keyword.  See [[*Setting
+letter metadata in LCO files]].
+
 * DONE Configuration guide
 
 In addition to the actual content a typical letter also contains
@@ -364,3 +387,11 @@ in an LCO file.
 
 [fn:6] See the [[http://www.komascript.de/][KOMA script documentation]] for a list of accepted
 values.
+
+
+
+
+
+
+
+
