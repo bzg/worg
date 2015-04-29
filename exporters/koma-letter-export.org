@@ -122,6 +122,29 @@ the corresponding [[http://orgmode.org/worg/images/ox-koma-letter/koma-letter-ex
 When composing new letters it may be useful to start with template
 by typing =C-c C-e #= and choosing =koma-letter=.
 
+** TODO Learning more about KOMA-Script Letter
+~org-koma-letter.el~ exports a LaTeX document utilizing the ~scrlttr2~
+class of KOMA-Script.  The document class is described in great
+details in chapter 4 of the [[http://mirrors.ctan.org/macros/latex/contrib/koma-script/doc/scrguien.pdf][KOMA-Script manual]].  If you have TeXLive
+you can open the manual with the command ~texdoc KOMA-Script~ and with
+MiKTeX one might call ~mthelp KOMA-Script~.
+
+Elements such as the address-field is automatically typeset using
+user-provided /metadata/, or /variables/, such as address, sender name
+etc.  A full list of variables are available in table 4.1 and an
+illustration of placement of variables is shown in figure 4.9, both
+the in KOMA-Script manual.  A subset of these are supported directly
+by ~ox-koma-letter.el~.
+
+Placement of elements is typically defined by a LCO file.  If, for
+instance, the ~DIN~ LCO file is loaded, letters are typeset to fit
+German DIN envelopes.  See table 4.18 in the KOMA-Script manual for
+default classes.
+
+You can customize the look of your letter by writing your own LCO
+files and including them with the ~#+LCO:~ keyword.  See [[*Setting
+letter metadata in LCO files]].
+
 * DONE Configuration guide
 
 In addition to the actual content a typical letter also contains
@@ -138,7 +161,7 @@ called /letter options/.
 Letter metadata can be configured in one of four ways, listed below
 from the most specific to the most general:
 
-1. using Org option lines, as show in the [[*A%20simple%20letter%20example][simple letter example]] above,
+1. using Org option lines, as show in the [[*A simple letter example][simple letter example]] above,
 2. by using separate Org LaTeX classes,
 3. by setting Emacs variables, or
 4. in a KOMA-Script Letter Class Option file (LCO file).
@@ -156,7 +179,7 @@ footer and so forth.  The class is then loaded by inserting
 *** DONE Setting letter metadata in Org option lines
 
 A simple way to set letter metadata on-the-fly is by using Org option
-lines as used in the [[*A%20simple%20letter%20example][simple letter example]] above where we used both
+lines as used in the [[*A simple letter example][simple letter example]] above where we used both
 special headings and keywords.
 
 Some letter options are set using an =#+OPTIONS:= line in the same
@@ -201,8 +224,8 @@ variable =org-koma-letter-class-option-file=.  KOMA-Script comes with
 a variety of pre-made LCO files, such as =DIN= for German letters,
 =NF= for French letters, or =UScommercial9= for US-American letters.
 
-Letter metadata set in LCO files overwrites [[*Setting%20letter%20meta%20data%20in%20Emacs%20variables][letter metadata set in
-Emacs variables]] but not [[*Setting%20letter%20meta%20data%20in%20Org%20option%20lines][letter metadata set in the Org file]].
+Letter metadata set in LCO files overwrites [[*Setting letter metadata in Emacs variables][letter metadata set in
+Emacs variables]] but not [[*Setting letter metadata in Org option lines][letter metadata set in the Org file]].
 
 LCO files are convenient as modules that can be loaded to access
 particular setups across letters.  Examples include the sender's
@@ -258,6 +281,9 @@ the command =kpsewhich foo.lco=. After adding a file to the TeX Live
 path you may have to run =mktexlsr=.
 
 ** DONE List of KOMA-Script letter metadata settings
+   :PROPERTIES:
+   :CUSTOM_ID: settings
+   :END:
 
 This section tries to list all Org option lines, Emacs variables, and
 the corresponding =ox-koma-letter= variables or options that control
@@ -282,21 +308,21 @@ lines. In general, they correspond to a LaTeX command such as:
 \setkomavar{<KOMA variable>}{<value>}
 #+END_SRC
 
-| Option line      | Emacs variable                      | KOMA-Script variable | Description                              |
-|------------------+-------------------------------------+----------------------+------------------------------------------|
-| =#+LCO:=         | =org-koma-letter-class-option-file= |                      | The default LCO file.                    |
-| =#+TITLE:=       |                                     | =title=              | The  title of the letter.                |
-| =#+SUBJECT:=     |                                     | =subject=            | The subject of the letter                |
-| =#+DATE:=        |                                     | =date=               | The time-stamp of the letter.            |
-| =#+PLACE:=       | =org-koma-letter-place=             | =place=              | The place of the letter.                 |
-| =#+AUTHOR:=      | =org-koma-letter-sender=            | =fromname=           | The sender's name.                       |
+| Option line       | Emacs variable                      | KOMA-Script variable | Description                              |
+|-------------------+-------------------------------------+----------------------+------------------------------------------|
+| =#+LCO:=          | =org-koma-letter-class-option-file= |                      | The default LCO file.                    |
+| =#+TITLE:=        |                                     | =title=              | The  title of the letter.                |
+| =#+SUBJECT:=      |                                     | =subject=            | The subject of the letter                |
+| =#+DATE:=         |                                     | =date=               | The time-stamp of the letter.            |
+| =#+PLACE:=        | =org-koma-letter-place=             | =place=              | The place of the letter.                 |
+| =#+AUTHOR:=       | =org-koma-letter-sender=            | =fromname=           | The sender's name.                       |
 | =#+FROM_ADDRESS:= | =org-koma-letter-from-address=      | =fromaddress=        | The sender's address.[fn:3]              |
 | =#+PHONE_NUMBER:= | =org-koma-letter-phone=             | =fromphone=          | The sender's phone number.               |
-| =#+EMAIL:=       | =org-koma-letter-email=             | =fromemail=          | The sender's email.                      |
+| =#+EMAIL:=        | =org-koma-letter-email=             | =fromemail=          | The sender's email.                      |
 | =#+TO_ADDRESS:=   |                                     |                      | The recipient's address.[fn:3]           |
-| =#+OPENING:=     | =org-koma-letter-opening=           |                      | The opening line of the letter.[fn:5]    |
-| =#+CLOSING:=     | =org-koma-letter-closing=           |                      | The closing line of the letter.[fn:5]    |
-| =#+SIGNATURE:=   | =org-koma-letter-signature=         | =signature=          | The sender's signature.                  |
+| =#+OPENING:=      | =org-koma-letter-opening=           |                      | The opening line of the letter.[fn:5]    |
+| =#+CLOSING:=      | =org-koma-letter-closing=           |                      | The closing line of the letter.[fn:5]    |
+| =#+SIGNATURE:=    | =org-koma-letter-signature=         | =signature=          | The sender's signature.                  |
 | =#+LATEX_CLASS:=  | =org-koma-letter-default-class=     |                      | Corresponds to =org-latex-default-class= |
 
 *** DONE List of =ox-koma-letter= options
@@ -314,7 +340,7 @@ general, they correspond to a LaTeX command such as:
 | Option                | Emacs variable                               | KOMA-Script option | Description                                                          |
 |-----------------------+----------------------------------------------+--------------------+----------------------------------------------------------------------|
 | =after-closing-order= | =org-koma-letter-special-tags-after-closing= |                    | Order or special headlines such as =ps=, =cc=, and =encl=            |
-| =after-letter-order=  | =org-koma-letter-special-tags-after-letter=  |                    | Order or special headlines such as =after_letter=                     |
+| =after-letter-order=  | =org-koma-letter-special-tags-after-letter=  |                    | Order or special headlines such as =after_letter=                    |
 | =backaddress=         | =org-koma-letter-use-backaddress=            | =backaddress=      | Print the sender's address in a  line above the recipient's address. |
 | =phone=               | =org-koma-letter-use-phone=                  | =fromphone=        | Print the sender's phone.                                            |
 | =email=               | =org-koma-letter-use-email=                  | =fromemail=        | Print the sender's email.                                            |
@@ -328,21 +354,21 @@ general, they correspond to a LaTeX command such as:
 :END:
 Special headings may be used to input metadata in =ox-koma-letter=
 documents.  A special heading is simply a heading with a recognized
-tag.  Their usages were illustrated in the [[*%20A%20simple%20letter%20example][example]] above.  Special
-headings tags are defined in the variables
-=org-koma-letter-special-tags-in-letter=,
+tag.  Their usages were illustrated in the [[*A simple letter
+example][example]] above.  Special headings tags are defined in the
+variables =org-koma-letter-special-tags-in-letter=,
 =org-koma-letter-special-tags-after-closing=, and
 =org-koma-letter-special-tags-after-letter=.  Currently the following
 special headings are recognized.
 
-| Tag           | KOMA-Script          | Description                                    |
-|---------------+----------------------+------------------------------------------------|
-| =to=          | =\begin{letter}{to}= | To-address. Alternative to =#+TO_ADDRESS:=.     |
-| =from=        | =fromaddress=        | From-address.  Alternative to =+FROM_ADDRESS:=. |
-| =ps=          | =\ps{}=              | Wrap content in a =ps=-macro.                  |
-| =cc=          | =\cc{}=              | Wrap content in a =cc=-macro.                  |
-| =encl=        | =\encl{}=            | Wrap content in a =encl= macro.                |
-| =after_letter= |                      | Content is inserted after =\end{letter}=.      |
+| Tag            | KOMA-Script          | Description                                     |
+|----------------+----------------------+-------------------------------------------------|
+| =to=           | =\begin{letter}{to}= | To-address. Alternative to =#+TO_ADDRESS:=.     |
+| =from=         | =fromaddress=        | From-address.  Alternative to =+FROM_ADDRESS:=. |
+| =ps=           | =\ps{}=              | Wrap content in a =ps=-macro.                   |
+| =cc=           | =\cc{}=              | Wrap content in a =cc=-macro.                   |
+| =encl=         | =\encl{}=            | Wrap content in a =encl= macro.                 |
+| =after_letter= |                      | Content is inserted after =\end{letter}=.       |
 
 
 
@@ -356,7 +382,7 @@ subject contains the Org headline text.
 
 [fn:3] The options lines =#+FROM_ADDRESS:= and =#+TO_ADDRESS:= can be
 used multiple times and may also be specified using headlines cf. the
-[[*%20A%20simple%20letter%20example][example]] above.
+[[*A simple letter example][example]] above.
 
 
 [fn:5] The options lines =#+OPENING:= and =#+CLOSING:= cannot be set
@@ -364,3 +390,11 @@ in an LCO file.
 
 [fn:6] See the [[http://www.komascript.de/][KOMA script documentation]] for a list of accepted
 values.
+
+
+
+
+
+
+
+

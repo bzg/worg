@@ -82,17 +82,17 @@ random task.
 #+BEGIN_SRC emacs-lisp
   (defvar my/org-lisp-directory "~/.emacs.d/org/lisp/"
     "Directory where your org-mode files live.")
-  
+
   (defvar my/org-compile-sources t
     "If `nil', never compile org-sources. `my/compile-org' will only create
   the autoloads file `org-loaddefs.el' then. If `t', compile the sources, too.")
-  
+
   ;; Customize: (must end with a slash!)
   (setq my/org-lisp-directory "~/.emacs.d/org/lisp/")
-  
+
   ;; Customize:
   (setq  my/org-compile-sources t)
-  
+
   (defun my/compile-org(&optional directory)
     "Generate autoloads file org-loaddefs.el.  Optionally compile
      all *.el files that come with org-mode."
@@ -291,9 +291,9 @@ sentences.
    (goto-char (match-beginning 0))
    t))
 
-(add-to-list 'org-metaup-hook 
+(add-to-list 'org-metaup-hook
  (lambda () (interactive) (org-transpose-paragraphs -1)))
-(add-to-list 'org-metadown-hook 
+(add-to-list 'org-metadown-hook
  (lambda () (interactive) (org-transpose-paragraphs 1)))
 #+end_src
 *** Changelog support for org headers
@@ -579,7 +579,10 @@ equivalent function after =C-c ^ f=, use this one instead:
 #+END_SRC
 
 *** Adding Licenses to org files
-  You can add pretty standard licenses, such as creative commons or gfdl to org articles using [[file:code/elisp/org-license.el][org-license.el]].
+
+You can add pretty standard licenses, such as creative commons or gfdl
+to org articles using =org-license.el=.
+
 ** Org Table
    :PROPERTIES:
    :CUSTOM_ID: Tables
@@ -596,10 +599,10 @@ Andrew Young provided this function in [[http://thread.gmane.org/gmane.emacs.org
 #+end_src
 
 *** Transpose table
-#+index: Table!Calculation
     :PROPERTIES:
     :CUSTOM_ID: transpose-table
     :END:
+#+index: Table!Calculation
 
 Since Org 7.8, you can use =org-table-transpose-table-at-point= (which
 see.)  There are also other solutions:
@@ -610,7 +613,7 @@ see.)  There are also other solutions:
 - with org-babel and R: provided by Dan Davison in the mailing list (old
   =#+TBLR:= syntax), see [[http://thread.gmane.org/gmane.emacs.orgmode/10159/focus=10159][gmane]] or [[http://lists.gnu.org/archive/html/emacs-orgmode/2008-12/msg00454.html][gnu]]
 
-- with field coordinates in formulas (=@#= and =$#=): see [[file:org-hacks.org::#field-coordinates-in-formulas-transpose-table][Worg]].
+- with field coordinates in formulas (=@#= and =$#=): see [[#field-coordinates-in-formulas-transpose-table][Worg]].
 
 *** Manipulate hours/minutes/seconds in table formulas
 #+index: Table!hours-minutes-seconds
@@ -691,7 +694,7 @@ Elisp formulas) to compute time durations.  For example:
 
 *** Dates computation
 #+index: Table!dates
-Xin Shi [[http://article.gmane.org/gmane.emacs.orgmode/15692][asked]] for a way to calculate the duration of 
+Xin Shi [[http://article.gmane.org/gmane.emacs.orgmode/15692][asked]] for a way to calculate the duration of
 dates stored in an org table.
 
 Nick Dokos [[http://article.gmane.org/gmane.emacs.orgmode/15694][suggested]]:
@@ -755,10 +758,10 @@ Here is the code implementing this macro.
 
 Which allows the following forms of table manipulation such as adding
 and subtracting hex values.
-| 0x10 | 0x0 | 0x10 |  16 |
-| 0x20 | 0x1 | 0x21 |  33 |
-| 0x30 | 0x2 | 0x32 |  50 |
-| 0xf0 | 0xf | 0xff | 255 |
+| 0x10 | 0x0 | #ERROR | #ERROR |
+| 0x20 | 0x1 | #ERROR | #ERROR |
+| 0x30 | 0x2 | #ERROR | #ERROR |
+| 0xf0 | 0xf | #ERROR | #ERROR |
 #+TBLFM: $3='(with-hex 'hex (+ $2 $1))::$4='(with-hex nil (identity $3))
 
 *** Field coordinates in formulas (=@#= and =$#=)
@@ -801,7 +804,7 @@ list on
 [[http://thread.gmane.org/gmane.emacs.orgmode/22610/focus=23662][gmane]] or
 [[http://lists.gnu.org/archive/html/emacs-orgmode/2010-04/msg00086.html][gnu]].
 For more efficient solutions see
-[[file:org-hacks.org::#transpose-table][Worg]].
+[[#transpose-table][Worg]].
 
 To transpose this 4x7 table
 
@@ -870,18 +873,18 @@ which is the Emacs Calc implementation of the equation
 where /i/ is the current time and /a/ is the length of the preceding period.
 
 *** Rearrange one or more field within the same row or column
-#+index: Table!Editing
     :PROPERTIES:
     :CUSTOM_ID: field-same-row-or-column
     :END:
+#+index: Table!Editing
 
 -- Michael Brand
 
 **** Rearrange the column sequence in one row only
-#+index: Table!Editing
      :PROPERTIES:
      :CUSTOM_ID: column-sequence-in-row
      :END:
+#+index: Table!Editing
 
 The functions below can be used to change the column sequence in one
 row only, without affecting the other rows above and below like with
@@ -949,10 +952,10 @@ S-TAB=.
 : | f | g | h | i  |    |
 
 **** Rearrange the row sequence in one column only
-#+index: Table!Editing
      :PROPERTIES:
      :CUSTOM_ID: row-sequence-in-column
      :END:
+#+index: Table!Editing
 
 The functions below can be used to change the column sequence in one
 column only, without affecting the other columns left and right like
@@ -1083,7 +1086,7 @@ horizontal separator lines is to interactively or programmatically
 simply:
 
 1) Transpose the table, see
-   [[http://orgmode.org/worg/org-hacks.html#transpose-table][Org hacks]].
+   [[#transpose-table][Org hacks]].
 2) Use =f-org-table-*-column-in-row-*=, see
    [[http://orgmode.org/worg/org-hacks.html#column-sequence-in-row][previous
    section]].
@@ -1207,7 +1210,7 @@ I consider this as only a hack for several reasons:
 #+index: Remember!frame
 #+index: Customization!remember
 (Note: this hack is likely out of date due to the development of
-[[org-capture]].)
+=org-capture=.)
 
 # FIXME: gmane link?
 On emacs-orgmode, Ryan C. Thompson suggested this:
@@ -1235,11 +1238,11 @@ parameters for the remember frame:
 Setting remember-frame-alist to =((width . 80) (height . 15)))= give a
 reasonable size for the frame.
 ** Handling Links
-*** [[#heading-to-link][Turn a heading into an org link]] 
+*** [[#heading-to-link][Turn a heading into an org link]]
 *** Quickaccess to the link part of hyperlinks
 #+index: Link!Referent
 Christian Moe [[http://permalink.gmane.org/gmane.emacs.orgmode/43122][asked]], if there is a simpler way to copy the link part
-of an org hyperling other than to use `C-c C-l C-a C-k C-g', 
+of an org hyperling other than to use `C-c C-l C-a C-k C-g',
 which is indeed kind of cumbersome.
 
 The thread offered [[http://permalink.gmane.org/gmane.emacs.orgmode/43606][two ways]]:
@@ -1247,13 +1250,13 @@ The thread offered [[http://permalink.gmane.org/gmane.emacs.orgmode/43606][two w
 Using a [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Keyboard-Macros.html][keyboard macro]]:
 #+begin_src emacs-lisp
 (fset 'getlink
-      (lambda (&optional arg) 
-        "Keyboard macro." 
-        (interactive "p") 
+      (lambda (&optional arg)
+        "Keyboard macro."
+        (interactive "p")
         (kmacro-exec-ring-item (quote ("\C-c\C-l\C-a\C-k\C-g" 0 "%d")) arg)))
 #+end_src
 
-or a function: 
+or a function:
 #+begin_src emacs-lisp
 (defun my-org-extract-link ()
   "Extract the link location at point and put it on the killring."
@@ -1705,10 +1708,10 @@ directories and extensions to generate different lists of agenda
 files.
 
 *** Restrict org-agenda-files by filetag
-#+index: Agenda!Files
   :PROPERTIES:
   :CUSTOM_ID: set-agenda-files-by-filetag
   :END:
+#+index: Agenda!Files
 - Matt Lundin
 
 It is often helpful to limit yourself to a subset of your agenda
@@ -2160,7 +2163,7 @@ added willy-nilly any time that the statistics cookie is changed.
   ;; see http://thread.gmane.org/gmane.emacs.orgmode/42715
   (eval-after-load 'org-list
     '(add-hook 'org-checkbox-statistics-hook (function ndk/checkbox-list-complete)))
-  
+
   (defun ndk/checkbox-list-complete ()
     (save-excursion
       (org-back-to-heading t)
@@ -2353,6 +2356,22 @@ top of each kind of code box:
 Additionally, we use color to distinguish code output (the =.example=
 class) from input (all the =.src-*= classes).
 
+*** Where can I find nice themes for HTML export?
+
+You can find great looking HTML themes (CSS + JS) at
+https://github.com/fniessen/org-html-themes, currently:
+
+- Bigblow, and
+
+  [[file:images/org-html-themes/bigblow.png]]
+
+- ReadTheOrg, a clone of Read The Docs.
+
+  [[file:images/org-html-themes/readtheorg.png]]
+
+See https://www.youtube.com/watch?v=DnSGSiXYuOk for a demo of the Org
+HTML theme Bigblow.
+
 *** Including external text fragments
 
 #+index: Export!including external text fragments
@@ -2368,7 +2387,7 @@ lines (thus during export as well).
   ,#+name: fetchsrc
   ,#+BEGIN_SRC emacs-lisp :results raw :var f="foo" :var s="Definition" :var e="\\. *$" :var b=()
     (defvar coqfiles nil)
-  
+
     (defun fetchlines (file-path search-string &optional end before)
       "Searches for the SEARCH-STRING in FILE-PATH and returns the matching line.
     If the optional argument END is provided as a number, then this
@@ -2394,10 +2413,10 @@ lines (thus during export as well).
                          (t (line-end-position 10)))
                       (line-end-position 10))))))
           (or result ""))))
-    
+
     (fetchlines (concat coqfiles f ".v") s e b)
   ,#+END_SRC
-  
+
   ,#+name: wrap-coq
   ,#+BEGIN_SRC emacs-lisp :var text="" :results raw
   (concat "#+BEGIN_SRC coq\n" text "\n#+END_SRC")
@@ -3282,7 +3301,7 @@ Here are two usage examples.
    : two 2
    : three 3
    : twenty 20
-   : EOF                  
+   : EOF
    results in
    : |    one |  1 |
    : |    two |  2 |
@@ -3291,12 +3310,12 @@ Here are two usage examples.
 
 2. and the following (notice the command line argument)
    : $ cat <<EOF|~/src/config/bin/txt2org 1
-   : strings numbers                                          
+   : strings numbers
    : one 1
    : two 2
    : three 3
    : twenty 20
-   : EOF 
+   : EOF
    results in
    : | strings | numbers |
    : |---------+---------|
@@ -3317,20 +3336,20 @@ Here is the script itself
   BEGIN {
       for(i=1; i<ARGC; i++){
           hlines[ARGV[i]+1]=1; ARGV[i] = "-"; } }
-  
+
   {
       if(NF > max_nf){ max_nf = NF; };
       for(f=1; f<=NF; f++){
           if(length($f) > lengths[f]){ lengths[f] = length($f); };
           row[NR][f]=$f; } }
-  
+
   END {
       hline_str="|"
       for(f=1; f<=max_nf; f++){
           for(i=0; i<(lengths[f] + 2); i++){ hline_str=hline_str "-"; }
           if( f != max_nf){ hline_str=hline_str "+"; }
           else            { hline_str=hline_str "|"; } }
-  
+
       for(r=1; r<=NR; r++){ # rows
           if(hlines[r] == 1){ print hline_str; }
           printf "|";
@@ -3342,7 +3361,7 @@ Here is the script itself
               # else{                printf " %s%s |", padding, cell; }
               printf " %s%s |", padding, cell; }
           printf "\n"; }
-      
+
       if(hlines[NR+1]){ print hline_str; } }
 #+end_src
 
@@ -3791,9 +3810,9 @@ index a0672ea..92a08f7 100644
 --- a/org-hacks.org
 +++ b/org-hacks.org
 @@ -2495,6 +2495,22 @@ ** Script (thru procmail) to output emails to an Org file
- 
+
  Everything is documented [[http://tychoish.com/code/org-mail/][here]].
- 
+
 +** Meaningful diff for org files in a git repository
 +
 +Since most diff utilities are primarily meant for source code, it is
@@ -3811,7 +3830,7 @@ index a0672ea..92a08f7 100644
 +: 	xfuncname = "^(\\*+ [a-zA-Z0-9]+.+)$"
 +
  * Musings
- 
+
  ** Cooking?  Brewing?
 #+end_example
 

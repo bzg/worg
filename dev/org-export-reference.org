@@ -23,6 +23,9 @@ document.
 
 
 * Defining a Back-End
+  :PROPERTIES:
+  :CUSTOM_ID: back-end
+  :END:
 
   A back-end is defined with ~org-export-define-backend~ function.  It
   requires two mandatory arguments: the back-end name and its translation
@@ -576,8 +579,6 @@ document.
   - ~:filter-center-block~
   - ~:filter-clock~
   - ~:filter-code~
-  - ~:filter-comment~
-  - ~:filter-comment-block~
   - ~:filter-drawer~
   - ~:filter-dynamic-block~
   - ~:filter-entity~
@@ -801,6 +802,13 @@ document.
    See also: [[#with-backend][~org-export-with-backend~]],
    [[#data-with-backend][~org-export-data-with-backend~]]
 
+** ~org-export-file-uri~
+   :PROPERTIES:
+   :CUSTOM_ID: file-uri
+   :END:
+
+   Return URI associated to a given filename.
+
 ** ~org-export-first-sibling-p~
    :PROPERTIES:
    :CUSTOM_ID: first-sibling-p
@@ -825,9 +833,23 @@ document.
    Used when a back-end needs to attach the footnote definition only
    to the first occurrence of the corresponding label.
 
+   Its scope can be arbitrary narrowed, e.g., to a headline.
+
    See also: [[#collect-footnote-definitions][~org-export-collect-footnote-definitions~]],
    [[#get-footnote-definition][~org-export-get-footnote-definition~]],
    [[#get-footnote-number][~org-export-get-footnote-number~]].
+
+** ~org-export-format-code~
+   :PROPERTIES:
+   :CUSTOM_ID: format-code
+   :END:
+
+   Helper function to format source code.  It applies a given function
+   on each line of the code, passing current line number and
+   associated code reference label, if any, as arguments.
+
+   See also: [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]],
+   [[#unravel-code][~org-export-unravel-code~]].
 
 ** ~org-export-format-code-default~
    :PROPERTIES:
@@ -841,18 +863,6 @@ document.
    otherwise applied to source code.
 
    See also: [[#format-code][~org-export-format-code~]], [[#unravel-code][~org-export-unravel-code~]].
-
-** ~org-export-format-code~
-   :PROPERTIES:
-   :CUSTOM_ID: format-code
-   :END:
-
-   Helper function to format source code.  It applies a given function
-   on each line of the code, passing current line number and
-   associated code reference label, if any, as arguments.
-
-   See also: [[#format-code-default][~org-export-format-code-default~]], [[#get-loc][~org-export-get-loc~]],
-   [[#unravel-code][~org-export-unravel-code~]].
 
 ** ~org-export-get-alt-title~
    :PROPERTIES:
@@ -954,6 +964,9 @@ document.
 
    Return the ordinal attached to a footnote reference or definition.
 
+   Its scope can be arbitrary narrowed, e.g., to get the numbering
+   relative to a headline.
+
    See also: [[#collect-footnote-definitions][~org-export-collect-footnote-definitions~]],
    [[#footnote-first-reference-p][~org-export-footnote-first-reference-p~]],
    [[#get-footnote-definition][~org-export-get-footnote-definition~]].
@@ -1043,6 +1056,19 @@ document.
 
    See also : [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]]
 
+** ~org-export-get-parent~
+   :PROPERTIES:
+   :CUSTOM_ID: get-parent
+   :END:
+
+   Return closest element containing current element or object, if
+   any.  Return nil otherwise.
+
+   See also: [[#get-next-element][~org-export-get-next-element~]],
+   [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
+   [[#get-parent-headline][~org-export-get-parent-headline~]],
+   [[#get-previous-element][~org-export-get-previous-element~]].
+
 ** ~org-export-get-parent-element~
    :PROPERTIES:
    :CUSTOM_ID: get-parent-paragraph
@@ -1067,19 +1093,6 @@ document.
    [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
    [[#get-previous-element][~org-export-get-previous-element~]].
 
-** ~org-export-get-parent~
-   :PROPERTIES:
-   :CUSTOM_ID: get-parent
-   :END:
-
-   Return closest element containing current element or object, if
-   any.  Return nil otherwise.
-
-   See also: [[#get-next-element][~org-export-get-next-element~]],
-   [[#get-parent-paragraph][~org-export-get-parent-paragraph~]],
-   [[#get-parent-headline][~org-export-get-parent-headline~]],
-   [[#get-previous-element][~org-export-get-previous-element~]].
-
 ** ~org-export-get-previous-element~
    :PROPERTIES:
    :CUSTOM_ID: get-previous-element
@@ -1091,6 +1104,42 @@ document.
    See also: [[#get-next-element][~org-export-get-next-element~]], [[#get-parent][~org-export-get-parent~]],
    [[#get-parent-headline][~org-export-get-parent-headline~]],
    [[#get-parent-paragraph][~org-export-get-parent-paragraph~]].
+
+** ~org-export-get-reference~
+   :PROPERTIES:
+   :CUSTOM_ID: get-reference
+   :END:
+
+   Return unique reference associated to an element or an object, as
+   a string.
+
+   Since it consists of alphanumerical characters only, it can be used
+   as internal references for back-ends needing them.
+
+   For example, it is used in =ox-latex.el= uses it to translate radio
+   targets into ~\label{}~ and links to radio targets into
+   ~\hyperref{}~:
+
+   #+BEGIN_SRC emacs-lisp
+   (defun org-latex-radio-target (radio-target text info)
+     (format "\\label{%s}%s" (org-export-get-reference radio-target info) text))
+
+   (defun org-latex-link (link desc info)
+     (let ((type (org-element-property :type link)))
+       (cond
+        ...
+        ((string= type "radio")
+         (let ((destination (org-export-resolve-radio-link link info)))
+           (if (not destination) desc
+             (format "\\hyperref[%s]{%s}"
+                     (org-export-get-reference destination info)
+                     desc))))
+        ...)))
+   #+END_SRC
+
+   See also: [[#inline-image-p][~org-export-inline-image-p~]],
+   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]],
+   [[#resolve-radio-link][~org-export-resolve-radio-link~]].
 
 ** ~org-export-get-relative-level~
    :PROPERTIES:
@@ -1180,7 +1229,7 @@ document.
      ("https" . "\\.\\(jpeg\\|jpg\\|png\\|gif\\|svg\\)\\'"))
    #+END_SRC
 
-   See also: [[#solidify-link-text][~org-export-solidify-link-text~]],
+   See also: [[#get-reference][~org-export-get-reference~]],
    [[#get-coderef-format][~org-export-get-coderef-format~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]].
 
 ** ~org-export-last-sibling-p~
@@ -1252,7 +1301,7 @@ document.
 
    See also: [[#get-ordinal][~org-export-get-ordinal~]], [[#resolve-coderef][~org-export-resolve-coderef~]],
    [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-radio-link][~org-export-resolve-radio-link~]],
-   [[#solidify-link-text][~org-export-solidify-link-text~]].
+   [[#get-reference][~org-export-get-reference~]].
 
 ** ~org-export-resolve-id-link~
    :PROPERTIES:
@@ -1266,7 +1315,7 @@ document.
 
    See also : [[#resolve-coderef][~org-export-resolve-coderef~]],
    [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#resolve-radio-link][~org-export-resolve-radio-link~]],
-   [[#solidify-link-text][~org-export-solidify-link-text~]].
+   [[#get-reference][~org-export-get-reference~]].
 
 ** ~org-export-resolve-radio-link~
    :PROPERTIES:
@@ -1290,28 +1339,14 @@ document.
          (let ((destination (org-export-resolve-radio-link link info)))
            (when destination
              (format "\\hyperref[%s]{%s}"
-                     (org-export-solidify-link-text path)
+                     (org-export-get-reference destination info)
                      (org-export-data (org-element-contents destination) info)))))
         ...)))
    #+END_SRC
 
    See also : [[#resolve-coderef][~org-export-resolve-coderef~]],
    [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]], [[#resolve-id-link][~org-export-resolve-id-link~]],
-   [[#solidify-link-text][~org-export-solidify-link-text~]].
-
-** ~org-export-solidify-link-text~
-   :PROPERTIES:
-   :CUSTOM_ID: solidify-link-text
-   :END:
-
-   Normalize a string, replacing most non-standard characters with
-   hyphens.
-
-   Used to turn targets names into safer versions for links.
-
-   See also: [[#inline-image-p][~org-export-inline-image-p~]],
-   [[#resolve-id-link][~org-export-resolve-id-link~]], [[#resolve-fuzzy-link][~org-export-resolve-fuzzy-link~]],
-   [[#resolve-radio-link][~org-export-resolve-radio-link~]].
+   [[#get-reference][~org-export-get-reference~]].
 
 ** ~org-export-table-cell-address~
    :PROPERTIES:
@@ -1464,7 +1499,7 @@ document.
    Non-nil when a a table row element ends a rowgroup, header
    included.
 
-   See also: [[#table-cell-starts-ends-header-p][~org-export-table-row-ends-header-p~]],
+   See also: [[#table-row-ends-header-p][~org-export-table-row-ends-header-p~]],
    [[#table-row-group][~org-export-table-row-group~]],
    [[#table-row-starts-header-p][~org-export-table-row-starts-header-p~]],
    [[#table-row-starts-rowgroup-p][~org-export-table-row-starts-rowgroup-p~]].
@@ -1476,7 +1511,7 @@ document.
 
    Return row group number for a given table row element.
 
-   See also: [[#table-cell-starts-ends-header-p][~org-export-table-row-ends-header-p~]],
+   See also: [[#table-row-ends-header-p][~org-export-table-row-ends-header-p~]],
    [[#table-row-ends-rowgroup-p][~org-export-table-row-ends-rowgroup-p~]],
    [[#table-row-starts-header-p][~org-export-table-row-starts-header-p~]],
    [[#table-row-starts-rowgroup-p][~org-export-table-row-starts-rowgroup-p~]].
@@ -1512,7 +1547,7 @@ document.
 
    Non-nil when a table row element starts table's header.
 
-   See also: [[#table-cell-starts-ends-header-p][~org-export-table-row-ends-header-p~]],
+   See also: [[#table-row-ends-header-p][~org-export-table-row-ends-header-p~]],
    [[#table-row-ends-rowgroup-p][~org-export-table-row-ends-rowgroup-p~]],
    [[#table-row-group][~org-export-table-row-group~]],
    [[#table-row-starts-rowgroup-p][~org-export-table-row-starts-rowgroup-p~]],
@@ -1526,7 +1561,7 @@ document.
    Non-nil when a table row element starts a rowgroup, header
    included.
 
-   See also: [[#table-cell-starts-ends-header-p][~org-export-table-row-ends-header-p~]],
+   See also: [[#table-row-ends-header-p][~org-export-table-row-ends-header-p~]],
    [[#table-row-ends-rowgroup-p][~org-export-table-row-ends-rowgroup-p~]],
    [[#table-row-group][~org-export-table-row-group~]],
    [[#table-row-starts-header-p][~org-export-table-row-starts-header-p~]].
