@@ -22,6 +22,9 @@
 @set MAINTAINEREMAIL @email{carsten at orgmode dot org}
 @set MAINTAINERCONTACT @uref{mailto:carsten at orgmode dot org,contact the maintainer}
 @c %**end of header
+@documentencoding UTF-8
+@documentlanguage es
+@smallbook
 @finalout
 
 @c Macro definitions
@@ -40,22 +43,22 @@
 @end macro
 
 @macro seealso{text}
-@noindent @b{Further reading}@*@noindent \text\
+@noindent
+@b{M@'as lecturas}@*@noindent \text\
 @end macro
 @copying
 
-Copyright @copyright{} 2010--2013 Free Software Foundation
+Copyright @copyright{} 2010--2014 Free Software Foundation
 
 @quotation
-Se permite la copia, distribuci@'on y/o modificaci@'on de este
-documento bajo los t@'erminos de la GNU Free Documentation License,
-Version 1.3 o posteriores versiones publicadas por la Free Software
-Foundation; sin secciones invariantes, con texto al inicio de la
-cubierta de portada 'A GNU Manual', y con el texto de contraportada
-como se muestra abajo (a). Una copia de esta licencia est@'a incluida
-en la secci@'on titulada 'GNU Free Documentation License'' en el
-manual de Org completo que est@'a distribuido junto con la
-gu@'{@dotless{i}}a compacta.
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with the Front-Cover Texts being ``Un Manual
+GNU,'' and with the Back-Cover Texts as in (a) below.  A copy of the
+license is included in the section entitled ``GNU Free Documentation
+License'' in the full Org manual, which is distributed together with
+the compact guide.
 
 (a) El texto de contraportada de la FSF es: ``Tu tienes la libertad
 para copiar y modificar este manual de GNU''.
@@ -71,9 +74,10 @@ para copiar y modificar este manual de GNU''.
 @title La Gu@'{@dotless{i}}a compacta de Org-mode
 
 @subtitle Versi@'on @value{VERSION}
-@author por Carsten Dominik 
-y traducido por David Arroyo Men@'endez con contribuciones usuarios 
-de emacs hispanohablantes
+@author Por Carsten Dominik.  
+Traducido por David Arroyo Men@'endez con contribuciones usuarios de
+emacs hispanohablantes.
+Dise@~no gr@'afico por Adolfo Antón Bravo.
 
 @c The following two commands start the copyright page.
 @page
@@ -85,7 +89,7 @@ de emacs hispanohablantes
 @shortcontents
 
 @ifnottex
-@node Top, Introducci@'on, (dir), (dir)
+@node Arriba, Introducci@'on, (dir), (dir)
 @top Gu@'{@dotless{i}}a de Org Mode
 
 @insertcopying
@@ -108,7 +112,7 @@ de emacs hispanohablantes
 * Trabajando con C@'odigo Fuente::  Trozos de c@'odigo fuente dentro de Org
 * Miscel@'anea::             El resto de cosas que no tienen otro lugar
 
-* Licencia de Documentaci@'on Libre de GNU::  Esta licencia de manual.
+* GNU Free Documentation License::  Esta licencia de manual.
 
 @detailmenu
  --- El Listado Detallado de Nodos ---
@@ -152,8 +156,8 @@ Elementos TODO
 
 
 * Usando los estados TODO::  Poniendo y cambiado estados
-* Flujos de trabajo multi-estado::  M@'as que ahora si/no
-* Proceso de acceso::        Fechas y notas para el progreso
+* Flujos de trabajo multi-estado::  M@'as que si/no
+* Proceso de acceso::        Fechas y notas para avanzar
 * Prioridades::              Algunas cosas son m@'as importantes que otras
 * Rompiendo tareas::         Partiendo una tarea en piezas manejables
 * Cajas de chequeo::         Listas de marcas
@@ -264,7 +268,7 @@ Miscel@'anea
 @end detailmenu
 @end menu
 
-@node Introducci@'on, Estructura del documento, Top, Top
+@node Introducci@'on, Estructura del documento, Arriba, Arriba
 @chapter Introducci@'on
 
 @menu
@@ -309,8 +313,9 @@ l@'{@dotless{i}}nea al archivo @file{.emacs}:
 (setq load-path (cons "~/path/to/orgdir/contrib/lisp" load-path))
 @end smallexample
 
-@noindent If you have been using git or a tar ball to get Org, you need to
-ejecuta el siguiente comando para generar informaci@'on de
+@noindent
+Si has estado usando git o un tar ball para obtener Org, se necesita
+ejecutar el siguiente comando para generar informaci@'on de
 autocarga. Comando:
 
 @smallexample
@@ -344,7 +349,7 @@ otras ideas acerca de @'el, por favor envie un correo a la lista de
 Org @email{emacs-orgmode@@gnu.org}. Para m@'as informaci@'on de c@'omo
 enviar informes de error, lea el manual principal.
 
-@node Estructura del documento, Tablas, Introducci@'on, Top
+@node Estructura del documento, Tablas, Introducci@'on, Arriba
 @chapter Estructura del documento
 
 Org est@'a basado en el modo Outline y suministra comandos flexibles
@@ -379,7 +384,7 @@ comando, @command{org-cycle}, el cual est@'a asignado a la tecla
 @node Cabeceras, Visibilidad c@'{@dotless{i}}clica, Outlines, Estructura del documento
 @section Cabeceras
 
-Los cabeceras@footnote{Nota del Traductor. Headlines es traducido por
+Las cabeceras@footnote{Nota del Traductor. Headlines es traducido por
 cabecera y hace referencia a t@'{@dotless{i}}tulos y
 subt@'{@dotless{i}}tulos}
 definen la estructura del @'arbol de sangrado (@'{@dotless{i}}tems de
@@ -400,11 +405,12 @@ t@'{@dotless{i}}tulos.}. Por ejemplo:
 * Otro t@'{@dotless{i}}tulo de nivel superior
 @end smallexample
 
-@noindent Some people find the many stars too noisy and would prefer an
-La idea general que tiene un espacio en blanco seguido por un
-asterisco es el comienzo de un subt@'{@dotless{i}}tulo o
-cabecera. @ref{Vista limpia}, describe una configuraci@'on para
-realizar esto.
+@noindent
+Algunas personas encuentran que muchas estrellas son molestas y
+preferir@'{@dotless{i}}an un @'{@dotless{i}}tem de contenido
+@samp{outline} que tenga una estrella seguida de un espacio en blanco
+para comenzar cabeceras. @ref{Vista limpia}, describe una
+configuraci@'on para realizar esto.
 
 @node Visibilidad c@'{@dotless{i}}clica, Movimiento, Cabeceras, Estructura del documento
 @section Visibilidad c@'{@dotless{i}}clica
@@ -486,12 +492,12 @@ Inserta una nueva entrada TODO con el mismo nivel de la cabecera actual.
 En una nueva entrada sin texto a@'un, @key{TAB} rotar@'a
 c@'{@dotless{i}}clicamente a trav@'es de niveles similares.
 @item M-@key{left}@r{/}@key{right}
-Promociona/devalua la cabecera actual en un nivel.
+Promociona/deval@'ua la cabecera actual en un nivel.
 @item M-S-@key{left}@r{/}@key{right}
-Promociona/devalua el subarbol actual en un nivel.
+Promociona/deval@'ua el sub@'arbol actual en un nivel.
 @item M-S-@key{up}@r{/}@key{down}
-Mueve el subarbol arriba/abajo (intercambia entre anterior/siguiente
-subarbol del mismo nivel).
+Mueve el sub@'arbol arriba/abajo (intercambia entre anterior/siguiente
+sub@'arbol del mismo nivel).
 @item C-c C-w
 Mueve la entrada o regi@'on en una lozalizaci@'on
 diferente. @xref{Rellenar y copiar}.
@@ -500,17 +506,17 @@ Limitar la memoria intermedia al @'arbol actual / ocult@'andolo
 @end table
 
 Cuando esto es en una regi@'on activa (Transient Mark mode), promueve
-y devalua todas las cabeceras en la regi@'on.
+y deval@'ua todas las cabeceras en la regi@'on.
 
 @node @'Arboles poco densos, Listas planas, Edici@'on de estructura, Estructura del documento
 @section @'Arboles poco densos
 
-Una importante caracter@'{@dotless{i}}stica de Org-mode es su
+Una caracter@'{@dotless{i}}stica  importante de Org-mode es su
 posibilidad para construir @emph{@'arboles poco densos} para la
-informaci@'on seleccionada en un arbol de outline, as@'{@dotless{i}}
+informaci@'on seleccionada en un @'arbol de outlines, as@'{@dotless{i}}
 que el documento entero es manejado como es posible, pero la
 informaci@'on seleccionada es hecha visible con la estructura de
-cabaceras de encima@footnote{Vea adem@'as las variables
+cabeceras de encima@footnote{Vea adem@'as las variables
 @code{org-show-hierarchy-above}, @code{org-show-following-heading},
 @code{org-show-siblings} y @code{org-show-entry-below} para controlar
 los detalles de c@'omo el contexto se muestra en cada
@@ -538,7 +544,7 @@ posteriormente en este manual.
 @node Listas planas, Notas al pie, @'Arboles poco densos, Estructura del documento
 @section Listas planas
 
-Sin una entrada en el @'arbol de outlines, listas formateadas a mano
+Sin una entrada en el @'arbol de outlines, las listas formateadas a mano
 pueden suministrar una estructura adicional. Ello tambi@'en
 proporciona una forma de crear listas de cajas de chequeo
 (@pxref{Cajas de chequeo}). Org soporta la edici@'on de tales listas,
@@ -547,8 +553,8 @@ y el conversor HTML (@pxref{Exportando}) los analiza y formatea.
 Org permite listas ordenadas, desordenadas y describirlas.
 @itemize @bullet
 @item
-@emph{Desordenada} los items de la lista comienzan con @samp{-},
-@samp{+} o @samp{*} como marcas.
+@emph{Desordenada} los @'{@dotless{i}}tems de la lista comienzan con
+@samp{-}, @samp{+} o @samp{*} como marcas.
 @item
 @emph{Ordenada} los @'{@dotless{i}}tems de la lista comienzan con @samp{1.}
 o
@@ -580,7 +586,7 @@ antes de dos l@'{@dotless{i}}neas en blanco. Un ejemplo:
 @end smallexample
 
 Los siguientes comandos act@'uan en @'{@dotless{i}}tems cuando el cursor
-est@'a en la primera l@'{@dotless{i}}mea de un @'{@dotless{i}}tem (la
+est@'a en la primera l@'{@dotless{i}}nea de un @'{@dotless{i}}tem (la
 l@'{@dotless{i}}nea con la bola o el n@'umero). 
 
 @table @kbd
@@ -594,14 +600,15 @@ estructura}).
 Inserta un nuevo @'{@dotless{i}}tem con una caja de chequeo
 (@pxref{Cajas de chequeo}).
 @item M-S-@key{up}@r{/}@key{down}
-Mueve el @'{@dotless{i}}tem incluyendo los subitems arriba/abajo
-(intercambia con el @'{@dotless{i}}tem previo/siguiente del mismo
-sangrado. Si la lista es ordenada, la renumeraci@'on es autom@'atica.
+Mueve el @'{@dotless{i}}tem incluyendo los sub@'{@dotless{i}}tems
+arriba/abajo (intercambia con el @'{@dotless{i}}tem previo/siguiente
+del mismo sangrado. Si la lista es ordenada, la renumeraci@'on es
+autom@'atica.
 @item M-@key{left}@r{/}M-@key{right}
 Decrementa/incrementa el sangrado del @'{@dotless{i}}tem, dejando los
 hijos sueltos.
 @item M-S-@key{left}@r{/}@key{right}
-Decrementa/incrementa el sangrado del @'{@dotless{i}}tem. incluyendo
+Decrementa/incrementa el sangrado del @'{@dotless{i}}tem, incluyendo
 los sub@'{@dotless{i}}tems.
 @item C-c C-c
 Si es una caja de chequeo (@pxref{Cajas de chequeo}) en una
@@ -629,7 +636,8 @@ usaba.
 [fn:1] El enlace es: http://orgmode.org
 @end smallexample
 
-@noindent The following commands handle footnotes:
+@noindent
+El siguiente comando maneja notas al pi@'e:
 
 @table @kbd
 @item C-c C-x f
@@ -650,7 +658,7 @@ Org-mode}@*@uref{http://sachachua.com/wp/2008/01/outlining-your-notes-with-org/,
 Tutorial de Sacha Chua}}
 
 
-@node Tablas, Hiperenlaces, Estructura del documento, Top
+@node Tablas, Hiperenlaces, Estructura del documento, Arriba
 @chapter Tablas
 
 Org viene con un r@'apido e intuitivo editor de tablas. C@'alculos
@@ -693,9 +701,11 @@ introducir
 |-
 @end smallexample
 
-@noindent and then press @key{TAB} to align the table and start filling in
-campos. Incluso m@'as r@'apido ser@'{@dotless{i}}a escribir
-@code{|Nombre|Tel@'efono|Edad} seguido de @kbd{C-c @key{RET}}.
+@noindent
+y entonces presiona @key{TAB} para alinear la tabla y empieza
+rellenando campos.  Incluso m@'as r@'apido ser@'{@dotless{i}}a
+escribir @code{|Nombre|Tel@'efono|Edad} seguido de @kbd{C-c
+@key{RET}}.
 
 Cuando se introduce texto en un campo, Org trata @key{DEL},
 @key{Backspace} y todas las teclas de forma especial, para que la
@@ -780,7 +790,7 @@ Tutorial de hojas de c@'alculo de Bastien}@*
 @uref{http://orgmode.org/worg/org-tutorials/org-plot.php, Tutorial de
 gr@'aficos de Eric}}
 
-@node Hiperenlaces, Elementos TODO, Tablas, Top
+@node Hiperenlaces, Elementos TODO, Tablas, Arriba
 @chapter Hiperenlaces
 
 Al igual que HTML, Org permite enlaces dentro de archivos, enlaces
@@ -888,13 +898,13 @@ para insertarlo en un fichero Org, y poder seguir el enlace.
 @c
 Almacena un enlace desde la posici@'on actual. @'Este es un comando
 @emph{global} (debes crear el atajo de teclado por t@'{@dotless{i}}
-mismo) el cual puede ser usado en cualquier buffer para crear un
+mismo) el cual puede ser usado en cualquier b@'uffer para crear un
 enlace. El enlace ser@'a almacenado para posteriores inserciones
-dentro de un buffer Org (ver m@'as abajo).
+dentro de un b@'uffer Org (ver m@'as abajo).
 @item C-c C-l
 @c
 Inserta un enlace. Esto sugiere un enlace que ser@'a insertado dentro
-del buffer. Se puede escribir un enlace, o usar la teclas del
+del b@'uffer. Se puede escribir un enlace, o usar la teclas del
 historial @key{arriba} y @key{abajo} para acceder a los enlaces
 almacenados. Tambi@'en ser@'a consultado por la parte de descripci@'on
 del enlace. Cuando es llamado con el prefijo @kbd{C-u}, se usa el
@@ -927,14 +937,13 @@ adjuntar una b@'usqueda a un enlace de fichero, junto con una explicaci@'on:
 @smallexample
 [[file:~/code/main.c::255]]                 @r{Encontrar l@'{@dotless{i}}nea 255}
 [[file:~/xx.org::Mi Objetivo]]              @r{Encontrar @samp{<<Mi Objetivo>>}}
-[[file:~/xx.org::#mi-id-personal]]          @r{Encontrar entrada con
-id personal}
+[[file:~/xx.org::#mi-id-personal]]          @r{Encontrar entrada con id personal}
 @end smallexample
 
 @seealso{ @uref{http://orgmode.org/manual/Hyperlinks.html#Hyperlinks,
 Cap@'{@dotless{i}}tulo 4 del manual}}
 
-@node Elementos TODO, Etiquetas, Hiperenlaces, Top
+@node Elementos TODO, Etiquetas, Hiperenlaces, Arriba
 @chapter Elementos TODO
 
 Org mode no requiere listas TODO que est@'en en documentos
@@ -943,16 +952,15 @@ ficheros de notas, porque los @'{@dotless{i}}tems TODO normalmente
 llegan mientras se toman notas. Con Org mode, simplemente marca
 cualquier entrada en un @'arbol siendo un @'{@dotless{i}}tem TODO. De
 este modo, la informaci@'on no est@'a duplicada, y los
-@'{@dotless{i}}tems TODO permanecen en el contexto que
-emerg@'{@dotless{i}}an.
+@'{@dotless{i}}tems TODO permanecen en el contexto emergente.
 
-Org mode provee m@'etodos para darte un visi@'on de todas las cosas
-que tienes que haces, recoge desde muchos ficheros.
+Org mode providing methods to give you an overview of all the things that
+you have to do, collected from many files.
 
 @menu
 * Usando los estados TODO::  Poniendo y cambiado estados
-* Flujos de trabajo multi-estado::  M@'as que ahora si/no
-* Proceso de acceso::        Fechas y notas para el progreso
+* Flujos de trabajo multi-estado::  M@'as que si/no
+* Proceso de acceso::        Fechas y notas para avanzar
 * Prioridades::              Algunas cosas son m@'as importantes que otras
 * Rompiendo tareas::         Partiendo una tarea en piezas manejables
 * Cajas de chequeo::         Listas de marcas
@@ -980,27 +988,27 @@ Rotar el estado TODO del @'{@dotless{i}}tem actual
 (no marcado) -> TODO -> DONE -> (no marcado)\n@end smallexample
 
 La misma rotaci@'on puede tambi@'en ser hecha ``de manera remota''
-desde los buffers de agenda y l@'{@dotless{i}}nea de tiempo con la
+desde los b@'uffers de agenda y l@'{@dotless{i}}nea de tiempo con la
 tecla @kbd{t} (@pxref{Comandos de la agenda}).
 
 @item S-@key{derecha}@r{/}@key{izquierda}
 Seleccionar el siguiente/precedente estado TODO, similar a rotar.
 @item C-c / t
 Ver @'{@dotless{i}}tems TODO en un @emph{@'arbol poco denso}
-(@pxref{@'Arboles poco densos}). Encoge el buffer, pero muestra todos
+(@pxref{@'Arboles poco densos}). Encoge el b@'uffer, pero muestra todos
 los @'{@dotless{i}}tems y la jerarqu@'{@dotless{i}}a de
 t@'{@dotless{i}}tulos y subt@'{@dotless{i}}tulos por encima de ellos.
 @item C-c a t
 Muestra la lista global TODO. Esta colecci@'on de @'{@dotless{i}}tems
 TODO de todos los archivos de la agenda (@pxref{Vistas de la Agenda})
-en un @'unico buffer.
+en un @'unico b@'uffer.
 @item S-M-@key{RET}
 Inserta una nueva entrada TODO debajo del @'{@dotless{i}}tem actual.
 @end table
 
 @noindent
 Al cambiar el estado de un @'{@dotless{i}}tem TODO se puede tambi@'en
-activar cambios de etiqueta. Ver el docstring de la opci@'on
+activar cambios de etiqueta. V@'ease la documentaci@'on de la opci@'on
 @code{org-todo-state-tags-triggers} para m@'as detalles.
 
 @node Flujos de trabajo multi-estado, Proceso de acceso, Usando los estados TODO, Elementos TODO
@@ -1028,7 +1036,7 @@ TODO a FEEDBACK, despu@'es a VERIFY y finalmente a DONE y DELEGATED.
 @end smalllisp
 
 Las palabras reservadas son todas diferentes, esto ayuda a Org mode a
-guardar la traza de que subsecuencia deber@'{@dotless{i}}a ser usada
+guardar la traza de la subsecuencia que deber@'{@dotless{i}}a ser usada
 para una entrada dada. El ejemplo tambi@'en muestra c@'omo definir
 teclas para un r@'apido acceso a un estado particular, a@~nadiendo una
 letra entre par@'entesis despu@'es de cada palabra reservada - se
@@ -1051,13 +1059,14 @@ para que Org mode reconozca los cambios.
 @node Proceso de acceso, Prioridades, Flujos de trabajo multi-estado, Elementos TODO
 @section Proceso de acceso
 
-Org mode puede grabar autom@'aticamente un timestamp y posiblemente
-una nota cuando se marca un @'{@dotless{i}}tem TODO como DONE, @'o
-incluso cada vez que se cambia el estado de un @'{@dotless{i}}tem
-TODO. Este sistema es altamente configurable; las configuraciones
-pueden seguir una l@'ogica por tecla y pueden afectar a un fichero o
-incluso a un sub@'arbol. Para m@'as informaci@'on de c@'omo fijar
-fecha y hora de una tarea, lea @ref{Estableciendo tiempo de trabajo}.
+Org mode puede grabar autom@'aticamente una marca de tiempo
+@emph{timestamp} y posiblemente una nota cuando se marca un
+@'{@dotless{i}}tem TODO como DONE, @'o incluso cada vez que se cambia
+el estado de un @'{@dotless{i}}tem TODO. Este sistema es altamente
+configurable; las configuraciones pueden seguir una l@'ogica por tecla
+y pueden afectar a un fichero o incluso a un sub@'arbol. Para m@'as
+informaci@'on de c@'omo fijar fecha y hora de una tarea, lea
+@ref{Estableciendo tiempo de trabajo}.
 
 @menu
 * Cerrando @'{@dotless{i}}tems::  ¿Cu@'ando se marc@'o a DONE?
@@ -1068,7 +1077,7 @@ fecha y hora de una tarea, lea @ref{Estableciendo tiempo de trabajo}.
 @unnumberedsubsec Cerrando @'{@dotless{i}}tems
 
 El registro m@'as b@'asico es guardar @emph{cuando} un
-@'{@dotless{i}}tem TODO se finaliz@'o. Esto se logra con@footnote{La
+@'{@dotless{i}}tem TODO se finaliza. Esto se logra con@footnote{La
 correspondiente configuraci@'on en el buffer es @code{#+STARTUP:
 logdone}}.
 
@@ -1080,9 +1089,10 @@ logdone}}.
 As@'{@dotless{i}}, cada vez que se cambia una entrada desde un estado
 TODO (no DONE) a cualquiera de los estados DONE, una
 l@'{@dotless{i}}nea @samp{CLOSED: [timestamp]} ser@'a insertada justo
-despu@'es de la cabecera. Si quieres grabar una nota con una marca de
-tiempo (timestamp) usa@footnote{La correspondiente configuraci@'on en
-el buffer es: @code{#+STARTUP: lognotedone}} 
+despu@'es de la cabecera. Si se quiere grabar una nota con una marca
+de tiempo @emph{timestamp} use lo siguiente:@footnote{La
+correspondiente configuraci@'on en el buffer es: @code{#+STARTUP:
+lognotedone}} 
 
 @smalllisp
 (setq org-log-done 'note)
@@ -1090,7 +1100,8 @@ el buffer es: @code{#+STARTUP: lognotedone}}
 
 @noindent
 Entonces, se preguntar@'a por la nota, y la nota ser@'a almacenada
-debajo de la entrada con una cabercera @samp{Closing Note} (Cerrando Nota).
+debajo de la entrada con una cabecera Cerrar nota @emph{Closing
+Note}.
 
 @node Trazando los estados TODO, , Cerrando @'{@dotless{i}}tems, Proceso de acceso
 @unnumberedsubsec Trazando los estados TODO
@@ -1102,8 +1113,6 @@ registros ser@'an insertados despu@'es de la cabecera como una lista
 de @'{@dotless{i}}tems. Cuando se toman un mont@'on de notas, se
 podr@'{@dotless{i}}a querer tener las notas fuera de la vista dentro
 de un "@i{caj@'on}" (drawer)
-@seealso{@uref{http://www.gnu.org/software/emacs/manual/html_node/org/Drawers.html#Drawers,
-Drawers en el Cap@'{@dotless{i}}tulo 2 del manual}}
 
 Para el registro de estados, Org mode conf@'{@dotless{i}}a en una
 configuraci@'on basada en palabras reservadas. Esto se logra
@@ -1135,7 +1144,7 @@ prioridad} en la cabecera de un @'{@dotless{i}}tem TODO, como esta
 @noindent
 Org mode soporta tres prioridades: @samp{A}, @samp{B},
 @samp{C}. @samp{A} es la m@'as alta, por defecto ser@'a @samp{B} si
-ninguna es dada. Las prioridades marcan diferencia s@'olo en la
+no se da ninguna. Las prioridades marcan diferencia s@'olo en la
 agenda.
 
 @table @kbd
@@ -1153,12 +1162,12 @@ Incremente/decrementa la prioridad de la cabecera actual
 
 Es a menudo ventajoso dividir grandes tareas en peque@~nas y
 manejables subtareas. Puede realizar esto creando un @'arbol de ideas
-(outlines) bajo un item TODO, el cual detalla las subtareas en el
-@'arbol. Para poner la vista sobre la fracci@'on de subtareas que
-est@'an ya completadas, inserte un @samp{[/]} o @samp{[%]} en
-cualquier lugar de la cabecera. Estas marcas ser@'an actualizadas cada
-vez que el estado TODO de alg@'un hijo cambie, o presionando @kbd{C-c
-C-c} en la marca. Por ejemplo:
+(outlines) bajo un @'{@dotless{i}}tem TODO, el cual detalla las
+subtareas en el @'arbol. Para poner la vista sobre la fracci@'on de
+subtareas que est@'an ya completadas, inserte un @samp{[/]} o
+@samp{[%]} en cualquier lugar de la cabecera. Estas marcas ser@'an
+actualizadas cada vez que el estado TODO de alg@'un hijo cambie, o
+se presione @kbd{C-c C-c} en la marca. Por ejemplo:
 
 @smallexample
 * Organizar Fiesta [33%]
@@ -1187,12 +1196,14 @@ de chequeo.
   - [ ] pensar qu@'e m@'usica escuchar
 @end smallexample
 
-Las cajas de chequeo funcionan jer@'arquicamente, si un item es caja de
-chequeo y tiene hijos que son cajas de chequeo, marcando las cajas de
-chequeo hijos se marcar@'a la caja de chequeo del padre para reflejar
-si ninguno, alguno o todos los hijos est@'an marcados.
+Las cajas de chequeo funcionan jer@'arquicamente, si un
+@'{@dotless{i}}tem es caja de chequeo y tiene hijos que son cajas de
+chequeo, marcando las cajas de chequeo hijos se marcar@'a la caja de
+chequeo del padre para reflejar si ninguno, alguno o todos los hijos
+est@'an marcados.
 
-@noindent The following commands work with checkboxes:
+@noindent
+El siguiente comando funciona con cajas de chequeo @samp{checkboxes}:
 
 @table @kbd
 @item C-c C-c
@@ -1212,10 +1223,10 @@ orgtutorial_dto.php, Tutorial de introducci@'on de David O'Toole}@*
 members.optusnet.com.au/~charles57/GTD/gtd_workflow.html,
 Configuraci@'on de GTD de Charles Cave}}
 
-@node Etiquetas, Propiedades, Elementos TODO, Top
+@node Etiquetas, Propiedades, Elementos TODO, Arriba
 @chapter Etiquetas
 
-Una excelante forma de nombrar y contextualizar informaci@'on
+Una excelente forma de nombrar y contextualizar informaci@'on
 interrelacionada es asignar @i{etiquetas} a las cabeceras. Org mode
 tiene un amplio soporte para etiquetas. @footnote{Nota del Traductor: Tanto
 label como tag se traduce como etiqueta. En general, label se utiliza
@@ -1254,14 +1265,14 @@ en la lista
 @end smallexample
 
 @noindent
-la cabecera final tendr@'a las etiquetas @samp{:trabajo:},
+La cabecera final tendr@'a las etiquetas @samp{:trabajo:},
 @samp{:jefa:}, @samp{:notas:} y @samp{:actividad:} incluso aunque la
 cabecera final no est@'e expl@'{@dotless{i}}citamente marcada con
-estas etiquetas. Se puede tambi@'en asignar etiquetas para que todas
+estas etiquetas. Se pueden tambi@'en asignar etiquetas para que todas
 las entradas en un fichero hereden si estas etiquetas fueron definidas
 en un hipot@'etico nivel cero alrededor del fichero entero. Usa una
 l@'{@dotless{i}}nea como esta@footnote{Como siempre estas
-configuraciones de buffer se activan presionando @kbd{C-c C-c}.}:
+configuraciones de b@'uffer se activan presionando @kbd{C-c C-c}.}:
 
 @smallexample
 #+FILETAGS: :Pedro:Jefe:Secreto:
@@ -1270,7 +1281,7 @@ configuraciones de buffer se activan presionando @kbd{C-c C-c}.}:
 @node Poniendo marcas, Etiquetar grupos, Marca de herencia, Etiquetas
 @section Poniendo marcas
 
-Las etiquetas pueden simplemente ser escritas en un bufer al final de
+Las etiquetas pueden simplemente ser escritas en un b@'uffer al final de
 una cabecera. Despu@'es de los dos puntos, @kbd{M-@key{TAB}}
 autocompleta etiquetas. Hay tambi@'en un comando para insertar etiquetas:
 
@@ -1281,7 +1292,7 @@ ofrecer@'a autocompletado o una interfaz especial de una sola tecla
 para asignar etiquetas, ver m@'as abajo. Despu@'es de presionar
 @key{RET}, las etiquetas ser@'an insertadas y alineadas para
 @code{org-tags-column}. Cuando se llama con el prefijo @kbd{C-u},
-todas las etiquetas en el buffer actual ser@'an alineadas a esta
+todas las etiquetas en el b@'uffer actual ser@'an alineadas a esta
 columna, solo para que las cosas se vean bien.
 @item C-c C-c
 Cuando el cursor est@'a en una cabecera, hace lo mismo que @kbd{C-c
@@ -1291,7 +1302,7 @@ C-q}.
 Org soporta inserci@'on de etiquetas basado en una @emph{lista de
 etiquetas}. Por defecto esta lista es construida din@'amicamente,
 conteniendo todas las etiquetas actualmente usadas en el
-buffer. Tambi@'en se puede especificar globalmente una lista dura de
+b@'uffer. Tambi@'en se puede especificar globalmente una lista dura de
 etiquetas con la variable @code{org-tag-alist}. Finalmente se puede
 asignar las etiquetas por defecto para un fichero dado con
 l@'{@dotless{i}}neas como
@@ -1301,9 +1312,9 @@ l@'{@dotless{i}}neas como
 @end smallexample
 
 Por defecto, Org mode usa las facilidades de compleci@'on del
-minibuffer para introducir etiquetas. Sin embargo, tambi@'en
+minib@'uffer para introducir etiquetas. Sin embargo, tambi@'en
 implementa otro r@'apido m@'etodo de selecci@'on de etiquetas llamado
-@emph{fast tag selection}. Este permite que tu selecciones y
+@emph{fast tag selection}. Esto permite que tu selecciones y
 dejes de seleccionar etiquetas con solo presionar una sola tecla. Para
 que esto funcione bien se debe asignar letras @'unicas para las
 etiquetas m@'as usadas. Se puede hacer esto de manera global
@@ -1316,8 +1327,10 @@ etiquetar muchos @'{@dotless{i}}tems en diferentes ficheros con
 (setq org-tag-alist '(("@@trabajo" . ?t) ("@@casa" . ?c) ("portatil" . ?p)))
 @end smalllisp
 
-@noindent If the tag is only relevant to the file you are working on, then you
-o bien establecer en la l@'{@dotless{i}}nea TAGS una opci@'on como:
+@noindent
+Si la etiqueta @samp{tag} es solo relevante para el fichero en el que
+se est@'a trabajando, entonces se puede asignar la l@'{@dotless{i}}nea
+de opci@'on TAG de la siguiente manera:
 
 @smallexample
 #+TAGS: @@trabajo(t)  @@casa(c)  @@futbol(f)  servidor(s)  pc(p)
@@ -1330,10 +1343,10 @@ o bien establecer en la l@'{@dotless{i}}nea TAGS una opci@'on como:
 @cindex etiquetas, grupos
 En un conjunto de etiquetas mutuamente exclusivas, la primera etiqueta
 puede ser definida como una @emph{etiqueta de grupo}. Cuando se busca
-para una etiqueta de grupo, devolver@'a las coincidencias para todos
-los miembros en el grupo. En una vista de agenda, filtrar por una
-etiqueta de grupo mostrar@'a cabeceras etiquetadas con al menos uno de
-los miembros del grupo. Esto crea b@'usquedas y filtros incluso m@'as
+una etiqueta de grupo, devolver@'a las coincidencias para todos los
+miembros en el grupo. En una vista de agenda, filtrar por una etiqueta
+de grupo mostrar@'a cabeceras etiquetadas con al menos uno de los
+miembros del grupo. Esto crea b@'usquedas y filtros incluso m@'as
 flexibles.
 
 Se pueden establecer grupos de etiquetas insertando un punto y coma
@@ -1353,10 +1366,10 @@ esta variable.
 
 @kindex C-c C-x q
 @vindex org-group-tags
-Si quieres ignorar las etiquetas grupo temporalmente, cambia el
+Si se quieren ignorar las etiquetas grupo temporalmente, cambia el
 soporte de etiquetas grupo con @command{org-toggle-tags-groups},
-asociado a @kbd{C-c C-x q}. Si quieres deshabilitar etiquetas grupos
-completamente, configura @var{org-group-tags} a nil.
+asociado a @kbd{C-c C-x q}. Si se quieren deshabilitar etiquetas
+grupos completamente, configura @var{org-group-tags} a nil.
 
 @node Buscando marcas, , Etiquetar grupos, Etiquetas
 @section Buscando marcas
@@ -1375,7 +1388,9 @@ Crea una lista global de marcas coincidentes de todos los archivos de
 la agenda. @xref{Emparejar marcas y propiedades}.
 @item C-c a M
 Crea una lista global de marcas coincidentes de todos los archivos de
-la agenda. @xref{Emparejar marcas y propiedades}.
+la agenda, pero chequea solo @'{@dotless{i}}tems TODO y fuerza el
+chequeo de subitems (ver la variable
+@code{org-tags-match-list-sublevels}).
 @end table
 
 Estos comandos buscan coincidencias de cadenas que permiten una
@@ -1393,7 +1408,7 @@ Cap@'{@dotless{i}}tulo 6 del manual}@*
 @uref{http://sachachua.com/wp/2008/01/tagging-in-org-plus-bonus-code-for-timeclocks-and-tags/,
 art@'{@dotless{i}}culo de Sacha Chua acerca de etiquetado en Org-mode}}
 
-@node Propiedades, Fechas y horas, Etiquetas, Top
+@node Propiedades, Fechas y horas, Etiquetas, Arriba
 @chapter Propiedades
 
 Las propiedades son pares clave valor asociados con una entrada. Estos
@@ -1456,11 +1471,11 @@ propiedades}.
 
 @seealso{
 @uref{http://orgmode.org/manual/Properties-and-Columns.html#Properties-and-Columns,
-Chap@'{@dotless{i}}tulo 7 del manual}@*
+Cap@'{@dotless{i}}tulo 7 del manual}@*
 @uref{http://orgmode.org/worg/org-tutorials/org-column-view-tutorial.php,Bastien
 Guerry's column view tutorial}}
 
-@node Fechas y horas, Capturar - Rellenar - Archivar, Propiedades, Top
+@node Fechas y horas, Capturar - Rellenar - Archivar, Propiedades, Arriba
 @chapter Fechas y horas
 
 Para tener una planificaci@'on de un proyecto, los @'{@dotless{i}}tems
@@ -1488,10 +1503,10 @@ aparecer en cualquier lugar, titular o cuerpo de una entrada del
 fecha espec@'{@dotless{i}}fica de la agenda (@pxref{Agenda
 semanal/diaria}). Distinguimos:
 
-@noindent @b{Plain timestamp; Event; Appointment}@*
-Una marca de tiempo simple solo asigna una fecha/hora a un
-@'{@dotless{i}}tem. Esto es solo como escribir una cita o evento en
-una agenda en papel.
+@noindent
+@b{Una marca de tiempo; Evento; Cita}@* Una marca de tiempo simple
+solo asigna una fecha/hora a un @'{@dotless{i}}tem. Esto es solo como
+escribir una cita o evento en una agenda en papel.
 
 @smallexample
 * Ver pelis con Pedro
@@ -1500,37 +1515,40 @@ una agenda en papel.
   <2006-11-02 Thu 20:00-22:00>
 @end smallexample
 
-@noindent @b{Timestamp with repeater interval}@*
-Una marca de tiempo puede contener un @emph{intervalo de
-repetici@'on}, indicando que se aplica no solo en la fecha dada, pero
-de nuevo y de nuevo despu@'es de un cierto intervalo de N
-d@'{@dotless{i}}as (d), semanas @emph{weeks} (w), meses (m), o a@~nos
-@emph{years} (y). Lo siguiente muestra en la agenda cada Mi@'ercoles:
+@noindent
+@b{Marca de tiempo con intervalo de repetici@'on}@* Una marca de
+tiempo puede contener un @emph{intervalo de repetici@'on}, indicando
+que se aplica no solo en la fecha dada, pero de nuevo y de nuevo
+despu@'es de un cierto intervalo de N d@'{@dotless{i}}as (d), semanas
+@emph{weeks} (w), meses (m), o a@~nos @emph{years} (y). Lo siguiente
+muestra en la agenda cada Mi@'ercoles:
 @smallexample
 * Recoger a Samuel en el colegio
   <2007-05-16 Wed 12:30 +1w>
 @end smallexample
 
-@noindent @b{Diary-style sexp entries}@*
-Para especificaciones de fecha m@'as complejas, Org mode da soporte
-usando las entradas diarias sexp implementadas en el paquete Emacs
-calendar/diary. Por ejemplo:
+@noindent
+@b{Entradas de estilo diario sexp}@* Para especificaciones de fecha
+m@'as complejas, Org mode da soporte usando las entradas diarias sexp
+implementadas en el paquete Emacs calendar/diary. Por ejemplo:
 @smallexample
 * El encuentro nerd los segundos jueves del mes
   <%%(diary-float t 4 2)>
 @end smallexample
 
-@noindent @b{Time/Date range}@*
-Dos marcas de tiempo conectadas por @samp{--} denotan un rango.
+@noindent
+@b{Rango fecha/hora}@* Dos marcas de tiempo conectadas por @samp{--}
+denotan un rango.
 @smallexample
 ** Encuentro en Amsterdam
    <2004-08-23 Mon>--<2004-08-26 Thu>
 @end smallexample
 
-@noindent @b{Inactive timestamp}@*
-Como una marca de tiempo @emph{timestamp}, pero con par@'entesis
-cuadrados en vez de angulares. Estas marcas de tiempo son inactivas en
-el sentido de que @emph{no} aparecen como entrada en la agenda.
+@noindent
+@b{Marcas de tiempo inactivas}@* Como una marca de tiempo
+@emph{timestamp}, pero con par@'entesis cuadrados en vez de
+angulares. Estas marcas de tiempo son inactivas en el sentido de que
+@emph{no} aparecen como entrada en la agenda.
 
 @smallexample
 * Julia lleg@'o tarde por quinta vez
@@ -1552,7 +1570,7 @@ Crea un di@'alogo para una fecha e inserta la correspondiente marca de
 tiempo. Cuando el cursor est@'a en una marca de tiempo existente en el
 buffer, el comando es usado para modificar esta marca de tiempo en vez
 de insertar una nueva. Cuando este comando es usado dos veces
-seguidas, un rango de tiempo es insertado. Con un prefijo, tambi@'en
+seguidas, un rango de tiempo se inserta. Con un prefijo, tambi@'en
 a@~nade la hora actual. 
 @item C-c !
 @c
@@ -1583,9 +1601,10 @@ para m@'as informaci@'on de c@'omo funciona la fecha/hora.
 Una marca de tiempo puede ser precedida por palabras clave especiales
 para facilitar la planificaci@'on.
 
-@noindent @b{DEADLINE}@*
-Significa: la tarea (normalmente un @'{@dotless{i}}tem TODO, aunque no
-necesariamente) se supone que finalizar@'a en tal fecha.
+@noindent
+@b{DEADLINE}@* Significa: la tarea (normalmente un @'{@dotless{i}}tem
+TODO, aunque no necesariamente) se supone que finalizar@'a en tal
+fecha.
 @table @kbd
 @item C-c C-d
 Inserta la palabra clave @samp{DEADLINE} con una marca, en la
@@ -1605,11 +1624,12 @@ que la entrada es marcada como realizada @emph{DONE}. Un ejemplo:
 @end smallexample
 
 
-@noindent @b{SCHEDULED}@*
-Significa: est@'as @i{planificando empezar trabajando} en esta tarea
-en la fecha dada@footnote{Esto es bastante diferente, ya que es
-normalmente comprendido por @i{planificar un encuentro}, que es hecho
-en Org-mode insertando una marca de tiempo sin palabra clave.}
+@noindent
+@b{SCHEDULED}@* significa: se @i{planifica empezar trabajando} en esta
+tarea en la fecha dada@footnote{Esto es bastante diferente, ya que
+normalmente se comprende la @i{planificaci@'on de un encuentro}, que
+se hace en Org-mode insertando una marca de tiempo sin palabra
+clave.}
 
 @table @kbd
 @item C-c C-s
@@ -1662,12 +1682,12 @@ medidas con reloj.
 @item C-c C-x C-o
 Para el reloj (@emph{clock-out}. Esto inserta otra marca de tiempo en
 la misma localizaci@'on donde el reloj fu@'e iniciado por @'ultima
-vez. Eso tambi@'en directamente computa el tiempo resultante en
+vez. Eso tambi@'en computa directamente el tiempo resultante en
 insertarlo despu@'es el rango de tiempo como @samp{=> HH:MM}.
 @item C-c C-x C-e
 Actualiza el esfuerzo de estimar la tarea para la actual medici@'on de
 reloj.
-@item C-c C-x C-x
+@item C-c C-x C-q
 Cancela la medici@'on de reloj actual. Esto es @'util si el reloj
 fu@'e iniciado por error, o si se ya se finaliz@'o el trabajo.
 @item C-c C-x C-j
@@ -1704,15 +1724,15 @@ Tutorial de Fechas y Horas de Charles Cave}@*
 @uref{http://doc.norang.ca/org-mode.html#Clocking, Flujo de trabajo de
 cronomentrar de Bernt Hansen}}
 
-@node Capturar - Rellenar - Archivar, Vistas de la Agenda, Fechas y horas, Top
+@node Capturar - Rellenar - Archivar, Vistas de la Agenda, Fechas y horas, Arriba
 @chapter Capturar - Rellenar - Archivar
 
 Una parte importante de cualquier organizaci@'on de sistemas es la
 habilidad para r@'apidamente capturar nuevas ideas y tareas, y asociar
 material de referencia con ellas. Org define un proceso de captura
 para crear tareas. Una vez en el sistema, tareas y proyectos necesitan
-ser movidas alrededor. Moviendo @'arboles de proyectos completos a un
-archivo deja el sistema compacto y r@'apido.
+ser movidas. Moviendo @'arboles de proyectos completos a un archivo
+deja el sistema compacto y r@'apido.
 
 @menu
 * Capturar::                 Capturando nuevas cosas
@@ -1751,13 +1771,13 @@ para notas y define un atajo global para capturar nuevas cosas.
 
 @table @kbd
 @item C-c c
-Comienza un proceso de captura. dej@'andolo dentro de un estrecho
-buffer indirecto para editar.
+Comienza un proceso de captura, que deja dentro un estrecho b@'uffer
+indirecto para editar.
 @item C-c C-c
-Una vez que tu has introducido informaci@'on dentro del buffer de
+Una vez que se ha introducido informaci@'on dentro del b@'uffer de
 captura, @kbd{C-c C-c} devolver@'a a la ventana de configuraci@'on
-antes de que el proceso capture, as@'{@dotless{i}} tu puedes resumir
-tu trabajo sin distracci@'on.
+antes de que el proceso capture, as@'{@dotless{i}} se puede resumir
+el trabajo sin distracci@'on.
 @item C-c C-w
 Finaliza moviendo la entrada a una nueva localizaci@'on
 (ver secci@'on 9.2).
@@ -1769,11 +1789,10 @@ Abortar el proceso de captura y devolver el estado previo.
 @unnumberedsubsec Plantillas de capturas
 
 Se pueden usar plantillas para generar diferentes formas de capturar
-notas y almacenarlas en diferentes lugares. Por ejemplo, si le
-gustar@'{@dotless{i}}a almacenar nuevas tareas bajo una cabecera
-@samp{Tareas} en el fichero @file{TODO.org}, y art@'{@dotless{i}}culos
-de revistas en un @'arbol de fechas en @file{journal.org} se
-podr@'{@dotless{i}}a usar:
+notas y almacenarlas en diferentes lugares. Por ejemplo, si gusta
+almacenar nuevas tareas bajo una cabecera @samp{Tareas} en el fichero
+@file{TODO.org}, y art@'{@dotless{i}}culos de revistas en un @'arbol
+de fechas en @file{journal.org} se podr@'{@dotless{i}}a usar:
 
 @smallexample
 (setq org-capture-templates
@@ -1783,30 +1802,31 @@ podr@'{@dotless{i}}a usar:
         "* %?\nEntered on %U\n  %i\n  %a")))
 @end smallexample
 
-@noindent In these entries, the first string is the key to reach the
-plantilla, la segunda es una corta descripci@'on. Entonces sigue el
-tipo de la entrada y una definici@'on del objetivo de la
-localizaci@'on para almacenar la nota. Finalmente, la plantilla en
-s@'{@dotless{i}} misma, una cadena con %-escapes para rellenar la
-informaci@'on basado en tiempo y contexto.
+@noindent
+En estas entradas, la primera cadena es la clave para lograr la
+plantilla, la segunda es una descripci@'on corta. Entonces sigue el
+tipo de la entrada y una definici@'on de la localizaci@'on del
+objetivo para almacenar la nota. Finalmente, la plantilla en
+s@'{@dotless{i}} misma, es una cadena con %-escapes para rellenar la
+informaci@'on basada en tiempo y contexto.
 
 Cuando se llama a @kbd{M-x org-capture}, Org pregunta por una clave
-para seleccionar la plantilla (si tu tienes m@'as de una plantilla) y
-entonces prepara el buffer como
+para seleccionar la plantilla (si se tiene m@'as de una plantilla) y
+entonces se prepara el b@'uffer como
 @smallexample
 * TODO
-  [[file:@var{enlace a d@'onde tu estabas inicializando la captura}]]
+  [[file:@var{enlace a d@'onde se estaba inicializando la captura}]]
 @end smallexample
 
 @noindent
-Durante la expansi@'on de la plantilla, especiales
-@kbd{%}-escapes@footnote{Si se necesita una de estas secuencias
-literalmente, escapa el @kbd{%} con una barra invertida.} permite la
-inserci@'on din@'amica de contenido. Aqu@'{@dotless{i}} una peque@~na
-selecci@'on de las posibilidades, consulta el manual para m@'as.
+Durante la expansi@'on de la plantilla, @kbd{%}-escapes@footnote{Si se
+necesita una de estas secuencias literalmente, escapa el @kbd{%} con
+una barra invertida.} especiales permiten la inserci@'on din@'amica de
+contenido. Aqu@'{@dotless{i}} una peque@~na selecci@'on de las
+posibilidades, consulte el manual para m@'as.
 @smallexample
 %a          @r{anotaci@'on, normalmente el enlace creado con @code{org-store-link}}
-%i          @r{contenido inicial, la regi@'on cuando la capturas se llama con C-u.}
+%i          @r{contenido inicial, la regi@'on cuando se captura se llama con C-u.}
 %t, %T      @r{marca de tiempo, solo fecha, o fecha y tiempo}
 %u, %U      @r{como el de debajo, pero con marcas de tiempo inactivas}
 @end smallexample
@@ -1816,9 +1836,9 @@ selecci@'on de las posibilidades, consulta el manual para m@'as.
 
 Cuando se revisa el dato capturado, se puede querer rellenar o copiar
 algunas de las entradas dentro de una lista diferente, por ejemplo,
-dentro de un proyecto. Cortando, encontrando la localizaci@'on
-correcta y entonces pegando la nota es complejo. Para simplificar este
-proceso, se pueden usar los siguientes comandos:
+dentro de un proyecto. Cortando, encuentra la localizaci@'on correcta
+y entonces pegar la nota es complejo. Para simplificar este proceso,
+se pueden usar los siguientes comandos:
 
 @table @kbd
 @item C-c M-x
@@ -1828,34 +1848,33 @@ Copiar la entrada o regi@'on. Este comando se comporta como
 Reajusta la entrada o regi@'on al punto. Este comando ofrece posibles
 localizaciones para reajustar la entrada y permite seleccionar una con
 autocompletado. El @'{@dotless{i}}tem (o todos los @'{@dotless{i}}tems
-en la regi@'on) est@'a bajo el objetivo rellenado debajo del objetivo
-encabezado como un sub@'{@dotless{i}}tem. @* Por defecto, todas las
-cabeceras 1 en el actual buffer son considerados para ser objetivos,
-pero puedes tener definiciones m@'as complejas a trav@'es de un
-n@'umero de ficheros. Ver la variable @code{org-refile-targets} para
-detalles.
+en la regi@'on) es rellenado bajo el objetivo estructurado como
+sub@'{@dotless{i}}tem. @* Por defecto, todas las cabeceras de nivel 1
+en el actual b@'uffer son consideradas para ser objetivos, pero se
+pueden tener definiciones m@'as complejas a trav@'es de un n@'umero de
+ficheros. Ver la variable @code{org-refile-targets} para detalles.
 @item C-u C-c C-w
 Usa el interfaz de reajuste para saltar a un encabezado.
 @item C-u C-u C-c C-w
 Salta a la localizaci@'on d@'onde el @'ultimo @code{org-refile}
-movi@'o un @'arbol.
+se movi@'o a un @'arbol.
 @end table
 
 @node Archivando, , Rellenar y copiar, Capturar - Rellenar - Archivar
 @section Archivando
 
-Cuando un proyecto represent@'o por un (sub)@'arbol est@'a finalizado,
-tu puedes querer mover el @'arbol fuera del camino y p@'aralo desde la
-contribuci@'on a la agenda. El archivo es importante para guardar tus
-ficheros de trabajo b@'usquedas como la construcci@'on de vistas de
-agenda r@'apidas. La acci@'on de archivaci@'on m@'as com@'un es mover
-un @'arbol de proyecto a otro fichero, el fichero archivo.
+Cuando un proyecto se represent@'o por un (sub)@'arbol y este se
+finaliza, se puede querer mover el @'arbol fuera del camino y hacer
+que no contribuya a la agenda. Archivar es importante para guardar los
+ficheros de trabajo b@'usquedas globales como la construcci@'on de
+vistas de agenda r@'apidas. La acci@'on m@'as com@'un de archivo es
+mover un @'arbol de proyecto a otro fichero, el fichero archivo.
 
 @table @kbd
 @item C-c C-x C-a
 Archivar la actual entrada usando el comando especificado en la
 variable @code{org-archive-default-command}.
-@item C-c C-x C-s@ @r{or short} @ C-c $
+@item C-c C-x C-s@ @r{o m@'as corto} @ C-c $
 Archiva el sub@'arbol empezando en la posici@'on del cursor a la
 localizaci@'on dada por @code{org-archive-location}.
 @end table
@@ -1877,7 +1896,7 @@ Cap@'{@dotless{i}}tulo 9 del manual}@*
 @uref{http://orgmode.org/worg/org-tutorials/org-protocol-custom-handler.php,
 Sebastian Rose's tutorial para capturar desde un servidor web}}@uref{}@*
 
-@node Vistas de la Agenda, Marcado, Capturar - Rellenar - Archivar, Top
+@node Vistas de la Agenda, Marcado, Capturar - Rellenar - Archivar, Arriba
 @chapter Vistas de la Agenda
 
 Debido a que Org funciona, los @'{@dotless{i}}tems TODO, los
@@ -1888,13 +1907,13 @@ que son importantes para una fecha particular, esta informaci@'on debe
 ser recogida, ordenada y mostrada en un camino organizado. Hay vistas
 varias vistas diferentes, ver debajo.
 
-La informaci@'on extraida es mostrada en un @emph{buffer de agenda}
-especial. Este buffer es de solo lectura, pero proporciona comandos
+La informaci@'on extraida es mostrada en un @emph{b@'uffer de agenda}
+especial. Este b@'uffer es de solo lectura, pero proporciona comandos
 para visitar las localizaciones correspondientes en los ficheros Org
 originales, e incluso para editar estos ficheros remotamente. La
-edici@'on remota desde los buffer de agenda significa, por ejemplo,
-que tu puedes cambiar las fechas de entrega y citas desde el buffer de
-agenda. Los comandos disponibles en el buffer de Ageda son listados en
+edici@'on remota desde los b@'uffer de agenda significa, por ejemplo,
+que tu puedes cambiar las fechas de entrega y citas desde el b@'uffer de
+agenda. Los comandos disponibles en el b@'uffer de Agenda son listados en
 @ref{Comandos de la agenda}.
 
 @menu
@@ -1930,17 +1949,18 @@ fichero despu@'es del otro.
 Las vistas son creadas a trav@'es de un disparador, que debería ser
 emparejado a una tecla global --- por ejemplo @kbd{C-c a}
 (@pxref{Instalaci@'on}). Despu@'es de presionar @kbd{C-c a}, una carta
-adicional se necesita ejecutar una comando:
+adicional se necesita ejecutar un comando:
 @table @kbd
 @item a
 La agenda como calendario (@pxref{Agenda semanal/diaria}).
 @item t @r{/} T
-Una lista de todos los items TODO (@pxref{Lista global TODO}).
+Una lista de todos los @'{@dotless{i}}tems TODO (@pxref{Lista global
+TODO}).
 @item m @r{/} M
 Una lista de titulares coincidentes con la expresi'on TAGS
 (@pxref{Emparejar marcas y propiedades}).
 @item L
-La vista de la l@'{@dotless{i}}nea de tiempo para el buffer actual
+La vista de la l@'{@dotless{i}}nea de tiempo para el b@'uffer actual
 @pxref{L@'{@dotless{i}}nea de tiempo}).
 @item s
 Una lista de entradas seleccionadas por una expresi@'on boleana de
@@ -1992,7 +2012,8 @@ a@~nos
 
 Org puede interactuar con la funcionalidad de notificaciones de citas
 de Emacs. Para a@~nadir todas la citas de tus ficheros de agenda, usa
-el comando @code{org-agenda-to-appt}. Ver el docstring para detalles.
+el comando @code{org-agenda-to-appt}. Ver la documentaci@'on para
+detalles.
 
 @node Lista global TODO, Emparejar marcas y propiedades, Agenda semanal/diaria, Vistas de agenda internas
 @subsection La lista global TODO
@@ -2042,8 +2063,8 @@ Como @kbd{C-c a m}, pero solo selecciona cabeceras que son tambi@'en
 @subsubheading Emparejar sintaxis
 
 Una cadena de b@'usqueda puede usar operadores booleanos @samp{&} para
-AND y @samp{|} para OR. @samp{&} liga con m@'as fuerte que
-@samp{|}. Par@'entesis est@'an actualmente no implementados. Cada
+AND y @samp{|} para OR. @samp{&} es m@'as fuerte que
+@samp{|}. Los par@'entesis est@'an actualmente no implementados. Cada
 elemento en la b@'usqueda es una etiqueta, o una expresi@'on regular
 como @code{PROPIEDAD OPERADOR VALOR} con un operador de comparaci@'on,
 accediendo un valor de propiedad. Cada elemento puede ser precedido
@@ -2051,19 +2072,19 @@ por @samp{-}, para seleccionar contra ello, y @samp{+} es sint@'actico
 puede ser precedido por @samp{-}, para seleccionarlo, y @samp{+} es
 az@'ucar sint@'actico para selecci@'on positiva. El operador AND
 @samp{&} es opcional cuando @samp{+} o @samp{-} est@'a
-presente. Aqu@'{@dotless{i}} est@'an algunos ejemplos, usando solo
+presente. Aqu@'{@dotless{i}} hay algunos ejemplos, usando solo
 etiquetas.
 
 @table @samp
 @item +work-boss
-Selecciona las l@'{@dotless{i}}neas de cabeza etiquetadas como
+Selecciona las l@'{@dotless{i}}neas de cabecera etiquetadas como
 @samp{:trabajo:}, pero descarta estas tambi@'en etiquetadas como
 @samp{:jefe:}.
 @item trabajo|port@'atil
 Selecciona l@'{@dotless{i}}neas etiquetadas como @samp{:trabajo:} o
 @samp{:port@'atil}.
 @item trabajo|escritorio+noche
-Como antes, pero requiere las l@'{@dotless{i}}neas @samp{:portátil:}
+Como antes, pero requiere las l@'{@dotless{i}}neas @samp{:port@'atil:}
 para ser etiquetado tambi@'en como @samp{:noche:}.
 @end table
 
@@ -2172,9 +2193,9 @@ son mostradas en la agenda, como son entradas han sido organizadas en
 este d@'{@dotless{i}}a. Cuando se llamo con un prefijo @kbd{C-u},
 muestra todas las posibles entradas logbook, incluyendo cambios estado.
 @item r @r{o} g
-Recrear el buffer de agenda, para reflejar los cambios.
+Recrear el b@'uffer de agenda, para reflejar los cambios.
 @item s
-Salva todos los buffers Org en la sesi@'on Emacs actual, y tambi@'en
+Salva todos los b@'uffers Org en la sesi@'on Emacs actual, y tambi@'en
 las localizaciones de IDs.
 
 @tsubheading{Filtro secundario y buscar la edici@'on}
@@ -2226,10 +2247,10 @@ por un d@'{@dotless{i}}a.
 @c
 Empieza el cron@'ometro en el @'{@dotless{i}}tem actual.
 @item O / X
-Para/cancela el reloj previamente iniciada.
+Para/cancela el reloj previamente iniciado.
 
 @item J
-Salta al reloj en ejecuci@'on en otra ventana.
+Salta al reloj en ejecuci@'on a otra ventana.
 @end table
 
 @node Vistas de agenda personalizadas, , Comandos de la agenda, Vistas de la Agenda
@@ -2255,7 +2276,7 @@ siguiente ejemplo contiene todos los tipos de b@'usqueda v@'alida:
 @end smalllisp
 
 @noindent
-La cadena inicial en cada entrada define las claves que tu tienes para
+La cadena inicial en cada entrada define las claves que se tienen para
 presionar despu@'es el comando disparador @kbd{C-c a} en orden para
 acceder el comando. Usualmente esto ser@'a solo un car@'acter. El
 segundo par@'ametro es el tipo de b@'usqueda, seguida por la cadena o
@@ -2284,15 +2305,15 @@ agenda}@*
 @uref{http://www.newartisans.com/2007/08/using-org-mode-as-a-day-planner.html,
 Configuraci@'on de John Wiegley}}
 
-@node Marcado, Exportando, Vistas de la Agenda, Top
+@node Marcado, Exportando, Vistas de la Agenda, Arriba
 @chapter Marcas para enriquecer la exportaci@'on
 
-Cuando la exportaci@'on documentos Org-mode, el exportador intenta
-reflejar la estructura del documento tan precisamente como sea posible
-en el backend. Desde exportar a formatos como HTML, @LaTeX{}, o DocBook
-permite muchos formatos enriquecidos, Org mode tiene reglas en c@'omo
-preparar texto para exportar riqueza. Esta secci@'on resume las reglas
-de marcado usados en un buffer Org-mode.
+Cuando se exportan documentos en Org-mode, el exportador intenta
+reflejar la estructura del documento de manera tan precisa como sea
+posible en el backend. Exportar a formatos como HTML, @LaTeX{}, o
+DocBook permite enriquecer el formatos, Org mode tiene reglas de
+c@'omo preparar texto para la exportaci@'on enriquecida. Esta
+secci@'on resume las reglas de marcado usados en un b@'uffer Org-mode.
 
 @menu
 * Elementos del marcado estructural::  Estructura vista por el exportador
@@ -2320,7 +2341,7 @@ de marcado usados en un buffer Org-mode.
 @subheading T@'{@dotless{i}}tulo de documento
 
 @noindent
-El t@'{@dotless{i}}tutlo del documento exportado es tomado desde la
+El t@'{@dotless{i}}tulo del documento exportado es tomado desde la
 l@'{@dotless{i}}nea especial
 
 @smallexample
@@ -2376,7 +2397,7 @@ tambi@'en ser usado para poes@'{@dotless{i}}a de formato.
 #+END_VERSE
 @end smallexample
 
-Cuando cita un pasaje desde otro documento, ello es un libro de usos y
+Cuando se cita un pasaje desde otro documento, es un libro de usos y
 costumbres para formatear esto como un p@'arrafo que se pretende en
 ambos la izquierda y el margen derecho. Se puede incluir citas en
 documentos Org-mode como este:
@@ -2388,7 +2409,8 @@ pero no cualquiera -- Albert Einstein
 #+END_QUOTE
 @end smallexample
 
-Si te gustar@'{@dotless{i}}a centrar alg@'un texto, hacerlo como esto:
+Si se quisiera centrar alg@'un texto, se puede hacer
+as@'{@dotless{i}}:
 @smallexample
 #+BEGIN_CENTER
 Cada cosa deber@'{@dotless{i}}a hecha tan simple como posible \\
@@ -2410,12 +2432,17 @@ l@'{@dotless{i}}nea que consista de solo dashes, y al menos 5 de ellos.
 @node L@'{@dotless{i}}neas de comentarios, , @'Enfasis y monoespacio, Elementos del marcado estructural
 @subheading L@'{@dotless{i}}neas de comentarios
 
-Las l@'{@dotless{i}}neas empezando cero o m@'as car@'acteres de
-espacios en blanco seguidos por @samp{#} son tratados como comentarios
-y nunca ser@'an exportados. Tampoco se exportar@'an sub@'arboles
-enteros empezando con la palabra @samp{COMMENT}. Finalmente,
-regiones alrededor por @samp{#+BEGIN_COMMENT} ... @samp{#+END_COMMENT}
-no ser@'an exportadas.
+Las l@'{@dotless{i}}neas empezando con cero o m@'as car@'acteres de
+espacios en blanco seguidos por @samp{#} y un espacio en blanco son
+tratadas como comentarios y, como tales, no se exportan.
+
+Tambi@'en, regiones rodeadas por @samp{#+BEGIN_COMMENT}
+... @samp{#+END_COMMENT} no se exportan.
+
+Finalmente, una palabra clave @samp{COMMENT} al principio de una
+entrada, pero despu@'es de cualquier otra palabra clave o prioridad,
+los comentarios est@'an fuera del sub@'arbol entero. El comando de
+debajo ayuda cambiando el estado del comentario de una cabecera.
 
 @table @kbd
 @item C-c ;
@@ -2508,12 +2535,17 @@ podr@'{@dotless{i}}a usar:
 #+INCLUDE: "~/.emacs" src emacs-lisp
 @end smallexample
 @noindent
-El segundo opcional y tercer par@'ametro son la marca (e.g.@:
-@samp{cita}, @samp{ejemplo}, o @samp{fuente}), y, si la marca es
-@samp{fuente}, el lenguaje para el formatear los contenidos. La marca
-es opcional, si no est@'a dado, el texto ser@'a asumido para estar en
-el formato de Org mode y ser@'a procesado normalmente. @kbd{C-c '}
-visitar@'a el fichero incluido.
+Los par@'ametros opcionales segundo y tercero son la marca (e.g.@:
+@samp{ejemplo}, o @samp{fuente}), y, si la marca es @samp{fuente}, el
+lenguaje formatea los contenidos. La marca es opcional, si no es dada,
+el texto se asume para estar en el formato de Org mode y ser@'a
+procesado normalmente. Los enlaces de fichero ser@'an interpretados
+as@'{@dotless{i}}:
+@smallexample
+#+INCLUDE: "./otherfile.org::#my_custom_id" :only-contents t
+@end smallexample
+@noindent
+@kbd{C-c '} visitar@'a el fichero incluido.
 
 @node @LaTeX{} embebido, , Archivos Include, Marcado
 @section @LaTeX{} embebido
@@ -2533,7 +2565,7 @@ soluci@'on debe ser $a=+\sqrt@{2@}$ o $a=-\sqrt@{2@}$.\begin@{equation@}
 x=\sqrt@{b@}
 \end@{equation@}
 @end smallexample
-@noindent With
+@noindent
 Con @uref{http://orgmode.org/manual/LaTeX-fragments.html#LaTeX-fragments,
 configuraci@'on especial}, trozos de @LaTeX{} ser@'an incluidos como
 im@'agenes cuando se exporta a HTML.
@@ -2541,7 +2573,7 @@ im@'agenes cuando se exporta a HTML.
 @seealso{ @uref{http://orgmode.org/manual/Markup.html#Markup,
 Cap@'{@dotless{i}}tulo 11 del manual}}
 
-@node Exportando, Publicaci@'on, Marcado, Top
+@node Exportando, Publicaci@'on, Marcado, Arriba
 @chapter Exportando
 
 Los documentos Org-mode pueden exportarse a una variedad de otros
@@ -2565,25 +2597,25 @@ planificaci@'on puede ser incorporada a calendarios de escritorio.
 @section Opciones de exportaci@'on
 
 El exportador reconoce l@'{@dotless{i}}neas especiales en el b@'uffer
-que proporciona informaci@'on adicional. Estas l@'{@dotless{i}}neas
+que proporcionan informaci@'on adicional. Estas l@'{@dotless{i}}neas
 pueden ser puestas en cualquier lugar en el fichero. El conjunto
 completo de l@'{@dotless{i}}neas que pueden ser insertadas dentro del
-b@'uffer con @kbd{C-c C-e t}.
+b@'uffer con @kbd{C-c C-e #}.
 
 @table @kbd
-@item C-c C-e t
+@item C-c C-e #
 Inserta plantilla con opciones de exportaciones, ver ejemplo de debajo.
 @end table
 
 @smallexample
-#+TITLE:       el t@'{@dotless{i}}tulo que ser@'a mostrado (por defecto es el nombre del b@'uffer)
+#+TITLE:       el t@'{@dotless{i}}tulo que ser@'a mostrado
 #+AUTHOR:      el autor (por defecto tomado desde @code{user-full-name})
-#+DATE:        una fecha, fija, de una cadena de formato para @code{format-time-string}
-#+EMAIL:       su direcci@'on de correo (por defecto @code{user-mail-address})
+#+DATE:        una fecha, fija, o una marca de tiempo Org
+#+EMAIL:       su direcci@'on de correo (por defecto desde @code{user-mail-address})
 #+DESCRIPTION: la descripci@'on de la p@'agina e.g.@: para la meta etiqueta XHTML
-#+KEYWORDS:    la p@'agina keywords, e.g.@: para la meta etiqueta XHTML
-#+LANGUAGE:    lenguaje para HTML, por ej.@: @samp{en} (@code{org-export-default-language})
-#+OPTIONS:     H:2 num:t toc:t \n:nil @@:t ::t |:t ^:t f:t TeX:t ...
+#+KEYWORDS:    la p@'agina de palabras clave (@samp{keywords}), e.g.@: para la meta etiqueta XHTML
+#+LANGUAGE:    lenguaje, por ej.@: @samp{en} (@code{org-export-default-language})
+#+OPTIONS:     H:2 num:t toc:t \n:nil @@:t ::t |:t ^:t f:t teX:t ...
 @end smallexample
 
 @node El dispensador de exportaci@'on, Exportaci@'on ASCII/Latin-1/UTF-8, Opciones de exportaci@'on, Exportando
@@ -2627,16 +2659,17 @@ Exportar como un fichero HTML @file{myfile.html}.
 Exportar como fichero HTML e inmediatamente lo abre con un navegador.
 @end table
 
-Para insertar HTML que deber@'{@dotless{i}}a ser copia lateral para el
-fichero exportado usa otro
+Para insertar HTML que debe ser copiado literalmente para el fichero
+exportado usa otro
 
 @smallexample
 #+HTML: C@'odigo Literal HTML para exportar
 @end smallexample
-@noindent or
+@noindent
+o
 @smallexample
 #+BEGIN_HTML
-Todas las l@'{@dotless{i}}neas entre estos marchadores son exportados
+Todas las l@'{@dotless{i}}neas entre estos marcadores son exportados
 literalmente
 #+END_HTML
 @end smallexample
@@ -2654,7 +2687,7 @@ Exportando a @LaTeX{} y procesando a PDF, entonces se abre el fichero PDF
 resultante.
 @end table
 
-Por defecto, la salida @LaTeX{}] usa la clase @code{article}. Se puede
+Por defecto, la salida @LaTeX{} usa la clase @code{article}. Se puede
 cambiar esto para a@~nadir una opci@'on como @code{#+LaTeX_CLASS:
 myclass} en su fichero. La clase debe ser listada en
 @code{org-export-latex-classes}.
@@ -2686,7 +2719,7 @@ Tutorial de exportaci@'on de LaTeX de Thomas Dye}
 @uref{http://orgmode.org/worg/org-tutorials/org-beamer/tutorial.php,
 Tutorial de presentaciones de BEAMER de Eric Fraga}}
 
-@node Publicaci@'on, Trabajando con C@'odigo Fuente, Exportando, Top
+@node Publicaci@'on, Trabajando con C@'odigo Fuente, Exportando, Arriba
 @chapter Publicaci@'on
 
 Org incluye un sistema de gesti@'on de publicaci@'on que permite
@@ -2736,7 +2769,7 @@ Tutorial de publicaci@'on de Sebastian Rose}@*
 @uref{http://orgmode.org/worg/org-tutorials/org-jekyll.php,
 Configuraci@'on de Jekyll de Ian Barton}}
 
-@node Trabajando con C@'odigo Fuente, Miscel@'anea, Publicaci@'on, Top
+@node Trabajando con C@'odigo Fuente, Miscel@'anea, Publicaci@'on, Arriba
 @chapter Trabajando con c@'odigo fuente
 Org-mode proporciona un n@'umero de funcionalidades para trabajar con
 c@'odigo fuente, incluyendo editando de bloques c@'odigo en sus modo
@@ -2765,16 +2798,16 @@ comportamiento de bloques de c@'odigo como se demuesta debajo, y el
 
 @subheading Editando c@'odigo fuente
 Usa @kbd{C-c '} para editar el actual bloque de c@'odigo. Esto trae un
-lenguaje en modo mayor edita el buffer conteniendo el cuerpo del
-bloque de c@'odigo. Salvando este buffer escribir@'a los nuevos
-contenidos atr@'as al buffer de Org. Usa @kbd{C-c '} atr@'as para
-salir del buffer de edici@'on.
+lenguaje en modo mayor que edita el b@'uffer conteniendo el cuerpo del
+bloque de c@'odigo. Salvando este b@'uffer escribir@'a los nuevos
+contenidos atr@'as al b@'uffer de Org. Usa @kbd{C-c '} atr@'as para
+salir del b@'uffer de edici@'on.
 
 @subheading Evaluando c@'odigos de bloques
 Usa @kbd{C-c C-c} para evaluar el actual bloque c@'odigo e inserta sus
-resultados en el b@'uffer Org-mode. Por defecto, la evaluaci@'on solo
-cambia para bloques de c@'odigo @code{emacs-lisp}, sin embargo, el
-soporte existe para evaluar bloques en muchos lenguajes. Para una
+resultados en el b@'uffer de Org-mode. Por defecto, la evaluaci@'on
+solo cambia para bloques de c@'odigo @code{emacs-lisp}, sin embargo,
+el soporte existe para evaluar bloques en muchos lenguajes. Para una
 lista completa de lenguajes ver el manual. Lo siguiente muestra un
 bloque de c@'odigo y sus resultados.
 
@@ -2870,7 +2903,7 @@ Cap@'{@dotless{i}}tulo 11.3 del manual}@*
 @uref{http://orgmode.org/worg/org-contrib/babel/index.php, El sitio
 Babel en Worg}}
 
-@node Miscel@'anea, Licencia de Documentaci@'on Libre de GNU, Trabajando con C@'odigo Fuente, Top
+@node Miscel@'anea, GNU Free Documentation License, Trabajando con C@'odigo Fuente, Arriba
 @chapter Miscel@'anea
 
 @menu
@@ -2957,9 +2990,9 @@ Cap@'{@dotless{i}}tulo 15 del manual}@*
 del manual}@* @uref{http://orgmode.org/orgcard.pdf,tarjeta de referencia}}
 
 
-@c @node GNU Free Documentation License,  , Miscellaneous, Top
-@c @appendix GNU Free Documentation License
-@c @include doclicense.texi
+@node GNU Free Documentation License, , Miscel@'anea, Arriba
+@appendix GNU Free Documentation License
+@include doclicense.texi
 
 
 @bye
