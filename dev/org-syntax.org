@@ -630,18 +630,28 @@ Unless specified otherwise, case is not significant.
    A LaTeX fragment can follow multiple patterns:
 
    #+BEGIN_EXAMPLE
-   \NAME POST
+   \NAME BRACKETS
    \(CONTENTS\)
    \[CONTENTS\]
    $$CONTENTS$$
    PRE$CHAR$POST
-   PRE$BORDER1 BODY BORDER2$
+   PRE$BORDER1 BODY BORDER2$POST
    #+END_EXAMPLE
 
    NAME contains alphabetical characters only and must not have an
    association in either ~org-entities~ or ~org-entities-user~.
 
-   POST is the same as for entities.
+   BRACKETS is optional, and is not separated from NAME with white
+   spaces.  It may contain any number of the following patterns:
+
+   #+BEGIN_EXAMPLE
+   [CONTENTS1]
+   {CONTENTS2}
+   #+END_EXAMPLE
+
+   where CONTENTS1 can contain any characters excepted "{" "}", "["
+   "]" and newline and CONTENTS2 can contain any character excepted
+   "{", "}" and newline.
 
    CONTENTS can contain any character but cannot contain "\)" in the
    second template or "\]" in the third one.
@@ -652,8 +662,8 @@ Unless specified otherwise, case is not significant.
    CHAR is a non-whitespace character different from ~.~, ~,~, ~?~,
    ~;~, ~'~ or a double quote.
 
-   POST is any of ~-~, ~.~, ~,~, ~?~, ~;~, ~:~, ~'~, a double quote,
-   a whitespace character and the end of line.
+   POST is any punctuation (including parentheses and quotes) or space
+   character, or the end of line.
 
    BORDER1 is a non-whitespace character different from ~.~, ~;~, ~.~
    and ~$~.
