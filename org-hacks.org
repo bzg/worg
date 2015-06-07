@@ -2255,6 +2255,19 @@ There are different strategies to accomplish this:
    will also fail to update section numbers.  It should be fairly
    simple to also make it work with HTML.
 
+*NOTE: another way to accomplish this behavior is to use the [[http://orgmode.org/cgit.cgi/org-mode.git/plain/contrib/lisp/ox-extra.el][=ox-extra.el=]] package:*
+To use this, add the following to your =.elisp= file:
+
+#+begin_src emacs-lisp
+    (add-to-list 'load-path "path/to/contrib/lisp")
+    (require 'ox-extra)
+    (ox-extras-activate '(ignore-headlines))
+#+end_src
+
+After this is added, then any headlines having an =:ignore:= tag will
+be omitted from the export, but their contents will be included in the
+export.
+
 *** Export Org to Org and handle includes.
 #+index: Export!handle includes
 N.B: this does not apply to the "new" export engine (>= 8.0) - the function
