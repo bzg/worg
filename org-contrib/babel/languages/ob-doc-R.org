@@ -133,8 +133,49 @@ Currently, the following extensions are recognized: =.png=, =.jpg=,
 =.jpeg=, =.tiff=, =.bmp=, =.pdf=, =.ps=, =.postscript=, =.tex=, and
 =.svg=.  If the extension of the file name passed to =:file= is not
 recognized, PNG format output is created by default.
-    
-For further clarification of =:file= and =:results=, see [[http://thread.gmane.org/gmane.emacs.orgmode/35396/focus=35766][this thread]].
+
+If the source code block uses grid-based R graphics, e.g., the lattice
+and ggplot2 packages, then care must be taken either to print() the
+graphics object, specify =:results output=, or run the code in a
+=:session=.  This is because the graphics functions from lattice and
+ggplot2 return objects that must be explicitly printed to see them,
+using the print function.  This happens automatically when run
+interactively, e.g., =:session=, but when called inside another
+function, it does not.  The way =:results value= is defined to
+operate, device and ggplot2 function calls are wrapped in a =main=
+function, and unless the object is specifically printed, no output is
+produced.
+
+Some years ago, Erik Iverson summarized the different ways of getting
+this working.[fn:1]  His summary, updated to reflect a change in Org
+Babel syntax [fn:2], follows:
+
+: * does /not/ produce a file
+: #+begin_src R :file 1.png :results value graphics
+: library(lattice)
+: xyplot(1:10 ~ 1:10)
+: #+end_src
+
+: * does produce a file, by printing object
+: #+begin_src R :file 2.png :results value graphics
+: library(lattice)
+: print(xyplot(1:10 ~ 1:10))
+: #+end_src
+
+: * does produce a file, by using :results output
+: #+begin_src R :file 3.png :results output graphics
+: library(lattice)
+: xyplot(1:10 ~ 1:10)
+: #+end_src
+
+: * does produce a file, by evaluating in :session
+: #+begin_src R :file 4.png :session :results graphics
+: library(lattice)
+: xyplot(1:10 ~ 1:10)
+: #+end_src
+
+
+# For further clarification of =:file= and =:results=, see [[http://thread.gmane.org/gmane.emacs.orgmode/35396/focus=35766][this thread]].
 
 There are many R-specific header arguments used to configure R graphics
 devices.  They include:
@@ -439,3 +480,8 @@ included correctly in LaTex-based export targets.
  view and place point at the prompt. ESS binds this to =C-c C-z= and
  =C-M-r= by default.
 
+* Footnotes
+
+[fn:2][[http://thread.gmane.org/gmane.emacs.orgmode/35396/focus=35766][{babel} R: New handling of file output]] 
+
+[fn:1][[http://article.gmane.org/gmane.emacs.orgmode/26082][babel grid based R graphical output with :results value]] 
