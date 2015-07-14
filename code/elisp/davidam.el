@@ -174,16 +174,23 @@
       (setq total (+ total (1+ number))))
     (message "Number of pebbles: %d" total)))
 
-;;; Template
+;;; Skeleton Template
 
-(define-skeleton davidam-create-skeleton
+(define-skeleton davidam-skeleton-create
   "Insert a skeleton statement."
   ""
   '(setq str (skeleton-read "Skeleton Name? "))
   > "(define-skeleton " str \n
-  > "\"Insert a " str "statement.\"" \n
-  > "" \n
-  _
-  > ")"
+  > "\"Insert a " str " statement.\"" \n
+  > "\"\"" \n
+  > _ \n
+  > "> \"" str "();\"" \n
+  > -2 ")"
 )
 
+(define-skeleton davidam-skeleton-add-setq
+  "Add setq when I'm adding skeletons"
+  ""
+  '(setq var (skeleton-read "var: "))
+  > "'(setq " var " (skeleton-read \"" var ": \"))"
+)
