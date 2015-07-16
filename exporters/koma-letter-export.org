@@ -92,23 +92,26 @@ Printed below is a minimal Org file that can be exported as a
 KOMA-Script letter. In this file, press =C-c C-e= to bring up the
 exporter dispatcher and then press =k o= to export the Org file to a
 PDF file. For your convenience, you can [[http://orgmode.org/worg/sources/exporters/koma-letter-new-example.org][download the KOMA letter
-example]] and you can also [[http://orgmode.org/w/?p%3Dworg.git%3Ba%3Dblob_plain%3Bf%3Dimages/ox-koma-letter/koma-letter-new-example.pdf][download the example PDF letter]].
+example]] and you can also [[http://orgmode.org/worg/sources/exporters/koma-letter-new-example.pdf][download the example PDF letter]].
 
 #+INCLUDE: koma-letter-new-example.org src org
 
 Since no =LaTeX_CLASS= has been specified the default class will be
 used.  The first block of lines specify title, subject and date.
-=CLOSING= and =PLACE= specify the closing sentence and the place from
-which the letter is send.
+=PLACE= specify the closing sentence and the place from which the
+letter is send.
 
 The address of the receiver is specified in the [[#special-headings][special heading]]  with
 the =:to:= tag.  Note that the headline text is arbitrary and ignored.
 
 The main letter is the first non-special heading[fn:1].  Notice that
 the text of this headline also serves as the opening of the letter.
+The closing of the letter is set via the closing special heading.
+Note that closing statement is the headline title and the signature is
+the content.
 
 Finally, the 'backmatter' printed after the signature are defined in
-the tree [[#special-headings][special heading]] with the tags =ps=, =cc= and =encl=.  With
+the tree special heading with the tags =ps=, =cc= and =encl=.  With
 the =OPTION= =after-closing-order= we can reorder the ordering of the
 'backmatter'.  The content of the =after_letter= heading is inserted
 after =\end{letter}=.  This is useful executing arbitrary latex
@@ -208,7 +211,6 @@ closing line and the location.
 #+END_SRC
 
 A [[#settings][list of KOMA letter metadata settings]] is provided below.
-
 
 *** DONE Setting letter metadata in LCO files
 
@@ -361,14 +363,15 @@ variables =org-koma-letter-special-tags-in-letter=,
 =org-koma-letter-special-tags-after-letter=.  Currently the following
 special headings are recognized.
 
-| Tag            | KOMA-Script          | Description                                     |
-|----------------+----------------------+-------------------------------------------------|
-| =to=           | =\begin{letter}{to}= | To-address. Alternative to =#+TO_ADDRESS:=.     |
-| =from=         | =fromaddress=        | From-address.  Alternative to =+FROM_ADDRESS:=. |
-| =ps=           | =\ps{}=              | Wrap content in a =ps=-macro.                   |
-| =cc=           | =\cc{}=              | Wrap content in a =cc=-macro.                   |
-| =encl=         | =\encl{}=            | Wrap content in a =encl= macro.                 |
-| =after_letter= |                      | Content is inserted after =\end{letter}=.       |
+| Tag            | KOMA-Script               | Description                                                                   |
+|----------------+---------------------------+-------------------------------------------------------------------------------|
+| =to=           | =\begin{letter}{to}=      | To-address. Alternative to =#+TO_ADDRESS:=.                                   |
+| =from=         | =fromaddress=             | From-address.  Alternative to =+FROM_ADDRESS:=.                               |
+| =closing=      | =closing= and =signature= | headings title and signature.  Alternative to =#+CLOSING:= and =#+SIGNATURE:= |
+| =ps=           | =\ps{}=                   | Wrap content in a =ps=-macro.                                                 |
+| =cc=           | =\cc{}=                   | Wrap content in a =cc=-macro.                                                 |
+| =encl=         | =\encl{}=                 | Wrap content in a =encl= macro.                                               |
+| =after_letter= |                           | Content is inserted after =\end{letter}=.                                     |
 
 
 
@@ -380,10 +383,9 @@ recognized tag.  These headings are treated specially.
 [fn:2] If the letter is exported below an Org headline, the default
 subject contains the Org headline text.
 
-[fn:3] The options lines =#+FROM_ADDRESS:= and =#+TO_ADDRESS:= can be
-used multiple times and may also be specified using headlines cf. the
-[[*A simple letter example][example]] above.
-
+[fn:3] The options lines =#+FROM_ADDRESS:=, =#+TO_ADDRESS:=, can be
+used multiple times and may also be specified using headlines cf. the [[*A simple letter
+ example][example]] above.
 
 [fn:5] The options lines =#+OPENING:= and =#+CLOSING:= cannot be set
 in an LCO file.
