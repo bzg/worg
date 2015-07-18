@@ -179,12 +179,36 @@
 (define-skeleton davidam-skeleton-create
   "Insert a skeleton statement."
   ""
-  '(setq str (skeleton-read "Skeleton Name? "))
+  '(setq str (skeleton-read "Function Name? "))
   > "(define-skeleton " str \n
   > "\"Insert a " str " statement.\"" \n
   > "\"\"" \n
   > _ \n
-  > "> \"" str "();\"" \n
+  > "> \"" str "();\" \\n" \n
+  > -2 ")"
+)
+
+(define-skeleton davidam-skeleton-create-drupal
+  "Insert a skeleton statement."
+  ""
+  '(setq str (skeleton-read "Function Name? "))
+  > "(define-skeleton drupal-" str \n
+  > "\"Insert a " str " statement.\"" \n
+  > "\"\"" \n
+  > _ \n
+  > "> \"" str "();\" \\n" \n
+  > -2 ")"
+)
+
+(define-skeleton davidam-skeleton-create-php
+  "Insert a skeleton statement."
+  ""
+  '(setq str (skeleton-read "Function Name? "))
+  > "(define-skeleton php-" str \n
+  > "\"Insert a " str " statement.\"" \n
+  > "\"\"" \n
+  > _ \n
+  > "> \"" str "();\" \\n" \n
   > -2 ")"
 )
 
