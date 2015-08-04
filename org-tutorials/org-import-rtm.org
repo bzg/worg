@@ -49,11 +49,18 @@ and modify them to fit your needs (you need to add your RTM-atom feed url at lea
               ((string= (xml-get-attribute item 'class) "rtm_due")
                (setq entry (plist-put entry :due (car (xml-node-children valuesub))))
                (setq mydate (car (xml-node-children valuesub)))
+	       ;; Any time will be stripped
+	       ;; Entries will be only schedued to a date
                (if (string= mydate "never")
                    nil
+		   ;; entries could be scheduled to a date "Tue 4 Aug 15" 
+		   ;; or to a date/time "Tue 4 Aug 15 at 10:00AM"
+		   (if (string-match "^\\([a-zA-Z]*\\) \\([0-9]*\\) \\([a-zA-Z]*\\) \\([0-9]*\\) at \\([0-9:]*\\)" mydate)
+		       (setq mydate (concat "20" (match-string 4 mydate) " " (match-string 3 mydate) " " (match-string 2 mydate) " " (match-string 5 mydate) ":01"))
+		     (progn
+		       (string-match "^\\([a-zA-Z]*\\) \\([0-9]*\\) \\([a-zA-Z]*\\) \\([0-9]*\\)$" mydate)
+		       (setq mydate (concat "20" (match-string 4 mydate) " " (match-string 3 mydate) " " (match-string 2 mydate) " 00:00:01"))))
                  (progn
-                  (string-match "^\\([a-zA-Z]*\\) \\([0-9]*\\) \\([a-zA-Z]*\\) \\([0-9]*\\)$" mydate)
-                  (setq mydate (concat "20" (match-string 4 mydate) " " (match-string 3 mydate) " " (match-string 2 mydate) " 00:00:01"))
                   (setq mydate (parse-time-string mydate))
                   (setq mydate (apply #'encode-time mydate))
                   (setq mydate (format-time-string (car org-time-stamp-formats) mydate))
