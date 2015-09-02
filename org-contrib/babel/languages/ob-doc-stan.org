@@ -1,0 +1,299 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Stan Source Code Blocks in Org Mode
+#+AUTHOR:     Kyle Meyer
+#+EMAIL:      kyle[at]kyleam[dot]com
+#+LANGUAGE:   en
+#+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="http://mc-stan.org/">Stan</a>
+  </p>
+  <p>
+  <a href="http://mc-stan.org/">
+  <img src="http://mc-stan.org/images/stan_logo.png"/>
+  </a>
+  </p>
+  </div>
+#+end_html
+
+* Template Checklist [11/12] 					   :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result%20Types][Result Types]]
+  - [ ] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+
+* Introduction
+
+Stan is a language used to write models for Bayesian inference.  After
+specifying the model, a number of interfaces are available to run it.
+All of these interfaces have Babel support, making it easy to feed
+them the result of the Stan block.
+
+* Requirements and Setup
+
+ob-stan.el is currently available in the developmental version of Org.
+(Version 8.3.1 is the last Org release at the time of writing.)
+
+In addition the following components must be installed:
+
+- At least one Stan interface
+
+  Each Stan interface has specific installation instructions available
+  from Stan's [[http://mc-stan.org/interfaces/][interfaces page]].
+
+- [[https://github.com/stan-dev/stan-mode][Stan mode]], which provides Emacs support for Stan and is available on
+  [[http://melpa.org/#/stan-mode][MELPA]]
+
+Activate evaluation of Stan source code blocks by adding ~stan~ to
+~org-babel-load-languages~.  (The snippet below will usually contain
+items for several other languages, including the interface that you
+plan to use to drive Stan.)
+
+#+begin_src emacs-lisp
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((stan . t)))
+#+end_src
+
+* Org Mode Features for Stan Source Code Blocks
+** Header Arguments
+   - file :: An output file must be specified to evaluate Stan code
+	for use as input to other interfaces.  If
+	~org-babel-stan-cmdstan-directory~ is non-nil and the file
+	name does not have a ".stan" extension, write the contents to
+	an intermediate file and compile the model to the named file
+	(for use from the command line).  Otherwise, dump the block
+	content to the specified file name (to be used as input to all
+	other interfaces).
+
+** Sessions
+
+Stan does not support sessions.
+
+** Result Types
+
+Stan source code blocks return a link to a file, which can be used as
+a variable in other blocks to supply the file name to a Stan sampling
+call.
+
+* Examples of Use
+
+Stan blocks allow you to edit the model in Stan mode while keeping the
+Stan code in the Org file rather than in a separate file.  The details
+of how to sample with the model will depend on the interface, but the
+main idea is the same for all interfaces except for CmdStan.  Most
+Stan interfaces accept the model either as a string (in the language
+of the interface) or a file name of a ".stan" file that contains the
+model.  For CmdStan, on the other hand, a ".stan" file is compiled
+into an executable that can be run from the command line.  In this
+case, the Stan block is dumped to an intermediate file that is
+compiled to the model program using the Makefile provided by CmdStan.
+
+The first example below demonstrates how to use a Stan block in the R
+interface to Stan, and the second example uses the same model with the
+CmdStan interface.
+
+** Sampling with RStan interface
+
+The Stan block below specifies a simple model that when executed will
+be written to ~:file~, which can be used to refer to it downstream.
+
+: #+name: model-stan
+: #+begin_src stan :file model.stan
+:   data {
+:     int<lower=1> N;
+:     vector[N] x;
+:   }
+:
+:   parameters {
+:     real mu;
+:     real<lower=0> sigma;
+:   }
+:
+:   model {
+:     x ~ normal(mu, sigma);
+:   }
+: #+end_src
+:
+: #+RESULTS: model-stan
+: file:model.stan
+
+Generate some data that will be used as input to the model.
+
+: #+begin_src R :session *R* :result silent
+:   set.seed(33)
+:
+:   N <- 50
+:   x <- rnorm(N, 20, 3)
+: #+end_src
+
+Load RStan, and provide the model file name and data as arguments to
+the sampling function call.
+
+: #+begin_src R :session *R* :var model=model-stan :results output
+:   library(rstan)
+:
+:   fit <- stan(file=model, data=list(N=N, x=x), chains=1)
+: #+end_src
+:
+: #+RESULTS:
+: #+begin_example
+: COMPILING THE C++ CODE FOR MODEL 'model' NOW.
+:
+: SAMPLING FOR MODEL 'model' NOW (CHAIN 1).
+:
+: Chain 1, Iteration:    1 / 2000 [  0%]  (Warmup)
+: Chain 1, Iteration:  200 / 2000 [ 10%]  (Warmup)
+: Chain 1, Iteration:  400 / 2000 [ 20%]  (Warmup)
+: Chain 1, Iteration:  600 / 2000 [ 30%]  (Warmup)
+: Chain 1, Iteration:  800 / 2000 [ 40%]  (Warmup)
+: Chain 1, Iteration: 1000 / 2000 [ 50%]  (Warmup)
+: Chain 1, Iteration: 1001 / 2000 [ 50%]  (Sampling)
+: Chain 1, Iteration: 1200 / 2000 [ 60%]  (Sampling)
+: Chain 1, Iteration: 1400 / 2000 [ 70%]  (Sampling)
+: Chain 1, Iteration: 1600 / 2000 [ 80%]  (Sampling)
+: Chain 1, Iteration: 1800 / 2000 [ 90%]  (Sampling)
+: Chain 1, Iteration: 2000 / 2000 [100%]  (Sampling)
+: #  Elapsed Time: 0.007173 seconds (Warm-up)
+: #                0.005748 seconds (Sampling)
+: #                0.012921 seconds (Total)
+: #+end_example
+
+** Sampling with CmdStan interface
+
+To use the CmdStan interface, set ~org-babel-stan-cmdstan-directory~
+to the top-level directory of the CmdStan source code.
+
+: #+begin_src elisp :results silent
+:   (setq org-babel-stan-cmdstan-directory "/path/to/cmdstan/source/")
+: #+end_src
+
+Modify the Stan block from above, removing the ".stan" extension from
+the file name.  Executing the block now compiles the Stan code the
+specified file.  (If the extension is not removed, the block will be
+executed as in the above example.)
+
+: #+name: model
+: #+begin_src stan :file model
+:   data {
+:     int<lower=1> N;
+:     vector[N] x;
+:   }
+:
+:   parameters {
+:     real mu;
+:     real<lower=0> sigma;
+:   }
+:
+:   model {
+:     x ~ normal(mu, sigma);
+:   }
+: #+end_src
+:
+: #+RESULTS: model
+: file:model
+
+Before running the model, dump the data generated in the last section
+to a file that can be passed as a command line argument.
+
+: #+begin_src R :session *R* :results silent
+:   stan_rdump(c('N', 'x'), 'normal.data.R')
+: #+end_src
+
+Finally, call the compiled program from a shell block.
+
+: #+begin_src sh :results output verbatim
+:   ./model sample data file=normal.data.R
+: #+end_src
+:
+: #+RESULTS:
+: #+begin_example
+:  method = sample (Default)
+:    sample
+:      num_samples = 1000 (Default)
+:      num_warmup = 1000 (Default)
+:      save_warmup = 0 (Default)
+:      thin = 1 (Default)
+:      adapt
+:        engaged = 1 (Default)
+:        gamma = 0.050000000000000003 (Default)
+:        delta = 0.80000000000000004 (Default)
+:        kappa = 0.75 (Default)
+:        t0 = 10 (Default)
+:        init_buffer = 75 (Default)
+:        term_buffer = 50 (Default)
+:        window = 25 (Default)
+:      algorithm = hmc (Default)
+:        hmc
+: 	 engine = nuts (Default)
+: 	   nuts
+: 	     max_depth = 10 (Default)
+: 	 metric = diag_e (Default)
+: 	 stepsize = 1 (Default)
+: 	 stepsize_jitter = 0 (Default)
+:  id = 0 (Default)
+:  data
+:    file = normal.data.R
+:  init = 2 (Default)
+:  random
+:    seed = 2115254906
+:  output
+:    file = output.csv (Default)
+:    diagnostic_file =  (Default)
+:    refresh = 100 (Default)
+:
+:
+: Gradient evaluation took 4e-06 seconds
+: 1000 transitions using 10 leapfrog steps per transition would take 0.04 seconds.
+: Adjust your expectations accordingly!
+:
+:
+: Iteration:    1 / 2000 [  0%]  (Warmup)
+: Iteration:  100 / 2000 [  5%]  (Warmup)
+: Iteration:  200 / 2000 [ 10%]  (Warmup)
+: Iteration:  300 / 2000 [ 15%]  (Warmup)
+: Iteration:  400 / 2000 [ 20%]  (Warmup)
+: Iteration:  500 / 2000 [ 25%]  (Warmup)
+: Iteration:  600 / 2000 [ 30%]  (Warmup)
+: Iteration:  700 / 2000 [ 35%]  (Warmup)
+: Iteration:  800 / 2000 [ 40%]  (Warmup)
+: Iteration:  900 / 2000 [ 45%]  (Warmup)
+: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+: Iteration: 1100 / 2000 [ 55%]  (Sampling)
+: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+: Iteration: 1300 / 2000 [ 65%]  (Sampling)
+: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+: Iteration: 1500 / 2000 [ 75%]  (Sampling)
+: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+: Iteration: 1700 / 2000 [ 85%]  (Sampling)
+: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+: Iteration: 1900 / 2000 [ 95%]  (Sampling)
+: Iteration: 2000 / 2000 [100%]  (Sampling)
+:
+: #  Elapsed Time: 0.012414 seconds (Warm-up)
+: #                0.025817 seconds (Sampling)
+: #                0.038231 seconds (Total)
+:
+: #+end_example
