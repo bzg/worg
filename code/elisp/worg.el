@@ -9,7 +9,6 @@
 ;; Maintainer: Bastien Guerry <bzg AT altern DOT org>
 ;; Keywords: org, wp, toc
 ;; Description: Shows a browsable table of contents for Org buffer
-;; URL: http://www.cognition.ens.fr/~guerry/u/org-toc.el
 ;;
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
