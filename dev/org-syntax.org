@@ -405,16 +405,17 @@ Unless specified otherwise, case is not significant.
    NAME cannot contain any whitespace character.
 
    If NAME is "COMMENT", it will be a "comment block".  If it is
-   "EXAMPLE", it will be an "example block".  If it is "SRC", it will
-   be a "source block".  If it is "VERSE", it will be a "verse block".
-
-   If NAME is a string matching the name of any export back-end
-   loaded, the block will be an "export block".
+   "EXAMPLE", it will be an "example block".  If it is "EXPORT", it
+   will be an "export block".  If it is "SRC", it will be a "source
+   block".  If it is "VERSE", it will be a "verse block".
 
    DATA can contain any character but a new line.  It can be ommitted,
-   unless the block is a "source block".  In this case, it must follow
-   the pattern "LANGUAGE SWITCHES ARGUMENTS", where SWITCHES and
-   ARGUMENTS are optional.
+   unless the block is either a "source block" or an "export block".
+
+   In the latter case, it should be constituted of a single word.
+
+   In the former case, it must follow the pattern "LANGUAGE SWITCHES
+   ARGUMENTS", where SWITCHES and ARGUMENTS are optional.
 
    LANGUAGE cannot contain any whitespace character.
 
@@ -429,7 +430,7 @@ Unless specified otherwise, case is not significant.
 
    CONTENTS can contain any character, including new lines.  Though it
    will only contain Org objects if the block is a verse block.
-   Otherwise, contents will not be parsed.
+   Otherwise, CONTENTS will not be parsed.
 
 ** Clock, Diary Sexp and Planning
    :PROPERTIES:
