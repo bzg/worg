@@ -83,30 +83,6 @@ document.
                      (:latex-hyperref-p nil "texht" org-latex-with-hyperref t)))
   #+END_SRC
 
-  It is also possible, with ~:export-block~ keyword, to associate
-  given block names to the ~export-block~ type.  Such blocks can
-  contain raw code that will be directly inserted in the output, as
-  long as the corresponding translator function says so.
-
-  In the following example, in the ~html~ back-end, =HTML= blocks are
-  export blocks.  The associated translator function inserts their
-  contents as-is, and ignores any other export block.
-
-  #+BEGIN_SRC emacs-lisp
-  (org-export-define-backend 'html
-    '(...
-      (export-block . org-html-export-block)
-      ... )
-    :export-block "HTML")
-
-  (defun org-html-export-block (export-block contents info)
-    "Transcode a EXPORT-BLOCK element from Org to HTML.
-  CONTENTS is nil.  INFO is a plist used as a communication
-  channel."
-    (when (string= (org-element-property :type export-block) "HTML")
-      (org-element-property :value export-block)))
-  #+END_SRC
-
   Eventually ~org-export-define-backend~ allows to define back-ends
   specific filters.  Refer to [[#filter-system][The Filter System]] section for more
   information.
@@ -1102,9 +1078,8 @@ document.
    Since it consists of alphanumerical characters only, it can be used
    as internal references for back-ends needing them.
 
-   For example, it is used in =ox-latex.el= uses it to translate radio
-   targets into ~\label{}~ and links to radio targets into
-   ~\hyperref{}~:
+   For example, =ox-latex.el= uses it to translate radio targets into
+   ~\label{}~ and links to radio targets into ~\hyperref{}~:
 
    #+BEGIN_SRC emacs-lisp
    (defun org-latex-radio-target (radio-target text info)
