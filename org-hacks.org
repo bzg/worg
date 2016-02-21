@@ -188,6 +188,23 @@ in old Org's list of known percent escapes.
       (goto-char (point-min))))
 #+END_SRC
 
+*** Go to a child of the current heading
+#+index: Navigation!Heading
+- [[http://langec.wordpress.com][Christoph Lange]]
+
+=org-jump-to-child= in [[file:code/elisp/org-jump.el::(defun%20org-jump-to-child][org-jump.el]] (keybinding suggested there: =C-c o c=) interactively prompts for the title of a child node, i.e. sub-heading, of the current heading and jumps to the child node having that title (in case of ambiguity: the /last/ such node).
+
+In the absence of a readily accessible structural representation of the tree outline, this is ipmlemented by walking over all child nodes and collecting their titles and their positions in the file.
+  
+*** Go to a heading by its ID (=CUSTOM_ID= property)
+#+index: Navigation!Heading
+- [[http://langec.wordpress.com][Christoph Lange]]
+
+=org-jump-to-id= in [[file:code/elisp/org-jump.el::(defun%20org-jump-to-id][org-jump.el]] (keybinding suggested there: =C-c o j=) interactively prompts for the one of the =CUSTOM_ID= property values in the current document and jumps to the [first] node that has this ID.
+
+This implementation works efficiently in a 5 MB org file with 100 IDs. Together with ido or helm I find it a very user-friendly way of jumping to frequently used headings.
+
+I noticed that =org-babel-ref-goto-headline-id= does something similar, so maybe some code could be shared among the two functions.
 *** Show next/prev heading tidily
 
 #+index: Navigation!Heading
