@@ -31,13 +31,13 @@ This property information can then be collected into tables.
 
 Lets look at the following org-collector block.
 
-: #+BEGIN: propview :id "december" :conds ((string= spendtype "food")) :cols (ITEM amount)
+: #+BEGIN: propview :id "december" :conds ((string= SPENDTYPE "food")) :cols (ITEM AMOUNT)
 : #+END:
 
 To evaluate this block press =\C-c\C-c= with your cursor on the
 =#+BEGIN= line of the block.  Evaluation will result in the following
 
-: #+BEGIN: propview :id "december" :conds ((string= spendtype "food")) :cols (ITEM amount)
+: #+BEGIN: propview :id "december" :conds ((string= SPENDTYPE "food")) :cols (ITEM AMOUNT)
 : | "ITEM"                           | "amount" |
 : |----------------------------------+----------|
 : | "Grocery Store [2008-12-01 Mon]" |    56.77 |
@@ -51,17 +51,18 @@ Lets look at the arguments one by one.
 - :id "december" ::
   The =:id= argument has the effect of limiting the search to headers
   under the header with the id of "december".
-- :conds ((string= spendtype "food")) ::
+- :conds ((string= SPENDTYPE "food")) ::
   The =:conds= argument accepts a list of e-lisp expressions.  Only
   headlines which match all of these expressions will be displayed in
-  the table.  The names of properties of a headline can be used as
-  variables in the expressions.  This particular expression only
-  returns true when the =spendtype= property of a headline is equal to "food".
-- :cols (ITEM amount) ::
+  the table.  The names of properties of a headline, in upper cases,
+  can be used as variables in the expressions.  This particular
+  expression only returns true when the =SPENDTYPE= property of a
+  headline is equal to "food".
+- :cols (ITEM AMOUNT) ::
   The =:cols= property controls what each row of the table should look
   like.  In this case we are showing =ITEM= which shows the actual
-  text of the headline as well as =amount= which show the value of the
-  =amount= property of each headline.
+  text of the headline as well as =AMOUNT= which show the value of the
+  =AMOUNT= property of each headline.
 
 
 
@@ -70,8 +71,8 @@ Lets look at the arguments one by one.
 This example demonstrates a couple of new headline arguments for
 =org-collector=.
 
-: #+BEGIN: propview :cols (ITEM (+ 400 amount)) :scope tree :match "example"
-: | "ITEM"                                                                          | "(+ 400 amount)" |
+: #+BEGIN: propview :cols (ITEM (+ 400 AMOUNT)) :scope tree :match "example"
+: | "ITEM"                                                                          | "(+ 400 AMOUNT)" |
 : |---------------------------------------------------------------------------------+------------------|
 : | "December Spending                                                   :example:" |                0 |
 : | "Week One"                                                                      |                0 |
@@ -83,7 +84,7 @@ This example demonstrates a couple of new headline arguments for
 : |                                                                                 |                  |
 : #+END:
 
-- :cols (ITEM (+ 400 amount)) ::
+- :cols (ITEM (+ 400 AMOUNT)) ::
   Notice that the =:cols= list in this example contains an elisp
   expression for one of the column values.  It is possible to run
   arbitrary elisp over the header properties the results of which will
