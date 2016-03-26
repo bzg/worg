@@ -140,15 +140,22 @@ It features:
 - =:main= :: can be set to "no" to inhibit wrapping of the code block
      in a =main= function call
 
-- =:includes= :: (C & CC+ only)
+- =:includes= ::
+     (C & CC+ only)
      accepts either a single string name, or a list of
      names of files to =#include= in the execution of the code block
 
-- =:import package=:: (D only)
+- =:import= ::
+     (D only)
      An import statement will be declared in the D source before the source code
 
-- =:defines= (C & C++ only):: just like =:includes= but for =#defines= lines at the
+- =:defines= ::
+     (C & C++ only) just like =:includes= but for =#defines= lines at the
      top of the code
+
+- =:libs= ::
+     (C & C++ only) useful for linking with a library, may be given
+     =-L/path/to/lib= and =-llibrary= instructions.
 
 ** Sessions
    There is no support for sessions
@@ -158,25 +165,44 @@ It features:
 ** TODO Other
    - Differences from other supported languages
 * Examples of Use
-** Hello World in C & C++
+** Hello World in C
 
 Here is Hello World!
 
 #+name: c-hello
 #+begin_src C :exports results
-  printf ("Hello World!");
+  printf ("Hello World!\n");
 #+end_src
 
 This source code block:
 #+begin_example
 #+begin_src C
-  printf ("Hello World!");
+  printf ("Hello World!\n");
 #+end_src
 #+end_example
 
 yields this result (type =C-c C-c= in the source block):
 #+results: c-hello
 Hello World!
+
+** Hello World in C++
+
+#+begin_src C++ :includes <iostream>
+  std::cout<<"Hello World!\n";
+#+end_src
+
+#+begin_example
+#+begin_src C++ :includes <iostream>
+  std::cout<<"Hello World!\n";
+#+end_src
+#+end_example
+
+yields this result (type =C-c C-c= in the source block):
+#+results:
+Hello World!
+
+Note that the =<iostream>= used to be automatically #included, but now
+it must be explicitely specified through the =:includes= parameter.
 
 ** Hello World in D
 Here is Hello World!
@@ -200,9 +226,10 @@ Hello World!
 Note that:
 - if no =main()= is declared, a trivial one is automatically provided,
 - there is no directive like:
-  + =#include "stdio.h"= (in C or C++)
+  + =#include "stdio.h"= (in C)
   + =import std.stdio;= (in D)
   because those libraries are so common that they are always included.
+- C++ needs to explicitely include either =stdio.h= or =<iostream>=
 
 ** Scalar variables
 Variables may be declared outside the script.
@@ -246,8 +273,8 @@ yields this result (type =C-c C-c=):
 | myint    |    145 |
 | mydouble |   3.14 |
 
-If you want to see the expanded source code, without compiling a running it,
-just type =C-c C-v v=".
+If you want to see the expanded source code, without compiling and running it,
+just type =C-c C-v v=.
 
 ** Process an Org Mode Table
 
