@@ -133,25 +133,26 @@ It features:
   The =type[]= is used for lists or vectors declared in the header.
 
 - =:cmdline= :: command line arguments to pass to the executable
-     compiled from the code block
+     compiled from the code block.
 
-- =:flags= :: flags to pass to the compiler
+- =:flags= ::
+     flags to pass to the compiler.
 
 - =:main= :: can be set to "no" to inhibit wrapping of the code block
-     in a =main= function call
+     in a =main= function call.
 
 - =:includes= ::
      (C & CC+ only)
      accepts either a single string name, or a list of
-     names of files to =#include= in the execution of the code block
+     names of files to =#include= in the execution of the code block.
 
 - =:import= ::
-     (D only)
-     An import statement will be declared in the D source before the source code
+     (D only) An import statement will be declared in the D source
+     before the source code.
 
 - =:defines= ::
      (C & C++ only) just like =:includes= but for =#defines= lines at the
-     top of the code
+     top of the code.
 
 - =:libs= ::
      (C & C++ only) useful for linking with a library, may be given
@@ -160,10 +161,6 @@ It features:
 ** Sessions
    There is no support for sessions
 
-** TODO Result Types
-   - Which result types are supported?
-** TODO Other
-   - Differences from other supported languages
 * Examples of Use
 ** Hello World in C
 
@@ -187,10 +184,12 @@ Hello World!
 
 ** Hello World in C++
 
+#+name: cpp-hello
 #+begin_src C++ :includes <iostream>
   std::cout<<"Hello World!\n";
 #+end_src
 
+This source code block:
 #+begin_example
 #+begin_src C++ :includes <iostream>
   std::cout<<"Hello World!\n";
@@ -198,7 +197,7 @@ Hello World!
 #+end_example
 
 yields this result (type =C-c C-c= in the source block):
-#+results:
+#+results: cpp-hello
 Hello World!
 
 Note that the =<iostream>= used to be automatically #included, but now
@@ -223,7 +222,7 @@ yields this result (type =C-c C-c= in the source block):
 #+results: d-hello
 Hello World!
 
-Note that:
+** Note that:
 - if no =main()= is declared, a trivial one is automatically provided,
 - there is no directive like:
   + =#include "stdio.h"= (in C)
