@@ -25,7 +25,7 @@
   </div>
 #+end_html
 
-* Template Checklist [10/12] 					   :noexport:
+* Template Checklist [11/14] 					   :noexport:
   - [X] Revise #+TITLE:
   - [X] Indicate #+AUTHOR:
   - [X] Add #+EMAIL:
@@ -42,6 +42,8 @@
   - [ ] Describe [[Result%20Types][Result Types]]
   - [ ] Describe [[Other]] differences from supported languages
   - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+  - [X] Add caveats about utf-8 in strings
+  - [ ] Add caveats about utf-8 in tables
 * Introduction
 Python is a high-level, readable, interpreted language which can be
 used for many common computing tasks.  It runs on most modern
@@ -242,3 +244,51 @@ return 'images/python-matplot-fig.png' # return filename to org-mode
 
 #+end_example
 [[file:images/python-matplot-fig.png]]
+
+* Caveats
+
+You need some care in order to pass utf-8 strings to python.
+
+** passing utf-8 strings to python
+
+#+begin_example
+#+NAME: unicode_str
+,#+BEGIN_EXAMPLE
+“this string is not ascii!”
+,#+END_EXAMPLE
+#+end_example
+
+#+begin_example
+#+NAME: error-in-passing-var
+#+BEGIN_SRC python :var data=unicode_str
+return data
+#+END_SRC
+#+end_example
+
+#+begin_example
+#+RESULTS: error-in-passing-var
+#+end_example
+
+Will produce no output and prints the following message in the buffer
+=*Org-Babel Error Output*=:
+
+#+BEGIN_EXAMPLE
+  File "<stdin>", line 3
+SyntaxError: Non-ASCII character '\xe2' in file <stdin> on line 3, but no encoding declared; see http://www.python.org/peps/pep-0263.html for details
+#+END_EXAMPLE
+
+** passing utf-8 strings to python with workaround
+
+A workaround is to use =:preamble= with the value =# -*- coding:utf-8 -*-=
+
+#+begin_example
+#+NAME: ok-in-passing-var
+#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :var data=unicode_str
+return data
+#+END_SRC
+#+end_example
+
+#+begin_example
+#+RESULTS: ok-in-passing-var
+: “this string is not ascii!”
+#+end_example
