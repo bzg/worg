@@ -112,6 +112,18 @@ There are 11 SQLite-specific header arguments.
                 =.import=. 
  - nullvalue :: a string to use in place of NULL values.
 
+*** Variables 
+
+It is possible to pass variables to sqlite. Variables can be of type table or scalar. Variables are defined using :var=<value>
+and referred in the code block as $<name>.
+
+ - Table variables :: Table variables are exported as a temporary csv file that
+    can then be imported by sqlite. The actual value of the variable is the name of temporary csv file. 
+
+ - Scalar variables :: This is a value that will replace references
+       to variable's name. String variables should be quoted;
+       otherwise they are considered a table variable.
+    
 
 ** Sessions
 SQLite sessions are not supported.
@@ -151,5 +163,53 @@ Hello world!
 
 Note that =db= and =dir= together specify the path to the file
 that holds the SQLite database.
+
+** Using scalar variables
+
+In this example we create a variable with the name of the relation to query and a value to use in a query where clause.
+Note that the replacement excludes the quotes of string variables.
+
+#+BEGIN_EXAMPLE
+,#+BEGIN_SRC sqlite :db /tmp/rip.db :var rel="tname" n=300 :colnames yes
+drop table if exists $rel;
+create table $rel(n int, id int);
+insert into $rel(n,id) values (1,210), (3,800);
+select * from $rel where id > $n;
+,#+END_SRC
+
+,#+RESULTS:
+| 3 | 800 |
+#+END_EXAMPLE
+
+** Using table variables
+
+We can also pass a table to a query. In this case, the contents of the table are exported as a csv file that can then 
+be imported into a relation:
+
+#+BEGIN_EXAMPLE
+,#+NAME: tableexample
+| id |  n |
+|----+----|
+|  1 |  5 |
+|  2 |  9 |
+|  3 | 10 |
+|  4 |  9 |
+|  5 | 10 |
+
+,#+begin_src sqlite :db /tmp/rip.db :var orgtable=tableexample :colnames yes
+drop table if exists testtable;
+create table testtable(id int, n int);
+.mode csv testtable
+.import $orgtable testtable
+select n, count(*) from testtable group by n;
+,#+end_src
+
+,#+RESULTS:
+|  n | count(*) |
+|----+----------|
+|  5 |        1 |
+|  9 |        2 |
+| 10 |        2 |
+#+END_EXAMPLE
 
 
