@@ -110,38 +110,40 @@ on the line before working with the example:
 OK, here is the example.
 
 #+begin_src org
-,* TODO Win a million in Las Vegas
-,  The "third" TODO (see above) cannot become a TODO without this money.
+  ,* TODO Win a million in Las Vegas
+    :PROPERTIES:
+      :ID: I-cannot-do-it-without-money
+    :END:
 
-,  :PROPERTIES:
-,    :ID: I-cannot-do-it-without-money
-,  :END:
+    The "third" TODO (see above) cannot become a TODO without this money.
 
-,* Do this by doing a chain of TODOs
-,** NEXT This is the first in this chain
-,   :PROPERTIES:
-,     :TRIGGER: chain-siblings(NEXT)
-,   :END:
-, 
-,** This is the second in this chain
 
-,** This is the third in this chain
-,   :PROPERTIES:
-,     :BLOCKER: I-cannot-do-it-without-money
-,   :END:
+  ,* Do this by doing a chain of TODOs
+  ,** NEXT This is the first in this chain
+     :PROPERTIES:
+       :TRIGGER: chain-siblings(NEXT)
+     :END:
 
-,** This is the forth in this chain
-,   When this is DONE, we will also trigger entry XYZ-is-my-id
-,   :PROPERTIES:
-,     :TRIGGER: XYZ-is-my-id(TODO)
-,   :END:
+  ,** This is the second in this chain
 
-,** This is the fifth in this chain
-, 
-,* Start writing report
-,   :PROPERTIES:
-,     :ID: XYZ-is-my-id
-,   :END:
+  ,** This is the third in this chain
+     :PROPERTIES:
+       :BLOCKER: I-cannot-do-it-without-money
+     :END:
+
+  ,** This is the forth in this chain
+     :PROPERTIES:
+       :TRIGGER: XYZ-is-my-id(TODO)
+     :END:
+
+     When this is DONE, we will also trigger entry XYZ-is-my-id
+
+  ,** This is the fifth in this chain
+
+  ,* Start writing report
+     :PROPERTIES:
+       :ID: XYZ-is-my-id
+     :END:
 #+end_src
 
 * Advanced Triggerring Example
