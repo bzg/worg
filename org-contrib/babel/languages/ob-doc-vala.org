@@ -1,0 +1,234 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Vala Source Code Blocks in Org Mode
+#+AUTHOR:     Christian Garbs
+#+EMAIL:      mitch[at]cgarbs[dot]de
+#+LANGUAGE:   en
+#+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  http://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_export html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="https://wiki.gnome.org/Projects/Vala">Vala</a>
+  </p>
+  <!-- Vala has no logo, see https://wiki.gnome.org/Projects/Vala/Logo -->
+  </div>
+#+end_export
+
+* Template Checklist [12/12] 					   :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site => there is none!
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result%20Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+
+[[https://wiki.gnome.org/Projects/Vala][Vala]] is a programming language for the GObject system (think Glib and
+GTK) that is converted to C source code and then compiled.
+
+You can write non-interactive programs in Vala and capture their
+output (stdout) in the orgmode document.
+
+You could even write interactive programs that start a GUI when you
+evaluate them, but this would be somewhat awkward because your emacs
+session will freeze while the program is running.
+
+* Requirements and Setup
+
+** Installation and configuration of Vala software
+
+You need to install a Vala compiler and accompanying libraries as well
+as a C compiler on your system (see [[https://wiki.gnome.org/Projects/Vala/ValaPlatforms][Installing Vala]]).
+
+** Emacs configuration
+
+Apart from at least version 9.1 of Org, no other Emacs packages are required.
+
+Optional packages of interest might be [[https://www.emacswiki.org/emacs/vala-mode.el][vala-mode.el]] (a major editing
+mode for Vala code; [[https://wiki.gnome.org/Projects/Vala/Emacs?action%3DAttachFile&do%3Dview&target%3Dvala-mode.el][alternative link]]) or [[https://github.com/mygnu/flycheck-vala.el][flycheck-vala.el]] (Flycheck
+integration).
+
+** Org-mode configuration (org-babel-do-load-languages)
+
+The =ob-vala.el= file is part of Emacs.  To activate Vala as a Babel
+language, simply add =(vala . t)= to the =org-babel-do-load-languages=
+function in your Emacs configuration file, as shown below:
+
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages (quote ((emacs-lisp . t)
+                                     (vala . t)
+                                     (perl . t))))
+#+END_SRC
+
+Babel expects a Vala compiler named ~valac~ in your path, but you can
+change this by editing the ~defcustom~ ~org-babel-vala-compiler~.
+
+* Org Mode Features for Vala Source Code Blocks
+** Header Arguments
+*** Vala-specific header arguments
+
+Vala language blocks support two special header arguments:
+
+- ~:flags~ passes arguments to the compiler
+- ~:cmdline~ passes commandline arguments to the generated executable
+
+** Sessions
+
+As Vala is a compiled language, there is no support for sessions.
+
+** Result Types
+*** Which result types are supported?
+
+There is no special result type handling.  The standard output of the
+evaluated code block is parsed by the default Babel rules.
+
+A single number should become a number, a single string a string.
+Multiple values are parsed as a list.  Multiple lines of multiple
+values become a table (see [[Commandline%20parameters][Commandline parameters]] example).
+
+** Other
+*** Differences from other supported languages
+
+There currently is no support for the [[http://orgmode.org/manual/var.html#var][~:var~]] header.  If you need to
+pass parameters to your Vala code, you can only use ~:flags~ or
+~:cmdline~ (see [[Vala-specific%20header%20arguments][Vala-specific header arguments]]).
+
+* Examples of Use
+
+** Hello World!
+
+#+BEGIN_SRC vala
+  class Demo.HelloWorld : GLib.Object {
+      public static int main(string[] args) {
+          stdout.printf("Hello World!\n");
+          return 0;
+      }
+  }
+#+END_SRC
+
+#+RESULTS:
+: Hello World!
+
+** Multiple classes
+
+Multiple classes can be defined in a single code block:
+
+#+BEGIN_SRC vala
+  class HelloWorld : GLib.Object {
+      public static void greet() {
+          stdout.printf("Hello World!\n");
+      }
+  }
+
+  class Demo : GLib.Object {
+      public static int main(string[] args) {
+          HelloWorld.greet();
+          return 0;
+      }
+  }
+#+END_SRC
+
+#+RESULTS:
+: Hello World!
+
+** Conditional compilation
+
+The header argument ~:flags -D FOO~ passes the flags ~-D FOO~ to the
+Vala compiler so the =#if FOO= compilation option is used:
+
+#+BEGIN_SRC vala :flags -D FOO
+  class Demo.HelloWorld : GLib.Object {
+      public static int main(string[] args) {
+#if FOO
+          stdout.printf("Foo\n");
+#else
+          stdout.printf("No foo\n");
+#endif
+          return 0;
+      }
+  }
+#+END_SRC
+
+#+RESULTS:
+: Foo
+
+** GTK example
+
+#+BEGIN_SRC vala :flags --pkg gtk+-3.0 :results silent
+using Gtk;
+
+public class HelloWorldWindow : Window {
+
+    public HelloWorldWindow () {
+        var label = new Label ("Hello World");
+        add (label);
+        set_default_size (100, 100);
+    }
+}
+
+void main (string[] args) {
+    Gtk.init (ref args);
+
+    var win = new HelloWorldWindow ();
+    win.destroy.connect (Gtk.main_quit);
+    win.show_all ();
+
+    Gtk.main ();
+}
+#+END_SRC
+
+The header argument ~:flags~ passes ~--pkg gtk+-3.0~ to the Vala
+compiler to include the GTK3 library.  It needs to be installed
+(eg. package =libgtk-3-dev= on Ubuntu >= 11.04).
+
+This example must be executed under a graphical environment.
+
+The output is ignored (~:results silent~).
+
+** Commandline parameters
+
+#+BEGIN_SRC vala :cmdline foo bar
+  class Demo.HelloWorld : GLib.Object {
+      public static int main(string[] args) {
+          // skip args[0] as it is the binary name
+          for (int i=1; i < args.length; i++) {
+              stdout.printf("argv[%d] = %s\n" , i, args[i]);
+          }
+          return 0;
+      }
+  }
+#+END_SRC
+
+#+RESULTS:
+| argv[1] | = | foo |
+| argv[2] | = | bar |
+
+The header argument =:cmdline= passes commandline arguments to the
+Vala program upon execution.
+
+Not that the automatic conversion of the result data recognizes this
+output as a table.  You can change this by using the header argument
+~:results verbatim~.
+
+** Links to tutorials and other resources
+
+See [[https://wiki.gnome.org/Projects/Vala/Documentation][Vala Documentation]] for the API documentation, tutorials, sample
+code and other resources.
