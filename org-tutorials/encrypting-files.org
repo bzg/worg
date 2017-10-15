@@ -34,9 +34,9 @@ decrypted file recognized as an org file, you should make:
   # -*- mode:org; epa-file-encrypt-to: ("me@mydomain.com") -*-
 #+END_SRC
 
-the first line in the file. Where "me@mydomain.com" is the email
+the first line in the file. Where =me@mydomain.com= is the email
 address associated with your default gnupg key. Note that gpg
-encrypted files should be saved with the default extension of .gpg.
+encrypted files should be saved with the default extension of =.gpg=.
 
 When you open the file you will be prompted for your password and
 Emacs will display the decrypted contents in org-mode. When you save
@@ -48,9 +48,9 @@ encrypt/decrypt your file is the pass phrase. Using Public Key
 Encryption, you require both your private key and your pass phrase.
 
 EasyPG can use both methods of encryption. If you want to use
-symmetric encryption omitting the "epa-file-encrypt-to:" from your
-.gpg file or setting it to ~nil~ should do the trick. If this doesn't work, you may try
-setting the variable:
+symmetric encryption omitting the "epa-file-encrypt-to: " from your
+=.gpg= file or setting it to ~nil~ should do the trick. If this doesn't
+work, you may try setting the variable:
 
 #+BEGIN_SRC emacs-lisp
   (setq epa-file-select-keys nil) 
@@ -73,22 +73,23 @@ org-crypt you need to add something like the following to your .emacs:
 (setq org-crypt-key nil)
 #+END_SRC
 
-Now any text below a headline that has a :crypt: tag will be
+Now any text below a headline that has a =:crypt:= tag will be
 automatically be encrypted when the file is saved. If you want to use
-a different tag just customize the "org-crypt-tag-matcher" setting.
+a different tag just customize the =org-crypt-tag-matcher= setting.
 
 Preventing tag inheritance stops you having encrypted text inside
 encrypted text.
 
-To decrypt the text just call "M-x org-decrypt-entry" and the
+To decrypt the text just call =M-x org-decrypt-entry= and the
 encrypted text where the point is will be replaced with the plain
 text. If you use this feature a lot, you will probably want to bind
-"M-x org-decrypt-entry" to a key.
+=M-x org-decrypt-entry= to a key.
 
-Entries with a :crypt: tag will be automatically be encrypted when you
+Entries with a =:crypt:= tag will be automatically be encrypted when you
 save the file.
 
-If you have autosave turned on and decrypt the files encrypted
+** Emacs Backup Files - a Warning.
+With org-crypt, if you have autosave turned on and decrypt the
 entries, the autosave file will contain the entries in plain text. For
 this reason your should disable autosave for encrypted files.
 
@@ -106,18 +107,18 @@ package manager:
   sudo apt-get install gpg-agent
 #+END_SRC
 
-You can configure gnupg-agent by editing ~/.gnupg/gpg-agent.conf. As a
+You can configure gnupg-agent by editing =~/.gnupg/gpg-agent.conf=. As a
 minimum you will probably want to set:
 
-- default-cache-ttl the time the cahse entry is valid in seconds. The
+- =default-cache-ttl= the time the cahse entry is valid in seconds. The
   default is 600.
-- max-cache-ttl the maximum time a cache entry is valid in
+- =max-cache-ttl= the maximum time a cache entry is valid in
   seconds. After this time the cache entry will be expired even if it
   has been accessed recently.
 
 
 To ensure that gnupg uses gnupg-agent you should edit
-~/.gnupg/gpg.conf and make sure that the use-agent line is
+=~/.gnupg/gpg.conf= and make sure that the use-agent line is
 un-commented.
 
 If you are using a console based system you need to:
@@ -133,13 +134,8 @@ one of the pin entry programs, such as pinentry-gtk2 or pinentry-qt,
 so that X can prompt you for your pass phrase.
 
 
-Now when you try to open a .gpg file, or decrypt some text encrypted
+Now when you try to open a =.gpg= file, or decrypt some text encrypted
 with org-crypt, you will be prompted for your pass phrase, but your
 password will be cached so re-opening the file, or decrypting another
 region will not prompt you for your password again.
-
-* Emacs Backup Files - a Warning.
-With org-crypt, if you have autosave turned on and decrypt the
-entries, the autosave file will contain the entries in plain text. For
-this reason your should disable autosave for encrypted files.
 
