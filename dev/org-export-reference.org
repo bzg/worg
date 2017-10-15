@@ -28,9 +28,9 @@ document.
   :END:
 
   A back-end is defined with ~org-export-define-backend~ function.  It
-  requires two mandatory arguments: the back-end name and its translation
-  table, an alist that associates element and object types to translator
-  functions.  According to the doc-string:
+  requires two mandatory arguments: the back-end name and its
+  translation table, an alist that associates element and object types
+  to translator functions.  According to the documentation:
 
   #+BEGIN_QUOTE
   These functions should return a string without any trailing space,
@@ -87,20 +87,55 @@ document.
   specific filters.  Refer to [[#filter-system][The Filter System]] section for more
   information.
 
-  If the new back-end shares most properties with another one,
-  ~org-export-define-derived-backend~ can be used to simplify the
-  process.  In the example below, we implement a new back-end which behaves
-  like ~latex~ excepted for headlines and the template.
+  If the new back-end shares most properties with another one, use
+  ~org-export-define-derived-backend~ to simplify the creation
+  process.  In the example below, we implement a new back-end which
+  behaves like ~latex~ except for headlines and the template.
 
   #+BEGIN_SRC emacs-lisp
-  (org-export-define-derived-backend 'my-latex 'latex
-    :translate-alist '((headline . my-latex-headline-translator)
-                       (template . my-latex-template)))
+    (org-export-define-derived-backend 'my-latex 'latex
+      :translate-alist '((headline . my-latex-headline-translator)
+			 (template . my-latex-template)))
   #+END_SRC
 
   Back-ends defined with either function can be registered in the export
   dispatcher using special keyword =:menu-entry=.  See defuns docstrings
   for more information.
+
+  Eventually, you can create an anonymous back-end with
+  ~org-export-create-backend~.  It can inherit from an existing
+  back-end or define everything from scratch.
+
+  Such a back-end doesn't appear in any user-facing menu, however.  It
+  is meant to be used as an argument for ~org-export-with-backend~ and
+  ~org-export-data-with-backend~, for exporting rules with a limited
+  scope.
+
+  For example, entries in a table of contents usually link to headings
+  in the document.  As a consequence, targets, footnote references,
+  and external links may be ignored from the table of contents.  As an
+  exemple, the HTML export back-end prunes various link-like types
+  from table of contents' entries -- here ~toc-entry~ -- with the
+  following code:
+
+  #+BEGIN_SRC emacs-lisp
+    (org-export-data-with-backend
+     toc-entry
+     (org-export-create-backend
+      :parent 'html
+      :transcoders `((footnote-reference . ,#'ignore)
+		     (link . ,(lambda (l c i)
+				(or c
+				    (org-export-data
+				     (org-element-property :raw-link l)
+				     i))))
+		     (radio-target . ,(lambda (_r c _i) c))
+		     (target . ,#'ignore)))
+     info)
+  #+END_SRC
+
+  Since this is a common anonymous back-end, the above is readily
+  available calling ~org-export-toc-entry-backend~.
 
 * The Communication Channel
   :PROPERTIES:
@@ -750,7 +785,8 @@ document.
    Recursively convert some data (an element, an object, a secondary
    string or a string) using another backend.
 
-   See also: [[#with-backend][~org-export-with-backend~]].
+   See also: [[#with-backend][~org-export-with-backend~]],
+   [[#toc-entry-backend][~org-export-toc-entry-backend~]].
 
 ** ~org-export-excluded-from-toc-p~
 :PROPERTIES:
@@ -1523,6 +1559,16 @@ See also : [[#collect-headlines][~org-export-collect-headlines~]].
    [[#table-row-ends-rowgroup-p][~org-export-table-row-ends-rowgroup-p~]],
    [[#table-row-group][~org-export-table-row-group~]],
    [[#table-row-starts-header-p][~org-export-table-row-starts-header-p~]].
+
+** ~org-export-toc-entry-backend~
+:PROPERTIES:
+:CUSTOM_ID: toc-entry-backend
+:END:
+
+Generate an anonymous export back-end appropriate for entries in table
+of contents.
+
+See also: [[#data-with-backend][~org-export-data-with-backend~]].
 
 ** ~org-export-translate~
 
