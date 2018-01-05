@@ -14,12 +14,12 @@ Check an Org-mode environment.
  - don't be malicious, only put reasonable code into this buffer
  - don't be angry, you've been warned about the possible risks of
    using this buffer
-   
+
  In general Org-moders are very nice and will most likely keep this
  buffer both safe and useful.
 
 * Instructions
-  - Download the file [[https://orgmode.org/w/?p%3Dworg.git%3Ba%3Dblob_plain%3Bf%3Dorg-contrib/babel/examples/org-check.org%3Bh%3Dc6e25782c8fa781990d28676052af6006099cf96%3Bhb%3DHEAD][org-check.org]]
+  - Download the file [[https://code.orgmode.org/bzg/worg/raw/master/org-contrib/babel/examples/org-check.org][org-check.org]]
   - Calculate the table by putting point in the table and pressing =C-u C-c *=
   - Check the =results= column
     - if you see all "pass" results, then your environment passes
@@ -108,14 +108,14 @@ Check an Org-mode environment.
 |               |                | chk-sys-cmd      | "ruby"             |         |
 |               |                | pkg-loaded       | 'org-babel-ruby    |         |
 |---------------+----------------+------------------+--------------------+---------|
-#+TBLFM: 
+#+TBLFM:
 
 * Tasks
 ** Org Setup
    - It is sometimes the case that updating Org-mode seems to have no
      effect.  This can arise when there are multiple Org-mode
      installations, or if Org-mode was compiled and then not
-     recompiled after an update. 
+     recompiled after an update.
 *** Org library
     - This is where emacs is finding the Org-mode installation
 *** Org version
@@ -126,7 +126,7 @@ Check an Org-mode environment.
     - Check that the variable [[elisp:(progn (describe-variable 'org-export-latex-classes) (other-window 1))][org-export-latex-classes]] has been set
 
 ** Preview LaTeX
-   - Previewing LaTeX in the Org-mode buffer requires: 
+   - Previewing LaTeX in the Org-mode buffer requires:
      - a working LaTeX installation, including the =latex= executable
      - the [[http://sourceforge.net/projects/dvipng/][dvipng]] executable
      - paths to these executables on =exec-path=
@@ -134,10 +134,10 @@ Check an Org-mode environment.
      need to install software
    - If latex-system passes and latex fails, then you need to modify
      the variable =exec-path=, so the path to the latex executable is
-     included 
+     included
    - If dvipng-system passes and dvipng fails, then you need to modify
      the variable =exec-path=, so the path to the dvipng executable is
-     included 
+     included
    - Image size can be scaled using the =:scale= property of the
      variable =org-format-latex-options=
 ** Make pdf files
@@ -329,7 +329,7 @@ Check an Org-mode environment.
 
 #+name: org-version
 #+begin_src emacs-lisp :results silent
-(if (null org-version) "fail" org-version)  
+(if (null org-version) "fail" org-version)
 #+end_src
 
 ** COMMENT Package loaded
@@ -358,7 +358,7 @@ assigned a default value"
 ** COMMENT Check external commands
 #+name: chk-ext-cmd(x)
 #+begin_src emacs-lisp :results silent
-    (if (org-check-external-command x "" t) "pass" "fail") 
+    (if (org-check-external-command x "" t) "pass" "fail")
 #+end_src
 
 ** Export LaTeX classes
@@ -389,9 +389,9 @@ assigned a default value"
   (if (string-equal x "fail") x (if (org-check-external-command x "" t)
   "pass" "fail"))
 #+end_src
-   
 
-** =org-agenda-files= 
+
+** =org-agenda-files=
    - The [[elisp:(progn (describe-variable 'org-agenda-files) (other-window 1))][org-agenda-files]] variable is required for a number of optional, but useful, Org-mode commands
         - [[elisp:(progn (describe-function 'org-agenda) (other-window 1))][org-agenda]]
         - [[elisp:(progn (describe-variable 'org-export-icalendar-combine-agenda-files) (other-window 1))][org-export-icalendar-combine-agenda-files]]
@@ -404,7 +404,7 @@ assigned a default value"
     "pass")
 #+end_src
 
-** COMMENT Check System Command   
+** COMMENT Check System Command
 
 FIXME: "variable "chk-sys-cmd" in block "transpose-elisp" must be assigned
 a default value"
@@ -441,8 +441,8 @@ Report the scale setting for inline images.  Default is 1.0.
 #+end_src
 
 #+name: chk-ltx-pkg
-#+begin_src emacs-lisp :var x=chk-kpse() 
-  (if (string-equal x "pass") 
+#+begin_src emacs-lisp :var x=chk-kpse()
+  (if (string-equal x "pass")
     (let* ((z (org-splice-latex-header org-format-latex-header
                                       org-export-latex-default-packages-alist
                                       org-export-latex-packages-alist nil))

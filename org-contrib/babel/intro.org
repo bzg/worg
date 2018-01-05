@@ -121,7 +121,7 @@ way. [And in R it is possible to divert all graphical output to file] A
 possible extension of the above might be to use a "magic variable" so
 that a python variable is created e.g. __org_babel_output_file__ that
 always holds a string corresponding to the file specified by :file. Eric
-may have further ideas / views here. 
+may have further ideas / views here.
 
 
 ** DONE What function is bound to C-c '?
@@ -171,7 +171,7 @@ may have further ideas / views here.
     Babel is to place your code in blocks in an Org-mode file, and to
     use Babel's [[#literate-programming][Literate Programming]] support to extract pure code
     from your Org files.
-    
+
   All of these use cases, as well as exhaustive documentation of the
   features of Babel are covered in the [[https://orgmode.org/manual/Working-With-Source-Code.html#Working-With-Source-Code][Working with Source Code]]
   section of the Org manual.
@@ -273,7 +273,7 @@ structure becomes:
 Babel executes code blocks for *interpreted* languages such
 as shell, python, R, etc. by passing code to the interpreter, which
 must be installed on your system.  You control what is done with the
-results of execution. 
+results of execution.
 
 Here are examples of code blocks in three different languages,
 followed by their output. If you are viewing the Org-mode version of
@@ -309,7 +309,7 @@ HTML export of the resulting string:
 #+resname:
 : This file takes up  36K
 
-*** [[http://www.r-project.org/][R]] 
+*** [[http://www.r-project.org/][R]]
      What are the most common words in this file?
 In the Org-mode file:
 : #+begin_src R :colnames yes
@@ -378,7 +378,7 @@ HTML export of the resulting image:
      returns tabular data (a vector, array or table of some sort) then
      this will be held as an Org-mode table in the buffer. This
      setting is the default.
-     
+
      For example, consider the following block of python code and its
      output.
 
@@ -509,24 +509,24 @@ The table looks like this in the Org-mode buffer:
 
 The [[http://www.gnu.org/software/emacs/manual/elisp.html][Emacs Lisp]] source code:
 #+name: fibonacci-seq
-#+begin_src emacs-lisp :var fib-inputs=fibonacci-inputs 
+#+begin_src emacs-lisp :var fib-inputs=fibonacci-inputs
   (defun fibonacci (n)
     (if (or (= n 0) (= n 1))
         n
       (+ (fibonacci (- n 1)) (fibonacci (- n 2)))))
-  
+
   (mapcar (lambda (row)
             (mapcar #'fibonacci row)) fib-inputs)
 #+end_src
 
 In the Org-mode buffer the function looks like this:
 : #+name: fibonacci-seq
-: #+begin_src emacs-lisp :var fib-inputs=fibonacci-inputs 
+: #+begin_src emacs-lisp :var fib-inputs=fibonacci-inputs
 :   (defun fibonacci (n)
 :     (if (or (= n 0) (= n 1))
 :         n
 :       (+ (fibonacci (- n 1)) (fibonacci (- n 2)))))
-:   
+:
 :   (mapcar (lambda (row)
 :             (mapcar #'fibonacci row)) fib-inputs)
 : #+end_src
@@ -540,7 +540,7 @@ The return value of =fibonacci-seq= is a table:
     Code can be evaluated in-line using the following syntax:
 
 : Without header args: src_lang{code} or with header args: src_lang[args]{code},
-: for example src_python[:session]{10*x}, where x is a variable existing in the 
+: for example src_python[:session]{10*x}, where x is a variable existing in the
 : python session.
 
 ** Code Block Body Expansion
@@ -556,10 +556,10 @@ The return value of =fibonacci-seq= is a table:
      contents. This facility is useful for debugging.
 
 - tangling :: The expanded body can be tangled.  Tangling this way includes
-     variable values that  may be 
-              - the results of other code blocks, 
-              - variables stored in headline properties, or 
-              - tables.  
+     variable values that  may be
+              - the results of other code blocks,
+              - variables stored in headline properties, or
+              - tables.
 
      One possible use for tangling expanded code block is for emacs
      initialization.  Values such as user names and passwords can be
@@ -580,7 +580,7 @@ The code block refers to the data table:
   (setq my-special-username (first (first data)))
   (setq my-special-password (first (second data)))
 #+end_src
-  
+
 With point inside the code block,  =C-c M-b p= expands the contents:
 #+begin_src emacs-lisp
   (let ((data (quote (("john-doe") ("abc123")))))
@@ -608,12 +608,12 @@ For example, let's take some system diagnostics in the shell and graph them with
    directories in our home directory, together with their
    sizes. Babel automatically converts the output into an Org-mode
    table.
-   
+
 : #+name: directories
 : #+begin_src sh :results replace
 :   cd ~ && du -sc * |grep -v total
 : #+end_src
-   
+
 #+resname: directories
 |       72 | "Desktop"   |
 | 12156104 | "Documents" |
@@ -636,7 +636,7 @@ For example, let's take some system diagnostics in the shell and graph them with
    pie-chart. Note how this code block uses the =srcname=
    of the previous code block to obtain the data.
 
-In the Org-mode file: 
+In the Org-mode file:
 : #+name: directory-pie-chart(dirs = directories)
 : #+begin_src R :session R-pie-example :file ../../images/babel/dirs.png
 :   pie(dirs[,1], labels = dirs[,2])
@@ -672,7 +672,7 @@ following source block creates an Org-mode table filled with five random
 numbers between 0 and 1.
 
 : #+name: tbl-example-data
-: #+begin_src R 
+: #+begin_src R
 : runif(n=5, min=0, max=1)
 : #+end_src
 
@@ -869,13 +869,13 @@ HTML export of code:
 
   Babel comes pre-populated with the code blocks located in
   the [[file:library-of-babel.org][Library of Babel]] file -- raw file at
-@@html: <a href="https://orgmode.org/w/org-mode.git/blob/HEAD:/doc/library-of-babel.org">library-of-babel.org</a>@@
+@@html: <a href="https://code.orgmode.org/bzg/worg/raw/master/library-of-babel.org">library-of-babel.org</a>@@
   --. It is possible to add code blocks to the library from any
   Org-mode file using the =org-babel-lob-ingest= (bound to =C-c C-v
   l=).
 
   #+name: add-file-to-lob
-  #+begin_src emacs-lisp 
+  #+begin_src emacs-lisp
   (org-babel-lob-ingest "path/to/file.org")
   #+end_src
 
@@ -991,7 +991,7 @@ Calling =org-babel-tangle= will result in the following shell source
 code being written to the =hello.sh= file:
 
 #+name: hello-world-output
-#+begin_src sh 
+#+begin_src sh
 #!/usr/bin/env sh
 
 # [[file:~/org/temp/index.org::*Noweb%20test][hello-world]]
@@ -1048,7 +1048,7 @@ For a simple example of usage, follow these 5 steps:
 
 1) create a directory named =.emacs.d= in the base of your home
    directory;
-   #+begin_src sh 
+   #+begin_src sh
    mkdir ~/.emacs.d
    #+end_src
 2) checkout the latest version of Org-mode into the src subdirectory
@@ -1062,15 +1062,15 @@ For a simple example of usage, follow these 5 steps:
 3) place the following code block in a file called =init.el= in your Emacs
    initialization directory (=~/.emacs.d=).
    #+name: emacs-init
-   #+begin_src emacs-lisp 
+   #+begin_src emacs-lisp
      ;;; init.el --- Where all the magic begins
      ;;
      ;; This file loads Org-mode and then loads the rest of our Emacs initialization from Emacs lisp
      ;; embedded in literate Org-mode files.
-     
+
      ;; Load up Org Mode and (now included) Org Babel for elisp embedded in Org Mode files
      (setq dotfiles-dir (file-name-directory (or (buffer-file-name) load-file-name)))
-     
+
      (let* ((org-dir (expand-file-name
                       "lisp" (expand-file-name
                               "org" (expand-file-name
@@ -1084,10 +1084,10 @@ For a simple example of usage, follow these 5 steps:
        ;; load up Org-mode and Org-babel
        (require 'org-install)
        (require 'ob-tangle))
-     
+
      ;; load up all literate org-mode files in this directory
      (mapc #'org-babel-load-file (directory-files dotfiles-dir t "\\.org$"))
-     
+
      ;;; init.el ends here
    #+end_src
 4) implement all of your Emacs customizations inside of Emacs Lisp
@@ -1099,7 +1099,7 @@ For a simple example of usage, follow these 5 steps:
   :PROPERTIES:
   :CUSTOM_ID: reproducable-research
   :END:
-#+begin_quote 
+#+begin_quote
 An article about computational science in a scientific publication is
 not the scholarship itself, it is merely advertising of the
 scholarship. The actual scholarship is the complete software
@@ -1138,4 +1138,3 @@ advantages:
 block's results in a separate buffer.
 
 [fn:2]  This mode will be familiar to Sweave users.
-
