@@ -30,7 +30,7 @@
 ;;                          "/srv/http/org-mode/fortunes" 120)
 ;; 
 ;; This is the function that is used to create the javascript
-;; code on http://orgmode.org that inserts a random quote:
+;; code on https://orgmode.org that inserts a random quote:
 ;; 
 ;; (worg-write-fortune-file 
 ;;  "~/install/git/worg/org-quotes.org" 

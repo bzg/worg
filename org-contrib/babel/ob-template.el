@@ -4,7 +4,7 @@
 
 ;; Author: your name here
 ;; Keywords: literate programming, reproducible research
-;; Homepage: http://orgmode.org
+;; Homepage: https://orgmode.org
 ;; Version: 0.01
 
 ;;; License:
@@ -38,7 +38,7 @@
 ;;
 ;; If you are planning on adding a language to org-babel we would ask
 ;; that if possible you fill out the FSF copyright assignment form
-;; available at http://orgmode.org/request-assign-future.txt as this
+;; available at https://orgmode.org/request-assign-future.txt as this
 ;; will make it possible to include your language support in the core
 ;; of Org-mode, otherwise unassigned language support files can still
 ;; be included in the contrib/ directory of the Org-mode repository.
