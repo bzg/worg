@@ -1,7 +1,7 @@
 #+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
-#+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
 #+TITLE:      org-babel-screen
 #+AUTHOR:     Benjamin Andresen
 #+EMAIL:      b.andresen@gmail.com
@@ -13,7 +13,7 @@
     <p>Org-babel support for interactive terminals</p>
   </div>
 #+end_export
-  
+
 * Introduction
   :PROPERTIES:
   :CUSTOM_ID: introduction
@@ -21,7 +21,7 @@
   org-babel-screen is an extension to [[file:../index.org][Org-babel]] and was inspired by
   [[http://angg.twu.net/][Eduardo Ochs]]'s [[http://angg.twu.net/eev-article.html][eev]].
 
-  org-babel-screen provides the ability to write interactive [[http://en.wikipedia.org/wiki/Make_(software)][Makefiles]]
+  org-babel-screen provides the ability to write interactive [[https://en.wikipedia.org/wiki/Make_(software)][Makefiles]]
   that can be called from inside [[http://www.gnu.org/software/emacs/][Emacs]]. Now before you get your hopes
   up: The whole point of Makefiles is that they should run automatic.
   org-babel-screen doesn't do that! I guess the only thing they have
@@ -52,7 +52,7 @@
   The default headers arguments are a bit more interesting. If you
   don't have [[http://invisible-island.net/xterm/][XTerm]] installed or you don't wish to use it, you need to
   edit the value of /org-babel-default-header-args:screen/.
-  
+
   This is the default:
   #+begin_src emacs-lisp
     (defvar org-babel-default-header-args:screen
@@ -83,7 +83,7 @@
     to do globbing with it.
 
     This example is very verbose, but here it goes:
-    
+
 :    #+begin_src screen :cmd zsh :session create-gif
 :      TMPDIR=/tmp/gif
 :      VIDEOFILE=~/TMP/DubistTerrorist_de_divx_HD.avi
@@ -117,35 +117,35 @@
 :   #+begin_src screen :session create-gif
 :     START=1:00
 :     SECS=10
-:     
+:
 :     mplayer -ao null -vo png $VIDEOFILE -ss $START -endpos $SECS
 :   #+end_src
 
 ** Delete the frames you don't want
    This is the second interactive part.
-   
+
    You delete the frames by pressing 'd' in qiv.
 :   #+begin_src screen :session create-gif
-:     qiv . 
+:     qiv .
 :   #+end_src
 
 ** Resize pictures
    256 x the corresponding aspect ratio is a good size.
 :   #+begin_src screen :session create-gif
 :     SCALE=25%
-:     
+:
 :     mkdir Small/
 :     for img (*.png) { convert -scale $SCALE $img Small/$img }
 :     file Small/*.png([1])
 :   #+end_src
-   
+
 ** Inspect down-scaled size
    If the size isn't alright, redo the previous step with a different SCALE.
-   
+
 :   #+begin_src screen :session create-gif
 :     qiv Small/*.png
 :   #+end_src
-   
+
 ** Generate gif file
    The settings here are for an endless looping gif. If the gif plays
    to fast or too slow, you can just change the command line options
@@ -160,7 +160,7 @@
 :   #+begin_src screen :session create-gif
 :     opera animation.gif
 :   #+end_src
-   
+
 * Example 2: Semi-parallel communication via netcat
   :PROPERTIES:
   :CUSTOM_ID: Example2
@@ -226,4 +226,3 @@ org-screen-babel to /tmp/testfile and reading it back via Emacs. If
 the validation fails, the setup is deemed broken.
 
 [fn:2] The example is taken from Eev as well: [[http://angg.twu.net/eev-current/anim/channels.anim.html][channels.anim]]
-

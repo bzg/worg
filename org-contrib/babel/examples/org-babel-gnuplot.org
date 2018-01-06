@@ -44,7 +44,7 @@ alternative to babel. Instructions already exist on Worg for this.[fn:2] The
 .org file used to create the org-plot Worg entry is linked in the
 Introduction on that page and can be very helpful in getting a feel
 for using gnuplot by using the =#+PLOT= header above a table. This
-page, in contrast, is about using gnuplot in its "native" form. 
+page, in contrast, is about using gnuplot in its "native" form.
 
 To do this, babel support for the gnuplot language must be
 enabled. Versions of Org-mode prior to 7.01 required enabling /both/
@@ -170,7 +170,7 @@ set xtics ("Tic 1" -1, "Tic 2" 10, "Tic 3" 1001)
 The gnuplot default is for tics to show up on both sides and the top and
 bottom of the graph. In other words, the tics on the left y-axis and
 bottom x-axis are "mirrored" to the opposing side of the plot
-borders. Stop this (tics only on left/bottom) by using: 
+borders. Stop this (tics only on left/bottom) by using:
 #+begin_example
 set xtics nomirror
 set ytics nomirror
@@ -371,7 +371,7 @@ plot data u 1:2 w p lw 2 title 'x vs. y1', \
 Sometimes it's desireable to have text as the x-values/xtics instead of
 numbers.[fn:8] Gnuplot will plot a column of text entries as the x-values for
 its points by spacing the named values evenly along the axis. Here's
-an example of a running distance log:[fn:6] 
+an example of a running distance log:[fn:6]
 
 #+attr_html: width="800"
 [[https://orgmode.org/worg/images/babel/gnuplot-named-xtics.png]]
@@ -392,7 +392,7 @@ an example of a running distance log:[fn:6]
   reset
 
   set title "Running Stats"
-  
+
   set xlabel "Date"
   set xtics rotate by -45
 
@@ -446,7 +446,7 @@ values should correspond to these x-values. Here is an example:
   set xlabel "Wars in Time"
 
   set title 'War Deaths'
-  
+
   plot data using 2:3:xticlabels(1) w p lw 3 notitle
 #+end_src
 
@@ -457,7 +457,7 @@ For multiple data sets, simply include multiple columns for y-values
 to be plotted and plot each data set with the syntax
 =x:y:xticlabels(col #)=. Most likely, the =col #= will be the same for
 all data sets (the column of names for xtics will probably remain the
-same). Here is an example: 
+same). Here is an example:
 #+begin_example
 plot data u 2:3:xticlabels(1) title 'Set1',\
 data u 2:4:xticlabels(1) title 'Set2', \
@@ -647,7 +647,7 @@ Walking through the code:
     graph for the next two slices
   - =set origin= tells gnuplot to start the plot at the bottom left (0,0)
   - =lmargin= is set for 10 (standard) but =rmargin= is set at 0 in
-    order to let the left edge of the middle slice sit 
+    order to let the left edge of the middle slice sit
     against the right edge of the left-most slice with no gap
   - The =ylabel= is set here, and only once. Each slice is
     treated as a separate graph, and setting it for each slice creates
@@ -701,7 +701,7 @@ previous footnote above presents such case.[fn:11]
 
 ** Broken X-Axis
 Arrows can be used quite cleverly to "break" axes.[fn:13] [fn:14] [fn:15] The method involves drawing 6 arrows to "break" both the top
-and bottom x-axes: 2 diagonal and 1 white per axis to create the illusion of a break. 
+and bottom x-axes: 2 diagonal and 1 white per axis to create the illusion of a break.
 
 While the following is not /really/ to scale, the example of a
 far distant date with a broken line and then some recent dates shows
@@ -783,14 +783,14 @@ Here are some notes on the above:
   gnuplot-tricks blog for how to do this with a continuous function
   (e.g. sin x) and an "offset" variable for the same effect.[fn:14]
 
-In the case above, the x-axis is "cheated" in that it is not only 
+In the case above, the x-axis is "cheated" in that it is not only
 broken, but the scale is artificially manipulated. In the data chart,
 there should have been population values at 10,000 BC, 5,000 BC, and 1
 AD. Instead they occur at 1600, 1650 and 1700 AD. The spacing is proportionate, but scaled by 100x
 (50 years apart vs. 5,000). Compared to the plot from 1750-2005, it's
 obviously not the same x-axis scale. If the actual data points were
 used, the later data points would have been significantly "scrunched."
-While not technically correct, it's perhaps more visually appealing, especially where scale is 
+While not technically correct, it's perhaps more visually appealing, especially where scale is
 not too important. To get the point across, it does the job very well:
 left of break was not much growth, then in a much smaller time scale
 to the right of the break, much population growth occurred. The
@@ -814,7 +814,7 @@ document. The use of =reset= at the beginning of each gnuplot block
 eliminates these issues by clearing any "residual options" from previously generated output.
 
 ** Image Quality
-For many graphs, output to .png (with =:file filename.png= in the header) may be 
+For many graphs, output to .png (with =:file filename.png= in the header) may be
 sufficient. Sometimes, however, the generated image quality is not
 acceptable. The mailing list provided an excellent solution
 for increased gnuplot image quality:[fn:16]
@@ -834,7 +834,7 @@ terminal...= command used. This creates a higher resolution .eps image instead o
 =color= option, the output will default to monochrome (black and
 white). The =solid= option can be used to keep all linestyles as solid
 lines; without it, gnuplot will cycle through various styles of
-dashes/shapes/etc. 
+dashes/shapes/etc.
 
 Once the .eps file is generated, ImageMagick can be used to convert
 it to .png:[fn:17]
@@ -866,7 +866,7 @@ convert -density 300 file.eps file.png
 
 [fn:11] http://t16web.lanl.gov/Kawano/gnuplot/plot6-e.html
 
-[fn:12] Wikipedia: http://en.wikipedia.org/wiki/World_population#Population_by_region_2
+[fn:12] Wikipedia: https://en.wikipedia.org/wiki/World_population#Population_by_region_2
 
 [fn:13] http://gnuplot-tricks.blogspot.com/2009/05/gnuplot-tricks-many-say-that-it-is.html
 
@@ -879,5 +879,3 @@ convert -density 300 file.eps file.png
 [fn:17] http://www.imagemagick.org/script/index.php
 
 [fn:18] http://www.mail-archive.com/emacs-orgmode@gnu.org/msg29903.html
-
-
