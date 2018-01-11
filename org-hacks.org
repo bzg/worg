@@ -3212,6 +3212,28 @@ value is a string containg the unaligned `org-mode' table."
   (org-table-align))
 #+END_SRC
 
+** foldout.el
+
+~foldout.el~, which is part of Emacs, is a nice little companion for
+~outline-mode~.  With ~foldout.el~ one can narrow to a subtree and
+later unnarrow.  ~foldout.el~ is useful for Org mode out of the box.
+
+There is one annoyance though (at least for me):
+~foldout-zoom-subtree~ opens the drawers.
+
+This can be fixed e.g. by using the following slightly modified
+version of ~foldout-zoom-subtree~ which uses function ~org-show-entry~
+instead of ~outline-show-entry~.
+
+#+begin_src emacs-lisp
+(defun foldout-zoom-org-subtree (&optional exposure)
+  "Same as `foldout-zoom-subtree' with often nicer zoom in Org mode."
+  (interactive "P")
+  (cl-letf
+      (((symbol-function #'outline-show-entry) (lambda () (org-show-entry))))
+    (foldout-zoom-subtree exposure)))
+#+end_src
+
 * Hacking Org: Working with Org-mode and External Programs.
 ** Use Org-mode with Screen [Andrew Hyatt]
 #+index: Link!to screen session
