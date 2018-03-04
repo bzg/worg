@@ -1,15 +1,15 @@
+#+TITLE:      Babel: Languages
+
 #+OPTIONS:    H:3 num:nil toc:3 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
-#+TITLE:      Babel: Languages
 #+AUTHOR:     Eric Schulte, Dan Davison, Tom Dye
 #+EMAIL:      schulte.eric at gmail dot com, davison at stats dot ox dot ac dot uk, tsd at tsdye dot com
 #+LANGUAGE:   en
 #+HTML_HEAD:      <style type="text/css">#outline-container-langs{ clear:both; }</style>
 #+HTML_HEAD:      <style type="text/css">#outline-container-syntax{ clear:both; }</style>
 #+HTML_HEAD:      <style type="text/css">#table-of-contents{ max-width:100%; }</style>
-#+LINK_UP:    index.php
 #+LINK_HOME:  https://orgmode.org/worg/
 
 * Babel Languages
@@ -21,15 +21,15 @@ Babel supports a growing number of programming languages.  Table
 [[babel-languages]] lists supported languages, indicates how they are
 identified in Babel, and provides links to documentation and to other
 software required for full support.  Note that the table is divided
-into sections by the location of the language support: the first section
-includes core languages distributed with Emacs; the second section
-includes contributed languages that have not assigned copyright to
-FSF; and the third section includes languages distributed through the
-Emacs package system.
+into sections by the location of the language support: the first
+section includes core languages distributed with Emacs; the second
+section includes contributed languages that have not assigned
+copyright to FSF; and the third section includes languages distributed
+through the Emacs package system.
 
 #+caption: Languages supported by Babel
 #+name: babel-languages
-| *Core*               |             |                         |                                                 |
+| *Core*                 |             |                         |                                                 |
 | Language             | Identifier  | Documentation           | Requirements                                    |
 |----------------------+-------------+-------------------------+-------------------------------------------------|
 | ABC                  | abc         | [[file:languages/ob-doc-abc.org][ob-doc-abc]]              | [[http://moinejf.free.fr/][abcm2ps]], [[https://github.com/mkjunker/abc-mode][abc-mode]]                               |
@@ -85,7 +85,7 @@ Emacs package system.
 | Stan                 | stan        | [[file:languages/ob-doc-stan.org][ob-doc-stan]]             | [[http://mc-stan.org/][Stan]], [[https://github.com/stan-dev/stan-mode][Stan mode]]                                 |
 | Vala                 | vala        | [[file:languages/ob-doc-vala.org][ob-doc-vala]]             | [[https://wiki.gnome.org/Projects/Vala][Vala]]                                            |
 |----------------------+-------------+-------------------------+-------------------------------------------------|
-| *Contributed*        |             |                         |                                                 |
+| *Contributed*          |             |                         |                                                 |
 | Language             | Identifier  | Documentation           | Requirements                                    |
 |----------------------+-------------+-------------------------+-------------------------------------------------|
 | Eukleides            | eukleides   | [[file:languages/ob-doc-eukleides.org][ob-doc-eukleides]]        | [[http://eukleides.org/][eukleides]]                                       |
@@ -98,7 +98,7 @@ Emacs package system.
 | Stata                | stata       | [[file:languages/ob-doc-stata.org][ob-doc-stata]]            | [[http://stata.com/][Stata]], [[http://ess.r-project.org/][ess-mode]]                                 |
 | Tcl                  | tcl         | [[file:languages/ob-doc-tcl.org][ob-doc-tcl]]              | [[http://www.tcl.tk/][tclsh]]                                           |
 |----------------------+-------------+-------------------------+-------------------------------------------------|
-| *Emacs Package*      |             |                         |                                                 |
+| *Emacs Package*        |             |                         |                                                 |
 | Language             | Identifier  | Documentation           | Requirements                                    |
 |----------------------+-------------+-------------------------+-------------------------------------------------|
 | Axiom                | axiom, spad | [[https://bitbucket.org/pdo/axiom-environment][ob-axiom on bitbucket]]   | [[http://www.axiom-developer.org/][axiom]], [[http://www.open-axiom.org/][ OpenAxiom]], or [[http://fricas.sourceforge.net/][FriCAS]], [[https://bitbucket.org/pdo/axiom-environment/][axiom-environment]] |
@@ -117,38 +117,43 @@ Emacs package system.
 | Typescript           | typescript  | [[https://github.com/lurdan/ob-typescript][ob-typescript on github]] | [[https://nodejs.org/][node.js]], [[https://www.npmjs.com/package/typescript][typescript]]                             |
 
 
-Note: Many languages in Table [[babel-languages]] still require documentation.  A
-template is provided [[https://code.orgmode.org/bzg/worg/raw/master/org-contrib/babel/languages/ob-doc-template.org][in the worg git repository]] for the addition of
-language documentation.
+Note: Many languages in Table [[babel-languages]] still require
+documentation.  A template is provided [[https://code.orgmode.org/bzg/worg/raw/master/org-contrib/babel/languages/ob-doc-template.org][in the worg git repository]] for
+the addition of language documentation.
 
 * Configure active languages
   :PROPERTIES:
   :CUSTOM_ID: configure
   :END:
+
 To add support for a particular language to your Babel installation
 first make sure that the requirements of the language are met, then
 you may customize the =org-babel-load-languages= variable, update the
 variable's value manually by adding[fn:1]
+
 : (lang . t)
+
 to its definition.  A line like the following to explicitly /remove/
 support for a language.
+
 : (lang . nil)
 
 Here is an example manual configuration of this variable, which
 enables support for =R=, and disables support for =emacs-lisp=.
+
 #+begin_src emacs-lisp :exports code
-  ;; active Babel languages
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((R . t)
-     (emacs-lisp . nil)
-     ))
+;; active Babel languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((R . t)
+   (emacs-lisp . nil)))
 #+end_src
 
 * Develop support for new languages
   :PROPERTIES:
   :CUSTOM_ID: develop
   :END:
+
 The core Babel functions (viewing, export, tangling, etc...) are
 language agnostic and will work even for languages that are not
 explicitly supported.  Explicit language-specific support is required
@@ -163,15 +168,15 @@ functionality in an incremental fashion -- Babel will make use of
 those functions which are available, and will fail gracefully when
 functionality has not yet been implemented.
 
-There is a short Emacs Lisp template ([[https://code.orgmode.org/bzg/worg/raw/master/org-contrib/babel/ob-template.el][ob-template.el]]) which can be used as
-a starting point for implementing support for new languages.  To fetch
-a copy of this file, please clone Worg:
+There is a short Emacs Lisp template ([[https://code.orgmode.org/bzg/worg/raw/master/org-contrib/babel/ob-template.el][ob-template.el]]) which can be
+used as a starting point for implementing support for new languages.
+To fetch a copy of this file, please clone Worg:
+
 #+begin_example
  ~$ git clone https://code.orgmode.org/bzg/worg.git
 #+end_example
+
 You should find org-contrib/babel/ob-template.el.
-
-
 
 Developers are encouraged to read the [[file:../../org-contribute.org][Org-mode contribution
 instructions]] in the hope that the language support can be included
@@ -180,8 +185,8 @@ into the Org-mode core.
 * Footnotes
 
 [fn:1] If you want to load a language in the =contrib= directory by
-       specifying it in the =org-babel-do-load-languages= variable,
-       then please follow [[https://orgmode.org/worg/dev/org-build-system.html#sec-4-1-2][these instructions]]. Otherwise, a language in
-       the =contrib= directory must be explicitly required with e.g.
-       =(require 'ob-oz)= after a path to the =contrib= directory has
-       been added to =load-path=.
+       specifying it in the =org-babel-do-load-languages= variable, then
+       please follow [[https://orgmode.org/worg/dev/org-build-system.html#sec-4-1-2][these instructions]]. Otherwise, a language in the
+       =contrib= directory must be explicitly required with e.g.
+       =(require 'ob-oz)= after a path to the =contrib= directory has been
+       added to =load-path=.
