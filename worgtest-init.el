@@ -106,7 +106,7 @@
 	   :base-directory ,worg-base-color-themes-directory
 	   :base-extension "el"
 	   :html-extension "html"
-	   :publishing-directory ,(concat worg-htmlroot "/color-themes/")
+	   :publishing-directory ,(concat worg-htmlroot "/code/elisp/")
 	   :recursive t
 	   :publishing-function org-publish-attachment)
 	  ("worg-images-dir"
@@ -142,7 +142,7 @@
 
 (setq worg-base-directory worg-base)
 (setq worg-base-code-directory (concat worg-base "code/"))
-(setq worg-base-color-themes-directory (concat worg-base "color-themes/"))
+(setq worg-base-color-themes-directory (concat worg-base "code/elisp/"))
 (setq worg-base-images-directory (concat worg-base "images/"))
 (setq worg-publish-directory worg-htmlroot)
 (set-org-publish-project-alist)
@@ -160,7 +160,7 @@
    (let ((org-format-latex-signal-error nil)
 	 (worg-base-directory worg-base)
 	 (worg-base-code-directory (concat worg-base "code/"))
-	 (worg-base-color-themes-directory (concat worg-base "color-themes/"))
+	 (worg-base-color-themes-directory (concat worg-base "code/elisp/"))
 	 (worg-base-images-directory (concat worg-base "images/"))
 	 (worg-publish-directory worg-htmlroot))
      (set-org-publish-project-alist)
@@ -173,7 +173,7 @@
    (let ((org-format-latex-signal-error nil)
 	 (worg-base-directory worg-base)
 	 (worg-base-code-directory (concat worg-base "code/"))
-	 (worg-base-color-themes-directory (concat worg-base "color-themes/"))
+	 (worg-base-color-themes-directory (concat worg-base "code/elisp/"))
 	 (worg-base-images-directory (concat worg-base "images/"))
 	 (worg-publish-directory worg-htmlroot))
      (set-org-publish-project-alist)
