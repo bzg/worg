@@ -1,62 +1,71 @@
+#+TITLE:      Org Mode: Data Collection and Analysis
+#+AUTHOR:     Eric Schulte
 #+OPTIONS:    H:3 num:nil toc:1 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) 
-#+TITLE:      Org Mode: Data Collection and Analysis
-#+AUTHOR:     Eric Schulte
 #+EMAIL:      
 #+LANGUAGE:   en
 #+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
 
-[[file:index.org][{Back to Babel's index}]]
+[[file:../index.org][{Back to Babel's index}]]
 
 * Data Collection and Analysis
-  This example uses Org-babel to automate a repeated data-collection
-  and analysis task.  A Ruby code block is used to scrape data from
-  the output of a computational experiment.  This data is then written
-  to an Org-mode table.  A block of R code reads from this table and
-  calculates lines of fit.  Finally a block of gnuplot code is used to
-  graph the results of both the raw data and the R analysis.  By
-  performing all of these steps within an Org-mode document working
-  notes, discussion, and TODOs can be naturally interspersed with the
-  code, and the results can easily be published to HTML or PDF for
-  distribution.
+
+This example uses Org-babel to automate a repeated data-collection and
+analysis task.  A Ruby code block is used to scrape data from the
+output of a computational experiment.  This data is then written to an
+Org-mode table.  A block of R code reads from this table and
+calculates lines of fit.  Finally a block of gnuplot code is used to
+graph the results of both the raw data and the R analysis.  By
+performing all of these steps within an Org-mode document working
+notes, discussion, and TODOs can be naturally interspersed with the
+code, and the results can easily be published to HTML or PDF for
+distribution.
 
 ** Requirement
-   - A working [[http://www.ruby-lang.org/en/][Ruby]] installation
-   - A working [[http://www.r-project.org/][R]] installation
-   - A working [[http://www.gnuplot.info/][gnuplot]] installation
+
+- A working [[http://www.ruby-lang.org/en/][Ruby]] installation
+- A working [[http://www.r-project.org/][R]] installation
+- A working [[http://www.gnuplot.info/][gnuplot]] installation
 
 ** Advantages
-   - Org-babel handles passing the data between different programming
-     languages
-   - Raw data persists in tables in the Org-mode file
-   - Working notes can be collocated with the code/results to which
-     they refer
-   - Tasks can be saved and updated from within the same file in which
-     the work is being performed
-   - Org-mode exporting facilities can be used to export the results
-     to HTML or PDF for distribution
+
+- Org-babel handles passing the data between different programming
+  languages.
+
+- Raw data persists in tables in the Org-mode file.
+
+- Working notes can be collocated with the code/results to which they
+  refer.
+
+- Tasks can be saved and updated from within the same file in which
+  the work is being performed.
+
+- Org-mode exporting facilities can be used to export the results to
+  HTML or PDF for distribution.
 
 ** Disadvantages
-   - This approach can allow the experimenter to use whatever language
-     is most comfortable for each sub-task, sometimes resulting in an
-     overly complicated work flow.  For example, in the example below I
-     did not have to learn how to calculate the mean and standard
-     deviation in R since it was easier for me to do so in Ruby even
-     though a full R solution would have been more efficient.
+
+- This approach can allow the experimenter to use whatever language is
+  most comfortable for each sub-task, sometimes resulting in an overly
+  complicated work flow.  For example, in the example below I did not
+  have to learn how to calculate the mean and standard deviation in R
+  since it was easier for me to do so in Ruby even though a full R
+  solution would have been more efficient.
 
 ** Example
 
 *** Code for running experiment and collecting the results
 
-    This portion will not be repeatable as it would require the
-    entire experimental setup.  It is provided for demonstration.
+This portion will not be repeatable as it would require the entire
+experimental setup.  It is provided for demonstration.
 
-    *Ruby* run-timer-test: Runs the actual experiment.  This is
-    tangled to an external file and run on the command line -- since
-    these runs can take several days, I prefer to run them 
-    outside of Emacs (normally using [[http://www.gnu.org/software/screen/][screen]]).
+*Ruby* run-timer-test: Runs the actual experiment.  This is tangled to
+an external file and run on the command line -- since these runs can
+take several days, I prefer to run them outside of Emacs (normally
+using [[http://www.gnu.org/software/screen/][screen]]).
+
 #+name: run-timer-test
 #+begin_src ruby :results silent :tangle timer :exports code
   DEFAULT_CMDLINE = "--swap 0 --del 0 --mut 0.1 example.c "
@@ -83,11 +92,11 @@
   end
 #+end_src
 
-    *Ruby* parse-output: The execution of =run-timer-test= leaves
-    results distributed across many text log files.  The following
-    Ruby source code block is
-    used to collect results from these files and dump them into an
-    Org-mode file as a table.
+*Ruby* parse-output: The execution of =run-timer-test= leaves results
+distributed across many text log files.  The following Ruby source
+code block is used to collect results from these files and dump them
+into an Org-mode file as a table.
+
 #+name: parse-output
 #+begin_src ruby :results output raw :exports code
   def look(path)
@@ -115,8 +124,9 @@
 #+end_src
 
 *** Data
-    Here is fake example output from the =parse-output= Ruby source
-    code block above.
+
+Here is fake example output from the =parse-output= Ruby source code
+block above.
 
 #+tblname: example-data
 | normal_0  | 1 | 150.264 | 150.631066 | 163.0 | 1 |
@@ -136,10 +146,12 @@
 | pll_3_6   | 3 |   1.433 |   2.018572 |   1.0 | 1 |
 
 *** Analysis
-    The code blocks in this section will be repeatable as they rely on
-    the fake data given above.
 
-    *Ruby* calculate mean and standard deviation over the second column
+The code blocks in this section will be repeatable as they rely on the
+fake data given above.
+
+*Ruby* calculate mean and standard deviation over the second column
+
 #+name: stddev
 #+begin_src ruby :var raw=example-data :results raw output :exports code
   by_procs = {}
@@ -161,7 +173,7 @@
 | 3 |       17.6483815 | 14.9070317402304 |
 | 4 | 43.0102596666667 | 42.1863032424348 |
 
-    *R* find the curve that best fits these data
+*R* find the curve that best fits these data
 #+begin_src R :session R :exports code :var data=example-stddev :results output
   procs <- data$V1
   times <- data$V2
@@ -185,8 +197,9 @@ Number of iterations to convergence: 1
 Achieved convergence tolerance: 3.924e-08
 #+end_example
 
-    *gnuplot* plot the raw data, along with the error bars and the best
-    fit curve
+*gnuplot* plot the raw data, along with the error bars and the best fit
+curve.
+
 #+begin_src gnuplot :var data=example-data :var mydata=example-stddev :exports code
   set xrange [0.5:5]
   set yrange [0:]
@@ -197,12 +210,11 @@ Achieved convergence tolerance: 3.924e-08
   replot 11.12 + 45.70/x title 'fit'
 #+end_src
 
-    Which produces the following [[file:../../../images/babel/example-graph.png]]
+Which produces the following [[file:../../../images/babel/example-graph.png]]
 
 *** Distribution
-    Using Org-mode's exporting capabilities it is easy to publish the
-    entire working file including source-code and raw data, to share
-    sections using `org-narrow-to-subtree', or even to share
-    individual tables or graphs.
 
-
+Using Org-mode's exporting capabilities it is easy to publish the
+entire working file including source-code and raw data, to share
+sections using `org-narrow-to-subtree', or even to share individual
+tables or graphs.

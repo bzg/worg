@@ -1,16 +1,15 @@
+#+TITLE:      Exporting Gantt charts with Taskjuggler v3 (tj3)
+#+AUTHOR:     John Henderson
+#+EMAIL:      jw DOT hendy AT gmail DOT com
 #+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c)
-#+TITLE:      Exporting Gantt charts with Taskjuggler v3 (tj3)
-#+AUTHOR:     John Henderson
-#+EMAIL:      jw DOT hendy AT gmail DOT com
 #+LANGUAGE:   en
 #+PRIORITIES: A C B
 #+CATEGORY:   worg
 
-[[file:index.org][{Back to Worg's index}]]
-
+[[https://orgmode.org/worg/][{Back to Worg's index}]]
 
 * Introduction
 
@@ -30,9 +29,9 @@ longer features the former [[http://qt-project.org/][Qt]]-based GUI for task/tim
 It should also be mentioned that the project is now [[http://www.taskjuggler.org/manual/change_log.html#version_1_0_0][10 years old]], and, as a result, is
 [[http://taskjuggler.org/tj3/manual/toc.html][fantastically documented]].
 
-The [[https://orgmode.org/manual/TaskJuggler-export.html][Org-mode manual coverage of Taskjuggler]] covers Taskjuggler export to some extent,
-however the defaults assume the use of version 2.x.x. This tutorial will lay out
-the changes required to successfully export with tj3.
+The manual used to cover Taskjuggler export to some extent, however
+the defaults assume the use of version 2.x.x. This tutorial will lay
+out the changes required to successfully export with tj3.
 
 * Installation and Setup
 
@@ -100,8 +99,8 @@ In addition, here are a list of current variables you can customize:
 - org-taskjuggler-default-project-duration
 - org-taskjuggler-default-project-version
 - ~org-taskjuggler-default-reports~: sets a report file to use. This may be written in
-     text format (as in, the variable set to the full report text string), or (perhaps
-     easier) to a [[http://www.taskjuggler.org/tj3/manual/include.properties.html][=.tji= file containing the report definition]].
+  text format (as in, the variable set to the full report text string), or (perhaps
+  easier) to a [[http://www.taskjuggler.org/tj3/manual/include.properties.html][=.tji= file containing the report definition]].
 - org-taskjuggler-extension
 - org-taskjuggler-final-hook
 - org-taskjuggler-keep-project-as-task
@@ -111,7 +110,7 @@ In addition, here are a list of current variables you can customize:
 - org-taskjuggler-reports-directory
 - org-taskjuggler-resource-tag
 - ~org-taskjuggler-target-version~: should be set to the output of the command =tj3
-     --version=, e.g. =(setq org-taskjuggler-target-version 3.4)=
+  --version=, e.g. =(setq org-taskjuggler-target-version 3.4)=
 - org-taskjuggler-valid-report-attributes
 - org-taskjuggler-valid-resource-attributes
 - org-taskjuggler-valid-task-attributes
@@ -143,7 +142,6 @@ particularly helpful:
   week specified translates to =9d= calendar time. Effort requires at least one resource
   defined and assigned to the task, and will use his/her available work time/day to figure
   out how long the task will take.
-
 
 * Mapping of Taskjuggler syntax to Org-mode
 
@@ -219,23 +217,28 @@ file, =home-renovation.org= and create a top level headline to contain our tasks
 #+END_SRC
 
 * References
-- [[http://www.taskjuggler.org/tj3/manual/toc.html][Taskjuggler (tj3) user manual]]
-- [[https://orgmode.org/manual/TaskJuggler-export.html][Taskjuggler in the Org-mode manual]]
-- [[https://orgmode.org/worg/org-tutorials/org-taskjuggler.html][Taskjuggler (v2) guide on Worg]] (though some functionality is out of date for using tj3,
-  most of the specifications still work, and the guide is excellent overall for getting a
-  feel for using Org-mode with Taskjuggler.
 
+- [[http://www.taskjuggler.org/tj3/manual/toc.html][Taskjuggler (tj3) user manual]]
+
+- [[https://orgmode.org/worg/org-tutorials/org-taskjuggler.html][Taskjuggler (v2) guide on Worg]] (though some functionality is out of
+  date for using tj3, most of the specifications still work, and the
+  guide is excellent overall for getting a feel for using Org-mode
+  with Taskjuggler.
 
 * Footnotes
 
-[fn:1] You may run into compilation issues due to special characters in that file on
-lines 37 (a copyright symbol), 79, and 83 (two accented characters in resource names). If
-this happens, just replace those three characters with something else, or delete them,
-and the file should compile. [[https://github.com/taskjuggler/TaskJuggler/issues/105][An issue has been filed]] inquiring about whether or not this
-is a system setup issue and, if not, suggesting that the characters be replaced.
+[fn:1] You may run into compilation issues due to special characters
+in that file on lines 37 (a copyright symbol), 79, and 83 (two
+accented characters in resource names). If this happens, just replace
+those three characters with something else, or delete them, and the
+file should compile. [[https://github.com/taskjuggler/TaskJuggler/issues/105][An issue has been filed]] inquiring about whether
+or not this is a system setup issue and, if not, suggesting that the
+characters be replaced.
 
 * TODO Fill in the details!					   :noexport:
+
 ** Plan your project
+
 You start out as you normally would by breaking down the project into
 tasks. Let's take the following example where you have a project to
 create an accounting software:
@@ -425,15 +428,15 @@ There are several ways to define dependencies between tasks. When
 coming from an Org mode background you probably want to define them
 using the facilities provided by Org mode, which are either
 
-  - The =ORDERED= property which allows you to state that the child
-    tasks have to be completed in the order they appear (top most
-    first).
+- The =ORDERED= property which allows you to state that the child
+  tasks have to be completed in the order they appear (top most
+  first).
 
-  - The =BLOCKER= property which allows you to state that a task
-    depends on either
-    - a previous sibling ("previous-sibling") or
-    - any other task by stating the ~task_id~ property of the
-      predecessor
+- The =BLOCKER= property which allows you to state that a task
+  depends on either
+  - a previous sibling ("previous-sibling") or
+  - any other task by stating the ~task_id~ property of the
+    predecessor
 
 Again, it is probably easiest to define the dependencies using the
 column view as shown below in the screen shot:
@@ -706,28 +709,28 @@ by simply appending it.  The following examples should illustrate this:
 
 #+BEGIN_EXAMPLE:
 ** Preparation
-   :PROPERTIES:
-   :task_id:  preparation
-   :ORDERED:  t
-   :END:
+:PROPERTIES:
+:task_id:  preparation
+:ORDERED:  t
+:END:
 ** Training material
-   :PROPERTIES:
-   :task_id:  training_material
-   :ORDERED:  t
-   :END:
+:PROPERTIES:
+:task_id:  training_material
+:ORDERED:  t
+:END:
 *** Markup Guidelines
-    :PROPERTIES:
-    :Effort:   2d
-    :END:
+:PROPERTIES:
+:Effort:   2d
+:END:
 *** Workflow Guidelines
-    :PROPERTIES:
-    :Effort:   2d
-    :END:
+:PROPERTIES:
+:Effort:   2d
+:END:
 ** Presentation
-  :PROPERTIES:
-  :Effort:   2d
-  :BLOCKER:  training_material @{ gapduration 1d @} preparation
-  :END:
+:PROPERTIES:
+:Effort:   2d
+:BLOCKER:  training_material @{ gapduration 1d @} preparation
+:END:
 #+END_EXAMPLE:
 
 #+index: org-export-taskjuggler-default-reports
