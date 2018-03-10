@@ -1,6 +1,6 @@
-#+STARTUP: align fold nodlcheck hidestars oddeven lognotestate
 #+TITLE: EMACS ORG-INFO.JS
 #+AUTHOR: Sebastian Rose
+#+STARTUP: align fold nodlcheck hidestars oddeven lognotestate
 #+EMAIL:
 #+LANGUAGE: en
 #+OPTIONS: d:nil
@@ -12,256 +12,265 @@
 
 * The Name of the Game
 
-  org-info-js (subsequently called /the script/) implements part of Emacs Org-mode
-  in its XHTML-exported files, allowing them to be rendered and browsed in a
-  linuxdoc/texinfo style.
+org-info-js (subsequently called /the script/) implements part of Emacs
+Org-mode in its XHTML-exported files, allowing them to be rendered and
+browsed in a linuxdoc/texinfo style.
 
-  This documentation is one XHTML file, exported from one *.org file using a
-  single keyboard shortcut. No additional postprocessing was done.  There are no
-  external dependencies and the script is small and fast, even for large files.
-  It is used on the [[https://orgmode.org/Changes.html][org-mode site]] to display =ORGWEBPAGE/Changes.org= which
-  consists of more than 220 sections.
+This documentation is one XHTML file, exported from one *.org file
+using a single keyboard shortcut. No additional postprocessing was
+done.  There are no external dependencies and the script is small and
+fast, even for large files.  It is used on the [[https://orgmode.org/Changes.html][org-mode site]] to
+display =ORGWEBPAGE/Changes.org= which consists of more than 220
+sections.
 
-  If you don't mind using it despite the /health warnings/ we wish you good luck
-  and hope the fun will outweigh your effort.
+If you don't mind using it despite the /health warnings/ we wish you
+good luck and hope the fun will outweigh your effort.
 
-  There are some drawbacks though. It is currently not possible to
-  open internal links in another tab (e.g. using middle click in
-  Firefox) due my poor JavaScript knowledge. This is not very high on
-  my TODO list since the history mechanism of the script is a good
-  alternative to tab usage.
+There are some drawbacks though. It is currently not possible to open
+internal links in another tab (e.g. using middle click in Firefox) due
+my poor JavaScript knowledge. This is not very high on my TODO list
+since the history mechanism of the script is a good alternative to tab
+usage.
 
-  Go to the next section by pressing '=n='.
+Go to the next section by pressing '=n='.
 
-  Find out about shortcuts in section [[#shortcuts][Shortcuts]] (and come back here
-  pressing '=b='). In addition, '=?=' will show all shortcuts available.
+Find out about shortcuts in section [[#shortcuts][Shortcuts]] (and come back here
+pressing '=b='). In addition, '=?=' will show all shortcuts available.
 
 ** <<<Download>>>
 
-   - A list of changes can be found [[file:changes.org][here]] (separate file).
-   - Download the [[file:org-info.js][minified version]] or the [[file:org-info-src.js][source code]].
-   - Create the minified versions from the sources using the [[file:Makefile][Makefile]] and a
-     little [[file:sed.txt][sed script]].
+- A list of changes can be found [[file:changes.org][here]] (separate file).
 
-   Development of the script takes place on github
-   (http://github.com/SebastianRose/org-info-js/tree/master), but every working
-   release is published here on Worg synchronously. That said, you can follow
-   the development by tracking the Worg repo as well, available at
-   [[https://code.orgmode.org/bzg/worg]].
+- Download the [[file:org-info.js][minified version]] or the [[file:org-info-src.js][source code]].
+
+- Create the minified versions from the sources using the =Makefile= and
+  a little sed script (see within this directory).
+
+  Development of the script takes place on [[http://github.com/SebastianRose/org-info-js/tree/master][github]], but every working
+  release is published here on Worg synchronously. That said, you can
+  follow the development by tracking the Worg repo as well, available
+  at [[https://code.orgmode.org/bzg/worg]].
 
 ** Terms used throughout this Document
-   :PROPERTIES:
-   :CUSTOM_ID: terms
-   :END:
+:PROPERTIES:
+:CUSTOM_ID: terms
+:END:
 
-   The script knows three different so called /view modes/. One may toggle the
-   view mode by pressing '=m=' or click the /toggle view/ link the script adds to
-   your pages. Currently three view modes exist:
+The script knows three different so called /view modes/. One may toggle
+the view mode by pressing '=m=' or click the /toggle view/ link the script
+adds to your pages. Currently three view modes exist:
 
-   + *info view mode* ::
-     This mode displays the sections one by one, paged like the typical
-     linuxdoc or texinfo files. This is the view mode you should face when
-     first visiting this documentation.
++ *info view mode* ::
+     This mode displays the sections one by one, paged like the
+     typical linuxdoc or texinfo files. This is the view mode you
+     should face when first visiting this documentation.
 
-   + *plain view mode* ::
-     This mode displays the entire file. In this mode the sections are foldable
-     by clicking the headlines or pressing '=f=' (fold). The entire structure
-     of the document may be (un-)folded using '=F='. You may determine what's
-     visible on page load.
++ *plain view mode* ::
+     This mode displays the entire file. In this mode the sections are
+     foldable by clicking the headlines or pressing '=f=' (fold). The
+     entire structure of the document may be (un-)folded using
+     '=F='. You may determine what's visible on page load.
 
-   + *presentation mode* ::
-     This mode displays sections one by one as slides. Still
-     very rustic and experimental. Rick Moynihan embarked and we plan a separate
-     tool for presentations, but...
++ *presentation mode* ::
+     This mode displays sections one by one as slides. Still very
+     rustic and experimental. Rick Moynihan embarked and we plan a
+     separate tool for presentations, but...
 
-   The table of contents (*TOC*) is required, albeit it may be hidden (CSS). The TOC may
-   be visited using '=i=' (index) regardless of its visibility.
+     The table of contents (*TOC*) is required, albeit it may be hidden
+     (CSS). The TOC may be visited using '=i=' (index) regardless of its
+     visibility.
 
-   A *section* is everything with a headline.
+     A *section* is everything with a headline.
 
 * Features
-  :PROPERTIES:
-  :CUSTOM_ID: features
-  :END:
+:PROPERTIES:
+:CUSTOM_ID: features
+:END:
 ** Appearance
 
-   + *Toggle plain view, info view and presentation* ::
-     One can click the script-generated links in info view mode to read through
-     the whole file page by page. By clicking on '/toggle view/' (or pressing
-     `m´) you can switch between info and plain view mode. The presentation mode
-     is very rudimentary and just a quick hack realy. Press 'x' to see it.
-   + *Keep place in file when toggling* ::
-     When changing the view mode via the '/toggle view/' links, the reader gets
-     the same part of the document presented after the view change as he saw
-     before.
-   + *Cut the TOC* ::
-     You may cut the table of contents to a certain depth. The splitting of the
-     document is not affected by this option. Hence you might set the level of
-     headlines to 4, but cut the TOC to show only the first two levels.
-   + *Optional subindexes* ::
-     The script optionally creates subindexes under the headline of a section
-     containing subsections not exceeding =org-export-headline-levels=. This
-     was done to get a more texinfo/linuxdoc kind of feel and a better
-     orientaton.
-   + *Startupview customizable* ::
-     Choose how to display the document on load. Info-like or plain and more.
-   + *Toggle links everywhere / only on top* ::
-     You may choose to display the '/toggle view/' links above every headline
-     or just next the current sections headline.
-   + *Numbered pages* ::
-     In info view mode every page gets a page number starting from one.
-   + *Markright alike headings* ::
++ *Toggle plain view, info view and presentation* ::
+     One can click the script-generated links in info view mode to
+     read through the whole file page by page. By clicking on '/toggle
+     view/' (or pressing `m´) you can switch between info and plain
+     view mode. The presentation mode is very rudimentary and just a
+     quick hack realy. Press 'x' to see it.
++ *Keep place in file when toggling* ::
+     When changing the view mode via the '/toggle view/' links, the
+     reader gets the same part of the document presented after the
+     view change as he saw before.
++ *Cut the TOC* ::
+     You may cut the table of contents to a certain depth. The
+     splitting of the document is not affected by this option. Hence
+     you might set the level of headlines to 4, but cut the TOC to
+     show only the first two levels.
++ *Optional subindexes* ::
+     The script optionally creates subindexes under the headline of a
+     section containing subsections not exceeding
+     =org-export-headline-levels=. This was done to get a more
+     texinfo/linuxdoc kind of feel and a better orientaton.
++ *Startupview customizable* ::
+     Choose how to display the document on load. Info-like or plain
+     and more.
++ *Toggle links everywhere / only on top* ::
+     You may choose to display the '/toggle view/' links above every
+     headline or just next the current sections headline.
++ *Numbered pages* ::
+     In info view mode every page gets a page number starting from
+     one.
++ *Markright alike headings* ::
      Info view mode only. Similar to the =\markright= command in LaTeX
-     the Title of the current sections parent appears on top of each page. In
-     subsections this heading can be use as link up to start of the parent
-     section (see top of this page when you're in info view mode). You can move
-     to the parent section by pressing `u´ (up).
-   + *Tooltips* ::
-     Moving the mouse on the navigation links shows a tooltip with name of
-     next/previous section.
-   + *Hide TOC* ::
-     The TOC can be hidden completly. Hitting '=i=' still will show it. When
-     showing the TOC hitting '=i=' any navigation command ('=n=', '=p=',
-     '=s='...) will trigger an history-back. Thus the TOC will not get in your
-     way when navigating the history later on.
+     the Title of the current sections parent appears on top of each
+     page. In subsections this heading can be use as link up to start
+     of the parent section (see top of this page when you're in info
+     view mode). You can move to the parent section by pressing `u´
+     (up).
++ *Tooltips* ::
+     Moving the mouse on the navigation links shows a tooltip with
+     name of next/previous section.
++ *Hide TOC* ::
+     The TOC can be hidden completly. Hitting '=i=' still will show
+     it. When showing the TOC hitting '=i=' any navigation command ('=n=',
+     '=p=', '=s='...) will trigger an history-back. Thus the TOC will not
+     get in your way when navigating the history later on.
 
 ** Keyboard navigation
 
-   + *Easy keyboard navigation* ::
++ *Easy keyboard navigation* ::
      See Section [[#shortcuts][Shortcuts]] for a list of shortcuts.
-   + Navigation history ::
-     Navigating a file through the keyboard shortcuts is recorded in an internal
-     history. You may go back and forth in this history. Once an end is reached,
-     org-info.js tries to go back/forth in the browsers history. If you move
-     back to a previous visited file that uses the script, you will return to
-     the place you left the file. Thus following links in published files feels
-     like following footnotes.
-   + *Customizable features* ::
-     All features are customizable simply by setting up your export options
-     template (see [[#setup][Setup]]).
-   + *Folding* ::
++ Navigation history ::
+     Navigating a file through the keyboard shortcuts is recorded in
+     an internal history. You may go back and forth in this
+     history. Once an end is reached, org-info.js tries to go
+     back/forth in the browsers history. If you move back to a
+     previous visited file that uses the script, you will return to
+     the place you left the file. Thus following links in published
+     files feels like following footnotes.
++ *Customizable features* ::
+     All features are customizable simply by setting up your export
+     options template (see [[#setup][Setup]]).
++ *Folding* ::
      Emulates the way of folding in emacs Org-mode. Mouse supported.
 
 ** Searching
 
-   + *Full text-search with highlighting* :: Search forward, backwards, repeated
++ *Full text-search with highlighting* :: Search forward, backwards, repeated
      search... (experimental). Simple regular expressions are supported. Try to
      search for =a[e-h].*n= for example. All searches are case
      insensitive. Grouping is not supported. We couldn't search for round
      brackets otherwise. Supported are wildcards (e.g. =.*=) and ranges
      (e.g. =[a-g]=). Sometimes only one match is found between two HTML tags. The
      longer the expression, the better the matches.
-   + *Occur mode* ::
++ *Occur mode* ::
      As experimental as the text-search, but I love this one. You may link to a
      file using this script like this: =index.html?OCCUR=java=. Use regular
      expressions likewise.
-   + *Tags index* ::
++ *Tags index* ::
      '=C=' shows a table of contents based on tags. Inherited tags are not
      supported yet. This was an [[http://lists.gnu.org/archive/html/emacs-orgmode/2008-07/msg00434.html][idea of Rick Moynihan]].
 
 ** Miscellaneous
 
-   + *Inter-linking* ::
++ *Inter-linking* ::
      The exported pages can be linked to the homepage and an directory index or
      some other sort of parent file.
-   + *Adjusted internal links* ::
++ *Adjusted internal links* ::
      Internal links to section headings are automatically adjusted to work with
      this script. When following such internal links, one may go back again
      using '=b='.
-   + *Detect the target in the URL* ::
++ *Detect the target in the URL* ::
      If the URL is suffixed by '=#sec-x.y.z=' that section will be displayed
      after startup.
-   + *Structure is taken from export preferences* ::
++ *Structure is taken from export preferences* ::
      The paging is done according to your setting of
      =org-export-headline-levels=. Scanning the TOC is a good way to get
      around browser detection. An option to hide the TOC exists.
-   + *Startup information* ::
++ *Startup information* ::
      Show a little message on page load to tell the visitor about the script
      usage.
-   + *Wrap text before first headline* :: This is a temporary fix for the missing
++ *Wrap text before first headline* :: This is a temporary fix for the missing
      =<p>= element around the text before the first headline, available since
      version 0.0.7.3a (fixed in current Org-mode versions). If you export with
      =skip:nil=, you may add this to your stylesheet:
      : #text-before-first-headline {color:red;font-weight:bold;}
-   + Hooks :: The OrgHtmlManager object provides hooks (two currently) to add
-              custom actions.
++ Hooks :: The OrgHtmlManager object provides hooks (two currently) to add
+     custom actions.
 
 * Shortcuts
-  :PROPERTIES:
-  :CUSTOM_ID: shortcuts
-  :END:
+:PROPERTIES:
+:CUSTOM_ID: shortcuts
+:END:
 
-  The visitor of this file (and every XHTML-exported org file that includes the
-  script) may use the mouse or the following keys to navigate. '=?=' should give
-  you a list of shortcuts.
+The visitor of this file (and every XHTML-exported org file that includes the
+script) may use the mouse or the following keys to navigate. '=?=' should give
+you a list of shortcuts.
 
-  The script always tries to keep the last selected section visible. This is
-  somewhat strange when scrolling, but really helpful for keyboard navigation.
+The script always tries to keep the last selected section visible. This is
+somewhat strange when scrolling, but really helpful for keyboard navigation.
 
-  The TOC is handled specially, when hidden. If you press '=i=', the TOC is
-  displayed. Any subsequent key press goes back to where you've been before. The
-  TOC does not show up the history. Same applies to the keyboard help.
+The TOC is handled specially, when hidden. If you press '=i=', the TOC is
+displayed. Any subsequent key press goes back to where you've been before. The
+TOC does not show up the history. Same applies to the keyboard help.
 
-  | Key       | Function                                                |
-  |-----------+---------------------------------------------------------|
-  | ? / ¿     | show this help screen                                   |
-  |-----------+---------------------------------------------------------|
-  |           | *Moving around*                                         |
-  | n / p     | goto the next / previous section                        |
-  | N / P     | goto the next / previous sibling                        |
-  | t / E     | goto the first / last section                           |
-  | g         | goto section...                                         |
-  | u         | go one level up (parent section)                        |
-  | i / C     | show table of contents / tags index                     |
-  | b / B     | go back to last / forward to next visited section.      |
-  | h / H     | go to main index in this directory / link HOME page     |
-  |-----------+---------------------------------------------------------|
-  |           | *View*                                                  |
-  | m / x     | toggle the view mode between info and plain / slides    |
-  | f / F     | fold current section / whole document (plain view only) |
-  |-----------+---------------------------------------------------------|
-  |           | *Searching*                                             |
-  | s / r     | search forward / backward....                           |
-  | S / R     | search again forward / backward                         |
-  | o         | occur-mode                                              |
-  | c         | clear search-highlight                                  |
-  |-----------+---------------------------------------------------------|
-  |           | *Misc*                                                  |
-  | l / L / U | display HTML link / Org link / Plain-URL                |
-  | v / V     | scroll down / up                                        |
+| Key       | Function                                                |
+|-----------+---------------------------------------------------------|
+| ? / ¿     | show this help screen                                   |
+|-----------+---------------------------------------------------------|
+|           | *Moving around*                                           |
+| n / p     | goto the next / previous section                        |
+| N / P     | goto the next / previous sibling                        |
+| t / E     | goto the first / last section                           |
+| g         | goto section...                                         |
+| u         | go one level up (parent section)                        |
+| i / C     | show table of contents / tags index                     |
+| b / B     | go back to last / forward to next visited section.      |
+| h / H     | go to main index in this directory / link HOME page     |
+|-----------+---------------------------------------------------------|
+|           | *View*                                                    |
+| m / x     | toggle the view mode between info and plain / slides    |
+| f / F     | fold current section / whole document (plain view only) |
+|-----------+---------------------------------------------------------|
+|           | *Searching*                                               |
+| s / r     | search forward / backward....                           |
+| S / R     | search again forward / backward                         |
+| o         | occur-mode                                              |
+| c         | clear search-highlight                                  |
+|-----------+---------------------------------------------------------|
+|           | *Misc*                                                    |
+| l / L / U | display HTML link / Org link / Plain-URL                |
+| v / V     | scroll down / up                                        |
 
-  Thanks Carsten, for this beautiful table!
+Thanks Carsten, for this beautiful table!
 
 * Setup
-  :PROPERTIES:
-  :CUSTOM_ID: setup
-  :END:
+:PROPERTIES:
+:CUSTOM_ID: setup
+:END:
 
-  This section describes how to setup your org files to use the
-  script. [[#the-new-way][Export-Setup - the new Way]] covers setting up org XHTML
-  export with Org-mode version >= 6.02. For those using an older
-  Org-mode version < 6.02 the next section ([[#the-old-way][Export-Setup - the old Way]])
-  remains. [[#using-set][Using Set()]] contains a list of all supported options for adjusting
-  the =org\_html\_manager= to suit your needs.
+This section describes how to setup your org files to use the
+script. [[#the-new-way][Export-Setup - the new Way]] covers setting up org XHTML
+export with Org-mode version >= 6.02. For those using an older
+Org-mode version < 6.02 the next section ([[#the-old-way][Export-Setup - the old Way]])
+remains. [[#using-set][Using Set()]] contains a list of all supported options for adjusting
+the =org\_html\_manager= to suit your needs.
 
-  See the Download section on how to obtain a version of the script.
+See the Download section on how to obtain a version of the script.
 
-  The first version of this document was created with the new XHTML exporter
-  which was revised by Carsten Dominik in March 2008 (in Org-mode v5.23a+) to
-  better support =XML=.  You can use =M-x org-version= to see which version of
-  Org-mode you have installed.
+The first version of this document was created with the new XHTML exporter
+which was revised by Carsten Dominik in March 2008 (in Org-mode v5.23a+) to
+better support =XML=.  You can use =M-x org-version= to see which version of
+Org-mode you have installed.
 
 ** Export-Setup - the new Way
-   :PROPERTIES:
-   :CUSTOM_ID: the-new-way
-   :END:
+:PROPERTIES:
+:CUSTOM_ID: the-new-way
+:END:
 
-   The modern way of org export setup provides extra options to include and
-   configure the script, as well as an emacs customize interface for this very
-   purpose. Options set in customize may be overwritten on a per-file basis
-   using one or more special =#+INFOJS_OPT:= lines in the head of your org file.
+The modern way of org export setup provides extra options to include and
+configure the script, as well as an emacs customize interface for this very
+purpose. Options set in customize may be overwritten on a per-file basis
+using one or more special =#+INFOJS_OPT:= lines in the head of your org file.
 
-   As an example, the head of this org file looks like:
+As an example, the head of this org file looks like:
 
 #+BEGIN_SRC org
 ,#+INFOJS_OPT: path:org-info.js
@@ -272,94 +281,94 @@
 
 *** Using customize
 
-    To use customize type
-    : M-x customize-group RET org-export-html RET
-    scroll to the bottom and click =Org Export HTML INFOJS=.
+To use customize type
+: M-x customize-group RET org-export-html RET
+scroll to the bottom and click =Org Export HTML INFOJS=.
 
-    On this page three main options may be configured. /Org Export Html Use
-    Infojs/ is very good documented and /Org Infojs Template/ should be
-    perfect by default. So I'll concentrate on /Org Infojs Options/ here.
+On this page three main options may be configured. /Org Export Html Use
+Infojs/ is very good documented and /Org Infojs Template/ should be
+perfect by default. So I'll concentrate on /Org Infojs Options/ here.
 
-      + =path= ::
-        Absolute or relative URL to the script as used in in XHTML
-        links. '=org-info.js=' will find the file in the current
-        directory. Keep in mind that this will be the directory of the
-        exported file, eventually a directory on a server.
++ =path= ::
+     Absolute or relative URL to the script as used in in XHTML
+     links. '=org-info.js=' will find the file in the current
+     directory. Keep in mind that this will be the directory of the
+     exported file, eventually a directory on a server.
 
-      + =view= ::
-        What kind of view mode should the script enter on startup? Possible
-        values are
-        + =info= --- info view mode,
-        + =overview= --- plain view mode, only first level headlines visible,
-        + =content= --- plain view mode, all headlines visible,
-        + =showall= --- plain view mode showing the entire document.
++ =view= ::
+     What kind of view mode should the script enter on startup? Possible
+     values are
+     + =info= --- info view mode,
+     + =overview= --- plain view mode, only first level headlines visible,
+     + =content= --- plain view mode, all headlines visible,
+     + =showall= --- plain view mode showing the entire document.
 
-      + =toc= ::
-        Show the table of contents? \\
-        Possible values:
-        + =t= --- show the toc,
-        + =nil= --- hide the toc (only show when '=i=' is pressed),
-        + =Publishing/Export property= --- derivate this setting from another
-          property like =org-export-with-toc=.
++ =toc= ::
+     Show the table of contents? \\
+     Possible values:
+     + =t= --- show the toc,
+     + =nil= --- hide the toc (only show when '=i=' is pressed),
+     + =Publishing/Export property= --- derivate this setting from another
+       property like =org-export-with-toc=.
 
-      + =ltoc= ::
-        Should the script insert a local table of contents below the headings
-        of sections containing subsections? The default is no.\\
-        Possible values:
-        + =t= --- show the local toc below the first text in a section,
-        + =nil= --- hide the toc (only show when '=i=' is pressed). This is
-          the default, if this option is omitted.
-        + =above= --- sho the toc directly under the sections heading.
++ =ltoc= ::
+     Should the script insert a local table of contents below the headings
+     of sections containing subsections? The default is no.\\
+     Possible values:
+     + =t= --- show the local toc below the first text in a section,
+     + =nil= --- hide the toc (only show when '=i=' is pressed). This is
+       the default, if this option is omitted.
+     + =above= --- sho the toc directly under the sections heading.
 
-      + =mouse= ::
-        Highlight the headline under the mouse in plain view mode?
-        + =underline= --- underline the headline under mouse,
-        + =#dddddd= --- or any valid XHTML/CSS color value like =red= to draw a
-          colored background for the headline under the mouse.
++ =mouse= ::
+     Highlight the headline under the mouse in plain view mode?
+     + =underline= --- underline the headline under mouse,
+     + =#dddddd= --- or any valid XHTML/CSS color value like =red= to draw a
+       colored background for the headline under the mouse.
 
-      + =runs= ::
-        *Obsolete*.
-        Number of attempts to scan the document. It's no risk to set this to a
-        higher value than the default. The =org_html_manager= will stop as
-        soon as the entire document is scanned.
++ =runs= ::
+     *Obsolete*.
+     Number of attempts to scan the document. It's no risk to set this to a
+     higher value than the default. The =org_html_manager= will stop as
+     soon as the entire document is scanned.
 
-      + =buttons= ::
-        Affects plain view mode only. If '=t=', display the little
-        /Up|HOME|HELP|Toggle view/ links next to _each_ headline in plain view
-        mode.
++ =buttons= ::
+     Affects plain view mode only. If '=t=', display the little
+     /Up|HOME|HELP|Toggle view/ links next to _each_ headline in plain view
+     mode.
 
 *** Per File Basis: ~#+INFOJS_OPT~
 
-    A single file may overwrite the global options using a line like this:
+A single file may overwrite the global options using a line like this:
 
 #+BEGIN_SRC org
   ,#+INFOJS_OPT: view:info mouse:underline up:index.html home:http://www.mydomain.tpl toc:t
 #+END_SRC
 
-    Possible options are the same as in the previous section. Additional (?)
-    options include:
+Possible options are the same as in the previous section. Additional (?)
+options include:
 
-    + =home= ::
-      An URL to link to the homepage. The text displayed is =HOME=.
-    + =up= ::
-      An URL pointing to some main page. The text displayed is =Up=.
++ =home= ::
+     An URL to link to the homepage. The text displayed is =HOME=.
++ =up= ::
+     An URL pointing to some main page. The text displayed is =Up=.
 
 ** Export-Setup - the old Way
-   :PROPERTIES:
-   :CUSTOM_ID: the-old-way
-   :END:
+:PROPERTIES:
+:CUSTOM_ID: the-old-way
+:END:
 
-   This section describes the old way to setup the script using the
-   =org-export-html-style= configuration. If you own a current version (6.00
-   ++) of Org-mode you should better use [[#the-new-way][Export-Setup - the new Way]] of setting
-   up the export for script usage. You might want to read the sections [[#xhtml][The XHTML]]
-   for more information. [[#using-set][Using Set()]] contains a list of all supported options
-   recognised by the script.
+This section describes the old way to setup the script using the
+=org-export-html-style= configuration. If you own a current version (6.00
+++) of Org-mode you should better use [[#the-new-way][Export-Setup - the new Way]] of setting
+up the export for script usage. You might want to read the sections [[#xhtml][The XHTML]]
+for more information. [[#using-set][Using Set()]] contains a list of all supported options
+recognised by the script.
 
 *** Using a special * COMMENT Section
 
-    The second possibility to include the script is to add a special section
-    to the end of your org file (multiple lines possible):
+The second possibility to include the script is to add a special section
+to the end of your org file (multiple lines possible):
 
 #+BEGIN_SRC org
 ,* COMMENT html style specifications
@@ -379,15 +388,15 @@
 ,# End:
 #+END_SRC
 
-      Ensure to precede all the verbatim double quotes with a backslash and
-      include the whole value of =org-export-html-style= into double quotes
-      itself.
+Ensure to precede all the verbatim double quotes with a backslash and
+include the whole value of =org-export-html-style= into double quotes
+itself.
 
 *** Using customize
 
-      One could customize the option '=org-export-html-style=' globaly by
-      :M-x cuomize-variable RET org-export-html-style RET
-      and set it there.
+One could customize the option '=org-export-html-style=' globaly by
+:M-x cuomize-variable RET org-export-html-style RET
+and set it there.
 
 #+BEGIN_SRC html
 <script type="text/javascript" src="org-info.js"></script>
@@ -401,14 +410,14 @@ org_html_manager.setup ();
 </script>
 #+END_SRC
 
-      This way all your files will be exported using the script in the
-      future. If you publish entire directories, supply an absolute URI to the
-      =src= attribute of the first script tag above.
+This way all your files will be exported using the script in the
+future. If you publish entire directories, supply an absolute URI to the
+=src= attribute of the first script tag above.
 
 *** Export-Setup per Project
 
-      Last but not least and very handy is the possibility to setup the usage of
-      the script per project. This is a taylor made passage of the org manual:
+Last but not least and very handy is the possibility to setup the usage of
+the script per project. This is a taylor made passage of the org manual:
 
 #+BEGIN_SRC emacs-lisp
 (setq org-publish-project-alist
@@ -427,55 +436,55 @@ org_html_manager.setup ();
                 </script>")))
 #+END_SRC
 
-      Don't forget to add an export target for the script itself ;-)
+Don't forget to add an export target for the script itself ;-)
 
 * Linking to Files using the Script
-  :PROPERTIES:
-  :CUSTOM_ID: linking
-  :END:
+:PROPERTIES:
+:CUSTOM_ID: linking
+:END:
 
-  Just use the ordinary link syntax to link to files that use the script. Append
-  the section to the URL if neccessary:
+Just use the ordinary link syntax to link to files that use the script. Append
+the section to the URL if neccessary:
 
-  : http://www.domain.tld/path/to/org.html#sec-3.4
+: http://www.domain.tld/path/to/org.html#sec-3.4
 
-  One may overwrite the author's settings using special suffixes appended to the
-  URL of the script. Here are some examples linking to this section and changing
-  the intial view mode. Currently only the '/internal/' options are used (see
-  [[#using-set][Using set()]] for a list).
+One may overwrite the author's settings using special suffixes appended to the
+URL of the script. Here are some examples linking to this section and changing
+the intial view mode. Currently only the '/internal/' options are used (see
+[[#using-set][Using set()]] for a list).
 
 #+BEGIN_HTML
-    <ul>
-    <li>
-    <a href="index.html?TOC=1&amp;VIEW=info#sec-5"><code>index.html?TOC=1&amp;VIEW=info#sec-5</code></a>
-    </li>
-    <li>
-    <a href="index.html?TOC=0&amp;VIEW=overview#sec-5"><code>index.html?TOC=0&amp;VIEW=overview#sec-5</code></a>
-    </li>
-    <li>
-    <a href="index.html?VIEW=content&amp;TOC_DEPTH=1#sec-5"><code>index.html?VIEW=content&amp;TOC_DEPTH=1#sec-5</code></a>
-    </li>
-    <li>
-    <a href="index.html?VIEW=showall&amp;MOUSE_HINT=rgb(255,133,0)#sec-5"><code>index.html?VIEW=showall&amp;MOUSE_HINT=rgb(255,133,0)#sec-5</code></a>
-    </li>
-    <li>
-    <a href="index.html?OCCUR=java"><code><b>index.html?OCCUR=java</b></code></a>
-    </li>
-    </ul>
+<ul>
+<li>
+<a href="index.html?TOC=1&amp;VIEW=info#sec-5"><code>index.html?TOC=1&amp;VIEW=info#sec-5</code></a>
+</li>
+<li>
+<a href="index.html?TOC=0&amp;VIEW=overview#sec-5"><code>index.html?TOC=0&amp;VIEW=overview#sec-5</code></a>
+</li>
+<li>
+<a href="index.html?VIEW=content&amp;TOC_DEPTH=1#sec-5"><code>index.html?VIEW=content&amp;TOC_DEPTH=1#sec-5</code></a>
+</li>
+<li>
+<a href="index.html?VIEW=showall&amp;MOUSE_HINT=rgb(255,133,0)#sec-5"><code>index.html?VIEW=showall&amp;MOUSE_HINT=rgb(255,133,0)#sec-5</code></a>
+</li>
+<li>
+<a href="index.html?OCCUR=java"><code><b>index.html?OCCUR=java</b></code></a>
+</li>
+</ul>
 #+END_HTML
 
-  *Note* that it is not possible to change the '/HOME/' and '/Up/' links.
+*Note* that it is not possible to change the '/HOME/' and '/Up/' links.
 
-  *Note* also that everything but =[0-9a-zA-Z\.-_]= should be URL encoded if used
-  as an options value.
+*Note* also that everything but =[0-9a-zA-Z\.-_]= should be URL encoded if used
+as an options value.
 
 * CSS
-  :PROPERTIES:
-  :CUSTOM_ID: css
-  :END:
+:PROPERTIES:
+:CUSTOM_ID: css
+:END:
 
-  Here is an excerpt from the stylesheet for this file. Be carful not to mess
-  things up when trying to position the console.
+Here is an excerpt from the stylesheet for this file. Be carful not to mess
+things up when trying to position the console.
 
 #+BEGIN_SRC css
 /* Styles for org-info.js */
@@ -531,69 +540,69 @@ org_html_manager.setup ();
 
 * Supported Browsers
 
-  The functionality of the script is based on =DOM=. This leads to some
-  incompatibility with legacy browsers. But hey, it's 2009, isn't it?
+The functionality of the script is based on =DOM=. This leads to some
+incompatibility with legacy browsers. But hey, it's 2009, isn't it?
 
-  So what browsers are supported then? Well - I don't know for
-  sure. JavaScript™ 1.4 plus =DOM= should make
-    + Netscape 6.0 and higher
-    + Internet Explorer 5.0 and up
-    + Firefox 1.0 ++  - 2.0.0.12 and 3.0 Beta tested
-    + Opera 7.0 and higher - v.9.26 tested.
-    + Safari 1.0
+So what browsers are supported then? Well - I don't know for
+sure. JavaScript™ 1.4 plus =DOM= should make
+  + Netscape 6.0 and higher
+  + Internet Explorer 5.0 and up
+  + Firefox 1.0 ++  - 2.0.0.12 and 3.0 Beta tested
+  + Opera 7.0 and higher - v.9.26 tested.
+  + Safari 1.0
 
-  I try to test the script before each release in Firefox 3.x.x and Opera 10 on
-  Linux, and in FF 3, IE 6 and Safari on windows. Because of the number of
-  features and browsers, some bugs might remain undiscovered. Please report bugs
-  to the emacs-orgmode mailing list. In most cases we manage to fix them within
-  the next 24 hours.
+    I try to test the script before each release in Firefox 3.x.x and Opera 10 on
+    Linux, and in FF 3, IE 6 and Safari on windows. Because of the number of
+    features and browsers, some bugs might remain undiscovered. Please report bugs
+    to the emacs-orgmode mailing list. In most cases we manage to fix them within
+    the next 24 hours.
 
 ** <<People reported it works in>>
 
-   So let's gather the tested Browsers here. Problems are only listed, if they
-   are Browser specific. Let me say it again: we don't wont to support legacy
-   browsers, do we?
+So let's gather the tested Browsers here. Problems are only listed, if they
+are Browser specific. Let me say it again: we don't wont to support legacy
+browsers, do we?
 
-   | Browser           |    Version |
-   |-------------------+------------|
-   | Opera             |      9.26+ |
-   | Firefox/Iceweasel |   2.0.0.12 |
-   | Firefox/Iceweasel | 3.0.2 Beta |
-   | IE                |        5.5 |
-   | IE                |          6 |
+| Browser           |    Version |
+|-------------------+------------|
+| Opera             |      9.26+ |
+| Firefox/Iceweasel |   2.0.0.12 |
+| Firefox/Iceweasel | 3.0.2 Beta |
+| IE                |        5.5 |
+| IE                |          6 |
 
-   If you manage to get this thingy working in any browser please let us know, so
-   we can update the above table.
+If you manage to get this thingy working in any browser please let us know, so
+we can update the above table.
 
 * Why Do I Need a T.O.C?
 
-  Currently the script depends on the table of contents in the resulting
-  XHTML. The TOC can be hidden though.
+Currently the script depends on the table of contents in the resulting
+XHTML. The TOC can be hidden though.
 
-  The main reason is the behaviour of browsers. There is no safe way to detect
-  if the entire document is loaded at a certain point in time. Opera for example
-  returns =true= if we ask it =if(document.body)=. The =init()= function of the
-  =OrgHtmlManager= is aware of the possibility, that not even the TOC might
-  be loaded when this function is called. Hence it should work for slow
-  connections too.
+The main reason is the behaviour of browsers. There is no safe way to detect
+if the entire document is loaded at a certain point in time. Opera for example
+returns =true= if we ask it =if(document.body)=. The =init()= function of the
+=OrgHtmlManager= is aware of the possibility, that not even the TOC might
+be loaded when this function is called. Hence it should work for slow
+connections too.
 
 * The XHTML
-  :PROPERTIES:
-  :CUSTOM_ID: xhtml
-  :END:
+:PROPERTIES:
+:CUSTOM_ID: xhtml
+:END:
 
-  End users may consider this section obsolete as of org version 6.00-pre-3,
-  since there is a new configuration interface in org now to setup the script
-  without dealing with JavaScript. It is still here to show the desired look
-  of the head section of the XHTML. Also someone might be interested to use the
-  script for XHTML files not exported from org.
+End users may consider this section obsolete as of org version 6.00-pre-3,
+since there is a new configuration interface in org now to setup the script
+without dealing with JavaScript. It is still here to show the desired look
+of the head section of the XHTML. Also someone might be interested to use the
+script for XHTML files not exported from org.
 
-  The script has to be included in the header of the resulting XHTML files. The
-  document structure has to be exactly the one produced by the current XHTML
-  export of emacs Org-mode.
-  You may pass options to the =org\_html\_manager= by utilising its =set()=
-  method. For a list of options see section [[#using-set][Using Set()]]. This is what the
-  head section should look like:
+The script has to be included in the header of the resulting XHTML files. The
+document structure has to be exactly the one produced by the current XHTML
+export of emacs Org-mode.
+You may pass options to the =org\_html\_manager= by utilising its =set()=
+method. For a list of options see section [[#using-set][Using Set()]]. This is what the
+head section should look like:
 
 #+BEGIN_SRC html
 <script type="text/javascript" src="org-info.js"></script>
@@ -608,8 +617,8 @@ org_html_manager.setup ();
 </script>
 #+END_SRC
 
-  To just use the script with the defaults put this into the head section of the
-  XHTML files:
+To just use the script with the defaults put this into the head section of the
+XHTML files:
 
 #+BEGIN_SRC html
 <script type="text/javascript" src="org-info.js"></script>
@@ -620,54 +629,54 @@ org_html_manager.setup ();
 </script>
 #+END_SRC
 
-  I recommend the use of
+I recommend the use of
 
 #+BEGIN_SRC html
 <script type="text/javascript" src="org-info.js"></script>
 #+END_SRC
 
-  instead of
+instead of
 
 #+BEGIN_SRC html
 <script type="text/javascript" src="org-info.js" />
 #+END_SRC
 
-  which is valid XHTML but not understood by all browsers. I'll use the first
-  version throughout this document where ever the space allows to do so.
+which is valid XHTML but not understood by all browsers. I'll use the first
+version throughout this document where ever the space allows to do so.
 
 ** Using ~set()~
-   :PROPERTIES:
-   :CUSTOM_ID: using-set
-   :END:
+:PROPERTIES:
+:CUSTOM_ID: using-set
+:END:
 
-   Before calling
-   : org_html_manager.setup ();
-   one may configure the script by using the =org\_html\_manager='s function
-   =set(key, val)=. There is one important rule for all of these options. If
-   you set a string value containing single quotes, do it this way:
-   : org_html_manager.set("key", "value with \\'single quotes\\'");
+Before calling
+: org_html_manager.setup ();
+one may configure the script by using the =org\_html\_manager='s function
+=set(key, val)=. There is one important rule for all of these options. If
+you set a string value containing single quotes, do it this way:
+: org_html_manager.set("key", "value with \\'single quotes\\'");
 
-   + =VIEW= :: Set to a true value to start in textinfo kind of view. Note: you
++ =VIEW= :: Set to a true value to start in textinfo kind of view. Note: you
      could also use =org\_html\_manager.INFO\_VIEW=,
      =org\_html\_manager.PRESENTATION\_VIEW= or
      =org\_html\_manager.PLAIN\_VIEW=. Defaults to plain view mode.
-   + =HIDE\_TOC= ::
++ =HIDE\_TOC= ::
      If =1=, hide the table of contents.
-   + =SUB\_INDEXES= ::
++ =SUB\_INDEXES= ::
      If set to a =true= (=1= or not empty string) value, create subindexes
      for sections containing subsections. See sections 1 2, or 3.1 of this
      document. The index below the headline (under 'Contents:') is generated
      by the script. This one is off by default.
-   + =VIEW\_BUTTONS= ::
++ =VIEW\_BUTTONS= ::
      If =true=, include the small '/toggle view/' link above every headline in
      plain view too. The visitor can toggle the view every where in the file
      then. If =false=, only at the top of the file such a link is displayed
      when in plain view. Default is =false=.
-   + =MOUSE\_HINT= ::
++ =MOUSE\_HINT= ::
      Highlight the heading under the mouse. This can be a background color
      (like '=#ff0000=', '=red=' or '=rgb(230,230,230)=') or the keyword
      '=underline='.
-   + =LINK\_UP= ::
++ =LINK\_UP= ::
      May be set, to link to an other file, preferably the main index page of a
      subdirectory. You might consider using an absolute URL here. This link will be
      displayed as
@@ -675,40 +684,40 @@ org_html_manager.setup ();
      This way we can link files into a tree, if all subdirectories in the
      project follow the same conventions. The '=h=' shortcut will
      bring you there as well.
-   + =LINK\_HOME= ::
++ =LINK\_HOME= ::
      May be set, to link to an other file, preferably the main home page. This
      link will be displayed as
      : <a href="LINK_HOME">Up</a>
      The '=H=' shortcut will trigger this action.
-   + =TOC\_DEPTH= ::
++ =TOC\_DEPTH= ::
      Cut the TOC at a certain level. This was done to support big big
      files and was requested by Carsten Dominik. If '=0=' or not provided at
      all the TOC will not be cut. If set to a number greater than '=0=',
      the TOC will cut to only show headlines down to that very level.
-   + =HELP= ::
++ =HELP= ::
      Display a little message on page load? Defaults to no message. Set to =1=
      to display the startup message.
 
 * Hooks
-   :PROPERTIES:
-   :CUSTOM_ID: hooks
-   :END:
+:PROPERTIES:
+:CUSTOM_ID: hooks
+:END:
 
-   Currently two hooks are provided.  Each hook function is called with one or
-   more parameters the first of which is the OrgHtmlManager object.
+Currently two hooks are provided.  Each hook function is called with one or
+more parameters the first of which is the OrgHtmlManager object.
 
-   - '~onReady~' :: This hook is run once the document is loaded, the view is
-                  setup and the startup section is shown.  The second parameter
-                  is the first section shown, i.e. an OrgNode object.
-   - '~onShowSection~' :: This one runs after showing a new section.  This hook is
-        not called for the first section shown.  Use the '~onReady~' hook for the
-        first section.  The second parameter is an object with to OrgNodes: the
-        previously shown section and the current section.
+- '~onReady~' :: This hook is run once the document is loaded, the view is
+     setup and the startup section is shown.  The second parameter
+     is the first section shown, i.e. an OrgNode object.
+- '~onShowSection~' :: This one runs after showing a new section.  This hook is
+     not called for the first section shown.  Use the '~onReady~' hook for the
+     first section.  The second parameter is an object with to OrgNodes: the
+     previously shown section and the current section.
 
 
-   To add functions to the hooks, fill a global object ~orgInfoHooks~ with the
-   function objects you need.  This is necessary, because code added via the
-   ~#+STYLE:~ option lines is executed before org-info.js is loaded.
+To add functions to the hooks, fill a global object ~orgInfoHooks~ with the
+function objects you need.  This is necessary, because code added via the
+~#+STYLE:~ option lines is executed before org-info.js is loaded.
 
 #+begin_src org
   ,#+STYLE: <script type="text/javascript">
@@ -735,127 +744,127 @@ org_html_manager.setup ();
   ,#+STYLE: </script>
 #+end_src
 
-   *Make sure to remove hook functions at the end of the hook*.  Strange things
-   could happen otherwise (the hook loop will overlook a member. While the hook
-   loop runs in first hook first, the remove loop removes the last hook first).
+*Make sure to remove hook functions at the end of the hook*.  Strange things
+could happen otherwise (the hook loop will overlook a member. While the hook
+loop runs in first hook first, the remove loop removes the last hook first).
 
 * How it works
 
-  First of all the script is included  in the header as described in [[#setup][Setup]].  The
-  document has  to be exported with TOC  since the script depends  on it (See
-  [[Why Do I Need a T.O.C?]]).
+First of all the script is included  in the header as described in [[#setup][Setup]].  The
+document has  to be exported with TOC  since the script depends  on it (See
+[[Why Do I Need a T.O.C?]]).
 
-  When   included,   it   creates    a   global   JavaScript™   variable   named
-  =org\_html\_manager=.
+When   included,   it   creates    a   global   JavaScript™   variable   named
+=org\_html\_manager=.
 
-  The  =org\_html\_manager::setup()=  function,  that  you  will  have  to  call
-  yourself  (see examples in  [[#setup][Setup]]), sets  up a  timeout function  calling its
-  =init()= function after  50ms. After those 50 ms  The =init()= function starts
-  its first attempt  to scan the document, using the TOC  as a guide. During
-  this scan the  =org\_html\_manager= builds a tree of  nodes, each caching some
-  data for later use. Once an element of the document is scanned it is marked by
-  setting a property =scanned\_for\_org= to =1=. This way it will not be scanned
-  a second time in  subsquent runs (it will be checked though,  but no work will
-  be done for it).
+The  =org\_html\_manager::setup()=  function,  that  you  will  have  to  call
+yourself  (see examples in  [[#setup][Setup]]), sets  up a  timeout function  calling its
+=init()= function after  50ms. After those 50 ms  The =init()= function starts
+its first attempt  to scan the document, using the TOC  as a guide. During
+this scan the  =org\_html\_manager= builds a tree of  nodes, each caching some
+data for later use. Once an element of the document is scanned it is marked by
+setting a property =scanned\_for\_org= to =1=. This way it will not be scanned
+a second time in  subsquent runs (it will be checked though,  but no work will
+be done for it).
 
-  If the document  (or the TOC) is not  entirely loaded, =org\_html\_manager=
-  stops  scanning,  sets  the  timeout  again  to start  an  other  scan  50  ms
-  later. Once the  entire document is loaded and scanned no  new timeout will be
-  set, and the document is displayed in the desired way (hopefully).
+If the document  (or the TOC) is not  entirely loaded, =org\_html\_manager=
+stops  scanning,  sets  the  timeout  again  to start  an  other  scan  50  ms
+later. Once the  entire document is loaded and scanned no  new timeout will be
+set, and the document is displayed in the desired way (hopefully).
 
-  Once the number of attempts to scan the  the document was configurable. This
-  was dropped, since we can not know in advance how fast the document will be
-  loaded on the client side.
+Once the number of attempts to scan the  the document was configurable. This
+was dropped, since we can not know in advance how fast the document will be
+loaded on the client side.
 
-  The =org\_html\_manager= also changes the document a bit to make it react on
-  certain input events and follow your wishes. The old '/event handling/' was
-  entirely based on the normal link functions using so called =accesskeys=. This
-  has changed long ago, but the accesskeys will stay cause there is no reason to
-  remove them.
+The =org\_html\_manager= also changes the document a bit to make it react on
+certain input events and follow your wishes. The old '/event handling/' was
+entirely based on the normal link functions using so called =accesskeys=. This
+has changed long ago, but the accesskeys will stay cause there is no reason to
+remove them.
 
 * Presentations with org-info.js
 
-  The script can handle all the sections as single slides. Press '=x=' to switch
-  to the presentation mode. In this mode you may navigate the sections using the
-  mouse. Currently a single click moves forward and a doubleclick backwards
-  (will change this to right mouse button for backwards movement).
+The script can handle all the sections as single slides. Press '=x=' to switch
+to the presentation mode. In this mode you may navigate the sections using the
+mouse. Currently a single click moves forward and a doubleclick backwards
+(will change this to right mouse button for backwards movement).
 
-  The first plain list (i.e. an <ul> element) in a section is special. The items
-  will be shown one by one when moving forward.
+The first plain list (i.e. an <ul> element) in a section is special. The items
+will be shown one by one when moving forward.
 
-  If you're at the end of the presentation, a click does not trigger a
-  warning. Same applies to a doubleclick when in the first section.
+If you're at the end of the presentation, a click does not trigger a
+warning. Same applies to a doubleclick when in the first section.
 
-  There is no plan to extend this feature set very much. A better plan might
-  be to write a separate tool to handle slides.
+There is no plan to extend this feature set very much. A better plan might
+be to write a separate tool to handle slides.
 
 * History
 
-  The aim of this little script was to implement a part of emacs Org-mode
-  facilities of folding. Oh, no - not originaly.
+The aim of this little script was to implement a part of emacs Org-mode
+facilities of folding. Oh, no - not originaly.
 
-  My first idea was to view some of my larger org files without scrolling. I
-  wanted to have them paged just like texinfo or linuxdoc files. In February
-  2008 I came across Carsten Dominik's /ideas/ page
-  [[https://orgmode.org/todo.html]]. And I could not resist to write him some of my
-  thoughts about this great emacs mode including some little ideas and
-  drawbacks. I don't know how, but somehow these guys made me, lazy bone that
-  I am, write this little script as an appetizer of /web 3.0 in Org-mode/ (Phil
-  Jackson).
+My first idea was to view some of my larger org files without scrolling. I
+wanted to have them paged just like texinfo or linuxdoc files. In February
+2008 I came across Carsten Dominik's /ideas/ page
+[[https://orgmode.org/todo.html]]. And I could not resist to write him some of my
+thoughts about this great emacs mode including some little ideas and
+drawbacks. I don't know how, but somehow these guys made me, lazy bone that
+I am, write this little script as an appetizer of /web 3.0 in Org-mode/ (Phil
+Jackson).
 
-  I did and since some people really liked it, worked a bit more on it and added
-  features. Bastien Guerry was so kind to publish it on
-  http://www.legito.net/org-info-js/ the first months. Thanks Bastien.
+I did and since some people really liked it, worked a bit more on it and added
+features. Bastien Guerry was so kind to publish it on
+http://www.legito.net/org-info-js/ the first months. Thanks Bastien.
 
-  In the first days of April Carsten Dominik added code to Org-mode to support
-  the usage of this script. Hence the script may now be configured in a similar way
-  to the other export options. Since then it is even possible to configure this
-  script through customize.
+In the first days of April Carsten Dominik added code to Org-mode to support
+the usage of this script. Hence the script may now be configured in a similar way
+to the other export options. Since then it is even possible to configure this
+script through customize.
 
 * Thanks
 
-  Very special thanks to Carsten Dominik, Bastien Guerry and Phil Jackson who
-  have encouraged me to write and publish this little piece of (unfinished) work
-  and all the hundreds of hours they spent on this fantastic emacs mode called
-  Org-mode and the export modules.
+Very special thanks to Carsten Dominik, Bastien Guerry and Phil Jackson who
+have encouraged me to write and publish this little piece of (unfinished) work
+and all the hundreds of hours they spent on this fantastic emacs mode called
+Org-mode and the export modules.
 
-  Org is a new working experience for me and there is nothing comparable to
-  working with emacs AND Org-mode.
+Org is a new working experience for me and there is nothing comparable to
+working with emacs AND Org-mode.
 
-  Another big kiss to Gabi ([[http://www.emma-stil.de][www.emma-stil.de]]) for being so patient while I was
-  not working on our projects but playing with emacs.
+Another big kiss to Gabi ([[http://www.emma-stil.de][www.emma-stil.de]]) for being so patient while I was
+not working on our projects but playing with emacs.
 
-  Thanks to Tobias Prinz for listening to my stupid JavaScript questions and all
-  the usefull tips. Espacially the negative margin trick and key input.
+Thanks to Tobias Prinz for listening to my stupid JavaScript questions and all
+the usefull tips. Espacially the negative margin trick and key input.
 
-  And again big thanks to Carsten Dominik for making the inclusion and
-  configuration of the script so easy for the users, all the inspired ideas and
-  the great org radio table trick. A lot of the power of the final make up is
-  your merit! We all love to read the Org-mode mailing lists because of the
-  kind and relaxed tone that is yours.
+And again big thanks to Carsten Dominik for making the inclusion and
+configuration of the script so easy for the users, all the inspired ideas and
+the great org radio table trick. A lot of the power of the final make up is
+your merit! We all love to read the Org-mode mailing lists because of the
+kind and relaxed tone that is yours.
 
-  Thanks a lot for OrgMode!
+Thanks a lot for OrgMode!
 
 * License
 
-  What I think about licenses? Well - I think licences and patents are not far
-  from each other. Poor people (and poor countries!!!) stay poor because of both
-  of them. But since I know where I live, in a world made of licenses and
-  patents, I have to apply some license to my work to protect it and stay
-  unprotected.
+What I think about licenses? Well - I think licences and patents are not far
+from each other. Poor people (and poor countries!!!) stay poor because of both
+of them. But since I know where I live, in a world made of licenses and
+patents, I have to apply some license to my work to protect it and stay
+unprotected.
 
-  Hence the script was originally licensed under GPL 2. Since v.0.1.1.6 the
-  license was changed to [[http://www.gnu.org/licenses/old-licenses/gpl-2.0.html][GPL version 3]]. This document is subject to [[http://www.fsf.org/licensing/licenses/fdl.txt][GFDL]].
+Hence the script was originally licensed under GPL 2. Since v.0.1.1.6 the
+license was changed to [[http://www.gnu.org/licenses/old-licenses/gpl-2.0.html][GPL version 3]]. This document is subject to [[http://www.fsf.org/licensing/licenses/fdl.txt][GFDL]].
 
 * THE END
 
-  The original version of this document was written in emacs23 with Org-mode
-  v. 5.22a+.  The visibilty of the contents of a individual section or
-  subsection can be toggled by clicking the stars in front of the headlines or
-  moving there and hitting =TAB=. The visibility of the entire document structure
-  can be changed by pressing =SHIFT+TAB= anywhere. When on a headline, pressing
-  =ALT+UP/DOWN= moves the entire subtree to different location in the tree,
-  keeping its level of indentation. =ALT+LEFT/RIGHT= promotes and demotes the
-  subtree.
+The original version of this document was written in emacs23 with Org-mode
+v. 5.22a+.  The visibilty of the contents of a individual section or
+subsection can be toggled by clicking the stars in front of the headlines or
+moving there and hitting =TAB=. The visibility of the entire document structure
+can be changed by pressing =SHIFT+TAB= anywhere. When on a headline, pressing
+=ALT+UP/DOWN= moves the entire subtree to different location in the tree,
+keeping its level of indentation. =ALT+LEFT/RIGHT= promotes and demotes the
+subtree.
 
-  [[file:img/emacs23-org.js.org.png]]
+[[file:img/emacs23-org.js.org.png]]
