@@ -1,9 +1,9 @@
+#+TITLE:      LaTeX Source Code Blocks in Org Mode
+#+AUTHOR:     Tom Dye
 #+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
-#+TITLE:      LaTeX Source Code Blocks in Org Mode
-#+AUTHOR:     Tom Dye
 #+EMAIL:      tsd [at] tsdye [dot] com
 #+LANGUAGE:   en
 #+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
@@ -13,31 +13,30 @@
 
 #+name: banner
 #+begin_export html
-  <div id="subtitle" style="float: center; text-align: center;">
+<div id="subtitle" style="float: center; text-align: center;">
   <p>
-  Org Mode support for <a href="http://www.tug.org/">LaTeX</a>
-  Source Code Blocks
+    Org Mode support for <a href="http://www.tug.org/">LaTeX</a>
+    Source Code Blocks
   </p>
   <p>
-  <a href="http://www.tug.org/">
-  <img src="images/latex-logo-for-banner.png"/>
-  </a>
+    <a href="http://www.tug.org/">
+      <img src="images/latex-logo-for-banner.png"/>
+    </a>
   </p>
-  </div>
+</div>
 #+end_export
 
-#+BEGIN_SRC latex :file latex-logo.png :buffer yes
+#+begin_src latex :file latex-logo.png :buffer yes
 \LaTeX
-#+END_SRC
+#+end_src
 
 #+RESULTS[32c48c151ab8d684ca94cdac40ada3df69e5057e]:
-#+BEGIN_LaTeX
+#+begin_latex
 [[file:latex-logo.png]]
-#+END_LaTeX
-
-
+#+end_latex
 
 * Template Checklist [13/13]                                       :noexport:
+
   - [X] Revise #+TITLE:
   - [X] Indicate #+AUTHOR:
   - [X] Add #+EMAIL:
@@ -55,7 +54,9 @@
   - [X] Describe [[Result%20Types][Result Types]]
   - [X] Describe [[Other]] differences from supported languages
   - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+
 * Introduction
+
 LaTeX is a document markup language and a document preparation system
 for the TeX typesetting program.  The TeX program was developed by
 Donald Knuth at Stanford University to typeset complex mathematics.
@@ -64,69 +65,66 @@ of documents such as letters, articles, reports, and books.  The
 current version is LaTeX2e.  An ambitious update, LaTeX3, has been in
 the works for some time.
 
-Org Mode is able to export LaTeX directly.[fn:1]  LaTeX code
-embedded in an Org Mode file (not within source code blocks) is
-exported correctly to a number of the export backends.[fn:2] 
+Org Mode is able to export LaTeX directly[fn:1]. LaTeX code embedded
+in an Org Mode file (not within source code blocks) is exported
+correctly to a number of the export backends[fn:2].
 
 LaTeX source code blocks can be used to tangle a LaTeX source file, or
 to create bitmap images or pdf snippets of arbitrary LaTeX code.
 Typically, this latter use involves mathematics, but it conceivably
-extends to any TeX output.[fn:3] The LaTeX logo at the top of this
+extends to any TeX output[fn:3]. The LaTeX logo at the top of this
 page is a bitmap image generated from a simple LaTeX source code
-block.  The complex example provided by [[Andreas%20Leha][Andreas
-Leha]], below, uses the TikZ package to create a graphics image.
+block.  The complex example provided by [[Andreas%20Leha][Andreas Leha]], below, uses the
+TikZ package to create a graphics image.
 
 * Requirements and Setup
+
 In order to use LaTeX source code blocks to their full capacity, a
 working LaTeX installation is required.[fn:4] LaTeX systems are
 distributed widely through various channels and one should be
 available for your computer system.  A good place to find one is the
 [[http://www.tug.org][TeX Users Group]].
 
-Once LaTeX is installed and is working correctly, you will need to tell
-Emacs where to find the various LaTeX executable files.  The location
-of these files is likely distribution dependent: my MacTeX
+Once LaTeX is installed and is working correctly, you will need to
+tell Emacs where to find the various LaTeX executable files.  The
+location of these files is likely distribution dependent: my MacTeX
 distribution places them in the =/usr/texbin= subdirectory.
 Accordingly, I have this in =.emacs=:
 
 #+begin_src emacs-lisp :exports code
-    (setq exec-path (append exec-path '("/usr/texbin")))
+(setq exec-path (append exec-path '("/usr/texbin")))
 #+end_src
 
-Org Mode can generate
-[[http://www.w3.org/Press/PNG-fact.html][Portable Network Graphics]]
-(png) bitmaps from LaTeX source code blocks, which it does with the
-=dvipng= program that comes with most LaTeX distributions.  If you
-want to generate bitmaps in other file formats, then you will need to
-install [[http://www.imagemagick.org/script/index.php][ImageMagick]],
-a software suite to create, edit, compose or convert bitmap images.
+Org Mode can generate [[http://www.w3.org/Press/PNG-fact.html][Portable Network Graphics]] (png) bitmaps from
+LaTeX source code blocks, which it does with the =dvipng= program that
+comes with most LaTeX distributions.  If you want to generate bitmaps
+in other file formats, then you will need to install [[http://www.imagemagick.org/script/index.php][ImageMagick]], a
+software suite to create, edit, compose or convert bitmap images.
 Ensure that the ImageMagick executables are installed somewhere on the
 Emacs =exec-path=.
 
 If you plan to edit LaTeX source code blocks separately, with =C-c= ',
 or want to control the size of pdf snippets, then it is highly
-recommended that [[http://www.gnu.org/software/auctex/][AucTeX]] be
-installed, as well.  AucTeX is an extensible package for writing and
-formatting TeX files.  Assuming that AucTeX is installed properly, the
-following line in =.emacs= will ensure that AucTeX is loaded.
+recommended that [[http://www.gnu.org/software/auctex/][AucTeX]] be installed, as well.  AucTeX is an
+extensible package for writing and formatting TeX files.  Assuming
+that AucTeX is installed properly, the following line in =.emacs= will
+ensure that AucTeX is loaded.
 
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
 (load "auctex.el" nil t t)
 #+end_src
 
-Also highly recommended is
-[[http://www.gnu.org/software/auctex/reftex.html][RefTeX]], a
-cross-reference, bibliography, glossary, and index manager initially
-written by the creator of Org Mode, Carsten Dominik.  Add the
-following line to =.emacs=:
+Also highly recommended is [[http://www.gnu.org/software/auctex/reftex.html][RefTeX]], a cross-reference, bibliography,
+glossary, and index manager initially written by the creator of Org
+Mode, Carsten Dominik.  Add the following line to =.emacs=:
 
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex) 
 #+end_src
 
-Finally, you'll need to ensure that =org-babel-load-languages=
-includes an entry for LaTeX.  Typically, =org-babel-load-languages=
-will contain many entries.  The example below omits other languages.
+Finally, you'll need to ensure that =org-babel-load-languages= includes
+an entry for LaTeX.  Typically, =org-babel-load-languages= will contain
+many entries.  The example below omits other languages.
 
 #+begin_src emacs-lisp :tangle yes
   (org-babel-do-load-languages
@@ -135,55 +133,51 @@ will contain many entries.  The example below omits other languages.
 #+end_src
 
 * Org Mode Features for LaTeX Source Code Blocks
+
 ** Header Arguments
+
 LaTeX source code blocks set default values for two standard header
 arguments.  In addition, several LaTeX-specific header arguments are
 defined to control creation of bitmap images and pdf snippets.
  
 *** LaTeX-specific Default Values
-The LaTeX-specific default value of the
-[[https://orgmode.org/manual/results.html#results][=:results= header
-argument]] is "latex", which wraps the results in a =#+BEGIN_LaTeX
-... #+END_LaTeX= block.
 
-The LaTeX-specific default value of the
-[[https://orgmode.org/manual/exports.html#exports][=:exports= header
-argument]] is "results".
+The LaTeX-specific default value of the [[https://orgmode.org/manual/results.html#results][=:results= header argument]] is
+"latex", which wraps the results in a =#+BEGIN_LaTeX ... #+END_LaTeX=
+block.
+
+The LaTeX-specific default value of the [[https://orgmode.org/manual/exports.html#exports][=:exports= header argument]] is
+"results".
 
 *** LaTeX-specific Header Arguments
 
-The standard [[https://orgmode.org/manual/file.html#file][=:file= header
-argument]] associated with a LaTeX source code block by itself can
-take the name of either a Portable Network Graphics (png) or a
-Portable Document Format (pdf) file.  File names for other bitmap file
-types can be supplied in conjunction with the =:imagemagick= header
-argument, described below.
+The standard [[https://orgmode.org/manual/file.html#file][=:file= header argument]] associated with a LaTeX source
+code block by itself can take the name of either a Portable Network
+Graphics (png) or a Portable Document Format (pdf) file.  File names
+for other bitmap file types can be supplied in conjunction with the
+=:imagemagick= header argument, described below.
 
 The =:buffer= header argument is a LaTeX-specific header argument that
-takes the values =yes= or =no=.  It is consulted when a bitmap image
-has been requested using the =:file= header argument.  If =:buffer
-yes=, the default, then Org Mode consults the values of
-=org-format-latex-options= and passes these to the =dvipng= program.
-If =:buffer no=, then Org Mode takes background and foreground colors
-from the Emacs buffer.
+takes the values =yes= or =no=.  It is consulted when a bitmap image has
+been requested using the =:file= header argument.  If =:buffer yes=, the
+default, then Org Mode consults the values of =org-format-latex-options=
+and passes these to the =dvipng= program.  If =:buffer no=, then Org Mode
+takes background and foreground colors from the Emacs buffer.
 
 Several LaTeX-specfic header arguments control production of pdf
 snippets.  The LaTeX-specific =:headers= header argument takes a Lisp
-list that specifies entries for the LaTeX preamble,
-e.g., '("\\usepackage{tikz}").  The =:fit= header argument invokes the
-[[http://www.ctan.org/tex-archive/macros/latex/contrib/preview][LaTeX
-preview package]], which is developed and distributed along with
-AucTeX.  The =:border= header argument takes a
-[[http://en.wikibooks.org/wiki/LaTeX/Useful_Measurement_Macros#Length_.27macros.27][LaTeX
-length]], which should be greater than =0.50001bp=, or half a usual
-PostScript point.  This can be used to make pdf pages larger than they
-are by default.  The header arguments =:pdfheight= and =:pdfwidth= set
-the dimensions of the pdf page.  They can be passed a valid LaTeX length.
+list that specifies entries for the LaTeX preamble, e.g.,
+'("\\usepackage{tikz}").  The =:fit= header argument invokes the [[http://www.ctan.org/tex-archive/macros/latex/contrib/preview][LaTeX
+preview package]], which is developed and distributed along with AucTeX.
+The =:border= header argument takes a [[http://en.wikibooks.org/wiki/LaTeX/Useful_Measurement_Macros#Length_.27macros.27][LaTeX length]], which should be
+greater than =0.50001bp=, or half a usual PostScript point.  This can be
+used to make pdf pages larger than they are by default.  The header
+arguments =:pdfheight= and =:pdfwidth= set the dimensions of the pdf page.
+They can be passed a valid LaTeX length.
 
 Andreas Leha added the ability to produce bitmaps in formats other
 than png, using the LaTeX-specific =:imagemagick= header argument.
-Quoting Andreas' notice sent to the Org Mode list[fn:5]
-
+Quoting Andreas' notice sent to the Org Mode list[fn:5].
 
 LaTeX source blocks now have three new options:
 - =:imagemagick= ::
@@ -195,24 +189,26 @@ LaTeX source blocks now have three new options:
 - =:imoutoptions= ::
   This is passed to ImageMagick before the output file.
 
-     
 ** Sessions
+
 LaTeX does not support sessions.
 
 ** Result Types
+
  The default result type is =latex=, which wraps the results in a
 =#+BEGIN_LaTeX ... #+END_LaTeX= block.
+
 ** Other
+
 LaTeX source code blocks are a special case because their
-functionality largely overlaps with the export facilities in Org
-Mode.  
+functionality largely overlaps with the export facilities in Org Mode.
 
 * Examples of Use
+
 ** "Hello World"
 
 At its simplest, Org Mode evaluation of LaTeX source code blocks with
-=C-c C-c= wraps the results in a =#+BEGIN_LaTeX ... #+END_LaTeX=
-block.
+=C-c C-c= wraps the results in a =#+BEGIN_LaTeX ... #+END_LaTeX= block.
 
 : #+name: hello-world
 : #+BEGIN_SRC latex
@@ -225,22 +221,22 @@ block.
 : #+END_LaTeX
 
 ** Andreas Leha
+
 This complex example was posted to the Org Mode list by Andreas Leha.
 It depends on a working installation of the R statistical
 software.[fn:6] The code makes use of R sessions to preserve state
 between R source code blocks.
 
-The first source code block loads the
-[[http://www.texample.net/tikz/resources/][TikZ package]], which
-defines a language to produce vector graphics from a
-geometric/algebraic description.
+The first source code block loads the [[http://www.texample.net/tikz/resources/][TikZ package]], which defines a
+language to produce vector graphics from a geometric/algebraic
+description.
 
 #+begin_src R :session :exports code :results silent
   library("tikzDevice")
 #+end_src
 
-A simple plot is generated and output as LaTeX code by the TikZ
-device in R.
+A simple plot is generated and output as LaTeX code by the TikZ device
+in R.
 
 #+name: test_plot
 #+begin_src R :session :exports code :results output latex
@@ -264,7 +260,6 @@ original post.
 : #+begin_src latex :exports results :file test.png 
 :   <<test_plot()>>
 : #+end_src
-
 
 With this header, the LaTeX output of the TikZ device in R yields a
 graph of the random number generation.
@@ -324,6 +319,7 @@ illustrative purposes.
 : #+END_LaTeX
 
 ** Backend dependent execution -- conditionally export tikz to SVG on HTML export
+
 This example demonstrates the handling of a LaTeX code block
 differently depending on the export backend.  If the following file is
 exported to HTML the tikz code block will be converted to an SVG
@@ -365,12 +361,12 @@ graphics across both HTML and pdf from a single document and image
 source.
 
 ** Latex Options                                                   :noexport:
+
 #+LATEX_HEADER: \usepackage{tikz}
+
 * Footnotes
 
-[fn:1] See
-  https://orgmode.org/manual/LaTeX-and-PDF-export.html#LaTeX-and-PDF-export
-  for LaTeX export instructions.
+[fn:1] See [[https://orgmode.org/manual/LaTeX-export.html#LaTeX-export][LaTeX export]] instructions in the manual.
 
 [fn:2] See https://orgmode.org/manual/Embedded-LaTeX.html#Embedded-LaTeX.
 
