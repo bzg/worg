@@ -178,7 +178,7 @@ a single agenda command that compiles the results of all the searches:
 #+BEGIN_SRC emacs-lisp
 (setq org-agenda-custom-commands
       '(("O" "Office block agenda"
-	 ((agenda "" ((org-agenda-ndays 1))) 
+	 ((agenda "" ((org-agenda-span 1)))
 	              ;; limits the agenda display to a single day
 	  (tags-todo "+PRIORITY=\"A\"")
 	  (tags-todo "computer|office|phone")
@@ -206,12 +206,12 @@ block views for the weekly review, such as:
 #+BEGIN_SRC emacs-lisp
 (setq org-agenda-custom-commands
       '(("W" "Weekly Review"
-	 ((agenda "" ((org-agenda-ndays 7))) ;; review upcoming deadlines and appointments
-	                                   ;; type "l" in the agenda to review logged items 
-	  (stuck "") ;; review stuck projects as designated by org-stuck-projects
-	  (todo "PROJECT") ;; review all projects (assuming you use todo keywords to designate projects)
-	  (todo "MAYBE") ;; review someday/maybe items
-	  (todo "WAITING"))) ;; review waiting items 
+	 ((agenda "" ((org-agenda-span 7))); review upcoming deadlines and appointments
+	                                   ; type "l" in the agenda to review logged items 
+	  (stuck "") ; review stuck projects as designated by org-stuck-projects
+	  (todo "PROJECT") ; review all projects (assuming you use todo keywords to designate projects)
+	  (todo "MAYBE") ; review someday/maybe items
+	  (todo "WAITING"))) ; review waiting items
 	 ;; ...other commands here
 	))
 #+END_SRC 
@@ -332,7 +332,7 @@ Here is an example of a weekly calendar using
 #+begin_src emacs-lisp
   (setq org-agenda-custom-commands
         '(("c" "Calendar" agenda ""
-           ((org-agenda-ndays 7)                          ;; [1]
+           ((org-agenda-span 7)                          ;; [1]
             (org-agenda-start-on-weekday 0)               ;; [2]
             (org-agenda-time-grid nil)                    
             (org-agenda-repeating-timestamp-show-all t)   ;; [3]
@@ -420,7 +420,7 @@ items omitted:
 #+BEGIN_SRC emacs-lisp
 (setq org-agenda-custom-commands
 '(("c" "Weekly schedule" agenda ""
-	 ((org-agenda-ndays 7)		;; agenda will start in week view
+	 ((org-agenda-span 7)		;; agenda will start in week view
 	  (org-agenda-repeating-timestamp-show-all t)   ;; ensures that repeating events appear on all relevant dates
 	  (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))))  
 	;; limits agenda view to timestamped items
@@ -437,7 +437,7 @@ deadlines due within the next 60 days:
            ((org-agenda-entry-types '(:deadline))
             ;; a slower way to do the same thing
             ;; (org-agenda-skip-function '(org-agenda-skip-entry-if 'notdeadline))
-            (org-agenda-ndays 1)
+            (org-agenda-span 1)
             (org-deadline-warning-days 60)
             (org-agenda-time-grid nil)))
           ;; ...other commands here
@@ -469,12 +469,12 @@ Here's the code:
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-custom-commands
         '(("P" "Printed agenda"
-           ((agenda "" ((org-agenda-ndays 7)                      ;; overview of appointments
+           ((agenda "" ((org-agenda-span 7)                      ;; overview of appointments
                         (org-agenda-start-on-weekday nil)         ;; calendar begins today
                         (org-agenda-repeating-timestamp-show-all t)
                         (org-agenda-entry-types '(:timestamp :sexp))))
-            (agenda "" ((org-agenda-ndays 1)                      ;; daily agenda
-                        (org-deadline-warning-days 7)             ;; 7 day advanced warning for deadlines
+            (agenda "" ((org-agenda-span 1)                      ; daily agenda
+                        (org-deadline-warning-days 7)            ; 7 day advanced warning for deadlines
                         (org-agenda-todo-keyword-format "[ ]")
                         (org-agenda-scheduled-leaders '("" ""))
                         (org-agenda-prefix-format "%t%s")))
