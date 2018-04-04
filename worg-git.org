@@ -13,9 +13,9 @@
 
 * What is git?
 
-[[http://git.or.cz][git]] is a fast version control system that lets you collaborate on a project.
-For details on how to use git, go and read the [[http://www.kernel.org/pub/software/scm/git/docs/gittutorial.html][git tutorial]].  For details on
-the public git repository, please check it [[https://code.orgmode.org/bzg/worg][here]].
+[[http://git.or.cz][git]] is a fast version control system that lets you collaborate on a
+project.  For details on how to use git, go and read the [[http://www.kernel.org/pub/software/scm/git/docs/gittutorial.html][git tutorial]].
+For details on the public git repository, please check it [[https://code.orgmode.org/bzg/worg][here]].
 
 The homepage of the Worg project is here: https://orgmode.org/worg/.
 
@@ -27,13 +27,9 @@ or
 
    : ~$ git clone git@code.orgmode.org:bzg/worg.git
 
-or by cloning the http mirror:
-
-   : ~$ git clone http://repo.or.cz/worg.git
-
-Since Worg is constantly updated you may want to update your copy of Worg
-before reading sometimes later.  To do so =cd= into the Worg directory and
-upgrade your copy of Worg with the command:
+Since Worg is constantly updated you may want to update your copy of
+Worg before reading sometimes later.  To do so =cd= into the Worg
+directory and upgrade your copy of Worg with the command:
 
    : ~$ git pull
 
@@ -46,8 +42,9 @@ If you want to contribute to Worg, keep reading.
 
 1. If you don't have a SSH-key, [[file:worg-git-ssh-key.org][create one]].
 
-2. Send your public key to [[mailto:bzgATgnuDOTorg][Bastien]] asking for push access and wait
-   for confirmation that you have push access.
+2. Create an account on https://code.orgmode.org.
+
+3. Add your public key on this account.
 
 4. Install =git= on your system. Tell =git= to use your private key with
    worg by updating =~/.ssh/config= with:
@@ -59,16 +56,6 @@ If you want to contribute to Worg, keep reading.
 5. Clone the project somewhere in a working directory:
 
      : ~$ git clone git@code.orgmode.org:bzg/worg.git
-
-   If you already have your local clone of Worg obtained via http
-   protocol, you can easily tell your git to remain using =http= for
-   fetching and =git= for pushing, by adding to your =~/.gitconfig=:
-
-     : [url "git@code.orgmode.org:bzg/worg.git"]
-     :   pushInsteadOf = http://repo.or.cz/r/
-
-   which could come handy later on for any project you clone from
-   http://repo.or.cz
 
 6. Go to the newly created =worg/= directory and edit some files.
 
@@ -112,13 +99,14 @@ If you want to contribute to Worg, keep reading.
 
 ** Getting organized
 
-The Worg TODO file is =worg-todo.org=.  If you are a Worg zealot, maybe you
-want to add this file to the list of your agenda files.  For example, here
-is my =org-agenda-files= variable:
+The Worg TODO file is =worg-todo.org=.  If you are a Worg zealot, maybe
+you want to add this file to the list of your agenda files.  For
+example, here is my =org-agenda-files= variable:
 
   : (setq org-agenda-files '("~/org/bzg.org" "~/git/worg/worg-todo.org")
 
-I have an agenda custom command for checking tasks that are assigned to me:
+I have an agenda custom command for checking tasks that are assigned
+to me:
 
   : (org-add-agenda-custom-command '("W" tags "Owner=\"Bastien\""))
 
@@ -142,11 +130,12 @@ Now your changes will be filed under your name.
 
 ** Rebase to avoid merging commits
 
-It's good practice to pull the current version of the repository before
-making your own additions. But even if you do, someone might make a change
-while you are working. So it will often be necessary to pull immediately
-before pushing your new commit. In this situation, if you use =git pull=
-directly, then a 'merge commit' will be generated, looking like this:
+It's good practice to pull the current version of the repository
+before making your own additions. But even if you do, someone might
+make a change while you are working. So it will often be necessary to
+pull immediately before pushing your new commit. In this situation, if
+you use =git pull= directly, then a 'merge commit' will be generated,
+looking like this:
 
 #+begin_example
 commit aaaabbbbbbbbbaaaaaaaaabbbbbbbb
@@ -157,37 +146,38 @@ Date:   Wed Nov 24 00:00:01 2010 -0700
     Merge branch 'master' of git+ssh://repo.or.cz/srv/git/Worg
 #+end_example
 
-That's not a major problem, but it's nice to keep the commit logs free of
-this stuff. To avoid generating the merge commit, use the =--rebase= option
-when pulling:
+That's not a major problem, but it's nice to keep the commit logs free
+of this stuff. To avoid generating the merge commit, use the =--rebase=
+option when pulling:
 
 : ~$ git pull --rebase
 
-Basically this means that your commit will be put to the top of the stack,
-as if no one had made any additions while you were working. More advanced
-git users might make their changes in a personal branch, and then rebase
-that branch against a freshly pulled master branch before merging it in to
-master. The end result would be the same as pulling with =--rebase=.
+Basically this means that your commit will be put to the top of the
+stack, as if no one had made any additions while you were
+working. More advanced git users might make their changes in a
+personal branch, and then rebase that branch against a freshly pulled
+master branch before merging it in to master. The end result would be
+the same as pulling with =--rebase=.
 
 ** Dealing with line endings
 
-Unix, Windows and Mac all have different conventions for marking the end of
-a line. This might lead to problems when editing the same file across
-platforms. Github advises Linux users to automatically convert all external
-files to LF on committing (see
+Unix, Windows and Mac all have different conventions for marking the
+end of a line. This might lead to problems when editing the same file
+across platforms. Github advises Linux users to automatically convert
+all external files to LF on committing (see
 [[http://help.github.com/dealing-with-lineendings]]) by setting:
 
 : ~$ git config --global core.autocrlf input
 
-For Worg, this is the wrong solution, since there are already files with
-both end of line conventions in the repository.  Instead tell git locally
-not to convert files by setting:
+For Worg, this is the wrong solution, since there are already files
+with both end of line conventions in the repository.  Instead tell git
+locally not to convert files by setting:
 
 : ~$ git config core.autocrlf false
 
-Of course you have to be careful not to save Windows files as Unix files or
-vice versa, since this would lead to large and confusing diffs. This should
-not be a problem with Worg as
+Of course you have to be careful not to save Windows files as Unix
+files or vice versa, since this would lead to large and confusing
+diffs. This should not be a problem with Worg as
 
 - one rarely edits other people's files anyway, and
 - Emacs can deal with end of line conventions transparently.
