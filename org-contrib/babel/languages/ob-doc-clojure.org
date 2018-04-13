@@ -262,6 +262,31 @@ time of a Java virtual machine, this can make execution of many blocks slow.
 The :session option will allow control of the process assigned to each code block.
 Please refer to the org manual for details on :session usage.
 
+* Specify namespace
+
+By default, each individual code block will execute under CIDER
+connection session's current namespace. But you can specify a namespace like bellowing:
+
+#+begin_example
+,#+begin_src clojure :results pp
+(ns kk.test)
+(def he "hi")
+,#+end_src
+
+,#+RESULTS:
+: #'kk.test/he
+
+You can see the second code block still us individual namespace.
+
+,#+begin_src clojure :results value :ns kk2
+(def he "hi")
+,*ns*
+,#+end_src
+
+,#+RESULTS:
+: nil#'kk2/he#namespace[kk2
+#+end_example
+
 * Additional Examples
 
 The above set-up and examples were intended for the beginner to achieve success
