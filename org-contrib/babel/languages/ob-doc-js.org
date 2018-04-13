@@ -1,0 +1,92 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org-babel-js
+#+AUTHOR:     stardiviner
+#+EMAIL:      numbchild at gmail dot com
+#+LANGUAGE:   en
+#+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  https://orgmode.org/worg/
+
+* hello, world demo
+
+#+begin_src js
+console.log("Hello, World!");
+#+end_src
+
+#+RESULTS:
+: Hello, World!
+
+* Configuration
+
+#+begin_src emacs-lisp
+(require 'ob-js)
+
+(add-to-list 'org-babel-load-languages '(js . t))
+(org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
+(add-to-list 'org-babel-tangle-lang-exts '("js" . "js"))
+#+end_src
+
+
+* Use JavaScript libraries
+
+src_js{console.log()} is supported by default.
+
+#+begin_src js
+var util = require("util");
+console.log("this is a Node.js test program!");
+#+end_src
+
+#+RESULTS:
+: this is a Node.js test program!
+
+* Support session for many Emacs packages
+
+The header argument :session value of packages REPL buffer names are default.
+
+And they all support for auto initiate session with ob-core.el
+built-in function ~org-babel-initiate-session~, which is used by
+commands like ~org-babel-switch-to-session~ / ([C-c C-v C-z]).
+
+** Indium
+
+#+begin_src js :session "*JS REPL*"
+console.log("stardiviner")
+#+end_src
+
+** skewer-mode
+
+#+begin_src js :session "*skewer-repl*"
+console.log("stardiviner")
+#+end_src
+
+** js-comint
+
+#+begin_src js :session "*Javascript REPL*"
+console.log("stardiviner")
+#+end_src
+
+** helper command to insert session header argument
+
+I write an helper command to insert session header argument easily:
+
+#+begin_src emacs-lisp
+(defun ob-js-insert-session-header-arg (session)
+  "Insert ob-js `SESSION' header argument.
+- `js-comint'
+- `skewer-mode'
+- `Indium'
+"
+  (interactive (list (completing-read "ob-js session: "
+                                      '("js-comint" "skewer-mode" "indium"))))
+  (org-babel-insert-header-arg
+   "session"
+   (pcase session
+     ("js-comint" "\"*Javascript REPL*\"")
+     ("skewer-mode" "\"*skewer-repl*\"")
+     ("indium" "\"*JS REPL*\""))))
+
+(define-key org-babel-map (kbd "J") 'ob-js-insert-session-header-arg)
+#+end_src
