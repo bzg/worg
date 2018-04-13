@@ -1,0 +1,132 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org-babel-clojure Literate Programming
+#+AUTHOR:     stardiviner
+#+EMAIL:      numbchild at gmail dot com
+#+LANGUAGE:   en
+#+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  https://orgmode.org/worg/
+
+#+begin_export html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org-babel support for
+  <a href="http://clojure.org/">Clojure</a>
+  </p>
+  <p>
+  <a href="http://clojure.org/">
+  <img src="http://clojure.org/images/clojure-logo-120b.png"/>
+  </a>
+  </p>
+  </div>
+#+end_export
+
+* Motivation
+
+Setup scaffold for Clojure Literate Programming in Org-mode.
+
+I like Emacs Org-mode “Literate Programming” very much. It’s a kind of paradigm.
+I can apply this idea on many places. Now Clojure is my favourite programming
+language. I hope to combine them together. But ob-clojure does not suitable for
+Literate Programming very much like other language babel (like Python) supports.
+
+So I decide to solve this problem in my way.
+
+* Configuration
+
+** my sample confguration
+
+#+begin_src emacs-lisp
+(require 'ob-clojure-literate)
+(setq ob-clojure-literate-auto-jackin-p t)
+
+;;; no project, CIDER jack-in outside of project.
+;; ISSUE: can't use `clj-refactor'
+;; (setq ob-clojure-literate-project-location nil)
+;;; use `ob-clojure/' as ob-clojure-literate project.
+(setq ob-clojure-literate-project-location
+      (expand-file-name (concat user-emacs-directory "Org-mode/")))
+(setq ob-clojure-literate-default-session "*cider-repl ob-clojure*")
+
+;; (add-hook 'org-mode-hook #'ob-clojure-literate-mode)
+(define-key org-babel-map (kbd "M-c") 'ob-clojure-literate-mode)
+#+end_src
+
+* Auto Start CIDER REPL
+
+Set option ~ob-clojure-literate-auto-jackin-p~ to ~t~, and if
+~ob-clojure-literate~ minor mode is enabled, it will auto launch CIDER
+REPL if not exist yet.
+
+#+begin_src emacs-lisp
+(setq ob-clojure-literate-auto-jackin-p t)
+#+end_src
+
+* Specify and use default CIDER session
+
+You can specify a default CIDER session name by option ~ob-clojure-literate-default-session~.
+Its value default is ~"*cider-repl ob-clojure*"~.
+
+#+begin_src org
+,#+begin_src clojure :session "*cider-repl ob-clojure*" :results output
+(prn *ns*)
+,#+end_src
+
+,#+RESULTS:
+: #namespace[user]
+#+end_src
+
+There is a command (~ob-clojure-literate-specify-session-header-argument~) to insert this session
+name header argument. You can bind it to a keybinding.
+
+It is smart enough to auto choose from exist sessions if there are more than one.
+
+* Support auto initiate session 
+
+ob-clojure-literate has support for auto initiate session with
+ob-core.el built-in function ~org-babel-initiate-session~, which is used
+by commands like ~org-babel-switch-to-session~ / ([C-c C-v C-z]).
+
+* Support insert an inline image as result
+
+ob-clojure by default does not support generate graphics file link as
+inline image result like other Babel languages. Like ob-gnuplot, ob-R
+etc support this behavior.
+
+Currently ob-clojure-literate only support Incanter. Use this feature like this:
+
+#+begin_src org
+,#+begin_src clojure :dir "data/images" :results graphics :file "incanter-plot.png"
+(use '(incanter core stats datasets charts io pdf))
+
+(def incanter-plot (histogram (sample-normal 1000)))
+,#+end_src
+
+,#+RESULTS:
+[[file:data/images/incanter-plot.png
+#+end_src
+
+Currently (when I write this document), CIDER is going to add
+content-type result which will support display image. The discussion and PR is at here:
+
+- https://github.com/clojure-emacs/cider/issues/1510
+- https://github.com/clojure-emacs/cider/pull/2248/files
+- old prototype project: https://github.com/technomancy/nrepl-discover
+- a nice try demo:
+  - https://github.com/clojure-emacs/cider/issues/1510#issuecomment-373988901
+  - https://github.com/clojure-emacs/cider/pull/2248
+- https://github.com/clojure-emacs/cider-nrepl/pull/517
+
+* More functions
+
+There are some functions inside this library that I have not
+represented here. I might update this document someday.
+
+
+* Release History
+
+Original this package is on GitHub (https://github.com/stardiviner/ob-clojure-literate).
+If you're interested in this project, PR welcome. or contact me.
