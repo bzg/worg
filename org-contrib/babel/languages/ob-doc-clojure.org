@@ -287,6 +287,26 @@ You can see the second code block still us individual namespace.
 : nil#'kk2/he#namespace[kk2
 #+end_example
 
+* Change Clojure cwd in Org-mode way
+
+As this blog post [[https://stardiviner.github.io/Blog/Clojure%2520Plotting%2520to%2520Org%2520inline%2520image%2520in%2520ob-clojure.html][Clojure Plotting to Org inline image in ob-clojure]] mentioned.
+
+Because Clojure is based on JVM, can JVM does not allow to dynamically
+change current working directory (=cwd=). So if you use =ob-clojure= in
+Org-mode, and need to interact with path, directory, file etc. You
+need to figure other ways. Here is an Org-mode way, use header
+argument ~:var~ to pass current buffer's path into Clojure, then use
+this dir variable in Clojure to construct a correct path.
+
+#+begin_src org
+,#+begin_src clojure :results graphics :dir "data/images" :file "ob-clojure-literate.png" :var dir=(concat (file-name-directory (buffer-file-name)) "data/images/")
+(use '(incanter core stats datasets charts io pdf))
+(def hist (histogram (sample-normal 1000)))
+(save hist (str dir "ob-clojure-literate.png"))
+,#+end_src
+#+end_src
+
+
 * Additional Examples
 
 The above set-up and examples were intended for the beginner to achieve success
