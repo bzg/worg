@@ -269,7 +269,7 @@ BEGIN {
         if (condense)
             print "* <" date "> " gensub("^[ ]+", "", "", gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary)))
         else
-            print "* " gensub("^[ ]+", "", "", gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary))) "\n<" date ">"
+            print "* " gensub("^[ ]+", "", "", gensub("\\\\,", ",", "g", gensub("\\\\n", " ", "g", summary)))
         print ":PROPERTIES:"
         print     ":ID:       " id
         if(length(location))
@@ -277,7 +277,8 @@ BEGIN {
         if(length(status))
             print ":STATUS:   " status
         print ":END:"
-
+        if (! condense)
+            print "<" date ">"
         print ""
         # translate \n sequences to actual newlines and unprotect commas (,)
         if(length(entry)>1)
