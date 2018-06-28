@@ -1,0 +1,263 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Perl in Org Mode
+#+AUTHOR:     Daniel M. German
+#+EMAIL:      dmg[at]uvic[dot]ca
+#+LANGUAGE:   en
+#+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
+#+LINK_UP:    ../languages.html
+#+LINK_HOME:  https://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_export html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="http://www.perl.org/">Perl</a>
+  </p>
+  <p>
+  <a href="http://www.perl.org/">
+  <img src="./images/perl5raptor.png"/>
+  </a>
+  </p>
+  </div>
+#+end_export
+
+* Template Checklist [11/12]                                       :noexport:
+- [X] Revise #+TITLE:
+- [X] Indicate #+AUTHOR:
+- [X] Add #+EMAIL:
+- [X] Revise banner source block [3/3]
+  - [X] Add link to a useful language web site
+  - [X] Replace "Language" with language name
+  - [X] Find a suitable graphic and use it to link to the language
+    web site
+- [X] Write an [[Introduction]]
+- [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+- [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+- [X] Describe [[Header%20Arguments][Header Arguments]]
+- [X] Describe support for [[Sessions]]
+- [X] Describe [[Result%20Types][Result Types]]
+- [ ] Describe [[Other]] differences from supported languages
+- [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+
+This document is a short introduction to using Perl within Org mode.
+
+* Requirements and Setup
+
+The only requirement is installed in the computer where Org Babel is
+executing the scripts.
+
+
+#+begin_src emacs-lisp :exports code
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((lisp . t)))
+#+end_src
+
+* Org Mode Features for Perl Code Blocks
+** Header Arguments
+
+The support of Perl in Babel is basic. There are no language-specific
+arguments for Perl code blocks.
+
+** Result Types
+
+The only supported type is ~value~
+
+** Support for sessions
+
+There is no support for sessions.
+
+** var
+
+It is possible ot pass several variables to Perl, including table
+variables. See below.
+
+* Examples of Use
+
+These are two simple examples:
+
+#+BEGIN_EXAMPLE
+#+BEGIN_SRC perl :results value
+"hello world";
+#+END_SRC
+
+#+RESULTS:
+: hello world
+#+END_EXAMPLE
+
+#+begin_src perl
+10 * 20 + 5;
+#+end_src
+
+#+RESULTS:
+: 205
+#+end_example
+
+#+RESULTS: countingTo10
+
+* Other types of output
+
+Perl scripts might generate data that is parsed by Org. Unfortunately
+its current support is not very powerful. Currently there is only one
+method to receive data: ~:results value~. This is the default.  The
+result of the code block (the value of the last expression evaluated)
+if returned to Org. If the result is an array (up to two dimensions)
+it is interpreted as a table. Some examples below:
+
+
+#+BEGIN_EXAMPLE
+#+BEGIN_SRC perl :results value
+[[1,2],[2,4]]
+#+END_SRC
+
+#+RESULTS:
+| 1 | 2 |
+| 2 | 4 |
+#+END_EXAMPLE
+
+#+BEGIN_SRC perl :results value
+10 + 20
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+30
+#+end_example
+
+When returning an array, it is important to return a reference to the array. Otherwise it is interpreted as an scalar.
+
+For example, this returns the size of the array:
+
+#+BEGIN_EXAMPLE
+#+BEGIN_SRC perl :results value
+my @result ;
+$i = 0;
+for $j ('a'..'e')  {
+   $result[$i] = $j;
+   $i ++;
+}
+@result;
+#+END_SRC
+
+#+RESULTS:
+: 5
+#+END_EXAMPLE
+But this returns the values of the array and creates the corresponding table
+
+#+BEGIN_EXAMPLE
+#+BEGIN_SRC perl :results value
+my @result ;
+$i = 0;
+for $j ('a'..'e')  {
+   $result[$i] = $j;
+   $i ++;
+}
+\@result;
+#+END_SRC
+
+#+RESULTS:
+| a |
+| b |
+| c |
+| d |
+| e |
+#+END_EXAMPLE
+
+#+BEGIN_EXAMPLE
+#+BEGIN_SRC perl :results value
+my @result ;
+for $i (0..3) {
+   for $j (0..2) {
+      $result[$i][$j] = $j*$i+$j;
+   }
+}
+\@result;
+#+END_SRC
+
+#+RESULTS:
+| 0 | 1 | 2 |
+| 0 | 2 | 4 |
+| 0 | 3 | 6 |
+| 0 | 4 | 8 |
+#+END_EXAMPLE
+
+* Using tables as input
+
+The most useful feature of using Perl within Org is the ability to use
+tables as input to scripts.
+
+Let us assume we have the following table:
+
+#+BEGIN_EXAMPLE
+#+NAME:exampletable
+| 1 | a |
+| 2 | b |
+| 3 | c |
+| 4 | d |
+#+END_EXAMPLE
+
+We want to use this table as input. Org passes a table to Perl as
+a reference to an array of anonymous one-dimension arrays. In
+a nutshell, you can access an element of a table using
+~$$nameTable[row][column]~. Remember, in Perl indexes are zero based:
+For instance, this block simply returns the input table. Please note
+that because data is already a reference we can simply return it.
+
+#+BEGIN_EXAMPLE
+#+name: example1usingTable
+#+begin_src perl :var data=exampletable :results table :type value
+$data
+#+end_src
+
+#+RESULTS: example1usingTable
+| 1 | a |
+| 2 | b |
+| 3 | c |
+| 4 | d |
+#+END_EXAMPLE
+
+One challenge, however, is to know how big the table is. Perl does not have
+native two dimensional arrays. Instead, it uses arrays of arrays (each sub-array
+can have any size). In the block below we use a function (~org_table_size~) to
+return the number of columns and rows in a table.
+
+#+BEGIN_EXAMPLE
+#+name: example2usingTable
+#+begin_src perl :results value :var data=exampletable
+# first we need to define two functions that will make our life easier
+sub org_table_size
+{
+    # return the number of columns and rows in a table
+    my ($table) = @_;
+    my $y = $$table[0];
+    return (scalar(@$y), scalar (@$table));
+}
+
+my @result ;
+
+my ($cols, $rows) = org_table_size($data);
+
+## transpose the input table
+
+for my $i ($0..$cols-1) {
+    for my $j (0 .. $rows-1) {
+        $result[$i][$j] = $$data[$j][$i];
+    }
+}
+\@result;
+#+end_src
+
+#+RESULTS: example2usingTable
+| 1 | 2 | 3 | 4 |
+| a | b | c | d |
+#+END_EXAMPLE
+
+* Links to Tutorials and Other Resources
+
+The best resource for Perl is [[https://perldoc.perl.org][The Perl programming documentation]]
+project.
