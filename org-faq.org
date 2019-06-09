@@ -4445,30 +4445,41 @@ It will recursively search for =org= files in your =$HOME= directory
 You can then use rsync to make sure =~/org/backup/= also lives on a
 remote and safe place.
 
-* MobileOrg
+* Org-mode on mobile devices
 
-#+index: MobileOrg
+#+index: MobileDevices
 
-** Which versions of MobileOrg are available?
-   :PROPERTIES:
-   :CUSTOM_ID: mobileorg_versions
-   :END:
+** What mobile apps for org-mode are available?
 
-MobileOrg is available for Apple's iOS, and for Google's Android.
+These are the most popular apps for keeping notes in org-mode format
+on mobile devices:
 
 - MobileOrg for *iOS*, created by Richard Moreland.  Check out [[https://mobileorg.github.io][the project's page]].
-- MobileOrg for *Android*, by Matt Jones.  See [[http://wiki.github.com/matburt/mobileorg-android/][his project page]].
+- Orgzly for *Android*. See [[http://www.orgzly.com/][the project's page]]
+
+There is also an app called MobileOrg for *Android* which is now
+unmaintained and not fully compatible with recent versions of
+Android. See [[http://wiki.github.com/matburt/mobileorg-android/][the project page]].
 
 ** Can I use the same files on my mobile device as on my computer?
 
-Absolutely!  Both apps currently offer the same options for
-synchronization of =.org= files with a computer-based installation of
-Org-mode:
+Absolutely! Depending on the mobile app and your preferences, a number
+of options are available.
+
+*** Synchronizing using the MobileOrg protocol
+
+Org-mode in Emacs has a builtin protocol for synchronizing and merging
+changes from the mobile device. This protocol is supported by
+MobileOrg for iOS and by the (unmaintained) MobileOrg for Android, but
+*not* by Orgzly. Synchronization is initiated from within Emacs, which
+needs to fetch a file containing only the changes in a
+MobileOrg-specific file format. The file can be retrieved:
 
 - via [[http://www.dropbox.com/][Dropbox.com]] (easier to set up, free accounts available)
+- via [[https://syncthing.net/][Syncthing]] (open source and self hosted, potentially more data privacy)
 - via a [[https://en.wikipedia.org/wiki/WebDAV][WebDAV]] server of your choice (potentially more data privacy)
 
-** How does synchronization via WebDAV work?
+**** How does synchronization via WebDAV work?
    :PROPERTIES:
    :CUSTOM_ID: mobileorg_webdav
    :END:
@@ -4518,7 +4529,7 @@ through, for example, /ssh/ and /scp/:
   to [[http://article.gmane.org/gmane.emacs.tramp/7991][a bug with tramp and =ControlPersist=]] you may need to use =scpx=
   instead of =scp= as the /tramp/ transfer method.{{{EndWarningBox}}}
 
-** Does Emacs have to use /TRAMP/ to access the remote directory?
+**** Does Emacs have to use /TRAMP/ to access the remote directory?
 
 No, you can alternatively use a local directory for staging.  Other
 means must then be used to keep this directory in sync with the WebDAV
@@ -4536,8 +4547,27 @@ directory using /scp/.
   (lambda () (shell-command "scp ~/stage/mobileorg.org user@wdhost:mobile/")))
 #+end_src
 
-Alternatively you could write a simple script to synchronise from
+Alternatively you could write a simple script to synchronize from
 =~/stage/= to the remote directory via /rsync/.
+
+*** Synchronizing with Syncthing or Dropbox directly
+
+Among Orgzly users it is popular to synchronize the org files
+themselves (rather than just the changesets) with [[https://syncthing.net/][Syncthing]] or
+[[http://www.dropbox.com/][Dropbox.com]]. This method provides no way of merging parallel edits, so
+you must ensure that a synchronization is performed when switching
+device, or you'll be in trouble. [[https://medium.com/@JosephKiran/replacing-cloud-based-to-do-apps-with-orgzly-and-syncthing-6a065419d61][This blog post]] provides some details
+for using Orgzly with Syncthing.
+
+*** Synchronizing with Git and a shell script
+
+An option which is attractive if you already prefer to have your org
+files version controlled by git is to initiate synchronization from a
+shell script on the computer, and handle merge conflicts with git
+merges. Edits made in parallel will be visible as parallel branches in
+the git log, and most conflicts should be handled by the
+auto-merger. [[https://pantarei.xyz/posts/sync-org-mode-with-mobile/][This blog post]] provides such a script with setup
+instructions.
 
 * Mathjax
 
