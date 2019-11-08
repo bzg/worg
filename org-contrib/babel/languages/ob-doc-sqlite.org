@@ -212,4 +212,44 @@ select n, count(*) from testtable group by n;
 | 10 |        2 |
 #+END_EXAMPLE
 
+If dropping/overwriting a table is undesirable, a temporary SQL table
+can be used to insert new values into an existing table:
 
+#+BEGIN_EXAMPLE
+,#+begin_src sqlite :db /tmp/rip.db :var orgtable=tableexample :colnames yes
+create temporary table temp_table(id int, n int);
+.mode csv testtable
+.import $orgtable temp_table
+insert into existing_table (id, n) select id,n from temp_table;
+,#+end_src
+#+END_EXAMPLE
+** Using Org tables as an updatable "view" on SQLite tables
+Org tables can be used to conveniently display some data from a SQLite
+table, allow the user to edit it in Org, and the re-insert the updated
+data into the underlying SQLite table. Do this by naming the results
+table, then using it as input to another SQLite block that updates
+rows. If your table has a primary key, you'll definitely want to use
+it to make sure the correct rows are edited.
+
+#+BEGIN_EXAMPLE
+,#+begin_src sqlite :db /tmp/reviews.db
+select id,title,rating from bookreview where rating is null;
+,#+end_src
+
+,#+name: ratings
+,#+RESULTS:
+|  5 | To Kill a Mockingbird | null |
+| 12 | Three Body Problem    | null |
+
+,#+begin_src sqlite :db /tmp/reviews.db :var ratings=ratings
+create temporary table updates (id, title, rating);
+.mode csv updates
+.import $ratings updates
+update bookreview set rating = (select rating from updates
+where bookreview.id = updates.id)
+where exists (select * from updates where updates.id = bookreview.id);
+#+END_EXAMPLE
+
+By editing the intermediary table to replace "null" values with a
+numerical rating, and then running the second source block, the SQLite
+table will be updated correctly.
