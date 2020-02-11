@@ -3,8 +3,8 @@
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
 #+TITLE:      R Source Code Blocks in Org Mode
-#+AUTHOR:     Eric Schulte, Dan Davison, Tom Dye
-#+EMAIL:      schulte.eric at gmail dot com, davison at stats dot ox dot ac dot uk
+#+AUTHOR:     Eric Schulte, Dan Davison, Tom Dye, Tyler Smith
+#+EMAIL:      schulte.eric at gmail dot com, davison at stats dot ox dot ac dot uk, tyler at plantarum dot ca
 #+LANGUAGE:   en
 #+HTML_HEAD:      <style type="text/css">#outline-container-introduction{ clear:both; }</style>
 #+LINK_UP:    ../languages.html
@@ -25,7 +25,7 @@
   </div>
 #+end_export
 
-* Template Checklist [12/12]                                       :noexport:
+* Template Checklist [13/14]                           :noexport:
   - [X] Revise #+TITLE:
   - [X] Indicate #+AUTHOR:
   - [X] Add #+EMAIL:
@@ -42,6 +42,8 @@
   - [X] Describe [[Result%20Types][Result Types]]
   - [X] Describe [[Other]] differences from supported languages
   - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+  - [ ] Update how-to output graphics
+  - [X] Update requirements
 * Introduction
 R is a free software environment for statistical computing and
 graphics.  R source code blocks are fully supported in Org Mode with a
@@ -57,34 +59,51 @@ Precompiled binary distributions for Gnu/Linux, Mac OS X, and Windows
 are available at the [[http://cran.r-project.org][Comprehensive R Archive Network]], which also makes
 available the source code for compilation on other platforms.
 
-Org Mode supports graphical output for LaTeX documents using the [[http://sourceforge.net/projects/pgf/][PGF
-and TikZ graphics system for TeX]].  In order to use this facility your
-R installation will need the [[http://cran.r-project.org/web/packages/tikzDevice/index.html][tikzDevice package]].  One way to ensure
-that this device is loaded is to put the following lines in
-=.Rprofile=: 
-
-#+BEGIN_EXAMPLE
-old <- getOption("defaultPackages")
-options(defaultPackages = c(old, "tikzDevice"))
-#+END_EXAMPLE
-
-
 The Emacs mode, [[http://ess.r-project.org/][Emacs Speaks Statistics (ESS)]], is required for
 session-based evaluation.  ESS is designed to support editing of
 scripts and interaction with various statistical analysis programs
 such as R, S-Plus, SAS, Stata, and JAGS. 
 
-The following two lines in =.emacs= point Emacs to ESS and load it.
-Note that you will likely need to adjust the =load-path= accordingly. 
+You can install ESS from the [[https://melpa.org/][MELPA repository]], using Emacs' package
+facility. This is usually the easiest way to install it; if you need
+to, instructions for installing from source are found at the [[https://ess.r-project.org/index.php?Section=download][ESS
+website]].
 
-#+begin_src emacs-lisp
-   (add-to-list 'load-path "~/.emacs.d/src/ess-5.6/lisp")
-   (require 'ess-site)
+To install from Melpa, you need to add it to your
+~package-archives~. The MELPA maintainers recommend the following
+code:
+
+#+begin_src elisp
+(require 'package)
+(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+                    (not (gnutls-available-p))))
+       (proto (if no-ssl "http" "https")))
+  (when no-ssl (warn "\
+Your version of Emacs does not support SSL connections,
+which is unsafe because it allows man-in-the-middle attacks.
+There are two things you can do about this warning:
+1. Install an Emacs version that does support SSL and be safe.
+2. Remove this warning from your init file so you won't see it again."))
+  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
+  ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+  ;; and `package-pinned-packages`. Most users will not need or want to do this.
+  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
+  )
+(package-initialize)
 #+end_src
- 
-Finally, you'll need to ensure that =org-babel-load-languages=
-includes an entry for R.  Typically, =org-babel-load-languages=
-will contain many entries.  The example below omits other languages.
+
+Note that the minimal requirement is just to have the line 
+
+#+begin_src elisp
+(add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
+#+end_src
+
+at the appropriate place in your configuration (i.e., before you call
+~package-initialize~.
+
+You also need to ensure that =org-babel-load-languages= includes an
+entry for R. Typically, =org-babel-load-languages= will contain many
+entries. The example below omits other languages.
 
 #+begin_src emacs-lisp :tangle yes
   (org-babel-do-load-languages
