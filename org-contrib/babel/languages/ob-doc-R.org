@@ -25,7 +25,7 @@
   </div>
 #+end_export
 
-* Template Checklist [13/14]                           :noexport:
+* Template Checklist [14/15]                           :noexport:
   - [X] Revise #+TITLE:
   - [X] Indicate #+AUTHOR:
   - [X] Add #+EMAIL:
@@ -42,8 +42,9 @@
   - [X] Describe [[Result%20Types][Result Types]]
   - [X] Describe [[Other]] differences from supported languages
   - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
-  - [ ] Update how-to output graphics
+  - [X] Update how-to output graphics
   - [X] Update requirements
+  - [ ] Update Examples of Use
 * Introduction
 R is a free software environment for statistical computing and
 graphics.  R source code blocks are fully supported in Org Mode with a
@@ -99,7 +100,7 @@ Note that the minimal requirement is just to have the line
 #+end_src
 
 at the appropriate place in your configuration (i.e., before you call
-~package-initialize~.
+~package-initialize~).
 
 You also need to ensure that =org-babel-load-languages= includes an
 entry for R. Typically, =org-babel-load-languages= will contain many
@@ -136,22 +137,23 @@ both 32bit and 64bit binaries. The above path points to the 32bit paths; for
 * Org Mode Features for R Source Code Blocks
 ** Header Arguments
 
-There are no R-specific default header arguments.
+There are no R-specific /default/ header arguments.
 
 If a =:file filename.ext= header argument is provided to an R source
 block, then the output from the source block will go to the named
 file. What that output is depends on the value of the =:results=
 header argument.
 
-If the value is =:results graphics= then "base" graphics output is
-captured on disk, and a link to the graphics file is inserted into the
-Org Mode buffer (as is also the case with the graphics-only languages
-such as gnuplot, ditaa, dot, and asymptote.)  An attempt is made to
-find an R graphics device corresponding to the file extension.
-Currently, the following extensions are recognized: =.png=, =.jpg=,
-=.jpeg=, =.tiff=, =.bmp=, =.pdf=, =.ps=, =.postscript=, =.tex=, and
-=.svg=.  If the extension of the file name passed to =:file= is not
-recognized, PNG format output is created by default.
+If the value is =:results file graphics= then "base" graphics output
+is captured to the file specified by the ~:file~ argument. A link to
+the file is inserted into the Org Mode buffer. **NB: as of org version
+9.3, the ~:results~ argument must include both ~file~ and ~graphics~;
+earlier versions only required the ~graphics~ argument**. An attempt
+is made to find an R graphics device corresponding to the file
+extension. Currently, the following extensions are recognized: =.png=,
+=.jpg=, =.jpeg=, =.tiff=, =.bmp=, =.pdf=, =.ps=, =.postscript=,
+=.tex=, and =.svg=. If the extension of the file name passed to
+=:file= is not recognized, PNG format output is created by default.
 
 If the source code block uses grid-based R graphics, e.g., the lattice
 and ggplot2 packages, then care must be taken either to print() the
@@ -160,42 +162,40 @@ graphics object, specify =:results output=, or run the code in a
 ggplot2 return objects that must be explicitly printed to see them,
 using the print function.  This happens automatically when run
 interactively, e.g., =:session=, but when called inside another
-function, it does not.  The way =:results value= is defined to
-operate, device and ggplot2 function calls are wrapped in a =main=
-function, and unless the object is specifically printed, no output is
-produced.
+function, it does not.  
 
 Some years ago, Erik Iverson summarized the different ways of getting
-this working.[fn:1]  His summary, updated to reflect a change in Org
-Babel syntax [fn:2], follows:
+this working. His summary, updated to reflect a change in Org
+Babel syntax, follows:
 
-: * does /not/ produce a file
-: #+begin_src R :file 1.png :results value graphics
+: * does /not/ work; produces a file, but it does 
+: * not contain a valid graphics format
+: #+begin_src R :file 1.png :results file graphics
 : library(lattice)
 : xyplot(1:10 ~ 1:10)
 : #+end_src
 
 : * does produce a file, by printing object
-: #+begin_src R :file 2.png :results value graphics
+: #+begin_src R :file 2.png :results graphics file
 : library(lattice)
 : print(xyplot(1:10 ~ 1:10))
 : #+end_src
 
 : * does produce a file, by using :results output
-: #+begin_src R :file 3.png :results output graphics
+: #+begin_src R :file 3.png :results output graphics file
 : library(lattice)
 : xyplot(1:10 ~ 1:10)
 : #+end_src
 
 : * does produce a file, by evaluating in :session
-: #+begin_src R :file 4.png :session :results graphics
+: #+begin_src R :file 4.png :session :results graphics file
 : library(lattice)
 : xyplot(1:10 ~ 1:10)
 : #+end_src
 
-
 # For further clarification of =:file= and =:results=, see [[http://thread.gmane.org/gmane.emacs.orgmode/35396/focus=35766][this thread]].
 
+*** Graphics Header Arguments
 There are many R-specific header arguments used to configure R graphics
 devices.  They include:
 
@@ -253,15 +253,14 @@ devices.  They include:
 
 #+begin_src org :exports code
   ,#+header: :width 8 :height 8 :R-dev-args bg="olivedrab", fg="hotpink"
-  ,#+begin_src R :file z.pdf :results graphics
+  ,#+begin_src R :file z.pdf :results graphics file
   ,plot(matrix(rnorm(100), ncol=2), type="l")
   ,#+end_src
 #+end_src
 
 ** Sessions
-Sessions are fully supported by R source code blocks.  They can be
-used as one way to preserve state accessed by several source code
-blocks.  Sessions are also useful for debugging, since it is possible
+Sessions are fully supported by R source code blocks. They can be used
+as one way to preserve state accessed by several source codeblocks. Sessions are also useful for debugging, since it is possible
 to view the values of variables created during the session.
 
 ** Result Types
@@ -296,9 +295,9 @@ outputs supported by R source code blocks in Org Mode include:
                        hyperlinking
 
 When using R to produce graphical displays, you will typically set
-=:results graphics=.  However, if you use the [[http://had.co.nz/ggplot/][ggplot implementation of
+=:results graphics file=.  However, if you use the [[http://had.co.nz/ggplot/][ggplot implementation of
 the grammar of graphics in R]], then you will need to set =:results
-output graphics=.
+output graphics file= (see above).
 
 * Examples of Use
 ** Debugging
@@ -309,8 +308,9 @@ output graphics=.
     visit the R buffer (i.e. the buffer containing the "inferior ESS"
     process). Then you can inspect the objects that have been created,
     and try out some lines of code. Useful R functions for inspecting
-    objects include (as always in R, type a "?" followed by the name
-    of the function to get help with the function)
+    objects include (in R, type a "?" followed by the name of the
+    function, or use ~C-c C-v~ to use ESS's help browser, to get help
+    with the function)
     - str
     - dim
     - summary
@@ -480,8 +480,3 @@ included correctly in LaTex-based export targets.
  view and place point at the prompt. ESS binds this to =C-c C-z= and
  =C-M-r= by default.
 
-* Footnotes
-
-[fn:2][[http://thread.gmane.org/gmane.emacs.orgmode/35396/focus=35766][{babel} R: New handling of file output]] 
-
-[fn:1][[http://article.gmane.org/gmane.emacs.orgmode/26082][babel grid based R graphical output with :results value]] 
