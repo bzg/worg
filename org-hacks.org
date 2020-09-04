@@ -3270,6 +3270,25 @@ value is a string containg the unaligned `org-mode' table."
   (org-table-align))
 #+END_SRC
 
+** Don't let visual-line-mode shadow org special commands
+
+=M-x visual-line-mode RET= will use ~beginning-of-visual-line~,
+~end-of-visual-line~, and ~kill-visual-line~ instead of
+~org-beginning-of-line~, ~org-end-of-line~, and ~org-kill-line~, while 
+those might be preferred in an Org buffer.
+
+To avoid this, you can use this hack:
+
+#+begin_src emacs-lisp
+(add-hook 'visual-line-mode-hook
+          (lambda () (when (derived-mode-p 'org-mode)
+                       (local-set-key (kbd "C-a") #'org-beginning-of-line)
+                       (local-set-key (kbd "C-e") #'org-end-of-line)
+                       (local-set-key (kbd "C-k") #'org-kill-line))))
+#+end_src
+
+See [[https://orgmode.org/list/87zh7jfyal.fsf@gmail.com/][this discussion]].
+
 ** foldout.el
 
 ~foldout.el~, which is part of Emacs, is a nice little companion for
