@@ -1,22 +1,39 @@
 # -*- org-tags-column: -80; sentence-end-double-space: t; -*-
+
 #+OPTIONS:    H:3 num:nil \n:nil ::t |:t ^:{} -:t f:t *:t tex:t
 #+OPTIONS:    toc:2 tags:t d:("LOGBOOK")
 #+STARTUP:    align fold nodlcheck indent
+#+TITLE: Org bugs and issues
 #+AUTHOR:     Carsten Dominik
 #+LANGUAGE:   en
-#+PRIORITIES: A C B
 #+CATEGORY:   worg
-#+ARCHIVE:    ::** Closed issues
 #+DRAWERS:    PROPERTIES LOGBOOK
-
-# This is the unofficial Org mode bug and issue tracker
-
-#+TITLE: Org bugs, issues, and requests
 #+TODO: TODO STARTED(s@) DELEGATED(d@) | RESOLVED(r@) CANCELED(c@)
 
 # (debbugs-gnu '("serious" "important" "normal") '("org-mode"))
 
-* Open issues
+* Issue tracker
+
+The Org community tracks issue on [[https://updates.orgmode.org/][updates.orgmode.org]] - see [[https://orgmode.org/list/87y2p64xo7.fsf@gnu.org/][this
+announcement]].
+
+You can subscribe to this [[https://updates.orgmode.org/feed/bugs][RSS feed for new bugs]].
+
+If you want to report a bug, use =M-x org-submit-bug-report= or directly
+send an email to [[mailto:emacs-orgmode@gnu.org][the Org mailing list]].
+
+Make sure to read Org's manual instructions on how to provide [[https://orgmode.org/org.html#Feedback][useful
+feedback]].
+
+If you can reproduce a bug, that's really helpful: reply to the
+original poster adding =X-Bug-Woof: confirmed= in your mail header.
+
+* Old issues
+
+These issues are /old/: if you want to help, please check the report
+link, try to reproduce the problem and reply to the email using
+=X-Bug-Woof: confirmed= if the issue is still present or =X-Bug-Woof:
+fixed= if the issue as been fixed, removing it from this file too.
 
 ** TODO Clocktable error with multiple source files from parent dir ([[https://orgmode.org/list/86txhu59fu.fsf@somewhere.org][report]]) :#28:
 ** TODO Background color reset for links and DONE headlines ([[https://orgmode.org/list/867gl81tml.fsf@somewhere.org][report]])        :#27:
@@ -50,245 +67,3 @@ actually runs.
 ** TODO Can org regenerate the cache automatically ([[https://orgmode.org/list/CAJcAo8sVQDjbE5sdn0PTzQ9edgNkCBOpE+joD=vekscB8yhjJQ@mail.gmail.com/][report]])                :#4:
 ** TODO How to refile without refiling in order to cache a restricted refile? ([[https://orgmode.org/list/CAJcAo8uzE5MkGMOQ+=DV5Oq7vMBypW61MtsYP4Az2_kRvP2wbw@mail.gmail.com][report]]) :#3:
 
-* Archive
-
-** Closed issues
-
-*** CANCELED refile cache and auto-save files                             :#5:
-:LOGBOOK:
-- State "CANCELED"   from "TODO"       [2013-09-25 Mi 16:06] \\
-  Another thread also covers this
-:END:
-:PROPERTIES:
-:ARCHIVE_TIME: 2013-09-25 Mi 16:06
-:ARCHIVE_FILE: ~/lib/emacs/work/Worg/org-issues.org
-:ARCHIVE_OLPATH: Open issues
-:ARCHIVE_CATEGORY: worg
-:ARCHIVE_TODO: CANCELED
-:END:
-https://orgmode.org/list/CAJcAo8v4ksYxkn6Ts3H2H7vVfQhjVTsq7FNzOTB4u==VYZf1GQ@mail.gmail.com
-
-*** RESOLVED [Feature Request] Make property-drawers exportable           :#2:
-:LOGBOOK:
-- State "RESOLVED"   from "STARTED"    [2013-09-26 Do 14:17] \\
-  Patch by Nicolas implemnts this
-- State "STARTED"    from "TODO"       [2013-09-25 Mi 14:31] \\
-  Nicolas is working with me and Thorsten to fix this
-:END:
-:PROPERTIES:
-:ARCHIVE_TIME: 2013-09-26 Do 14:17
-:ARCHIVE_FILE: ~/lib/emacs/work/Worg/org-issues.org
-:ARCHIVE_OLPATH: Open issues
-:ARCHIVE_CATEGORY: worg
-:ARCHIVE_TODO: RESOLVED
-:END:
-https://orgmode.org/list/8738shvzaj.fsf@gmail.com
-
-*** RESOLVED Colored tags generate an error when C-x C-w ing the agenda  :#24:
-:LOGBOOK:
-- State "RESOLVED"   from "DELEGATED"  [2013-09-27 Fr 09:24] \\
-  This is a bug in ps-print, hopefully Sebastien will report it to Emacs
-- State "DELEGATED"  from "TODO"       [2013-09-25 Mi 09:58] \\
-  Sebastien Vauban
-:END:
-:PROPERTIES:
-:ARCHIVE_TIME: 2013-09-27 Fr 09:24
-:ARCHIVE_FILE: ~/lib/emacs/work/Worg/org-issues.org
-:ARCHIVE_OLPATH: Open issues
-:ARCHIVE_CATEGORY: worg
-:ARCHIVE_TODO: RESOLVED
-:END:
-**** Reported by Sebastien Vauban on <2013-09-11 Mi>
-#+begin_example
-Hello,
-
-If you have colors for tags:
-
---8<---------------cut here---------------start------------->8---
- ;; faces for specific tags
- (setq org-tag-faces
-       '(("home" .
-          (:slant italic
-           :foreground "#5C88D3" :background "#BBDDFF"))
-         ("work" .
-          (:slant italic
-           :foreground "#5F7C43" :background "#C1D996"))))
---8<---------------cut here---------------end--------------->8---
-
-you can't export the agenda views anymore; they all generate the following
-error:
-
-#+begin_src text
- Debugger entered--Lisp error: (wrong-type-argument listp "#5C88D3")
-   ps-face-attributes("#5C88D3")
-   ps-face-attribute-list((:slant italic :foreground "#5C88D3" :background "#BBDDFF"))
-   ps-plot-with-face(459 463 (:slant italic :foreground "#5C88D3" :background "#BBDDFF"))
-   ps-generate-postscript-with-faces1(1 6850)
-   ps-generate-postscript-with-faces(1 6850)
-   ps-generate(#<buffer Agenda View> 1 6850 ps-generate-postscript-with-faces)
-   ps-spool-with-faces(1 6850 nil)
-   ps-print-with-faces(1 6850 "~/agenda.ps")
-   ps-print-buffer-with-faces("~/agenda.ps")
-   ...
-   command-execute(org-agenda-write)
-#+end_src
-
-Best regards,
- Seb
-
--- 
-Sebastien Vauban
-
-#+end_example
-
-
-
-*** RESOLVED Org-protocol/org-capture and new emacsclient frames	 :#12:
-CLOSED: [2014-02-18 Tue 10:03]
-:LOGBOOK:
-- State "RESOLVED"   from "TODO"       [2014-02-18 Tue 10:03] \\
-  Resolved in this thread
-  https://orgmode.org/list/87wqjhus0v.fsf@gmail.com
-:END:
-**** Reported by Josiah Schwab on <2013-08-21 Mi>
-
-#+begin_example
-Hi All,
-
-I am in the process of setting up org-protocol to allow me to capture
-links from chromium into my TODOs.
-
-After reading this worg article
-https://orgmode.org/worg/org-contrib/org-protocol.html
-I have the chrome -> org portion working.
-
-When I click my bookmark, which is
- javascript:location.href='org-protocol://capture://W/'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection())
-the org-protocol link is handled correctly, spawning the command
- /usr/bin/emacsclient -c -n "org-protocol://capture://W/https%3A%2F%2Fwww.google.com%2F/Google/"
-and that interacts with my capture template
- ("W" "Web TODO" entry (file org-default-notes-file) "* TODO %?\n%U\n%a\n")
-to open up a capture buffer that looks like what I want.
-
-All is good except for two undesired behaviors:
- 1) I get a new emacs frame which is split, with the capture buffer
- only occupying one half.
- 2) When I finish capture with C-c C-c the frame sticks around.
-
-I suppose this is more of an emacs question (org has done its thing),
-but a similar question has been discussed on this list before:
-http://comments.gmane.org/gmane.emacs.orgmode/33650 
-
-Because that discussion was not making use of org-protocol, I was not
-able to generalize its conclusions to my circumstance.
-
-Suggestions or pointers to other resources would be welcome.
-
-Best,
-Josiah
-
-#+end_example
-
-*** RESOLVED table.el complex tables and orgtbl-to-latex		 :#19:
-CLOSED: [2015-01-31 sam. 13:07]
-:PROPERTIES:
-:ARCHIVE_TIME: 2015-01-31 sam. 13:08
-:ARCHIVE_FILE: ~/.emacs.d/devel/worg/org-issues.org
-:ARCHIVE_OLPATH: Open issues
-:ARCHIVE_CATEGORY: worg
-:ARCHIVE_TODO: RESOLVED
-:END:
-:LOGBOOK:
-- State "RESOLVED"   from "TODO"       [2015-01-31 sam. 13:07] \\
-  Implemented.
-:END:
-https://orgmode.org/list/87ppwfow51.fsf@mat.ucm.es
-
-*** RESOLVED flyspell check within source code blocks			 :#17:
-CLOSED: [2015-01-31 sam. 13:06]
-:PROPERTIES:
-:ARCHIVE_TIME: 2015-01-31 sam. 13:08
-:ARCHIVE_FILE: ~/.emacs.d/devel/worg/org-issues.org
-:ARCHIVE_OLPATH: Open issues
-:ARCHIVE_CATEGORY: worg
-:ARCHIVE_TODO: RESOLVED
-:END:
-:LOGBOOK:
-- State "RESOLVED"   from "TODO"       [2015-01-31 sam. 13:06] \\
-  Implemented.
-:END:
-https://orgmode.org/list/1369466246-5113-1-git-send-email-trevor.m.murphy@gmail.com
-
-*** CANCELED Exporting verbatim and code to html converts -- to en dash	  :#1:
-CLOSED: [2015-01-31 sam. 13:05]
-:PROPERTIES:
-:ARCHIVE_TIME: 2015-01-31 sam. 13:08
-:ARCHIVE_FILE: ~/.emacs.d/devel/worg/org-issues.org
-:ARCHIVE_OLPATH: Open issues
-:ARCHIVE_CATEGORY: worg
-:ARCHIVE_TODO: CANCELED
-:END:
-:LOGBOOK:
-- State "CANCELED"   from "TODO"       [2015-01-31 sam. 13:05] \\
-  ~ and = markup have been swapped. ~ is code and = verbatim.
-:END:
-https://orgmode.org/list/CA+5B0FMWAJPmciRucXYzatnUD-FEWGwr=6b3ctVY6rpZMSkirg@mail.gmail.com
-
-*** RESOLVED org-cycle on hidden inline task makes also other inline tasks visible :#21:
-CLOSED: [2015-01-31 sam. 13:14]
-:PROPERTIES:
-:ARCHIVE_TIME: 2015-01-31 sam. 13:15
-:ARCHIVE_FILE: ~/.emacs.d/devel/worg/org-issues.org
-:ARCHIVE_OLPATH: Open issues
-:ARCHIVE_CATEGORY: worg
-:ARCHIVE_TODO: RESOLVED
-:END:
-:LOGBOOK:
-- State "RESOLVED"   from "TODO"       [2015-01-31 sam. 13:14] \\
-  Solved.
-:END:
-https://orgmode.org/list/87ioyftsdn.fsf@kafka.loc
-
-*** RESOLVED Accents Issues in Table formula in French			 :#15:
-CLOSED: [2015-02-01 dim. 01:10]
-:PROPERTIES:
-:ARCHIVE_TIME: 2015-02-01 dim. 01:11
-:ARCHIVE_FILE: ~/.emacs.d/devel/worg/org-issues.org
-:ARCHIVE_OLPATH: Open issues
-:ARCHIVE_CATEGORY: worg
-:ARCHIVE_TODO: RESOLVED
-:END:
-:LOGBOOK:
-- State "RESOLVED"   from "TODO"       [2015-02-01 dim. 01:10] \\
-  Fixed in b5d9f4be4daf0b0e8b32bc28493b2e1440fa205e.
-:END:
-https://orgmode.org/list/CAOnk0vSk+SFRL1M46mjv_EUmcuC4owehHc1=uBi_WT2k-ccTLQ@mail.gmail.com
-
-*** RESOLVED user-chosen separator in org-table-convert-region		 :#20:
-CLOSED: [2015-02-01 dim. 01:14]
-:PROPERTIES:
-:ARCHIVE_TIME: 2015-02-01 dim. 01:14
-:ARCHIVE_FILE: ~/.emacs.d/devel/worg/org-issues.org
-:ARCHIVE_OLPATH: Open issues
-:ARCHIVE_CATEGORY: worg
-:ARCHIVE_TODO: RESOLVED
-:END:
-:LOGBOOK:
-- State "RESOLVED"   from "TODO"       [2015-02-01 dim. 01:14] \\
-  This feature is already in the code base. Nothing to fix.
-:END:
-https://orgmode.org/list/7516a8ee97c7efa620a8dd0570a747e6@avalenn.eu
-
-*** RESOLVED `org-agenda-sorting-strategy' does not work in `tags-todo'	 :#29:
-CLOSED: [2015-02-17 mar. 12:02]
-:PROPERTIES:
-:ARCHIVE_TIME: 2015-02-17 mar. 12:03
-:ARCHIVE_FILE: ~/.emacs.d/devel/worg/org-issues.org
-:ARCHIVE_OLPATH: Open issues
-:ARCHIVE_CATEGORY: worg
-:ARCHIVE_TODO: RESOLVED
-:END:
-:LOGBOOK:
-- State "RESOLVED"   from "TODO"       [2015-02-17 mar. 12:02]
-:END:
-https://orgmode.org/list/86hadqurl2.fsf@somewhere.org
