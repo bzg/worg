@@ -5,55 +5,55 @@
 [[file:index.org][{Back to Worg's contibutions index}]]
 
 *Note that this package might need to be updated to work with the new
-Org repo starting 2018. See
-[[http://lists.gnu.org/r/emacs-orgmode/2017-12/msg00578.html][here]]
-for the announcement.*
+Org repo starting 2018. See [[http://lists.gnu.org/r/emacs-orgmode/2017-12/msg00578.html][here]] for the announcement.*
 
 =org-track.el= aims to add a simple interface to track Org-mode's git
-repository on https://code.orgmode.org/bzg/org-mode.git. For non-git users,
-an =org-latest.tar.gz= archive is provided and will be downloaded from
-https://orgmode.org/org-latest.tar.gz.
+repository on https://code.orgmode.org/bzg/org-mode.git. For non-git
+users, an =org-latest.tar.gz= archive is provided and will be downloaded
+from https://orgmode.org/org-latest.tar.gz.
 
-The idea was born in a thread on the great emacs-orgmode mailing list on a
-request from Stefan Vollmer: https://orgmode.org/list/D5AB1A81-4B00-4B4F-9A1C-A2995AE297FA@nf.mpg.de
+The idea was born in a thread on the emacs-orgmode mailing list on [[https://orgmode.org/list/D5AB1A81-4B00-4B4F-9A1C-A2995AE297FA@nf.mpg.de][a
+request from Stefan Vollmar]].
 
-If you run into trouble, drop us a mail on the great
-[[mailto:emacs-orgmode@gnu.org][emacs-orgmode Mailinglist]].
+If you run into trouble, drop us a mail on the [[mailto:emacs-orgmode@gnu.org][emacs-orgmode mailing
+list]].
 
 # <<usage>>
+
 * Usage
 
-  You will need an initial version of the Org-mode distribution in your load
-  path.  For easy upgrading, add the following to your =.emacs=:
+  You will need an initial version of the Org-mode distribution in
+  your load path.  For easy upgrading, add the following to your
+  =.emacs=:
 
   #+begin_src emacs-lisp
     (add-to-list load-path "/path/to/org-mode/lisp")
     (add-to-list load-path "/path/to/org-mode/contrib/lisp")
-    (require org-install)
+    (require org)
     (require org-track)
   #+end_src
 
-  Adjust at least the variable =org-track-directory=. You can use customize for
-  this:
+  Adjust at least the variable =org-track-directory=. You can use
+  customize for this:
 
   : M-x customize-variable RET org-track-directory RET
 
-  From now on, to update and compile the current development version of Org-mode
-  is just a matter of typing:
+  From now on, to update and compile the current development version
+  of Org-mode is just a matter of typing:
 
   : M-x org-track-update RET
 
-  This will download the current =org-latest.tar.gz=, update the autoloads file
-  =org-install.el= and (optionally) compile the sources.
+  This will download the current =org-latest.tar.gz=, update the
+  autoloads file =org-install.el= and (optionally) compile the sources.
 
 
 # <<org-git-directory>>
 * org-track-directoy Layout
 
-  The =org-track-directory= is the only variable you'll need to adjust. This is
-  the directory where your local copy of Org-mode will live. I.e., a sub
-  directory 'org-mode/' will be added here. Also the file =org-latest.tar.gz= will
-  be put here (and deleted after updates):
+  The =org-track-directory= is the only variable you'll need to
+  adjust. This is the directory where your local copy of Org-mode will
+  live. I.e., a sub directory 'org-mode/' will be added here. Also the
+  file =org-latest.tar.gz= will be put here (and deleted after updates):
 
   : org-track-directory
   :         |-- org-latest.tar.gz (if you download archives)
@@ -64,7 +64,6 @@ If you run into trouble, drop us a mail on the great
   :             |   `-- lisp       (add this dir to your loadpath)
   :             `-- ...
 
-
 * Fine-tuning
 
   To see and/or change all the related variables, do:
@@ -73,27 +72,27 @@ If you run into trouble, drop us a mail on the great
 
   Here is a list of all variables the script uses:
 
-  - =org-track-directory= :: The directory, where the sub-directory =org-mode/=
-      lives. Default: =~/.emacs.d/org/lisp=
-  - =org-track-compile-sources= :: Compile the sources after downloading? Defaults
-      to =t=.
-  - =org-track-org-url= :: The package is downloaded from this URL. This denotes
-      the folder actually (i.e. the URL without the basename =org-latest.tar.gz=).
+  - =org-track-directory= :: The directory, where the sub-directory
+    =org-mode/= lives. Default: =~/.emacs.d/org/lisp=
+  - =org-track-compile-sources= :: Compile the sources after
+    downloading? Defaults to =t=.
+  - =org-track-org-url= :: The package is downloaded from this URL. This
+    denotes the folder actually (i.e. the URL without the basename
+    =org-latest.tar.gz=).
   - =org-track-org-package= :: The name the package itself. Default:
-      =org-latest.tar.gz=.
-  - =org-track-remove-package= :: Remove the downloaded package after unpacking?
-      The default is to keep the archive.
-
+    =org-latest.tar.gz=.
+  - =org-track-remove-package= :: Remove the downloaded package after
+    unpacking?  The default is to keep the archive.
 
 * How it works
 
-  The `*.tar.gz' version is extracted without external dependencies (tar-mode).
-  To make sure that =org-latest.tar.gz= is opened in tar-mode, the code modifies
-  your `auto-mode-alist':
+  The `*.tar.gz' version is extracted without external dependencies
+  (tar-mode).  To make sure that =org-latest.tar.gz= is opened in
+  tar-mode, the code modifies your `auto-mode-alist':
 
   #+begin_src emacs-lisp
-    (add-to-list 'auto-mode-alist '("org-latest\\.tar\\.gz\\'" . tar-mode))
+  (add-to-list 'auto-mode-alist '("org-latest\\.tar\\.gz\\'" . tar-mode))
   #+end_src
 
   The downloaded package can be removed. See the option
-  =org-git-remove-package=. Default is not to remove =org-latest.tar.gz=.
+  =org-git-remove-package=.  Default is not to remove =org-latest.tar.gz=.

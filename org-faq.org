@@ -977,11 +977,6 @@ Some org variables have to be set before org.el is loaded or else they
 will not work. (An example is the new variable
 =org-enforce-todo-dependencies=.)
 
-To make sure all your variables work you should not use =(require
-'org)=. Instead use the following setting:
-
-: (require 'org-install)
-
 You should also make sure that you do not require any other =org-...=
 files in your =.emacs= file before you have set your org variables,
 since these will also cause org.el to be loaded. To be safe, load org
@@ -1014,7 +1009,7 @@ need to change for your own use.
   (add-to-list 'load-path (expand-file-name "~/git/org-mode/lisp"))
   (add-to-list 'auto-mode-alist '("\\.\\(org\\  |org_archive\\|txt\\)$" . org-mode))
   (setq org-agenda-files '("/tmp/test.org"))
-  (require 'org-install)
+  (require 'org)
   (require 'org-habit)
 
   (global-set-key "\C-cl" 'org-store-link)
@@ -1202,11 +1197,10 @@ the system-wide path; this is bad.
 
 You should add your directories to the =load-path= at the beginning:
 
-:  (add-to-list 'load-path "~/.emacs.d/org-mode/lisp") (require 'org-install)
+:  (add-to-list 'load-path "~/.emacs.d/org-mode/lisp")
 
-Function =add-to-list= adds at the beginning. Don't use =append=
-because it appends at the end. Also be sure to use =(require
-'org-install)= and not =(require 'org)=.
+Function =add-to-list= adds at the beginning. Don't use =append= because
+it appends at the end.
 
 This wrong version loading may also happen if you have a byte-compiled
 =org.elc= from an old version together with a new =org.el=. Since
