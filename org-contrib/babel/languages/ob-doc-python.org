@@ -87,7 +87,7 @@ example below omits other languages.
    used).  Default is none.
  - =:return=: Value to return (only when result-type is value, and not
    in session mode; not commonly used).  Default is None; in
-   non-session mode use return() to return a value.
+   non-session mode use the =return= statement to return a value.
  - =:python=: Name of the command for executing Python code.
 
 *** Common Header Arguments
@@ -99,48 +99,25 @@ example below omits other languages.
 ** Sessions
 Session mode is fully supported in python, including named sessions.
 In session mode, each block is run in the same long-running python
-interactive interpreter session, as if you had typed that block into
-python.  You can have multiple sessions, all independent.
+interactive interpreter session.  You can have multiple sessions, all
+independent.
 
 Sessions can be used to define functions, set up variables, and share
 code between source blocks.
 
-Session mode in python is slightly different from non-session mode,
-because in session mode you are talking to a single "interactive"
-python session.  In python's interactive mode, blank lines are
-special: they indicate the end of an indented block.  So you have to
-write your org-mode python a little differently when using session
-mode.
+** Return values
 
-Also, in non-session mode, the python code block will be wrapped in a
-function, so to return a value (in =:results value= mode) you have to
-use a =return= statement.  In session mode, the python code is
-evaluated directly by the interpreter, not in a function context, and
-the last statement's value will be automatically returned, so you must
-_not_ use a =return= statement.
+Session and non-session modes handle return values slightly
+differently.  In non-session mode, the python code block will be
+wrapped in a function, so to return a value (in =:results value= mode)
+you have to use a =return= statement.  In session mode, the last
+statement's value will be returned if it is a top-level expression;
+you should _not_ use a =return= statement.
 
- - Session mode:
+*** Non-session mode example
+
 #+begin_example
-# blank lines not OK in indented blocks, and don't use return()
-# Source block is passed directly to interactive python;
-# value is value of _ at end.
-#+begin_src python :session
-def foo(x):
-  if x>0:
-    return x+1
-  else:
-    return x-1
-
-foo(1)
-#+end_src
-
-#+RESULTS:
-: 2
-#+end_example
-
- - Non-session mode:
-#+begin_example
-# blank lines OK in indented blocks, and use return()
+# use return statement
 # Entire source block will get indented and used as the body of main()
 #+begin_src python
 def foo(x):
@@ -157,11 +134,65 @@ return foo(5)
 : 6
 #+end_example
 
-Finally, if you are using matplotlib for graphics, matplotlib uses an
-"interactive" backend when started from an interactive python (as you
-might expect).  So you have to set the backend explicitly to a PDF or
-PNG or other file-exporting backend when using session mode.  See the
-example at
+*** Session mode example
+
+#+begin_example
+# don't use return statement
+#+begin_src python :session
+def foo(x):
+  if x>0:
+    return x+1
+  else:
+    return x-1
+
+foo(1)
+#+end_src
+
+#+RESULTS:
+: 2
+#+end_example
+
+A limitation of session-mode return values is that the final statement
+must be a top-level expression, otherwise nothing is returned.
+
+For example, the code block below doesn't return anything, because the
+final expression is an indented if/else block, not a top-level
+expression:
+
+#+begin_example
+#+begin_src python :session :results value
+import random
+if random.randint(0,10) % 2 == 0:
+    "even"
+else:
+    "odd"
+#+end_src
+
+#+RESULTS:
+#+end_example
+
+To return the value of an indented block, assign the value to a
+variable, and return that variable as the final top-level expression:
+
+#+begin_example
+#+begin_src python :session :results value
+import random
+if random.randint(0,10) % 2 == 0:
+    ret = "even"
+else:
+    ret = "odd"
+ret
+#+end_src
+
+#+RESULTS:
+: even
+#+end_example
+
+** Graphics
+
+If you are using matplotlib for graphics, you may have to set the
+backend explicitly to a PDF or PNG or other file-exporting backend
+when using session mode.  See the example at
 
 #+begin_example
 #+begin_src python :session :results file
@@ -181,8 +212,7 @@ plt.savefig('images/myfig.pdf')
 
 ** Result Types
    * =value=: Value results are the value of the last expression
-     evaluated in the code block.  This is found in session mode using
-     using the "_" special python interpreter variable.
+     evaluated in the code block.
 
    * =output=: Output results come from whatever the python code prints on stdout.
 
@@ -190,7 +220,7 @@ plt.savefig('images/myfig.pdf')
   - Hello World!
 #+begin_example
 #+begin_src python :results output
-print "Hello, world!"
+print("Hello, world!")
 #+end_src
 
 #+RESULTS:
@@ -244,51 +274,3 @@ return 'images/python-matplot-fig.png' # return filename to org-mode
 
 #+end_example
 [[file:images/python-matplot-fig.png]]
-
-* Caveats
-
-You need some care in order to pass utf-8 strings to python.
-
-** passing utf-8 strings to python
-
-#+begin_example
-#+NAME: unicode_str
-,#+BEGIN_EXAMPLE
-“this string is not ascii!”
-,#+END_EXAMPLE
-#+end_example
-
-#+begin_example
-#+NAME: error-in-passing-var
-#+BEGIN_SRC python :var data=unicode_str
-return data
-#+END_SRC
-#+end_example
-
-#+begin_example
-#+RESULTS: error-in-passing-var
-#+end_example
-
-Will produce no output and prints the following message in the buffer
-=*Org-Babel Error Output*=:
-
-#+BEGIN_EXAMPLE
-  File "<stdin>", line 3
-SyntaxError: Non-ASCII character '\xe2' in file <stdin> on line 3, but no encoding declared; see http://www.python.org/peps/pep-0263.html for details
-#+END_EXAMPLE
-
-** passing utf-8 strings to python with workaround
-
-A workaround is to use =:preamble= with the value =# -*- coding:utf-8 -*-=
-
-#+begin_example
-#+NAME: ok-in-passing-var
-#+BEGIN_SRC python :preamble "# -*- coding: utf-8 -*-" :var data=unicode_str
-return data
-#+END_SRC
-#+end_example
-
-#+begin_example
-#+RESULTS: ok-in-passing-var
-: “this string is not ascii!”
-#+end_example
