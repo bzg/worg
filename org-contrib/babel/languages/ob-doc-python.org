@@ -77,17 +77,17 @@ example below omits other languages.
 * Org Mode Features for Python Source Code Blocks
 ** Header Arguments
 *** Language-Specific Header Arguments
- - =:results {output, value}=: Value mode is the default (as with
-   other languages).  In value mode you can use the following subtypes:
+ - =:results {output, value}=: Output results come from whatever the
+   python code prints on stdout. Value results are the value of the
+   last expression evaluated in the code block. Value mode is the
+   default (as with other languages).  In value mode you can use the
+   following subtypes:
    - =raw=: value is inserted directly
    - =pp=: value is pretty-printed by python using =pprint.pformat(%s)=, then inserted
    - =file=: value is interpreted as a filename to be interpolated
      when exporting; commonly used for graphics output.
- - =:preamble=: Preamble code, inserted before the body (not commonly
-   used).  Default is none.
- - =:return=: Value to return (only when result-type is value, and not
-   in session mode; not commonly used).  Default is None; in
-   non-session mode use the =return= statement to return a value.
+ - =:return=: Appends a =return= statement to the end of the code
+   block. Only when result-type is value, and not in session mode.
  - =:python=: Name of the command for executing Python code.
 
 *** Common Header Arguments
@@ -190,33 +190,104 @@ ret
 
 ** Graphics
 
-If you are using matplotlib for graphics, you may have to set the
-backend explicitly to a PDF or PNG or other file-exporting backend
-when using session mode.  See the example at
+To return plots, save the figure to a file, return the filename, and
+set the header argument =:results file=.
+
+For example:
 
 #+begin_example
 #+begin_src python :session :results file
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 fig=plt.figure(figsize=(3,2))
 plt.plot([1,3,2])
 fig.tight_layout()
-plt.savefig('images/myfig.pdf')
-'images/myfig.pdf' # return this to org-mode
+
+fname = 'images/myfig.pdf'
+plt.savefig(fname)
+fname # return this to org-mode
 #+end_src
 
 #+RESULTS:
 [[file:images/myfig.pdf]]
 #+end_example
 
-** Result Types
-   * =value=: Value results are the value of the last expression
-     evaluated in the code block.
+You can use noweb to reduce the boilerplate of saving and returning
+the filename; see the [[*Plotting][example]] below.
 
-   * =output=: Output results come from whatever the python code prints on stdout.
+If you are using matplotlib for graphics, you may have to set the
+backend explicitly to a PDF or PNG or other file-exporting backend
+when using session mode, for example by calling
+=matplotlib.use('Agg')=. See also [[*Additional examples][Additional examples]].
 
-* Examples of Use
+** Noweb
+
+Noweb syntax allows references between code blocks.  One situation
+where this is useful is when you have some boilerplate code you need
+to repeat across many code blocks, and want to hide during export.
+
+Below are examples of how this can be useful for returning matplotlib
+figures and pandas dataframes.
+
+*** Plotting
+
+Returning a plot from a ob-python block requires saving the figure to
+a file and returning the filename. In the example below, we extract
+this to a separate block that can be referred to by other code
+blocks. The =:noweb strip-export= header argument means to allow noweb
+syntax, but to hide the inserted code during export.
+
+#+begin_src org
+,#+name: savefig
+,#+begin_src python :var figname="plot.svg" width=5 height=5 :exports none
+  return f"""plt.savefig('{figname}', width={width}, height={height})
+  '{figname}'"""
+,#+end_src
+
+,#+header: :noweb strip-export
+,#+begin_src python :results value file :session :exports both
+  import matplotlib, numpy
+  import matplotlib.pyplot as plt
+  fig=plt.figure(figsize=(4,2))
+  x=numpy.linspace(-15,15)
+  plt.plot(numpy.sin(x)/x)
+  fig.tight_layout()
+  <<savefig(figname="plot.png", width=10, height=5)>>
+,#+end_src
+#+end_src
+
+*** Pandas dataframes
+
+In the below example, we use the external [[https://pypi.org/project/tabulate/][tabulate]] package to convert
+a pandas Dataframe into org-mode format, but wrap it in a noweb block
+so we can hide the conversion during export.
+
+#+begin_src org
+,#+name: pd2org
+,#+begin_src python :var df="df" :exports none
+  return f"return tabulate({df}, headers={df}.columns, tablefmt='orgtbl')"
+,#+end_src
+
+,#+header: :prologue from tabulate import tabulate
+,#+header: :noweb strip-export
+,#+begin_src python :results value raw :exports both
+  import pandas as pd
+  df = pd.DataFrame({
+      "a": [1,2,3],
+      "b": [4,5,6]
+  })
+  <<pd2org("df")>>
+,#+end_src
+
+,#+RESULTS:
+|   | a | b |
+|---+---+---|
+| 0 | 1 | 4 |
+| 1 | 2 | 5 |
+| 2 | 3 | 6 |
+#+end_src
+
+* Additional examples
   - Hello World!
 #+begin_example
 #+begin_src python :results output
