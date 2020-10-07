@@ -122,6 +122,75 @@ Pandoc is the Swiss-army knife to convert files from one markup format
 into another, it can convert documents from many source format,
 including Org, to many other.
 
+** R packages
+*** orgutils
+- Author: Enrico Schumann
+- Homepage: https://cran.r-project.org/web/packages/orgutils/
+#+begin_quote
+Helper functions for Org files (<http://orgmode.org/>): a generic function 'toOrg' for transforming R objects into Org markup (most useful for data frames; there are also methods for Dates/POSIXt) and a function to read Org tables into data frames.
+#+end_quote
+- Description and examples
+Convert data.frames into org tables.
+#+begin_src R :results output :session *R*
+library(orgutils)
+toOrg(head(mtcars))
+#+end_src
+
+#+RESULTS:
+: | row.names         |  mpg | cyl | disp |  hp | drat |    wt |  qsec | vs | am | gear | carb |
+: |-------------------+------+-----+------+-----+------+-------+-------+----+----+------+------|
+: | Mazda RX4         |   21 |   6 |  160 | 110 |  3.9 |  2.62 | 16.46 |  0 |  1 |    4 |    4 |
+: | Mazda RX4 Wag     |   21 |   6 |  160 | 110 |  3.9 | 2.875 | 17.02 |  0 |  1 |    4 |    4 |
+: | Datsun 710        | 22.8 |   4 |  108 |  93 | 3.85 |  2.32 | 18.61 |  1 |  1 |    4 |    1 |
+: | Hornet 4 Drive    | 21.4 |   6 |  258 | 110 | 3.08 | 3.215 | 19.44 |  1 |  0 |    3 |    1 |
+: | Hornet Sportabout | 18.7 |   8 |  360 | 175 | 3.15 |  3.44 | 17.02 |  0 |  0 |    3 |    2 |
+: | Valiant           | 18.1 |   6 |  225 | 105 | 2.76 |  3.46 | 20.22 |  1 |  0 |    3 |    1 |
+
+*** ascii
+- Authors: David Hajage [aut], Mark Clements [cre, ctb], Seth Falcon [ctb], Terry Therneau [ctb], Matti Pastell [ctb], Friedrich Leisch [ctb]
+- Homepage: https://cran.r-project.org/web/packages/ascii/, https://github.com/mclements/ascii
+
+#+begin_quote
+Coerce R object to 'asciidoc', 'txt2tags', 'restructuredText', 'org', 'textile' or 'pandoc' syntax. Package comes with a set of drivers for 'Sweave'.
+#+end_quote
+- Description and examples
+Convert several R objects like tables, data.frame matrices into org tables
+#+begin_src R :results output :session *R*
+library(ascii)
+print(ascii(head(mtcars)),type='org')
+#+end_src
+
+#+RESULTS:
+: |                   | mpg   | cyl  | disp   | hp     | drat | wt   | qsec  | vs   | am   | gear | carb |
+: |-------------------+-------+------+--------+--------+------+------+-------+------+------+------+------|
+: | Mazda RX4         | 21.00 | 6.00 | 160.00 | 110.00 | 3.90 | 2.62 | 16.46 | 0.00 | 1.00 | 4.00 | 4.00 |
+: | Mazda RX4 Wag     | 21.00 | 6.00 | 160.00 | 110.00 | 3.90 | 2.88 | 17.02 | 0.00 | 1.00 | 4.00 | 4.00 |
+: | Datsun 710        | 22.80 | 4.00 | 108.00 | 93.00  | 3.85 | 2.32 | 18.61 | 1.00 | 1.00 | 4.00 | 1.00 |
+: | Hornet 4 Drive    | 21.40 | 6.00 | 258.00 | 110.00 | 3.08 | 3.21 | 19.44 | 1.00 | 0.00 | 3.00 | 1.00 |
+: | Hornet Sportabout | 18.70 | 8.00 | 360.00 | 175.00 | 3.15 | 3.44 | 17.02 | 0.00 | 0.00 | 3.00 | 2.00 |
+: | Valiant           | 18.10 | 6.00 | 225.00 | 105.00 | 2.76 | 3.46 | 20.22 | 1.00 | 0.00 | 3.00 | 1.00 |
+
+#+begin_src R :results output :session *R*
+print(ascii(table(mtcars$am,mtcars$gear)),type='org')
+#+end_src
+
+#+RESULTS:
+: |   | 3     | 4    | 5    |
+: |---+-------+------+------|
+: | 0 | 15.00 | 4.00 | 0.00 |
+: | 1 | 0.00  | 8.00 | 5.00 |
+
+#+begin_src R :results output :session *R*
+print(ascii(as.matrix(head(mtcars))),type='org')
+#+end_src
+
+#+RESULTS:
+: | 21.00 | 6.00 | 160.00 | 110.00 | 3.90 | 2.62 | 16.46 | 0.00 | 1.00 | 4.00 | 4.00 |
+: | 21.00 | 6.00 | 160.00 | 110.00 | 3.90 | 2.88 | 17.02 | 0.00 | 1.00 | 4.00 | 4.00 |
+: | 22.80 | 4.00 | 108.00 | 93.00  | 3.85 | 2.32 | 18.61 | 1.00 | 1.00 | 4.00 | 1.00 |
+: | 21.40 | 6.00 | 258.00 | 110.00 | 3.08 | 3.21 | 19.44 | 1.00 | 0.00 | 3.00 | 1.00 |
+: | 18.70 | 8.00 | 360.00 | 175.00 | 3.15 | 3.44 | 17.02 | 0.00 | 0.00 | 3.00 | 2.00 |
+: | 18.10 | 6.00 | 225.00 | 105.00 | 2.76 | 3.46 | 20.22 | 1.00 | 0.00 | 3.00 | 1.00 |
 
 * Org-mode exporters
 
