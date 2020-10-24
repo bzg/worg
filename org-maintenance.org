@@ -10,47 +10,69 @@
 This document describes the tasks the Org-mode maintainers have to do
 and how they are performed.
 
-* Git workflow
+* What's in a release?
+
+** We don't follow a release schedule
+
+Org development is the work of volunteers only and we cannot promise
+to follow a release schedule.
+
+** We don't use semantic versioning
+
+We use the same numbering convention than semantic versioning, but we
+don't follow the rules of SemVer, as expressed in [[https://semver.org][semver.org]].
+
+A /major/ release (e.g. =10=) means: "Hear ye, hear ye!  *All users* should
+pay attention and read the release notes before upgrading!".
+
+A /minor/ release (e.g. =10.1=) means: "Hear ye, hear ye!  *Power users and
+Org contributors* shoul pay attention and read the release notes before
+upgrading!  All other users are welcome to read them too."
+
+Note that this de facto convention has been made explicit after =9.4=.
+
+** Major, minor and bugfix releases
+
+- Major release :: The release number for a major release look like
+  this: =10=.  Major releases are made whenever Org is in a state where
+  the feature set is consistent and we know that the features that are
+  implemented will be supported in the future.
+
+- Minor release :: The release number for minor releases look like
+  this: =10.1=.  Minor releases are amends to main releases: small new
+  features or bugfixes.
+
+- Bugfix-only releases :: The release number for bugfixes-only
+  releases looks like this: =10.1.1=.  These release contain no new
+  feature at all, big or small, and only fix things that we cannot
+  affort not to fix in a minor release.
+
+** Conventions before and after Org 9.5
+
+Note that before =Org 9.5=, versions like =9.3=, =9.4=, etc. were really
+/major/ ones.  This was confusing for some users, especially those who
+expect Org to follow semantic versioning conventions.
+
+* Doing the release
+
+** Git workflow
 
 The git repository has two branches:
 
 - master :: for current development.
-
 - maint :: for bug fixes against latest major or minor release.
 
 Bug fixes always go on =maint= then are merged on =master=.
 
 New features always go on =master=.
 
-* Releasing
+** Merging or not merging
 
-** Major release
+When doing a major or minor release, we make sure that all changes
+from the maint branch are merged into the the master branch, then
+merge the master branch back into maint to synchronize the two.
 
-The release number for main releases look like this: =9.1=
-
-Main releases are made whenever Org is in a state where the feature
-set is consistent and we feel that the features that are implemented
-is something we want to support in the future.
-
-A major release turns the current state of the master branch into a
-release.
-
-When doing a /major release/, make sure all changes from the maint
-branch are merged into the the master branch, then merge the master
-branch back into maint to synchronize the two.
-
-** Minor release
-
-The release number for minor releases look like this: =9.1.7=
-
-Minor releases are small amends to main releases.  Usually they fix
-critical bugs discovered in a main release.  Minor bugs are usually
-not fixed -- they will be addressed in the next main release.
-
-Only the fix to the bug is bundled into a release, without the main
-development work going on in the master branch.  Since the bug fix
-will also be needed in the master branch, usually the fix is made in
-maint then merged in master.
+When doing a bugfix release, we do it from the maint branch directly.
 
 ** Tagging the release
 
