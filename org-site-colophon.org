@@ -7,6 +7,31 @@
 * Org all the things
 [[https://orgmode.org][The website]] is created from org-mode documents. Just change the =.html=
 extension of a page to =.org.html= to see the org source 😃.
+* Creating the features screenshots
+To produce the screenshots/screencasts in [[orgmode.org/features.html][features]], I did the following:
++ Use the [[https://github.com/hlissner/emacs-doom-themes/tree/screenshots#doom-one-light][doom-one-light]] theme
++ Use 24pt [[https://github.com/adobe-fonts/source-code-pro][Source Code Pro]]
++ Use a frame 50 columns wide, and 10--20 lines tall
++ No =org-superstar=
++ ~(prettify-symbols-mode -1)~
++ ~(setq org-pretty-entities nil)~
++ ~(setq org-hide-leading-stars nil)~
++ ~(setq org-link-descriptive nil)~
++ ~(org-restart-font-lock)~
+
+From here, I either use [[https://gitlab.com/ambrevar/emacs-gif-screencast][emacs-gif-screencast]] or the following function:
+#+begin_src emacs-lisp
+(defun org-screenshot-svg ()
+  "Save a screenshot of the current frame as an SVG image.
+Saves to a file in ~/Pictures/Org and puts the filename in the kill ring."
+  (interactive)
+  (let* ((filename (expand-file-name (format-time-string "~/Pictures/Org/%H:%M.svg")))
+         (data (x-export-frames nil 'svg)))
+    (with-temp-file filename
+      (insert data))
+    (kill-new filename)
+    (message filename)))
+#+end_src
 
 * Development
 For easy development, there are some little snippets which make SASS
@@ -73,7 +98,6 @@ The ="DESTINATION"= needs customising for your particular environment.
           (error (setq errors (append errors file))))))
     (message "finished exporting. Experienced errors with:%s" (if errors (concat "\n - " (s-join "\n - " errors)) ""))))
 #+end_src
-
 * Local deployment
 We use a little shell hack to immediately call Emacs on the file
 #+begin_src shell
