@@ -48,6 +48,7 @@ java source code block is evaluated, the code is written as a java
 class, compiled to a class file, and executed.
 
 * Requirements and Setup
+** Add Java Support to Babel
 
 1. Install the java compiler and runtime environment
 2. Configure java source code blocks for Org mode by adding the
@@ -59,6 +60,30 @@ class, compiled to a class file, and executed.
    '((java . t)))
 #+end_src
 
+** Configure Defaults
+
+Default behavior for ob-java differs from most babel languages in two
+ways:
+
+1. ob-java defaults to scripting mode (=:results output=)
+2. ob-java writes tempfiles to the current directory instead of the
+   babel temporary directory
+
+Both defaults are set in =org-babel-default-header-args:java=, and can
+be changed by modifying that variable.  To change both defaults to
+make ob-java consistent with the rest of babel, add this to your init
+file after initializing babel:
+
+#+begin_src emacs-lisp :exports code
+(nconc org-babel-default-header-args:java
+       '((:dir . nil)
+         (:results . value))
+#+end_src
+
+Note that this adds the overrides to the end of the list.  This is
+important because the list is processed in order and the last value is
+used.
+
 * Org Mode Features for Java Source Code Blocks
 ** Header Arguments
 
@@ -66,7 +91,7 @@ Java source code blocks accept the following header arguments.  All
 headers arguments are optional.
 
 - =:dir= :: specify which directory to write source and class files
-  (default is the babel temp dir)
+  ([[*Source and Class File Locations][default is the current directory]])
 - =:classname= :: fully qualified classname (see [[*Class and Main Method Definitions][Class and Main
   Method Definitions]])
 - =:imports= :: a list of classes to add as imports (see [[*Imports][Imports]])
@@ -425,6 +450,34 @@ code block:
 #+end_src
 #+end_example
 
+** Source and Class File Locations
+
+Most babel languages write the source code block to a file in the
+babel temporary directory and compile there, but originally ob-java
+used the current directory (the directory containing the org file)
+instead.
+
+This may be because the java compiler requires the source file to be
+under java package subdirectories and the babel temporary directory
+doesn't allow for subdirectories.  A benefit of using the current
+directory is that it allows source code blocks to depend on classes
+defined in other blocks.  When writing to the babel temporary
+directory, all source code blocks must be independent.
+
+ob-java can write to the babel temporary directory now, but by default
+it uses the current directory to preseve the previous behavior.  It is
+possible to change this behavior locally or globally.  This is a
+source block that will override the default and compile in the babel
+temporary directory:
+
+#+begin_example
+#+begin_src java :dir 'nil :classname com.package.Greeter
+  System.out.print("hello, world");
+#+end_src
+#+end_example
+
+To change the default behavior see [[*Configure Defaults][Configure Defaults]].
+
 ** Non-executable Classes
 
 If a source code block includes methods but doesn't include a main
@@ -438,4 +491,5 @@ There is no support for sessions
 * Current Issues
 ** TODO Tramp integration is currently broken
 Workaround: specify the =:dir= header argument.
+** TODO Document tramp support
 ** TODO Formatting shouldn't be required to return a table in scripting mode
