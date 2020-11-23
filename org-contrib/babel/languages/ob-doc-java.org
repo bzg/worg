@@ -122,7 +122,7 @@ class and main method definitions if they are omitted.  If
 =:classname= and the class definition in the source code block are
 both omitted, the class will be named =Main=.
 
-And this is exactly equivalent to the above hello world:
+This is exactly equivalent to the above hello world:
 
 #+begin_example
 #+begin_src java :results output
@@ -198,10 +198,12 @@ This example returns a list using scripting mode.  For the result to
 show up as a list in the org buffer, notice that the =:results= must
 be set to =raw list=.
 
+#+begin_example
 #+begin_src java :results output raw list
   System.out.println("1");
   System.out.println("2");
 #+end_src
+#+end_example
 
 This is the output:
 
@@ -227,8 +229,8 @@ following example.
 
 #+begin_example
 #+begin_src java :results value list
-Integer[] a = {4, 1};
-return a;
+  Integer[] a = {4, 1};
+  return a;
 #+end_src
 #+end_example
 
@@ -477,6 +479,18 @@ temporary directory:
 #+end_example
 
 To change the default behavior see [[*Configure Defaults][Configure Defaults]].
+** Tramp Support
+
+If the org file containing the java source code block is on a remote
+machine and =:dir= is either not set (it defaults to the current
+directory, which would be remote in this case) or is set to a remote
+path, then the source files will be written to the remote machine,
+compiled by the remote java compiler and run by the remote java
+runtime.
+
+If the org file is remote but =:dir= is set to a local directory, the
+source file will be written to the local machine and local java
+binaries will be used.
 
 ** Non-executable Classes
 
@@ -489,7 +503,4 @@ code block from erroring when evaluated.
 There is no support for sessions
 
 * Current Issues
-** TODO Tramp integration is currently broken
-Workaround: specify the =:dir= header argument.
-** TODO Document tramp support
 ** TODO Formatting shouldn't be required to return a table in scripting mode
