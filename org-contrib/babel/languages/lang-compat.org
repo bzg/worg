@@ -1,4 +1,4 @@
-#+TITLE:      Babel: Languages
+#+TITLE:      Babel: Language Compatability
 #+OPTIONS:    H:3 num:nil toc:3 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
@@ -7,7 +7,7 @@
 #+EMAIL:      ianxm at jhu dot edu
 #+LANGUAGE:   en
 #+HTML_LINK_HOME:  https://orgmode.org/worg/
-#+HTML_LINK_UP:  ../index.html
+#+HTML_LINK_UP:  index.html
 
 * Overview
 
@@ -15,16 +15,25 @@ This page looks at how consistent various languages are in babel.  The
 goal is to document inconsistencies so they can be resolved or at
 least better understood.
 
-* Summary
-| lang   | default mode | return list | output list | return table | output table |
-|--------+--------------+-------------+-------------+--------------+--------------|
-| C      | functional   | no support  | [[list-expected][expected]]    | no support   | [[table-expected][expected]]     |
-| java   | scripting    | [[list-expected][expected]]    | [[list-expected][expected]]    | [[table-expected][expected]]     | [[table-variant1][variant1]]     |
-| python | functional   | [[list-expected][expected]]    | [[list-expected][expected]]    | [[table-expected][expected]]     | [[table-variant1][variant1]]     |
-| elisp  | functional   | [[list-expected][expected]]    | [[list-expected][expected]]    | [[table-expected][expected]]     | [[table-variant1][variant1]]     |
-| shell  | scripting    | [[list-expected][expected]]    | [[list-expected][expected]]    | [[table-expected][expected]]     | [[table-expected][expected]]     |
-
-* List
+* Default Behaviors
+| language | results    | working    | prologue / |
+|          | mode       | dir        | epilogue   |
+|----------+------------+------------+------------|
+| C        | functional | babel temp | uses       |
+| java     | scripting  | current    | ignored    |
+| python   | functional | babel temp | uses       |
+| elisp    | functional | n/a        | uses       |
+| shell    | scripting  | n/a        | uses       |
+* Results
+** Summary
+| language | return list | output list | return table | output table |
+|----------+-------------+-------------+--------------+--------------|
+| C        | no support  | [[list-expected][expected]]    | no support   | [[table-expected][expected]]     |
+| java     | [[list-expected][expected]]    | [[list-expected][expected]]    | [[table-expected][expected]]     | [[table-variant1][variant1]]     |
+| python   | [[list-expected][expected]]    | [[list-expected][expected]]    | [[table-expected][expected]]     | [[table-variant1][variant1]]     |
+| elisp    | [[list-expected][expected]]    | [[list-expected][expected]]    | [[table-expected][expected]]     | [[table-variant1][variant1]]     |
+| shell    | [[list-expected][expected]]    | [[list-expected][expected]]    | [[table-expected][expected]]     | [[table-expected][expected]]     |
+** List
 
 When we return a list from a source code block, we want it to look
 like an org list.
@@ -36,55 +45,55 @@ like an org list.
 - two
 #+end_example
 
-** Functional Mode
+*** Functional Mode
 
 The following examples use =:results value list=.
 
-*** C
+**** C
 C has no support for functional mode.
-*** java
+**** java
 #+begin_src java :results value list
   String[] ret = {"one", "two"};
   return ret;
 #+end_src
-*** python
+**** python
 #+begin_src python :python python3 :results value list
 return ("one", "two")
 #+end_src
-*** elisp
+**** elisp
 #+begin_src elisp :results value list
 '("one" "two")
 #+end_src
-** Scripting Mode
+*** Scripting Mode
 
 The following examples use =:results output raw list=. These have to
 use =raw= in order to work.
 
-*** C
+**** C
 #+begin_src C :results output raw list
 printf("one\n");
 printf("two\n");
 #+end_src
-*** java
+**** java
 #+begin_src java :results output raw list
 System.out.println("one");
 System.out.println("two");
 #+end_src
-*** python
+**** python
 #+begin_src python :python python3 :results output raw list
 print("one")
 print("two")
 #+end_src
-*** elisp
+**** elisp
 #+begin_src elisp :results output raw list
   (princ "one\n")
   (princ "two")
 #+end_src
-*** shell
+**** shell
 #+begin_src sh :results output raw list
 echo "one\ntwo"
 #+end_src
-* Table
+** Table
 
 When we return a table from a source code block, we want it to look
 like an org table.
@@ -105,35 +114,35 @@ Some languages return this instead.
 : three, four
 #+end_example
 
-** Functional Mode
+*** Functional Mode
 
 The following examples use =:results value table=.
 
-*** C
+**** C
 C has no support for functional mode.
-*** java
+**** java
 #+begin_src java :results value table
   String [][] ret = {{"one","two"}, {"three", "four"}};
   return ret;
 #+end_src
-*** python
+**** python
 #+begin_src python :python python3 :results value table
 return (("one", "two"), ("three", "four"))
 #+end_src
-*** elisp
+**** elisp
 #+begin_src elisp :results value table
 '(("one" "two") ("three" "four"))
 #+end_src
-** Scripting Mode
+*** Scripting Mode
 
 The following examples use =:results output table=.
 
-*** C
+**** C
 #+begin_src C :results output table
 printf("one, two\n");
 printf("three, four\n");
 #+end_src
-*** java
+**** java
 #+begin_src java :results output table
 System.out.println("one, two");
 System.out.println("three, four");
@@ -146,21 +155,21 @@ System.out.println("|one| two");
 System.out.println("|three| four");
 #+end_src
 
-*** python
+**** python
 #+begin_src python :python python3 :results output table
   print("one, two")
   print("three, four")
 #+end_src
 
 doesn't work but raw table works
-*** elisp
+**** elisp
 #+begin_src elisp :results output table
   (princ "one, two\n")
   (princ "three, four")
 #+end_src
 
 doesn't work but raw table works
-*** shell
+**** shell
 #+begin_src sh :results output table
 echo "one, two\nthree, four"
 #+end_src
