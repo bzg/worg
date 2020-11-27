@@ -15,15 +15,28 @@ This page looks at how consistent various languages are in babel.  The
 goal is to document inconsistencies so they can be resolved or at
 least better understood.
 
+* Use of Common Headers
+|          | default  | :prologue / |
+| language | :results | :epilogue   |
+|----------+----------+-------------|
+| C        | output   | uses        |
+| java     | output   | ignored     |
+| python   | value    | uses        |
+| elisp    | value    | uses        |
+| shell    | output   | uses        |
 * Default Behaviors
-| language | results    | working    | prologue / |
-|          | mode       | dir        | epilogue   |
-|----------+------------+------------+------------|
-| C        | functional | babel temp | uses       |
-| java     | scripting  | current    | ignored    |
-| python   | functional | babel temp | uses       |
-| elisp    | functional | n/a        | uses       |
-| shell    | scripting  | n/a        | uses       |
+|          | write source      |
+| language | files to          |
+|----------+-------------------|
+| C        | tempdir           |
+| java     | :dir else tempdir |
+| python   | tempdir           |
+| elisp    | n/a               |
+| shell    | n/a               |
+* Variables
+** TODO Summary
+** TODO List
+** TODO Table
 * Results
 ** Summary
 | language | return list | output list | return table | output table |
@@ -173,3 +186,10 @@ doesn't work but raw table works
 #+begin_src sh :results output table
 echo "one, two\nthree, four"
 #+end_src
+
+* Other Resources
+
+- [[file:~/code/elisp/worg/org-contrib/babel/header-args.org][worg header args page]]
+  - links to [[https://orgmode.org/manual/Specific-header-arguments.html][Specific-header-arguments]] which is gone
+- [[https://orgmode.org/manual/Using-Header-Arguments.html#Using-Header-Arguments][header args in the manual]]
+- [[https://orgmode.org/manual/Extracting-Source-Code.html#Header-arguments][more header args in the manual]]
