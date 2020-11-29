@@ -35,13 +35,13 @@ least better understood.
 | shell    | no tempfiles          |
 * Variables
 ** Summary
-| language | int list        | double list    | string list | int table    | double table | string table |
-|----------+-----------------+----------------+-------------+--------------+--------------+--------------|
-| C        | 2d string list  | 2d string list | 2d list     | expected     | expected     | expected     |
-| java     | 2d string list  | 2d string list | 2d list     | expected     | expected     | expected     |
-| python   | 2d string list  | 2d string list | 2d list     | expected     | expected     | expected     |
-| elisp    | 2d string list  | 2d string list | 2d list     | expected     | expected     | expected     |
-| shell    | list of strings | no doubles     | expected    | no 2d arrays | no 2d arrays | no 2d arrays |
+| language | int      | double   | string   | int list        | double list    | string list | int table | double table | string table |
+|----------+----------+----------+----------+-----------------+----------------+-------------+-----------+--------------+--------------|
+| C        | error    | error    | error    | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
+| java     | error    | error    | error    | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
+| python   | [[int-item-variant1][variant1]] | [[double-item-variant1][variant1]] | [[string-item-variant1][variant1]] | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
+| elisp    | [[int-item-variant1][variant1]] | [[double-item-variant1][variant1]] | [[string-item-variant1][variant1]] | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
+| shell    | [[int-item-variant1][variant1]] | [[double-item-variant1][variant1]] | [[string-item-variant1][variant1]] | list of strings | n/a            | expected    | n/a       | n/a          | n/a          |
 
 For tables, values are passed to code blocks in two dimensional arrays
 or lists with item types (ints, doubles, or strings) that match the
@@ -51,10 +51,197 @@ Only =shell= passes a list as a single dimentional array.
 
 More details on how this can cause confusion in [[*Round Trip Between Source Blocks][Round Trip]].
 
+Shell doesn't support doubles or multidimensional arrays, so those
+cases don't apply.
+
 *** Issues
 1. should ints and doubles be passed as strings?
 2. should lists be passed as 2d lists tables?
 3. should =:results output= require =raw= to produce an org list?
+
+** Single Item
+*** int
+#+begin_example
+#+name: int-item-data
+10
+#+end_example
+
+Each example just outputs the given number surrounded in single
+quotes.  This is the expected response:
+
+#+name: int-item-expected
+#+begin_example
+#+RESULTS:
+: '10'
+#+end_example
+
+Some languages return this instead:
+
+#+name: int-item-variant1
+#+begin_example
+#+RESULTS:
+: '10
+: '
+#+end_example
+**** C
+#+begin_example
+#+begin_src C :results output :var item=int-item-data
+printf("'%s'", item);
+#+end_src
+#+end_example
+
+This does not compile because the variable value includes the trailing
+endline and C doesn't allow multiline string literals.
+
+**** java
+#+begin_example
+#+begin_src java :results output :var item=int-item-data
+System.out.println(String.format("'%s'", item));
+#+end_src
+#+end_example
+
+This does not compile because the variable value includes the trailing
+endline and java doesn't allow multiline string literals.
+**** python
+#+begin_example
+#+begin_src python :results output :var item=int-item-data
+print("'{}'".format(item))
+#+end_src
+#+end_example
+**** elisp
+#+begin_example
+#+begin_src elisp :results output :var item=int-item-data
+(princ (format "'%s'" item))
+#+end_src
+#+end_example
+**** shell
+#+begin_example
+#+begin_src sh :results output :var item=int-item-data
+echo "'$item'"
+#+end_src
+#+end_example
+
+*** double
+#+begin_example
+#+name: double-item-data
+10.1
+#+end_example
+
+Each example just outputs the given number surrounded in single
+quotes.  This is the expected response:
+
+#+name: double-item-expected
+#+begin_example
+#+RESULTS:
+: '10.1'
+#+end_example
+
+Some languages return this instead:
+
+#+name: double-item-variant1
+#+begin_example
+#+RESULTS:
+: '10.1
+: '
+#+end_example
+**** C
+#+begin_example
+#+begin_src C :results output :var item=double-item-data
+printf("'%s'", item);
+#+end_src
+#+end_example
+
+This does not compile because the variable value includes the trailing
+endline and C doesn't allow multiline string literals.
+
+**** java
+#+begin_example
+#+begin_src java :results output :var item=double-item-data
+System.out.println(String.format("'%s'", item));
+#+end_src
+#+end_example
+
+This does not compile because the variable value includes the trailing
+endline and java doesn't allow multiline string literals.
+**** python
+#+begin_example
+#+begin_src python :results output :var item=double-item-data
+print("'{}'".format(item))
+#+end_src
+#+end_example
+**** elisp
+#+begin_example
+#+begin_src elisp :results output :var item=double-item-data
+(princ (format "'%s'" item))
+#+end_src
+#+end_example
+**** shell
+#+begin_example
+#+begin_src sh :results output :var item=double-item-data
+echo "'$item'"
+#+end_src
+#+end_example
+
+*** string
+#+begin_example
+#+name: string-item-data
+ten
+#+end_example
+
+Each example just outputs the given number surrounded in single
+quotes.  This is the expected response:
+
+#+name: string-item-expected
+#+begin_example
+#+RESULTS:
+: 'ten'
+#+end_example
+
+Some languages return this instead:
+
+#+name: string-item-variant1
+#+begin_example
+#+RESULTS:
+: 'ten
+: '
+#+end_example
+**** C
+#+begin_example
+#+begin_src C :results output :var item=string-item-data
+printf("'%s'", item);
+#+end_src
+#+end_example
+
+This does not compile because the variable value includes the trailing
+endline and C doesn't allow multiline string literals.
+
+**** java
+#+begin_example
+#+begin_src java :results output :var item=string-item-data
+System.out.println(String.format("'%s'", item));
+#+end_src
+#+end_example
+
+This does not compile because the variable value includes the trailing
+endline and java doesn't allow multiline string literals.
+**** python
+#+begin_example
+#+begin_src python :results output :var item=string-item-data
+print("'{}'".format(item))
+#+end_src
+#+end_example
+**** elisp
+#+begin_example
+#+begin_src elisp :results output :var item=string-item-data
+(princ (format "'%s'" item))
+#+end_src
+#+end_example
+**** shell
+#+begin_example
+#+begin_src sh :results output :var item=string-item-data
+echo "'$item'"
+#+end_src
+#+end_example
 
 ** List
 
