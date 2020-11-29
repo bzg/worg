@@ -18,13 +18,13 @@ goal is to document inconsistencies so they can be resolved or at
 least better understood.
 
 * Support for Common Headers
-| language | :results value | :results output | default :results | :prologue/:epilogue |
-|----------+----------------+-----------------+------------------+---------------------|
-| C        | no             | yes             | output           | yes                 |
-| java     | yes            | yes             | output           | no                  |
-| python   | yes            | yes             | value            | yes                 |
-| elisp    | yes            | yes             | value            | yes                 |
-| shell    | yes            | yes             | output           | yes                 |
+| language | :results value | :results output | default :results | :prologue / :epilogue |
+|----------+----------------+-----------------+------------------+-----------------------|
+| C        | no             | yes             | output           | yes                   |
+| java     | yes            | yes             | output           | no                    |
+| python   | yes            | yes             | value            | yes                   |
+| elisp    | yes            | yes             | value            | yes                   |
+| shell    | yes            | yes             | output           | yes                   |
 * Default Behaviors
 | language | write source files to |
 |----------+-----------------------|
@@ -43,10 +43,13 @@ least better understood.
 | elisp    | 2d string list  | 2d string list | 2d list     | expected     | expected     | expected     |
 | shell    | list of strings | no doubles     | expected    | no 2d arrays | no 2d arrays | no 2d arrays |
 
-My expectation is that a list of ints will be available in the source
-block as a list or array of ints, but actually org lists are usually
-passed to source blocks as single column tables of strings.  Only
-=shell= passes a list as a single dimentional array.
+For tables, values are passed to code blocks in two dimensional arrays
+or lists with item types (ints, doubles, or strings) that match the
+data.  Lists are passed as two dimensional arrays as if they are
+tables with one column of data, and all values are passed as strings.
+Only =shell= passes a list as a single dimentional array.
+
+More details on how this can cause confusion in [[*Round Trip Between Source Blocks][Round Trip]].
 
 *** Issues
 1. should ints and doubles be passed as strings?
@@ -54,16 +57,16 @@ passed to source blocks as single column tables of strings.  Only
 3. should =:results output= require =raw= to produce an org list?
 
 ** List
-We should be able to pass in an org list and have the source block
-receive it as a 1d array or list.
 
 *** List of ints
 The following examples use this data:
 
+#+begin_example
 #+name: int-list-data
 - 1
 - 2
 - 3
+#+end_example
 
 All examples compute the sum of the numbers in the list.
 Output should look like:
@@ -73,6 +76,7 @@ Output should look like:
 : 6
 #+end_example
 **** C
+#+begin_example
 #+begin_src C :results output :var items=int-list-data
 int sum = 0;
 for (int ii=0; ii<items_rows; ii++) {
@@ -80,23 +84,31 @@ for (int ii=0; ii<items_rows; ii++) {
 }
 printf("%d", sum);
 #+end_src
+#+end_example
 
 **** java
+#+begin_example
 #+begin_src java :results value :var items=int-list-data
 import java.util.stream.Collectors;
 return items.stream()
     .collect(Collectors.summingInt(x -> Integer.parseInt(x.get(0))));
 #+end_src
+#+end_example
 **** python
+#+begin_example
 #+begin_src python :var items=int-list-data
 return sum([int(x[0]) for x in items])
 #+end_src
+#+end_example
 **** elisp
+#+begin_example
 #+begin_src elisp :var items=int-list-data
 (apply '+ (mapcar (lambda (x) (string-to-number (car x)))
                   items))
 #+end_src
+#+end_example
 **** shell
+#+begin_example
 #+begin_src sh :var items=int-list-data
 sum=0
 for item in $items; do
@@ -104,13 +116,16 @@ for item in $items; do
 done
 echo $sum
 #+end_src
+#+end_example
 *** List of doubles
 The following examples use this data
 
+#+begin_example
 #+name: double-list-data
 - 1.1
 - 2.2
 - 3.3
+#+end_example
 
 All examples compute the sum of the numbers in the list.
 Output should look like:
@@ -120,6 +135,7 @@ Output should look like:
 : 6.6
 #+end_example
 **** C
+#+begin_example
 #+begin_src C :var items=double-list-data :includes <stdlib.h>
 double sum = 0;
 for (int ii=0; ii<items_rows; ii++) {
@@ -127,33 +143,40 @@ for (int ii=0; ii<items_rows; ii++) {
 }
 printf("%lf", sum);
 #+end_src
+#+end_example
 **** java
+#+begin_example
 #+begin_src java :results value :var items=double-list-data
 import java.util.stream.Collectors;
 return items.stream()
     .collect(Collectors.summingDouble(x -> Double.parseDouble(x.get(0))));
 #+end_src
+#+end_example
 **** python
+#+begin_example
 #+begin_src python :var items=double-list-data
 return sum([float(x[0]) for x in items])
 #+end_src
+#+end_example
 **** elisp
+#+begin_example
 #+begin_src elisp :var items=double-list-data
 (apply '+ (mapcar (lambda (x) (string-to-number (car x)))
                   items))
 #+end_src
-
-#+RESULTS:
-: 6.6
+#+end_example
 **** shell
+
 Shell doesn't support doubles.
 *** List of strings
 The following examples use this data:
 
+#+begin_example
 #+name: string-list-data
 - a
 - b
 - c
+#+end_example
 
 Each example conncatenates the input into a space delimited list.
 Output looks like.:
@@ -164,6 +187,7 @@ Output looks like.:
 #+end_example
 
 **** C
+#+begin_example
 #+begin_src C :results output :var items=string-list-data :include <string.h>
 char ret[8];
 memset(ret, 0, 8);
@@ -173,22 +197,30 @@ for (int ii=0; ii<items_rows; ii++) {
  }
 printf("%s", ret);
 #+end_src
+#+end_example
 **** java
+#+begin_example
 #+begin_src java :results value :var items=string-list-data
 import java.util.stream.Collectors;
 return items.stream()
     .map(x -> x.get(0))
     .collect(Collectors.joining(" "));
 #+end_src
+#+end_example
 **** python
+#+begin_example
 #+begin_src python :var items=string-list-data
 return " ".join([x[0] for x in items])
 #+end_src
+#+end_example
 **** elisp
+#+begin_example
 #+begin_src elisp :var items=int-list-data
 (mapconcat #'car items " ")
 #+end_src
+#+end_example
 **** shell
+#+begin_example
 #+begin_src sh :var items=string-list-data
 ret=""
 for item in $items; do
@@ -196,13 +228,16 @@ for item in $items; do
 done
 echo $ret
 #+end_src
+#+end_example
 ** Table
 *** Table of ints
 The following source blocks operate on this table:
 
+#+begin_example
 #+name: int-table-data
 | 1 | 2 |
 | 3 | 4 |
+#+end_example
 
 Each source block sums the values found in the table.  The output show
 look like:
@@ -212,6 +247,7 @@ look like:
 : 10
 #+end_example
 **** C
+#+begin_example
 #+begin_src C :var items=int-table-data
 int sum = 0;
 for (int ii=0; ii<items_rows; ii++) {
@@ -221,7 +257,9 @@ for (int ii=0; ii<items_rows; ii++) {
  }
 printf("%d", sum);
 #+end_src
+#+end_example
 **** java
+#+begin_example
 #+begin_src java :results value :var items=int-table-data
 int sum = 0;
 for (List<Integer> row : items) {
@@ -231,7 +269,9 @@ for (List<Integer> row : items) {
 }
 return sum;
 #+end_src
+#+end_example
 **** python
+#+begin_example
 #+begin_src python :var items=int-table-data
 sum = 0
 for row in items:
@@ -239,19 +279,24 @@ for row in items:
         sum += col
 return sum
 #+end_src
+#+end_example
 **** elisp
+#+begin_example
 #+begin_src elisp :var items=int-table-data
 (apply '+ (mapcar (lambda (x) (apply '+ x)) items))
 #+end_src
+#+end_example
 **** shell
 The table becomes an associated list instead of a 2d array.  Bash
 doesn't support multidimensional arrays.
 *** Table of doubles
 The following source blocks operate on this table:
 
+#+begin_example
 #+name: double-table-data
 | 1.1 | 2.3 |
 | 3.1 | 4.3 |
+#+end_example
 
 Each source block sums the values found in the table.  The output show
 look like:
@@ -261,6 +306,7 @@ look like:
 : 10.8
 #+end_example
 **** C
+#+begin_example
 #+begin_src C :var items=double-table-data
 double sum = 0;
 for (int ii=0; ii<items_rows; ii++) {
@@ -270,7 +316,9 @@ for (int ii=0; ii<items_rows; ii++) {
  }
 printf("%lf", sum);
 #+end_src
+#+end_example
 **** java
+#+begin_example
 #+begin_src java :results value :var items=double-table-data
 double sum = 0;
 for (List<Double> row : items) {
@@ -280,7 +328,9 @@ for (List<Double> row : items) {
 }
 return sum;
 #+end_src
+#+end_example
 **** python
+#+begin_example
 #+begin_src python :var items=double-table-data
 sum = 0
 for row in items:
@@ -288,19 +338,24 @@ for row in items:
         sum += col
 return sum
 #+end_src
+#+end_example
 **** elisp
+#+begin_example
 #+begin_src elisp :var items=double-table-data
 (apply '+ (mapcar (lambda (x) (apply '+ x)) items))
 #+end_src
+#+end_example
 **** shell
 The table becomes an associated list instead of a 2d array.  Bash
 doesn't support multidimensional arrays.
 *** Table of strings
 The following source blocks operate on this table:
 
+#+begin_example
 #+name: string-table-data
 | a | b |
 | c | d |
+#+end_example
 
 concatenates the strings found in the table. The output show
 look like:
@@ -310,6 +365,7 @@ look like:
 : a b c d
 #+end_example
 **** C
+#+begin_example
 #+begin_src C :results output :var items=string-table-data :includes <string.h>
 char ret[8];
 memset(ret, 0, 8);
@@ -321,22 +377,29 @@ for (int ii=0; ii<items_rows; ii++) {
  }
 printf("%s", ret);
 #+end_src
+#+end_example
 **** java
+#+begin_example
 #+begin_src java :results value :var items=string-table-data
 import java.util.stream.Collectors;
 return items.stream()
     .map(x -> String.join(" ", x))
     .collect(Collectors.joining(" "));
 #+end_src
+#+end_example
 **** python
+#+begin_example
 #+begin_src python :var items=string-table-data
 return " ".join([" ".join(x) for x in items])
 #+end_src
+#+end_example
 **** elisp
+#+begin_example
 #+begin_src elisp :var items=string-table-data
 (mapconcat (lambda (x) (mapconcat #'identity x " "))
            items " ")
 #+end_src
+#+end_example
 **** shell
 The table becomes an associated list instead of a 2d array.  Bash
 doesn't support multidimensional arrays.
@@ -350,11 +413,12 @@ doesn't support multidimensional arrays.
 | elisp    | [[list-expected][expected]]    | [[list-expected][expected]] (w/ raw) | [[table-expected][expected]]     | [[table-variant1][variant1]]     |
 | shell    | [[list-expected][expected]]    | [[list-expected][expected]] (w/ raw) | [[table-expected][expected]]     | [[table-expected][expected]]     |
 
-My expectation is that returning rows of comma separated values should
-result in a table, but in some cases these are not rendered as a table.
+There is consistent behavior across languages for =:results value= but
+there are some inconsistencies with =:results output=.
 
-Going from org to source block a list becomes a two dimentional array,
-but in the other direction it is a single dimensional array.
+My expectation is that writing rows of comma separated values should
+result in a table, but in some cases the =:results raw= is required
+for this to work and in other cases that is not enough.
 
 *** Issues
 1. Can C support =:results value=?
@@ -379,49 +443,65 @@ The following examples use =:results value list=.
 **** C
 C has no support for =:results value=.
 **** java
+#+begin_example
 #+begin_src java :results value list
   String[] ret = {"one", "two"};
   return ret;
 #+end_src
+#+end_example
 **** python
+#+begin_example
 #+begin_src python :python python3 :results value list
 return ("one", "two")
 #+end_src
+#+end_example
 **** elisp
+#+begin_example
 #+begin_src elisp :results value list
 '("one" "two")
 #+end_src
+#+end_example
 *** :results output
 
 The following examples use =:results output raw list=.  These have to
 use =raw= in order to work.
 
 **** C
+#+begin_example
 #+begin_src C :results output raw list
 printf("one\n");
 printf("two\n");
 #+end_src
+#+end_example
 **** java
+#+begin_example
 #+begin_src java :results output raw list
 System.out.println("one");
 System.out.println("two");
 #+end_src
+#+end_example
 **** python
+#+begin_example
 #+begin_src python :python python3 :results output raw list
 print("one")
 print("two")
 #+end_src
+#+end_example
 **** elisp
+#+begin_example
 #+begin_src elisp :results output raw list
   (princ "one\n")
   (princ "two")
 #+end_src
+#+end_example
 
 **** shell
+#+begin_example
 #+begin_src sh :results output raw list
 echo "one"
 echo "two"
 #+end_src
+#+end_example
 ** Table
 
 When we return a table from a source code block, we want it to look
@@ -450,58 +530,130 @@ The following examples use =:results value table=.
 **** C
 C has no support for =:results value=.
 **** java
+#+begin_example
 #+begin_src java :results value table
   String [][] ret = {{"one","two"}, {"three", "four"}};
   return ret;
 #+end_src
+#+end_example
 **** python
+#+begin_example
 #+begin_src python :python python3 :results value table
 return (("one", "two"), ("three", "four"))
 #+end_src
+#+end_example
 **** elisp
+#+begin_example
 #+begin_src elisp :results value table
 '(("one" "two") ("three" "four"))
 #+end_src
+#+end_example
 *** :results output
 
 The following examples use =:results output table=.
 
 **** C
+#+begin_example
 #+begin_src C :results output table
 printf("one, two\n");
 printf("three, four\n");
 #+end_src
+#+end_example
 **** java
+#+begin_example
 #+begin_src java :results output table
 System.out.println("one, two");
 System.out.println("three, four");
 #+end_src
+#+end_example
 
 that fails but this "raw table" output works:
 
+#+begin_example
 #+begin_src java :results output raw table
 System.out.println("|one| two");
 System.out.println("|three| four");
 #+end_src
+#+end_example
 
 **** python
+#+begin_example
 #+begin_src python :python python3 :results output table
   print("one, two")
   print("three, four")
 #+end_src
+#+end_example
 
 doesn't work but raw table works
 **** elisp
+#+begin_example
 #+begin_src elisp :results output table
   (princ "one, two\n")
   (princ "three, four")
 #+end_src
+#+end_example
 
 doesn't work but raw table works
 **** shell
+#+begin_example
 #+begin_src sh :results output table
 echo "one, two\nthree, four"
 #+end_src
+#+end_example
+
+* Round Trip Between Source Blocks
+If a souce block (=ret-list-source=) returns a single dimensional
+array or list, it becomes an org list (=ret-list-result=).
+
+#+begin_example
+#+name: ret-list-source
+#+begin_src python :results list
+return [1,2,3]
+#+end_src
+#+end_example
+
+#+begin_example
+#+name: ret-list-result
+#+RESULTS: ret-list-source
+- 1
+- 2
+- 3
+#+end_example
+
+Then if another source block (=read-list-result=) accpets that list
+from the org buffer, it becomes a two dimensional table with one
+column.
+
+#+begin_example
+#+name: read-list-result
+#+begin_src python :var a=ret-list-result :results list
+return a
+#+end_src
+#+end_example
+
+#+begin_example
+#+RESULTS: read-list-result
+- ("1")
+- ("2")
+- ("3")
+#+end_example
+
+But if a source block accepts the output directly from the
+=ret-list-source=, the input will be a single dimensional array.
+
+#+begin_example
+#+name: read-list-direct
+#+begin_src python :var a=ret-list-source :results list
+return a
+#+end_src
+#+end_example
+
+#+begin_example
+#+RESULTS: read-list-direct
+- 1
+- 2
+- 3
+#+end_example
 
 * Other Resources
 
