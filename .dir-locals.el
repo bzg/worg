@@ -8,5 +8,5 @@
   (org-edit-src-content-indentation . 0)
   (org-adapt-indentation)
   (org-list-two-spaces-after-bullet-regexp)
-  (org-list-description-max-indent . 5)))
-
+  (org-list-description-max-indent . 5)
+  (org-blank-before-new-entry . ((heading . auto) (plain-list-item . auto)))))
