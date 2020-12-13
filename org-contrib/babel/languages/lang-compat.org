@@ -38,13 +38,13 @@ least better understood.
 | shell    | no tempfiles          |
 * Variables
 ** Summary
-| language | int      | double   | string   | int list        | double list    | string list | int table | double table | string table |
-|----------+----------+----------+----------+-----------------+----------------+-------------+-----------+--------------+--------------|
-| C        | error    | error    | error    | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
-| java     | error    | error    | error    | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
-| python   | [[int-item-variant1][variant1]] | [[double-item-variant1][variant1]] | [[string-item-variant1][variant1]] | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
-| elisp    | [[int-item-variant1][variant1]] | [[double-item-variant1][variant1]] | [[string-item-variant1][variant1]] | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
-| shell    | [[int-item-variant1][variant1]] | [[double-item-variant1][variant1]] | [[string-item-variant1][variant1]] | list of strings | n/a            | expected    | n/a       | n/a          | n/a          |
+| language | int      | double   | string   | singleton list | int list        | double list    | string list | int table | double table | string table |
+|----------+----------+----------+----------+----------------+-----------------+----------------+-------------+-----------+--------------+--------------|
+| C        | error    | error    | error    | error          | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
+| java     | error    | error    | error    | error          | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
+| python   | [[int-item-variant1][variant1]] | [[double-item-variant1][variant1]] | [[string-item-variant1][variant1]] | [[single-variant1][variant1]]       | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
+| elisp    | [[int-item-variant1][variant1]] | [[double-item-variant1][variant1]] | [[string-item-variant1][variant1]] | error          | 2d string list  | 2d string list | 2d list     | expected  | expected     | expected     |
+| shell    | [[int-item-variant1][variant1]] | [[double-item-variant1][variant1]] | [[string-item-variant1][variant1]] | expected       | list of strings | n/a            | expected    | n/a       | n/a          | n/a          |
 
 For tables, values are passed to code blocks in two dimensional arrays
 or lists with item types (ints, doubles, or strings) that match the
@@ -57,13 +57,17 @@ More details on how this can cause confusion in [[*Round Trip Between Source Blo
 Shell doesn't support doubles or multidimensional arrays, so those
 cases don't apply.
 
-*** Issues
+*** Callouts
 1. should ints and doubles be passed as strings?
 2. should lists be passed as 2d lists tables?
 3. should =:results output= require =raw= to produce an org list?
+4. should items include the trailing endline?
+5. why aren't singleton lists passed as lists?
 
 ** Single Item
 *** int
+The following examples use this data:
+
 #+begin_example
 #+name: int-item-data
 10
@@ -125,6 +129,8 @@ echo "'$item'"
 #+end_example
 
 *** double
+The following examples use this data:
+
 #+begin_example
 #+name: double-item-data
 10.1
@@ -186,6 +192,8 @@ echo "'$item'"
 #+end_example
 
 *** string
+The following examples use this data:
+
 #+begin_example
 #+name: string-item-data
 ten
@@ -247,7 +255,6 @@ echo "'$item'"
 #+end_example
 
 ** List
-
 *** List of ints
 The following examples use this data:
 
@@ -369,7 +376,7 @@ The following examples use this data:
 #+end_example
 
 Each example conncatenates the input into a space delimited list.
-Output looks like.:
+Output looks like:
 
 #+begin_example
 #+RESULTS:
@@ -384,7 +391,7 @@ memset(ret, 0, 8);
 for (int ii=0; ii<items_rows; ii++) {
     strcat(ret, " ");
     strcat(ret, items[ii][0]);
- }
+}
 printf("%s", ret);
 #+end_src
 #+end_example
@@ -405,7 +412,7 @@ return " ".join([x[0] for x in items])
 #+end_example
 **** elisp
 #+begin_example
-#+begin_src elisp :var items=int-list-data
+#+begin_src elisp :var items=string-list-data
 (mapconcat #'car items " ")
 #+end_src
 #+end_example
@@ -417,6 +424,81 @@ for item in $items; do
     ret="$ret $item"
 done
 echo $ret
+#+end_src
+#+end_example
+*** Singleton List
+There is inconsistent behavior between lists of one vs many items.
+See [[*Trimming a List to One Item][Trimming a List to One Item]] for details.
+
+The following examples use this data:
+
+#+begin_example
+#+name: single-list-data
+- one
+#+end_example
+
+Each source block just iterates over the input list, printing each
+value.  Expected output is:
+
+#+begin_example
+#+RESULTS:
+: one
+#+end_example
+
+Some languages give this result:
+
+#+name: single-variant1
+#+begin_example
+#+RESULTS:
+: o
+: n
+: e
+#+end_example
+
+**** C
+#+begin_example
+#+begin_src C :results output :var items=single-list-data[,0] :include <string.h>
+for (int ii=0; ii<items_cols; ii++) {
+    printf("%s\n", items[ii]);
+}
+#+end_src
+#+end_example
+
+This doesn't compile since =items= is passed as a =char*= instead of
+=char*[]=.
+**** java
+#+begin_example
+#+begin_src java :var items=single-list-data[,0]
+for (String item : items)
+   System.out.println(item);
+#+end_src
+#+end_example
+
+This doesn't compile since =items= is passed as a =String= instead of
+=String[]=.
+**** python
+#+begin_example
+#+begin_src python :results output :var items=single-list-data[,0]
+for item in items:
+    print(item)
+#+end_src
+#+end_example
+**** elisp
+#+begin_example
+#+begin_src elisp :results output :var items=single-list-data[,0]
+(dolist (item items)
+  (princ (format "%s\n" item)))
+#+end_src
+#+end_example
+
+This fails with a type error because =items= is passed as a string
+instead of a list.
+**** shell
+#+begin_example
+#+begin_src sh :var items=single-list-data[,0]
+for item in $items; do
+    echo $item
+done
 #+end_src
 #+end_example
 ** Table
@@ -610,7 +692,7 @@ My expectation is that writing rows of comma separated values should
 result in a table, but in some cases the =:results raw= is required
 for this to work and in other cases that is not enough.
 
-*** Issues
+*** Callouts
 1. Can C support =:results value=?
 2. should =:results output= require =raw= and write vertical bars to
    produce an org table?
@@ -844,6 +926,54 @@ return a
 - 2
 - 3
 #+end_example
+
+* Trimming a List to One Item
+If a list contains more than one item, as in =two-list-data=, source
+blocks can access it's items as a single dimensional list by indexing.
+Given the following data and source block:
+
+#+begin_example
+#+name: two-list-data
+- one
+- two
+#+end_example
+
+#+begin_example
+#+begin_src python :results output :var items=one-list-data[,0]
+for item in items:
+    print (item)
+#+end_src
+#+end_example
+
+The result, as expected, is:
+
+#+begin_example
+#+RESULTS:
+: one
+: two
+#+end_example
+
+But if the list only contains one item, as in =one-list-data=, it is
+no longer passed to the source block as a list.
+
+#+begin_example
+#+name: one-list-data
+- one
+#+end_example
+
+Execution of the same source block as used above, but pointing at
+=one-list-data=, results in:
+
+#+begin_example
+#+RESULTS:
+: o
+: n
+: e
+#+end_example
+
+This can cause a problem if you trim your data to a single item in
+order to test a source block.  Suddenly the source block is accepting
+a different data type.
 
 * Other Resources
 
