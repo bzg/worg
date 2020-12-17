@@ -66,8 +66,7 @@
 <link rel=\"alternate stylesheet\" title=\"Zenburn\" href=\"/worg/style/worg-zenburn.css\" type=\"text/css\" />
 <link rel=\"alternate stylesheet\" title=\"Classic\" href=\"/worg/style/worg-classic.css\" type=\"text/css\" />
 <link rel=\"stylesheet\" href=\"https://orgmode.org/css/lightbox.css\" type=\"text/css\" media=\"screen\" />
-<link rel=\"SHORTCUT ICON\" href=\"/org-mode-unicorn.ico\" type=\"image/x-icon\" />
-<link rel=\"icon\" href=\"/org-mode-unicorn.ico\" type=\"image/ico\" />"
+<link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\" />"
 	   :recursive t
 	   :html-preamble ,(org-get-file-contents (concat worg-base "preamble.html"))
 	   :html-postamble "<div id=\"show_source\"><input type=\"button\" value=\"Show Org source\" onClick='show_org_source()'></div><div id=\"license\"><p>Documentation from the https://orgmode.org/worg/ website (either in its HTML format or in its Org format) is licensed under the <a href=\"http://www.gnu.org/copyleft/fdl.html\">GNU Free Documentation License version 1.3</a> or later.  The code examples and css stylesheets are licensed under the <a href=\"http://www.gnu.org/licenses/gpl.html\">GNU General Public License v3</a> or later.</p></div>"
@@ -89,8 +88,7 @@
 <link rel=\"alternate stylesheet\" title=\"Zenburn\" href=\"/worg/style/worg-zenburn.css\" type=\"text/css\" />
 <link rel=\"alternate stylesheet\" title=\"Classic\" href=\"/worg/style/worg-classic.css\" type=\"text/css\" />
 <link rel=\"stylesheet\" href=\"https://orgmode.org/css/lightbox.css\" type=\"text/css\" media=\"screen\" />
-<link rel=\"SHORTCUT ICON\" href=\"/org-mode-unicorn.ico\" type=\"image/x-icon\" />
-<link rel=\"icon\" href=\"/org-mode-unicorn.ico\" type=\"image/ico\" />"
+<link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\" />"
 	   :recursive t
 	   :html-preamble ,(org-get-file-contents (concat worg-base "preamble.html"))
 	   :html-postamble "<div id=\"show_source\"><input type=\"button\" value=\"Show Org source\" onClick='show_org_source()'></div><div id=\"license\"><p>Documentation from the https://orgmode.org/worg/ website (either in its HTML format or in its Org format) is licensed under the <a href=\"http://www.gnu.org/copyleft/fdl.html\">GNU Free Documentation License version 1.3</a> or later.  The code examples and css stylesheets are licensed under the <a href=\"http://www.gnu.org/licenses/gpl.html\">GNU General Public License v3</a> or later.</p></div>"
