@@ -113,6 +113,11 @@ It features:
    : M-x customize-variable org-babel-load-languages
    and add the C language (capital "C", which gives access to C, C++, D)
 
+3- Default are given for the compilers: =gcc=, =g++=, =rdmd=. They may be
+   customized. Type:
+   : M-x customize-group org-babel
+   and look for =Org Babel C++ Compiler= and such.
+
 * Org Mode Features for C, C++, D Source Code Blocks
 ** Header Arguments
 
@@ -254,10 +259,12 @@ Example in C or C++:
 
 yields this result (type =C-c C-c=):
 
+#+begin_example
 #+RESULTS:
 | mystring | Sunday |
 | myint    |    145 |
 | mydouble |   3.14 |
+#+end_example
 
 Example in D:
 #+begin_example
@@ -271,10 +278,12 @@ Example in D:
 
 yields this result (type =C-c C-c=):
 
+#+begin_example
 #+RESULTS:
 | mystring | Sunday |
 | myint    |    145 |
 | mydouble |   3.14 |
+#+end_example
 
 If you want to see the expanded source code, without compiling and running it,
 just type =C-c C-v v=.
@@ -287,6 +296,7 @@ a new Org mode table.
 
 This table will be input in the script, and iterated row by row:
 
+#+begin_example
 #+tblname: somedata
 | nb    | sqr | noise |
 |-------+-----+-------|
@@ -295,6 +305,7 @@ This table will be input in the script, and iterated row by row:
 | two   |   4 |  4.61 |
 | three |   9 |  9.05 |
 | four  |  16 | 16.55 |
+#+end_example
 
 The table is converted to a variable in the script:
   : const char* somedata[5][3] = {...};  // in C & C++
@@ -347,9 +358,11 @@ To convert a string cell to a numeric value on the fly, use standard convertors:
 This code:
 
 #+begin_example
+#+name: c-table
 #+header: :exports results
 #+begin_src C++ :var somedata=somedata
   #include "stdlib.h"
+  #include "stdio.h"
   int main()
   {
     for (int i=0; i<somedata_rows; i++) {
@@ -367,12 +380,14 @@ This code:
 
 yields this result:
 
-#+RESULTS: c-table
+#+begin_example
+,#+RESULTS: c-table
 | 0 | zero  |  0 |     0 |  0.23 |   230 |
 | 1 | one   |  1 |  1000 |  1.31 |  1310 |
 | 2 | two   |  4 |  4000 |  4.61 |  4610 |
 | 3 | three |  9 |  9000 |  9.05 |  9050 |
 | 4 | four  | 16 | 16000 | 16.55 | 16550 |
+#+end_example
 
 *** Example in D
 
@@ -392,7 +407,7 @@ yields this result:
 #+end_src
 
 #+begin_example
-#+begin_src D :results output :var somedata=somedata :var TT="321" :var QQ=3.14
+#+begin_src D :var somedata=somedata
   void main()
   {
     foreach (i, row; somedata) {
@@ -441,10 +456,6 @@ However only =C++= works for generated code visualization
 through =C-c C-v v=.
 
 ** Pure numeric + header  cast error
-A type mismatch between strings  and double cause an error
+A type mismatch between strings and double cause an error
 when attempting to use the cell accessor with column name
 when the table is pure numeric.
-
-** Compilers customization
-There is no customization of the compilers paths or names
-through the standard Emacs customization facility.
