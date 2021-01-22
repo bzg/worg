@@ -19,8 +19,8 @@ You might want to watch the [[http://www.youtube.com/watch?v=h7Z2PiAcgh8][screen
 
 * Defining custom handlers
 
-  =org-protocol= scanns the list of filenames passed to the emacs-server for
-  "=org-protocol:/sub-protocol:/=" and triggers actions assossiated with
+  =org-protocol= scans the list of filenames passed to the emacs-server for
+  "=org-protocol:/sub-protocol:/=" and triggers actions associated with
   =sub-protocol= through the custom variable =org-protocol-protocol-alist=.
 
   To defun a custom org-protocol handler basically means to define two basic
@@ -41,7 +41,7 @@ You might want to watch the [[http://www.youtube.com/watch?v=h7Z2PiAcgh8][screen
 #+end_src
 
   The =:protocol= property is the sub-protocol, that triggers the action. Note,
-  that names of protcols (or URL schemas) are only allowed to consist of a
+  that names of protocols (or URL schemes) are only allowed to consist of a
   restricted set of characters. See [[http://www.ietf.org/rfc/rfc1738.txt][rfc1738]], section 2.1.
 
   The =:function= is an arbitrary function that takes exactly one argument: the
@@ -67,7 +67,7 @@ You might want to watch the [[http://www.youtube.com/watch?v=h7Z2PiAcgh8][screen
 nil)
 #+end_src
 
-  Now the URL =org-protocol://hello-world://encoded-data= will call our fuction
+  Now the URL =org-protocol://hello-world://encoded-data= will call our function
   with the string "=encoded-data=". Hence an
 
   : emacsclient org-protocol://hello-world://encoded-data
@@ -77,7 +77,7 @@ nil)
 
 * Killing the client
 
-  If your handler uses interactive functions that could be canceld by the user
+  If your handler uses interactive functions that could be canceled by the user
   by typing '=C-g=', consider to supply the '=:kill-client=' property when you
   define the protocol.
 
@@ -93,7 +93,7 @@ nil)
   #+end_src
 
   Otherwise, if the user has an interactive property defined in her capture
-  template, discarding it through '=C-g=' would leed to emacsclient waiting for
+  template, discarding it through '=C-g=' would lead to emacsclient waiting for
   ever, thus to the appropriate questions when exiting emacs.
 
   All filenames passing from emacsclient to the emacs will be ignored if you
@@ -105,7 +105,7 @@ nil)
   Note, that our =hello-world= handler explicitly returns =nil=. This tells
   =org-protocol= to remove the filename from the list of files passed to the
   emacs-server. If more than one filename was supplied, all those filenames are
-  searched for protocols. Only filenames without protocolls are passed to the
+  searched for protocols. Only filenames without protocols are passed to the
   emacs-server as usual.
 
   Another possible return value is a string. If the string is a valid filename,
@@ -235,9 +235,9 @@ nil)
   doesn't really matter how many slashes succeed the scheme part of the URL,
   also known as /protocol/.
 
-  This behaviour is the main reasons, why the slash was choosen as the
+  This behavior is the main reasons, why the slash was chosen as the
   default separator for data fields. Keeping the slashes is insecure, since some
-  of the data fields could contain double or tripple slashes themselves.
+  of the data fields could contain double or triple slashes themselves.
 
 
 
