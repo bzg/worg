@@ -1,0 +1,422 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Haxe Source Code Blocks in Org Mode
+#+AUTHOR:     Ian Martins
+#+EMAIL:      ianxm at jhu dot edu
+#+LANGUAGE:   en
+#+HTML_LINK_UP:    index.html
+#+HTML_LINK_HOME:  https://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_export html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="https://www.haxe.org">Haxe</a>
+  </p>
+  <p>
+  <a href="https://www.haxe.org/">
+    <img src="https://haxe.org/img/haxe-logo-horizontal.svg" width="200" />
+  </a>
+  </p>
+  </div>
+#+end_export
+
+* Template Checklist [12/12]                                       :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements%20and%20Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org%20Mode%20Features%20for%20Language%20Source%20Code%20Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header%20Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result%20Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples%20of%20Use][Examples of Use]]
+* Introduction
+
+Haxe is an open source high-level strictly-typed programming language
+with a fast optimizing cross-compiler.  When a haxe source code block
+is evaluated, the code is written as a haxe class, then either
+interpreted directly by the haxe compiler or compiled to a neko or
+hashlink binary and run.
+
+* Requirements and Setup
+** Add haxe Support to Babel
+
+1. Install the haxe compiler and optionally the neko and/or hashlink
+   runtime environments
+2. Configure haxe source code blocks for Org mode by adding the
+   appropriate dotted pair to =org-babel-load-languages=
+
+#+begin_src emacs-lisp :exports code
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((haxe . t)))
+#+end_src
+
+* Org Mode Features for Haxe Source Code Blocks
+** Header Arguments
+
+Haxe source code blocks accept the following header arguments.  All
+headers arguments are optional.
+
+- =:dir= :: specify which directory to write source and class files
+  ([[*Source and Class File Locations][default is the current directory]])
+- =:classname= :: fully qualified classname (see [[*Class and Main Method Definitions][Class and Main
+  Method Definitions]])
+- =:imports= :: a list of classes to add as imports (see [[*Imports][Imports]])
+- =:cmdline= :: pass command line arguments to the neko or hashlink
+  runtime.
+- =:target= :: the language for the haxe compiler to target.  The
+  default is =interp= mode.  Can be set to =neko= or =hashlink= to use
+  either of those runtimes.
+
+** Simple Example
+
+This is hello world:
+
+#+begin_example
+#+begin_src haxe :results output
+  class Main {
+      public static function main() {
+          Sys.print("hello, world");
+      }
+  }
+#+end_src
+#+end_example
+
+** Class and Main Method Definitions
+
+It is not necessary to include the =class= statement or define a
+=main= method. ob-haxe will wrap a source code block in boilerplate
+class and main method definitions if they are omitted.  If
+=:classname= and the class definition in the source code block are
+both omitted, the class will be named =Main=.
+
+This is exactly equivalent to the above hello world:
+
+#+begin_example
+#+begin_src haxe :results output
+  Sys.print("hello, world");
+#+end_src
+#+end_example
+
+** Classname and Package Name
+
+The package and classname of a class can be defined in the source code
+block or by the =:classname= header argument or both.  If they are
+defined in both places, then they must match.
+
+=:classname= can just be a classname, like =Greeter= or it could
+contain the package name, such as =com.pkg.Greeter=.  This example
+names the class =Greeter= and puts it in the =com.pkg= package.
+
+#+begin_example
+#+begin_src haxe :results output :classname com.pkg.Greeter
+  Sys.print("hello, world");
+#+end_src
+#+end_example
+
+** Source Files and Tangling
+
+By default, when a source code block is evaluated the source files and
+class files are written directly to babel's temporary directory.  If a
+package was specified, it is removed so that babel doesn't have to
+create subdirectories under its temporary directory.  In the above
+=com.pkg.Greeter= example, the default behavior is to remove the
+=com.pkg= and write =Greeter.hx= to babel's temporary directory.
+
+If the =:dir= header argument is specified, then source files are
+written within package directories under the specified directory and
+package names are preserved.  In the =com.pkg.Greeter= example, if
+the =:dir= header is given, the package is preserved.
+
+Tangling works as expected.  Package is always preserved when
+tangling.
+
+** Return values
+
+Babel source code blocks can either return a value (this is called
+functional mode and is the default, and can be specified with
+=:results output=) or output printed by the source code block (this is
+called scripting mode and can be chosen with =:results value=).
+
+We've already seen hello world in scripting mode, but here it is
+again:
+
+#+begin_example
+#+begin_src haxe :results output
+  Sys.print("hello, world");
+#+end_src
+#+end_example
+
+This is what hello world looks like in functional mode:
+
+#+begin_example
+#+begin_src haxe :results value
+  return "hello, world";
+#+end_src
+#+end_example
+
+*** Return a List
+
+This example returns a list using scripting mode.  For the result to
+show up as a list in the org buffer, notice that the =:results= must
+be set to =raw list=.
+
+#+begin_example
+#+begin_src haxe :results output raw list
+  Sys.println("1");
+  Sys.println("2");
+#+end_src
+#+end_example
+
+This is the output:
+
+#+begin_example
+#+RESULTS:
+- 1
+- 2
+#+end_example
+
+Returning a list in functional mode is straightforward.  Simply say
+=:results= will return a =list= and then return an =Array= or =List=.
+This example results in identical output to the previous example.
+
+#+begin_example
+#+begin_src haxe :results value list
+  return [1, 2];
+#+end_src
+#+end_example
+
+*** Return a Table
+
+This example returns a table using scripting mode.  Notice that the
+output includes pipe characters to build the table, and the =:results=
+header specifies the type is =raw=.
+
+#+begin_example
+#+begin_src haxe :results output raw
+  Sys.println("|1|2|3");
+  Sys.println("|4|5|6");
+#+end_src
+#+end_example
+
+This is the output:
+
+#+begin_example
+#+RESULTS:
+| 1 | 2 | 3 |
+| 4 | 5 | 6 |
+#+end_example
+
+The same output is achieved with the following:
+
+#+begin_example
+#+begin_src haxe :results value table
+    return [[1, 2, 3],
+            [4, 5, 6]];
+#+end_src
+#+end_example
+
+*** Return a Table with Headers
+
+This example returns a table with headers using scripting mode.  The
+hline is created the same way as it is created while editing an org
+table, by inserting a =|-= at the start of a line inside the table.
+
+#+begin_example
+#+begin_src haxe :results output raw
+  Sys.println("|col1|col2|col3");
+  Sys.println("|-");
+  Sys.println("|1|2|3");
+  Sys.println("|4|5|6");
+#+end_src
+#+end_example
+
+This is the output:
+
+#+begin_example
+#+RESULTS:
+| col1 | col2 | col3 |
+|------+------+------|
+|    1 |    2 |    3 |
+|    4 |    5 |    6 |
+#+end_example
+
+The same output is achieved with the following.  Note that the hline
+is represented with a =null= in the table, and that we had to change
+to using a =List<Object>= since the header row items are =String= but
+the rest of the data items are =int=.
+
+#+begin_example
+#+begin_src haxe :results value table
+  var a :Array<Dynamic> = [["col1", "col2", "col3"],
+                           null,
+                           [1, 2, 3],
+                           [4, 5, 6]];
+  return a;
+#+end_src
+#+end_example
+
+** Variables
+
+Haxe source code blocks can take input from the org buffer as
+variables.
+
+*** Variables
+
+Pass variables with the =:var= header.  Variable types are inferred.
+This example accepts two integers and adds them:
+
+#+begin_example
+#+begin_src haxe :var a=1 b=2 :results output
+  Sys.print("sum: " + (a+b));
+#+end_src
+#+end_example
+
+When passing string variables, be sure to escape the quotes, like this:
+
+#+begin_example
+#+begin_src haxe :var a="some string" :results output
+  Sys.print(a);
+#+end_src
+#+end_example
+
+Haxe source code blocks can accept elisp =list= or =vector=.  In
+either case the variables are typed as =Array<Dynamic>=.
+
+#+begin_example
+#+begin_src haxe :var a='("one" "two") :results output
+  Sys.print(a[0] + " " + a[1]);
+#+end_src
+#+end_example
+
+This example accepts a named list taken from the org buffer.  Note
+that lists appear to be a table with one item in each row.  =a= is a
+=Array<Dynamic>= here, where the outside array contains rows and the
+inside array contains columns.
+
+#+begin_example
+#+name: some-list
+- one
+- two
+
+#+begin_src haxe :var a=some-list :results output
+  Sys.print(a[0][0] + " " + a[1][0]);
+#+end_src
+#+end_example
+
+Another way to accept an org list is to slice it when it is assigned.
+The =[,0]= in this examples selects the first column of each row.  =a=
+is still an =Array<Dynamic>= but now each item is a single list item.
+
+#+begin_example
+#+name: some-list
+- one
+- two
+
+#+begin_src haxe :var a=some-list[,0] :results output
+  Sys.print(a[0] + " " + a[1]);
+#+end_src
+#+end_example
+
+The following example transposes and doubles the values in a 2x2
+table.
+
+#+begin_example
+#+name: some-table
+| 1 | 2 |
+| 3 | 4 |
+
+#+begin_src haxe :var a=some-table :results output
+  Sys.println((a[0][0]*2) + " " + (a[1][0]*2));
+  Sys.println((a[0][1]*2) + " " + (a[1][1]*2));
+#+end_src
+#+end_example
+
+** Imports
+
+Imports can be added at the top of source code blocks or added using
+the =:imports= header argument.  Imports are allowed in source code
+blocks that omit the boilerplate class and main method definitions.
+
+=sys.io.File= can be used without explicitly importing it.
+
+This example imports a class using the =:imports= header argument:
+
+#+begin_example
+#+begin_src haxe :results output :imports haxe.crypto.Base64 haxe.io.Bytes
+  var encoded = Base64.encode(Bytes.ofString("42"));
+  var decoded = Base64.decode(encoded);
+  Sys.print('encoded=$encoded, decoded=$decoded');
+#+end_src
+#+end_example
+
+This is exactly equivalent, but specifies the import within the source
+code block:
+
+#+begin_example
+#+begin_src haxe :results output
+  import haxe.crypto.Base64;
+  import haxe.io.Bytes;
+  var encoded = Base64.encode(Bytes.ofString("42"));
+  var decoded = Base64.decode(encoded);
+  Sys.print('encoded=$encoded, decoded=$decoded');
+#+end_src
+#+end_example
+
+** Source and Class File Locations
+
+Most babel languages write the source code block to a file in the
+babel temporary directory and compile there.  This is the default
+behavior for ob-haxe.  When writing to the babel temporary
+directory, all source code blocks must be independent.
+
+A benefit of writing to the current directory instead of the babel
+temporary directory is that it allows source code blocks to depend on
+classes defined in other blocks.
+
+In order to override override the default and compile in the current
+directory, set the =:dir= parameter on the source code block.
+
+#+begin_example
+#+begin_src haxe :results output :dir "."
+  Sys.print("hello, world");
+#+end_src
+#+end_example
+
+** Tramp Support
+
+If the org file containing the haxe source code block is on a remote
+machine and =:dir= is either not set (it defaults to the current
+directory, which would be remote in this case) or is set to a remote
+path, then the source files will be written to the remote machine,
+compiled by the remote haxe compiler and interpreted by the remote
+haxe compiler or run by the remote neko or hashlink runtime.
+
+If the org file is remote but =:dir= is set to a local directory, the
+source file will be written to the local machine and local binaries
+will be used.
+
+** Non-executable Classes
+
+If a source code block includes methods but doesn't include a main
+method, a generic main method will be added.  This prevents the source
+code block from erroring when evaluated.
+
+** Sessions
+
+There is no support for sessions.
+
+* Current Issues
+** TODO Formatting shouldn't be required to return a table in scripting mode
