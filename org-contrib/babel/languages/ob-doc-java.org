@@ -322,10 +322,10 @@ This example accepts two integers and adds them:
 #+end_src
 #+end_example
 
-When passing string variables, be sure to escape the quotes, like this:
+This example passes a string variable:
 
 #+begin_example
-#+begin_src java :var a=\"some string\" :results output
+#+begin_src java :var a="some string" :results output
   System.out.print(a);
 #+end_src
 #+end_example
@@ -339,7 +339,7 @@ either case the variables are typed as =java.util.List=.  In this
 example =a= is a =List<String>=.
 
 #+begin_example
-#+begin_src java :var a='(\"one\" \"two\") :results output
+#+begin_src java :var a='("one" "two") :results output
   System.out.print(a.get(0) + " " + a.get(1));
 #+end_src
 #+end_example
@@ -395,7 +395,7 @@ All arguments are typed as strings.
 Here is an example that passes an argument:
 
 #+begin_example
-#+begin_src java :results output :cmdargs \"argument\"
+#+begin_src java :results output :cmdargs "argument"
   System.out.print(args[0]);
 #+end_src
 #+end_example
@@ -403,16 +403,16 @@ Here is an example that passes an argument:
 Pass multiple arguments by separating them by spaces.
 
 #+begin_example
-#+begin_src java :results output :cmdargs \"two arguments\"
+#+begin_src java :results output :cmdargs "two arguments"
   System.out.print(args[0] + " " + args[1]);
 #+end_src
 #+end_example
 
-In order to pass a string with spaces, quote the string and
-double-escape the quotes.
+In order to pass a string with spaces, quote the string twice and
+escape the inner quotes.
 
 #+begin_example
-#+begin_src java :results output :cmdargs \"\\\"this is one argument\\\"\"
+#+begin_src java :results output :cmdargs "\"this is one argument\""
   System.out.print(args[0]);
 #+end_src
 #+end_example
@@ -434,9 +434,9 @@ This example imports a class using the =:imports= header argument:
 
 #+begin_example
 #+begin_src java :results output :imports java.util.Base64
-  byte[] encoded = Base64.getEncoder().encode(\"encoded message\".getBytes());
+  byte[] encoded = Base64.getEncoder().encode("encoded message".getBytes());
   String decoded = new String(Base64.getDecoder().decode(encoded));
-  System.out.print(String.format(\"encoded=%s, decoded=%s\", new String(encoded), decoded));
+  System.out.print(String.format("encoded=%s, decoded=%s", new String(encoded), decoded));
 #+end_src
 #+end_example
 
@@ -446,9 +446,9 @@ code block:
 #+begin_example
 #+begin_src java :results output
   import java.util.Base64;
-  byte[] encoded = Base64.getEncoder().encode(\"encoded message\".getBytes());
+  byte[] encoded = Base64.getEncoder().encode("encoded message".getBytes());
   String decoded = new String(Base64.getDecoder().decode(encoded));
-  System.out.print(String.format(\"encoded=%s, decoded=%s\", new String(encoded), decoded));
+  System.out.print(String.format("encoded=%s, decoded=%s", new String(encoded), decoded));
 #+end_src
 #+end_example
 
