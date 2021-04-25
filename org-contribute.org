@@ -14,7 +14,7 @@
 # This file is the default header for new Org files in Worg.  Feel free
 # to tailor it to your needs.
 
-* How to contribute
+* Various ways of contributing to Org
 :PROPERTIES:
 :CUSTOM_ID: types-of-contributions
 :END:
@@ -41,16 +41,8 @@ Every contribution to Org is very welcome.
   you have read the [[https://orgmode.org/org.html#Feedback][Feedback]] section of Org's manual or this other
   great text: [[http://www.chiark.greenend.org.uk/~sgtatham/bugs.html][How to Send Bug Reports Effectively]]
 
-- You can *submit patches* to the mailing list.  See the [[For Org
-  contributors: preferred way of submitting patches][Preferred way of
-  submitting patches]] section for details.  You can run =make test=
-  to check that your patch does not introduce new bugs.
-
-  If your patch is against an Org file that is part of Emacs, then
-  your total contribution (all patches you submit) should change /less
-  than 15 lines/ (See the [[http://git.savannah.gnu.org/cgit/emacs.git/tree/CONTRIBUTE][CONTRIBUTE file in GNU Emacs]].)  If you
-  contribute more, you have to assign the copyright of your
-  contribution to the Free Software Foundation (see below).
+- You can *submit patches* to the mailing list.  See [[#first-patch][Your first patch]]
+  and [[#patches][Details on how to submit patches]].
 
 - You can *contribute to Worg*.  Learn what Worg is [[file:worg-about.org][about]] and how to
   contribute to it [[file:worg-git.org][through git]].
@@ -104,31 +96,56 @@ to do if you don't receive an answer]].
 The Org mailing list has *contributor stewards* who will try their best
 to make sure your contributions get all the attention they deserve.
 
-* For Org developers
-  :PROPERTIES:
-  :CUSTOM_ID: devs
-  :END:
+* Your first patch as an occasional contributor
+:PROPERTIES:
+:CUSTOM_ID: first-patch
+:END:
 
-Org developers are those who have write access to the repository.
+You don't need write access to the repository to contribute with
+patches, just send them to [[file:org-mailing-list.org][the mailing list]].  Here is a checklist to
+go through before submitting a patch:
+  
+1. Make your patch against the latest maint or master branch
+2. Run =~$ make test= to catch broken tests
+3. Check compilation warning with =~$ make compile=
+4. If relevant, include or update tests
+5. If your patch is adding a feature, please update =etc/ORG-NEWS=
+6. If relevant, don't forget to update =doc/org-manual.org=
+7. Take extra care of the commit message (see [[#commit-messages][Commit messages and ChangeLog entries]])
+8. If your change is small enough, include =TINYCHANGE= at the bottom
+   of the commit message.
 
-** Git workflow
+If your patch is against an Org file that is part of Emacs, then your
+total contribution (all patches you submit) should change /less than 15
+lines/ (See the [[http://git.savannah.gnu.org/cgit/emacs.git/tree/CONTRIBUTE][CONTRIBUTE file in GNU Emacs]].)  
 
-Please read Worg's page on [[https://orgmode.org/worg/org-maintenance.html][Org maintenance]].
+If you contribute more, you have to assign the [[#copyright][copyright]] of your
+contribution to the Free Software Foundation.  See [[#devs][Your first commit
+as an Org committer]].
 
-** Pushing your first commit
+* Your first commit as an Org committer
+:PROPERTIES:
+:CUSTOM_ID: devs
+:END:
 
-1. Send [[mailto:bzgATgnuDOTorg][Bastien]] the username you want for https://code.orgmode.org
-2. Add your public key to your account, once its creation is confirmed
-3. Clone =org-mode.git=: =~$ git clone git@code.orgmode.org:bzg/org-mode.git=
-4. Commit your changes against the code and the documentation
-5. Run =make test=
-6. If the tests pass, push your changes
+Org regular contributors and maintainers have write access to the Git
+repository.
+
+1. Fill in [[https://orgmode.org/request-assign-future.txt][this form]] and wait for the FSF feedback
+2. Send [[mailto:bzgATgnuDOTorg][Bastien]] the username you want for https://code.orgmode.org
+3. Add your public key to your account, once its creation is confirmed
+4. Clone =org-mode.git=: =~$ git clone git@code.orgmode.org:bzg/org-mode.git=
+5. Commit your changes against the code and the documentation
+6. Run =make test=
+7. If the tests pass, push your changes
 
 If you are undertaking big changes, please create a dedicated branch
 locally and make sure you have a clean commit history before merging
 it into the maint or master branch.
 
-* Preferred way of submitting patches
+To check our Git workflow, please read [[https://orgmode.org/worg/org-maintenance.html][Org maintenance]].
+
+* Details on how to submit patches
 :PROPERTIES:
 :CUSTOM_ID: patches
 :END:
@@ -138,7 +155,7 @@ it into the maint or master branch.
 Org is part of Emacs, so any contribution should follow the [[http://www.gnu.org/software/emacs/manual/html_node/elisp/Coding-Conventions.html][GNU Emacs
 Lisp coding conventions]] described in Emacs manual.
 
-** Sending patch with git
+** Sending patch with Git
 
 Please use Git to make patches and send them via email -- this is
 perfectly fine for major and minor changes.
@@ -297,9 +314,9 @@ Further reference:
 - [[https://www.gnu.org/prep/standards/html_node/Style-of-Change-Logs.html#Style-of-Change-Logs][Standard Emacs change log entry format]]
 - [[http://git.savannah.gnu.org/cgit/emacs.git/plain/CONTRIBUTE][Contribution guide from Emacs repo]]
 
-* Copyright issues when contributing to Emacs Org mode
+* Dealing with copyright when contributing to Org mode
 :PROPERTIES:
-:CUSTOM_ID: copyright-issues
+:CUSTOM_ID: copyright
 :END:
 
 Org is made of many files.  Most of them are also distributed as part
