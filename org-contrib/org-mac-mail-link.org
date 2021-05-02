@@ -1,0 +1,147 @@
+#+TITLE:     org-mac-mail-link.el -- Create and handle links to the selected Mail.app message
+#+OPTIONS:   ^:{} author:Tim Visher
+#+STARTUP: odd
+
+# This file is released by its authors and contributors under the GNU
+# Free Documentation license v1.3 or later, code examples are released
+# under the GNU General Public License v3 or later.
+
+[[file:index.org][{Back to Worg's contibutions index}]]
+
+* Overview
+
+  This code will allow you to capture a TODO item based on the
+  currently selected Mail.app message using =org-capture=.
+
+* Installation
+
+  You should simply copy the source code from this document into your
+  init file and edit it as you see fit.
+
+* Usage
+
+  Activate =org-capture= however you see fit (=M-x org-capture= works
+  just fine) and then whack the keychord you have set up to activate
+  the capture template.
+
+* Code
+
+  #+begin_src elisp
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;; Capture template for the currently selected Mail.app message
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (defun org-mac-mail-link-get-selected-message-subject
+      ()
+    (with-temp-buffer
+      (call-process
+       "osascript" nil t nil
+       "-e" "tell application \"Mail\" to get subject of item 1 of (selection as list)")
+      (buffer-substring-no-properties (point-min) (- (point-max) 1))))
+
+  (defun org-mac-mail-link-get-selected-message-id
+      ()
+    (with-temp-buffer
+      (call-process
+       "osascript" nil t nil
+       "-e" "tell application \"Mail\" to get message id of item 1 of (selection as list)")
+      ;; This additional encoding specifically of =/= is because Mail.app
+      ;; claims to be unable to find a message if it's ID contains unencoded
+      ;; slashes.
+      (browse-url-url-encode-chars
+       (buffer-substring-no-properties (point-min) (- (point-max) 1))
+       "[/]")))
+
+  (defun org-mac-mail-link-get-link-string
+      ()
+    (let ((subject (org-mac-mail-link-get-selected-message-subject))
+          (message-id (org-mac-mail-link-get-selected-message-id)))
+      (org-link-make-string (format "message:%s" message-id)
+                            subject)))
+
+  (defun org-mac-mail-link-get-body-quote-template-element
+      ()
+    (let ((body (setq body (with-temp-buffer
+                             (call-process
+                              "osascript" nil t nil
+                              "-e" "tell application \"Mail\" to get content of item 1 of (selection as list)")
+                             (buffer-substring-no-properties (point-min) (- (point-max) 1))))))
+      (format "
+
+    ,#+begin_quote
+  %s
+    ,#+end_quote"
+              (string-join
+               ;; Remove duplicate empty lines
+               (seq-reduce
+                (lambda (acc next)
+                  (if (string= next (or (car (last acc)) ""))
+                      acc
+                    (append acc (list next))))
+                ;; Indent each line by two spaces for inclusion in the quote
+                (mapcar (lambda (string)
+                          (let ((string (string-trim string)))
+                            (if (string= "" string)
+                                string
+                              (format "  %s" string))))
+                        (split-string body "\n"))
+                '())
+               "\n"))))
+
+  (require 'org-capture)
+
+  ;;; You may also wish to use the Customize interface for this variable
+  ;;; which is quite nice.
+  (setq org-capture-templates
+        ;; These 2-item entries are only necessary if you want to nest the
+        ;; capture template under a keychord.
+        '(("t" "TODO")
+          ("tc" "TODO Current")
+          ("tcm" "TODO Current Mail" entry
+           ;; If you maintain your TODO list in a single file this will
+           ;; place the resulting org-capture template expansion under the
+           ;; 'Inbox' heading. You may want to modify this.
+           ;;
+           ;; The resulting heading looks something like
+           ;;
+           ;; ** TODO [[message:<encoded messageID>][subject]]
+           ;;
+           ;;    [2021-05-02 Sun 16:22]
+           ;;
+           ;;    #+begin_quote
+           ;;    Unwrapped
+           ;;
+           ;;    Body
+           ;;
+           ;;    Text
+           ;;    #+end_quote
+           (file+headline "~/your-org-todo.org" "Inbox")
+           "* TODO %(org-mac-mail-link-get-link-string)
+
+    %U%(org-mac-mail-link-get-body-quote-template-element)" :prepend t :immediate-finish t)))
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;; Use =C-c C= as your org-capture keybinding
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (eval-after-load 'org
+    '(org-defkey org-mode-map (kbd "C-c C") #'org-capture))
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;; Teach org about opening message links
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (defun org-mac-mail-link-open-link
+      (mid _)
+    (start-process "open-link" nil "open" (format "message://%%3C%s%%3E"
+                                                  mid)))
+
+  (defun org-mac-mail-link-add-message-links
+      ()
+    (org-link-set-parameters
+     "message" :follow #'org-mac-mail-link-open-link))
+
+  (eval-after-load 'org
+    '(org-mac-mail-link-add-message-links))
+
+  #+end_src
