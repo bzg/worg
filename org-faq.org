@@ -1024,6 +1024,40 @@ something like this:
 /Applications/emacs.app/Contents/MacOS/Emacs -Q -l ~/minimal.emacs
 #+end_src
 
+** What is the best setup for indenting?
+
+Indentation is a matter of personal preferences.  General indentation
+preferences are controlled in Emacs via ~electric-indent-mode~.  Org
+indentation behavior changes depending on ~org-adapt-indentation~, which
+accepts three values: =nil= (no special indentation), =t= (always indent
+relatively the the element above) and =headline-data= (only indent the
+~PROPERTIES/LOGBOOK~ drawers relatively to the current level).  On top
+of these two configuration areas, there the difference between =RET= and
+=C-j=.
+
+Here are two tables summarizing the behavior depending on whether
+~electric-indent-mode~ is enable (the default) or not:
+
+With `electric-indent-mode' enabled:
+
+| org-adapt-indentation =>  | nil                    | t                          | headline-data              |
+|---------------------------+------------------------+----------------------------+----------------------------|
+| RET after a headline      | Do not indent          | Indent                     | Do not indent              |
+| C-j after a headline      | Do not indent          | Do not indent              | Do not indent              |
+| RET anywhere              | Indent wrt previous    | Indent wrt previous        | Indent wrt previous        |
+| C-j anywhere              | Do not indent wrt prev | Do not indent wrt previous | Do not indent wrt previous |
+| Insert PROPERTIES/LOGBOOK | Do not indent          | Indent wrt headline        | Indent wrt headline        |
+
+With `electric-indent-mode' disabled:
+
+| org-adapt-indentation =>  | nil                 | t                          | headline-data              |
+|---------------------------+---------------------+----------------------------+----------------------------|
+| RET after a headline      | Do not indent       | Do not indent              | Do not indent              |
+| C-j after a headline      | Do not indent       | Indent                     | Do not indent              |
+| RET                       | Do not indent       | Do not indent wrt previous | Do not indent wrt previous |
+| C-j                       | Indent wrt previous | Indent wrt previous        | Indent wrt previous        |
+| Insert PROPERTIES/LOGBOOK | Do not indent       | Indent wrt headline        | Indent wrt headline        |
+
 ** Can I migrate from Planner?
 
    Yes.  This [[http://www.c0t0d0s0.de/plan2org/plan2org.pl][perl script]] or [[http://gitorious.org/bkuhn-small-hacks/org-mode/blobs/master/planner2org.plx
