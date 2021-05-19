@@ -1029,21 +1029,33 @@ something like this:
    :CUSTOM_ID: indentation
    :END:
 
-Indentation is a matter of personal preferences.  General indentation
-preferences are controlled in Emacs via ~electric-indent-mode~.  Org
-indentation behavior changes depending on ~org-adapt-indentation~, which
-accepts three values: =nil= (no special indentation), =t= (always indent
-relatively the the element above) and =headline-data= (only indent the
-~PROPERTIES/LOGBOOK~ drawers relatively to the current level).  On top
-of these two configuration areas, there the difference between =RET= and
-=C-j=.
+Indentation, both appearance and behavior, is a matter of personal
+preferences.  You may try if the following adjustments suits better
+for you than the defaults.  Set ~org-adapt-indentation~ to have
+content aligned to headline titles.  Disable ~electric-indent-mode~ to
+avoid automatic indentation in response to =RET= key.
 
-Here are two tables summarizing the behavior depending on whether
-~electric-indent-mode~ is enable (the default) or not:
+In more details, ~org-adapt-indentation~ controls indentation with
+regards to previous element.  Apparent effect is increased indentation
+for content of deeper nested headings.  The variable accepts three
+values: =nil= (no special indentation), =t= (always indent relatively
+the the element above) and =headline-data= (only indent the
+~PROPERTIES/LOGBOOK~ drawers relatively to the current level).  Value
+=t= is suitable for short entries especially if you plan to share your
+documents with someone who does not use Emacs.  If you just want to
+make heading level more prominent then consider adding visual left
+margin using =#+STARTUP: indent= as described in the [[https://orgmode.org/manual/Clean-View.html#Clean-View][Clean View]]
+section of the manual.  The option works without adding extra spaces
+to the document text.
 
-With `electric-indent-mode' enabled:
+Configured indentation may be applied in response to =RET= or to
+=C-j= depending on the state of ~electric-indent-mode~.  The following
+tables summarizes the difference.  Version number is added to column
+header if it describes default settings.
 
-| org-adapt-indentation =>  | nil                    | t                          | headline-data              |
+With ~electric-indent-mode~ enabled:
+
+| org-adapt-indentation =>  | nil (Org >= 9.5)       | t (Org 9.4)                | headline-data              |
 |---------------------------+------------------------+----------------------------+----------------------------|
 | RET after a headline      | Do not indent          | Indent                     | Do not indent              |
 | C-j after a headline      | Do not indent          | Do not indent              | Do not indent              |
@@ -1051,15 +1063,30 @@ With `electric-indent-mode' enabled:
 | C-j anywhere              | Do not indent wrt prev | Do not indent wrt previous | Do not indent wrt previous |
 | Insert PROPERTIES/LOGBOOK | Do not indent          | Indent wrt headline        | Indent wrt headline        |
 
-With `electric-indent-mode' disabled:
+With ~electric-indent-mode~ disabled:
 
-| org-adapt-indentation =>  | nil                 | t                          | headline-data              |
+| org-adapt-indentation =>  | nil                 | t                          | headline-data (Org < 9.4)  |
 |---------------------------+---------------------+----------------------------+----------------------------|
 | RET after a headline      | Do not indent       | Do not indent              | Do not indent              |
 | C-j after a headline      | Do not indent       | Indent                     | Do not indent              |
 | RET                       | Do not indent       | Do not indent wrt previous | Do not indent wrt previous |
 | C-j                       | Indent wrt previous | Indent wrt previous        | Indent wrt previous        |
 | Insert PROPERTIES/LOGBOOK | Do not indent       | Indent wrt headline        | Indent wrt headline        |
+
+Do not try to avoid or to ignore indentation of heading body or
+properties drawer determined by current state of
+~org-adapt-indentation~ and ~electric-indent-mode~ by pressing =C-j=
+instead of =RET= (or vice versa). The result is transient and you will
+lost formatting when you refile heading or change its level (promote
+or demote it).
+
+You may have noticed recommendation to disable ~electric-indent-mode~
+to restore behavior prior to Org 9.4.  In Org 9.5
+~org-adapt-indentation~ default value changed to =nil= and, that is
+more important, a number of bugs related to indentation were fixed.
+Using =RET= with enabled ~electric-indent-mode~ should be convenient
+now.  Just customize ~org-adapt-indentation~ variable accordingly to
+you preferences.
 
 ** Can I migrate from Planner?
 
