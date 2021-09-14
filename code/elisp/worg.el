@@ -27,7 +27,7 @@
 ;;; Commentary:
 ;;
 ;; This file provides dynamic blocks for editing Worg pages.
-;; See the Worg project here: https://code.orgmode.org/bzg/worg.
+;; See the Worg project here: https://git.sr.ht/~bzg/worg.
 ;;
 ;; Put this file into your load-path and the following into your ~/.emacs:
 ;;   (require 'worg)
