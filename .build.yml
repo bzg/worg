@@ -1,0 +1,19 @@
+image: debian/stable
+packages:
+  - emacs
+  - elpa-htmlize
+  - rsync
+sources:
+  - https://git.sr.ht/~bzg/worg
+  - https://git.savannah.gnu.org/git/emacs/org-mode.git
+secrets:
+  - 7a38e4c8-2b08-446e-a478-2a114a50db86
+tasks:
+  - install: |
+      cd org-mode
+      git checkout bugfix
+      make autoloads
+      cd ../worg
+      ./publish.sh
+  - upload: |
+      rsync -e "ssh -o StrictHostKeyChecking=no" -av worg/* bzg.fr:/home/build/orgmode/worg/
