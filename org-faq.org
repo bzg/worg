@@ -321,16 +321,6 @@ Please check [[file:org-papers.org][the Org papers page]] for more references re
   :PROPERTIES:
   :CUSTOM_ID: Keeping-current
   :END:
-** Upgrading to Org 8.0/master and using the new export engine
-   :PROPERTIES:
-   :CUSTOM_ID: new-exporter-switch
-   :END:
-
-#+index: Upgrade!new exporter
-#+index: Export!new exporter
-
-See [[file:org-8.0.org][Upgrading to Org 8.0 (or the current master branch)]].
-
 ** My Emacs ships with an older version Org-mode! How do I upgrade?
    :PROPERTIES:
    :CUSTOM_ID: updating-org
@@ -489,10 +479,10 @@ issue with mixed installations.
 
   Say you want to make minor changes to the =org.el= or any other
   version controlled file from Org and you want to keep these changes
-  on top of the =master= branch from Org.  Create a local branch for
-  your changes on top of origin/master as follows:
+  on top of the =main= branch from Org.  Create a local branch for
+  your changes on top of origin/main as follows:
 
-  : $ git checkout -b local origin/master
+  : $ git checkout -b local origin/main
   : $ git config branch.local.rebase true
   : # Make your changes to the sources and create a new commit
   : $ git commit -am 'My local changes to Org'
@@ -501,9 +491,9 @@ issue with mixed installations.
 
   Now each time you pull new commits from the distribution repository
   your local commits will be rewound and replayed on top of the new
-  origin/master.  You would normally work on your =local= branch which
+  =origin/main=.  You would normally work on your =local= branch which
   includes your custom commits; there's no need to switch back to the
-  =master= branch.
+  =main= branch.
 
   If you get a conflict during a =git pull= (a change in Org and one
   of your local changes try to alter the same line of code) you will
@@ -531,28 +521,28 @@ issue with mixed installations.
   using
 : $ git rebase --abort
 
-** How can I use a stable release version instead of the bleeding edge master?
+** How can I use a stable release version instead of the bleeding edge main branch?
    :PROPERTIES:
    :CUSTOM_ID: using-stable-releases-only
    :END:
 
-The =master= branch of the git repository always contains the bleeding
+The =main= branch of the git repository always contains the bleeding
 edge development code.  This is important for Org's fast development,
-because code on master gets checked out by many people daily and we
+because code on =main= gets checked out by many people daily and we
 quickly receive bug reports if something is wrong.  On rare occasions,
 this code may not function perfectly for a limited time while we are
 trying to fix things.  It is therefore recommended to keep a
 known-good version of org-mode installed outside the source tree and
-always run the full test suite before using a new version from master.
+always run the full test suite before using a new version from =main=.
 
 Not everyone like to use this bleeding-edge code and face the danger
-to hit a surprising bug.  The branch =maint= is specifically for
+to hit a surprising bug.  The branch =bugfix= is specifically for
 collecting only fixes for known bugs between releases.  If you don't
 want to wait for a new release, but don't want to live on the bleeding
-edge, consider using =maint=.
+edge, consider using =bugfix=.
 
 From time to time, we make a release by merging all the new features
-from =master= into =maint=.  This typically happens when the
+from =main= into =bugfix=.  This typically happens when the
 maintainers feel that
 
 1. they have reached a good point in the development
@@ -581,7 +571,7 @@ To see which release tags are available.  Let's say you decide to use
 This set the working tree of the repository to the state of Org at the
 moment of release 7.01f.  You can then run Org from the repository be
 sure to use the stable release while development continues on the
-master branch.
+=main= branch.
 
 Later, when we release 7.02, you can switch to that using
 
@@ -594,7 +584,7 @@ Later, when we release 7.02, you can switch to that using
 Alternatively, if you just want to always run whatever the latest
 stable release is, you can do
 
-: $ git checkout -b stable origin/maint
+: $ git checkout -b stable origin/bugfix
 
 and then regularly update this branch by doing
 

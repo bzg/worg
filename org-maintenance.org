@@ -32,7 +32,7 @@ that all contributions get the attention they deserve.
 
 John Corless is helping with confirming reported bugs.
 
-Some =ob-*.el= have a dedicated maintainer (see this [[https://list.orgmode.org/87d015if5g.fsf@gnu.org/][call for help]].)
+Some file have a dedicated maintainer (see this [[https://list.orgmode.org/87d015if5g.fsf@gnu.org/][call for help]].)
 
 * What's in a release?
 
@@ -73,9 +73,9 @@ Note that this de facto convention has been made explicit after =9.4=.
 
 ** Conventions before and after Org 9.5
 
-Note that before =Org 9.5=, versions like =9.3=, =9.4=, etc. were really
-/major/ ones.  This was confusing for some users, especially those who
-expect Org to follow semantic versioning conventions.
+Note that before =Org 9.5=, versions like =9.3=, =9.4=, etc. were
+really /major/ ones.  This was confusing for some users, especially
+those who expect Org to follow semantic versioning conventions.
 
 * Releasing
 
@@ -83,24 +83,24 @@ expect Org to follow semantic versioning conventions.
 
 The git repository has two branches:
 
-- master :: For current development.
-- maint :: For bug fixes against latest major or minor release.
+- main :: For current development.
+- bugfix :: For bug fixes against latest major or minor release.
 
-Bug fixes always go on =maint= then are merged on =master=.
+Bug fixes always go on =bugfix= then are merged on =main=.
 
-New features always go on =master=.
+New features always go on =main=.
 
-** Major release: merging master into maint
+** Major release: merging main into bugfix
 
-All commits in the =maint= branch should always be merged into the
-=master= branch.  Both minor and major releases are done from the =maint=
-branch.  When doing a major release, the =master= branch is merged into
-the =maint= branch.
+All commits in the =bugfix= branch should always be merged into the
+=main= branch.  Both minor and major releases are done from the =bugfix=
+branch.  When doing a major release, the =main= branch is merged into
+the =bugfix= branch.
 
 ** Tagging the release
 
 When doing a major and a minor release, after all necessary merging is
-done, tag the _maint_ branch for the release with:
+done, tag the _bugfix_ branch for the release with:
 
   : git tag -a release_9.1.7 -m "Adding release tag"
 
@@ -112,28 +112,7 @@ We also encourage you to sign release tags like this:
 
   : git tag -s release_9.1.7 -m "Adding release tag"
 
-** Uploading the release files from the orgmode.org server
-
-Log on the orgmode.org server as the emacs user and ~cd~ to ~~/git/org-mode~.
-
-From there do
-
-  : make release
-  : make upload
-
-to create the =.tar.gz= and =.zip= files, the documentation, and to upload
-everything at the right place.
-
-* Available Org's builds on the server
-
-There are two cron tasks on the server: one that builds the ELPA
-packages and one that builds =org-latest.tar.gz= and =org-latest.zip=.
-
-ELPA packages are built from the *maint* branch.  One ELPA package
-contains Org's core, another one called "org-plus-contrib" contains
-Org and contributed libraries.
-
-=org-latest*= snapshots are built from the *master* branch.
+The GNU ELPA packages is built from the *bugfix* branch.
 
 * Synchronization Org and upstream Emacs
 
@@ -146,7 +125,7 @@ propagating the changes back to the Org repository is called
 /backporting/ for historical reasons.
 
 To find changes that need to be backported from the Emacs repository,
-the following =git= command, courtesy of [[http://permalink.gmane.org/gmane.emacs.devel/215861][Kyle Meyer]], can be used:
+the following =git= command, courtesy of Kyle Meyer, can be used:
 
 #+begin_src shell
 git log $rev..origin/emacs-25 -- lisp/org doc/misc/org.texi \
@@ -166,16 +145,16 @@ folder in the Emacs repository.
 New releases of Org should be added to the [[https://git.savannah.gnu.org/cgit/emacs.git][Emacs repository]].
 
 Typically, Org can be synchronized by copying over files from the
-=emacs-sync= branch of the Org repository to the =master= branch of
-Emacs repository.  The =emacs-sync= branch has a few extra changes
-compared with the =maint= branch.  If the Emacs maintainers are
-planning a new release of Emacs soon, it is possible that another
-branch should be used.
+=km/emacs-from-master= branch of the Org repository to the =main=
+branch of Emacs repository.  The =km/emacs-from-master= branch has a
+few extra changes compared with the =bugfix= branch.  If the Emacs
+maintainers are planning a new release of Emacs soon, it is possible
+that another branch should be used.
 
 If the new release of Org contains many changes, it may be useful to
 use a separate branch before merging, e.g. =scratch/org-mode-merge=.
-This branch can then be merged with the =master= branch, when
-everything has been tested.
+This branch can then be merged with the =main= branch, when everything
+has been tested.
 
 Please see [[http://git.savannah.gnu.org/cgit/emacs.git/tree/CONTRIBUTE][CONTRIBUTE]] in the Emacs repository for guidelines on
 contributing to the Emacs repository.
