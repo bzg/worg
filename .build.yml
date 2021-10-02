@@ -17,3 +17,8 @@ tasks:
       ./publish.sh
   - upload: |
       rsync -e "ssh -o StrictHostKeyChecking=no" -av worg/* bzg.fr:/home/build/orgmode/worg/
+triggers:
+  - action: email
+    condition: failure
+    to: bzg@gnu.org
+    
