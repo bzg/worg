@@ -1,17 +1,17 @@
+#+TITLE:      org-R: Computing and data visualisation in Org-mode using R
+#+AUTHOR:     Dan Davison
+#+EMAIL:      davison@stats.ox.ac.uk
 #+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c)
-#+TITLE:      org-R: Computing and data visualisation in Org-mode using R
-#+AUTHOR:     Dan Davison
-#+EMAIL:      davison@stats.ox.ac.uk
 #+LANGUAGE:   en
 #+PRIORITIES: A C B
 #+CATEGORY:   worg-tutorial
+#+HTML_LINK_UP:    index.html
+#+HTML_LINK_HOME:  https://orgmode.org/worg/
 
 # #+INFOJS_OPT: view:overview
-
-[[file:../index.org][{Back to Worg's index}]]
 
 * Important
   Org-R has been replaced by [[file:../../org-contrib/babel/index.org][Org-babel]] which provides a much improved
@@ -431,7 +431,7 @@ recognise any usage affinities between the clustered org users?
   In addition to the action:<some-action> option (described [[*Table of available actions][here]], the
   following options are available:
 |-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| *Input options*                                                   |                                                                                                                                        |
+| *Input options*                                                     |                                                                                                                                        |
 |-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
 | infile:/path/to/file.csv                                          | input data comes from file.csv                                                                                                         |
 | infile:http://www.stats.ox.ac.uk/~davison/software/org-R/file.csv | input data comes from file.csv somewhere on the web                                                                                    |
@@ -445,13 +445,13 @@ recognise any usage affinities between the clustered org users?
 | columns:((1)(2 3))                                                | (when plotting) plot columns 2 and 3 on y-axis against column 1 on x-axis                                                              |
 | columns:(("age")("wing length" "fierceness"))                     | (when plotting) plot columns named "wing length" and "fierceness" on y-axis against "age" on x-axis                                    |
 |-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| *Action options*                                                  |                                                                                                                                        |
+| *Action options*                                                    |                                                                                                                                        |
 |-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
 | action:some-action                                                | off-the-shelf plotting action or computation (see [[*Table of available actions][separate list]]), or any R function that makes sense (e.g. head, summary)              |
 | lines:t                                                           | (when plotting) join points with lines (similar to action:lines)                                                                       |
 | args:(:xlab "\"the x axis title\"" :lwd 4)                        | provide extra arguments as a p-list (note the need to quote strings if they are to appear as strings in R)                             |
 |-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| *Output options*                                                  |                                                                                                                                        |
+| *Output options*                                                    |                                                                                                                                        |
 |-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
 | outfile:/path/to/image.png                                        | save image to file and insert link into org buffer (also: .pdf, .ps, .jpg, .jpeg, .bmp, .tiff)                                         |
 | outfile:png                                                       | save image to file in org-attach directory and insert link                                                                             |
@@ -464,7 +464,7 @@ recognise any usage affinities between the clustered org users?
 | output-to-buffer:t                                                | force numerical output to org buffer (shouldn't be necessary)                                                                          |
 | inline:t                                                          | don't name links to output (so that graphics are inline when exported to HTML)                                                         |
 |-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
-| *Misc options*                                                    |                                                                                                                                        |
+| *Misc options*                                                      |                                                                                                                                        |
 |-------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------|
 | showcode:t                                                        | Display a buffer containing the R code that was generated to do what was requested.                                                    |
   
@@ -474,29 +474,29 @@ To specify an action from the following list, use e.g. action:hist on
 the #+R line.
 
 | *Actions that generate numerical output* |                                                                                                         |
-|------------------------------------------+---------------------------------------------------------------------------------------------------------|
-| tabulate                                 | count occurrences of distinct input values. Input data should be discrete. This is function table in R. |
-| summary                                  | summarise data in columns (minimum, 1st quartile, median, mean, 3rd quartile, max)                      |
-| head                                     | show first 6 rows of a larger table                                                                     |
-| transpose                                | transpose a table                                                                                       |
-|                                          |                                                                                                         |
+|----------------------------------------+---------------------------------------------------------------------------------------------------------|
+| tabulate                               | count occurrences of distinct input values. Input data should be discrete. This is function table in R. |
+| summary                                | summarise data in columns (minimum, 1st quartile, median, mean, 3rd quartile, max)                      |
+| head                                   | show first 6 rows of a larger table                                                                     |
+| transpose                              | transpose a table                                                                                       |
+|                                        |                                                                                                         |
 | *Actions that generate graphical output* |                                                                                                         |
-|------------------------------------------+---------------------------------------------------------------------------------------------------------|
-|                                          |                                                                                                         |
+|----------------------------------------+---------------------------------------------------------------------------------------------------------|
+|                                        |                                                                                                         |
 | *Discrete data*                          |                                                                                                         |
-| barplot                                  | produces 'side-by-side' bar plots if multiple columns selected                                          |
-|                                          |                                                                                                         |
+| barplot                                | produces 'side-by-side' bar plots if multiple columns selected                                          |
+|                                        |                                                                                                         |
 | *Indexed data*                           |                                                                                                         |
-| plot                                     | if only 1 column selected, index is automatic: 1,2,...                                                  |
-| lines                                    | same as plot                                                                                            |
-| points                                   | same as plot but don't join points with lines                                                           |
-|                                          |                                                                                                         |
+| plot                                   | if only 1 column selected, index is automatic: 1,2,...                                                  |
+| lines                                  | same as plot                                                                                            |
+| points                                 | same as plot but don't join points with lines                                                           |
+|                                        |                                                                                                         |
 | *Continuous data*                        |                                                                                                         |
-| hist                                     | histogram                                                                                               |
-| density                                  | like a smoothed histogram (i.e. a curve)                                                                |
-|                                          |                                                                                                         |
+| hist                                   | histogram                                                                                               |
+| density                                | like a smoothed histogram (i.e. a curve)                                                                |
+|                                        |                                                                                                         |
 | *Grid of values*                         |                                                                                                         |
-| image                                    | a grid image, with cells coloured according to their numerical values                                   |
+| image                                  | a grid image, with cells coloured according to their numerical values                                   |
 
 
 Apart from tabulate, the action: names are the same as the names of

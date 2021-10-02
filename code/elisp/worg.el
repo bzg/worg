@@ -5,8 +5,8 @@
 ;; Emacs Lisp Archive Entry
 ;; Filename: worg.el
 ;; Version: 0.1
-;; Author: Bastien Guerry <bzg AT altern DOT org>
-;; Maintainer: Bastien Guerry <bzg AT altern DOT org>
+;; Author: Bastien Guerry <bzg AT gnu DOT org>
+;; Maintainer: Bastien Guerry <bzg AT gnu DOT org>
 ;; Keywords: org, wp, toc
 ;; Description: Shows a browsable table of contents for Org buffer
 ;;
