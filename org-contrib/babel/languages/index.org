@@ -13,7 +13,7 @@
 #+HTML_LINK_UP:  ../index.html
 
 * Improving This Document                                          :noexport:
-** TODO Broken links in Core language table [0/9]
+** TODO Broken links [0/7]
  - [ ] C
  - [ ] C++
  - [ ] D
@@ -21,130 +21,181 @@
  - [ ] Lua language link
  - [ ] Perl logo
  - [ ] PicoLisp logo
- - [ ] Lisp Flavored Erlang?
- - [ ] Scala?
-** DONE Normalize headings
-CLOSED: [2021-10-02 Sat 15:05]
-Change to title case, edit to reduce redundancy.
-* Supported Languages
-  :PROPERTIES:
-  :CUSTOM_ID: langs
-  :END:
-
-Babel supports a growing number of programming languages.  Table
-[[babel-languages]] lists supported languages, indicates how they are
-identified in Babel, and provides links to documentation and to other
-software required for full support.
-
-The table is divided into sections that indicate how support for each
-language is distributed: *Core* languages are distributed with Emacs;
-*Org-contrib* languages are distributed in the [[https://git.sr.ht/~bzg/org-contrib][org-contrib]] NonGNU ELPA
-package; and *Package* languages are distributed outside of Org-mode
-through the Emacs package system.
-
-#+caption: Languages supported by Babel
-#+name: babel-languages
-| Core language         | Identifier      | Requirements                                   | Maintainer        |
-|-----------------------+-----------------+------------------------------------------------+-------------------|
-| [[file:ob-doc-awk.org][Awk]]                   | =awk=           | AWK                                            | Tyler Smith       |
-| [[file:ob-doc-C.org][C]]                     | =C=             | none                                           | Thierry Banel     |
-| [[file:ob-doc-C.org][C++]]                   | =cpp=           | none                                           |                   |
-| Calc                  | =calc=          | none                                           | Tom Gillespie     |
-| [[file:ob-doc-clojure.org][Clojure]]               | =clojure=       | [[http://clojure.org/][Clojure]], [[https://github.com/clojure-emacs/clojure-mode][Clojure Mode]], [[https://github.com/clojure-emacs/cider][CIDER]], [[http://leiningen.org/][Leiningen]]        | Bastien Guerry    |
-| comint                | =comint=        |                                                |                   |
-| [[file:ob-doc-css.org][CSS]]                   | =css=           | none                                           |                   |
-| [[file:ob-doc-C.org][D]]                     | =D=             | [[http://dlang.org][D]]                                              |                   |
-| [[file:ob-doc-ditaa.org][Ditaa]]                 | =ditaa=         | [[http://ditaa.sourceforge.net][ditaa]] (bundled with Org-mode)                  |                   |
-| [[file:ob-doc-dot.org][Dot (Graphviz)]]        | =dot=           | [[http://www.graphviz.org/][dot]]                                            | Justin Abrahms    |
-| Emacs Lisp            | =emacs-lisp=    | none                                           |                   |
-| [[file:ob-doc-eshell.org][eshell]]                | =eshell=        | eshell                                         | stardiviner       |
-| Forth                 | =forth=         | [[https://www.gnu.org/software/gforth/][gforth]]                                         |                   |
-| Fortran               | =F90=           | fortran                                        |                   |
-| [[file:ob-doc-gnuplot.org][Gnuplot]]               | =gnuplot=       | [[http://www.gnuplot.info/][gnuplot]], [[http://cars9.uchicago.edu/~ravel/software/gnuplot-mode.html][gnuplot-mode]]                          |                   |
-| Groovy                | =groovy=        | [[https://groovy-lang.org/][Apache Groovy]]                                  | Palak Mathur      |
-| Haskell               | =haskell=       | [[http://www.haskell.org/][haskell]], [[http://projects.haskell.org/haskellmode-emacs/][haskell-mode]], [[http://www.haskell.org/haskellwiki/Haskell_mode_for_Emacs#inf-haskell.el:_the_best_thing_since_the_breadknife][inf-haskell]], [[http://people.cs.uu.nl/andres/lhs2tex/][lhs2tex]]    | Lawrence Bottorff |
-| [[file:ob-doc-java.org][Java]]                  | =java=          | [[https://openjdk.java.net/][Java]]                                           | Ian Martins       |
-| [[file:ob-doc-js.org][Javascript]]            | =js=            | [[http://nodejs.org/][node.js]]                                        |                   |
-| [[file:ob-doc-LaTeX.org][LaTeX]]                 | =latex=         | [[http://www.latex-project.org/][latex]], [[http://www.gnu.org/software/auctex/][auctex]], [[http://www.gnu.org/software/auctex/reftex.html][reftex]]                          |                   |
-| [[file:ob-doc-lilypond.org][Lilypond]]              | =ly=            | [[http://lilypond.org/][LilyPond]]                                       |                   |
-| [[file:ob-doc-lisp.org][Lisp]]                  | =lisp=          | Lisp, [[http://common-lisp.net/project/slime/][Slime]]                                    |                   |
-| [[http://www.lua.org/][Lua]]                   | =lua=           | [[http://www.lua.org/][Lua]]                                            |                   |
-| [[file:ob-doc-makefile.org][Make]]                  | =makefile=      | none                                           |                   |
-| [[file:ob-doc-octave-matlab.org][Matlab]]                | =matlab=        | [[https://www.mathworks.com/products/matlab.html][MATLAB]], [[http://sourceforge.net/projects/matlab-emacs/][matlab.el]]                              |                   |
-| [[file:ob-doc-maxima.org][Maxima]]                | =max=           | [[http://maxima.sourceforge.net/][Maxima]], Common Lisp, gnuplot (optional)        |                   |
-| Objective Caml        | =ocaml=         | [[http://caml.inria.fr/][ocaml]], [[http://www-rocq.inria.fr/~acohen/tuareg/][tuareg-mode]]                             |                   |
-| [[file:ob-doc-octave-matlab.org][Octave]]                | =octave=        | [[https://www.gnu.org/software/octave/][Octave]]                                         |                   |
-| Org                   | =org=           | none                                           |                   |
-| [[file:ob-doc-perl.org][Perl]]                  | =perl=          | [[http://www.perl.org/][perl]], [[http://www.emacswiki.org/emacs/CPerlMode][cperl-mode]] (optional)                    | Corwin Brust      |
-| PlantUML              | =plantuml=      | [[https://plantuml.com][PlantUML]]                                       |                   |
-| Processing            | =processing=    | [[https://processing.org/][Processing]]                                     |                   |
-| [[file:ob-doc-python.org][Python]]                | =python=        | [[http://www.python.org/][python]], [[https://launchpad.net/python-mode][python-mode]] (optional)                 | Jack Kamm         |
-| [[file:ob-doc-R.org][R]]                     | =R=             | [[http://www.r-project.org/][R]], [[http://ess.r-project.org/][ess-mode]], [[http://cran.r-project.org/web/packages/tikzDevice/index.html][tikzDevice]]                        | Jeremie Juste     |
-| Ruby                  | =ruby=          | [[http://www.ruby-lang.org/][ruby]], [[http://www.ruby-lang.org/][irb]], [[http://github.com/eschulte/rinari/raw/master/util/ruby-mode.el][ruby-mode]], [[http://github.com/eschulte/rinari/raw/master/util/inf-ruby.el][inf-ruby mode]]            |                   |
-| Sass                  | =sass=          | [[http://sass-lang.com/][Sass]], [[http://github.com/nex3/haml/blob/master/extra/sass-mode.el][sass-mode]]                                |                   |
-| Scheme                | =scheme=        | none                                           |                   |
-| [[file:ob-doc-screen.org][Screen]]                | =screen=        | [[https://www.gnu.org/software/screen/][GNU Screen]]                                     | Ken Mankoff       |
-| Sed                   | =sed=           | [[https://www.gnu.org/software/sed/][sed]]                                            |                   |
-| shell                 | =shell=         | a shell                                        |                   |
-| [[file:ob-doc-sql.org][SQL]]                   | =sql=           | an RDBMS                                       |                   |
-| [[file:ob-doc-sqlite.org][SQLite]]                | =sqlite=        | [[http://www.sqlite.org/index.html][SQLite]], [[http://www.sqlite.org/sqlite.html][sqlite3]], [[http://www.emacswiki.org/emacs/SqlMode][SQL mode]]                      | Nick Savage       |
-|-----------------------+-----------------+------------------------------------------------+-------------------|
-| *Org-contrib language* | *Identifier*    | *Requirements*                                 | *Maintainer*      |
-|-----------------------+-----------------+------------------------------------------------+-------------------|
-| [[file:ob-doc-abc.org][ABC]]                   | =abc=           | [[http://moinejf.free.fr/][abcm2ps]], [[https://github.com/mkjunker/abc-mode][abc-mode]]                              | William Waites    |
-| Arduino               | =arduino=       | [[https://www.arduino.cc/][Arduino]]                                        |                   |
-| [[file:ob-doc-asymptote.org][Asymptote]]             | =asymptote=     | [[http://asymptote.sourceforge.net/][Asymptote]], [[http://asymptote.sourceforge.net/doc/Editing-modes.html][asy-mode]]                            | Luc Pellissier    |
-| C#                    | =csharp=        | [[https://github.com/mono/mono][mono]]                                           |                   |
-| Coq                   | =coq=           | [[https://coq.inria.fr/][Coq]], [[https://proofgeneral.github.io/][Proof General]]                             | Luc Pellissier    |
-| ebnf                  | =ebnf=          | [[https://www.emacswiki.org/emacs/EbnfToPsPackage][ebnf2ps]]                                        |                   |
-| [[file:ob-doc-eukleides.org][Eukleides]]             | =eukleides=     | [[http://eukleides.org/][eukleides]]                                      |                   |
-| Fomus                 | =fomus=         | [[http://fomus.sourceforge.net/][fomus (music notation)]]                         |                   |
-| hledger               | =hledger=       | [[https://hledger.org/][hledger]]                                        |                   |
-| Io                    | =io=            | [[https://iolanguage.org/index.html][Io]], java                                       |                   |
-| [[file:ob-doc-J.org][J]]                     | =J=             | [[http://www.jsoftware.com/][J]], [[https://github.com/zellio/j-mode][j-mode]]                                      | Joseph Novakovich |
-| [[https://github.com/gjkerns/ob-julia/blob/master/ob-julia-doc.org][Julia]]                 | =julia=         | [[http://ess.r-project.org][ess]]                                            |                   |
-| [[file:ob-doc-ledger.org][Ledger]]                | =ledger=        | [[http://wiki.github.com/jwiegley/ledger/][ledger]]                                         | Eric S. Fraga     |
-| Mathematica           | =mathematica=   | [[https://www.wolfram.com/mathematica/][Mathematica]]                                    |                   |
-| [[file:ob-doc-mathomatic.org][Mathomatic]]            | =mathomatic=    | [[https://github.com/mfillpot/mathomatic][Mathomatic]]                                     |                   |
-| [[file:ob-doc-mscgen.org][Mscgen]]                | =mscgen=        | [[http://www.mcternan.me.uk/mscgen/][Mscgen]]                                         | Justin Abrahms    |
-| [[file:ob-doc-oz.org][OZ]]                    | =oz=            | [[http://www.mozart2.org/][Mozart]] which includes a major mode             |                   |
-| php                   | =php=           | [[https://www.php.net/][PHP]]                                            |                   |
-| [[file:ob-doc-picolisp.org][Picolisp]]              | =picolisp=      | [[http://picolisp.com/5000/!wiki?home][PicoLisp]]                                       |                   |
-| redis                 | =redis=         | [[https://redis.io/][redis]]                                          |                   |
-| sclang                | =sclang=        | [[https://supercollider.github.io/][SuperCollider]]                                  |                   |
-| Shen                  | =shen=          | [[http://www.shenlanguage.org/][Shen]], [[http://elpa.gnu.org/packages/shen-mode.html][shen-mode]]                                |                   |
-| smiles                | =smiles=        |                                                |                   |
-| spice                 | =spice=         | [[http://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/][SPICE]]                                          |                   |
-| [[file:ob-doc-stan.org][Stan]]                  | =stan=          | [[http://mc-stan.org/][Stan]], [[https://github.com/stan-dev/stan-mode][Stan mode]]                                |                   |
-| [[file:ob-doc-stata.org][Stata]]                 | =stata=         | [[http://stata.com/][Stata]], [[http://ess.r-project.org/][ess-mode]]                                |                   |
-| [[file:ob-doc-tcl.org][Tcl]]                   | =tcl=           | [[http://www.tcl.tk/][tclsh]]                                          |                   |
-| [[file:ob-doc-vala.org][Vala]]                  | =vala=          | [[https://wiki.gnome.org/Projects/Vala][Vala]]                                           |                   |
-| VB.net                | =vbnet=         | [[https://github.com/mono/mono][mono]], [[https://www.mankier.com/package/mono-basic][vbnc]]                                     |                   |
-|-----------------------+-----------------+------------------------------------------------+-------------------|
-| *Package language*    | *Identifier*    | *Requirements*                                 | *Maintainer*      |
-|-----------------------+-----------------+------------------------------------------------+-------------------|
-| [[https://bitbucket.org/pdo/axiom-environment][Axiom]]                 | =axiom=, =spad= | [[http://www.axiom-developer.org/][axiom]], [[http://www.open-axiom.org/][OpenAxiom]], or [[http://fricas.sourceforge.net/][FriCAS]], [[https://bitbucket.org/pdo/axiom-environment/][axiom-environment]] |                   |
-| [[https://github.com/zweifisch/ob-elixir][Elixir]]                | =elixir=        | [[http://elixir-lang.org/][elixir]], [[http://www.erlang.org/][Erlang]]                                 |                   |
-| [[https://github.com/krisajenkins/ob-translate][Google Translate]]      | =translate=     | [[https://github.com/atykhonov/google-translate][google-translate]]                               |                   |
-| [[file:ob-doc-haxe.org][Haxe]]                  | =haxe=          | [[https://haxe.org/][Haxe]]                                           |                   |
-| [[https://github.com/krisajenkins/ob-browser][HTML]]                  | =browser=       | [[http://phantomjs.org/][PhantomJS]], ob-browser.js                       |                   |
-| [[https://github.com/zweifisch/ob-http][http request]]          | =http=          | [[http://curl.haxx.se/][cURL]]                                           |                   |
-| [[https://github.com/gregsexton/ob-ipython][iPython]]               | =ipython=       | [[file:ob-doc-python.org][ob-python]]                                      |                   |
-| [[http://github.com/zweifisch/ob-kotlin][Kotlin]]                | =kotlin=        | [[http://kotlinlang.org/][Kotlin]], [[https://github.com/quantumman/emacs.d/blob/master/auto-install/kotlin-mode.el][kotlin-mode]]                            |                   |
-| Lisp Flavored Erlang  | =lfe=           | [[http://lfe.io/][lfe]]                                            |                   |
-| [[https://github.com/krisajenkins/ob-mongo][MongoDB]]               | =mongo=         | [[https://www.mongodb.org/][MongoDB]]                                        |                   |
-| [[https://github.com/zweifisch/ob-cypher][Neo4j]]                 | =cypher=        | [[http://neo4j.com/][neo4j]], [[https://github.com/fxbois/cypher-mode][cypher-mode]]                             |                   |
-| [[https://github.com/ljos/ob-prolog][Prolog]]                | =prolog=        | [[http://www.swi-prolog.org/][SWI Prolog]]                                     |                   |
-| [[https://github.com/millarc/ob-rec.el][rec]]                   | =rec=           | [[https://www.gnu.org/software/recutils/][GNU Recutils]]                                   |                   |
-| Scala                 | =scala=         | [[http://www.scala-lang.org][Scala]]                                          |                   |
-| [[https://github.com/swannodette/ob-sml][Standard ML]]           | =sml=           | [[https://en.wikipedia.org/wiki/Standard_ML][Standard ML]], [[http://www.iro.umontreal.ca/~monnier/elisp/][sml-mode]]                          |                   |
-| [[https://github.com/lurdan/ob-typescript][Typescript]]            | =typescript=    | [[https://nodejs.org/][node.js]], [[https://www.npmjs.com/package/typescript][typescript]]                            |                   |
+** TODO Add a bit on how to volunteer to maintain a language
+I'm not clear about the best way to handle this.
+** TODO Write documentation for some core languages
 
 Note: Many languages in Table [[babel-languages]] require documentation.
 A template is provided [[https://git.sr.ht/~bzg/worg/tree/master/item/org-contrib/babel/languages/ob-doc-template.org][in the worg git repository]] for the addition of
 language documentation.
+** INPROGRESS List of core Babel language maintainers
+#+begin_src shell :results output
+cd /path/to/org-mode-master
+git grep -i maintainer lisp/ob-*.el
+#+end_src
 
-Note also that there are some [[file:lang-compat.org][inconsistencies across languages]].
+#+RESULTS:
+#+begin_example
+lisp/ob-C.el:;; Maintainer: Thierry Banel
+lisp/ob-R.el:;; Maintainer: Jeremie Juste
+lisp/ob-awk.el:;; Maintainer: Tyler Smith <tyler@plantarum.ca>
+lisp/ob-calc.el:;; Maintainer: Tom Gillespie <tgbugs@gmail.com>
+lisp/ob-clojure.el:;; Maintainer: Bastien Guerry <bzg@gnu.org>
+lisp/ob-dot.el:;; Maintainer: Justin Abrahms
+lisp/ob-eshell.el:;; Maintainer: stardiviner <numbchild@gmail.com>
+lisp/ob-gnuplot.el:;; Maintainer: Ihor Radchenko <yantar92@gmail.com>
+lisp/ob-groovy.el:;; Maintainer: Palak Mathur
+lisp/ob-haskell.el:;; Maintainer: Lawrence Bottorff <borgauf@gmail.com>
+lisp/ob-java.el:;; Maintainer: Ian Martins <ianxm@jhu.edu>
+lisp/ob-julia.el:;; Maintainer: Pedro Bruel <pedro.bruel@gmail.com>
+lisp/ob-perl.el:;; Maintainer: Corwin Brust
+lisp/ob-python.el:;; Maintainer: Jack Kamm <jackkamm@gmail.com>
+lisp/ob-screen.el:;; Maintainer: Ken Mankoff
+lisp/ob-sqlite.el:;; Maintainer: Nick Savage
+#+end_example
+
+** DONE Divide Table 1 in two
+CLOSED: [2021-10-03 Sun 12:10] SCHEDULED: <2021-10-03 Sun>
+*** Core table
+Language, Identifier, Documentation, Maintainer
+*** Contrib table
+Language, Identifier, Documentation
+** DONE Remove Babel package languages
+CLOSED: [2021-10-03 Sun 12:11] SCHEDULED: <2021-10-03 Sun>
+About [[https://git.sr.ht/~bzg/org-contrib][org-contrib]]:  This repository contains add-ons to Org.
+
+You can use them by installing the org-contrib NonGNU ELPA package from https://elpa.nongnu.org/nongnu/.
+** DONE Normalize headings
+CLOSED: [2021-10-02 Sat 15:05]
+Change to title case, edit to reduce redundancy.
+
+* Language Support
+  :PROPERTIES:
+  :CUSTOM_ID: langs
+  :END:
+Babel supports a growing number of programming languages; more than
+ten dozen languages currently have some Babel support.  Babel support
+for more than three dozen widely used languages is distributed with
+Emacs, and the various [[https://www.emacswiki.org/emacs/ELPA][Emacs Lisp Package Archives]] include support for
+more than four dozen languages.  In addition, for various historical
+reasons, Babel support for more than two dozen languages is
+distributed in the [[https://git.sr.ht/~bzg/org-contrib][Org-contrib package]].
+
+This page provides pointers to sources of Babel language support,
+instructions to activate a supported language, and a brief guide to
+developing support for a language in case you'd like to use a new
+language with Babel or contribute to existing Babel language support.
+
+** Language Support Distributed with Emacs
+Table [[babel-languages]] lists the Babel language support distributed
+with Emacs. The table provides a link to a web page with information
+about the language, indicates how the language is identified in Babel, provides
+a link to existing documentation, and indicates the generosity of your
+colleagues who have volunteered to maintain a bit of Babel language
+support.
+
+Note that there are some [[file:lang-compat.org][inconsistencies among supported languages]].
+# Bit on how to volunteer about here.
+
+#+caption: Core languages supported by Babel
+#+name: babel-languages
+| Language      | Identifier   | Documentation        | Maintainer        |
+|---------------+--------------+----------------------+-------------------|
+| [[https://groovy-lang.org/][Apache Groovy]] | =groovy=     |                      | Palak Mathur      |
+| [[https://en.wikipedia.org/wiki/AWK#Versions_and_implementations][AWK]]           | =awk=        | [[file:ob-doc-awk.org][ob-doc-awk]]           | Tyler Smith       |
+| [[https://en.wikipedia.org/wiki/List_of_compilers#C_compilers][C]]             | =C=          | [[file:ob-doc-C.org][ob-doc-c]]             | Thierry Banel     |
+| [[Zhttps://en.wikipedia.org/wiki/List_of_compilers#C++_compilers][C++]]           | =cpp=        | [[file:ob-doc-C.org][ob-doc-c]]             |                   |
+| [[https://www.gnu.org/software/emacs/manual/html_mono/calc.html][Calc]]          | =calc=       |                      | Tom Gillespie     |
+| [[https://en.wikipedia.org/wiki/List_of_command-line_interpreters][CLI]]           | =shell=      |                      |                   |
+| [[http://clojure.org/][Clojure]]       | =clojure=    | [[file:ob-doc-clojure.org][ob-doc-clojure]]       | Bastien Guerry    |
+| [[https://masteringemacs.org/article/comint-writing-command-interpreter][Comint mode]]   | =comint=     |                      |                   |
+| [[https://developer.mozilla.org/en-US/docs/Web/CSS][CSS]]           | =css=        | [[file:ob-doc-css.org][ob-doc-css]]           |                   |
+| [[http://dlang.org][D]]             | =D=          | [[file:ob-doc-C.org][ob-doc-c]]             |                   |
+| [[http://ditaa.sourceforge.net][ditaa]]         | =ditaa=      | [[file:ob-doc-ditaa.org][ob-doc-ditaa]]         |                   |
+| Emacs lisp    | =emacs-lisp= |                      |                   |
+| [[https://www.gnu.org/software/emacs/manual/html_mono/eshell.html][Eshell]]        | =eshell=     | [[file:ob-doc-eshell.org][ob-doc-eshell]]        | stardiviner       |
+| [[https://en.wikipedia.org/wiki/List_of_compilers#Fortran_compilers][Fortran]]       | =F90=        |                      |                   |
+| [[https://www.gnu.org/software/gforth/][Gforth]]        | =forth=      |                      |                   |
+| [[http://www.gnuplot.info/][Gnuplot]]       | =gnuplot=    | [[file:ob-doc-gnuplot.org][ob-doc-gnuplot]]       |                   |
+| [[https://www.gnu.org/software/screen/][GNU Screen]]    | =screen=     | [[file:ob-doc-screen.org][ob-doc-screen]]        | Ken Mankoff       |
+| [[https://www.gnu.org/software/sed/][GNU sed]]       | =sed=        |                      |                   |
+| [[http://www.graphviz.org/][Graphviz]]      | =dot=        | [[file:ob-doc-dot.org][ob-doc-dot]]           | Justin Abrahms    |
+| [[http://www.haskell.org/][Haskell]]       | =haskell=    |                      | Lawrence Bottorff |
+| [[https://openjdk.java.net/][Java]]          | =java=       | [[file:ob-doc-java.org][ob-doc-java]]          | Ian Martins       |
+| [[https://julialang.org/][Julia]]         | =julia=      |                      | Pedro Bruel       |
+| [[http://www.latex-project.org/][LaTeX]]         | =latex=      | [[file:ob-doc-LaTeX.org][ob-doc-LaTeX]]         |                   |
+| [[http://lilypond.org/][LilyPond]]      | =ly=         | [[file:ob-doc-lilypond.org][ob-doc-lilypond]]      |                   |
+| [[https://en.wikipedia.org/wiki/List_of_compilers#Common_Lisp_compilers][Lisp]]          | =lisp=       | [[file:ob-doc-lisp.org][ob-doc-lisp]]          |                   |
+| [[http://www.lua.org/][Lua]]           | =lua=        |                      |                   |
+| [[https://en.wikipedia.org/wiki/Make_(software)#Derivatives][Make]]          | =makefile=   | [[file:ob-doc-makefile.org][ob-doc-makefile]]      |                   |
+| [[https://www.mathworks.com/products/matlab.html][MATLAB®]]       | =matlab=     | [[file:ob-doc-octave-matlab.org][ob-doc-octav-matlab]]  |                   |
+| [[http://maxima.sourceforge.net/][Maxima]]        | =max=        | [[file:ob-doc-maxima.org][ob-doc-maxima]]        |                   |
+| [[http://nodejs.org/][Node.js]]       | =js=         | [[file:ob-doc-js.org][ob-doc-js]]            |                   |
+| [[http://caml.inria.fr/][OCaml]]         | =ocaml=      |                      |                   |
+| [[https://www.gnu.org/software/octave/][Octave]]        | =octave=     | [[file:ob-doc-octave-matlab.org][ob-doc-octave-matlab]] |                   |
+| [[https://orgmode.org/][Org mode]]      | =org=        |                      |                   |
+| [[http://www.perl.org/][Perl]]          | =perl=       | [[file:ob-doc-perl.org][ob-doc-perl]]          | Corwin Brust      |
+| [[https://plantuml.com][PlantUML]]      | =plantuml=   |                      |                   |
+| [[https://processing.org/][Processing]]    | =processing= |                      |                   |
+| [[http://www.python.org/][Python]]        | =python=     | [[file:ob-doc-python.org][ob-doc-python]]        | Jack Kamm         |
+| [[http://www.r-project.org/][R]]             | =R=          | [[file:ob-doc-R.org][ob-doc-R]]             | Jeremie Juste     |
+| [[https://en.wikipedia.org/wiki/Relational_database#RDBMS][RDBMS]]         | =sql=        | [[file:ob-doc-sql.org][ob-doc-sql]]           |                   |
+| [[http://www.ruby-lang.org/][Ruby]]          | =ruby=       |                      |                   |
+| [[http://sass-lang.com/][Sass]]          | =sass=       |                      |                   |
+| [[https://en.wikipedia.org/wiki/List_of_compilers#Scheme_compilers_and_interpreters][Scheme]]        | =scheme=     |                      |                   |
+| [[http://www.sqlite.org/index.html][SQLite]]        | =sqlite=     | [[file:ob-doc-sqlite.org][ob-doc-sqlite]]        | Nick Savage       |
+
+** Language Support Distributed with Org-contrib
+Once upon a time, Babel language support that was not released under
+the [[https://www.gnu.org/licenses/gpl-3.0.en.html][GPL]] was kept in [[https://git.sr.ht/~bzg/org-contrib][Org-contrib]].  Later, with the goal of easing the
+burden of Org-mode maintenance, lesser-known languages distributed
+with Emacs were also moved to [[https://git.sr.ht/~bzg/org-contrib][Org-contrib]].  Table
+[[contributed-languages]] includes pointers to these languages and some
+documentation of their Babel integration.
+
+#+caption: Contributed languages supported by Babel
+#+name: contributed-languages
+| Language      | Identifier    | Documentation     |
+|---------------+---------------+-------------------|
+| [[https://abcnotation.com/][abc]]           | =abc=         | [[file:ob-doc-abc.org][ob-doc-abc]]        |
+| [[https://www.arduino.cc/][Arduino]]       | =arduino=     |                   |
+| [[http://asymptote.sourceforge.net/][Asymptote]]     | =asymptote=   | [[file:ob-doc-asymptote.org][ob-doc-asymptote]]  |
+| [[https://coq.inria.fr/][Coq]]           | =coq=         |                   |
+| [[https://www.emacswiki.org/emacs/EbnfToPsPackage][ebnf2ps]]       | =ebnf=        |                   |
+| [[http://fomus.sourceforge.net/][FOMUS]]         | =fomus=       |                   |
+| [[https://hledger.org/][hledger]]       | =hledger=     |                   |
+| [[https://iolanguage.org/index.html][io]]            | =io=          |                   |
+| [[http://www.jsoftware.com/][J]]             | =J=           | [[file:ob-doc-J.org][ob-doc-J]]          |
+| [[http://wiki.github.com/jwiegley/ledger/][ledger]]        | =ledger=      | [[file:ob-doc-ledger.org][ob-doc-ledger]]     |
+| [[https://www.wolfram.com/mathematica/][Mathematica]]   | =mathematica= |                   |
+| [[https://github.com/mfillpot/mathomatic][Mathomatic™]]   | =mathomatic=  | [[file:ob-doc-mathomatic.org][ob-doc-mathomatic]] |
+| [[https://www.mono-project.com/][Mono]]          | =csharp=      |                   |
+| [[https://github.com/mono/mono][Mono]]          | =vbnet=       |                   |
+| [[http://www.mozart2.org/][Mozart]]        | =oz=          | [[file:ob-doc-oz.org][ob-doc-oz]]         |
+| [[http://www.mcternan.me.uk/mscgen/][Mscgen]]        | =mscgen=      | [[file:ob-doc-mscgen.org][ob-doc-mscgen]]     |
+| [[https://www.php.net/][PHP]]           | =php=         |                   |
+| [[http://picolisp.com/5000/!wiki?home][PicoLisp]]      | =picolisp=    | [[file:ob-doc-picolisp.org][ob-doc-picolisp]]   |
+| [[https://redis.io/][Redis]]         | =redis=       |                   |
+| [[http://www.shenlanguage.org/][Shen]]          | =shen=        |                   |
+| [[https://archive.epa.gov/med/med_archive_03/web/html/smiles.html][SMILES]]        | =smiles=      |                   |
+| [[http://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/][SPICE]]         | =spice=       |                   |
+| [[http://mc-stan.org/][Stan]]          | =stan=        | [[file:ob-doc-stan.org][ob-doc-stan]]       |
+| [[http://stata.com/][Stata]]         | =stata=       | [[file:ob-doc-stata.org][ob-doc-stata]]      |
+| [[https://supercollider.github.io/][SuperCollider]] | =sclang=      |                   |
+| [[http://www.tcl.tk/][Tcl]]           | =tcl=         | [[file:ob-doc-tcl.org][ob-doc-tcl]]        |
+| [[https://wiki.gnome.org/Projects/Vala][Vala]]          | =vala=        | [[file:ob-doc-vala.org][ob-doc-vala]]       |
+| [[http://eukleides.org/][ΕΥΚΛΕΙΔΗΣ]]     | =eukleides=   | [[file:ob-doc-eukleides.org][ob-doc-eukleides]]  |
+
+** Language Support Distributed via an Emacs Lisp Package Archive
+
+Most language support is distributed through an [[https://www.emacswiki.org/emacs/ELPA][Emacs Lisp Package
+Archive]]. You can find the Babel language support available on your
+setup with =M-x list-packages=.  In theory, it ought to be possible to
+identify all the Babel language support packages with a keyword search
+using =M-x package-menu-filter=, but this method is unreliable because
+package developers do not subscribe to a keyword authority list.  In
+practice, you can search for package names that start with =ob-= and
+go from there.
 
 * Activate a Language
   :PROPERTIES:
