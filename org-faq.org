@@ -328,17 +328,16 @@ Please check [[file:org-papers.org][the Org papers page]] for more references re
 #+index: Upgrade
 
 Org-mode develops quickly, which means that versions of Org-mode
-shipped with Emacs are more or less out-of-date. If you'd like to
-upgrade to the most recent version of org-mode, you have a number of
-options.
+shipped with Emacs are often older than the last stable release.  If
+you'd like to upgrade to the most recent version of org-mode, you have
+a number of options.
 
- 1. Download the [[https://orgmode.org/index.html#sec-3][most recent release]] of org-mode as zip or tarball and
-    follow the [[https://orgmode.org/manual/Installation.html#Installation][installation instructions]] in the manual.
+ 1. Install Org from GNU ELPA and the Emacs package manager as
+    [[#installing-via-elpa][explained in this FAQ]].
+
  2. Clone and install the development git repository as [[#keeping-current-with-Org-mode-development][explained
-    here]]. If you don't want to run the bleeding edge, you can still
+    here]].  If you don't want to run the bleeding edge, you can still
     use git [[#using-stable-releases-only][to track the most recent stable releases]].
- 3. Install and updated org-mode automatically through the Emacs
-    Package Manager as [[#installing-via-elpa][explained in this FAQ]].
 
 /Note/: Please also see [[#mixed-install][Is my Orgmode installation mixed?]] for a common
 issue with mixed installations.
@@ -611,46 +610,28 @@ system.
    :CUSTOM_ID: installing-via-elpa
    :END:
 
-   Daily builds of Org-mode are distributed as an ELPA package from both
-   [[http://elpa.gnu.org/packages/][GNU Emacs Lisp Package Archive]] as well as from the [[https://orgmode.org/elpa/][Org-mode Emacs Lisp
-   Archive]].
+   Releases of Org-mode are distributed as GNU ELPA package.
 
    Steps for installing Org with package manager:
-   1) Do =M-x list-packages= to browse available packages.
-   2) If the above command is unavailable you need to [[#installing-elpa][install the package
-      manager]] before proceeding ahead.
-   3) If you see =org= as an available package, skip to step 5.
-   4) If you are here it means that org is unavailable in the GNU's
-      archives.  Report this discrepancy to [[mailto:emacs-orgmode@gnu.org][Orgmode mailing list.]]
 
-      In the meanwhile, you can manually download the tarball and
-      install it. Refer [[*How do I install Org-mode from a ELPA-compatible tarball?][to this FAQ entry]] for further information.
-   5) Press =i= to mark the package for installation
-   6) Press =x= to install
-   7) Reload Emacs
-   8) Use =M-x locate-library RET org=. If your installation is
+   1) Do =M-x list-packages= to browse available packages.
+   2) If the above command is unavailable you need to [[#installing-elpa][install the
+      package manager]] before proceeding ahead.
+   3) If you see =org= as an available package.
+   4) Press =i= to mark the package for installation
+   5) Press =x= to install
+   6) Reload Emacs
+   7) Use =M-x locate-library RET org=. If your installation is
       successful you would something like the following:
 
       =Library is file ~/.emacs.d/elpa/org-20110403/org.elc=
-
-#   7) If you get the following error "*Failed to download `Org-mode'
-#      archive.*" in step 2, you can manually download the tarball and
-#      install it.
-#
-#   8) Add Orgmode as a package archive. This can be done in two ways:
-#   9) Use =M-x customize-variable RET package-archives=
-#   10) Add the following line to your =.emacs= and reload Emacs.
-#       #+begin_src emacs-lisp
-#         (add-to-list 'package-archives '("Org-mode" . "https://orgmode.org/elpa/"))
-#       #+end_src
-#
 
 ** How do I install Emacs package manager?
    :PROPERTIES:
    :CUSTOM_ID: installing-elpa
    :END:
 
-   If you are running Emacs 24 or find the command =M-x list-packages=
+   If you are running Emacs >=24 or find the command =M-x list-packages=
    available you already have the package manager installed.
 
    Steps for installing package manager on emacs-23:
@@ -666,67 +647,7 @@ system.
         (require 'package)
         (package-initialize)
       #+end_src
-
-** I don't see Org-mode as an installation option in Package Manager Menu?
-   :PROPERTIES:
-   :CUSTOM_ID: why-no-org-in-elpa
-   :END:
-
-   Emacs Package Manager is a very recent addition to Emacs. Work is
-   under way to have have Org-mode seamlessly integrate with Emacs'
-   Package Manager. As a result, it will be some time before the
-   Org-mode packages are available and usable from either GNU or
-   Org-mode package archives.
-
-   In the meanwhile, you can install Org-mode via package manager
-   through ELPA-compatible tar. Refer [[#installing-from-elpa-tarball][to this FAQ entry]] for more
-   information.
-
-** How do I install Org-mode from a ELPA-compatible tarball?
-   :PROPERTIES:
-   :CUSTOM_ID: installing-from-elpa-tarball
-   :END:
-
-#+index: ELPA
-
-   Org-mode is distributed as an ELPA-compatible tar which can be used
-   in conjunction with Emacs' package manager.
-
-   1. If you are already running Org-mode, note the current version
-      reported by M-x org-version.
-   2. Download the latest tarball from [[https://orgmode.org/elpa/][Org-mode repo]].
-   3. Do =M-x package-install-file=. When prompted for =Package file
-      name=, point it to .tar file downloaded in step 2.
-
-      You will now see Package Manager compiling the files and
-      installing it.
-   4. Reload emacs. This step is very important.
-   5. Note the version of the new installation using M-x
-      org-version. If the new and old versions are different, the
-      installation is done and you are all set to enjoy the updated
-      Org-mode. Otherwise skip to step 6.
-   6. Review you load-path using =C-h v load-path=. Most likely that
-      your old installation path takes precedence over the path chosen
-      by package manager (which is typically
-      =~/.emacs.d/elpa/...=). Fix this anamoly by moving
-      =(package-initialize)= line in .emacs to a more appropriate
-      location.
-
-** Why would I use ELPA tarballs instead of the snapshot tarballs?
-   :PROPERTIES:
-   :CUSTOM_ID: why-elpa
-   :END:
-
-#+index: ELPA
-
-   ELPA-tarballs automate much the process of upgrading org-mode. Much
-   of the following grunt work is done automatically by the Package
-   Manager:
-
-   1. Downloading, compiling, and activating of org-mode (including
-      setting org-mode's =load-path= and autoloads).
-   2. Updating info files.
-
+      
 * Setup
   :PROPERTIES:
   :CUSTOM_ID: Setup
