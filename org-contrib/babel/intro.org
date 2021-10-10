@@ -124,7 +124,8 @@ It shows the mean as 0.00, when the table above it shows 0.77.
 The LOB was moved out of Org and now lives on Worg.  Need to sort this, perhaps with directions on how to install the LOB from Worg.
 ** TODO HTML export of code appears broken in [[#literate-programming][another section]]
 Here, the export appears to be missing entirely.
-** TODO Remove texttt characters from headings
+** DONE Remove texttt characters from headings
+CLOSED: [2021-10-09 Sat 16:12]
 They look small and weird.
 ** TODO Starter kit links in [[#emacs-initialization][this section]] are to an archived project and a deprecated project
 Are literate starter kits a thing anymore?
@@ -315,7 +316,7 @@ Here are examples of code blocks in four different languages,
 followed by their output. If you are viewing the Org version of
 this document in Emacs, place point anywhere inside a block and press
 =_C-c C-c_= to run the code[fn:1] (and feel free to alter it!).
-*** =Ruby=
+*** Ruby
 In the Org file:
 : #+begin_src ruby
 : "This block was last evaluated on #{Date.today}"
@@ -330,7 +331,7 @@ HTML export of the resulting string:
 #+resname:
 : This block was last evaluated on 2009-08-09
 
-*** =Shell=
+*** Shell
 In the Org file:
 : #+begin_src shell
 :   echo "This file takes up `du -h org-babel.org |sed 's/\([0-9k]*\)[ ]*org-babel.org/\1/'`"
@@ -345,7 +346,7 @@ HTML export of the resulting string:
 #+RESULTS:
 : This file takes up 4.0K
 
-*** [[http://www.r-project.org/][=R=]]
+*** [[http://www.r-project.org/][R]]
 What are the most common words in this file?
 In the Org file:
 : #+begin_src R :colnames yes
@@ -365,7 +366,7 @@ t(sort(table(words[nchar(words) > 3]), decreasing=TRUE)[1:10])
 |------+-----------+-------------+---------+------+-------+-------+------+------+--------|
 |   90 |        47 |          44 |      44 |   43 |    41 |    41 |   37 |   36 |     26 |
 
-*** [[http://ditaa.sourceforge.net/][=ditaa=]]
+*** [[http://ditaa.sourceforge.net/][ditaa]]
 
     In the Org file:
     : #+begin_src ditaa :file blue.png :cmdline -r
@@ -402,19 +403,21 @@ t(sort(table(words[nchar(words) > 3]), decreasing=TRUE)[1:10])
    the results of code evaluation: functional mode and scripting
    mode.  The choice of mode is specified by the =:results= header
    argument.
-*** =:results value= (functional mode)
+*** Functional Mode
     :PROPERTIES:
     :CUSTOM_ID: results-value
     :END:
     The 'result' of code evaluation is the *value* of the last
-    statement in the code block. In functional mode, the
-    code block is a function with a return value. The return
-    value of one code block can be used as input for another
-    code block, even one in a different language.  In this
+    statement in the code block. In functional mode, the code block is
+    a function with a return value. Functional mode is indicated by
+    setting the header argument =:results value=.
+
+    The return value of one code block can be used as input for
+    another code block, even one in a different language.  In this
     way, Org Babel becomes a [[#meta-programming-language][meta-programming language]]. If the block
     returns tabular data (a vector, array or table of some sort) then
-    this will be held as an Org table in the buffer. This
-    setting is the default.
+    this will be held as an Org table in the buffer. This setting is
+    the default.
 
     For example, consider the following block of python code and its
     output.
@@ -432,17 +435,20 @@ return 2 + 2
     Notice that, in functional mode, the output consists of the value of
     the last statement and nothing else.
 
-*** =:results output= (scripting mode)
+*** Scripting Mode
     :PROPERTIES:
     :CUSTOM_ID: results-output
     :END:
 
-    In scripting mode, Org Babel captures the text output of the
-    code block and places it in the Org buffer. It is
-    called scripting mode because the code block contains a series of
-    commands, and the output of each command is returned. Unlike
-    functional mode, the code block itself has no return value
-    apart from the output of the commands it contains.[fn:2]
+    In scripting mode, Org Babel captures the text output of the code
+    block and places it in the Org buffer.  Scripting mode is
+    indicated by setting the header argument =:results output=.
+
+    It is called scripting mode because the code block contains a
+    series of commands, and the output of each command is
+    returned. Unlike functional mode, the code block itself has no
+    return value apart from the output of the commands it
+    contains.[fn:2]
 
     Consider the result of evaluating this code block with
     scripting mode.
@@ -496,7 +502,7 @@ print('Two plus two is')
    the status of *functions*. Arguments can be passed to code blocks in
    both functional and scripting modes.
 
-*** Simple example of using a code block as a function
+*** Using a Code Block as a Function
 
     First let's look at a very simple example. The following source
     code block defines a function, using python, that squares its argument.
@@ -526,7 +532,7 @@ return x*x
     #+results: square(x=6)
     : 36
 
-*** A more complex example using an Org table as input
+*** Using an Org Table as Input
 
     In this example we define a function called =fibonacci-seq=, using
     Emacs Lisp.  The function =fibonacci-seq= computes a Fibonacci
@@ -626,8 +632,7 @@ return x*x
   )
    #+end_src
 
-
-** A Meta-programming Language for Org
+** A Meta-Programming Language for Org
    :PROPERTIES:
    :CUSTOM_ID: meta-programming-language
    :END:
@@ -701,7 +706,7 @@ return x*x
   What Org Babel adds is the ability to use code blocks (in whatever
   language) in the =#+TBLFM= line to perform the necessary computation.
 
-*** Example 1: Data Summaries Using =R=
+*** Example 1: Data Summaries Using R
     As a simple example, we'll fill in a cell in an Org table with the
     average value of a few numbers. First, let's make some data. The
     following source block creates an Org table filled with five random
@@ -797,7 +802,7 @@ colMeans(x)
     | R                | basic-R      |     |          13 |          13 | pass |
     #+TBLFM: $5='(if (= (length $3) 1) (sbe $2 (n $3)) (sbe $2)) :: $6='(if (string= $4 $5) "pass" (format "expected %S but was %S" $4 $5))
 
-**** code blocks for tests
+**** Code Blocks for Tests
 
      In the Org file:
 
@@ -957,7 +962,7 @@ colMeans(x)
   The [[#literate-programming-example][following example]] demonstrates the process of *tangling* in
   Org Babel.
 
-*** Simple Literate Programming Example (Noweb syntax)
+*** Simple Literate Programming Example (Noweb Syntax)
     :PROPERTIES:
     :CUSTOM_ID: literate-programming-example
     :END:
