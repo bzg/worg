@@ -19,7 +19,7 @@
      rerunning the same calculation.  The cache uses a sha1 hash key of the
      source code body and the header arguments to determine if
      recalculation is required.  These hash keys are kept mostly hidden in
-     the #+resname line of the results of the block.  This behavior is
+     the #+results line of the results of the block.  This behavior is
      turned off by default.  It is controlled through the :cache
      and :nocache header arguments.  To enable caching on a single block
      add the :cache header argument, to enable global caching change the
@@ -30,7 +30,7 @@
      (assq-delete-all :nocache org-babel-default-header-args)))
 
    - It is now possible to fold results by tabbing on the beginning of the
-     #+resname line.  This can be done automatically to all results on
+     #+results line.  This can be done automatically to all results on
      opening of a file by adding the following to your org-mode hook
 
      (add-hook 'org-mode-hook 'org-babel-result-hide-all)
@@ -40,10 +40,6 @@
 
      :file (format "%s/images/pca-scatter.png" dir)
 
-** TODO Example of an [[*In-line Code Blocks][inline code block]] is cryptic
-Revise the example to approximate the style of the manual.
-** TODO #+resname: is deprecated
-Change #+resname: to #+name: globally.
 ** TODO Language specific header arguments
    -    org-babel: capture graphical output from R
 
@@ -88,7 +84,7 @@ Change #+resname: to #+name: globally.
  55
    #+end_src
 
-   #+resname: fileoutput
+   #+results: fileoutput
    [[file:outfile.txt]]
 
    This functionality is now available for ruby & python in branch
@@ -115,20 +111,32 @@ Change #+resname: to #+name: globally.
 
 ** TODO The Header Arguments section of the manual has been reorganized
 Now, the header arguments are dispersed through the manual according to function.  Figure out how to replace references to the old manual section.
-** TODO The Org manual has a style for meta-information in examples
-e.g, #+NAME: <name>
-Change the meta-information in this document to match the manual style.
 ** TODO HTML export of code appears broken in [[#spreadsheet][this section]]
 It shows the mean as 0.00, when the table above it shows 0.77.
-** TODO Is it correct to say that Org Babel is pre-populated with LOB in [[#library-of-babel][this section]]?
+** TODO Starter kit links in [[#emacs-initialization][this section]] are to an archived project and a deprecated project
+Are literate starter kits a thing anymore?
+** DONE Get rid of underscores in tt markup
+CLOSED: [2021-10-16 Sat 15:30]
+Change =_Ctrl C '_= to =Ctrl C '=
+** DONE Example of an [[*In-line Code Blocks][inline code block]] is cryptic
+CLOSED: [2021-10-16 Sat 15:26]
+Revise the example to approximate the style of the manual.
+** DONE #+resname: is deprecated
+CLOSED: [2021-10-16 Sat 10:19]
+Change #+resname: to #+results: globally.
+** DONE The Org manual has a style for meta-information in examples
+CLOSED: [2021-10-16 Sat 15:27]
+e.g, #+NAME: <name>
+Change the meta-information in this document to match the manual style.
+** DONE Is it correct to say that Org Babel is pre-populated with LOB in [[#library-of-babel][this section]]?
+CLOSED: [2021-10-16 Sat 15:27]
 The LOB was moved out of Org and now lives on Worg.  Need to sort this, perhaps with directions on how to install the LOB from Worg.
-** TODO HTML export of code appears broken in [[#literate-programming][another section]]
+** DONE HTML export of code appears broken in [[#literate-programming][another section]]
+CLOSED: [2021-10-16 Sat 15:28]
 Here, the export appears to be missing entirely.
 ** DONE Remove texttt characters from headings
 CLOSED: [2021-10-09 Sat 16:12]
 They look small and weird.
-** TODO Starter kit links in [[#emacs-initialization][this section]] are to an archived project and a deprecated project
-Are literate starter kits a thing anymore?
 ** DONE Regularize programming language names
 CLOSED: [2021-10-09 Sat 15:15]
 Typically, the programming language name is capitalized, even though command line calls to the language are not.  Change language names throughout to recognize this distinction.  NB some programming language names are not capitalized.
@@ -256,12 +264,12 @@ Change "sh" to "shell"
    Org file.  Code blocks can be entered directly into the
    Org file, but it is often easier to enter code with the
    function =org-edit-src-code=, which is called with the keyboard
-   shortcut, =_C-c '_=.  This places the code block in a new buffer with
+   shortcut, =C-c '=.  This places the code block in a new buffer with
    the appropriate mode activated.
 
    #+begin_src org
-  ,#+begin_src language org-switches
-  ,body
+  ,#+begin_src <language> <switches> 
+  ,<body>
   ,#+end_src
    #+end_src
 
@@ -284,23 +292,23 @@ Change "sh" to "shell"
    structure becomes:
 
    #+begin_src org
-  ,#+begin_src language  org-switches header-arguments
-  ,body
+  ,#+begin_src <language>  <switches> <header arguments>
+  ,<body>
   ,#+end_src
    #+end_src
 
-
-   - language :: The language of the code in the source-code block. Valid
-	values must be members of =org-babel-interpreters=.
-   - header-arguments :: Header arguments control many facets of the
+   - <language> :: The language of the code in the source-code
+     block. Valid values must be members of =org-babel-interpreters=.
+   - <switches> :: Control code execution, export, and format.     
+   - <header arguments> :: Header arguments control many facets of the
      evaluation and output of source-code blocks.  See the [[https://orgmode.org/manual/Header-arguments.html#Header-arguments][Header
      Arguments]] section for a complete review of available header
      arguments.
-   - body :: The source code to be evaluated.  An important key-binding
-	is =​C-c '​=.  This calls =org-edit-src-code=, a function that brings
-	up an edit buffer containing the code using the Emacs major mode
-	appropriate to the language.  You can edit your code block
-	as you regularly would in Emacs.
+   - <body> :: The source code to be evaluated.  An important
+     key-binding is =C-c '=.  This calls =org-edit-src-code=, a
+     function that brings up an edit buffer containing the code using
+     the Emacs major mode appropriate to the language.  You can edit
+     your code block as you regularly would in Emacs.
 
 * Executing Source Code
   :PROPERTIES:
@@ -315,7 +323,7 @@ Change "sh" to "shell"
 Here are examples of code blocks in four different languages,
 followed by their output. If you are viewing the Org version of
 this document in Emacs, place point anywhere inside a block and press
-=_C-c C-c_= to run the code[fn:1] (and feel free to alter it!).
+=C-c C-c= to run the code[fn:1] (and feel free to alter it!).
 *** Ruby
 In the Org file:
 : #+begin_src ruby
@@ -328,7 +336,7 @@ HTML export of code:
 #+end_src
 
 HTML export of the resulting string:
-#+resname:
+#+results:
 : This block was last evaluated on 2009-08-09
 
 *** Shell
@@ -348,6 +356,7 @@ HTML export of the resulting string:
 
 *** [[http://www.r-project.org/][R]]
 What are the most common words in this file?
+
 In the Org file:
 : #+begin_src R :colnames yes
 :   words <- tolower(scan("intro.org", what="", na.strings=c("|",":")))
@@ -356,15 +365,18 @@ In the Org file:
 
 HTML export of code:
 
-#+begin_src R :colnames yes
+#+name: r-tutorial-example
+#+begin_src R :colnames yes :exports both
 words <- tolower(scan("intro.org", what="", na.strings=c("|",":")))
 t(sort(table(words[nchar(words) > 3]), decreasing=TRUE)[1:10])
 #+end_src
 
-#+RESULTS:
-| code | #+end_src | #+begin_src | #+name: | with | babel | block | this | that | blocks |
-|------+-----------+-------------+---------+------+-------+-------+------+------+--------|
-|   90 |        47 |          44 |      44 |   43 |    41 |    41 |   37 |   36 |     26 |
+HTML export of the resulting table:
+
+#+RESULTS: r-tutorial-example
+| code | #+end_src | #+name: | #+begin_src | babel | with | block | this | that | blocks |
+|------+-----------+---------+-------------+-------+------+-------+------+------+--------|
+|   90 |        47 |      45 |          44 |    43 |   43 |    41 |   37 |   36 |     27 |
 
 *** [[http://ditaa.sourceforge.net/][ditaa]]
 
@@ -381,6 +393,7 @@ t(sort(table(words[nchar(words) > 3]), decreasing=TRUE)[1:10])
 
     HTML export of code:
     #+name: ditaa-blue
+    #+header: :exports both
     #+begin_src ditaa :file ../../images/babel/blue.png :cmdline -r
 +---------+
 | cBLU    |
@@ -422,14 +435,15 @@ t(sort(table(words[nchar(words) > 3]), decreasing=TRUE)[1:10])
     For example, consider the following block of python code and its
     output.
 
-    #+begin_src python :results value
+    #+name: python-tutorial-functional-mode
+    #+begin_src python :results value :exports both
 import time
 print("Hello, today's date is %s" % time.ctime())
 print('Two plus two is')
 return 2 + 2
     #+end_src
 
-    #+resname:
+    #+RESULTS: python-tutorial-functional-mode
     : 4
 
     Notice that, in functional mode, the output consists of the value of
@@ -453,21 +467,22 @@ return 2 + 2
     Consider the result of evaluating this code block with
     scripting mode.
 
-    #+name: name
-    #+begin_src python :results output
+    #+name: python-tutorial-scripting-mode
+    #+begin_src python :results output :exports both
 import time
 print("Hello, today's date is %s" % time.ctime())
 print('Two plus two is')
 2 + 2
     #+end_src
 
-    #+resname: name
-    : Hello, today's date is Wed Nov 11 18:50:36 2009
+    #+RESULTS: python-tutorial-scripting-mode
+    : Hello, today's date is Sat Oct 16 10:48:47 2021
     : Two plus two is
 
-    Here, scripting mode returned the text that python sent to =stdout=.  Because
-    the code block doesn't include a =print()= statement for the last
-    value, =(2 + 2)=, 4 does not appear in the results.
+    Here, scripting mode returned the text that python sent to
+    =stdout= with the two =print()= statements.  Because the code
+    block doesn't include a =print()= statement for the last value,
+    =(2 + 2)=, 4 does not appear in the results.
 
 ** Session-based Evaluation
    For some languages, such as =Python=, =R=, =Ruby= and =shell=, it is
@@ -508,7 +523,7 @@ print('Two plus two is')
     code block defines a function, using python, that squares its argument.
 
     #+name: square
-    #+header: :var x=0
+    #+header: :var x=0 :exports code 
     #+begin_src python
 return x*x
     #+end_src
@@ -520,16 +535,14 @@ return x*x
     : return x*x
     : #+end_src
 
-
-    Now we use the source block:
+    Now we use the source block (for information on the =#+call:= syntax see [[#library-of-babel][Library of Babel]]):
 
     : #+call: square(x=6)
 
-    (/for information on the/ =call= /syntax see/ [[#library-of-babel][Library of Babel]])
-
+    #+name: call-square
     #+call: square(x=6)
 
-    #+results: square(x=6)
+    #+RESULTS: call-square
     : 36
 
 *** Using an Org Table as Input
@@ -552,7 +565,7 @@ return x*x
 
     The [[http://www.gnu.org/software/emacs/manual/elisp.html][Emacs Lisp]] source code:
     #+name: fibonacci-seq
-    #+begin_src emacs-lisp :var fib-inputs=fibonacci-inputs
+    #+begin_src emacs-lisp :var fib-inputs=fibonacci-inputs :exports both
   (defun fibonacci (n)
     (if (or (= n 0) (= n 1))
         n
@@ -564,7 +577,7 @@ return x*x
 
     In the Org buffer the function looks like this:
     : #+name: fibonacci-seq
-    : #+begin_src emacs-lisp :var fib-inputs=fibonacci-inputs
+    : #+begin_src emacs-lisp :var fib-inputs=fibonacci-inputs 
     :   (defun fibonacci (n)
     :     (if (or (= n 0) (= n 1))
     :         n
@@ -575,14 +588,14 @@ return x*x
     : #+end_src
 
     The return value of =fibonacci-seq= is a table:
-    #+resname:
+    #+RESULTS: fibonacci-seq
     | 1 | 1 | 2 |  3 |  5 |   8 |  13 |  21 |   34 |   55 |
     | 1 | 3 | 8 | 21 | 55 | 144 | 377 | 987 | 2584 | 6765 |
 
 ** In-line Code Blocks
    Code can be evaluated in-line using the following syntax:
 
-   : Without header args: src_lang{code} or with header args: src_lang[args]{code},
+   : Without header args: src_<lang>{<code>} or with header args: src_<lang[<args>]{<code>},
    : for example src_python[:session]{10*x}, where x is a variable existing in the
    : python session.
 
@@ -594,17 +607,18 @@ return x*x
    tangling.  Expansion takes into account header arguments and
    variables.
 
-   - preview :: =C-c M-b p= is bound to =org-babel-expand-src-block=.  It
-	can be used inside a code block to preview the expanded
-	contents. This facility is useful for debugging.
+   - preview :: The shortcut, =C-c M-b p=, is bound to the function,
+     =org-babel-expand-src-block=.  It can be used inside a code block
+     to preview the expanded contents. This facility is useful for
+     debugging.
 
-   - tangling :: The expanded body can be tangled.  Tangling this way includes
-	variable values that  may be
+   - tangling :: The expanded body can be tangled.  Tangling this way
+     includes variable values that may be
 	- the results of other code blocks,
 	- variables stored in headline properties, or
 	- tables.
 
-	One possible use for tangling expanded code block is for emacs
+	One possible use for tangling expanded code block is for =Emacs=
 	initialization.  Values such as user names and passwords can be
 	stored in headline properties or in tables.  The =:no-expand=
 	header argument can be used to inhibit expansion of a code block
@@ -624,7 +638,7 @@ return x*x
   (setq my-special-password (first (second data)))
    #+end_src
 
-   With point inside the code block,  =C-c M-b p= expands the contents:
+   With point inside the code block, =C-c M-b p= expands the contents:
    #+begin_src emacs-lisp
   (let ((data (quote (("john-doe") ("abc123")))))
   (setq my-special-username (first (first data)))
@@ -646,17 +660,17 @@ return x*x
 
    For example, let's take some system diagnostics in the shell and graph them with R.
 
-   1. Create a code block, using shell code, to list
-      directories in our home directory, together with their
-      sizes. Org Babel automatically converts the output into an Org
-      table.
-
+   First, create a code block, using shell code, to list directories
+   in our home directory together with their sizes. Org Babel
+   automatically converts the output into an Org table.
+      
    : #+name: directories
    : #+begin_src shell :results replace
    :   cd ~ && du -sc * |grep -v total
    : #+end_src
-
-   #+resname: directories
+   
+   #+name: directories
+   #+results: directories
    |       72 | "Desktop"   |
    | 12156104 | "Documents" |
    |  3482440 | "Downloads" |
@@ -672,23 +686,27 @@ return x*x
    |  3821872 | "mail"      |
    | 10605392 | "src"       |
    |     1264 | "tools"     |
-
-   2. A function, written with a single line of R code, plots the data
-      in the Org table as a
-      pie-chart. Note how this code block uses the =srcname=
-      of the previous code block to obtain the data.
+   
+   Next write a function with a single line of R code that plots the
+   data in the Org table as a dot chart. Note how this code block uses
+   the =name= of the previous code block to obtain the data.
 
    In the Org file:
-   : #+name: directory-pie-chart(dirs = directories)
-   : #+begin_src R :session R-pie-example :file ../../images/babel/dirs.png
-   :   pie(dirs[,1], labels = dirs[,2])
+   : #+name: directory-dot-chart
+   : #+header: :var dirs=directories() :exports both
+   : #+begin_src R :results graphics file :file ../../images/babel/dirs.png
+   :   dotchart(dirs[,1], labels = dirs[,2])
    : #+end_src
 
    HTML export of code:
-   #+name: directory-pie-chart(dirs=directories)
-   #+begin_src R :session R-pie-example :file ../../images/babel/dirs.png
-  pie(dirs[,1], labels = dirs[,2])
+   #+name: directory-dot-chart
+   #+header: :var dirs=directories :exports both
+   #+begin_src R :results graphics file :file ../../images/babel/dirs.png
+  dotchart(dirs[,1], labels = dirs[,2])
    #+end_src
+
+   #+caption: HTML export of the directories dot chart.
+   #+RESULTS: directory-dot-chart
    [[file:../../images/babel/dirs.png]]
 
 * Using Code Blocks in Org Tables
@@ -888,41 +906,44 @@ colMeans(x)
   (see also [[https://orgmode.org/manual/Library-of-Babel.html#Library-of-Babel][Org manual:Library-of-Babel]])
 
   As we saw above with the [[*Using a Code Block as a Function][square]] example, once a source block
-  function has been defined it can be called using the =lob= notation:
+  function has been defined it can be called using the =#+call:= notation:
 
-  : #+lob: square(x=6)
+  : #+call: square(x=6)
 
   But what about code blocks that you want to make available to
   every Org buffer?
 
   In addition to the current buffer, Org Babel searches for
-  pre-defined code block functions in the Library of
-  Babel. This is a user-extensible collection of ready-made source
-  code blocks for handling common tasks.  One use for the Library of
-  Babel (not yet done!) will be to provide a choice of data graphing
-  procedures for data held in Org tables, using languages such as
-  =R=, =Gnuplot=, =Asymptote=, etc. If you implement something that might be
-  of use to other Org users, please consider adding it to the
-  Library of Babel; similarly, feel free to request help solving a
-  problem using external code via Org Babel -- there's always a chance
-  that other Org Babel users will be able to contribute some helpful
-  code.
+  pre-defined code block functions in files that have been assigned to
+  the Library of Babel, a user-extensible collection of source code
+  blocks.
 
-  Org Babel comes pre-populated with the code blocks located in
-  the [[file:library-of-babel.org][Library of Babel]] file---raw file at
-  @@html: <a href="https://git.sr.ht/~bzg/worg/tree/master/item/library-of-babel.org">library-of-babel.org</a>@@
-  --. It is possible to add code blocks to the library from any
-  Org file using the =org-babel-lob-ingest= (bound to =C-c C-v
-  l=).
+# One use for the Library of
+#   Babel (not yet done!) will be to provide a choice of data graphing
+#   procedures for data held in Org tables, using languages such as
+#   =R=, =Gnuplot=, =Asymptote=, etc. If you implement something that might be
+#   of use to other Org users, please consider adding it to the
+#   Library of Babel; similarly, feel free to request help solving a
+#   problem using external code via Org Babel -- there's always a chance
+#   that other Org Babel users will be able to contribute some helpful
+#   code.
+
+  Once upon a time, Org Mode was distributed with the eponymous
+  [[file:library-of-babel.org][Library of Babel]] file.  This file, which includes a wide variety of
+  source code blocks for common tasks, is now available at @@html: <a href="https://git.sr.ht/~bzg/worg/tree/master/item/library-of-babel.org">library-of-babel.org</a>@@.
+
+  In practice, you are free to register as many files as you wish to your Library of Babel 
+  using the function, =org-babel-lob-ingest=, which is bound to =C-c C-v l=.
 
   #+name: add-file-to-lob
-  #+begin_src emacs-lisp
+  #+begin_src emacs-lisp :exports code
   (org-babel-lob-ingest "path/to/file.org")
   #+end_src
 
   Note that it is possible to pass table values or the output of a
-  source-code block to Library of Babel functions. It is also possible
-  to reference Library of Babel functions in arguments to code blocks.
+  source-code block to registered Library of Babel functions. It is
+  also possible to reference registered Library of Babel functions in
+  arguments to code blocks.
 
 * Literate Programming
   :PROPERTIES:
@@ -1004,7 +1025,6 @@ colMeans(x)
   echo "\-----------------------------------------------------------/"
     #+end_src
 
-
     The third code block does have a =tangle= header argument
     indicating the name of the file to which the tangled source code will
     be written.  It also has [[http://www.cs.tufts.edu/~nr/noweb/][Noweb]] style references to the two previous
@@ -1013,7 +1033,7 @@ colMeans(x)
 
     In the Org file:
     : #+name: hello-world
-    : #+begin_src shell :tangle hello :exports none :noweb yes
+    : #+begin_src shell :tangle hello :exports results :noweb yes :results raw
     :   <<hello-world-prefix>>
     :   echo "|                       hello world                         |"
     :   <<hello-world-postfix>>
@@ -1021,12 +1041,19 @@ colMeans(x)
 
     HTML export of code:
     #+name: hello-world
-    #+begin_src shell :tangle hello.sh :exports none :noweb yes
+    #+begin_src shell :tangle hello.sh :exports both :noweb yes :results org
   <<hello-world-prefix>>
   echo "|                       hello world                         |"
   <<hello-world-postfix>>
     #+end_src
 
+    HTML export of results:
+    #+RESULTS: hello-world
+    #+begin_src org
+    /-----------------------------------------------------------\
+    |                       hello world                         |
+    \-----------------------------------------------------------/
+    #+end_src
 
     Calling =org-babel-tangle= will result in the following shell source
     code being written to the =hello.sh= file:
@@ -1043,7 +1070,7 @@ echo "\-----------------------------------------------------------/"
 # hello-world ends here
     #+end_src
 
-    In addition, the following syntax can be used to insert the *results*
+    In addition, the following Noweb syntax can be used to insert the *results*
     of evaluating a code block, in this case one named =example-block=.
 
     : # <<example-block()>>
@@ -1054,7 +1081,7 @@ echo "\-----------------------------------------------------------/"
 
     : # <<example-block(a=9)>>
 
-    sets the value of argument \"a\" equal to \"9\".  Note that
+    sets the value of argument =a= equal to =9=.  Note that
     these arguments are not evaluated in the current source-code
     block but are passed literally to =example-block()=.
 
