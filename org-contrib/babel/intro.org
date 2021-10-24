@@ -330,7 +330,7 @@ Here are examples of code blocks in four different languages,
 followed by their output. If you are viewing the Org version of
 this document in Emacs, place point anywhere inside a block and press
 =C-c C-c= to run the code[fn:1] (and feel free to alter it!).
-*** Ruby
+** Ruby
 In the Org file:
 : #+begin_src ruby
 : "This block was last evaluated on #{Date.today}"
@@ -345,7 +345,7 @@ HTML export of the resulting string:
 #+results:
 : This block was last evaluated on 2009-08-09
 
-*** Shell
+** Shell
 In the Org file:
 : #+begin_src shell
 :   echo "This file takes up `du -h org-babel.org |sed 's/\([0-9k]*\)[ ]*org-babel.org/\1/'`"
@@ -360,7 +360,7 @@ HTML export of the resulting string:
 #+RESULTS:
 : This file takes up 4.0K
 
-*** [[http://www.r-project.org/][R]]
+** R
 What are the most common words in this file?
 
 In the Org file:
@@ -384,7 +384,7 @@ HTML export of the resulting table:
 |------+-----------+---------+-------------+-------+------+-------+------+------+--------|
 |   90 |        47 |      45 |          44 |    43 |   43 |    41 |   37 |   36 |     27 |
 
-*** [[http://ditaa.sourceforge.net/][ditaa]]
+** ditaa
 
     In the Org file:
     : #+begin_src ditaa :file blue.png :cmdline -r
@@ -414,7 +414,7 @@ HTML export of the resulting table:
     #+RESULTS: ditaa-blue
     [[file:../../images/babel/blue.png]]
 
-** Capturing the Results of Code Evaluation
+* Capturing the Results of Code Evaluation
    :PROPERTIES:
    :CUSTOM_ID: results
    :END:
@@ -422,7 +422,7 @@ HTML export of the resulting table:
    the results of code evaluation: functional mode and scripting
    mode.  The choice of mode is specified by the =:results= header
    argument.
-*** Functional Mode
+** Functional Mode
     :PROPERTIES:
     :CUSTOM_ID: results-value
     :END:
@@ -455,7 +455,7 @@ return 2 + 2
     Notice that, in functional mode, the output consists of the value of
     the last statement and nothing else.
 
-*** Scripting Mode
+** Scripting Mode
     :PROPERTIES:
     :CUSTOM_ID: results-output
     :END:
@@ -490,7 +490,7 @@ print('Two plus two is')
     block doesn't include a =print()= statement for the last value,
     =(2 + 2)=, 4 does not appear in the results.
 
-** Session-based Evaluation
+* Session-based Evaluation
    For some languages, such as =Python=, =R=, =Ruby= and =shell=, it is
    possible to run an interactive session as an "inferior process"
    within Emacs. This means that an environment is created containing
@@ -514,7 +514,7 @@ print('Two plus two is')
    available, both in the =R= session, and when switching to the =R=
    code edit buffer with =​C-c '​=.
 
-** Arguments to Code Blocks
+* Arguments to Code Blocks
    :PROPERTIES:
    :CUSTOM_ID: arguments-to-source-code-blocks
    :END:
@@ -523,7 +523,7 @@ print('Two plus two is')
    the status of *functions*. Arguments can be passed to code blocks in
    both functional and scripting modes.
 
-*** Using a Code Block as a Function
+** Using a Code Block as a Function
 
     First let's look at a very simple example. The following source
     code block defines a function, using python, that squares its argument.
@@ -551,7 +551,7 @@ return x*x
     #+RESULTS: call-square
     : 36
 
-*** Using an Org Table as Input
+** Using an Org Table as Input
 
     In this example we define a function called =fibonacci-seq=, using
     Emacs Lisp.  The function =fibonacci-seq= computes a Fibonacci
@@ -598,14 +598,14 @@ return x*x
     | 1 | 1 | 2 |  3 |  5 |   8 |  13 |  21 |   34 |   55 |
     | 1 | 3 | 8 | 21 | 55 | 144 | 377 | 987 | 2584 | 6765 |
 
-** In-line Code Blocks
+* In-line Code Blocks
    Code can be evaluated in-line using the following syntax:
 
    : Without header args: src_<lang>{<code>} or with header args: src_<lang[<args>]{<code>},
    : for example src_python[:session]{10*x}, where x is a variable existing in the
    : python session.
 
-** Code Block Body Expansion
+* Code Block Body Expansion
    Org Babel "expands" code blocks prior to evaluation, i.e., the
    evaluated code comprises the code block contents augmented with
    code that assigns referenced data to variables. It is possible to
@@ -652,7 +652,7 @@ return x*x
   )
    #+end_src
 
-** A Meta-Programming Language for Org
+* A Meta-Programming Language for Org
    :PROPERTIES:
    :CUSTOM_ID: meta-programming-language
    :END:
@@ -730,7 +730,7 @@ return x*x
   What Org Babel adds is the ability to use code blocks (in whatever
   language) in the =#+TBLFM= line to perform the necessary computation.
 
-*** Example 1: Data Summaries Using R
+** Example 1: Data Summaries Using R
     As a simple example, we'll fill in a cell in an Org table with the
     average value of a few numbers. First, let's make some data. The
     following source block creates an Org table filled with five random
@@ -789,7 +789,7 @@ colMeans(x)
     is recalculated the source block will be evaluated again, and
     therefore the calculated average value will change.
 
-*** Example 2: Org Babel Test Suite
+** Example 2: Org Babel Test Suite
     While developing Org Babel, we used a suite of tests implemented
     as a large Org table.  To run the entire test suite we simply
     evaluate the table with C-u C-c C-c: all of the tests are run,
@@ -826,7 +826,7 @@ colMeans(x)
     | R                | basic-R      |     |          13 |          13 | pass |
     #+TBLFM: $5='(if (= (length $3) 1) (sbe $2 (n $3)) (sbe $2)) :: $6='(if (string= $4 $5) "pass" (format "expected %S but was %S" $4 $5))
 
-**** Code Blocks for Tests
+*** Code Blocks for Tests
 
      In the Org file:
 
@@ -989,7 +989,7 @@ colMeans(x)
   The [[#literate-programming-example][following example]] demonstrates the process of *tangling* in
   Org Babel.
 
-*** Simple Literate Programming Example (Noweb Syntax)
+** Simple Literate Programming Example (Noweb Syntax)
     :PROPERTIES:
     :CUSTOM_ID: literate-programming-example
     :END:
@@ -1091,7 +1091,7 @@ echo "\-----------------------------------------------------------/"
     these arguments are not evaluated in the current source-code
     block but are passed literally to =example-block()=.
 
-*** Emacs Initialization with Org Babel
+** Emacs Initialization with Org Babel
     :PROPERTIES:
     :CUSTOM_ID: emacs-initialization
     :END:
@@ -1113,7 +1113,7 @@ echo "\-----------------------------------------------------------/"
     Phil Hagelberg's excellent [[http://github.com/technomancy/emacs-starter-kit/tree/master][emacs-starter-kit]] available at
     [[http://github.com/eschulte/emacs-starter-kit/tree/master][Org-babel-emacs-starter-kit]].
 
-***** Literate Emacs Initialization
+*** Literate Emacs Initialization
       :PROPERTIES:
       :CUSTOM_ID: literate-emacs-init
       :END:
