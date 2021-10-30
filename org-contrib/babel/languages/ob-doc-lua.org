@@ -1,0 +1,115 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Lua Source Code Blocks in Org Mode
+#+AUTHOR:     Thomas S. Dye
+#+EMAIL:      tsd[at]tsdye[dot]online
+#+LANGUAGE:   en
+#+HTML_LINK_UP:    index.html
+#+HTML_LINK_HOME:  https://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_export html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Org Mode support for <a href="https://www.lua.org/">Lua</a>
+  </p>
+  <p>
+  <a href="https://www.lua.org/">
+  <img src="https://www.lua.org/images/luaa.gif"/>
+  </a>
+  </p>
+  </div>
+#+end_export
+
+* Template Checklist [12/12]                                       :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements and Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org Mode Features for Language Source Code Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [X] Describe [[Header Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples of Use][Examples of Use]]
+* Introduction
+The Lua site describes the language as
+#+begin_quote
+a powerful, efficient, lightweight, embeddable scripting language.  It supports procedural programming, object-oriented programming, functional programming, data-driven programming, and data description.
+#+end_quote
+Lua is commonly used as a scripting language in games.  It is the scripting language embedded in [[http://luatex.org/][LuaTeX]], an extended version of pdfTeX.
+
+  # - Range of typical uses within Org Mode.
+
+* Requirements and Setup
+
+The Lua site has the C source code for the interpreter and compilation instructions.  [[http://luabinaries.sourceforge.net/][LuaBinaries]] offers Lua libraries and executables compiled for several platforms.  Several Linux distributions either include Lua or offer it as a package.  Note that the interpreter is usually named =lua= or =lua5.3=.
+
+[[https://github.com/immerrr/lua-mode][Lua mode]] is a major mode for editing Lua sources in Emacs.  It is available from MELPA as =lua-mode=.  Code completion can be configured with [[https://emacs-lsp.github.io/lsp-mode/][LSP mode]] or [[https://github.com/ptrv/company-lua][company-lua]].
+
+Finally, you'll need to ensure that =org-babel-load-languages=
+includes an entry for Lua.  Typically, =org-babel-load-languages=
+will contain many entries.  The example below omits other languages.
+
+#+begin_src emacs-lisp 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((lua . t)))
+#+end_src
+  
+* Org Mode Features for Lua Source Code Blocks
+** Header Arguments
+   There are no Lua-specific default header arguments.
+   
+   There are no Lua-specific header arguments.
+** Sessions
+Sessions are not currently supported.
+** Result Types
+Only basic text output is supported.
+* Examples of Use
+** Hello World!
+In the Org mode buffer:
+#+begin_example
+,#+name: lua-hello-world
+,#+begin_src lua :results output :exports both
+print 'Hello World!'
+print ("Hello World!")
+,#+end_src
+#+end_example
+
+=HTML= export of the source block:
+#+name: lua-hello-world
+#+begin_src lua :results output :exports both
+print 'Hello World!'
+print ("Hello World!")
+#+end_src
+
+=HTML= export of the result:
+#+RESULTS: lua-hello-world
+: Hello World!
+: Hello World!
+** Some limitations
+
+The current implementation of =ob-lua.el= honors strings, integers, reals, or Org lists as variables.  It does not honor Org tables:
+
+#+begin_example
+org-babel-lua-var-to-lua: Wrong type argument: stringp, 1
+#+end_example
+
+The current implementation works solely in scripting mode and does not return =:results value=.
+
+** Links to Tutorials and Other Resources
+[[https://www.lua.org/start.html][Getting Started with Lua]]
+
+[[https://luarocks.org/][LuaRocks]]
+
+[[https://github.com/LewisJEllis/awesome-lua][Awesome Lua]]
