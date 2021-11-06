@@ -57,15 +57,24 @@ installed RDBMS. Org mode supports the following implementations:
   - monetdb :: a [[http://www.monetdb.org/][column storage technology]] designed to work with very
                large databases uses an executable named =mclient=;
 
-  - msosql :: the [[http://technet.microsoft.com/en-us/library/aa214012(v%3Dsql.80).aspx][Microsoft osql Utility]] that uses ODBC to connect to
-              an RDBMS server;
+  - mssql :: the [[http://technet.microsoft.com/en-us/library/aa214012(v%3Dsql.80).aspx][Microsoft osql Utility]] that uses ODBC to connect to
+              an RDBMS server with an executable named =sqlcmd=;
 
   - mysql :: [[http://www.mysql.com/][MySQL]] advertises itself as the world's most popular open
-             source database--the executable expected by Org mode is =mysql=;
+    source database--the executable expected by Org Babel is =mysql=;
 
   - postgresql ::  [[http://www.enterprisedb.com/products-services-training/products/postgresql-overview&ls%3DSEM?gclid%3DCMqe0bP7groCFQeCQgodTSwAcQ][PostgreSQL]] advertises itself as the world's most
-                   advanced open source database--the executable
-                   expected by Org mode is =psql=.
+    advanced open source database--the executable expected by Org Babel
+    is =psql=;
+
+  - sqsh :: an open-source interactive SQL client for the [[https://www.sap.com/products/sybase-ase.html][Adaptive Server Enterprise]] RDBMS;
+
+  - vertica :: [[https://www.vertica.com/][Vertica Systems]] analytic database management software--the executable expected by Org Babel is =vsql=;
+
+  - oracle :: [[https://www.oracle.com/index.html][Oracle]] RDBMS--the executable expected by Org Babel is =sqlplus=; and
+
+  - saphana :: [[https://www.sap.com/products/hana.html][SAP HANA]] in-memory database--the executable expected by Org Babel is =hdbsql=.
+                   
 
 Emacs has shipped with[[http://www.emacswiki.org/emacs/SqlMode][ SQL mode]] since version 21.4.
 
@@ -86,12 +95,16 @@ The =:colnames= header argument defaults to "yes".
 
 There are several SQL-specific header arguments:
 
-  - :engine :: one of "dbi", "monetdb", "msosql", "mysql", "postgresql";
+  - :engine :: one of "dbi", "monetdb", "mssql", "mysql", "postgresql", "postgres", "sqsh", "vertica", "oracle", "saphana";
   - :cmdline :: extra command line arguments for the RDBMS executable;
   - :dbhost :: the host name;
+  - :dbport :: the port number;
   - :dbuser :: the user name;
   - :dbpassword :: the user's password;
+  - :dbconnection :: to reference connections in =sql-connection-alist=;
+  - :dbinstance :: specific to SAP HANA; 
   - :database :: the database name;
+  - :out-file :: default "sql-out-";
 
 ** Sessions
 There is currently no support for sessions.
