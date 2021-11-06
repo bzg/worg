@@ -1,0 +1,77 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Emacs Lisp Source Code Blocks in Babel
+#+AUTHOR:     Thomas S. Dye
+#+EMAIL:      tsd [at] tsdye [dot] online
+#+LANGUAGE:   en
+#+HTML_LINK_UP:    index.html
+#+HTML_LINK_HOME:  https://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_export html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Babel support for <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/index.html">Emacs Lisp</a>
+  </p>
+  <p>
+  <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/index.html">
+  <img src="https://www.gnu.org/software/emacs/images/emacs.png"/>
+  </a>
+  </p>
+  </div>
+#+end_export
+
+* Template Checklist [7/12]                                        :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements and Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org Mode Features for Language Source Code Blocks][Org Mode Features for Language Source Code Blocks]]
+  - [ ] Describe [[Header Arguments][Header Arguments]]
+  - [ ] Describe support for [[Sessions]]
+  - [ ] Describe [[Result Types][Result Types]]
+  - [ ] Describe [[Other]] differences from supported languages
+  - [ ] Provide brief [[Examples of Use][Examples of Use]]
+* Introduction
+Emacs Lisp is an interpreted dialect of the Lisp programming language with extensions to support text editing.
+Babel and Org mode are both written in Emacs Lisp.
+* Requirements and Setup
+If your Emacs is up and running, then Emacs Lisp is installed, configured, and running.  Emacs Lisp source blocks are activated by default.
+* Babel Features for Emacs Lisp Source Code Blocks
+** Header Arguments
+   - :lexical :: A switch for evaluation scoping; "yes" or =t= indicates lexical scoping, "no" or =NIL= indicates dynamic scoping.  Default: "no".
+** Sessions
+Emacs is an Emacs Lisp session.
+** COMMENT Result Types
+   - Which result types are supported?
+** COMMENT Other
+   - Differences from other supported languages
+* Examples of Use
+Here is the obligatory Hello World! example.  Note that it uses the =elisp= source language alias for =emacs-lisp=.
+
+In the Org mode buffer:
+#+begin_example
+,#+name: emacs-lisp-hello-world
+,#+begin_src elisp :exports both 
+(princ "Hello World!")
+,#+end_src
+#+end_example
+
+HTML export of the source block:
+#+name: emacs-lisp-hello-world
+#+begin_src elisp :exports both 
+(princ "Hello World!")
+#+end_src
+
+HTML export of the results:
+#+RESULTS: emacs-lisp-hello-world
+: Hello World!
