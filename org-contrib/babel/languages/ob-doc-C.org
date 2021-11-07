@@ -70,34 +70,34 @@ the results of evaluation inserted into the buffer.
 : : 2
 
 ** About C
-C dates back in the 1970.
-It was devised by Kernighan & Ritchie.
+C dates back to the 1970's.
+It was devised by Kernighan and Ritchie.
 It was used to create the Unix kernel, and many of its utilities.
-Today it is still the base of the Linux & Unix kernel.
+Today it is still the base of the Linux and Unix kernels.
 
 ** About C++
 C++ was devised by Stroustrup in the 1980.
 The purpose was to enhance C with object programming.
 Among the features introduced by C++, there are:
-  - templates and the Standard Template Library,
-  - object programming, with class definition and inheritance,
-  - functions and operators overloading,
+  - templates and the Standard Template Library;
+  - object programming, with class definition and inheritance;
+  - functions and operators overloading; and
   - exceptions.
 
 ** About D
 [[http://dlang.org/][D]] is a C++-like language made by [[http://dlang.org/][Digital Mars]].
 It features:
-  - C++ syntax
-  - Built-in garbage collector
-  - Strong type system
-  - Meta-programming
-  - Seamless assembler support
-  - Usable as a scripting language
-  - C binary compatibility
-
+  - C++ syntax;
+  - built-in garbage collector;
+  - strong type system;
+  - meta-programming;
+  - seamless assembler support;
+  - usable as a scripting language; and
+  - C binary compatibility.
+    
 * Requirements and Setup
 
-1- You must have the compilers available on your computer.
+  1. You must have the compilers available on your computer.
    You may use only one of the three languages:
    there is no requirement to have all three installed.
    - C and C++ often come pre-installed.
@@ -108,12 +108,12 @@ It features:
 
    Eventually, the compilers must be in the =PATH=.
 
-2- Make any or all languages available to Babel.
+  2. Make any or all languages available to Babel.
    Type:
    : M-x customize-variable org-babel-load-languages
    and add the C language (capital "C", which gives access to C, C++, D)
 
-3- Default are given for the compilers: =gcc=, =g++=, =rdmd=. They may be
+  3. Default are given for the compilers: =gcc=, =g++=, =rdmd=. They may be
    customized. Type:
    : M-x customize-group org-babel
    and look for =Org Babel C++ Compiler= and such.
@@ -123,7 +123,7 @@ It features:
 
 - =:var VARIABLE=VALUE= ::
   A global C, C++, or D variable named VARIABLE will be declared
-  and initialized with VALUE
+  and initialized with VALUE.
 
   Possible types for VARIABLE may be:
     : int,
@@ -132,7 +132,7 @@ It features:
     : type[]    // type = int, double, string, const char*
     : type[][]  // type = int, double, string, const char*
 
-  The later type, =type[][]=, is used for variables storing Org tables
+  The latter type, =type[][]=, is used for variables storing Org tables.
 
   The =type[]= is used for lists or vectors declared in the header.
 
@@ -182,7 +182,7 @@ Here is Hello World!
 
 This source code block:
 #+begin_example
-#+begin_src C
+#+begin_src C :exports results
   printf ("Hello World!\n");
 #+end_src
 #+end_example
@@ -206,6 +206,7 @@ This source code block:
 #+end_example
 
 yields this result (type =C-c C-c= in the source block):
+
 #+results: cpp-hello
 Hello World!
 
@@ -222,7 +223,7 @@ Here is Hello World!
 
 This source code block:
 #+begin_example
-#+begin_src D
+#+begin_src D :exports results
   writefln ("Hello World!");
 #+end_src
 #+end_example
@@ -237,7 +238,7 @@ Hello World!
   + =#include "stdio.h"= (in C)
   + =import std.stdio;= (in D)
   because those libraries are so common that they are always included.
-- C++ needs to explicitely include either =stdio.h= or =<iostream>=
+- C++ needs to explicitly include either =stdio.h= or =<iostream>=
 
 ** Scalar variables
 Variables may be declared outside the script.
@@ -297,7 +298,7 @@ a new Org mode table.
 This table will be input in the script, and iterated row by row:
 
 #+begin_example
-#+tblname: somedata
+,#+name: somedata
 | nb    | sqr | noise |
 |-------+-----+-------|
 | zero  |   0 |  0.23 |
@@ -319,7 +320,7 @@ The dimensions of the table are available:
   : int somedata_rows = 5;
   : int somedata_cols = 3;
 
-Additionnally, an accessor function retrives a cell using the column
+Additionally, an accessor function retrives a cell using the column
 name as found in the header:
   : const char* cell = somedata_h(3,"noise"); // "9.05" in C & C++
   : string      cell = somedata_h(3,"noise"); // "9.05" in D
@@ -459,3 +460,14 @@ through =C-c C-v v=.
 A type mismatch between strings and double cause an error
 when attempting to use the cell accessor with column name
 when the table is pure numeric.
+
+
+** A table                                                         :noexport:
+#+name: somedata
+| nb    | sqr | noise |
+|-------+-----+-------|
+| zero  |   0 |  0.23 |
+| one   |   1 |  1.31 |
+| two   |   4 |  4.61 |
+| three |   9 |  9.05 |
+| four  |  16 | 16.55 |
