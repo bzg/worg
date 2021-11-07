@@ -1,0 +1,118 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Org Source Code Blocks in Babel
+#+AUTHOR:     Thomas S. Dye
+#+EMAIL:      tsd [at] tsdye [dot] online
+#+LANGUAGE:   en
+#+HTML_LINK_UP:    index.html
+#+HTML_LINK_HOME:  https://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_export html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Babel support for <a href="https://orgmode.org/">Org</a>
+  </p>
+  <p>
+  <a href="https://orgmode.org/">
+  <img src="https://orgmode.org/resources/img/org-mode-unicorn.svg"/>
+  </a>
+  </p>
+  </div>
+#+end_export
+
+* Template Checklist [11/12]                                       :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements and Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org Mode Features for Language Source Code Blocks][Babel Features for Language Source Code Blocks]]
+  - [X] Describe [[Header Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result Types][Result Types]]
+  - [ ] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples of Use][Examples of Use]]
+* Introduction
+Org is a GNU Emacs major mode for keeping notes, authoring documents, computational notebooks, literate programming, maintaining to-do lists, planning projects, and more---in a fast and effective plain text system.
+* Requirements and Setup
+To configure Babel to use Org, you'll need to ensure
+that =org-babel-load-languages= includes an entry for it.
+Typically, =org-babel-load-languages= will contain many entries.  The
+example below omits other languages.
+
+#+begin_src emacs-lisp 
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((org . t)))
+#+end_src
+* Babel Features for Org Source Code Blocks
+** Header Arguments
+Org code blocks yield raw, silent results by default.  They export code by default.
+
+Variables passed to an Org code block are referenced with a preceding =$=: e.g., the variable =foo= is referenced as =$foo=.
+
+** Sessions
+Org does not support sessions.
+
+** Result Types
+Org source blocks can return raw, ascii, latex, or html results.
+
+* Examples of Use
+One use of an Org source block might be as a template.
+An Org source block as it appears in an Org mode buffer:
+#+begin_example
+,#+name: org-hello
+,#+begin_src org :var addressee="" 
+Hello $addressee
+,#+end_src
+#+end_example
+
+HTML export of the source block:
+#+name: org-hello
+#+begin_src org :var addressee="" 
+Hello $addressee
+#+end_src
+
+Now, evaluate the Org source block in the header of a simple Emacs Lisp source block.
+
+The Emacs Lisp source block in the Org mode buffer:
+#+begin_example
+,#+name: print-org
+,#+begin_src elisp :var x=org-hello[](addressee="World!") 
+  (print x)
+,#+end_src
+#+end_example
+
+HTML export of the Emacs Lisp source block:
+#+name: print-org
+#+begin_src elisp :var x=org-hello[](addressee="World!") :exports both
+  (print x)
+#+end_src
+
+HTML export of the Emacs Lisp source block results:
+#+RESULTS: print-org
+: Hello World!
+
+Now, instruct the Org source block to return HTML and the Emacs Lisp source block to return HTML with the inner and outer arguments to an =#+call:= line.
+
+In the Org mode buffer:
+#+begin_example
+,#+call: print-org(x=org-hello[:results html](addressee="HTML!")):results html
+#+end_example
+
+#+call: print-org(x=org-hello[:results html](addressee="HTML!")):results html
+
+#+RESULTS:
+#+begin_export html
+<p>
+Hello HTML!</p>
+#+end_export
