@@ -51,11 +51,10 @@ If your Emacs is up and running, then Emacs Lisp is installed, configured, and r
    - :lexical :: A switch for evaluation scoping; "yes" or =t= indicates lexical scoping, "no" or =NIL= indicates dynamic scoping.  Default: "no".
 ** Sessions
 Emacs is an Emacs Lisp session.
-** COMMENT Result Types
-   - Which result types are supported?
-** COMMENT Other
-   - Differences from other supported languages
 * Examples of Use
+The ability to evaluate Emacs Lisp code in the context of your Emacs session is wonderful and scary at the same time.  The following examples scratch the surface of this enticing  practice.  Caveat emptor!
+
+** Hello World!
 Here is the obligatory Hello World! example.  Note that it uses the =elisp= source language alias for =emacs-lisp=.
 
 In the Org mode buffer:
@@ -68,10 +67,236 @@ In the Org mode buffer:
 
 HTML export of the source block:
 #+name: emacs-lisp-hello-world
-#+begin_src elisp :exports both 
+#+BEGIN_SRC elisp :exports both
 (princ "Hello World!")
-#+end_src
+#+END_SRC
 
 HTML export of the results:
 #+RESULTS: emacs-lisp-hello-world
 : Hello World!
+
+** Tangle and Export Concurrently
+This bit of fanciness with running code in header arguments is taken from Eric Schulte's [[http://eschulte.github.io/org-scraps/scraps/2012-01-20-name-src_emacs-lisp%7Borg-current-export-file%7D.html][org-scraps]].
+
+One block in the Org mode buffer to tangle:
+#+begin_example
+,#+BEGIN_SRC emacs-lisp :tangle yes
+  (message "I am tangled")
+,#+END_SRC
+#+end_example
+
+HTML export of the source block:
+#+BEGIN_SRC emacs-lisp :tangle no
+(message "I am tangled")
+#+END_SRC
+
+HTML export of the results:
+#+RESULTS:
+: I am tangled
+
+Another block in the Org mode buffer to export:
+#+begin_example
+,#+BEGIN_SRC emacs-lisp :exports results :var foo=(org-babel-tangle)
+  (message "I just tangled %S during export." foo)
+,#+END_SRC
+#+end_example
+
+# Avoid polluting the languages directory
+# #+BEGIN_SRC emacs-lisp :exports results :var foo=(org-babel-tangle)
+#   (message "I just tangled %S during export" foo)
+# #+END_SRC
+
+HTML export of the results:
+#+RESULTS:
+: I just tangled ("ob-doc-elisp.el") during export.
+** Emacs-Lisp Printing with Output to String
+   :PROPERTIES:
+   :DATE:     2011-04-10
+   :END:
+Another example from Eric Schulte's [[http://eschulte.github.io/org-scraps/scraps/2011-04-10-emacs-lisp-printing-with-output-to-string.html][org-scraps]].
+
+The first source block packages the results as a string.
+
+Source block in the Org mode buffer:
+#+begin_example
+,#+name: emacs-lisp-print-to-string
+,#+begin_src emacs-lisp :results output
+  (let ((dog (sqrt 2))
+        (cat 7))
+    (print (format "%s %f" "Dog: " (eval dog)))
+    (print (format "%s %d" "Cat: " (eval cat)) nil)
+    (print "Fish."))
+,#+end_src
+#+end_example
+
+HTML export of the source block:
+#+name: emacs-lisp-print-to-string
+#+begin_src emacs-lisp :results output :exports both
+  (let ((dog (sqrt 2))
+        (cat 7))
+    (print (format "%s %f" "Dog: " (eval dog)))
+    (print (format "%s %d" "Cat: " (eval cat)) nil)
+    (print "Fish."))
+#+end_src
+
+HTML export of the result:
+#+RESULTS: emacs-lisp-print-to-string
+: 
+: "Dog:  1.414214"
+: 
+: "Cat:  7"
+: 
+: "Fish."
+
+The second source block returns a table.
+
+Second source block in the Org mode buffer:
+#+begin_example
+,#+name: emacs-lisp-print-to-table
+,#+begin_src emacs-lisp
+  (let ((dog (sqrt 2))
+        (cat 7))
+    `((dog ,dog)
+      (cat ,cat)
+      (fish)))
+,#+end_src
+#+end_example
+
+HTML export of the source block:
+#+name: emacs-lisp-print-to-table
+#+begin_src emacs-lisp :exports both
+  (let ((dog (sqrt 2))
+        (cat 7))
+    `((dog ,dog)
+      (cat ,cat)
+      (fish)))
+#+end_src
+
+HTML export of the results:
+#+RESULTS: emacs-lisp-print-to-table
+| dog  | 1.4142135623730951 |
+| cat  |                  7 |
+| fish |                    |
+
+** Executing Emacs-Lisp on Export
+   :PROPERTIES:
+   :DATE:     2010-06-07
+   :END:
+This example from Eric Schulte's [[http://eschulte.github.io/org-scraps/scraps/2010-06-07-executing-emacs-lisp-on-export.html][org-scraps]] shows how to evaluate Emacs Lisp code during export.
+
+Here is the source block in the Org mode buffer:
+#+begin_example
+,#+name: eric-error
+,#+begin_src emacs-lisp
+  (error "eric")
+,#+end_src
+#+end_example
+
+Enabling HTML export of the source block with =:exports code= or =:exports both= aborts export with an error.
+
+HTML export of the results when the source block isn't exported:
+#+name: eric-error
+#+begin_src emacs-lisp 
+  (error "eric")
+#+end_src
+
+** Scalar Emacs Lisp Results
+   :PROPERTIES:
+   :DATE:     2011-06-19
+   :END:
+This example is from Eric Schulte's [[http://eschulte.github.io/org-scraps/scraps/2011-06-19-scalar-emacs-lisp-results.html][org-scraps]].
+
+Here is the source block in the Org mode buffer:
+#+begin_example
+,#+name: emacs-lisp-scalar
+,#+begin_src emacs-lisp :results scalar :exports both
+  '(1 2 3)
+,#+end_src
+#+end_example
+
+HTML export of the source block:
+#+name: emacs-lisp-scalar
+#+begin_src emacs-lisp :results scalar :exports both
+  '(1 2 3)
+#+end_src
+
+HTML export of the results:
+#+RESULTS: emacs-lisp-scalar
+: (1 2 3)
+
+** Convert Results to All String
+   :PROPERTIES:
+   :DATE:     2011-08-29
+   :END:
+This example from Eric Schulte's [[http://eschulte.github.io/org-scraps/scraps/2011-08-29-convert-results-to-all-string.html][org scraps]] shows one way to ensure that all elements in a table are rendered as strings.
+
+Given the following table:
+
+#+name: hetero-table
+#+begin_src emacs-lisp :exports results
+  '((1 2 3 4)
+    ("a" "b" "c" "d"))
+#+end_src
+
+#+RESULTS: hetero-table
+| 1 | 2 | 3 | 4 |
+| a | b | c | d |
+
+And given this Emacs Lisp source block:
+#+begin_example
+,#+name: all-to-string
+,#+begin_src emacs-lisp :var tbl='()
+  (defun all-to-string (tbl)
+    (if (listp tbl)
+        (mapcar #'all-to-string tbl)
+      (if (stringp tbl)
+          tbl
+        (format "%s" tbl))))
+  (all-to-string tbl)
+,#+end_src
+#+end_example
+
+#+name: all-to-string
+#+begin_src emacs-lisp :var tbl='()
+  (defun all-to-string (tbl)
+    (if (listp tbl)
+        (mapcar #'all-to-string tbl)
+      (if (stringp tbl)
+          tbl
+        (format "%s" tbl))))
+  (all-to-string tbl)
+#+end_src
+
+Then a reference to =hetero-table= indicates a mixture of strings and non-strings:
+#+begin_example
+,#+name: do-not-pass-to-all-string
+,#+begin_src emacs-lisp :var tbl=hetero-table
+  (mapcar (lambda (row) (mapcar (lambda (cell) (stringp cell)) row)) tbl)
+,#+end_src
+#+end_example
+
+#+name: do-not-pass-to-all-string
+#+begin_src emacs-lisp :var tbl=hetero-table :exports both
+  (mapcar (lambda (row) (mapcar (lambda (cell) (stringp cell)) row)) tbl)
+#+end_src
+
+#+RESULTS: do-not-pass-to-all-string
+| nil | nil | nil | nil |
+| t   | t   | t   | t   |
+
+But passing =hetero-table= through =all-to-string= in the header argument ensures that all the elements are strings:
+#+begin_example
+,#+name: pass-to-all-to-string
+,#+begin_src emacs-lisp :var tbl=all-to-string(hetero-table)
+  (mapcar (lambda (row) (mapcar (lambda (cell) (stringp cell)) row)) tbl)
+,#+end_src
+#+end_example
+
+#+name: pass-to-all-to-string
+#+begin_src emacs-lisp :var tbl=all-to-string(hetero-table) :exports both
+  (mapcar (lambda (row) (mapcar (lambda (cell) (stringp cell)) row)) tbl)
+#+end_src
+
+#+RESULTS: pass-to-all-to-string
+| t | t | t | t |
+| t | t | t | t |
