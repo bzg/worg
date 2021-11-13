@@ -1,0 +1,167 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc broken-links:nil
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Octave Code Blocks in Babel
+#+AUTHOR:     Dan Davison, Thomas S. Dye
+#+EMAIL:      davison at stats dot ox dot ac dot uk, tsd at tsdye dot online
+#+LANGUAGE:   en
+#+HTML_LINK_UP:    index.html
+#+HTML_LINK_HOME:  https://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_export html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Babel support for <a href="https://www.gnu.org/software/octave/index">Octave</a>
+  </p>
+  <p>
+  <a href="https://www.gnu.org/software/octave/index">
+  <img src="https://www.gnu.org/software/octave/img/octave-logo.svg"/>
+  </a>
+  </p>
+  </div>
+#+end_export
+
+* Template Checklist [12/12]                                       :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements and Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org Mode Features for Language Source Code Blocks][Babel Features for Language Source Code Blocks]]
+  - [X] Describe [[Header Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples of Use][Examples of Use]]
+* Introduction
+GNU Octave describes itself as a scientific programming language featuring a powerful mathematics-oriented syntax with built-in 2D/3D plotting and visualization tools.  The Octave syntax is drop-in compatible with many MATLAB® scripts.
+* Requirements and Setup
+[[https://wiki.octave.org/Category:Installation][GNU Octave]] can be installed on many operating systems.
+
+[[https://wiki.octave.org/Emacs][Emacs Octave Support]] has been distributed with Emacs since version 19.35.
+
+To configure Octave code blocks in Org mode, add the appropriate
+dotted pair to =org-babel-load-languages=
+
+#+begin_src emacs-lisp :exports code
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((octave . t)))
+#+end_src
+
+#+RESULTS:
+
+* Babel Features for Octave Code Blocks
+** Header Arguments
+There are no Octave-specific header arguments or default header argument values.
+** Sessions
+Babel supports Octave sessions.
+** Result Types
+Results of Octave code evaluation can be captured in scripting mode, as =:results output=, or functional mode, as =:results value=.  
+** Differences from Other Languages
+The special variable, =ans=, is used to collect values for return in functional mode.
+* Examples of Use
+** Hello World!
+In the Org mode buffer:
+#+begin_example
+,#+begin_src octave :results output
+disp('Hello World!')
+,#+end_src
+#+end_example
+
+HTML export of the Octave code block:
+#+begin_src octave :results output :exports code
+disp('Hello World!')
+#+end_src
+
+HTML export of the Octave code block result:
+#+RESULTS:
+: Hello World!
+
+** Return Part of a Table in Functional Mode
+This example is taken from an [[https://wiki.octave.org/Cookbook#Structures][Octave Cookbook]].
+
+Note the use of the variable, =ans=, on the final line.  Babel support for Octave treats =ans= as a special variable, returning it in functional mode.
+
+In the Org mode buffer:
+#+begin_example
+,#+begin_src octave
+samples = struct ("patient", {"Bob", "Kevin", "Bob" , "Andrew"},
+                  "age",     { 45  ,  52    ,  45   ,  23     },
+                  "protein", {"H2B", "CDK2" , "CDK2", "Tip60" },
+                  "tube"   , { 3   ,  5     ,  2    ,  18     }
+                  );
+ans = reshape ([samples(:).age], size (samples))
+,#+end_src
+#+end_example
+
+HTML export of the Octave code block:
+#+begin_src octave :exports code 
+samples = struct ("patient", {"Bob", "Kevin", "Bob" , "Andrew"},
+                  "age",     { 45  ,  52    ,  45   ,  23     },
+                  "protein", {"H2B", "CDK2" , "CDK2", "Tip60" },
+                  "tube"   , { 3   ,  5     ,  2    ,  18     }
+                  );
+ans = reshape ([samples(:).age], size (samples))
+#+end_src
+
+HTML export of the Octave code block result:
+#+RESULTS:
+| 45 | 52 | 45 | 23 |
+
+** Construct a Table in Octave
+In the Org mode buffer:
+#+begin_example
+,#+begin_src octave :results value
+ans = [8 6 4; 2 0 -2]
+,#+end_src
+#+end_example
+
+HTML export of the Octave code block:
+#+begin_src octave :results value :exports code
+ans = [8 6 4; 2 0 -2]
+#+end_src
+
+HTML export of the Octave code block result:
+#+RESULTS:
+| 8 | 6 |  4 |
+| 2 | 0 | -2 |
+
+** Graphical output
+In order to get graphical output without leaving open graph windows
+during evaluation, the following can be used:
+
+#+begin_example
+,#+begin_src octave :results file
+figure( 1, "visible", "off" );
+sombrero;
+print -dpng chart.png;
+ans = "chart.png";
+,#+end_src
+#+end_example
+The Octave =figure()= command opens an invisible graph window where the next plot commands should act. Then, the Octave =print= command exports the graph to a file.
+
+The header argument, =:results file=, instructs Babel to interpret the code block result as a file path.
+
+HTML export of the Octave code block:
+#+begin_src octave :results file :exports code :eval no-export
+figure( 1, "visible", "off" );
+sombrero;
+print -dpng ../images/octave-chart.png;
+ans = "../images/octave-chart.png";
+#+end_src
+
+HTML export of the Octave code block result:
+#+attr_html: :width 800
+#+RESULTS:
+[[https://orgmode.org/worg/org-contrib/babel/images/octave-chart.png]]
+
+    
