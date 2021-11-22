@@ -131,6 +131,12 @@ Write =data= to a google document named =title=.  If =data= is tabular
 it will be saved to a spreadsheet, otherwise it will be saved as a
 normal document.
 
+#+name: fibs
+#+begin_src emacs-lisp :var n=8 :exports none
+(flet ((fib (m) (if (< m 2) 1 (+ (fib (- m 1)) (fib (- m 2))))))
+  (mapcar (lambda (el) (list el (fib el))) (number-sequence 0 (- n 1))))
+#+end_src
+
 #+name: gdoc-write
 #+begin_src emacs-lisp :var title="babel-upload" :var data=fibs(n=10) :results silent
   (let* ((format (if (listp data) "csv" "txt"))
@@ -149,8 +155,8 @@ normal document.
 example usage
 : #+name: fibs
 : #+begin_src emacs-lisp :var n=8
-:   (flet ((fib (m) (if (< m 2) 1 (+ (fib (- m 1)) (fib (- m 2))))))
-:     (mapcar (lambda (el) (list el (fib el))) (number-sequence 0 (- n 1))))
+: (flet ((fib (m) (if (< m 2) 1 (+ (fib (- m 1)) (fib (- m 2))))))
+:   (mapcar (lambda (el) (list el (fib el))) (number-sequence 0 (- n 1))))
 : #+end_src
 :
 : #+call: gdoc-write(title="fibs", data=fibs(n=10))
