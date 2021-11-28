@@ -1,9 +1,9 @@
+#+TITLE:      Org-babel-lilypond
+#+AUTHOR:     Martyn Jago
 #+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
 #+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
 #+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
-#+TITLE:      Org-babel-lilypond
-#+AUTHOR:     Martyn Jago
 #+LANGUAGE:   en
 #+HTML_LINK_UP:    index.html
 #+HTML_LINK_HOME:  https://orgmode.org/worg/
@@ -27,31 +27,30 @@
 LilyPond is a music engraving program devoted to producing the
 highest-quality sheet music possible. Org-mode supports lilypond
 source code blocks that can generate music scores with optional
-auditing via Midi.
+auditing via MIDI.
 
 * Usage
 
 There are two modes available with ob-lilypond:
 
-  - *basic-mode* (default)
-  - *arrange-mode*
+- =basic-mode= (default), and
+- =arrange-mode=
 
-Which one you use depends on what you intend to do (a quick way to
-switch modes is via =M-x org-babel-lilypond-toggle-arrange-mode=).
+Which one you use depends on what you intend to do (type =M-x
+org-babel-lilypond-toggle-arrange-mode= to switch modes).
 
-* basic-mode
+* Basic Mode
 
-*basic-mode* (the default) allows you to embed LilyPond snippets into
-an Org-mode file, and compile and export them using typical Org-mode
-commands (such as =C-c C-e l p= for pdf export). This is useful if you
-want to mix blocks of Lilypond-generated score with text, and perhaps
-other images to export to Latex, Docbook, pdf, or HTML. In other
-words, *basic-mode* could be used as a very flexible replacement to
-*lilypond-book*.
+With =basic-mode= you can embed LilyPond snippets into an Org-mode
+file, compile and export them using typical Org-mode commands (such as
+=C-c C-e l p= for PDF export). This is useful if you want to mix
+blocks of LilyPond-generated score with text, and perhaps other images
+to export to LaTeX, Docbook, PDF, or HTML. In other words,
+=basic-mode= could be used as a flexible replacement to the
+=lilypond-book= command.
 
-*Warning!* in *basic-mode* a lilypond source block requires a =:file=
- parameter as shown below, as failure to do so will result in an error
- message.
+Note that in =basic-mode= a lilypond source block requires a =:file=
+parameter as shown below.
 
 #+begin_example
 #+begin_src lilypond :file mixolydian.png
@@ -68,12 +67,12 @@ words, *basic-mode* could be used as a very flexible replacement to
 #+end_src
 #+end_example
 
-The previous block will produce an image file in .png format, which
-would be suitable for exporting to HTML for instance.
+The previous block will produce an image file in ~.png~ format, which
+would be suitable for exporting to HTML, for instance.
 
-To generate a nice image for embedding into a pdf or Latex document,
-you might consider using the .eps (or .pdf) format as shown in the
-example below.
+To generate an image suitable for embedding into a PDF/LaTeX document,
+you might consider using the ~.pdf~ (or ~.eps~) format as shown in the
+following example.
 
 #+begin_example
 #+begin_src lilypond :file mixolydian.pdf
@@ -99,30 +98,26 @@ example below.
 
 * Compiling LilyPond Blocks
 
-In *basic-mode* the key sequence =C-c C-c= within a Lilypond block
-will compile the block. Exporting of all blocks and Org file contents
-is initiated with the sequence =C-c C-e= (standard Org-mode export
-keys).
+In =basic-mode=, pressing =C-c C-c= within a lilypond block compiles
+the block. Likewise, pressing =C-c C-e= (standard Org-mode export
+keys) exports the Org document.
 
 * Arrange Mode
 
-*arrange-mode* allows you to develop complete pieces of score, whilst
-organizing sections of the piece using typical Org-mode
-techniques. And because you are in Org-mode, you are free to use
-Literate Programming techniques to do things programatically, like
-storing information in tables etc.
+With =arrange-mode= you can develop complete pieces of score whilst
+organizing sections of the piece using typical literate programming
+techniques. This allows you to assemble scores programatically by
+using tables to store information among other methods.
 
-In addition, there are automated features to automatically audition
-the piece (via MIDI) and or display the resultant pdf output.
-
-To change the default mode to Arrange Mode, put the following in your
-Emacs init file:
-
-: (setq org-babel-lilypond-arrange-mode t)
-
-...or to temporarily switch between modes use the following command:
+The mode also includes features to audition the piece (via MIDI)
+automatically and or display the resultant PDF output. Again, you can
+switch modes using the following command:
 
 : M-x org-babel-lilypond-toggle-arrange-mode
+
+Or you can define your mode preference by changing the
+=org-babel-lilypond-arrange-mode= variable. Setting it to a non-nil
+value makes Arrange Mode the default mode.
 
 Following are examples generated using ob-lilypond in Arrange Mode.
 
@@ -146,37 +141,36 @@ Following are examples generated using ob-lilypond in Arrange Mode.
 
 * Tangling and Compiling LilyPond Blocks
 
-In *arrange-mode*, the key sequence =C-c C-c= within a Lilypond block
-initiates =org-babel-lilypond-tangle= (tangling of all Lilypond blocks
-within the current Org file). Depending on the feature settings,
-ob-lilypond will then either /display a pdf/ of the score, /play the
-generated MIDI file/, both, or neither.
+In =arrange-mode=, pressing =C-c C-c= within a LilyPond block
+initiates =org-babel-lilypond-tangle=, tangling all LilyPond blocks
+within the current Org file. Depending on the feature settings,
+ob-lilypond will then either /display/ a PDF of the score, /play/ the
+generated MIDI file, both, or neither.
 
-The command =M-x org-babel-lilypond-tangle= can also be called from
+The command =org-babel-lilypond-tangle= can also be called from
 anywhere in the file and could be tied to a function key with
 something like:
 
 : (global-set-key [f8] 'org-babel-lilypond-tangle)
 
-Some commands are included in arrange-mode to quickly enable/disable
+Some commands are included in =arrange-mode= to quickly enable/disable
 certain post-tangle activities, including:
 
-- =org-babel-lilypond-toggle-midi-play= (toggle whether midi will be
-  played following a successful compilation)
-- =org-babel-lilypond-toggle-pdf-display= (toggle whether pdf will be
-  displayed following a successful compilation)
+- =org-babel-lilypond-toggle-midi-play=, which decides whether to play
+  the corresponding MIDI following a successful compilation, and
+- =org-babel-lilypond-toggle-pdf-display=, which decides whether to
+  display the PDF following a successful compilation.
 
-*Note:* If using [[http://timidity.sourceforge.net/][Timidity]] for MIDI playback, kill the MIDI stream with
-=C-g= in Emacs.
+Note that when using [[http://timidity.sourceforge.net/][Timidity]] for MIDI playback, you can kill the MIDI
+stream by pressing =C-g= from Emacs.
 
 * Setup
 
-By default, =ob-lilypond= is included in the latest Org-mode. For
+By default, ob-lilypond is included in the latest Org-mode. For
 information on obtaining the latest Org-mode follow this link to the
 [[https://orgmode.org/manual/Installation.html][Org-mode Manual]] and follow the instructions.
 
-Then, add lilypond to your list of babel languages (in your init
-file):
+Then, add lilypond to your list of babel languages:
 
 #+begin_src emacs-lisp :exports code
 (org-babel-do-load-languages
@@ -186,11 +180,12 @@ file):
    (lilypond . t)))
 #+end_src
 
-Alternatively, you may *require* the ob-lilypond babel language directly:
+Alternatively, you may /require/ the ob-lilypond babel language
+directly:
 
 : (require 'ob-lilypond)
 
-To ensure all is correct consider *running the tests* (see below).
+To ensure all is correct consider /running the tests/ (see below).
 
 * Requirements
 
@@ -200,13 +195,16 @@ To ensure all is correct consider *running the tests* (see below).
 
 ** Nix
 
-- LilyPond is [[http://lilypond.org/][available here]] or via the the system-relevant package manager.
-- For MIDI, *Timidity* is [[http://timidity.sourceforge.net/][available here]] or via the system-relevant package manager.
-- For pdf, *Evince* is [[https://wiki.gnome.org/Apps/Evince][available here]] or via package manager.
+- LilyPond is [[http://lilypond.org/][available here]] or via the the system-relevant package
+  manager.
+- For MIDI, Timidity is [[http://timidity.sourceforge.net/][available here]] or via the system-relevant
+  package manager.
+- For PDF, Evince is [[https://wiki.gnome.org/Apps/Evince][available here]] or via package manager.
 
 ** Win32
 
-- Currently untested, although it should be made to work with minimal fuss.
+- Currently untested, although it should be made to work with minimal
+  fuss.
 
 * Testing
 
