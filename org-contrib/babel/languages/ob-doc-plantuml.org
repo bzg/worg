@@ -1,0 +1,132 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc broken-links:nil
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      PlantUML Code Blocks in Babel
+#+AUTHOR:     Thomas Dye
+#+EMAIL:      tsd [at] tsdye [dot] online
+#+LANGUAGE:   en
+#+HTML_LINK_UP:    index.html
+#+HTML_LINK_HOME:  https://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_export html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Babel support for <a href="https://plantuml.com/">PlantUML</a>
+  </p>
+  <p>
+  <a href="https://www.uml.org/index.htm">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/UML_logo.svg/400px-UML_logo.svg.png"/>
+  </a>
+  </p>
+  </div>
+#+end_export
+
+* Template Checklist [12/12]                                       :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements and Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org Mode Features for Language Source Code Blocks][Babel Features for Language Code Blocks]]
+  - [X] Describe [[Header Arguments][Header Arguments]]
+  - [X] Describe support for [[Sessions]]
+  - [X] Describe [[Result Types][Result Types]]
+  - [X] Describe [[Other]] differences from supported languages
+  - [X] Provide brief [[Examples of Use][Examples of Use]]
+* Introduction
+=PlantUML= is a Java component for creating Unified Modeling Language
+(UML) diagrams and several non-UML diagrams with a simple language.
+Diagram images can be generated in PNG, SVG, and LaTeX formats.
+
+=PlantUML= is integrated with [[https://plantuml.com/running][a wide variety of software applications]].
+Babel is a [[https://plantuml.com/emacs][standard way to use PlantUML in Emacs]].
+* Requirements and Setup
+=PlantUML= requires a working [[https://www.java.com/en/download/][Java]] installation and access to the
+=plantuml.jar= component.  A working [[https://graphviz.org/][GraphViz]] installation is required
+for many diagrams.
+
+Emacs has [[https://github.com/skuro/plantuml-mode][plantuml-mode]], a major mode for editing PlantUML sources.
+There are detailed [[https://github.com/skuro/plantuml-mode#installation][installation instructions]], as well as instructions
+for [[https://github.com/skuro/plantuml-mode#integration-with-org-mode][integration with Org]].
+
+You will likely want to set the variables =plantuml-jar-path= and
+=org-plantuml-jar-path= with the path to your local installation of
+=PlantUML=.  Alternatively, set the variable
+=plantuml-default-exec-mode= to access =PlantUML= non-locally.
+
+Activate evaluation of =PlantUML= source code blocks by adding
+=plantuml= to =org-babel-load-languages=.
+
+#+BEGIN_SRC emacs-lisp
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((plantuml . t))) ; this line activates plantuml
+#+END_SRC
+
+#+RESULTS:
+
+* Babel Features for PlantUML Code Blocks
+** Header Arguments
+=PlantUML= code blocks default to =:results file= and =:exports results=.
+
+=PlantUML= has these language-specific header arguments and one requirement:
+   - file :: =PlantUML= code blocks require that an output file be specified
+   - cmdline :: specify [[https://plantuml.com/command-line][command line arguments]] for =PlantUML=
+   - java :: arguments for the =java= runtimes (JRE) 
+** Sessions
+=PlantUML= does not support sessions. 
+** Result Types
+A =PlantUML= code block returns a link to the file it generates.
+     
+* Examples of Use
+:PROPERTIES:
+:header-args:plantuml: :eval no-export
+:END:
+Here is the obligatory Hello World! example in =PlantUML=.
+
+The =PlantUML= code block in the Org buffer:
+#+begin_example
+,#+begin_src plantuml :file images/hello-uml.png
+Bob -> Alice : Hello World!
+,#+end_src
+#+end_example
+
+HTML output of the =PlantUML= code block:
+#+begin_src plantuml :file images/hello-uml.png :exports both
+Bob -> Alice : Hello World!
+#+end_src
+
+#+caption: The PNG Hello World! image.
+#+RESULTS:
+[[file:images/hello-uml.png]]
+
+Here is an example using a theme.
+
+The =PlantUML= code block in the Org buffer:
+#+begin_example
+,#+begin_src plantuml :file images/theme-uml.png
+!theme spacelab
+a -> b
+b -> c
+,#+end_src
+#+end_example
+
+HTML output of the =PlantUML= code block:
+#+begin_src plantuml :file images/theme-uml.png :exports both
+!theme spacelab
+a -> b
+b -> c
+#+end_src
+
+#+caption: The themed PNG image.
+#+RESULTS:
+[[file:images/theme-uml.png]]
+
