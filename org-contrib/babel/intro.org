@@ -15,9 +15,9 @@
 
 * Improving this document					   :noexport:
 ** TODO Developments
-   - org-babel can now cache the results of source block execution to avoid
+   - org-babel can now cache the results of code block execution to avoid
      rerunning the same calculation.  The cache uses a sha1 hash key of the
-     source code body and the header arguments to determine if
+     code block body and the header arguments to determine if
      recalculation is required.  These hash keys are kept mostly hidden in
      the #+results line of the results of the block.  This behavior is
      turned off by default.  It is controlled through the :cache
@@ -40,7 +40,8 @@
 
      :file (format "%s/images/pca-scatter.png" dir)
 
-** TODO Starter kit links in [[#emacs-initialization][this section]] are to an archived project and a deprecated project
+** DONE Starter kit links in [[#emacs-initialization][this section]] are to an archived project and a deprecated project
+CLOSED: [2021-12-07 Tue 08:06]
 Are literate starter kits a thing anymore?
 ** DONE HTML export of code appears broken in [[#spreadsheet][this section]]
 CLOSED: [2021-10-23 Sat 14:19]
@@ -206,15 +207,16 @@ Change "sh" to "shell"
   Babel provides new features on a few different fronts, and
   different people may want to start in different places.
 
-  - Using source blocks in Org mode ::
-       If you are not familiar with creating source blocks in an Org
+  - Using code blocks in Org mode ::
+       If you are not familiar with creating code blocks in an Org
     buffer, and moving between that buffer and the language major-mode
-    edit buffer, then you should have a look at [[https://orgmode.org/manual/Literal-Examples.html#Literal-Examples][Org manual]] and Section
-    [[#source-code-blocks]], try it out, and come back.
+    edit buffer, then you should have a look at the [[https://orgmode.org/manual/Literal-Examples.html#Literal-Examples][Org manual's
+    Literal Examples section]] and Section [[#source-code-blocks]], try it
+    out, and come back.
   - Executing code ::
-       The core of Babel is its ability to execute code in Org
-       source blocks, taking input from other blocks and tables, with
-       output to further blocks and tables. This is described in Section
+       The core of Babel is its ability to execute source code in Org
+       code blocks, taking input from other blocks and tables, and with
+       output to yet other blocks and tables. This is described in Section
        [[#source-code-execution]].
   - Literate programming ::
        If you are a programmer writing code that you would normally
@@ -302,8 +304,9 @@ Change "sh" to "shell"
   ,#+end_src
    #+end_src
 
-   - <language> :: The language of the code in the source-code
-     block. Valid values must be members of =org-babel-interpreters=.
+   - <language> :: An identifier for the code block language (see the
+     [[https://orgmode.org/worg/org-contrib/babel/languages/index.html#orgf05f403][list of core languages]] and the [[https://orgmode.org/worg/org-contrib/babel/languages/index.html#org8f1cf6c][list of contributed languages]] for
+     identifiers).
    - <switches> :: Control code execution, export, and format.     
    - <header arguments> :: Header arguments control many facets of
      code block behavior, including [[https://orgmode.org/manual/Header-arguments.html#Header-arguments][tangling]], [[https://orgmode.org/manual/Evaluating-Code-Blocks.html][evaluation]], handling
@@ -525,8 +528,8 @@ print('Two plus two is')
 
 ** Using a Code Block as a Function
 
-    First let's look at a very simple example. The following source
-    code block defines a function, using Python, that squares its argument.
+    First let's look at a very simple example. The following Python
+    code block defines a function that squares its argument.
 
     #+name: square
     #+header: :var x=0 :exports code 
@@ -541,7 +544,8 @@ return x*x
     : return x*x
     : #+end_src
 
-    Now we use the source block (for information on the =#+call:= syntax see [[#library-of-babel][Library of Babel]]):
+    Now we use the Python code block with a =#+call:= line (for
+    information on the =#+call:= syntax see [[https://orgmode.org/manual/Evaluating-Code-Blocks.html#Evaluating-Code-Blocks][Evaluating Code Blocks]]):
 
     : #+call: square(x=6)
 
@@ -733,7 +737,7 @@ return x*x
 ** Example 1: Data Summaries Using R
     As a simple example, we'll fill in a cell in an Org table with the
     average value of a few numbers. First, let's make some data. The
-    following source block creates an Org table filled with five random
+    following code block creates an Org table filled with five random
     numbers between 0 and 1.
 
     : #+name: tbl-example-data
@@ -748,7 +752,7 @@ return x*x
     | 0.987541858805344 |
     | 0.994794291909784 |
 
-    Now we define a source block to calculate the mean of a table column.
+    Now we define a code block to calculate the mean of a table column.
 
     In the Org file:
     : #+name: R-mean
@@ -784,9 +788,9 @@ colMeans(x)
     table. Notice that as things stand the calculated value doesn't
     change, because the data (held in the table above named
     =tbl-example-data=) are static. However, if you delete that data table,
-    then the reference will be interpreted as a reference to the source
+    then the reference will be interpreted as a reference to the code
     block responsible for generating the data; each time the table formula
-    is recalculated the source block will be evaluated again, and
+    is recalculated the code block will be evaluated again, and
     therefore the calculated average value will change.
 
 ** Example 2: Org Babel Test Suite
@@ -909,7 +913,7 @@ colMeans(x)
   :CUSTOM_ID: library-of-babel
   :END:
 
-  As we saw with the [[*Using a Code Block as a Function][square]] example, once a source block function has
+  As we saw with the [[*Using a Code Block as a Function][square]] example, once a code block function has
   been defined in the buffer it can be called using the =#+call:=
   notation:
 
@@ -920,7 +924,7 @@ colMeans(x)
 
   In addition to the current buffer, Babel searches for
   pre-defined code block functions in files that have been assigned to
-  the Library of Babel, a user-extensible collection of source code
+  the Library of Babel, a user-extensible collection of code
   blocks.
 
 # One use for the Library of
@@ -942,13 +946,13 @@ colMeans(x)
   #+end_src
 
   Note that it is possible to pass table values or the output of a
-  source-code block to registered Library of Babel functions. It is
+  code block to registered Library of Babel functions. It is
   also possible to reference registered Library of Babel functions in
   arguments to code blocks.
   
   Once upon a time, Org was distributed with the eponymous
   Library of Babel file.  This file, which includes a wide variety of
-  source code blocks for common tasks, is now available at @@html: <a href="https://git.sr.ht/~bzg/worg/tree/master/item/library-of-babel.org">library-of-babel.org</a>@@.
+  code blocks for common tasks, is now available at @@html: <a href="https://git.sr.ht/~bzg/worg/tree/master/item/library-of-babel.org">library-of-babel.org</a>@@.
 
   For more information, see [[https://orgmode.org/manual/Library-of-Babel.html#Library-of-Babel][Library-of-Babel]].
 * Literate Programming
@@ -1083,12 +1087,12 @@ echo "\-----------------------------------------------------------/"
 
     Any optional arguments can be passed to =example-block()= by placing the
     arguments inside the parentheses following the convention defined when
-    calling source code block functions (see the [[#library-of-babel][Library of Babel]]). For example,
+    calling code block functions (see the [[#library-of-babel][Library of Babel]]). For example,
 
     : # <<example-block(a=9)>>
 
     sets the value of argument =a= equal to =9=.  Note that
-    these arguments are not evaluated in the current source-code
+    these arguments are not evaluated in the current code
     block but are passed literally to =example-block()=.
 
 * Emacs Initialization with Babel
