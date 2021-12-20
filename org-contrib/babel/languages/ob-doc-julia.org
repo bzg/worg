@@ -1,0 +1,92 @@
+#+OPTIONS:    H:3 num:nil toc:2 \n:nil ::t |:t ^:{} -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc broken-links:nil
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate hideblocks
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c) noexport(n)
+#+TITLE:      Julia Code Blocks in Babel
+#+AUTHOR:     Thomas S. Dye
+#+EMAIL:      tsd [at] tsdye [dot] online
+#+LANGUAGE:   en
+#+HTML_LINK_UP:    index.html
+#+HTML_LINK_HOME:  https://orgmode.org/worg/
+#+EXCLUDE_TAGS: noexport
+
+#+name: banner
+#+begin_export html
+  <div id="subtitle" style="float: center; text-align: center;">
+  <p>
+  Babel support for <a href="https://julialang.org/">Julia</a>
+  </p>
+  <p>
+  <a href="https://julialang.org/">
+  <img src="https://julialang.org/assets/infra/logo.svg"/>
+  </a>
+  </p>
+  </div>
+#+end_export
+
+* Template Checklist [7/12]                                        :noexport:
+  - [X] Revise #+TITLE:
+  - [X] Indicate #+AUTHOR:
+  - [X] Add #+EMAIL:
+  - [X] Revise banner source block [3/3]
+    - [X] Add link to a useful language web site
+    - [X] Replace "Language" with language name
+    - [X] Find a suitable graphic and use it to link to the language
+      web site
+  - [X] Write an [[Introduction]]
+  - [X] Describe [[Requirements and Setup][Requirements and Setup]]
+  - [X] Replace "Language" with language name in [[Org Mode Features for Language Source Code Blocks][Babel Features for Language Source Code Blocks]]
+  - [ ] Describe [[Header Arguments][Header Arguments]]
+  - [ ] Describe support for [[Sessions]]
+  - [ ] Describe [[Result Types][Result Types]]
+  - [ ] Describe [[Other]] differences from supported languages
+  - [ ] Provide brief [[Examples of Use][Examples of Use]]
+* Introduction
+The documentation for Julia describes it as "a flexible dynamic language, appropriate for scientific and numerical computing, with performance comparable to traditional statically-typed languages \dots [that] features optional typing, multiple dispatch, and good performance, achieved using type inference and just-in-time compilation, implemented using LLVM."
+
+Julia code blocks can be used in Org to define functions, filter and analyze data, create graphics and figures, and produce reproducible research papers.
+
+* Requirements and Setup
+Julia code blocks in Org require a working Julia installation.  Julia is [[https://julialang.org/downloads/][available]] for FreeBSD on ARM, Linux on ARM or x86, macOS on ARM or x86, and Windows.
+
+There is [[https://github.com/JuliaEditorSupport/julia-emacs][julia-mode]] in Melpa for Emacs.  It requires [[https://ess.r-project.org/][Emacs Speaks Statistics]] (ESS).
+
+Org mode can be configured to use Julia by creating an entry for it in =org-babel-load-languages=. Typically, =org-babel-load-languages= will contain many entries. The example below omits other languages.
+
+#+begin_src elisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((julia . t)))
+#+end_src
+
+#+RESULTS:
+
+* Babel Features for Julia Code Blocks
+** Header Arguments
+   There are no Julia-specific default header arguments.
+
+   Babel support for Julia defines two Julia-specific header arguments, =:width= and =:horizontal=.
+   
+** Sessions
+Sessions are fully supported through ESS.
+
+Sessions can be used to define functions, set up variables, and share code between source blocks. 
+* Examples of Use
+Here is the standard Hello World example in Julia.
+
+In the Org mode buffer:
+#+begin_example
+,#+begin_src julia :results output
+print("Hello World!")
+,#+end_src
+#+end_example
+
+HTML export of the code block:
+#+name: julia-hello-world
+#+begin_src julia :results output :exports both
+print("Hello World!")
+#+end_src
+
+HTML export of the result:
+#+RESULTS: julia-hello-world
+: Hello World!
