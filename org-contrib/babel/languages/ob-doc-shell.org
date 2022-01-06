@@ -35,7 +35,7 @@
     src="https://zsh.sourceforge.io/Images/wizard.gif"/></a>
 
     <a href="https://www.mirbsd.org/mksh.htm"><img width="150px"
-    src="https://www.mirbsd.org/pics/logo-grey.png"/></a>
+    src="http://www.mirbsd.org/pics/logo-grey.png"/></a>
 
     <a href="https://fishshell.com/"><img width="150px"
     src="https://fishshell.com/assets/img/Terminal_Logo2_CRT_Flat.png"/></a>
@@ -89,57 +89,81 @@ separate application.
 Run commands in separate shells...[fn:3]
 
 : #+begin_src sh :results output
-:   echo PID: $$
+:   echo PID: "$$"
 : #+end_src
 :
 : #+RESULTS:
-: : PID: 9952
+: : PID: 19056
 :
 : #+begin_src sh :results output
-:   echo PID: $$
+:   echo PID: "$$"
 : #+end_src
 :
 : #+RESULTS:
-: : PID: 9990
-:
+: : PID: 19059
+
 ...as part of a single instance...
 
 : #+begin_src sh :results output :session shared
-:   echo PID: $$
-:   export X=1
+:   echo PID: "$$"
+:   X=1
 : #+end_src
 :
 : #+RESULTS:
-: : PID: 9742
+: : PID: 19066
 :
 : #+begin_src sh :results output :session shared
-:   echo PID: $$
-:   echo X was set to $X
+:   echo PID: "$$"
+:   echo X was set to "$X"
 : #+end_src
 :
 : #+RESULTS:
-: : PID: 9742
+: : PID: 19066
 : : X was set to 1
 
-...or as a standlone script.
+...or as a shell command.
 
-#+begin_src sh :results output :shebang :exports both
-echo "Defining a number..."
-num=14
+: #+title: shell command (shebang) example
+:
+: This is a literate script file.  The script we'll make can be used to ask someone what operating
+: system they're using.  First, we define a reference.
+:
+: #+name: their-os
+: Linux
+:
+: The reference is then passed as stdin into a script which gets executed as a command according to
+: the shebang (within a shell specified by the block language).  We get a different response depending
+: on who we ask.
+:
+: Let's test it by asking RMS:
+:
+: #+begin_src bash :results output :shebang #!/usr/bin/env bash :stdin their-os :cmdline RMS :tangle ask_for_os.sh
+:
+:   # call as ./ask_for_os.sh NAME, where NAME is who to ask
+:
+:   if [ -z "$1" ]; then
+:       asked="$USER"
+:   else
+:       asked="$1"
+:   fi
+:
+:   echo Hi, "$asked"! What operating system are you using?
+:   read my_os
+:
+:   if [ "$asked" = "RMS" ]; then
+:       echo You\'re using GNU/"$my_os"!
+:   elif [ "$asked" = "Linus" ]; then
+:       echo You\'re using "$my_os"!
+:   else
+:       echo You\'re using `uname -o`!
+:   fi
+: #+end_src
+:
+: #+RESULTS:
+: : Hi, RMS! What operating system are you using?
+: : You're using GNU/Linux!
 
-if [[ $num -gt 10 ]]
-then
-  echo "The number is greater than 10."
-else
-  echo "The number is less than or equal to 10."
-fi
-#+end_src
-
-#+RESULTS:
-: Defining a number...
-: The number is greater than 10.
-
-Shell blocks can be tangled, use noweb, accept args, work with stdin,
+Shell blocks can accept args, work with stdin, be tangled, use noweb,
 and more[fn:4].
 
 * Requirements and Setup
@@ -175,9 +199,9 @@ Org Babel can run many different shells such as [[https://www.gnu.org/software/b
 
     : #+begin_src dash :result output
     :   if [ `basename $SHELL` == bash ]; then
-    :     echo bash;
+    :     echo bash
     :   else
-    :     echo dash;
+    :     echo dash
     :   fi
     : #+end_src
     :
@@ -212,31 +236,8 @@ Supported types: table, list, and file.
 
 Define the following 2D-array:
 
-#+name: make_array
-#+begin_src sh :exports none
-declare -a array
-
-m=4
-n=3
-for ((i=0; i<m; i++))
-do
-    for ((j=0; j<n; j++))
-    do
-        a[${i},${j}]=$RANDOM
-    done
-done
-for ((i=0; i<m; i++))
-do
-    for ((j=0; j<n; j++))
-    do
-        echo -ne "${a[${i},${j}]}\t"
-    done
-    echo
-done
-#+end_src
-
 : #+name: make_array
-: #+begin_src sh
+: #+begin_src bash
 : declare -a array
 :
 : m=4
@@ -323,22 +324,22 @@ another session is given. It uses a different shell instance and,
 therefore, has no knowledge of the variable from the other session.
 
 : #+begin_src sh :results none :session *my-session*
-:   export X=1
+:   X=1
 : #+end_src
 :
 : #+begin_src sh :results output :session *my-session*
-:   echo \"X was set to $X\"
+:   echo X was set to "$X"
 : #+end_src
 :
 : #+RESULTS:
-: : "X was set to 1"
+: : X was set to 1
 :
 : #+begin_src sh :results output :session *another-session*
-:   echo \"X was set to $X\"
+:   echo X was set to "$X"
 : #+end_src
 :
 : #+RESULTS:
-: : "X was set to "
+: : X was set to
 
 Sessions are useful for isolating processes and for incremental
 development.
@@ -362,7 +363,7 @@ space.
 /Example (scalar):/
 
 : #+begin_src dash :var by_two=0  x=2
-:   if [ $by_two = 0 ]; then
+:   if [ "$by_two" = "0" ]; then
 :     echo $(($x * 2))
 :   else
 :     echo $(($x * 3))
@@ -387,11 +388,11 @@ The =:var= header lets results be passed between blocks, which allows blocks to 
 like functions.
 
 : #+name: multiply_by_2
-: #+begin_src sh :var data="" :results output
+: #+begin_src bash :var data="" :results output
 :   echo $(($data * 2))
 : #+end_src
 :
-: #+begin_src sh :post multiply_by_2(data=*this*)
+: #+begin_src bash :post multiply_by_2(data=*this*)
 :   echo 3
 : #+end_src
 :
@@ -410,16 +411,16 @@ of whether a =:session= is declared.
 /Example:/
 
 : #+name: my-org-element
-: this is something referenced as stdin
-: the stdin can even be multiple lines!
+: This is something referenced as stdin.
+: The stdin can even be multiple lines!
 :
 : #+begin_src sh :stdin my-org-element :results output
 : cat
 : #+end_src
 :
 : #+RESULTS:
-: : this is something referenced as stdin
-: : the stdin can even be multiple lines!
+: : This is something referenced as stdin.
+: : The stdin can even be multiple lines!
 
 /Example:/
 
@@ -428,7 +429,7 @@ of whether a =:session= is declared.
 :
 : #+begin_src bash :stdin my-input :results output
 : read n
-: echo You entered: $n
+: echo You entered: "$n"
 : #+end_src
 :
 : #+RESULTS:
@@ -437,17 +438,17 @@ of whether a =:session= is declared.
 /Example:/
 
 : #+name: my-input-block
-: #+begin_src sh
-:   echo $(uname -o)
+: #+begin_src bash
+:   echo "$(uname -o)"
 :   x=$(ps -p $PPID -o comm=)
-:   echo ${x:1:5}
+:   echo "${x:1:5}"
 : #+end_src
 :
 : #+RESULTS: my-input-block
 : | GNU/Linux |
 : | emacs     |
 :
-: #+begin_src sh :stdin my-input-block
+: #+begin_src bash :stdin my-input-block
 :   echo $(cut -f 1 -d "/") rocks!
 : #+end_src
 :
@@ -463,8 +464,8 @@ Use the =:cmdline= header arg to pass arguments to a shell command.
 regardless of whether a =:session= is declared.
 
 : #+begin_src sh :cmdline arg1 arg2
-:   echo $1
-:   echo $2
+:   echo "$1"
+:   echo "$2"
 : #+end_src
 :
 : #+RESULTS:
@@ -474,10 +475,10 @@ regardless of whether a =:session= is declared.
 ** Shebang (standalone scripts) <<shebang>>
 =:shebang [shebang]=
 
-Use the =:shebang= header arg to process a block as a standalone script[fn:10].
+Use the =:shebang= header arg to process a block as a command[fn:10].
 
-Pass a =shebang= (e.g. =#!/bin/bash=) to override the declared shell. If no shebang
-is provided, the block language is used (e.g. bash).
+Pass an interpreter directive (e.g. =#!/bin/bash=) to override the declared shell. If no shebang
+is provided, the block language is used (e.g. =#+begin_src bash=).
 
 *NOTE* When the =:shebang= header arg is used, the block is evaluated in a temporary
 shell, regardless of whether a =:session= is declared.
@@ -489,27 +490,26 @@ in sequence which may result in unwanted output characters.
 /Example (remove unwanted characters):/
 
 : #+begin_src sh :results output :session unwanted-chars
-:   export X=1
+:   X=1
 :   echo Setting X...
 :   sleep 3
-:   echo \"X was set to $X\"
+:   echo X was set to "$X"
 : #+end_src
 :
 : #+RESULTS:
-: :
 : : Setting X...
-: : sh-5.1$ "X was set to 1"
-
+: : sh-5.1$ X was set to 1
+:
 : #+begin_src sh :results output :shebang
-:   export X=1
+:   X=1
 :   echo Setting X...
 :   sleep 3
-:   echo \"X was set to $X\"
+:   echo X was set to "$X"
 : #+end_src
 :
 : #+RESULTS:
 : : Setting X...
-: : "X was set to 1"
+: : X was set to 1
 
 /Example (override):/
 
