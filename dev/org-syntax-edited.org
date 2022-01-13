@@ -80,10 +80,6 @@ beginning of a line. Most elements can be indentated, with the
 exception of [[#Headings][headings]], [[#Inlinetasks][inlinetasks]], [[#Footnote_Definitions][footnote definitions]], and [[#Diary_Sexp][diary
 sexps]].
 
-** Case significance
-
-In this document, unless specified otherwise, case is insignificant.
-
 ** Syntax patterns
 
 *** General form
@@ -127,6 +123,10 @@ element or object.  There patterns are specified using the /PRE/ and
 #+begin_example
 PRE TOKEN POST
 #+end_example
+
+*** Case significance
+
+In this document, unless specified otherwise, case is insignificant.
 
 * Elements
 :PROPERTIES:
@@ -272,9 +272,9 @@ Affiliated keywords are structured according to one of the following pattern:
 + VALUE :: A string consisting of any characters but a newline, except
   in the case where KEY is member of
   ~org-element-parsed-keywords~[fn:oepkw:By default,
-  ~org-element-parsed-keywords~ contains =CAPTION=.] in
-  which case VALUE can contain the standard set of objects, excluding
-  footnote references.
+  ~org-element-parsed-keywords~ contains =CAPTION=.] in which case VALUE
+  is a series of objects from the standard set, excluding footnote
+  references.
 
 Repeating an affiliated keyword before an element will usually result
 in the prior VALUEs being overwritten by the last instance of KEY.
@@ -810,6 +810,15 @@ CONTENTS
 + CONTENTS (optional) :: A string which does not contain the substring
   =\end{NAME}=.
 
+*Examples*
+
+#+begin_example
+\begin{align*}
+2x - 5y &= 8 \\
+3x + 9y &= -12
+\end{align*}
+#+end_example
+
 *** Node Properties
 :PROPERTIES:
 :CUSTOM_ID: Node_Properties
@@ -894,7 +903,7 @@ Where NAME and POST are not separated by a whitespace character.
 + NAME :: A string with a valid association in either
   ~org-entities~[fn:oe:See the [[#Entities_List][appendix]] for a list of entities.] or
   ~org-entities-user~.
-+ POST :: Either:
++ [[#Special_Tokens][POST]] :: Either:
   - The end of line.
   - The string ={}=.
   - A non-alphabetic character.
@@ -1092,6 +1101,8 @@ Inline Babel calls are structured according to one of the following patterns:
 
 #+begin_example
 call_NAME(ARGUMENTS)
+call_NAME[HEADER1](ARGUMENTS)
+call_NAME(ARGUMENTS)[HEADER2]
 call_NAME[HEADER1](ARGUMENTS)[HEADER2]
 #+end_example
 
@@ -1101,7 +1112,7 @@ call_NAME[HEADER1](ARGUMENTS)[HEADER2]
   string consisting of any characters but a newline.  Opening and
   closing square brackets must be balanced.
 
-** Source Blocks
+** Inline Source Blocks
 :PROPERTIES:
 :CUSTOM_ID: Source_Blocks
 :END:
@@ -1173,10 +1184,10 @@ PRE PROTOCOL:PATHPLAIN POST
 #+end_example
 
 + [[#Special_Tokens][PRE]] :: A non word constituent character.
-+ PROTOCOL :: A string which is a one of the link type strings in
++ PROTOCOL :: A string which is one of the link type strings in
   ~org-link-parameters~[fn:olp:By default, ~org-link-parameters~ defines
   links of type =file+sys=, =file+emacs=, =shell=, =news=, =mailto=, =https=,
-  =http=, =ftp=, =help=, =file=, or =elisp=.].
+  =http=, =ftp=, =help=, =file=, and =elisp=.].
 + PATHPLAIN :: A string containing any non-whitespace character but =(=, =)=,
   =<=, or =>=.  It must end with a word-constituent character, or any
   non-whitespace non-punctuation character followed by =/=.
@@ -1198,7 +1209,7 @@ pattern:
 <PROTOCOL:PATHANGLE>
 #+end_example
 
-+ PROTOCOL :: A string which is a one of the link type strings in
++ PROTOCOL :: A string which is one of the link type strings in
   ~org-link-parameters~[fn:olp]
 + PATHANGLE :: A string containing any character but =]=, =<=, =>= or =\n=.
 
@@ -1225,7 +1236,7 @@ id:ID                  ("id" type)
 FUZZY                  ("fuzzy" type)
   #+end_example
   - FILENAME :: A string representing an absolute or relative file path.
-  - PROTOCOL :: A string which is a one of the link type strings in
+  - PROTOCOL :: A string which is one of the link type strings in
     ~org-link-parameters~[fn:olp]
   - PATHINNER :: A string consisting of any character besides square brackets.
   - ID :: A string consisting of hexadecimal numbers separated by hyphens.
@@ -1234,11 +1245,11 @@ FUZZY                  ("fuzzy" type)
   - FUZZY :: A string consisting of any character besides square brackets.
 
 + DESCRIPTION (optional) :: A series of objects enclosed by square
-  brackets, consisting of any character but square brackets.  It can
-  contain the minimal set of objects as well as [[#Export_Snippets][export snippets]],
-  [[#Inline_Babel_Calls][inline babel calls]], [[#Source_Blocks][inline source blocks]], [[#Macros][macros]], and [[#Statistics_Cookies][statistics
-  cookies]].  It can also contain another link, but only when it is a
-  plain or angle link.
+  brackets.  It can contain the minimal set of objects as well as
+  [[#Export_Snippets][export snippets]], [[#Inline_Babel_Calls][inline babel calls]], [[#Source_Blocks][inline source blocks]], [[#Macros][macros]],
+  and [[#Statistics_Cookies][statistics cookies]].  It can also contain another link, but only
+  when it is a plain or angle link.  It can contain square brackets,
+  so long as they are balanced.
 
 *Examples*
 
@@ -1435,7 +1446,7 @@ to the following pattern:
 PRE MARKER CONTENTS MARKER POST
 #+end_example
 
-Where /PRE/, MARKER, CONTENTS, MARKER and /POST/ are not separated by
+Where PRE, MARKER, CONTENTS, MARKER and POST are not separated by
 whitespace characters.
 
 + [[#Special_Tokens][PRE]] :: Either a whitespace character, =-=, =(=, ={=, ='=, ="=, or the beginning
