@@ -19,9 +19,13 @@ under the GNU General Public License v3 or later.
 Org is a plaintext format composed of simple, yet versatile, forms
 which represent formatting and structural information.  It is designed
 to be both intuitive to use, and capable of representing complex
-documents.  Like [[https://datatracker.ietf.org/doc/html/rfc7763][Markdown]], Org may be considered a lightweight markup
-language.  However, while Markdown refers to a collection of similar
-syntaxes, Org is a single syntax.
+documents.  Like Markdown ([[https://datatracker.ietf.org/doc/html/rfc7763][RFC7763]]), Org may be considered a
+lightweight markup language.  However, while Markdown refers to a
+collection of similar syntaxes, Org is a single syntax.
+
+#+begin_notes
+Should markdown be mentioned at all?
+#+end_notes
 
 This document describes and comments on Org syntax as it is currently
 read by its parser (=org-element.el=) and, therefore, by the export
@@ -78,7 +82,7 @@ considered part of the paragraph.
 Indentation consists of a series of space and tab characters at the
 beginning of a line. Most elements can be indentated, with the
 exception of [[#Headings][headings]], [[#Inlinetasks][inlinetasks]], [[#Footnote_Definitions][footnote definitions]], and [[#Diary_Sexp][diary
-sexps]].
+sexps]].  Indentation is only syntactically meaningful in plain lists.
 
 ** Syntax patterns
 
@@ -96,8 +100,11 @@ meaning, For instance, "KEY" and "VALUE" when describing
 [[#Keywords][Keywords]]. Tokens will be specified as either a string, or a series of
 elements or objects.
 
+#+attr_latex: :options [Important]
+#+begin_info
 Unless otherwise specified, a space in a pattern represents one or
 more horizontal whitespace characters.
+#+end_info
 
 Patterns will often also contain static structures that serve to
 differentiate a particular element or object type from others, but
@@ -141,7 +148,7 @@ In this document, unless specified otherwise, case is insignificant.
 :CUSTOM_ID: Headings
 :END:
 
-A Heading is a /unindented/ line structured according to the following pattern:
+A Heading is an /unindented/ line structured according to the following pattern:
 
 #+begin_example
 STARS KEYWORD PRIORITY TITLE TAGS
@@ -149,13 +156,17 @@ STARS KEYWORD PRIORITY TITLE TAGS
 
 + STARS :: A string consisting of one or more asterisks (up to
   ~org-inlinetask-min-level~ if the =org-inlinetask= library is loaded)
-  and ended by a space character.  The number of asterisks is used to
+  suffixed by a space character.  The number of asterisks is used to
   define the level of the heading.
 
 + KEYWORD (optional) :: A string which is a member of
   ~org-todo-keywords-1~[fn:otkw1:By default, ~org-todo-keywords-1~ only
-  contains =TODO= and =DONE=, however this is liable to change.].  Case is
-  significant.  This is called a "TODO keyword".
+  contains =TODO= and =DONE=, however ~org-todo-keywords-1~ is set on a
+  per-document basis.].
+  Case is significant.  This is called a "todo keyword". [fn::Implementation note:
+  todo keywords cannot be hardcoded in a tokenizer, the tokenizer must
+  be configurable at runtime so that in-file todo keywords are properly
+  interpreted.]
 
 + PRIORITY (optional) :: A single alphanumeric character preceded by a
   hash sign =#= and enclosed within square brackets (e.g. =[#A]= or =[#1]=).  This
@@ -180,15 +191,16 @@ STARS KEYWORD PRIORITY TITLE TAGS
 If the first word appearing in the title is =COMMENT=, the heading
 will be considered as "commented".  Case is significant.
 
-If its title is the value of ~org-footnote-section~ (=Footnotes= by
-default), it will be considered as a "footnote section".  Case is
-significant.
+If the TITLE of a heading is exactly the value of ~org-footnote-section~
+(=Footnotes= by default), it will be considered as a "footnote section".
+Case is significant.
 
 If =ARCHIVE= is one of the tags given, the heading will be considered as
 "archived".  Case is significant.
 
-A heading contains directly one section (optionally), followed by
-any number of deeper level headings.
+All content following a heading --- up to either the next heading, or the end of the
+document, forms a section contained by the heading. This is optional, as the
+next heading may occur immediately in which case no section is formed.
 
 *** Sections
 :PROPERTIES:
@@ -198,6 +210,12 @@ any number of deeper level headings.
 Sections contain one or more non-heading elements.  With the exception
 of the text before the first heading in a document (which is
 considered a section), sections only occur within headings.
+
+#+begin_notes
+Since sections are usually thought of as a larger group that includes
+nested content (e.g. "section 3"), and this isn't what Org sections are,
+maybe this should be called something slightly different?
+#+end_notes
 
 *Example*
 
@@ -224,83 +242,27 @@ Its internal structure could be summarized as:
    (heading))))
 #+end_example
 
-*** The top level section
+*** The zeroth section
 :PROPERTIES:
-:CUSTOM_ID: Top_level_section
+:CUSTOM_ID: Zeroth_section
 :END:
 
 All elements before the first heading in a document lie in a special
-section called the /top level section/.  It may be preceded by blank
-lines.  Unlike a normal section, the top level section can immediately
+section called the /zeroth section/.  It may be preceded by blank
+lines.  Unlike a normal section, the zeroth section can immediately
 contain a [[#Property_Drawers][property drawer]], optionally preceded by [[#Comments][comments]].  It cannot
 however, contain [[Planning][planning]].
-
-** Affiliated Keywords
-:PROPERTIES:
-:CUSTOM_ID: Affiliated_Keywords
-:END:
-
-With the exception of [[#Comments][comments]], [[#Clocks][clocks]], [[#Headings][headings]], [[#Inlinetasks][inlinetasks]],
-[[#Items][items]], [[#Node_Properties][node properties]], [[#Planning][planning]], [[#Property_Drawers][property drawers]], [[#Sections][sections]], and
-[[#Table_Rows][table rows]], every other element type can be assigned attributes.
-
-This is done by adding specific [[#Keywords][keywords]], named /affiliated/ keywords,
-immediately above the element considered (a blank line cannot lie
-between the affiliated keyword and element). Structurally, affiliated
-keyword are not considered an element in their own right but a
-property of the element they apply to.
-
-Affiliated keywords are structured according to one of the following pattern:
-
-#+begin_example
-,#+KEY: VALUE
-,#+KEY[OPTVAL]: VALUE
-,#+attr_BACKEND: VALUE
-#+end_example
-
-+ KEY :: A string which is a member of
-  ~org-element-affiliated-keywords~[fn:oeakw:By default,
-  ~org-element-affiliated-keywords~ contains =CAPTION=, =DATA=, =HEADERS=,
-  =LABEL=, =NAME=, =PLOT=, =RESNAME=, =RESULT=, =RESULTS=, =SOURCE=, =SRCNAME=, and
-  =TBLNAME=.].
-+ BACKEND :: A string consisting of alphanumeric characters, hyphens,
-  or underscores (=-_=).
-+ OPTVAL (optional) :: A string consisting of any characters but a
-  newline.  This term is only valid when KEY is a member of
-  ~org-element-dual-keywords~[fn:oedkw:By default,
-  ~org-element-dual-keywords~ contains =CAPTION= and =RESULTS=.].
-+ VALUE :: A string consisting of any characters but a newline, except
-  in the case where KEY is member of
-  ~org-element-parsed-keywords~[fn:oepkw:By default,
-  ~org-element-parsed-keywords~ contains =CAPTION=.] in which case VALUE
-  is a series of objects from the standard set, excluding footnote
-  references.
-
-Repeating an affiliated keyword before an element will usually result
-in the prior VALUEs being overwritten by the last instance of KEY.
-There are two situations under which the VALUEs will be concatenated:
-1. If KEY is a member of ~org-element-dual-keywords~[fn:oedkw].
-2. If the affiliated keyword is an instance of the patten
-   =#+attr_BACKEND: VALUE=.
-
-The following example contains three affiliated keywords:
-#+begin_example
-,#+name: image-name
-,#+caption: This is a caption for
-,#+caption: the image linked below
-[[file:some/image.png]]
-#+end_example
 
 ** Greater Elements
 :PROPERTIES:
 :CUSTOM_ID: Greater_Elements
 :END:
 
-Unless specified otherwise, greater elements can contain directly
+Unless otherwise specified, greater elements can directly contain
 any greater or [[#Lesser_Elements][lesser element]] except:
 + Elements of their own type.
 + [[#Planning][Planning]], which may only occur in a [[#Headings][heading]].
-+ [[#Property_Drawers][Property drawers]], which may only occur in a [[#Headings][heading]] or the [[#Top_level_section][top level
++ [[#Property_Drawers][Property drawers]], which may only occur in a [[#Headings][heading]] or the [[#Zeroth_section][zeroth
   section]].
 + [[#Node_Properties][Node properties]], which can only be found in [[#Property_Drawers][property drawers]].
 + [[#Items][Items]], which may only occur in [[#Plain_Lists][plain lists]].
@@ -411,6 +373,10 @@ level of at least ~org-inlinetask-min-level~[fn:oiml], with no optional
 components (i.e. only STARS and TITLE provided) and the string =END= as
 the TITLE. This allows the inlinetask to contain elements.
 
+#+begin_notes
+Urgh, this syntax is ugly. --- Tom G, Timothy
+#+end_notes
+
 *Examples*
 
 #+begin_example
@@ -448,8 +414,8 @@ BULLET COUNTER-SET CHECK-BOX TAG CONTENTS
   character, or a hyphen enclosed by square brackets (i.e. =[ ]=, =[X]=, or =[-]=).
 + TAG (optional) :: An instance of the pattern =TAG-TEXT ::= where
   =TAG-TEXT= represents a string consisting of non-newline characters
-  that does not contain the substring "\nbsp{}::\nbsp{}" (two colons surrounded by
-  whitespace).
+  that does not contain the substring ="\nbsp{}::\nbsp{}"= (two colons surrounded by
+  whitespace, without the quotes).
 + CONTENTS (optional) :: A collection of zero or more elements, ending
   at the first instance of one of the following:
   - The next item.
@@ -457,6 +423,7 @@ BULLET COUNTER-SET CHECK-BOX TAG CONTENTS
     not counting lines within other elements or [[#Inlinetasks][inlinetask]] boundaries.
   - Two consecutive blank lines.
 
+Since it is stated that CONTENTS will end at the next item,
 *Examples*
 
 #+begin_example
@@ -472,10 +439,17 @@ BULLET COUNTER-SET CHECK-BOX TAG CONTENTS
 
 A /plain list/ is a set of consecutive [[#Items][items]] of the same indentation.
 
+#+begin_info
+At a glance it may appear as though nested lists are not possible. They are, as
+items may themselves contain lists.
+#+end_info
+
 If first item in a plain list has a COUNTER in its BULLET, the plain
 list will be an "ordered plain-list".  If it contains a TAG, it will
 be a "descriptive list".  Otherwise, it will be an "unordered list".
-List types are mutually exclusive.
+List types are mutually exclusive at the same level of indentation, if
+both types are present consecutively then they parse as separate
+lists.
 
 For example, consider the following excerpt of an Org document:
 
@@ -524,6 +498,14 @@ CONTENTS
 + CONTENTS :: A collection of zero or more [[#Node_Properties][node properties]], not
   separated by blank lines.
 
+#+begin_notes
+The failure mode for malformed contents needs to be determined more clearly
+here. We don't want property draws to suddenly become plain drawers just because
+a user has a malformed line, that could be disastrous if certain settings in the
+property drawer mask settings from further up the tree. In short, malformed
+contents should not poison the whole property drawer. --- Tom G
+#+end_notes
+
 *Example*
 
 #+begin_example
@@ -542,10 +524,14 @@ Tables are started by a line beginning with either:
 + The string =+-= followed by a sequence of plus (=+=) and minus (=-=)
   signs, forming a "table.el" type table.
 
+#+begin_notes
+Maybe drop table.el from the spec?
+#+end_notes
+
 Tables cannot be immediately preceded by such lines, as the current
 line would the be part of the earlier table.
 
-Org tables contain table rows, and end at the first line not starting
+Org tables contain [[#Table_Rows][table rows]], and end at the first line not starting
 with a vertical bar. An Org table can be followed by a number of
 =#+TBLFM: FORMULAS= lines, where =FORMULAS= represents a string consisting
 of any characters but a newline.
@@ -571,27 +557,6 @@ Lesser elements cannot contain any other element.
 
 Only [[#Keywords][keywords]] which are a member of ~org-element-parsed-keywords~[fn:oepkw], [[#Blocks][verse
 blocks]], [[#Paragraphs][paragraphs]] or [[#Table_Rows][table rows]] can contain objects.
-
-*** Babel Call
-:PROPERTIES:
-:CUSTOM_ID: Babel_Call
-:END:
-
-Babel calls are structured according to one of the following patterns:
-#+begin_example
-,#+call: NAME(ARGUMENTS)
-,#+call: NAME[HEADER1](ARGUMENTS)
-,#+call: NAME(ARGUMENTS)[HEADER2]
-,#+call: NAME[HEADER1](ARGUMENTS)[HEADER2]
-#+end_example
-
-+ NAME :: A string consisting of any non-newline characters except for
-  square brackets, or parentheses (=[]()=).
-+ ARGUMENTS (optional) :: A string consisting of any non-newline
-  characters.  Opening and closing parenthesis must be balanced.
-+ HEADER1 (optional), HEADER2 (optional) :: A string consisting of any
-  non-newline characters.  Opening and closing square brackets must be
-  balanced.
 
 *** Blocks
 :PROPERTIES:
@@ -638,6 +603,11 @@ CONTENTS
   CONTENTS will contain Org objects when the block is a verse block,
   it is otherwise not parsed.
 
+#+begin_notes
+Can we drop switch support? This seems like a fairly good idea.\\
+"For the love of all that is sane" --- Tom G
+#+end_notes
+
 *Example*
 
 #+begin_example
@@ -674,7 +644,6 @@ clock: INACTIVE-TIMESTAMP-RANGE DURATION
 clock: [2024-10-12]
 #+end_example
 
-
 *** Diary Sexp
 :PROPERTIES:
 :CUSTOM_ID: Diary_Sexp
@@ -709,13 +678,19 @@ PLANNING
 #+end_example
 
 + HEADING :: A [[#Headings][heading]] element.
-+ PLANNING :: A line consisting of a series of =KEYWORD: TIMESTAMP=
++ PLANNING :: A line consisting of one or more =KEYWORD: TIMESTAMP=
   patterns (termed "info" patterns).
   - KEYWORD :: Either the string =DEADLINE=, =SCHEDULED=, or =CLOSED=.
+    #+begin_notes
+    Tom G has requested adding a =OPENED= keyword to track task creation/registration.
+    #+end_notes
   - TIMESTAMP :: A [[#Timestamps][timestamp]] object.
 
-It is not permitted for any blank lines to lie between HEADING and
-PLANNING.
+PLANNING must directly follow HEADING without any blank lines in
+between.
+
+When a keyword is repeated in a planning element, the last instance of it has
+priority.
 
 *Example*
 
@@ -783,6 +758,13 @@ Keywords are structured according to the following pattern:
   than =call= (which would forms a [[#Babel_Call][babel call]] element).
 + VALUE :: A string consisting of any characters but a newline.
 
+#+begin_notes
+Perhaps this should be changed to be =#+KEY[OPT]: VAL=? It would make the syntax
+more regular, considering affiliated keywords. I can't see any backwards
+compatibility concerns. \\
+This was suggested by Tom G, but I'm a fan --- Timothy.
+#+end_notes
+
 When KEY is a member of ~org-element-parsed-keywords~[fn:oepkw], VALUE can contain
 the standard set objects, excluding footnote references.
 
@@ -792,6 +774,106 @@ keyword may occur so long as it is not immediately preceding a valid
 element that can be affiliated.  For example, an instance of
 =#+caption: hi= followed by a blank line will be parsed as a keyword,
 not an affiliated keyword.
+
+**** Babel Call
+:PROPERTIES:
+:CUSTOM_ID: Babel_Call
+:END:
+
+Babel calls are structured according to one of the following patterns:
+#+begin_example
+,#+call: NAME(ARGUMENTS)
+,#+call: NAME[HEADER1](ARGUMENTS)
+,#+call: NAME(ARGUMENTS)[HEADER2]
+,#+call: NAME[HEADER1](ARGUMENTS)[HEADER2]
+#+end_example
+
++ NAME :: A string consisting of any non-newline characters except for
+  square brackets, or parentheses (=[]()=).
++ ARGUMENTS (optional) :: A string consisting of any non-newline
+  characters.  Opening and closing parenthesis must be balanced.
++ HEADER1 (optional), HEADER2 (optional) :: A string consisting of any
+  non-newline characters.  Opening and closing square brackets must be
+  balanced.
+
+#+begin_notes
+Should this be distinguished from other keywords at the AST
+interpretation stage, instead of the base syntax? --- Tom G
+#+end_notes
+
+**** Affiliated Keywords
+:PROPERTIES:
+:CUSTOM_ID: Affiliated_Keywords
+:END:
+
+With the exception of [[#Comments][comments]], [[#Clocks][clocks]], [[#Headings][headings]], [[#Inlinetasks][inlinetasks]],
+[[#Items][items]], [[#Node_Properties][node properties]], [[#Planning][planning]], [[#Property_Drawers][property drawers]], [[#Sections][sections]], and
+[[#Table_Rows][table rows]], every other element type can be assigned attributes.
+
+This is done by adding specific [[#Keywords][keywords]], named /affiliated/ keywords,
+immediately above the element considered (a blank line cannot lie
+between the affiliated keyword and element). Structurally, affiliated
+keyword are not considered an element in their own right but a
+property of the element they apply to.
+
+Affiliated keywords are structured according to one of the following pattern:
+
+#+begin_example
+,#+KEY: VALUE
+,#+KEY[OPTVAL]: VALUE
+,#+attr_BACKEND: VALUE
+#+end_example
+
++ KEY :: A string which is a member of
+  ~org-element-affiliated-keywords~[fn:oeakw:By default,
+  ~org-element-affiliated-keywords~ contains =CAPTION=, =DATA=, =HEADERS=,
+  =LABEL=, =NAME=, =PLOT=, =RESNAME=, =RESULT=, =RESULTS=, =SOURCE=, =SRCNAME=, and
+  =TBLNAME=.].
++ BACKEND :: A string consisting of alphanumeric characters, hyphens,
+  or underscores (=-_=).
++ OPTVAL (optional) :: A string consisting of any characters but a
+  newline.  Opening and closing square brackets must be balanced.
+  This term is only valid when KEY is a member of
+  ~org-element-dual-keywords~[fn:oedkw:By default,
+  ~org-element-dual-keywords~ contains =CAPTION= and =RESULTS=.].
++ VALUE :: A string consisting of any characters but a newline, except
+  in the case where KEY is member of
+  ~org-element-parsed-keywords~[fn:oepkw:By default,
+  ~org-element-parsed-keywords~ contains =CAPTION=.] in which case VALUE
+  is a series of objects from the standard set, excluding footnote
+  references.
+
+#+begin_notes
+Should this even be described at a syntax level instead of an AST
+processing level? --- Tom G
+#+end_notes
+
+Repeating an affiliated keyword before an element will usually result
+in the prior VALUEs being overwritten by the last instance of KEY.
+The sole exception to this is =#+header:= keywords, where in the case of multiple
+=:opt val= declarations the last declaration on the first line it occurs on has
+priority.
+
+#+begin_notes
+Maybe this should be first-line-wins for all affiliated keywords?
+This would be a breaking change though. --- Timothy
+#+end_notes
+
+There are two situations under which the VALUEs will be concatenated:
+1. If KEY is a member of ~org-element-dual-keywords~[fn:oedkw].
+2. If the affiliated keyword is an instance of the pattern
+   =#+attr_BACKEND: VALUE=.
+
+When no element immediately follows an instance of the "affiliated
+keyword" pattern, the keyword is a normal, non-affiliated keyword.
+
+The following example contains three affiliated keywords:
+#+begin_example
+,#+name: image-name
+,#+caption: This is a caption for
+,#+caption: the image linked below
+[[file:some/image.png]]
+#+end_example
 
 *** LaTeX Environments
 :PROPERTIES:
@@ -806,7 +888,7 @@ CONTENTS
 \end{NAME}
 #+end_example
 
-+ NAME :: A string consisting of alphanumeric or asterisk characters
++ NAME :: A non-empty string consisting of alphanumeric or asterisk characters
 + CONTENTS (optional) :: A string which does not contain the substring
   =\end{NAME}=.
 
@@ -986,6 +1068,10 @@ ought to be removed.
 
 They are slow to parse, fragile, redundant and imply false
 positives.  --- ngz
+
+Strong support for removing these.  --- Tom G
+
+I'm strongly in support of dropping $-syntax.  --- Timothy
 #+end_quote
 
 ** Export Snippets
@@ -999,7 +1085,7 @@ Export snippets are structured according to the following pattern:
 @@BACKEND:VALUE@@
 #+end_example
 
-+ BACKEND :: A string consisting of alphanumeric characters and hyphens.
++ BACKEND :: A string consisting of zero or more alphanumeric characters and hyphens.
 + VALUE (optional) :: A string containing anything but the string =@@=.
 
 ** Footnote References
@@ -1017,7 +1103,7 @@ Footnote references are structured according to one of the following patterns:
 
 + LABEL :: A string containing one or more word constituent characters,
   hyphens and underscores (=-_=).
-+ DEFINITION (optional) :: A series of objects from the standard set,
++ DEFINITION (optional) :: One or more objects from the standard set,
   so long as opening and closing square brackets are balanced within
   DEFINITION.
 
@@ -1048,13 +1134,13 @@ whitespace is significant.
 + CITESTYLE (optional) :: An instance of either the pattern =/STYLE= or =/STYLE/VARIANT=
   - STYLE :: A string made of any alphanumeric character, =_=, or =-=.
   - Variant :: A string made of any alphanumeric character, =_=, =-=, or =/=.
-+ GLOBALPREFIX (optional) :: A series of objects from the standard set,
++ GLOBALPREFIX (optional) :: One or more objects from the standard set,
   so long as all square brackets are balanced within GLOBALPREFIX, and
   it does not contain any semicolons (=;=) or subsequence that matches
   =@KEY=.
 + REFERENCES :: One or more [[#Citation_References][citation reference]] objects, separated by
   semicolons (=;=).
-+ GLOBALSUFFIX (optional) :: A series of objects from the standard set,
++ GLOBALSUFFIX (optional) :: One or more objects from the standard set,
   so long as all square brackets are balanced within GLOBALSUFFIX, and
   it does not contain any semicolons (=;=) or subsequence that matches
   =@KEY=.
@@ -1081,14 +1167,14 @@ KEYPREFIX @KEY KEYSUFFIX
 #+end_example
 Where KEYPREFIX, @​KEY, and KEYSUFFIX are not separated by whitespace.
 
-+ KEYPREFIX (optional) :: A series of objects from the minimal set,
++ KEYPREFIX (optional) :: One or more objects from the minimal set,
   so long as all square brackets are balanced within KEYPREFIX, and
   it does not contain any semicolons (=;=) or subsequence that matches
   =@KEY=.
 + KEY :: A string made of any word-constituent character, =-=, =.=, =:=,
   =?=, =!=, =`=, ='=, =/=, =*=, =@=, =+=, =|=, =(=, =)=, ={=, =}=, =<=, =>=, =&=, =_=, =^=, =$=, =#=, =%=, or
   =~=.
-+ KEYSUFFIX (optional) :: A series of objects from the minimal set,
++ KEYSUFFIX (optional) :: One or more objects from the minimal set,
   so long as all square brackets are balanced within KEYPREFIX, and
   it does not contain any semicolons (=;=).
 
@@ -1160,7 +1246,7 @@ PRE RADIO POST
 #+end_example
 
 + [[#Special_Tokens][PRE]] :: A non-alphanumeric character.
-+ RADIO :: A series of objects matched by some [[#Targets_and_Radio_Targets][radio target]].  It can
++ RADIO :: One or more objects matched by some [[#Targets_and_Radio_Targets][radio target]].  It can
   contain the minimal set of objects.
 + [[#Special_Tokens][POST]] :: A non-alphanumeric character.
 
@@ -1243,8 +1329,9 @@ FUZZY                  ("fuzzy" type)
   - CUSTOM-ID :: A string consisting of any character besides square brackets.
   - CODEREF :: A string consisting of any character besides square brackets.
   - FUZZY :: A string consisting of any character besides square brackets.
-
-+ DESCRIPTION (optional) :: A series of objects enclosed by square
+  Square brackets and backslashes can be present in PATHREG so long as
+  they are escaped by a backslash (i.e. =\]=, =\\=).
++ DESCRIPTION (optional) :: One or more objects enclosed by square
   brackets.  It can contain the minimal set of objects as well as
   [[#Export_Snippets][export snippets]], [[#Inline_Babel_Calls][inline babel calls]], [[#Source_Blocks][inline source blocks]], [[#Macros][macros]],
   and [[#Statistics_Cookies][statistics cookies]].  It can also contain another link, but only
@@ -1307,7 +1394,7 @@ Radio targets are structured according to the following pattern:
 <<<CONTENTS>>>
 #+end_example
 
-+ CONTENTS :: A series of objects from the minimal set, starting and
++ CONTENTS :: One or more objects from the minimal set, starting and
   ending with a non-whitespace character, and containing any character
   but =<=, =>=, or =\n=.
 
@@ -1372,14 +1459,14 @@ Table cells are structured according to the following pattern:
 CONTENTS SPACES|
 #+end_example
 
-+ CONTENTS :: A series of objects not containing the vertical bar
++ CONTENTS :: Zero or more objects not containing the vertical bar
   character (=|=).  It can contain the minimal set of objects,
   [[#Citations][citations]], [[#Export_Snippets][export snippets]], [[#Footnote_References][footnote references]], [[#Links][links]], [[#Macros][macros]],
   [[#Targets_and_Radio_Targets][radio targets]], [[#Targets_and_Radio_Targets][targets]], and [[#Timestamps][timestamps]].
 + SPACES :: A string consisting of zero or more of space characters,
   used to align the table columns.
 
-The final vertical bar (=|=) may be omitted in the last cell of a row.
+The final vertical bar (=|=) may be omitted in the last cell of a [[#Table_Rows][table row]].
 
 ** Timestamps
 :PROPERTIES:
@@ -1423,6 +1510,11 @@ MARK VALUE UNIT
 
 There can be two instances of =REPEATER-OR-DELAY= in the timestamp: one
 as a repeater and one as a warning delay.
+
+#+begin_notes
+Tom G has some syntax extensions he'd like to suggest for historical /
+far-future dates, timezone offsets, and second/sub-second times.
+#+end_notes
 
 *Examples*
 
