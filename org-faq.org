@@ -1926,20 +1926,67 @@ For example:
 
 #+index: Link!Mailto
 
-You can customize the function org-mode uses to open mailto links by
-setting the variable =org-link-mailto-program=:
+Org calls the ~browse-url~ function for =mailto:= links, so it should obey
+your Emacs configuration.  If something goes wrong then
+[[info:emacs#Browse-URL][info "(emacs) Browse-URL"]] may be a good starting point.
 
-=M-x customize-variable org-link-mailto-program=
+By default mail is composed in an Emacs buffer.  If you prefer some
+external application instead then set ~browse-url-mailto-function~ to
+~nil~, e.g. using
+[[elisp:(customize-variable 'browse-url-mailto-function)][=M-x customize-variable RET browse-url-mailto-function RET=]]
+and =mailto:= links will be opened according to the value of
+~browse-url~browser-function~.
 
-The default function called is =browse-url=, which opens a mail
-composition buffer within Emacs. The type of buffer opened by
-browse-url depends on the setting of the variable =mail-user-agent=.
-Thus, if you want to ensure that mailto links use Gnus to open a
-message buffer, you could add the following to your =.emacs=:
+If you wish to compose messages in Emacs then consult
+[[info:emacs#Mail Methods][info "(emacs) Mail Methods"]].  Check that ~browse-url-mailto-function~
+has its default value ~browse-url-mail~.  Emacs has several mail
+packages and the active one is determined by the ~mail-user-agent~ variable,
+so the next step may be to configure it to, e.g., =gnus-user-agent= using
+[[elisp:(customize-variable 'mail-user-agent)][=M-x customize-variable RET mail-user-agent RET=]].
 
-#+begin_src elisp
-(setq mail-user-agent 'gnus-user-agent)
+If you prefer an external application that is /not/ the one configured
+in your desktop environment, then you should write a custom URL
+handler function.  Be careful, try to avoid using the shell
+(e.g. ~shell-command~ function) since it is easy to mess up the
+escaping of the URL argument and allow execution of arbitrary code:
+some parts of links may be treated as shell specials.  Choosing a
+proper function to invoke an external application is a non-trivial
+task even for seasoned Emacs developers.  When possible use an option
+like double dash =--= before URLs that forces interpreting following
+as arguments even when a string resembles some option due to a leading
+dash.  For examples, consult the source code of ~browse-url-xdg-open~,
+~browse-url-default-macosx-browser~, or
+~browse-url-default-windows-browser~ for GNU/Linux,
+Mac\nbsp{}OS\nbsp{}X, or MS\nbsp{}Windows platforms accordingly.
+
+When you are ready with a function launching your preferred handler
+for =mailto:= links, you should add it to ~browse-url-handlers~
+associations list for Emacs-28.1 and newer or to
+~browse-url-browser-function~ for earlier versions by customizing the
+suitable variable.
+
+If you are going to change handler just in Org mode in a way that does
+not affect rest of Emacs than you can adjust =:follow= handler for
+mailto links, see [[info:org#Adding Hyperlink Types][info "(org) Adding Hyperlink Types"]] for details.
+E.g. for Mac\nbsp{}OS\nbsp{}X add the following snippet to your
+[[info:emacs#Init File][Emacs init file]] (on Linux to avoid silent failures add
+~(process-connection-type nil)~ to ~let~ variables or use
+~call-process~ with =0= as the =DESTINATION= argument instead):
+
+#+begin_src elisp :results none
+(with-eval-after-load 'ol
+  (org-link-set-parameters
+   "mailto"
+   :follow (lambda (path)
+	     (let ((url (concat "mailto:" path)))
+	       ;; platform-specific choice of function
+	       (start-process (concat "open " url) nil
+			      "open" "-a" "Thunderbird" "--args" url)))))
 #+end_src
+
+In earlier versions Org had ~org-link-mailto-program~ variable, but it
+was removed, so its customization does not work any more.  Update your
+init file if you noticed this variable.
 
 ** Can I use CamelCase links?
    :PROPERTIES:
