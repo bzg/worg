@@ -80,40 +80,42 @@ actions. Just register your custom sub-protocol and handler with the variable
 
 * Browser / system setup
 
-  - [[Linux setup (Gnome)]]
-  - [[Linux setup (KDE)]]
+  - [[GNU/Linux setup]]
   - [[Windows setup]]
   - [[Mac OS X setup]]
   - [[*Applications][Applications]]
   - [[*Verify the installation][Verify the installation]]
 
-*** Linux setup (Gnome)
+*** GNU/Linux setup
 
-    For this to work, you'll need the Gnome-Libraries to be installed.
+    Most common desktop environments (Gnome, KDE et al) comply with the [[https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html][XDG Desktop Entry Specification]].
+    This means setting up =emacsclient= as the =org-protocol= handler using a .desktop file can be regarded
+    as a, in most cases, standard way to set this up in most common desktop environments.
 
-    : gconftool-2 -s /desktop/gnome/url-handlers/org-protocol/command '/usr/local/bin/emacsclient %s' --type String
-    : gconftool-2 -s /desktop/gnome/url-handlers/org-protocol/enabled --type Boolean true
+    Some environments, e.g. Gnome as of Gnome 3, have deprecated other configuration methods,
+    e.g. =gconftool-2= to set-up protocol handling.
 
-*** Linux setup (KDE)
-
-    Add a file =org.protocol= to =~/.kde/share/kde4/services/=:
+    Create an =org-protocol.desktop= file either in =~/.local/share/applications/= to set-up =emacsclient= as the
+    =org-protocol= handler for the current user or in =/usr/share/applications= to set-up a system-wide
+    configuration:
 
     #+begin_example
-    # -*- conf -*-
-    [Protocol]
-    protocol=org-protocol
-    exec=/usr/bin/emacsclient '%u'
-    input=none
-    output=none
-    helper=true
-    listing=
-    reading=false
-    writing=false
-    makedir=false
-    deleting=false
+    [Desktop Entry]
+    Name=org-protocol
+    Comment=Intercept calls from emacsclient to trigger custom actions
+    Categories=Other;
+    Keywords=org-protocol;
     Icon=emacs
-    Description=A protocol for org-mode
+    Type=Application
+    Exec=emacsclient -- %u
+    Terminal=false
+    StartupWMClass=Emacs
+    MimeType=x-scheme-handler/org-protocol;
     #+end_example
+
+    Update the cache database of MIME types handled by desktop files via:
+
+    : update-desktop-database ~/.local/share/applications/
 
 *** Windows setup
 
