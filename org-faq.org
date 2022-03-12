@@ -2000,19 +2000,56 @@ consult the [[https://orgmode.org/worg/org-contrib/org-wikinodes.html][documenta
 
 ** Can I create links to Thunderbirds emails?
 
-Yes, see this: [[http://list.orgmode.org/ka42mn$mn9$1@ger.gmane.org][from Christoph Herzog: Re: Linking to Thunderbird (correction)]]
+Thunderbird-91 and later versions support =mid:= URI scheme proposed
+many years ago, see
+[[https://www.rfc-editor.org/rfc/rfc2392.html][RFC 2392 - Content-ID and Message-ID Uniform Resource Locators]]
+for details.  To create a link you need to copy the value of the
+Message-ID header, it should be possible with some add-on.  As the
+last resort you may obtain the identifier by opening message source
+(=Ctrl+U=).  Message-ID resembles email address but has a unique
+string in the local (user) part.  Remove angle brackets and prepend
+the inner part with =mid:= to create a link.  A command to open the
+referenced message would look like (do not forget to quote or to escape
+shell specials)
+: thunderbird 'mid:ka42mn$mn9$1@ger.gmane.org'
 
+Your need to define "mid" link type in your Emacs init file:
 #+BEGIN_SRC emacs-lisp
-(require 'org)
-
-(org-add-link-type "thunderlink" 'org-thunderlink-open)
-
-(defun org-thunderlink-open (path)
-  "Opens an email in Thunderbird with ThunderLink."
-  (start-process "myname" nil "thunderbird" "-thunderlink" (concat "thunderlink:" path)))
-
-(provide 'org-thunderlink)
+(with-eval-after-load 'ol
+  (org-link-set-parameters
+   "mid"
+   :follow (lambda (url &optional arg)
+	     (browse-url (concat "mid:" url) arg))))
 #+END_SRC
+
+Depending on your GNU/Linux distribution, =thuderbird.desktop= file
+may be shipped without mentioning the "mid" scheme in the list of
+supported MIME types.  As a workaround add the following lines
+(configuration sections may already exist) to
+=~/.config/mimeapps.list= or an equivalent global file:
+#+BEGIN_EXAMPLE
+[Added Associations]
+x-scheme-handler/mid=thunderbird.desktop;
+
+[Default Applications]
+x-scheme-handler/mid=thunderbird.desktop;
+#+END_EXAMPLE
+
+Instead of calling ~browse-url~ and setting up the scheme handler
+you may launch thunderbird directly.  It is a bit tricky in Emacs,
+see suggestions for configuring of the [[#mailto-links][mailto: link handler]].
+
+There is another way to open a particular message, but it is less
+convenient since moving the message to another folder invalidates
+the link:
+: thunderbird -mail 'imap-message://USER_NAME%40gmail.com@imap.googlemail.com/INBOX?messageId=ka42mn$mn9$1@ger.gmane.org'
+
+The ThunderLink add-on recommended earlier did not work since
+transition of Thunderbird from XUL add-ons to WebExtensions,
+so the following recipe is obsolete:
+[[http://list.orgmode.org/ka42mn$mn9$1@ger.gmane.org][from Christoph Herzog: Re: Linking to Thunderbird (correction)]].
+Notice that this link uses Message-ID to reference a particular
+message as well.
 
 * Plain Lists
   :PROPERTIES:
