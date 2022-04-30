@@ -314,8 +314,6 @@ CONTENTS
 + CONTENTS :: A collection of zero or more elements, subject to two
   conditions:
   - No line may start with =#+end_NAME=.
-  - Lines beginning with an asterisk must be quoted by a comma (=,*=).
-  Furthermore, lines starting with =#+= may be quoted by a comma (=,#+=).
 
 *** Drawers and Property Drawers
 :PROPERTIES:
@@ -442,10 +440,10 @@ BULLET COUNTER-SET CHECK-BOX TAG CONTENTS
   at the first instance of one of the following:
   - The next item.
   - The first line less or equally indented than the starting line,
-    not counting lines within other elements or [[#Inlinetasks][inlinetask]] boundaries.
+    not counting lines within other non-paragraph elements or
+    [[#Inlinetasks][inlinetask]] boundaries.
   - Two consecutive blank lines.
 
-Since it is stated that CONTENTS will end at the next item,
 *Examples*
 
 #+begin_example
@@ -619,14 +617,15 @@ CONTENTS
   (including newlines) subject to the same two conditions of greater
   block's CONTENTS, i.e.
   - No line may start with =#+end_NAME=.
-  - Lines beginning with an asterisk must be quoted by a comma (=,*=).
-  As with greater blocks, lines starting with =#+= may be quoted by a
-  comma (=,#+=).
-  CONTENTS will contain Org objects when the block is a verse block,
-  it is otherwise not parsed.
+  - Lines beginning with an asterisk or =#+= must be quoted by a comma
+    (=,*=, =,#+=).
+  CONTENTS will contain Org objects and not support comma-quoting when
+  the block is a verse block, it is otherwise not parsed.
 
 #+begin_notes
-Can we drop switch support? This seems like a fairly good idea.\\
+Can we drop switch support? This seems like a fairly good idea.
+The functionality can simply be shifted to ARGUMENTS with the
+well-established =:key val= forms.\\
 "For the love of all that is sane" --- Tom G
 #+end_notes
 
@@ -1012,6 +1011,11 @@ Where NAME and POST are not separated by a whitespace character.
   - The string ={}=.
   - A non-alphabetic character.
 
+#+begin_notes
+It's [[https://github.com/lucasvreis/org-parser/blob/main/SPEC.org#entities][been raised]] that "{}" is really part of the entity, and so
+probably shouldn't be considered part of POST --- Timothy.
+#+end_notes
+
 *Example*
 
 #+begin_example
@@ -1104,7 +1108,7 @@ Export snippets are structured according to the following pattern:
 @@BACKEND:VALUE@@
 #+end_example
 
-+ BACKEND :: A string consisting of zero or more alphanumeric characters and hyphens.
++ BACKEND :: A string consisting of one or more alphanumeric characters and hyphens.
 + VALUE (optional) :: A string containing anything but the string =@@=.
 
 ** Footnote References
@@ -1213,9 +1217,10 @@ call_NAME[HEADER1](ARGUMENTS)[HEADER2]
 
 + NAME :: A string consisting of any non-whitespace characters except
   for square brackets or parentheses (=[](​)=).
-+ ARGUMENTS (optional), HEADER1 (optional), HEADER2 (optional) :: A
-  string consisting of any characters but a newline.  Opening and
-  closing square brackets must be balanced.
++ ARGUMENTS, HEADER1 (optional), HEADER2 (optional) :: A string
+  consisting of zero or more non-newline characters.  Opening and
+  closing parentheses must be balanced within HEADER1 and HEADER2, and
+  opening and closing square brackets within BODY.
 
 ** Inline Source Blocks
 :PROPERTIES:
@@ -1229,10 +1234,12 @@ src_LANG{BODY}
 src_LANG[HEADERS]{BODY}
 #+end_example
 
-+ LANG :: A string consisting of any non-whitespace characters.
-+ HEADERS (optional), BODY (optional) :: A string consisting of any
-  characters but a newline.  Opening and closing square brackets must
-  be balanced.
++ LANG :: A string consisting of any characters other than whitespace,
+  the opening square bracket (=[=), or opening curly bracket (={=).
++ HEADERS (optional), BODY :: A string consisting of zero or more
+  non-newline characters.  Opening and closing square brackets must be
+  balanced within HEADERS, and opening and closing curly brackets
+  within BODY.
 
 ** Line Breaks
 :PROPERTIES:
@@ -1269,6 +1276,10 @@ PRE RADIO POST
   contain the minimal set of objects.
 + [[#Special_Tokens][POST]] :: A non-alphanumeric character.
 
+#+begin_notes
+Is the raw (unparsed) text or the parsed structure matched with radio links?
+#+end_notes
+
 *Example*
 
 #+begin_example
@@ -1293,9 +1304,15 @@ PRE PROTOCOL:PATHPLAIN POST
   ~org-link-parameters~[fn:olp:By default, ~org-link-parameters~ defines
   links of type =shell=, =news=, =mailto=, =https=, =http=, =ftp=, =help=, =file=, and
   =elisp=.].
-+ PATHPLAIN :: A string containing any non-whitespace character but =(=, =)=,
-  =<=, or =>=.  It must end with a word-constituent character, or any
-  non-whitespace non-punctuation character followed by =/=.
++ PATHPLAIN :: A string containing non-whitespace non-bracket (=(=)[]<>=)
+  characters, optionally containing parenthesis-wrapped non-whitespace
+  non-bracket substrings up to a depth of two. The string must end
+  with either a non-punctation non-whitespace character, a forwards
+  slash, or a parenthesis-wrapped substring.[fn::This overall pattern
+  may be matched with the following regexp: =(?:[^
+  \t\n\[\]<>()]|\((?:[^ \t\n\[\]<>()]|\([^
+  \t\n\[\]<>()]*\))*\))+(?:[^[:punct:] \t\n]|\/|\((?:[^
+  \t\n\[\]<>()]|\([^ \t\n\[\]<>()]*\))*\))=]
 + [[#Special_Tokens][POST]] :: A non word constituent character.
 
 *Example*
@@ -1316,7 +1333,8 @@ pattern:
 
 + PROTOCOL :: A string which is one of the link type strings in
   ~org-link-parameters~[fn:olp]
-+ PATHANGLE :: A string containing any character but =]=, =<=, =>= or =\n=.
++ PATHANGLE :: A string containing any character but =>=., where newlines
+  and indentation are ignored.
 
 The angle brackets allow for a more permissive PATH syntax, without
 accidentally matching surrounding text.
@@ -1355,7 +1373,7 @@ FUZZY                  ("fuzzy" type)
   [[#Export_Snippets][export snippets]], [[#Inline_Babel_Calls][inline babel calls]], [[#Source_Blocks][inline source blocks]], [[#Macros][macros]],
   and [[#Statistics_Cookies][statistics cookies]].  It can also contain another link, but only
   when it is a plain or angle link.  It can contain square brackets,
-  so long as they are balanced.
+  but not =]]=.
 
 *Examples*
 
@@ -1454,14 +1472,14 @@ CHAR^SCRIPT
 + SCRIPT :: One of the following constructs:
   - A single asterisk character (=*=).
   - An expression enclosed in curly brackets (={=, =}=), which may itself
-    contain balanced curly brackets.
+    contain balanced curly brackets and the standard set of objects.
   - An instance of the pattern:
     #+begin_example
 SIGN CHARS FINAL
     #+end_example
     With no whitespace between SIGN, CHARS and FINAL.
-    + SIGN :: Either a plus sign character (=+=), a minus sign character
-      (=-=), or the empty string.
+    + SIGN (optional) :: Either a plus sign character (=+=), a minus sign
+      character (=-=), or the empty string.
     + CHARS :: Either the empty string, or a string consisting of any
       number of alphanumeric characters, commas, backslashes, and
       dots.
