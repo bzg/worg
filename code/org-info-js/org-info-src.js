@@ -3,19 +3,9 @@
  * org-info.js
  *
  * Version: 0.1.7.1
+ * SPDX-License-Identifier: GPL-v3-or-Later
  *
  * @author Sebastian Rose, Hannover, Germany - sebastian_rose at gmx dot de
- *
- *
- * This software is subject to the GNU General Public Licens version 3:
- * see: http://www.gnu.org/licenses/
- *
- * Requirements:
- *
- *   Org-mode >= 6.12a
- *
- *   Org-mode > 6.23 (commit a68eb4b1e64cbe6e495fdd2c1eaf8ae597bf8602):
- *     You'll need at least org-info.js v.0.1.0.1
  *
  * Usage:
  *
