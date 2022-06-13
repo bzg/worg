@@ -16,111 +16,24 @@
 
 * How does Worg publish itself as a website?
 
-The server behind https://orgmode.org website takes care of publishing
-Worg into =HTML=.
+The [[https://git.sr.ht/~bzg/worg][Worg git repository]] is hosted on SourceHut.
 
-** How long does it take for a change to be published?
+The [[https://git.sr.ht/~bzg/worg/tree/master/item/.build.yml][build manifest]] takes care of running the [[https://git.sr.ht/~bzg/worg/tree/master/item/publish.sh][publish.sh script]] and
+uploading the generated HTML pages to the orgmode.org server.
 
-The changes should be available immediately following your =git push=.
+When you push a commit, it can take up to 10 minutes for the change to
+be visible online.
 
-** There is a problem.  Can I check the export output?
-
-As soon as you push a commit to the worg git repository on the org
-server, the publishing process is triggered.  You should see the
-output of the publishing process in your terminal.  If there's a
-problem, you should see the error in this output.
-
-** Looks like file XXX breaks the export.  What can I do?
-
-1. Put this file in the FIXME directory at the root of the Worg
-   repository.  Files in this FIXME directory won't be published.
-
-2. Fix the page or contact the author of the page telling him about the
-   problem.
-
-** Where are the "raw" .org files kept?
-
-In addition to publishing the html versions of the .org files Worg's
-git repository, the raw source .org files are also put in
-[[https://orgmode.org/worg/sources]]. It is nice to make the .org file
-available for those following a tutorial so that the actual .org
-file is viewable in addition to reading through the online html
-version. To do this, simply link to the file in the worg sources directory:
-
-- If the page in the git repository is =~/worg.git/path/to/file/file.org=,
-- Link like so: =https://orgmode.org/worg/sources/path/to/file/file.org=
+You can adapt this =publish.sh= script (especially the =org-mode= and
+=htmlize.el= load path) to test it locally.
 
 * Are there any writing conventions?
 
 Please don't use [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Specifying-File-Variables.html#Specifying-File-Variables][file variables]] in your org files.
 
+Also see the [[file:worg-editing.org][worg-editing]] page for more suggestions.
+
 * Can Worg execute code (via Babel)?
 
 No.  The default automated export does not allow code execution on the
 server for obvious security reasons.
-
-* What software is available on Worg for Babel code execution?
-
-If babel code execution works on your machine, it doesn't mean it will
-work on the orgmode.org server.  Here is the list of available
-software on orgmode.org:
-
-  | Software     |                    Version |
-  |--------------+----------------------------|
-  | GNU Emacs    |                  23.1.90.1 |
-  | shell        |                        3.1 |
-  | R            |                     2.11.1 |
-  | gnuplot-mode |                      O.6.0 |
-  | gnuplot      |                        4.4 |
-  | latex        | pdfeTeX 3.141592-1.21a-2.2 |
-
-* What .emacs.el file is used on the server?
-
-- https://orgmode.org/worg/code/elisp/emacs.el
-
-* I want it for my own server!
-
-Here is the detailed recipe:
-
-1. Configure your =~/.emacs.el= to know about your publishing projects
-   (more information on publishing [[http://www.gnu.org/software/emacs/manual/html_node/org/Publishing.html][here]] and [[file:org-tutorials/org-publish-html-tutorial.org][here]]).
-
-2. Use =(setq org-export-htmlize-output-type 'css)= in =~/.emacs.el=.
-
-   (Do =C-h v org-export-htmlize-output-type= for more information
-   about this.  Also =C-h v org-export-htmlize-generate-css= might
-   help.)
-
-3. Create =~/bin/pull-worg.sh= containing this script:
-
-   #+BEGIN_SRC sh-mode
-   #!/bin/bash
-
-   # unless this is already done elsewhere:
-   export PATH=$PATH:/home/you/bin/
-
-   # go to the place where you pull Worg
-   cd /home/you/git/worg/;
-
-   # pull worg
-   /home/you/bin/git-pull
-   #+END_SRC
-
-4. Create =~/bin/publish-worg.sh= containing this script:
-
-   #+BEGIN_SRC sh-mode
-   #!/bin/bash
-
-   # Adapt it to point at your emacs executable
-   /home/you/bin/emacs23 --batch -l ~/.emacs.el -f org-publish-all
-   #+end_src
-
-5. Cron the two scripts to run every hour, not at the same time
-
-   #+BEGIN_SRC generic-mode
-   0 * * * * /home/you/bin/pull-worg.sh >> /dev/null 2>&1
-   30 * * * * /home/you/bin/publish-worg.sh >> /dev/null 2>&1
-   #+END_SRC
-
-6. Sit and do something else while your Org repository is
-   automagically exported to HTML
