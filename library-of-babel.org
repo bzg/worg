@@ -29,7 +29,7 @@ A collection of simple utility functions:
 
 #+name: echo
 #+begin_src emacs-lisp :var input="echo'd"
-  input
+input
 #+end_src
 
 * File I/O
@@ -42,13 +42,13 @@ file as either a table or a string.
 
 #+name: read
 #+begin_src emacs-lisp :var file="" :var format=""
-  (if (string= format "csv")
-      (with-temp-buffer
-        (org-table-import (expand-file-name file) nil)
-        (org-table-to-lisp))
+(if (string= format "csv")
     (with-temp-buffer
-      (insert-file-contents (expand-file-name file))
-      (buffer-string)))
+      (org-table-import (expand-file-name file) nil)
+      (org-table-to-lisp))
+  (with-temp-buffer
+    (insert-file-contents (expand-file-name file))
+    (buffer-string)))
 #+end_src
 
 Write =data= to a file at =file=.  If =data= is a list, then write it
@@ -56,14 +56,14 @@ as a table in traditional Org-mode table syntax.
 
 #+name: write
 #+begin_src emacs-lisp :var data="" :var file="" :var ext='()
-  (flet ((echo (r) (if (stringp r) r (format "%S" r))))
-    (with-temp-file file
-      (case (and (listp data)
-                 (or ext (intern (file-name-extension file))))
-        ('tsv (insert (orgtbl-to-tsv data '(:fmt echo))))
-        ('csv (insert (orgtbl-to-csv data '(:fmt echo))))
-        (t    (org-babel-insert-result data)))))
-  nil
+(flet ((echo (r) (if (stringp r) r (format "%S" r))))
+  (with-temp-file file
+    (case (and (listp data)
+               (or ext (intern (file-name-extension file))))
+      ('tsv (insert (orgtbl-to-tsv data '(:fmt echo))))
+      ('csv (insert (orgtbl-to-csv data '(:fmt echo))))
+      (t    (org-babel-insert-result data)))))
+nil
 #+end_src
 
 ** Remote files
@@ -74,18 +74,18 @@ Read local or remote file in [[http://www.json.org/][json]] format into emacs-li
 
 #+name: json
 #+begin_src emacs-lisp :var file='() :var url='()
-  (require 'json)
-  (cond
-   (file
-    (org-babel-with-temp-filebuffer file
-      (goto-char (point-min))
-      (json-read)))
-   (url
-    (require 'w3m)
-    (with-temp-buffer
-      (w3m-retrieve url)
-      (goto-char (point-min))
-      (json-read))))
+(require 'json)
+(cond
+ (file
+  (org-babel-with-temp-filebuffer file
+    (goto-char (point-min))
+    (json-read)))
+ (url
+  (require 'w3m)
+  (with-temp-buffer
+    (w3m-retrieve url)
+    (goto-char (point-min))
+    (json-read))))
 #+end_src
 
 *** Google docs
@@ -103,17 +103,17 @@ for spreadsheets.
 
 #+name: gdoc-read
 #+begin_src emacs-lisp :var title="example" :var format="csv"
-  (let* ((file (concat title "." format))
-         (cmd (format "google docs get --format %S --title %S" format title)))
-    (message cmd) (message (shell-command-to-string cmd))
-    (prog1 (if (string= format "csv")
-               (with-temp-buffer
-                 (org-table-import (shell-quote-argument file) '(4))
-                 (org-table-to-lisp))
+(let* ((file (concat title "." format))
+       (cmd (format "google docs get --format %S --title %S" format title)))
+  (message cmd) (message (shell-command-to-string cmd))
+  (prog1 (if (string= format "csv")
              (with-temp-buffer
-               (insert-file-contents (shell-quote-argument file))
-               (buffer-string)))
-      (delete-file file)))
+               (org-table-import (shell-quote-argument file) '(4))
+               (org-table-to-lisp))
+           (with-temp-buffer
+             (insert-file-contents (shell-quote-argument file))
+             (buffer-string)))
+    (delete-file file)))
 #+end_src
 
 For example, a line like the following can be used to read the
@@ -139,27 +139,30 @@ normal document.
 
 #+name: gdoc-write
 #+begin_src emacs-lisp :var title="babel-upload" :var data=fibs(n=10) :results silent
-  (let* ((format (if (listp data) "csv" "txt"))
-         (tmp-file (make-temp-file "org-babel-google-doc" nil (concat "." format)))
-         (cmd (format "google docs upload --title %S %S" title tmp-file)))
-    (with-temp-file tmp-file
-      (insert
-       (if (listp data)
-           (orgtbl-to-csv
-            data '(:fmt (lambda (el) (if (stringp el) el (format "%S" el)))))
-         (if (stringp data) data (format "%S" data)))))
-    (message cmd)
-    (prog1 (shell-command-to-string cmd) (delete-file tmp-file)))
+(let* ((format (if (listp data) "csv" "txt"))
+       (tmp-file (make-temp-file "org-babel-google-doc" nil (concat "." format)))
+       (cmd (format "google docs upload --title %S %S" title tmp-file)))
+  (with-temp-file tmp-file
+    (insert
+     (if (listp data)
+         (orgtbl-to-csv
+          data '(:fmt (lambda (el) (if (stringp el) el (format "%S" el)))))
+       (if (stringp data) data (format "%S" data)))))
+  (message cmd)
+  (prog1 (shell-command-to-string cmd) (delete-file tmp-file)))
 #+end_src
 
 example usage
-: #+name: fibs
-: #+begin_src emacs-lisp :var n=8
-: (flet ((fib (m) (if (< m 2) 1 (+ (fib (- m 1)) (fib (- m 2))))))
-:   (mapcar (lambda (el) (list el (fib el))) (number-sequence 0 (- n 1))))
-: #+end_src
-:
-: #+call: gdoc-write(title="fibs", data=fibs(n=10))
+
+#+begin_example
+,#+name: fibs
+,#+begin_src emacs-lisp :var n=8
+(flet ((fib (m) (if (< m 2) 1 (+ (fib (- m 1)) (fib (- m 2))))))
+  (mapcar (lambda (el) (list el (fib el))) (number-sequence 0 (- n 1))))
+,#+end_src
+
+,#+call: gdoc-write(title="fibs", data=fibs(n=10))
+#+end_example
 
 * Plotting code
 
@@ -192,12 +195,12 @@ plot(data)
 
 #+name: headline
 #+begin_src emacs-lisp :var headline="" :var file='()
-  (save-excursion
-    (when file (get-file-buffer file))
-    (org-open-link-from-string (org-make-link-string headline))
-    (save-restriction
-      (org-narrow-to-subtree)
-      (buffer-string)))
+(save-excursion
+  (when file (get-file-buffer file))
+  (org-open-link-from-string (org-make-link-string headline))
+  (save-restriction
+    (org-narrow-to-subtree)
+    (buffer-string)))
 #+end_src
 
 #+call: headline(headline="Headline references")
@@ -229,34 +232,34 @@ optional.
 
 #+name: booktabs
 #+begin_src emacs-lisp :var table='((:head) hline (:body)) :var align='() :var env="tabular" :var width='() :noweb yes :results latex
-  (flet ((to-tab (tab)
-                 (orgtbl-to-generic
-                  (mapcar (lambda (lis)
-                            (if (listp lis)
-                                (mapcar (lambda (el)
-                                          (if (stringp el)
-                                              el
-                                            (format "%S" el))) lis)
-                              lis)) tab)
-                  (list :lend " \\\\" :sep " & " :hline "\\hline"))))
-    (org-fill-template
-     "
-  \\begin{%env}%width%align
-  \\toprule
-  %table
-  \\bottomrule
-  \\end{%env}\n"
-     (list
-      (cons "env"       (or env "table"))
-      (cons "width"     (if width (format "{%s}" width) ""))
-      (cons "align"     (if align (format "{%s}" align) ""))
-      (cons "table"
-            ;; only use \midrule if it looks like there are column headers
-            (if (equal 'hline (second table))
-                (concat (to-tab (list (first table)))
-                        "\n\\midrule\n"
-                        (to-tab (cddr table)))
-              (to-tab table))))))
+(flet ((to-tab (tab)
+               (orgtbl-to-generic
+                (mapcar (lambda (lis)
+                          (if (listp lis)
+                              (mapcar (lambda (el)
+                                        (if (stringp el)
+                                            el
+                                          (format "%S" el))) lis)
+                            lis)) tab)
+                (list :lend " \\\\" :sep " & " :hline "\\hline"))))
+  (org-fill-template
+   "
+\\begin{%env}%width%align
+\\toprule
+%table
+\\bottomrule
+\\end{%env}\n"
+   (list
+    (cons "env"       (or env "table"))
+    (cons "width"     (if width (format "{%s}" width) ""))
+    (cons "align"     (if align (format "{%s}" align) ""))
+    (cons "table"
+          ;; only use \midrule if it looks like there are column headers
+          (if (equal 'hline (second table))
+              (concat (to-tab (list (first table)))
+                      "\n\\midrule\n"
+                      (to-tab (cddr table)))
+            (to-tab table))))))
 #+end_src
 
 *** longtable
@@ -278,32 +281,32 @@ are optional.
 
 #+name: longtable
 #+begin_src emacs-lisp :var table='((:table)) :var align='() :var width='() :var hline="\\hline" :var firsthead='() :var head='() :var foot='() :var lastfoot='() :noweb yes :results latex
-  (org-fill-template
-   "
-  \\begin{longtable}%width%align
-  %firsthead
-  %head
-  %foot
-  %lastfoot
+(org-fill-template
+ "
+\\begin{longtable}%width%align
+%firsthead
+%head
+%foot
+%lastfoot
 
-  %table
-  \\end{longtable}\n"
-   (list
-    (cons "width"     (if width (format "{%s}" width) ""))
-    (cons "align"     (if align (format "{%s}" align) ""))
-    (cons "firsthead" (if firsthead (concat firsthead "\n\\endfirsthead\n") ""))
-    (cons "head"      (if head (concat head "\n\\endhead\n") ""))
-    (cons "foot"      (if foot (concat foot "\n\\endfoot\n") ""))
-    (cons "lastfoot"  (if lastfoot (concat lastfoot "\n\\endlastfoot\n") ""))
-    (cons "table" (orgtbl-to-generic
-                   (mapcar (lambda (lis)
-                             (if (listp lis)
-                                 (mapcar (lambda (el)
-                                           (if (stringp el)
-                                               el
-                                             (format "%S" el))) lis)
-                               lis)) table)
-                   (list :lend " \\\\" :sep " & " :hline hline)))))
+%table
+\\end{longtable}\n"
+ (list
+  (cons "width"     (if width (format "{%s}" width) ""))
+  (cons "align"     (if align (format "{%s}" align) ""))
+  (cons "firsthead" (if firsthead (concat firsthead "\n\\endfirsthead\n") ""))
+  (cons "head"      (if head (concat head "\n\\endhead\n") ""))
+  (cons "foot"      (if foot (concat foot "\n\\endfoot\n") ""))
+  (cons "lastfoot"  (if lastfoot (concat lastfoot "\n\\endlastfoot\n") ""))
+  (cons "table" (orgtbl-to-generic
+                 (mapcar (lambda (lis)
+                           (if (listp lis)
+                               (mapcar (lambda (el)
+                                         (if (stringp el)
+                                             el
+                                           (format "%S" el))) lis)
+                             lis)) table)
+                 (list :lend " \\\\" :sep " & " :hline hline)))))
 #+end_src
 
 *** booktabs-notes
@@ -311,7 +314,7 @@ are optional.
 This source block builds on [[booktabs]].  It accepts two additional
 arguments, both of which are optional.
 
-#+tblname: arguments
+#+name: arguments
 | arg    | description                                          |
 |--------+------------------------------------------------------|
 | notes  | an org-mode table with footnotes                     |
@@ -320,91 +323,91 @@ arguments, both of which are optional.
 An example footnote to the =arguments= table specifies the column
 span. Note the use of LaTeX, rather than Org-mode, markup.
 
-#+tblname: arguments-notes
+#+name: arguments-notes
 | \multicolumn{2}{l}{This is a footnote to the \emph{arguments} table.} |
 
 #+name: booktabs-notes
 #+begin_src emacs-lisp :var table='((:head) hline (:body)) :var notes='() :var align='() :var env="tabular" :var width='() :var lspace='() :noweb yes :results latex
-  (flet ((to-tab (tab)
-                 (orgtbl-to-generic
-                  (mapcar (lambda (lis)
-                            (if (listp lis)
-                                (mapcar (lambda (el)
-                                          (if (stringp el)
-                                              el
-                                            (format "%S" el))) lis)
-                              lis)) tab)
-                  (list :lend " \\\\" :sep " & " :hline "\\hline"))))
-    (org-fill-template
-     "
-    \\begin{%env}%width%align
-    \\toprule
-    %table
-    \\bottomrule%spacer
-    %notes
-    \\end{%env}\n"
-     (list
-      (cons "env"       (or env "table"))
-      (cons "width"     (if width (format "{%s}" width) ""))
-      (cons "align"     (if align (format "{%s}" align) ""))
-      (cons "spacer"    (if lspace "\\addlinespace" ""))
-      (cons "table"
-            ;; only use \midrule if it looks like there are column headers
-            (if (equal 'hline (second table))
-                (concat (to-tab (list (first table)))
-                        "\n\\midrule\n"
-                        (to-tab (cddr table)))
-              (to-tab table)))
-      (cons "notes" (if notes (to-tab notes) ""))
-      )))
+(flet ((to-tab (tab)
+               (orgtbl-to-generic
+                (mapcar (lambda (lis)
+                          (if (listp lis)
+                              (mapcar (lambda (el)
+                                        (if (stringp el)
+                                            el
+                                          (format "%S" el))) lis)
+                            lis)) tab)
+                (list :lend " \\\\" :sep " & " :hline "\\hline"))))
+  (org-fill-template
+   "
+  \\begin{%env}%width%align
+  \\toprule
+  %table
+  \\bottomrule%spacer
+  %notes
+  \\end{%env}\n"
+   (list
+    (cons "env"       (or env "table"))
+    (cons "width"     (if width (format "{%s}" width) ""))
+    (cons "align"     (if align (format "{%s}" align) ""))
+    (cons "spacer"    (if lspace "\\addlinespace" ""))
+    (cons "table"
+          ;; only use \midrule if it looks like there are column headers
+          (if (equal 'hline (second table))
+              (concat (to-tab (list (first table)))
+                      "\n\\midrule\n"
+                      (to-tab (cddr table)))
+            (to-tab table)))
+    (cons "notes" (if notes (to-tab notes) ""))
+    )))
 #+end_src
 
 ** Elegant lisp for transposing a matrix
 
-#+tblname: transpose-example
+#+name: transpose-example
 | 1 | 2 | 3 |
 | 4 | 5 | 6 |
 
 #+name: transpose
 #+begin_src emacs-lisp :var table=transpose-example
-  (apply #'mapcar* #'list table)
+(apply #'mapcar* #'list table)
 #+end_src
 
-#+resname:
+#+name: transpose-output
 | 1 | 4 |
 | 2 | 5 |
 | 3 | 6 |
 
 ** Convert every element of a table to a string
 
-#+tblname: hetero-table
+#+name: hetero-table
 | 1 | 2 | 3 |
 | a | b | c |
 
 #+name: all-to-string
 #+begin_src emacs-lisp :var tbl='()
-  (defun all-to-string (tbl)
-    (if (listp tbl)
-        (mapcar #'all-to-string tbl)
-      (if (stringp tbl)
-          tbl
-        (format "%s" tbl))))
-  (all-to-string tbl)
+(defun all-to-string (tbl)
+  (if (listp tbl)
+      (mapcar #'all-to-string tbl)
+    (if (stringp tbl)
+        tbl
+      (format "%s" tbl))))
+(all-to-string tbl)
 #+end_src
 
 #+begin_src emacs-lisp :var tbl=hetero-table
-  (mapcar (lambda (row) (mapcar (lambda (cell) (stringp cell)) row)) tbl)
+(mapcar (lambda (row) (mapcar (lambda (cell) (stringp cell)) row)) tbl)
 #+end_src
 
-#+name:
+#+name: stringp-output1
 | nil | nil | nil |
 | t   | t   | t   |
 
 #+begin_src emacs-lisp :var tbl=all-to-string(hetero-table)
-  (mapcar (lambda (row) (mapcar (lambda (cell) (stringp cell)) row)) tbl)
+(mapcar (lambda (row) (mapcar (lambda (cell) (stringp cell)) row)) tbl)
 #+end_src
 
-#+name:
+#+name: stringp-output2
 | t | t | t |
 | t | t | t |
 
@@ -422,29 +425,29 @@ local version control system, but has only been tested to work with
 Git. 'limit' is currently unsupported.
 
 #+name: vc-log
-#+headers: :var limit=-1
-#+headers: :var buf=(buffer-name (current-buffer))
+#+header: :var limit=-1
+#+header: :var buf=(buffer-name (current-buffer))
 #+begin_src emacs-lisp
-  ;; Most of this code is copied from vc.el vc-print-log
-  (require 'vc)
-  (when (vc-find-backend-function
-         (vc-backend (buffer-file-name (get-buffer buf))) 'print-log)
-    (let ((limit -1)
-          (vc-fileset nil)
-          (backend nil)
-          (files nil))
-      (with-current-buffer (get-buffer buf)
-        (setq vc-fileset (vc-deduce-fileset t)) ; FIXME: Why t? --Stef
-        (setq backend (car vc-fileset))
-        (setq files (cadr vc-fileset)))
-      (with-temp-buffer
-        (let ((status (vc-call-backend
-                       backend 'print-log files (current-buffer))))
-          (when (and (processp status)   ; Make sure status is a process
-                     (= 0 (process-exit-status status))) ; which has not terminated
-            (while (not (eq 'exit (process-status status)))
-              (sit-for 1 t)))
-          (buffer-string)))))
+;; Most of this code is copied from vc.el vc-print-log
+(require 'vc)
+(when (vc-find-backend-function
+       (vc-backend (buffer-file-name (get-buffer buf))) 'print-log)
+  (let ((limit -1)
+        (vc-fileset nil)
+        (backend nil)
+        (files nil))
+    (with-current-buffer (get-buffer buf)
+      (setq vc-fileset (vc-deduce-fileset t)) ; FIXME: Why t? --Stef
+      (setq backend (car vc-fileset))
+      (setq files (cadr vc-fileset)))
+    (with-temp-buffer
+      (let ((status (vc-call-backend
+                     backend 'print-log files (current-buffer))))
+        (when (and (processp status)   ; Make sure status is a process
+                   (= 0 (process-exit-status status))) ; which has not terminated
+          (while (not (eq 'exit (process-status status)))
+            (sit-for 1 t)))
+        (buffer-string)))))
 #+end_src
 
 ** Trivial python code blocks
@@ -463,22 +466,22 @@ a + b
 
 #+name: lob-add
 #+begin_src emacs-lisp :var a=0 :var b=0
-  (+ a b)
+(+ a b)
 #+end_src
 
 #+name: lob-minus
 #+begin_src emacs-lisp :var a=0 :var b=0
-  (- a b)
+(- a b)
 #+end_src
 
 #+name: lob-times
 #+begin_src emacs-lisp :var a=0 :var b=0
-  (* a b)
+(* a b)
 #+end_src
 
 #+name: lob-div
 #+begin_src emacs-lisp :var a=0 :var b=0
-  (/ a b)
+(/ a b)
 #+end_src
 
 * GANTT Charts
@@ -486,78 +489,109 @@ a + b
 The =elispgantt= source block was sent to the mailing list by Eric
 Fraga.  It was modified slightly by Tom Dye.
 
+
+** Example table of tasks and milestones for GANTT chart generation
+
+The following table describes the tasks and other relevant information for a project.  Each line is an /entry/ and there are three types of entry allowed in this table:
+
+- task :: an actual task that has a start time, a duration and an end time.
+- milestone :: a specific milestone in the project that has a start time alone
+- date :: a point in time that will be drawn as a vertical line in the GANTT chart (e.g. start of each year).
+
+Each element of the chart will be annotated with the content of the /label/ column of each entry.  The first column of the table is ignored but I use it to number the entries.  The last column, titled /align/, is used to determine where to place the /activity/ text for tasks, whether to the left or right of the bar or, if nothing is specified, centred within the bar itself.
+
+#+name: gantttesttable
+|    | type      | label | activity      | depends | start | duration | end | align |
+|----+-----------+-------+---------------+---------+-------+----------+-----+-------|
+|  1 | date      | Start |               |         |     0 |          |   0 |       |
+|  2 | task      | 1.1   | Lit survey    |         |     0 |        3 |   3 | right |
+|  3 | task      | 1.2   | Develop model |       2 |     3 |        9 |  12 | right |
+|  4 | milestone | M1    | model         |       3 |    12 |          |  12 |       |
+|  5 | task      | 1.3   | Implement     |       3 |    12 |        6 |  18 | left  |
+|  6 | date      | Y1    |               |         |    12 |          |  12 |       |
+|  7 | milestone | M2    | software      |       5 |    18 |          |  18 |       |
+|----+-----------+-------+---------------+---------+-------+----------+-----+-------|
+|  8 | task      | 2.1   | Surrogate     |       3 |    15 |        6 |  21 | left  |
+|  9 | task      | 2.2   | Implement     |       7 |    21 |        3 |  24 | left  |
+| 10 | milestone | M3    | software      |       8 |    24 |          |  24 |       |
+| 11 | date      | End   |               |         |    24 |          |  24 |       |
+|----+-----------+-------+---------------+---------+-------+----------+-----+-------|
+#+TBLFM: $1=1+@-1::$8=$6+$7::@5$6=@-1$+2::@6$6=@-1$+2::@8$6=@-2$+2::@9$6=3+@4$+2::@10$6=@-1$+2
+
+** elispgantt
+
 #+name: elispgantt
-#+begin_src emacs-lisp :var table=gantttest
-  (let ((dates "")
-        (entries (nthcdr 2 table))
-        (milestones "")
-        (nmilestones 0)
-        (ntasks 0)
-        (projecttime 0)
-        (tasks "")
-        (xlength 1))
-    (message "Initial: %s\n" table)
-    (message "Entries: %s\n" entries)
-    (while entries
-      (let ((entry (first entries)))
-        (if (listp entry)
-            (let ((id (first entry))
-                  (type (nth 1 entry))
-                  (label (nth 2 entry))
-                  (task (nth 3 entry))
-                  (dependencies (nth 4 entry))
-                  (start (nth 5 entry))
-                  (duration (nth 6 entry))
-                  (end (nth 7 entry))
-                  (alignment (nth 8 entry)))
-              (if (> start projecttime) (setq projecttime start))
-              (if (string= type "task")
-                  (let ((end (+ start duration))
-                        (textposition (+ start (/ duration 2)))
-                        (flush ""))
-                    (if (string= alignment "left")
+#+begin_src emacs-lisp :var table=gantttesttable
+(let ((dates "")
+      (entries (nthcdr 2 table))
+      (milestones "")
+      (nmilestones 0)
+      (ntasks 0)
+      (projecttime 0)
+      (tasks "")
+      (xlength 1))
+  (message "Initial: %s\n" table)
+  (message "Entries: %s\n" entries)
+  (while entries
+    (let ((entry (first entries)))
+      (if (listp entry)
+          (let ((id (first entry))
+                (type (nth 1 entry))
+                (label (nth 2 entry))
+                (task (nth 3 entry))
+                (dependencies (nth 4 entry))
+                (start (nth 5 entry))
+                (duration (nth 6 entry))
+                (end (nth 7 entry))
+                (alignment (nth 8 entry)))
+            (if (> start projecttime) (setq projecttime start))
+            (if (string= type "task")
+                (let ((end (+ start duration))
+                      (textposition (+ start (/ duration 2)))
+                      (flush ""))
+                  (if (string= alignment "left")
+                      (progn
+                        (setq textposition start)
+                        (setq flush "[left]"))
+                    (if (string= alignment "right")
                         (progn
-                          (setq textposition start)
-                          (setq flush "[left]"))
-                      (if (string= alignment "right")
-                          (progn
-                            (setq textposition end)
-                            (setq flush "[right]"))))
-                    (setq tasks
-                          (format "%s  \\gantttask{%s}{%s}{%d}{%d}{%d}{%s}\n"
-                                  tasks label task start end textposition flush))
-                    (setq ntasks (+ 1 ntasks))
-                    (if (> end projecttime)
-                        (setq projecttime end)))
-                (if (string= type "milestone")
-                    (progn
-                      (setq milestones
-                            (format
-                             "%s  \\ganttmilestone{$\\begin{array}{c}\\mbox{%s}\\\\ \\mbox{%s}\\end{array}$}{%d}\n"
-                             milestones label task start))
-                      (setq nmilestones (+ 1 nmilestones)))
-                  (if (string= type "date")
-                      (setq dates (format "%s  \\ganttdateline{%s}{%d}\n"
-                                          dates label start))
-                    (message "Ignoring entry with type %s\n" type)))))
-          (message "Ignoring non-list entry %s\n" entry)) ; end if list entry
-        (setq entries (cdr entries))))  ; end while entries left
-    (format "\\pgfdeclarelayer{background}
-  \\pgfdeclarelayer{foreground}
-  \\pgfsetlayers{background,foreground}
-  \\renewcommand{\\ganttprojecttime}{%d}
-  \\renewcommand{\\ganttntasks}{%d}
-  \\noindent
-  \\begin{tikzpicture}[y=-0.75cm,x=0.75\\textwidth]
-    \\begin{pgfonlayer}{background}
-      \\draw[very thin, red!10!white] (0,1+\\ganttntasks) grid [ystep=0.75cm,xstep=1/\\ganttprojecttime] (1,0);
-      \\draw[\\ganttdatelinecolour] (0,0) -- (1,0);
-      \\draw[\\ganttdatelinecolour] (0,1+\\ganttntasks) -- (1,1+\\ganttntasks);
-    \\end{pgfonlayer}
-  %s
-  %s
-  %s
-  \\end{tikzpicture}" projecttime ntasks tasks milestones dates))
+                          (setq textposition end)
+                          (setq flush "[right]"))))
+                  (setq tasks
+                        (format "%s  \\gantttask{%s}{%s}{%d}{%d}{%d}{%s}\n"
+                                tasks label task start end textposition flush))
+                  (setq ntasks (+ 1 ntasks))
+                  (if (> end projecttime)
+                      (setq projecttime end)))
+              (if (string= type "milestone")
+                  (progn
+                    (setq milestones
+                          (format
+                           "%s  \\ganttmilestone{$\\begin{array}{c}\\mbox{%s}\\\\ \\mbox{%s}\\end{array}$}{%d}\n"
+                           milestones label task start))
+                    (setq nmilestones (+ 1 nmilestones)))
+                (if (string= type "date")
+                    (setq dates (format "%s  \\ganttdateline{%s}{%d}\n"
+                                        dates label start))
+                  (message "Ignoring entry with type %s\n" type)))))
+        (message "Ignoring non-list entry %s\n" entry)) ; end if list entry
+      (setq entries (cdr entries))))  ; end while entries left
+  (format "\\pgfdeclarelayer{background}
+\\pgfdeclarelayer{foreground}
+\\pgfsetlayers{background,foreground}
+\\renewcommand{\\ganttprojecttime}{%d}
+\\renewcommand{\\ganttntasks}{%d}
+\\noindent
+\\begin{tikzpicture}[y=-0.75cm,x=0.75\\textwidth]
+  \\begin{pgfonlayer}{background}
+    \\draw[very thin, red!10!white] (0,1+\\ganttntasks) grid [ystep=0.75cm,xstep=1/\\ganttprojecttime] (1,0);
+    \\draw[\\ganttdatelinecolour] (0,0) -- (1,0);
+    \\draw[\\ganttdatelinecolour] (0,1+\\ganttntasks) -- (1,1+\\ganttntasks);
+  \\end{pgfonlayer}
+%s
+%s
+%s
+\\end{tikzpicture}" projecttime ntasks tasks milestones dates))
 #+end_src
 
 * Available languages
