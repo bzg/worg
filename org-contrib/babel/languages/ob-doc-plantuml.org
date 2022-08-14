@@ -49,18 +49,23 @@ Diagram images can be generated in PNG, SVG, and LaTeX formats.
 =PlantUML= is integrated with [[https://plantuml.com/running][a wide variety of software applications]].
 Babel is a [[https://plantuml.com/emacs][standard way to use PlantUML in Emacs]].
 * Requirements and Setup
-=PlantUML= requires a working [[https://www.java.com/en/download/][Java]] installation and access to the
-=plantuml.jar= component.  A working [[https://graphviz.org/][GraphViz]] installation is required
-for many diagrams.
+=PlantUML= blocks can be executed in one of two ways, requiring either
+
+- a working [[https://www.java.com/en/download/][Java]] installation and access to the =plantuml.jar= component or
+- the =plantuml= executable available from your distribution's package manager
+
+A working [[https://graphviz.org/][GraphViz]] installation is required for many diagrams.
 
 Emacs has [[https://github.com/skuro/plantuml-mode][plantuml-mode]], a major mode for editing PlantUML sources.
 There are detailed [[https://github.com/skuro/plantuml-mode#installation][installation instructions]], as well as instructions
-for [[https://github.com/skuro/plantuml-mode#integration-with-org-mode][integration with Org]].
+for [[https://github.com/skuro/plantuml-mode#integration-with-org-mode][integration with Org]].  While [[https://melpa.org/#/plantuml-mode][plantuml-mode]] does allow use of a
+remote server to render the diagram, please note that =ob-plantuml= does
+not currently support this functionality.
 
 You will likely want to set the variables =plantuml-jar-path= and
 =org-plantuml-jar-path= with the path to your local installation of
-=PlantUML=.  Alternatively, set the variable
-=plantuml-default-exec-mode= to access =PlantUML= non-locally.
+=PlantUML=.  Alternatively, set the variable =plantuml-default-exec-mode=
+to =executable= to use your local =plantuml= executable.
 
 Activate evaluation of =PlantUML= source code blocks by adding
 =plantuml= to =org-babel-load-languages=.
@@ -77,15 +82,22 @@ Activate evaluation of =PlantUML= source code blocks by adding
 ** Header Arguments
 =PlantUML= code blocks default to =:results file= and =:exports results=.
 
-=PlantUML= has these language-specific header arguments and one requirement:
-   - file :: =PlantUML= code blocks require that an output file be specified
+If you wish to export the =PlantUML= code block to a file, you must
+specify a =:file= header argument.  Alternatively, if you set =:results=
+to a value other than =file=, such as =:results verbatim=, then the ASCII
+=PlantUML= output will be inserted into the buffer below the code block.
+
+=PlantUML= has these language-specific header arguments:
    - cmdline :: specify [[https://plantuml.com/command-line][command line arguments]] for =PlantUML=
    - java :: arguments for the =java= runtimes (JRE) 
 ** Sessions
 =PlantUML= does not support sessions. 
 ** Result Types
-A =PlantUML= code block returns a link to the file it generates.
-     
+When the =:file= header argument has been specified, =PlantUML= code
+blocks return a link to the generated file.  Alternatively, if
+=:results= is set to a value other than =file=, then the generated ASCII
+diagram will be inserted into the buffer.
+
 * Examples of Use
 :PROPERTIES:
 :header-args:plantuml: :eval no-export
@@ -119,7 +131,7 @@ b -> c
 ,#+end_src
 #+end_example
 
-HTML output of the =PlantUML= code block:
+PNG output of the =PlantUML= code block:
 #+begin_src plantuml :file images/theme-uml.png :exports both
 !theme spacelab
 a -> b
@@ -130,3 +142,26 @@ b -> c
 #+RESULTS:
 [[file:images/theme-uml.png]]
 
+Here is an example of ASCII output inserted directly into the buffer.
+
+The =PlantUML= code block in the Org buffer:
+#+begin_example
+,#+begin_src plantuml :results verbatim
+Bob -> Alice : Hello World!
+,#+end_src
+#+end_example
+
+ASCII output of the =PlantUML= code block:
+#+begin_src plantuml :results verbatim
+Bob -> Alice : Hello World!
+#+end_src
+
+#+RESULTS:
+:      ,---.          ,-----.
+:      |Bob|          |Alice|
+:      `-+-'          `--+--'
+:        | Hello World!  |   
+:        |-------------->|   
+:      ,-+-.          ,--+--.
+:      |Bob|          |Alice|
+:      `---'          `-----'
