@@ -63,32 +63,6 @@ can ask a maintainer to revert it.
 Org development is the work of volunteers and we cannot promise to
 follow a release schedule.
 
-** Org releases are compatible with the latest three major Emacs releases
-:PROPERTIES:
-:CUSTOM_ID: emacs-compatibility
-:END:
-
-We aim at keeping the latest stable version of Org compatible with the
-*last three major releases of Emacs*.
-
-For example, if the latest release of Emacs is 28.x, you can expect
-the latest release of Org to be compatible with Emacs 28.x, 27.x and
-26.x, but not with Emacs 25.x.
-
-It does not mean that Org will not be usable, at least partially, with
-older Emacsen: but maintainers are not bound to fix bugs reported on
-them.
-
-Org versions that are not yet released (from the main or bugfix
-branch) don't come with any promise regarding compatibility.
-
-Before any release, maintainers test the release against the last
-three major releases of Emacs.
-
-In the future, abandoning backward-compatibility with an Emacs version
-will only be done through new major versions of Org (10.x, 11.x, etc.)
-but this is not the case yet.
-
 ** We don't use semantic versioning
 
 We use the same numbering convention than semantic versioning, but we
@@ -124,11 +98,31 @@ This de facto convention has been made explicit after =9.4=.
   we don't want to worry about adding non-critical and non-trivial
   changes there when Emacs comes close to a release.
 
-** Conventions before and after Org 9.5
+** Org releases are compatible with the latest three major Emacs releases
+:PROPERTIES:
+:CUSTOM_ID: emacs-compatibility
+:END:
 
-Note that before =Org 9.5=, versions like =9.3=, =9.4=, etc. were really
-/major/ ones.  This was confusing for some users, especially those who
-expect Org to follow semantic versioning conventions.
+We aim at keeping the latest stable version of Org compatible with the
+*last three major releases of Emacs*.
+
+For example, if the latest release of Emacs is 28.x, you can expect
+the latest release of Org to be compatible with Emacs 28.x, 27.x and
+26.x, but not with Emacs 25.x.
+
+It does not mean that Org will not be usable, at least partially, with
+older Emacsen: but maintainers are not bound to fix bugs reported on
+them.
+
+Org versions that are not yet released (from the main or bugfix
+branch) don't come with any promise regarding compatibility.
+
+Before any release, maintainers test the release against the last
+three major releases of Emacs.
+
+In the future, abandoning backward-compatibility with an Emacs version
+will only be done through new major versions of Org (10.x, 11.x, etc.)
+but this is not the case yet.
 
 * Where can I track bugs, patches and updates?
 
@@ -154,52 +148,50 @@ You can check the [[https://github.com/bzg/woof/blob/master/resources/md/howto.o
 
 * For the release manager and core maintainers
 ** Releasing a new version of Org
+*** What goes on the =bugfix= and =main= branches
 
-*** Preparing the release
+The [[https://git.savannah.gnu.org/cgit/emacs/org-mode.git/][git repository]] has two branches: =main= for current development and
+=bugfix= for bug fixes against latest major or minor release.
 
-
-
-*** Git workflow
-
-The [[https://git.savannah.gnu.org/cgit/emacs/org-mode.git/][git repository]] has two branches:
-
-- =main= : for current development.
-- =bugfix= : for bug fixes against latest major or minor release.
-
-Bug fixes always go on =bugfix= and are merged on =main=.
-
-New features always go on =main=.
+Critical or trivial bug fixes always go on =bugfix= and are merged on
+=main=.  Non-trivial and non-critical fixes go on =main=.  New features
+(e.g. new options) always go on =main=.
 
 *** For all releases
 
-Before a minor or major release, all commits in =bugfix= should be
-merged into =main.=
+The =bugfix= branch should always be merged into =main.=
 
-Both minor and major releases are created from the =bugfix= branch.
+All releases are created from the =bugfix= branch.
 
-Set the =;; Version: [...]= metadata in =org.el= correctly.
+Always remember to set the =;; Version: [...]= metadata in =org.el=
+correctly.
 
-*** For major releases only
+*** For bugfix releases
 
-When doing a major release (and only then), =main= is merged back into
-=bugfix=.
+When doing a bugfix release (and only then), you shoud *NOT* merge the
+=main= branch into the =bugfix= branch.
 
-*** Tagging the release
+*** For minor and major releases
+
+When doing a minor or major release, the =main= branch should be merged
+into the =bugfix= branch.
+
+*** Releasing by adding a new tag
 
 When doing a major and a minor release, after all necessary merging is
-done, tag the _bugfix_ branch for the release with:
+done, you need to tag the =bugfix= branch for the release with:
 
-  : git tag -a release_9.1.7 -m "Adding release tag"
+  : git tag -a release_9.2 -m "Adding release tag"
 
 and push tags with
 
   : git push --tags
 
-We also encourage you to sign release tags like this:
+We also encourage you to sign the release tags like this:
 
   : git tag -s release_9.1.7 -m "Adding release tag"
 
-The GNU ELPA packages is built from the *bugfix* branch.
+Pushing the new tag will trigger the release on GNU ELPA.
 
 ** Synchronization Org and upstream Emacs
 
