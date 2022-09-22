@@ -24,8 +24,22 @@
       "<link rel=\"stylesheet\" title=\"Standard\" href=\"/worg/style/worg.css\" type=\"text/css\" />
 <link rel=\"alternate stylesheet\" title=\"Zenburn\" href=\"/worg/style/worg-zenburn.css\" type=\"text/css\" />
 <link rel=\"alternate stylesheet\" title=\"Classic\" href=\"/worg/style/worg-classic.css\" type=\"text/css\" />
-<link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\" />"
-      )
+<link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\" />")
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (shell . t)
+   (dot . t)
+   (clojure . t)
+   (org . t)
+   (ditaa . t)
+   (org . t)
+   (ledger . t)
+   (scheme . t)
+   (plantuml . t)
+   (R . t)
+   (gnuplot . t)))
 
 (dolist (org-file (directory-files-recursively default-directory "\\.org$"))
   (let ((html-file (concat (file-name-directory org-file)
