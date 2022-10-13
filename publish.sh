@@ -4,7 +4,7 @@
 
 (add-to-list 'load-path "~/org-mode/lisp/")
 (require 'ox-html)
-(load "/usr/share/emacs/site-lisp/elpa-src/htmlize-1.55/htmlize.el")
+(load "/usr/share/emacs/site-lisp/elpa-src/htmlize-1.56/htmlize.el")
 
 (setq make-backup-files nil
       debug-on-error t)
