@@ -191,12 +191,17 @@ contribution.
 
 You can check the [[https://github.com/bzg/woof/blob/master/resources/md/howto.org][Woof! howto]] if you want to explore the details.
 
-* Org main branch is tested against latest Emacs versions every 4 hours
+* Org main branch is tested against latest Emacs versions every 3 hours
 
 The =main= branch of Org is tested against the three latest stable
-versions of GNU Emacs every four hours.  Failures to run all tests
-from the main branch are reported to the [[https://lists.sr.ht/~bzg/org-build-failures][org-build-failures]] mailing
-list.
+versions of GNU Emacs every three hours, with these rules:
+
+- If the repository didn't change, don't rerun the tests.
+- If the repository changed, report new test failures to the
+  [[https://lists.sr.ht/~bzg/org-build-failures][org-build-failures]] mailing list.
+- If the repository changed and the last test against a specific Emacs
+  version failed, report new failures against the same Emacs version
+  to bzg@gnu.org.
 
 Tests are run using SourceHut build manifests called from the
 orgmode.org server.  You can get the manifests files from the
