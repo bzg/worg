@@ -232,6 +232,30 @@ yields this result (type =C-c C-c= in the source block):
 #+results: d-hello
 Hello World!
 
+** Including multiple libraries
+:PROPERTIES:
+:ID:       048c4b93-3891-4a05-8cf5-1b055829f4db
+:END:
+
+When several libraries need to be included, =:includes= value should be set to a list:
+
+#+name: cpp-multiple-includes
+#+begin_src C++ :includes '(<iostream> <stdio.h>) :results output :exports results
+  std::cout<<"Hello World!\n";
+  printf("%d\n", 2+2);
+#+end_src
+
+#+begin_example
+,#+begin_src C++ :includes '(<iostream> <stdio.h>) :results output
+  std::cout<<"Hello World!\n";
+  printf("%d\n", 2+2);
+,#+end_src
+#+end_example
+
+#+RESULTS: cpp-multiple-includes
+: Hello World!
+: 4
+
 ** Note that:
 - if no =main()= is declared, a trivial one is automatically provided,
 - there is no directive like:
