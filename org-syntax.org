@@ -82,7 +82,7 @@ To simplify references to common collections of objects, we define two
 useful sets.  The /<<<minimal set>>> of objects/ refers to [[#Plain_Text][plain text]], [[#Emphasis_Markers][text
 markup]], [[#Entities][entities]], [[#LaTeX_Fragments][LaTeX fragments]], [[#Subscript_and_Superscript][superscripts and subscripts]].  The
 /<<<standard set>>> of objects/ refers to the entire set of objects, excluding
-citation references and [[#Table_Cells][table cells]].
+[[#Citation references][citation references]] and [[#Table_Cells][table cells]].
 
 ** Blank lines
 
@@ -98,9 +98,21 @@ considered part of the paragraph.
 ** Indentation
 
 Indentation consists of a series of space and tab characters at the
-beginning of a line. Most elements can be indentated, with the
+beginning of a line.  Most elements can be indentated, with the
 exception of [[#Headings][headings]], [[#Inlinetasks][inlinetasks]], [[#Footnote_Definitions][footnote definitions]], and [[#Diary_Sexp][diary
 sexps]].  Indentation is only syntactically meaningful in plain lists.
+
+The common indentation of all the lines within an element is
+discarded.  This also applies to single-line elements.
+
+*Examples*
+
+#+begin_example
+   This paragraph will not contain
+   a long sequence of spaces before "a".
+
+   This paragraph does not have leading spaces according to the parser.
+#+end_example
 
 ** Syntax patterns
 
@@ -153,6 +165,16 @@ PRE TOKEN POST
 
 In this document, unless specified otherwise, case is insignificant.
 
+** References to lisp variables
+
+Some parts of Org syntax are configurable via special keywords in the
+file or via Elisp settings in Emacs.  This syntax document exposes
+these variable parts by referencing to Elisp variables.
+
+Elisp programs utilizing the syntax may directly refer to the Elisp
+variable values.  Other users of this syntax reference can use to the
+default values we provide here.
+
 * Elements
 :PROPERTIES:
 :CUSTOM_ID: Elements
@@ -175,7 +197,8 @@ STARS KEYWORD PRIORITY TITLE TAGS
 + STARS :: A string consisting of one or more asterisks (up to
   ~org-inlinetask-min-level~ if the =org-inlinetask= library is loaded)
   suffixed by a space character.  The number of asterisks is used to
-  define the level of the heading.
+  define the level of the heading.  Space character after asterisks is
+  mandatory.
 
 + KEYWORD (optional) :: A string which is a member of
   ~org-todo-keywords-1~[fn:otkw1:By default, ~org-todo-keywords-1~ only
@@ -191,7 +214,8 @@ STARS KEYWORD PRIORITY TITLE TAGS
   is called a "priority cookie".
 
 + TITLE (optional) :: A series of objects from the standard set,
-  excluding line break objects.  It is matched after every other part.
+  excluding line break objects.  It is matched after =KEYWORD= and
+  =PRIORITY=.
 
 + TAGS (optional) :: A series of colon-separated strings consisting of
   alpha-numeric characters, underscores, at signs, hash signs, and
@@ -254,6 +278,23 @@ Its internal structure could be summarized as:
    (heading))))
 #+end_example
 
+Sections do not include blank lines immediately following the parent
+heading.  It also means that headings containing only blank lines do
+not contain any section.
+
+#+begin_example
+,* Heading without section, but with blank lines
+
+,* Another heading with section
+
+This is a section. It includes everything from "This is" down to "Last
+heading", including the trailing blank lines.
+
+,* Last heading
+#+end_example
+
+[[#The zeroth section][Zeroth section]] follows the same rule.
+
 *** The zeroth section
 :PROPERTIES:
 :CUSTOM_ID: Zeroth_section
@@ -301,8 +342,8 @@ CONTENTS
   - any other value, a "special block"
 + PARAMETERS (optional) :: A string consisting of any characters other
   than a newline.
-+ CONTENTS :: A collection of zero or more elements, subject to two
-  conditions:
++ CONTENTS :: A collection of zero or more elements, subject to the
+  following condition:
   - No line may start with =#+end_NAME=.
 
 *** Drawers and Property Drawers
@@ -349,7 +390,7 @@ and are structured according to the following pattern:
 [fn:LABEL] CONTENTS
 #+end_example
 
-+ LABEL :: Either a number or an instance of the pattern =fn:WORD=, where
++ LABEL :: Either a number or an instance of the pattern =WORD=, where
   =WORD= represents a string consisting of word-constituent characters,
   hyphens and underscores (=-_=).
 
@@ -423,7 +464,7 @@ BULLET COUNTER-SET CHECK-BOX TAG CONTENTS
   character, or a hyphen enclosed by square brackets (i.e. =[ ]=, =[X]=, or =[-]=).
 + TAG (optional) :: An instance of the pattern =TAG-TEXT ::= where
   =TAG-TEXT= represents a string consisting of non-newline characters
-  that does not contain the substring ="\nbsp{}::\nbsp{}"= (two colons surrounded by
+  that does not contain the substring =" :: "= (two colons surrounded by
   whitespace, without the quotes).
 + CONTENTS (optional) :: A collection of zero or more elements, ending
   at the first instance of one of the following:
@@ -451,8 +492,8 @@ BULLET COUNTER-SET CHECK-BOX TAG CONTENTS
 A /plain list/ is a set of consecutive [[#Items][items]] of the same indentation.
 
 #+begin_info
-At a glance it may appear as though nested lists are not possible. They are, as
-items may themselves contain lists.
+Note that item elements can contain other lists.  This allows creating
+nested lists.
 #+end_info
 
 If first item in a plain list has a COUNTER in its BULLET, the plain
@@ -474,10 +515,13 @@ Its internal structure is as follows:
 
 #+begin_example
 (ordered-plain-list
- (item)
  (item
+   (paragraph))
+ (item
+  (paragraph)
   (descriptive-plain-list
-   (item))))
+   (item
+     (paragraph)))))
 #+end_example
 
 *** Property Drawers
@@ -498,6 +542,17 @@ PLANNING
 PROPERTYDRAWER
 #+end_example
 
+Property drawer can also be present in [[#Zeroth_section][zeroth section]]:
+
+#+begin_example
+BEGINNING-OF-FILE
+BLANK-LINES
+COMMENT
+PROPERTYDRAWER
+#+end_example
+
+=BLANK-LINES= and =COMMENT= are optional.
+
 Property Drawers are structured according to the following pattern:
 
 #+begin_example
@@ -512,6 +567,7 @@ CONTENTS
 *Example*
 
 #+begin_example
+,* Heading
 :PROPERTIES:
 :CUSTOM_ID: someid
 :END:
@@ -909,7 +965,7 @@ A table row consists of a vertical bar (=|=) followed by:
 + A hyphen (=-=), forming a "rule" type row.  Any non-newline characters
   can follow the hyphen and this will still be a "rule" type row
 
-Table rows can only exist in [[#Tables][tables]].
+Table rows can only exist in [[#Tables][tables]] with Org type.
 
 * Objects
 :PROPERTIES:
@@ -936,15 +992,19 @@ specified.  Furthermore, while many objects may contain newlines, a
 blank line often terminates the element that the object is a part of,
 such as a paragraph.
 
+Trailing spaces at the end of objects are considered a part of those
+objects.
+
 ** Entities
 :PROPERTIES:
 :CUSTOM_ID: Entities
 :END:
 
-Entities are structured according to the following pattern:
+Entities are structured according to the following patterns:
 
 #+begin_example
 \NAME POST
+\NAME{}
 #+end_example
 
 Where NAME and POST are not separated by a whitespace character.
@@ -954,7 +1014,6 @@ Where NAME and POST are not separated by a whitespace character.
   ~org-entities-user~.
 + [[#Special_Tokens][POST]] :: Either:
   - The end of line.
-  - The string ={}=.
   - A non-alphabetic character.
 
 *Example*
@@ -1178,9 +1237,10 @@ Line breaks must occur at the end of an otherwise non-blank line, and
 are structured according to the following pattern:
 
 #+begin_example
-\\SPACE
+PRE\\SPACE
 #+end_example
 
++ [[#Special_Tokens][PRE]] :: Anything but backspace (=\=). 
 + SPACE :: Zero or more tab and space characters.
 
 ** Links
@@ -1371,9 +1431,9 @@ Statistics cookies are structured according to one of the following patterns:
 [NUM1/NUM2]
 #+end_example
 
-+ PERCENT (optional) :: A number.
-+ NUM1 (optional) :: A number.
-+ NUM2 (optional) :: A number.
++ PERCENT (optional) :: A non-negative integer.
++ NUM1 (optional) :: A non-negative integer.
++ NUM2 (optional) :: A non-negative integer.
 
 ** Subscript and Superscript
 :PROPERTIES:
@@ -1414,10 +1474,11 @@ SIGN CHARS FINAL
 :CUSTOM_ID: Table_Cells
 :END:
 
-Table cells are structured according to the following pattern:
+Table cells are structured according to the following patterns:
 
 #+begin_example
 CONTENTS SPACES|
+CONTENTS SPACES END-OF-LINE
 #+end_example
 
 + CONTENTS :: Zero or more objects not containing the vertical bar
@@ -1426,6 +1487,7 @@ CONTENTS SPACES|
   [[#Targets_and_Radio_Targets][radio targets]], [[#Targets_and_Radio_Targets][targets]], and [[#Timestamps][timestamps]].
 + SPACES :: A string consisting of zero or more of space characters,
   used to align the table columns.
++ END-OF-LINE :: Line ending.
 
 The final vertical bar (=|=) may be omitted in the last cell of a [[#Table_Rows][table row]].
 
@@ -1454,9 +1516,10 @@ YYYY-MM-DD DAYNAME
   - Y, M, D :: A digit.
   - DAYNAME (optional) :: A string consisting of non-whitespace
     characters except =+=, =-=, =]=, =>=, a digit, or =\n=.
-+ TIME (optional) :: An instance of the pattern =H:MM= where =H= represents a one to
-  two digit number (and can start with =0=), and =M= represents a single
-  digit.
++ TIME (optional) :: An instance of the pattern =H:MMREST= where =H=
+  represents a one to two digit number (and can start with =0=), and =M=
+  represents a single digit.  =REST= can contain anything but =\n= or
+  closing bracket.
 + REPEATER-OR-DELAY (optional) :: An instance of the following pattern:
   #+begin_example
 MARK VALUE UNIT
