@@ -17,6 +17,7 @@
       org-html-html5-fancy t
       org-html-validation-link nil
       org-plantuml-jar-path "/usr/share/plantuml/plantuml.jar"
+      org-ditaa-jar-path "/usr/bin/ditaa"
       org-html-preamble
       (with-temp-buffer (insert-file-contents "preamble.html") (buffer-string))
       org-html-postamble
