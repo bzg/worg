@@ -17,8 +17,8 @@ if you spot any mistakes, omissions or superfluities, please fix
 them. If you have an account, you can clone the Worg tree and make the
 additions/fixes (see [[https://orgmode.org/worg/worg-about.html]] for more
 information), but if you don't or don't want to do it yourself, that's
-fine too: a note to the [[mailto:emacs-orgmode@gnu.org][orgmode mailing list]] will also do
-the job. Thanks!
+fine too: a note to the [[mailto:emacs-orgmode@gnu.org][orgmode mailing list]] will also do the
+job. Thanks!
 
 Version: Org-mode version 7.8.03 (release_7.8.03.346.g1915.dirty)
 
@@ -207,9 +207,7 @@ immediate problems than getting org to work on your machine.
 OK, let's assume you fixed your version of texi2dvi. How do you use
 it? Just set
 
-#+BEGIN_SRC emacs-lisp
-  (setq org-latex-to-pdf-process '("texi2dvi --pdf %f" ))
-#+END_SRC
+  : (setq org-latex-to-pdf-process '("texi2dvi --pdf %f" ))
 
 Wait a minute: where do I put the --shell-escape option? That's the
 second problem with texi2dvi. The best way I know to have texi2dvi
@@ -238,19 +236,18 @@ that the error is usually well hidden, so you'll have to dig to find it.
 For example, trying to export this file to PDF with PDFLATEX undefined,
 gives me the following error:
 
-  =PDF file /home/nick/src/emacs/org/Worg/org-dependencies.pdf was not produced=
+  : PDF file /home/nick/src/emacs/org/Worg/org-dependencies.pdf was not produced
 
 But if I export to latex and try it from the command line:
 
-#+BEGIN_SRC sh
-pdflatex org-dependencies.tex
-#+END_SRC
+  : pdflatex org-dependencies.tex
 
 the error is clear:
 
-  =! Package minted Error: You must invoke LaTeX with the -shell-escape flag.=
+  : ! Package minted Error: You must invoke LaTeX with the -shell-escape flag.
 
 Achim Gratz suggested a different, less intrusive method on the mailing list:
+
 #+BEGIN_QUOTE
 > 2) put this in ~/.profile:
 >    PDFLATEX="pdflatex --shell-escape"
@@ -265,7 +262,6 @@ invocation of the command.
 Or if your system still had the locale bug even
 
  (setq org-latex-to-pdf-process '("LC_ALL=C PDFLATEX=\"pdflatex --shell-escape\" texi2dvi -p %f"))
-
 #+END_QUOTE
 
 *** STARTED Symbols
@@ -277,8 +273,8 @@ packages.
 
 | LaTeX macro | Rendered Symbol (approx) | LaTeX package | Ubuntu container package  |
 |-------------+--------------------------+---------------+---------------------------|
-| =\EUR=      | \EUR                     | marvosym      | texlive-fonts-recommended |
-| =\euro=     | \euro                    | eurosym       | texlive-fonts-recommended |
+| =\EUR=         | \EUR                        | marvosym      | texlive-fonts-recommended |
+| =\euro=         | \euro                        | eurosym       | texlive-fonts-recommended |
 
 Note that marvosym is now included as part of the default setup so you do
 not need to include the package explicitly.

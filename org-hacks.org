@@ -528,7 +528,7 @@ of its arguments."
           (when (match-string-no-properties 5)
             (let ((desc (match-string-no-properties 5)))
               (save-match-data
-                (incf wc (length (remove "" (org-split-string
+                (cl-incf wc (length (remove "" (org-split-string
                                              desc "\\W")))))))
           (goto-char (match-end 0)))
          ((looking-at org-any-link-re)
@@ -572,7 +572,7 @@ of its arguments."
                   (org-forward-same-level 1)
                 nil))
              (t
-              (incf wc))))))
+              (cl-incf wc))))))
         (re-search-forward "\\w+\\W*")))
     (message (format "%d words in %s." wc
                      (if mark-active "region" "buffer")))))
