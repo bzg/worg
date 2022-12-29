@@ -35,7 +35,6 @@
    (org . t)
    (ditaa . t)
    (org . t)
-   (ledger . t)
    (scheme . t)
    (plantuml . t)
    (R . t)
