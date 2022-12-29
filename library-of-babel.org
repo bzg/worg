@@ -18,7 +18,7 @@ file to the library by calling =(org-babel-lob-ingest
 This file is included in worg mainly less for viewing through the web
 interface, and more for contribution through the worg git repository.
 If you have code snippets that you think others may find useful please
-add them to this file and [[file:worg-about.org::*How to use git for Worg][How to use git for Worg]] to worg.
+add them to this file and [[file:worg-about.org::#git][How to use git for Worg]] to worg.
 
 The raw Org-mode text of this file can be downloaded at
 [[https://orgmode.org/worg/library-of-babel.org][library-of-babel.org]]
@@ -56,7 +56,7 @@ as a table in traditional Org-mode table syntax.
 
 #+name: write
 #+begin_src emacs-lisp :var data="" :var file="" :var ext='()
-(flet ((echo (r) (if (stringp r) r (format "%S" r))))
+(cl-flet ((echo (r) (if (stringp r) r (format "%S" r))))
   (with-temp-file file
     (case (and (listp data)
                (or ext (intern (file-name-extension file))))
@@ -133,7 +133,7 @@ normal document.
 
 #+name: fibs
 #+begin_src emacs-lisp :var n=8 :exports none
-(flet ((fib (m) (if (< m 2) 1 (+ (fib (- m 1)) (fib (- m 2))))))
+(cl-flet ((fib (m) (if (< m 2) 1 (+ (fib (- m 1)) (fib (- m 2))))))
   (mapcar (lambda (el) (list el (fib el))) (number-sequence 0 (- n 1))))
 #+end_src
 
@@ -157,7 +157,7 @@ example usage
 #+begin_example
 ,#+name: fibs
 ,#+begin_src emacs-lisp :var n=8
-(flet ((fib (m) (if (< m 2) 1 (+ (fib (- m 1)) (fib (- m 2))))))
+(cl-flet ((fib (m) (if (< m 2) 1 (+ (fib (- m 1)) (fib (- m 2))))))
   (mapcar (lambda (el) (list el (fib el))) (number-sequence 0 (- n 1))))
 ,#+end_src
 
@@ -232,7 +232,7 @@ optional.
 
 #+name: booktabs
 #+begin_src emacs-lisp :var table='((:head) hline (:body)) :var align='() :var env="tabular" :var width='() :noweb yes :results latex
-(flet ((to-tab (tab)
+(cl-flet ((to-tab (tab)
                (orgtbl-to-generic
                 (mapcar (lambda (lis)
                           (if (listp lis)
@@ -328,7 +328,7 @@ span. Note the use of LaTeX, rather than Org-mode, markup.
 
 #+name: booktabs-notes
 #+begin_src emacs-lisp :var table='((:head) hline (:body)) :var notes='() :var align='() :var env="tabular" :var width='() :var lspace='() :noweb yes :results latex
-(flet ((to-tab (tab)
+(cl-flet ((to-tab (tab)
                (orgtbl-to-generic
                 (mapcar (lambda (lis)
                           (if (listp lis)

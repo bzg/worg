@@ -350,20 +350,23 @@ FIXME: "variable "chk-babel-lang" in block "transpose-elisp" must be
 assigned a default value"
 
    - Checks if a language can be tangled by Org-babel
-#+name: chk-babel-lang(x)
-#+begin_src emacs-lisp :results silent
-  (let ((z  (mapcar #'(lambda (y)
-                (first y)) org-babel-tangle-langs )
-  )) (if (member x z) "pass" "fail") )
-#+end_src
+
+   #+name: chk-babel-lang(x)
+   #+begin_src emacs-lisp :results silent
+   (let ((z (mapcar #'(lambda (y) (first y))
+                    org-babel-tangle-langs)))
+     (if (member x z) "pass" "fail") )
+   #+end_src
 
 ** COMMENT Check external commands
+
 #+name: chk-ext-cmd(x)
 #+begin_src emacs-lisp :results silent
     (if (org-check-external-command x "" t) "pass" "fail")
 #+end_src
 
 ** Export LaTeX classes
+
 #+name: chk-ltx-cls
 #+begin_src emacs-lisp :results silent
   (if (null org-export-latex-classes) "fail" "pass")
@@ -374,31 +377,35 @@ assigned a default value"
    - This is typically a call to the LaTeX engine
    - If =fail= is returned, then the variable =org-latex-to-pdf-process=
      needs to be set
-#+name: chk-latex-engine
-#+begin_src emacs-lisp :results silent
-  (require 'org-latex)
-  (if  (null org-latex-to-pdf-process) "fail" (substring (first org-latex-to-pdf-process) 0 (string-match "\\ " (first org-latex-to-pdf-process))) )
-#+end_src
+
+   #+name: chk-latex-engine
+   #+begin_src emacs-lisp :results silent
+   (require 'ox-latex)
+   (if (null org-latex-to-pdf-process)
+       "fail"
+     (substring (first org-latex-to-pdf-process) 0 (string-match "\\ " (first org-latex-to-pdf-process))))
+   #+end_src
 
 ** LaTeX engine present
-   - Checks if the LaTeX engine specified by
-     =org-latex-to-pdf-process= can be found by Org-mode
-   - Returns =fail= if  =chk-latex-engine= returns =fail=
-   - If =fail= is returned, then the variable =exec-path= probably
-     needs to have the path to the LaTeX engine
+
+- Checks if the LaTeX engine specified by
+  =org-latex-to-pdf-process= can be found by Org-mode
+- Returns =fail= if =chk-latex-engine= returns =fail=
+- If =fail= is returned, then the variable =exec-path= probably
+  needs to have the path to the LaTeX engine
 #+name: chk-engine-cmd
 #+begin_src emacs-lisp :var x=chk-latex-engine :results silent
   (if (string-equal x "fail") x (if (org-check-external-command x "" t)
   "pass" "fail"))
 #+end_src
 
-
 ** =org-agenda-files=
-   - The [[elisp:(progn (describe-variable 'org-agenda-files) (other-window 1))][org-agenda-files]] variable is required for a number of optional, but useful, Org-mode commands
-        - [[elisp:(progn (describe-function 'org-agenda) (other-window 1))][org-agenda]]
-        - org-export-icalendar-combine-agenda-files : [[elisp:(progn (describe-variable 'org-export-icalendar-combine-agenda-files) (other-window 1))]]
-        - others?
-   - It is [[https://orgmode.org/manual/Agenda-files.html#Agenda-files][easy to set]]
+- The [[elisp:(progn (describe-variable 'org-agenda-files) (other-window 1))][org-agenda-files]] variable is required for a number of optional, but useful, Org-mode commands
+     - [[elisp:(progn (describe-function 'org-agenda) (other-window 1))][org-agenda]]
+     - org-export-icalendar-combine-agenda-files : [[elisp:(progn (describe-variable 'org-export-icalendar-combine-agenda-files) (other-window 1))]]
+     - others?
+- It is [[https://orgmode.org/manual/Agenda-files.html#Agenda-files][easy to set]]
+
 #+name: chk-agenda-files
 #+begin_src emacs-lisp :results silent
   (if (null org-agenda-files)
@@ -408,13 +415,13 @@ assigned a default value"
 
 ** COMMENT Check System Command
 
-FIXME: "variable "chk-sys-cmd" in block "transpose-elisp" must be assigned
-a default value"
+FIXME: "variable "chk-sys-cmd" in block "transpose-elisp" must be
+assigned a default value"
 
-   - Check if x is present on the system path
-   - If =fail= is returned, ensure that the executable is found on
-     your system, then check that =$PATH= holds a path to the
-     executable
+- Check if x is present on the system path
+- If =fail= is returned, ensure that the executable is found on
+  your system, then check that =$PATH= holds a path to the
+  executable
 
 #+name: chk-sys-cmd(x)
 #+begin_src sh :results silent
@@ -424,15 +431,17 @@ a default value"
     fi
 #+end_src
 
-
 ** =check-latex-scale=
+
 Report the scale setting for inline images.  Default is 1.0.
 
 #+name: chk-latex-scale
 #+begin_src emacs-lisp :results silent
   (plist-get org-format-latex-options :scale)
 #+end_src
+
 * Learning Lisp (slowly)                                           :noexport:
+
 ** Check LaTeX packages
 #+name: chk-kpse
 #+begin_src sh :results silent
@@ -459,18 +468,23 @@ Report the scale setting for inline images.  Default is 1.0.
 #+results: chk-ltx-pkg
 
 * Acknowledgments
+
 Many thanks to the following people for their generous help:
-  - Eric Schulte for setting up the original table and correcting code
-  - Sebastian Rose for the pointer to (featurep FEATURE &optional SUBFEATURE)
-  - Carsten Dominick for [[https://orgmode.org/guide/][Org-mode Guide]] and his many other efforts to
-    make Org-mode accessible to Lisp illiterates
+
+- Eric Schulte for setting up the original table and correcting code
+- Sebastian Rose for the pointer to (featurep FEATURE &optional SUBFEATURE)
+- Carsten Dominick for [[https://orgmode.org/guide/][Org-mode Guide]] and his many other efforts to
+  make Org-mode accessible to Lisp illiterates
 
 * Notes                                                            :noexport:
+
 ** DONE Provide a link to the org-check.org file in Instructions
 ** DONE Check, does Windows have something like which?
    - which is used in the shell scripts td wrote to check for latex
      and dvipng commands at the system level
+
 ** Source
+
 #+name: copy-to-worg
 #+begin_src sh :exports none :results output
   cd ~/org/worg/
