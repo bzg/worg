@@ -16,6 +16,7 @@
       org-html-doctype "html5"
       org-html-html5-fancy t
       org-html-validation-link nil
+      org-plantuml-jar-path "/usr/share/plantuml/plantuml.jar"
       org-html-preamble
       (with-temp-buffer (insert-file-contents "preamble.html") (buffer-string))
       org-html-postamble
@@ -40,14 +41,16 @@
    (R . t)
    (gnuplot . t)))
 
-(dolist (org-file (directory-files-recursively default-directory "\\.org$"))
+(dolist (org-file (directory-files-recursively
+		   default-directory "\\.org$"
+		   nil (lambda (n) (not (string-match-p "archive" n)))))
   (let ((html-file (concat (file-name-directory org-file)
 			   (file-name-base org-file) ".html")))
     (if (and (file-exists-p html-file)
-             (file-newer-than-file-p html-file org-file))
+	     (file-newer-than-file-p html-file org-file))
 	(message " [skipping] unchanged %s" org-file)
       (message "[exporting] %s" (file-relative-name org-file default-directory))
       (with-current-buffer (find-file org-file)
 	(condition-case err
-            (org-html-export-to-html)
+	    (org-html-export-to-html)
           (error (message (error-message-string err))))))))
