@@ -539,7 +539,7 @@ silently or calls the interactive debugger, as appropriate."
                                        :backtrace backtrace))))
          ;; Work around Emacs' heuristic (in eval.c) for detecting
          ;; errors in the debugger.
-         (incf num-nonmacro-input-events)
+         (cl-incf num-nonmacro-input-events)
          ;; FIXME: We should probably implement more fine-grained
          ;; control a la non-t `debug-on-error' here.
          (cond
@@ -1155,15 +1155,15 @@ Ensures a final newline is inserted."
         ;; Adjust stats to add new result.
         (if expectedp
             (etypecase result
-              (ert-test-passed (incf (ert-stats-passed-expected stats)))
-              (ert-test-failed (incf (ert-stats-failed-expected stats)))
-              (ert-test-error (incf (ert-stats-error-expected stats)))
+              (ert-test-passed (cl-incf (ert-stats-passed-expected stats)))
+              (ert-test-failed (cl-incf (ert-stats-failed-expected stats)))
+              (ert-test-error (cl-incf (ert-stats-error-expected stats)))
               (null)
               (ert-test-aborted-with-non-local-exit))
           (etypecase result
-            (ert-test-passed (incf (ert-stats-passed-unexpected stats)))
-            (ert-test-failed (incf (ert-stats-failed-unexpected stats)))
-            (ert-test-error (incf (ert-stats-error-unexpected stats)))
+            (ert-test-passed (cl-incf (ert-stats-passed-unexpected stats)))
+            (ert-test-failed (cl-incf (ert-stats-failed-unexpected stats)))
+            (ert-test-error (cl-incf (ert-stats-error-unexpected stats)))
             (null)
             (ert-test-aborted-with-non-local-exit)))
         (setf (aref results pos) result
