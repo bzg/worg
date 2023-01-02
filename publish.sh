@@ -4,6 +4,7 @@
 
 (add-to-list 'load-path "~/org-mode/lisp/")
 (require 'ox-html)
+(require 'cl-seq)
 (load "/usr/share/emacs/site-lisp/elpa-src/htmlize-1.56/htmlize.el")
 
 (setq make-backup-files nil
@@ -42,7 +43,7 @@
    (R . t)
    (gnuplot . t)))
 
-(dolist (org-file (remove-if
+(dolist (org-file (cl-remove-if
 		   (lambda (n) (string-match-p "worg/archive/" n))
 		   (directory-files-recursively default-directory "\\.org$")))
   (let ((html-file (concat (file-name-directory org-file)
