@@ -42,9 +42,9 @@
    (R . t)
    (gnuplot . t)))
 
-(dolist (org-file (directory-files-recursively
-		   default-directory "\\.org$"
-		   nil (lambda (n) (not (string-match-p "archive" n)))))
+(dolist (org-file (remove-if
+		   (lambda (n) (string-match-p "worg/archive/" n))
+		   (directory-files-recursively default-directory "\\.org$")))
   (let ((html-file (concat (file-name-directory org-file)
 			   (file-name-base org-file) ".html")))
     (if (and (file-exists-p html-file)
