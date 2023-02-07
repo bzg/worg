@@ -1999,13 +1999,16 @@ Yes, you can with the contributed package =org-wikinodes.el=.  Please
 consult the [[https://orgmode.org/worg/org-contrib/org-wikinodes.html][documentation]].
 
 ** Can I create links to Thunderbirds emails?
+:PROPERTIES:
+:CUSTOM_ID: mid-url-handler
+:END:
 
 Thunderbird-91 and later versions support =mid:= URI scheme proposed
-many years ago, see
-[[https://www.rfc-editor.org/rfc/rfc2392.html][RFC 2392 - Content-ID and Message-ID Uniform Resource Locators]]
-for details.  To create a link you need to copy the value of the
-Message-ID header, it should be possible with some add-on.  As the
-last resort you may obtain the identifier by opening message source
+many years ago in
+[[https://www.rfc-editor.org/rfc/rfc2392.html][RFC 2392 - Content-ID and Message-ID Uniform Resource Locators]].
+To create a link you need to copy the value of the Message-ID header.
+It requires installing some add-on, see =cb_thunderlink= example below.
+As the last resort you may obtain the identifier by opening message source
 (=Ctrl+U=).  Message-ID resembles email address but has a unique
 string in the local (user) part.  Remove angle brackets and prepend
 the inner part with =mid:= to create a link.  A command to open the
@@ -2034,6 +2037,10 @@ x-scheme-handler/mid=thunderbird.desktop;
 [Default Applications]
 x-scheme-handler/mid=thunderbird.desktop;
 #+END_EXAMPLE
+On Windows ensure that Thunderbird is installed as default handler
+for URI protocols related to mail.  This approach allows to have
+uniform handler withing Emacs, including
+[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Goto-Address-mode.html][~goto-address-mode~]].
 
 Instead of calling ~browse-url~ and setting up the scheme handler
 you may launch thunderbird directly.  It is a bit tricky in Emacs,
@@ -2044,12 +2051,26 @@ convenient since moving the message to another folder invalidates
 the link:
 : thunderbird -mail 'imap-message://USER_NAME%40gmail.com@imap.googlemail.com/INBOX?messageId=ka42mn$mn9$1@ger.gmane.org'
 
+There is
+[[https://addons.thunderbird.net/thunderbird/addon/cb_thunderlink/][=cb_thunderlink= Thunderbird add-on]]
+that allows to generate links accordingly to configurable template, e.g.
+: [[mid:$msgid$][$author_name$: $subject$ ($date_iso$)]]
+See the
+[[https://list.orgmode.org/63d01412.050a0220.9611.9c4d@mx.google.com/][discussion]]
+on the emacs-orgmode mailing list.
+Additionally the extension may open messages using =thunderlink:=
+and =cbthunderlink:= protocols however it requires installing
+of a helper application.  These URI schemes may be registered in Org
+just as it is suggested for =mid:= links above.
+
 The ThunderLink add-on recommended earlier did not work since
-transition of Thunderbird from XUL add-ons to WebExtensions,
+transition of Thunderbird-78 from XUL add-ons to WebExtensions,
 so the following recipe is obsolete:
 [[http://list.orgmode.org/ka42mn$mn9$1@ger.gmane.org][from Christoph Herzog: Re: Linking to Thunderbird (correction)]].
-Notice that this link uses Message-ID to reference a particular
-message as well.
+To open earlier created =thunderlink:= links either
+install =cb_thunderlink= add-on or add to ~browse-url-handlers~ alist
+a function that extracts Message-ID and passes it to =mid:= protocol
+handler.
 
 * Plain Lists
   :PROPERTIES:
