@@ -121,7 +121,19 @@ Run commands in separate shells...[fn:3]
 : : PID: 19066
 : : X was set to 1
 
-...or as a shell command.
+...asynchronously...
+
+: #+begin_src sh :session execute-asynchronously :async
+: echo "Execute session blocks in the background"
+: sleep 3
+: echo "Using the :async header"
+: #+end_src
+:
+: #+RESULTS:
+: : Execute session blocks in the background
+: : Using the :async header
+
+...or as a standalone shell command.
 
 : #+title: shell command (shebang) example
 :
@@ -216,6 +228,7 @@ shells.
 Common:
 - [[results][:results]]
 - [[session][:session]]
+  + [[async][:async]]
 - [[var][:var]]
 - [[https://orgmode.org/manual/Noweb-Reference-Syntax.html][:noweb]]
 - [[https://orgmode.org/manual/Extracting-Source-Code.html][:tangle]]
@@ -343,6 +356,59 @@ therefore, has no knowledge of the variable from the other session.
 
 Sessions are useful for isolating processes and for incremental
 development.
+
+** Async <<async>>
+=:async <[''/t/no]>=
+
+Run session blocks asynchronously with the =:async= header.  This
+means Emacs will not freeze while waiting for the block to execute.
+
+The =:async= header accepts optional arguments of "t" and "no".  When
+"t", blocks are executed in a background process.  When "no", the
+block behaves like =:session= (Emacs freezes until execution
+completes).  A "t" argument is assumed when no argument is given.
+
+*NOTE:* =:async= requires the =:session= header!
+
+/Examples:/
+
+A universally unique identifier (UUID) appears while an async block
+executes:
+
+: #+begin_src sh :results output :session test :async t
+: echo "Hello, world!"
+: sleep 3
+: echo "Good-bye, cruel World..."
+: #+end_src
+:
+: #+RESULTS:
+: : d3aec7bd-c2a0-41f4-bd4d-edad7143cbbc
+
+When the process completes, the UUID is replaced with the results:
+
+: #+begin_src sh :results output :session test :async t
+: echo "Hello, world!"
+: sleep 3
+: echo "Good-bye, cruel World..."
+: #+end_src
+:
+: #+RESULTS:
+: : Hello, world!
+: : Good-bye, cruel World...
+
+Disable asynchronous execution by passing "no" as an argument:
+
+: #+begin_src sh :results output :session test :async no
+: echo "Changing the :async argument to 'no'"
+: sleep 3
+: echo "will run the block synchronously (freezing Emacs"
+: echo "until the block completes)."
+: #+end_src
+:
+: #+RESULTS:
+: : Changing the :async argument to 'no'
+: : will run the block synchronously (freezing Emacs
+: : until the block completes).
 
 ** Variables  <<var>>
 =:var <name_1>=<value_1> ... [<name_n>=<value_n>]=
