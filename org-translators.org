@@ -22,58 +22,154 @@ export Org-mode data and import external data into the Org-mode system.
 
 * Org-mode Export Tools
 
-  - [[https://www.drupal.org/node/1977240][From Org-mode to Drupal]] by [[file:users/davidam.org][David Arroyo Menéndez]].
+The tools listed here do take Org-mode files and convert them to a different format:
 
-  - From Org-mode to Freemind by Marco Vezzoli, this is available in
-    the contrib directory of the distribution.
+** [[https://www.drupal.org/node/1977240][From Org-mode to Drupal]] by [[file:users/davidam.org][David Arroyo Menéndez]].
 
-  - From Org-mode to [[https://en.wikipedia.org/wiki/ICalendar][ICal]]endar applications:
+** From Org-mode to Freemind
 
-    - there are an export tool already implemented in org mode, is
-      [[https://orgmode.org/manual/iCalendar-export.html#iCalendar-export][explained at the org manual]].
+... by Marco Vezzoli, this is available in the contrib directory of the distribution.
 
-    - For Google users, read [[file:org-tutorials/org-google-sync.org][this tutorial]].
+** From Org-mode to [[https://en.wikipedia.org/wiki/ICalendar][ICal]]endar applications
+
+- there are an export tool already implemented in org mode, is
+  [[https://orgmode.org/manual/iCalendar-export.html#iCalendar-export][explained at the org manual]].
+
+- For Google users, read [[file:org-tutorials/org-google-sync.org][this tutorial]].
+
+** [[https://github.com/zzamboni/ox-leanpub][ox-leanpub: Org-mode exporter for Leanpub books]]
 
 * Org-mode Import Tools
 
-  - [[http://www.olafdietsche.de/palm/palm2orgmode.pl][From Palm TODO database to Orgmode]].  This Translator was
-    written by [[http://www.olafdietsche.de/][Olaf Dietsche]].
+The tools listed here do take non-Org-mode files and convert them to Org:
 
-  - From [[https://list.orgmode.org/20080112175502.0fb06b66@linux.site][Remind to Org]] by Detlef Steuer.
+** [[http://www.olafdietsche.de/palm/palm2orgmode.pl][From Palm TODO database to Orgmode]]
 
-  - From [[http://bitbucket.org/legoscia/of2org][OmniFocus to Org]] by Magnus Henoch.
+This Translator was written by [[http://www.olafdietsche.de/][Olaf Dietsche]].
 
-  - From [[http://www.hogbaysoftware.com/products/taskpaper][TaskPaper]] to Org by Carsten Dominik.  A quite complete
-    translation can be achieved by a compact Perl program:
+** From [[https://list.orgmode.org/20080112175502.0fb06b66@linux.site][Remind to Org]] by Detlef Steuer
 
-    #+begin_src perl
-      #!/usr/bin/perl
-      /^(\t*)-(.*?)((@\w+ *)*)$/;
-      @u=grep{$_ ne'@done'}(@t=split/ +/,$3);
-      @v=@u?('',@u,''):();
-      $t{$_}++for@u;
-      $_="*"x(2+length$1).(@t==@u?" TODO":" DONE").$2.join(":",@v)."\n"if$&;
-      s/^\w.*:\s*$/* $&/;
-      END{printf "* Setup\n#+TAGS: %s\n",join' ',keys%t}
-    #+end_src
+** From [[http://bitbucket.org/legoscia/of2org][OmniFocus to Org]] by Magnus Henoch
 
-    This program is quite unreadable because it resulted from a
-    [[https://list.orgmode.org/0277B507-1486-4172-B1C6-1B73B84148DD@science.uva.nl][contest for the most compact translator]] - but it works very well
-    anyway.
+** From [[http://www.hogbaysoftware.com/products/taskpaper][TaskPaper]] to Org by Carsten Dominik
 
-  - From [[https://bitbucket.org/josemaria.alkala/odt2org/wiki/Home][ODT to Org]], by Jose Maria Alkala.
+A quite complete translation can be achieved by a compact Perl program:
 
-  - From ICalendar to Org. There are some tools and documentation related:
+ #+begin_src perl
+   #!/usr/bin/perl
+   /^(\t*)-(.*?)((@\w+ *)*)$/;
+   @u=grep{$_ ne'@done'}(@t=split/ +/,$3);
+   @v=@u?('',@u,''):();
+   $t{$_}++for@u;
+   $_="*"x(2+length$1).(@t==@u?" TODO":" DONE").$2.join(":",@v)."\n"if$&;
+   s/^\w.*:\s*$/* $&/;
+   END{printf "* Setup\n#+TAGS: %s\n",join' ',keys%t}
+ #+end_src
 
-    - There is a mention of some tools at the [[file:org-tools/index.org][org-tools]] section, [[file:org-tools/index.org::*ical2org.awk - convert ics files to Org][here]].
+ This program is quite unreadable because it resulted from a
+ [[https://list.orgmode.org/0277B507-1486-4172-B1C6-1B73B84148DD@science.uva.nl][contest for the most compact translator]] - but it works very well
+ anyway.
 
-    - For Google users, see [[file:org-tutorials/org-google-sync.org::*From Google Calendar into org using .ics files][this]].
+** From [[https://bitbucket.org/josemaria.alkala/odt2org/wiki/Home][ODT to Org]], by Jose Maria Alkala
 
-    - For a command line tool that converts files, URLs (e.g., Google
-      Calendar), email attachments, and other sources into org-mode
-      events, see [[https://github.com/rjhorniii/ical2org][this]].  It can integrate with crontab, systemd,
-      etc. for automatic updating.  An example of [[https://www.djcbsoftware.nl/code/mu/mu4e.html][mu4e]] integration for
-      processing email attachments with ics content is shown.
+** From ICalendar to Org
+
+There are some tools and documentation related:
+
+- There is a mention of some tools at the [[file:org-tools/index.org][org-tools]] section, [[file:org-tools/index.org::*ical2org.awk - convert ics files to Org][here]].
+
+- For Google users, see [[file:org-tutorials/org-google-sync.org::*From Google Calendar into org using .ics files][this]].
+
+- For a command line tool that converts files, URLs (e.g., Google
+  Calendar), email attachments, and other sources into org-mode
+  events, see [[https://github.com/rjhorniii/ical2org][this]].  It can integrate with crontab, systemd,
+  etc. for automatic updating.  An example of [[https://www.djcbsoftware.nl/code/mu/mu4e.html][mu4e]] integration for
+  processing email attachments with ics content is shown.
+
+** From Microsoft Exchange to Org
+:PROPERTIES:
+:CREATED:  [2023-04-09 Sun 16:14]
+:END:
+
+*** exchange2org - Extracts Exchange calendar data in Org-mode format
+:PROPERTIES:
+:CREATED:  [2023-04-09 Sun 12:41]
+:END:
+
+- Author: [[https://karl-voit.at/][Karl Voit (publicvoit)]]
+- Website: https://github.com/novoid/exchange2org
+- License: GPL 3.0
+- Technology: Python 3
+- Bugs and feature requests: https://github.com/novoid/exchange2org/issues
+- State of development: 2023-04-09 worked for many years but author isn't using Exchange after 2019.
+
+This tool was very handy for getting Exchange-based appointments into
+my Org-mode agenda. Not used after 2019 so it might need some
+maintenance.
+
+** From Altlassian Jira to Org
+
+*** jira2org-story.py - Extract Jira Issues and Generate Org-mode Headings
+:PROPERTIES:
+:CREATED:  [2023-04-09 Sun 14:53]
+:END:
+
+- Author: [[https://karl-voit.at/][Karl Voit (publicvoit)]]
+- Website: https://github.com/novoid/jira2org-story.py
+- License: GPL 3.0
+- Technology: Python 3
+- Bugs and feature requests: https://github.com/novoid/jira2org-story.py/issues
+- State of development: 2023-04-09 stable.
+
+The script is accessing the API of Altlassian's Jira to generate
+[[https://gitlab.com/publicvoit/orgdown/-/blob/master/README.org][Orgdown]] content. The author is using it to extract whole epics from
+Jira and create more detailed workflows within Org-mode.
+
+This principle can be adapted to all sorts of use-cases. The author is
+using multiple variations of this script for specific workflows.
+
+** Memacs - Collecting data from all sorts of external data sources
+:PROPERTIES:
+:CREATED:  [2023-04-09 Sun 12:52]
+:END:
+
+- Author: [[https://karl-voit.at/][Karl Voit (publicvoit)]]
+- Website: https://github.com/novoid/Memacs
+- License: GPL 3.0
+- Technology: Python 3
+- Bugs and feature requests: https://github.com/novoid/Memacs/issues
+- State of development: 2023-04-09 some modules were written and used
+  by the author. Most modules are contributions from other users of
+  Memacs.
+
+If you want to (re-)collect your own data from various sources such as
+text messages, visited web pages, photographs, emails, git commits and
+so forth, this framework allows for using or writing modules that
+convert non-[[https://gitlab.com/publicvoit/orgdown/-/blob/master/README.org][Orgdown]] formats to Orgdown. This way, you get a really
+detailed agenda with all of your activities.
+
+* Org-mode to Org-mode
+:PROPERTIES:
+:CREATED:  [2023-04-09 Sun 16:15]
+:END:
+
+Sometimes, people write software outside of Elisp that has Org-mode files as input as well as output:
+
+** orgdepend_to_orgedna - Tool for the transition from [[https://orgmode.org/worg/org-contrib/org-depend.html][org-depend]] to [[https://www.nongnu.org/org-edna-el/][org-edna]]
+:PROPERTIES:
+:CREATED:  [2023-04-09 Sun 14:44]
+:END:
+
+- Author: [[https://karl-voit.at/][Karl Voit (publicvoit)]]
+- Website: https://github.com/novoid/orgdepend_to_orgedna
+- License: GPL 3.0
+- Technology: Python 3
+- Bugs and feature requests: https://github.com/novoid/orgdepend_to_orgedna/issues
+- State of development: 2023-04-09 used by the author to convert his setup once. Might need maintenance with newer versions.
+
+Most use-cases for org-depend can be migrated to org-edna using that
+tool. Please refer to the documentation to learn what can be converted
+and what not.
 
 * Bi-directional
 
