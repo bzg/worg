@@ -118,7 +118,7 @@ you should _not_ use a =return= statement.
 #+begin_example
 # use return statement
 # Entire source block will get indented and used as the body of main()
-#+begin_src python
+,#+begin_src python
 def foo(x):
   if x>0:
     return x+1
@@ -127,9 +127,9 @@ def foo(x):
     return x-1
 
 return foo(5)
-#+end_src
+,#+end_src
 
-#+RESULTS:
+,#+RESULTS:
 : 6
 #+end_example
 
@@ -137,7 +137,7 @@ return foo(5)
 
 #+begin_example
 # don't use return statement
-#+begin_src python :session
+,#+begin_src python :session
 def foo(x):
   if x>0:
     return x+1
@@ -145,9 +145,9 @@ def foo(x):
     return x-1
 
 foo(1)
-#+end_src
+,#+end_src
 
-#+RESULTS:
+,#+RESULTS:
 : 2
 #+end_example
 
@@ -159,31 +159,31 @@ final expression is an indented if/else block, not a top-level
 expression:
 
 #+begin_example
-#+begin_src python :session :results value
+,#+begin_src python :session :results value
 import random
 if random.randint(0,10) % 2 == 0:
     "even"
 else:
     "odd"
-#+end_src
+,#+end_src
 
-#+RESULTS:
+,#+RESULTS:
 #+end_example
 
 To return the value of an indented block, assign the value to a
 variable, and return that variable as the final top-level expression:
 
 #+begin_example
-#+begin_src python :session :results value
+,#+begin_src python :session :results value
 import random
 if random.randint(0,10) % 2 == 0:
     ret = "even"
 else:
     ret = "odd"
 ret
-#+end_src
+,#+end_src
 
-#+RESULTS:
+,#+RESULTS:
 : even
 #+end_example
 
@@ -195,7 +195,7 @@ set the header argument =:results file link=.
 For example:
 
 #+begin_example
-#+begin_src python :session :results file link
+,#+begin_src python :session :results file link
 import matplotlib
 import matplotlib.pyplot as plt
 fig=plt.figure(figsize=(3,2))
@@ -205,9 +205,9 @@ fig.tight_layout()
 fname = 'images/myfig.pdf'
 plt.savefig(fname)
 fname # return this to org-mode
-#+end_src
+,#+end_src
 
-#+RESULTS:
+,#+RESULTS:
 [[file:images/myfig.pdf]]
 #+end_example
 
@@ -289,11 +289,11 @@ so we can hide the conversion during export.
 * Additional examples
   - Hello World!
 #+begin_example
-#+begin_src python :results output
+,#+begin_src python :results output
 print("Hello, world!")
-#+end_src
+,#+end_src
 
-#+RESULTS:
+,#+RESULTS:
 : Hello, world!
 
 #+end_example
@@ -310,24 +310,24 @@ Two plus two equals 4
 
   - Extracting data from an org-mode table
 #+begin_example
-#+tblname: data_table
+,#+tblname: data_table
 | a | 1 |
 | b | 2 |
 | c | 3 |
-#+begin_src python :var val=1 :var data=data_table
+,#+begin_src python :var val=1 :var data=data_table
 # Return row specified by val.
 # In non-session mode, use return to return results.
 return(data[val])
-#+end_src
+,#+end_src
 
-#+RESULTS:
+,#+RESULTS:
 | b | 2 |
 
 #+end_example
 
   - Plotting
 #+begin_example
-#+begin_src python :results file link
+,#+begin_src python :results file link
 import matplotlib, numpy
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -337,9 +337,9 @@ plt.plot(numpy.sin(x)/x)
 fig.tight_layout()
 plt.savefig('images/python-matplot-fig.png')
 return 'images/python-matplot-fig.png' # return filename to org-mode
-#+end_src
+,#+end_src
 
-#+RESULTS:
+,#+RESULTS:
 [[file:images/python-matplot-fig.png]]
 
 #+end_example
