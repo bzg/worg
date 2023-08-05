@@ -22,6 +22,9 @@ tasks:
       ./publish.sh
   - upload: |
       rsync -e "ssh -o StrictHostKeyChecking=no" -av worg/* bzg.fr:/home/build/orgmode/worg/
+  - check: |
+      cd worg
+      ./publish.sh --debug
 triggers:
   - action: email
     condition: failure
