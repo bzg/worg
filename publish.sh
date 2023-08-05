@@ -17,6 +17,8 @@ This variable can be set when running publish.sh script:
       debug-on-error t)
 
 (setq org-confirm-babel-evaluate nil
+      ess-ask-for-ess-directory nil
+      ess-startup-directory nil
       org-html-style-default ""
       org-html-scripts ""
       org-html-htmlize-output-type 'css
