@@ -2,6 +2,11 @@
 
 ":"; exec emacs --quick --script "$0" -- "$@" # -*- mode: emacs-lisp; lexical-binding: t; -*-
 
+(defvar worg-publish-stop-on-error (member "--debug" command-line-args)
+  "When non-nil, stop publishing process when an error is encountered.
+This variable can be set when running publish.sh script:
+  ./publish.sh --debug")
+
 (add-to-list 'load-path "~/org-mode/lisp/")
 (require 'ox-html)
 (require 'cl-seq)
@@ -53,6 +58,8 @@
 	(message " [skipping] unchanged %s" org-file)
       (message "[exporting] %s" (file-relative-name org-file default-directory))
       (with-current-buffer (find-file org-file)
-	(condition-case err
-	    (org-html-export-to-html)
-          (error (message (error-message-string err))))))))
+	(if worg-publish-stop-on-error
+            (org-html-export-to-html)
+          (condition-case err
+	      (org-html-export-to-html)
+            (error (message (error-message-string err)))))))))
