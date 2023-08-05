@@ -53,4 +53,6 @@
 	(message " [skipping] unchanged %s" org-file)
       (message "[exporting] %s" (file-relative-name org-file default-directory))
       (with-current-buffer (find-file org-file)
-       (org-html-export-to-html)))))
+	(condition-case err
+	    (org-html-export-to-html)
+          (error (message (error-message-string err))))))))
