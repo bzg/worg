@@ -11,6 +11,7 @@ This variable can be set when running publish.sh script:
 (require 'ox-html)
 (require 'cl-seq)
 (load "/usr/share/emacs/site-lisp/elpa-src/htmlize-1.56/htmlize.el")
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/elpa-src/ess-18.10.3snapshot/")
 
 (setq make-backup-files nil
       debug-on-error t)
