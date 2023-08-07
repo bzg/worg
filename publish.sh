@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-
+":"; # -*- mode: emacs-lisp; lexical-binding: t; -*-
 ":"; exec emacs --quick --script "$0" -- "$@" # -*- mode: emacs-lisp; lexical-binding: t; -*-
 
 (defvar worg-publish-stop-on-error (member "--debug" command-line-args)
