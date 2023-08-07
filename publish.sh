@@ -7,7 +7,8 @@
 This variable can be set when running publish.sh script:
   ./publish.sh --debug")
 
-(add-to-list 'load-path "~/org-mode/lisp/")
+(push "~/org-mode/lisp/" load-path)
+(setq load-prefer-newer t)
 (require 'ox-html)
 (require 'cl-seq)
 (require 'htmlize)
