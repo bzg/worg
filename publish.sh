@@ -15,6 +15,9 @@ This variable can be set when running publish.sh script:
 (setq make-backup-files nil
       debug-on-error t)
 
+(push '(:eval . "no-export") org-babel-default-header-args)
+(push '(:eval . "no-export") org-babel-default-inline-header-args)
+
 (setq org-confirm-babel-evaluate nil
       ess-ask-for-ess-directory nil
       ess-startup-directory nil
