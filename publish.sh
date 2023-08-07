@@ -19,6 +19,10 @@ This variable can be set when running publish.sh script:
 (push '(:eval . "no-export") org-babel-default-header-args)
 (push '(:eval . "no-export") org-babel-default-inline-header-args)
 
+;; FIXME: Working around ESS bug.  `font-lock-reference-face' has been removed in Emacs 29.
+(define-obsolete-variable-alias
+  'font-lock-reference-face 'font-lock-constant-face "20.3")
+
 (setq org-confirm-babel-evaluate nil
       ess-ask-for-ess-directory nil
       ess-startup-directory nil
