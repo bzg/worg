@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 ":"; # -*- mode: emacs-lisp; lexical-binding: t; -*-
-":"; exec emacs --quick --script "$0" -- "$@" # -*- mode: emacs-lisp; lexical-binding: t; -*-
+":"; exec emacs --no-init-file --script "$0" -- "$@" # -*- mode: emacs-lisp; lexical-binding: t; -*-
 
 (defvar worg-publish-stop-on-error (member "--debug" command-line-args)
   "When non-nil, stop publishing process when an error is encountered.
@@ -10,8 +10,7 @@ This variable can be set when running publish.sh script:
 (add-to-list 'load-path "~/org-mode/lisp/")
 (require 'ox-html)
 (require 'cl-seq)
-(load "/usr/share/emacs/site-lisp/elpa-src/htmlize-1.56/htmlize.el")
-(add-to-list 'load-path "/usr/share/emacs/site-lisp/elpa-src/ess-18.10.3snapshot/")
+(require 'htmlize)
 
 (setq make-backup-files nil
       debug-on-error t)
