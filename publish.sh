@@ -44,6 +44,11 @@ This variable can be set when running publish.sh script:
 <link rel=\"alternate stylesheet\" title=\"Classic\" href=\"/worg/style/worg-classic.css\" type=\"text/css\" />
 <link rel=\"icon\" href=\"/favicon.ico\" type=\"image/x-icon\" />")
 
+;; Force default implementation to avoid interactive prompts.
+;; See https://builds.sr.ht/~bzg/job/1037325
+(require 'geiser)
+(setq geiser-default-implementation 'racket)
+
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
