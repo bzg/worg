@@ -18,18 +18,20 @@
 
 * Image basics
 
-  Images are inserted into an Org file in a fashion similar to links:
+  Images are inserted into an Org file as links:
 
-  : [[file:images/orgmode/org-mode-unicorn.png]]
+  : [[file:../images/orgmode/org-mode-unicorn.png]]
 
-  The =file:= prefix is optional, as long as a known image type is
-  used. Org-mode recognizes images by the file name suffix. Recognized
-  suffixes are all the members of
-  =org-export-html-inline-image-extensions= which defaults to the list
-  =("png" "jpeg" "jpg" "gif")=. That said, the images above could as
-  well be included using this link:
+  The =file:= prefix is optional, as long as the link is
+  recognized. Org-mode recognizes images by the file name
+  suffix. Recognized suffixes are all the members of
+  ~org-html-inline-image-rules~ which defaults to =jpeg=, =jpg=, =png=, =gif=,
+  and =tif= images.
 
-  : [[images/orgmode/org-mode-unicorn.png]]
+  That said, the images above could as well be included using this
+  link:
+
+  : [[../[[images/orgmode/org-mode-unicorn.png]]][[[images/orgmode/org-mode-unicorn.png][Monocerus glaucus]]]]
 
   The special form
 
@@ -41,10 +43,10 @@
   <a href="/worg/images/orgmode/org-mode-unicorn.png">Monocerus glaucus</a>
   #+end_src
 
-  For this tutorial, we assume the variable
-  =org-export-html-inline-images= is unchanged from its standard
-  setting, i.e. =maybe=. Images are shown in the exported page this
-  way. And we will talk about visible images only.
+  For this tutorial, we assume the variable =org-html-inline-images= is
+  unchanged from its standard setting, i.e. =t=. Images are shown in
+  the exported page this way. And we will talk about visible images
+  only.
 
   Don't be afraid.  Most of the text in this little tutorial is just
   blind text (and in gray color therefor).
@@ -59,7 +61,7 @@
 
   #+BEGIN_EXAMPLE org
   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh
-  [[/worg/images/orgmode/org-mode-unicorn.png]]
+  [[../images/orgmode/org-mode-unicorn.png]]
   euismod  tincidunt ut laoreet dolore magna aliquam erat volutpat.
   #+END_EXAMPLE
 
@@ -88,7 +90,7 @@
 
   {{{EndBlindText}}}
 
-  [[/img/org-mode-unicorn.png]]
+  [[../images/orgmode/org-mode-unicorn.png]]
 
   {{{BeginBlindText}}}
 
@@ -115,14 +117,14 @@
   of the =alt= attribute this way:
 
   : #+ATTR_HTML: :alt My fancy value for the alt attribute
-  : [[worg/images/orgmode/org-mode-unicorn.png]]
+  : [[../images/orgmode/org-mode-unicorn.png]]
 
   You may add more attributes to an =#+ATTR_HTML:= line. More than one
   =#+ATTR_HTML:= line is allowed for readability. Example:
 
   : #+ATTR_HTML: :alt Zoomed image.
   : #+ATTR_HTML: :width 300 :style border:2px solid black;
-  : [[worg/images/orgmode/org-mode-unicorn.png]]
+  : [[../images/orgmode/org-mode-unicorn.png]]
 
   A full list of valid attributes can be found on
   [[http://www.w3schools.com/tags/tag_img.asp]].
@@ -156,10 +158,10 @@
   This code shows, how we can add attributes to the =<img ... />= tag in Org-mode:
 
   : #+ATTR_HTML: :style float:right;margin:0px 0px 20px 20px;
-  : [[worg/images/orgmode/org-mode-unicorn.png]]
+  : [[../images/orgmode/org-mode-unicorn.png]]
   : Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
   : #+ATTR_HTML: :style float:left;margin:20px 20px 20px 0px;
-  : [[worg/images/orgmode/org-mode-unicorn.png]]
+  : [[../images/orgmode/org-mode-unicorn.png]]
   : euismod  tincidunt ut laoreet dolore magna aliquam erat volutpat.
 
   {{{BeginInfoBox}}}
@@ -174,7 +176,7 @@
   {{{BeginMiniPage}}}
 
   #+ATTR_HTML: :style float:right;margin:0px 0px 20px 20px;
-  [[worg/images/orgmode/org-mode-unicorn.png]]
+  [[../images/orgmode/org-mode-unicorn.png]]
 
   This text is directly succeeds the first image, which is right
   aligned. Because of the alignment, placing the image after the first few
@@ -198,7 +200,7 @@
   Text before the second image ends here.
 
   #+ATTR_HTML: :style float:left;margin:20px 20px 20px 0px;
-  [[worg/images/orgmode/org-mode-unicorn.png]]
+  [[../images/orgmode/org-mode-unicorn.png]]
 
   This text is directly following the second image. No empty lines are added.
   Neither before, nor after the image. We therefor see one big paragraph with
@@ -228,34 +230,34 @@
    lines break automatically. Just add =display:inline;= to the =style= attributes.
 
    : #+ATTR_HTML: :style display:inline;margin:10px;
-   : [[worg/images/orgmode/org-mode-unicorn.png]]
+   : [[../images/orgmode/org-mode-unicorn.png]]
    : #+ATTR_HTML: :style display:inline;margin:10px;
-   : [[worg/images/orgmode/org-mode-unicorn.png]]
+   : [[../images/orgmode/org-mode-unicorn.png]]
    : #+ATTR_HTML: :style display:inline;margin:10px;
-   : [[worg/images/orgmode/org-mode-unicorn.png]]
+   : [[../images/orgmode/org-mode-unicorn.png]]
    : #+ATTR_HTML: :style display:inline;margin:10px;
-   : [[worg/images/orgmode/org-mode-unicorn.png]]
+   : [[../images/orgmode/org-mode-unicorn.png]]
 
    results in:
 
    {{{BeginMiniPage}}}
 
    #+ATTR_HTML: :style display:inline;margin:10px;
-   [[worg/images/orgmode/org-mode-unicorn.png]]
+   [[../images/orgmode/org-mode-unicorn.png]]
    #+ATTR_HTML: :style display:inline;margin:10px;
-   [[worg/images/orgmode/org-mode-unicorn.png]]
+   [[../images/orgmode/org-mode-unicorn.png]]
    #+ATTR_HTML: :style display:inline;margin:10px;
-   [[worg/images/orgmode/org-mode-unicorn.png]]
+   [[../images/orgmode/org-mode-unicorn.png]]
    #+ATTR_HTML: :style display:inline;margin:10px;
-   [[worg/images/orgmode/org-mode-unicorn.png]]
+   [[../images/orgmode/org-mode-unicorn.png]]
    #+ATTR_HTML: :style display:inline;margin:10px;
-   [[worg/images/orgmode/org-mode-unicorn.png]]
+   [[../images/orgmode/org-mode-unicorn.png]]
    #+ATTR_HTML: :style display:inline;margin:10px;
-   [[worg/images/orgmode/org-mode-unicorn.png]]
+   [[../images/orgmode/org-mode-unicorn.png]]
    #+ATTR_HTML: :style display:inline;margin:10px;
-   [[worg/images/orgmode/org-mode-unicorn.png]]
+   [[../images/orgmode/org-mode-unicorn.png]]
    #+ATTR_HTML: :style display:inline;margin:10px;
-   [[worg/images/orgmode/org-mode-unicorn.png]]
+   [[../images/orgmode/org-mode-unicorn.png]]
 
    {{{EndMiniPage}}}
 
@@ -266,7 +268,7 @@
 
   : #+CAPTION: Monocerus glaucus
   : #+ATTR_HTML: :alt Monocerus glaucus
-  : [[[[worg/images/orgmode/org-mode-unicorn.png]]]]
+  : [[[[../images/orgmode/org-mode-unicorn.png]]]]
 
   {{{BeginInfoBox}}}
   In this case, empty lines before and after the image make no difference since
@@ -277,7 +279,7 @@
 
   #+CAPTION: Monocerus glaucus
   #+ATTR_HTML: :alt Monocerus glaucus
-  [[worg/images/orgmode/org-mode-unicorn.png]]
+  [[../images/orgmode/org-mode-unicorn.png]]
   {{{BeginBlindText
   }}}Lorem ipsum dolor sit amet, consectetuer
   adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore
@@ -407,6 +409,9 @@
     : @<br style="clear:both;" />
 
 ** Captions in a row
+:PROPERTIES:
+:ID:       9ca4e6ab-0389-4a9f-a4c2-7faf1262ddd0
+:END:
 
    In addition, =float:left;= changes the alignment of several images with caption
    in a row. They now fill a row on the display, until the screen width is
@@ -415,16 +420,16 @@
    #+begin_src org
      ,#+CAPTION: Michael
      ,#+ATTR_HTML::alt image
-     [[worg/images/orgmode/org-mode-unicorn.png]]
+     [[../images/orgmode/org-mode-unicorn.png]]
      ,#+CAPTION: Steve
      ,#+ATTR_HTML::alt image
-     [[worg/images/orgmode/org-mode-unicorn.png]]
+     [[../images/orgmode/org-mode-unicorn.png]]
      ,#+CAPTION: Carla
      ,#+ATTR_HTML::alt image
-     [[worg/images/orgmode/org-mode-unicorn.png]]
+     [[../images/orgmode/org-mode-unicorn.png]]
      ,#+CAPTION: Pete
      ,#+ATTR_HTML::alt image
-     [[worg/images/orgmode/org-mode-unicorn.png]]
+     [[../images/orgmode/org-mode-unicorn.png]]
 
      ... etc. - many more ...
    #+end_src
@@ -432,7 +437,7 @@
     results in:
 
 #+COMMENT: This has to be HTML, because we cannot include the styles into the head section.
-#+COMMENT: Therefor, this has to be reworked if the output of the exporter changes.
+#+COMMENT: Therefore, this has to be reworked if the output of the exporter changes.
 
    {{{BeginMiniPage}}}
 
@@ -607,7 +612,7 @@
 
   1. Images are referenced using Org-mode's link syntax.
   2. As for simple links, the =file:= prefix is optional, as long as the
-     suffix is a member of =org-export-html-inline-image-extensions=.
+     suffix is a member of =org-html-inline-image-rules=.
   3. We can add HTML attributes to images
      - using =#+ATTR_HTML:=
      - Both, the =#+ATTR_HTML:= line and the image have to be on their own line.
