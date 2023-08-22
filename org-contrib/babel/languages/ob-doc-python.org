@@ -81,10 +81,21 @@ example below omits other languages.
    last expression evaluated in the code block. Value mode is the
    default (as with other languages).  In value mode you can use the
    following subtypes:
-   - =raw=: value is inserted directly
+   - =verbatim=: value is returned as string. In particular, use this
+     to prevent conversion of lists and tuples to tables.
+   - =table=: (Org 9.7+) Try to convert the result to an Org table.
+     Dicts, numpy arrays, and pandas DataFrames/Series can be returned
+     as tables this way (by default, they are printed verbatim).  Note
+     that lists and tuples are already converted to table by default
+     (use =verbatim= to prevent that).
    - =pp=: value is pretty-printed by python using =pprint.pformat(%s)=, then inserted
-   - =file=: value is interpreted as a filename to be interpolated
-     when exporting; commonly used for graphics output.
+ - =:results graphics file {output, value}=: (Org 9.7+) save graphics
+   with matplotlib. The behavior depends on whether value or output
+   results are used. For value results, the last line should return a
+   matplotlib Figure object to plot. For output results, the current
+   figure (as returned by =pyplot.gcf()=) is cleared before
+   evaluation, and then plotted afterwards. Specify the file to save
+   the results to with =:file=.
  - =:return=: Appends a =return= statement to the end of the code
    block. Only when result-type is value, and not in session mode.
  - =:python=: Name of the command for executing Python code.
@@ -94,6 +105,7 @@ example below omits other languages.
  - =:var data=data-table=: Variables can be passed into python from org-mode tables as
    scalars or lists.  See the org-mode manual for more details.
  - =:exports {code, results, both, none}=: Standard babel option for what to export.
+ - =:file=: Filename to save results to (e.g. for =graphics=).
 
 ** Sessions
 Session mode is fully supported in python, including named sessions.
@@ -188,6 +200,7 @@ ret
 #+end_example
 
 ** Graphics
+*** Manual plotting with Org 9.6 and earlier
 
 To return plots, save the figure to a file, return the filename, and
 set the header argument =:results file link=.
@@ -214,10 +227,117 @@ fname # return this to org-mode
 You can use noweb to reduce the boilerplate of saving and returning
 the filename; see the [[*Plotting][example]] below.
 
-If you are using matplotlib for graphics, you may have to set the
-backend explicitly to a PDF or PNG or other file-exporting backend
-when using session mode, for example by calling
-=matplotlib.use('Agg')=. See also [[*Additional examples][Additional examples]].
+Depending on your Python and matplotlib installation details, you may
+have to set the backend explicitly to a PDF or PNG or other
+file-exporting backend when using session mode, for example by calling
+=matplotlib.use('Agg')=, for example:
+
+#+begin_example
+,#+begin_src python :results file link
+import matplotlib, numpy
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+fig=plt.figure(figsize=(4,2))
+x=numpy.linspace(-15,15)
+plt.plot(numpy.sin(x)/x)
+fig.tight_layout()
+plt.savefig('images/python-matplot-fig.png')
+return 'images/python-matplot-fig.png' # return filename to org-mode
+,#+end_src
+
+,#+RESULTS:
+[[file:images/python-matplot-fig.png]]
+
+#+end_example
+[[file:images/python-matplot-fig.png]]
+
+*** Automatic plotting in Org 9.7+
+
+Starting in Org 9.7, ob-python can automatically use matplotlib to
+save graphics results, using the header arg =:results graphics file=.
+The behavior depends on whether value or output results are used. For
+value results, the last line should return a matplotlib Figure object
+to plot. For output results, the current figure (as returned by
+=pyplot.gcf()=) is cleared before evaluation, and then plotted
+afterwards.
+
+Here is an example using output results:
+
+#+begin_example
+,#+begin_src python :results graphics file output :file boxplot.svg
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  plt.figure(figsize=(5, 5))
+  tips = sns.load_dataset("tips")
+  sns.boxplot(x="day", y="tip", data=tips)
+,#+end_src
+#+end_example
+
+And here is the same example using value results:
+
+#+begin_example
+,#+begin_src python :results graphics file value :file boxplot2.svg
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  plt.figure(figsize=(5, 5))
+  tips = sns.load_dataset("tips")
+  sns.boxplot(x="day", y="tip", data=tips)
+  return plt.gcf()
+,#+end_src
+#+end_example
+
+** Tables
+
+By default, lists and tuples are converted to Org tables automatically:
+
+#+begin_example
+,#+begin_src python
+  return [1,2,3]
+,#+end_src
+
+,#+RESULTS:
+| 1 | 2 | 3 |
+#+end_example
+
+You can suppress the table conversion with =:results verbatim=.
+
+#+begin_example
+,#+begin_src python :results verbatim
+  return [1,2,3]
+,#+end_src
+
+,#+RESULTS:
+: [1, 2, 3]
+#+end_example
+
+Most other objects are printed as string by default, but starting in
+Org 9.7, you can specify =:results table= to tell Org to try and
+convert the result to table.  In particular, this works for dicts,
+numpy arrays, and pandas DataFrames/Series:
+
+#+begin_example
+,#+begin_src python :results table
+  return {"a": 1, "b": 2}
+,#+end_src
+
+,#+RESULTS:
+| a | 1 |
+| b | 2 |
+
+,#+begin_src python :results table
+  import pandas as pd
+  import numpy as np
+
+  return pd.DataFrame(np.array([[1,2,3],[4,5,6]]),
+                      columns=['a','b','c'])
+,#+end_src
+
+,#+RESULTS:
+|   | a | b | c |
+|---+---+---+---|
+| 0 | 1 | 2 | 3 |
+| 1 | 4 | 5 | 6 |
+#+end_example
 
 ** Noweb
 
@@ -226,15 +346,17 @@ where this is useful is when you have some boilerplate code you need
 to repeat across many code blocks, and want to hide during export.
 
 Below are examples of how this can be useful for returning matplotlib
-figures and pandas dataframes.
+figures and pandas dataframes, in Org versions 9.6 or earlier (note
+that Org 9.7 adds built-in support for matplotlib graphics and pandas
+dataframes, so noweb isn't necessary for those cases anymore).
 
 *** Plotting
 
-Returning a plot from a ob-python block requires saving the figure to
-a file and returning the filename. In the example below, we extract
-this to a separate block that can be referred to by other code
-blocks. The =:noweb strip-export= header argument means to allow noweb
-syntax, but to hide the inserted code during export.
+Prior to Org 9.7, returning a plot from a ob-python block requires
+saving the figure to a file and returning the filename. In the example
+below, we extract this to a separate block that can be referred to by
+other code blocks. The =:noweb strip-export= header argument means to
+allow noweb syntax, but to hide the inserted code during export.
 
 #+begin_src org
 ,#+name: savefig
@@ -324,23 +446,3 @@ return(data[val])
 | b | 2 |
 
 #+end_example
-
-  - Plotting
-#+begin_example
-,#+begin_src python :results file link
-import matplotlib, numpy
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-fig=plt.figure(figsize=(4,2))
-x=numpy.linspace(-15,15)
-plt.plot(numpy.sin(x)/x)
-fig.tight_layout()
-plt.savefig('images/python-matplot-fig.png')
-return 'images/python-matplot-fig.png' # return filename to org-mode
-,#+end_src
-
-,#+RESULTS:
-[[file:images/python-matplot-fig.png]]
-
-#+end_example
-[[file:images/python-matplot-fig.png]]
