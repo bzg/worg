@@ -338,18 +338,18 @@ Sometimes Emacs maintainers make changes to Org files.  The process of
 propagating the changes back to the Org repository is called
 /backporting/ for historical reasons.
 
-To find changes that need to be backported from the Emacs repository,
-the following =git= command, courtesy of Kyle Meyer, can be used:
+To find changes that need to be ported from the Emacs repository, look
+for commits in the Emacs repo that touched Org files since the last
+sync using the following command:
 
 #+begin_src shell
-git log $rev..origin/emacs-25 -- lisp/org doc/misc/org.texi \
-  etc/refcards/orgcard.tex etc/ORG-NEWS etc/org \
-  etc/schema/od-manifest-schema-v1.2-os.rnc \
-  etc/schema/od-schema-v1.2-os.rnc
+git log $rev..$target -- lisp/org \
+  doc/misc/org.org doc/misc/org-setup.org \
+  etc/ORG-NEWS etc/org etc/refcards/orgcard.tex etc/schema/
 #+end_src
 
-here, =$rev= is the last commit from the =emacs-25= branch that was
-backported.  The should also be done for the =main= branch.
+Here =$target= is the Emacs branch of interest (e.g., =emacs-29=), and
+=$rev= is the last commit ported from that branch.
 
 There is also a [[http://git.savannah.gnu.org/cgit/emacs.git/atom/lisp/org/][feed]] to keep track of new changes in the =lisp/org=
 folder in the Emacs repository.
