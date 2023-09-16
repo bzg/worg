@@ -76,24 +76,165 @@ contain greater elements or lesser elements. Sections contain both
 greater and lesser elements, and headings can contain a section and
 other headings.
 
-** The minimal and standard sets of objects
+** General structure of Org document
 
-To simplify references to common collections of objects, we define two
-useful sets.  The /<<<minimal set>>> of objects/ refers to [[#Plain_Text][plain text]],
-[[#Emphasis_Markers][text markup]], [[#Entities][entities]], [[#LaTeX_Fragments][LaTeX fragments]], [[#Subscript_and_Superscript][superscripts and subscripts]].
-The /<<<standard set>>> of objects/ refers to the entire set of objects,
-excluding [[#Citation_References][citation references]] and [[#Table_Cells][table cells]].
+Any Org document is represented by a sequence of elements, that can
+recursively contain other elements and/or objects.
+
+An example document below can be represented as recursive syntax tree
+that is schematically outlined below.
+
+#+begin_example
+,#+title: An example Org document
+
+The document begins with optional zeroth section (everything before
+the first heading), followed by a sequence of headings.
+
+
+    :note:
+    Zeroth section can contain other elements - keyword, paragraph,
+    and drawer in this example.
+
+    The drawer, in turn, contains the previous and this paragraph; and
+    this paragraph consists of mostly plain-text objects, and a single
+    *bold markup*.
+    :end:
+
+,* Heading
+
+Contains an optional section that is, similar to zeroth section,
+followed by other subheadings.
+
+,** Sub-heading 1 with on section and children headings
+,** Sub-heading 2
+... has a section, but not child subheadings.
+
+,* Another heading
+#+end_example
+
+: (org-data ...
+:  (zeroth-section ...
+:   (keyword ...)
+:   (paragraph ...)
+:   (drawer
+:    (paragraph ...)
+:    (pragraph (plain-text) (bold (plain-text)))))
+:  (heading
+:   (section (paragraph ...))
+:   (heading)
+:   (heading (section ...)))
+:  (heading))
+
+** General structure of elements
+
+The most general representation of an Org syntax element is a sequence
+of markup defining the element itself, its contents, and the [[#Blanks][blank
+lines]] after.
+
+#+begin_example
+<opening markup, belongs to the element itself>
+<contents containing recursive child elements/objects>
+<closing markup, belongs to the element itself>
+<blank lines after, belongs to the element itself>
+#+end_example
+
+Not every Org element contains all the above components.  An example
+below demonstrates structure of some common Org elements, marking the
+parts corresponding to the above structure.
+
+#+begin_example
+,* Heading title is a part of the headline element itself <opening markup>
+
+
+Text inside heading is considered a part of its contents and can
+contain other elements recursively.  This paragraph only has
+<contents>, no <opening markup>, no <closing markup>, and a <blank
+line>.
+
+:drawer:
+The same works at the deeper levels, with this drawer having =:drawer:=
+line as <opening markup>, this paragraph belonging to drawer
+<contents>, =:end:= representing <closing markup>, and no <blank lines>
+after.
+:end:
+#+begin_comment
+A comment is taken verbatim, with this text not parsed recursively and
+considered a part of the comment block element itself.
+=#+begin_commend= is an <opening markup>, =#+end_comment= - closing
+markup, and <contents> is absent.
+#+end_comment
+This is the end of the heading, no <closing markup> exists for
+headings.
+#+end_example
+
+Org syntax objects have a similar structure, except blank lines being
+replaced by trailing spaces:
+
+#+begin_example
+This *bold markup*      also includes the subsequent trailing spaces into
+the bold object.
+#+end_example
 
 ** Blank lines
+:PROPERTIES:
+:CUSTOM_ID: Blanks
+:END:
 
 A line containing only spaces, tabs, newlines, and line feeds (=\t\n\r=)
 is considered a /blank line/.  Blank lines can be used to separate
 paragraphs and other elements.
 
-With the exception of [[#Items][list items]] and [[#Footnote_Definitions][footnote definitions]] blank lines
-belong to the preceding element with the narrowest possible scope.
-For example, if at the end of a section we have a paragraph and a
-blank line, that blank line is considered part of the paragraph.
+Blank lines are considered a part of a preceding element.
+
+A simple example is blank lines after a drawer:
+
+#+begin_example
+:drawer:
+Text.
+:end:
+
+
+The blank lines above are considered a part of the drawer.
+#+end_example
+
+However, in some cases, multiple Org elements may be candidates to
+"own" the blank lines:
+
+#+begin_example
+,* Heading
+Paragraph inside heading, blank lines may be considered a part of this
+paragraph or, similarly, a part of the parent section or heading.
+
+
+,* Another heading
+#+end_example
+
+By convention, with the exception of [[#Items][list items]] and [[#Footnote_Definitions][footnote
+definitions]] blank lines belong to the preceding element with the
+narrowest possible scope.
+
+In the above example, blank lines are considered a direct part of the
+paragraph, not the heading or section:
+
+: (heading (section (paragraph <blank lines> ...)))
+
+Blank lines at the end of [[#Items][list items]] and [[#Footnote_Definitions][footnote definitions]] do not
+include the containing elements because list items and footnote
+definitions are using blank lines as a part of their syntax definition:
+
+#+begin_example
+- Item 1
+
+- Item 2
+  :drawer:
+  inside item 2
+  :end:
+
+
+The above list item ends with two consequative blank lines.
+So, we do not include these structurally important blank lines into
+the inner elements inside the item.
+#+end_example
 
 ** Indentation
 
@@ -112,7 +253,21 @@ discarded.  This also applies to single-line elements.
    a long sequence of spaces before "a".
 
    This paragraph does not have leading spaces according to the parser.
+
+   #+begin_src emacs-lisp
+     (+ 1 2)
+   #+end_src
+   The above source block preserves two leading spaces inside the code
+   after removing the common indentation.
 #+end_example
+
+** The minimal and standard sets of objects
+
+To simplify references to common collections of objects, we define two
+useful sets.  The /<<<minimal set>>> of objects/ refers to [[#Plain_Text][plain text]],
+[[#Emphasis_Markers][text markup]], [[#Entities][entities]], [[#LaTeX_Fragments][LaTeX fragments]], [[#Subscript_and_Superscript][superscripts and subscripts]].
+The /<<<standard set>>> of objects/ refers to the entire set of objects,
+excluding [[#Citation_References][citation references]] and [[#Table_Cells][table cells]].
 
 ** Syntax patterns
 
