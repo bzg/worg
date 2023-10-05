@@ -811,8 +811,9 @@ CONTENTS
   (including newlines) subject to the same two conditions of greater
   block's CONTENTS, i.e.
   - No line may start with =#+end_NAME=.
-  - Lines beginning with an asterisk or =#+= must be quoted by a comma
-    (=,*=, =,#+=).
+  - Lines beginning with an asterisk must be quoted by a comma (=,*=)
+    and lines beginning with =#+= may be quoted by a comma when
+    necessary (=#+=).
   CONTENTS will contain Org objects and not support comma-quoting when
   the block is a verse block, it is otherwise not parsed.
 
@@ -827,6 +828,23 @@ CONTENTS
  But they’re perfectly splendid for shape!”
 ,#+end_verse
 #+end_example
+
+#+begin_example
+,#+begin_src emacs-lisp
+"This string
+,* has "*" escaped.
+Otherwise, '* has "*" escaped.' would be treated as a heading (which
+is context-free)."
+
+"#+ lines may or may not need to be escaped:
+,#+end_src if not escaped, would be this source block.
+However,
+#+keyword: does not interfere with code block end and may be left as is.
+,#+keyword may be escaped as well, optionally - parser removes all the
+commas in ,* and ,#+ lines."
+,#+end_src
+#+end_example
+
 
 *** Clock
 :PROPERTIES:
