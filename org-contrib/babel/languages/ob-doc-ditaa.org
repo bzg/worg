@@ -57,18 +57,34 @@ Activate evaluation of =ditaa= source code blocks by adding =ditaa= to
      '((ditaa . t))) ; this line activates ditaa
 #+END_SRC
 
+** Customization Options
+Org needs to know a few things about =ditaa= and the =java= executable in order to function. The following is a list of variables that can be customized.
+
+- org-ditaa-jar-path :: The path to the =ditaa= jar file.
+- org-babel-ditaa-java-cmd :: The name or path to the Java executable used to run the =ditaa= jar file.
+- org-ditaa-eps-jar-path :: The path to the =ditaaeps= jar file. [[https://ditaa-addons.sourceforge.net/][DitaaEps]] is maintained as part of the [[https://ditaa-addons.sourceforge.net/][ditaa-addons]] project.
+- org-ditaa-jar-option :: The prefix used before the =ditaa= jar path. The default is =-jar=.
+
 * Babel Features for ditaa Code Blocks
 ** Header Arguments
-   - file :: =ditaa= source code blocks require that an output file be specified
-   - cmdline :: specify [[http://ditaa.sourceforge.net/#usage][command line arguments]] for =ditaa=
-   - java :: arguments for the =java= runtimes (JRE) 
+   - file :: the output filename (mandatory)
+   - cmdline :: [[http://ditaa.sourceforge.net/#usage][command line arguments]] for =ditaa=
+   - java :: arguments for the =java= runtimes (JRE)
+   - eps :: produce an =eps= output file using =ditaaeps=
+   - pdf :: produce a =pdf= output file using =ditaaeps= followed by =epstopdf=
+
 ** Sessions
    =ditaa= does not support sessions.
 ** Result Types
 =Ditaa= source code blocks return a link to a [[http://www.libpng.org/pub/png/][png]] bitmap file.
 * Examples of Use
+** Hello World
 The obligatory Hello World! example in =ditaa=:
-#+BEGIN_EXAMPLE
+
+#+NAME: hello-world.org
+#+BEGIN_SRC org :exports code :results replace
+,#+NAME: hello-world
+,#+HEADER: :exports results
 ,#+BEGIN_SRC ditaa :file images/hello-world.png
 +--------------+
 |              |
@@ -76,9 +92,11 @@ The obligatory Hello World! example in =ditaa=:
 |              |
 +--------------+
 ,#+END_SRC
-#+END_EXAMPLE
+#+END_SRC
 
-#+header: :exports results
+#+RESULTS: hello-world.org
+#+NAME: hello-world
+#+HEADER: :exports results
 #+BEGIN_SRC ditaa :file images/hello-world.png
 +--------------+
 |              |
@@ -87,13 +105,29 @@ The obligatory Hello World! example in =ditaa=:
 +--------------+
 #+END_SRC
 
-#+RESULTS:
+#+RESULTS: hello-world
 [[file:images/hello-world.png]]
+** Passing command-line options to =ditaa=
 
 Now, round all corners by passing =ditaa= the =-r,--round-corners=
 command line switch.
 
-#+BEGIN_EXAMPLE
+#+NAME: hello-world-round.org
+#+BEGIN_SRC org :exports code :results replace
+,#+NAME: hello-world-round
+,#+HEADER: :exports results
+,#+BEGIN_SRC ditaa :file images/hello-world-round.png :cmdline -r
++--------------+
+|              |
+| Hello World! |
+|              |
++--------------+
+,#+END_SRC
+#+END_SRC
+
+#+RESULTS: hello-world-round.org
+#+NAME: hello-world-round
+#+HEADER: :exports results
 #+BEGIN_SRC ditaa :file images/hello-world-round.png :cmdline -r
 +--------------+
 |              |
@@ -101,17 +135,7 @@ command line switch.
 |              |
 +--------------+
 #+END_SRC
-#+END_EXAMPLE
 
-#+header: :exports results
-#+BEGIN_SRC ditaa :file images/hello-world-round.png :cmdline -r
-+--------------+
-|              |
-| Hello World! |
-|              |
-+--------------+
-#+END_SRC
-
-#+RESULTS:
+#+RESULTS: hello-world-round
 [[file:images/hello-world-round.png]]
 
