@@ -47,28 +47,9 @@
 </div>
 #+end_export
 
-* Template Checklist [12/12]                                       :noexport:
-  - [X] Revise #+TITLE:
-  - [X] Indicate #+AUTHOR:
-  - [X] Add #+EMAIL:
-  - [X] Revise banner source block [3/3]
-    - [X] Add link to a useful language web site
-    - [X] Replace "Language" with language name
-    - [X] Find a suitable graphic and use it to link to the language web site
-  - [X] Write an [[Introduction]]
-  - [X] Describe [[Requirements and Setup][Requirements and Setup]]
-  - [X] Replace "Language" with language name in [[Org Mode Features for Language Source Code Blocks][Babel Features for Language Source Code Blocks]]
-        removed this so that the max header depth is two
-
-  - [X] Describe [[Header Arguments][Header Arguments]]
-  - [X] Describe support for [[Sessions]]
-        this is a kind of header, so it is described there
-
-  - [X] Describe [[Result Types][Result Types]]
-        this is best done in the results section, since that's where types are used
-
-  - [X] Describe [[Other]] differences from supported languages
-  - [X] Provide brief [[Examples of Use][Examples of Use]]
+* Template Checklist [0/1]                                         :noexport:
+- [ ] Check if :shebang tip is correct.  It refers to cleaning output.
+  Is that just a bug which the :shebang execution path sidesteps?
 
 * Introduction
 # - Brief description of language.
@@ -227,11 +208,13 @@ shells.
 
 Common:
 - [[results][:results]]
+- [[dir][:dir]]
 - [[session][:session]]
   + [[async][:async]]
 - [[var][:var]]
 - [[https://orgmode.org/manual/Noweb-Reference-Syntax.html][:noweb]]
 - [[https://orgmode.org/manual/Extracting-Source-Code.html][:tangle]]
+
 
 Shell specific:
 - [[stdin][:stdin]]
@@ -315,6 +298,51 @@ created which contains the output.  The results contains a link to the file.
 : : 1526	5064	6484
 : : 1526	5064	6484
 : : 1526	5064	6484
+
+
+** Dir <<dir>>
+=:dir <path>=
+
+Use the =:dir= header to specify the default directory to use during
+execution.
+
+*TIP* Use =:dir= to execute commands on a [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Remote-Files.html][remote server]].  See [[https://www.gnu.org/software/emacs/manual/html_node/org/Environment-of-a-Code-Block.html#Choosing-a-working-directory-1][Choosing
+a working directory]] to learn more about =:dir=.
+
+/Example:/
+
+Open an SSH connection to a server and create a file if it doesn't
+already exist.
+
+: #+begin_src bash :results output :dir /ssh:user@localhost:/home/user
+: if [ ! -e  "foo_file" ];
+: then
+:     echo "foo" > foo_file
+:     echo "Created foo_file"
+: else
+:     echo "foo_file already exists!"
+: fi
+: #+end_src
+:
+: #+RESULTS:
+: : Created foo_file
+
+/Example (with sessions):/
+
+It also works with sessions!
+
+: #+begin_src bash :results output :dir /ssh:user@localhost:/home/user :session *remote*
+: if [ ! -e  "foo_file" ];
+: then
+:     echo "foo" > foo_file
+:     echo "Created foo_file"
+: else
+:     echo "foo_file already exists!"
+: fi
+: #+end_src
+:
+: #+RESULTS:
+: : foo_file already exists!
 
 ** Sessions <<session>>
 =:session <session-name>=
