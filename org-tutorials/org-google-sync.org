@@ -87,33 +87,28 @@ This will sync every 15 minutes starting at 5 minutes past the hour.
 
 * From org to Google Calendar
 
-  There are at least two possible paths to get the information into Google:
+  You can export from org mode to .ics; upload .ics to a public web
+  server giving it a hidden/secret name; tell Google to import this
+  .ics file.
 
-  1. export from org mode to .ics; upload .ics to a public web server
-     giving it a hidden/secret name; tell Google to import this .ics
-     file
-  2. use googlecl to import event when you create them into Google
-     calendar (update entries won't be reflected in Google). See [fn:2]
-
-  The first one has the disadvantage that the item won't show up in
-  your "main" calendar and therefore you can't easily share them with
+  This has the disadvantage that the item won't show up in your "main"
+  calendar and therefore you can't easily share them with
   others. Nevertheless, this route is relatively easy and therefore
-  we'll discuss it below.  The second option (as described in the link)
-  should work well, if you don't need to change things.
+  we'll discuss it below.
 
   Also keep in mind that your mileage will vary, since everything
   described on this page works for some people, but perhaps not for
-  you... if this is the case, feel free to ask on the org-email list
+  you... if this is the case, feel free to ask on the [[https://orgmode.org/worg/org-mailing-list.html][org mailing list]]
   and perhaps we can add missing features.
 
-  Back to the topic. To implement 1., we need org to export an .ics
-  file, which can be achieved using the function:
-  org-export-icalendar-combine-agenda-files.
+  Back to the topic. We need org to export an .ics file, which can be
+  achieved using the function:
+  ~org-export-icalendar-combine-agenda-files~.
   This will export all entries in you agenda. If you only want to
   export certain ones, you can set up a filter. For this we will
   define a filter function and then tell Emacs to use this filter.
   The filter shown here, will exclude items with a category "google"
-  (for example from the ical2org script) and "private" and also only
+  (for example from the =ical2org= script) and "private" and also only
   export entries that have a date and a time range set (that is, a
   start and a end time stamp). You can modify the function though to
   do anything you want!
@@ -174,7 +169,7 @@ This will sync every 15 minutes starting at 5 minutes past the hour.
   in your .emacs.
 
   Another Emacs variable that you might want to look into is:
-  org-icalendar-honor-noexport-tag.
+  ~org-icalendar-honor-noexport-tag~.
 
   You can now automate this via a cron job to generate updated .ics
   files.
@@ -217,4 +212,3 @@ https://github.com/kidd/org-gcal.el
 
 * Footnotes
 [fn:1] https://list.orgmode.org/87d3v95v87.wl%ucecesf@ucl.ac.uk
-[fn:2] https://list.orgmode.org/87y6dopqzy.wl%ucecesf@ucl.ac.uk
