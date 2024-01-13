@@ -2780,9 +2780,11 @@ it is a cons of 'gnus and the select (type and name).")
        (t (error "Unknown link type"))))))
 
 (eval-after-load 'org-gnus
-  '(progn
-     (add-to-list 'org-store-link-functions 'mde-org-gnus-save-by-mid)
-     (org-add-link-type "mid" 'mde-org-gnus-open-message-link)))
+  (lambda ()
+    (org-link-set-parameters
+     "mid"
+     :follow #'mde-org-gnus-open-message-link
+     :store #'mde-org-gnus-save-by-mid)))
 #+end_src
 
 ** Store link to a message when sending in Gnus
@@ -2837,13 +2839,13 @@ and you can then use links like =occur:my-file.txt#regex= to open a
 file and run occur with the regex on it.
 
 #+BEGIN_SRC emacs-lisp
-  (defun org-occur-open (uri)
-    "Visit the file specified by URI, and run `occur' on the fragment
+(defun org-occur-open (uri)
+  "Visit the file specified by URI, and run `occur' on the fragment
     \(anything after the first '#') in the uri."
-    (let ((list (split-string uri "#")))
-      (org-open-file (car list) t)
-      (occur (mapconcat 'identity (cdr list) "#"))))
-  (org-add-link-type "occur" 'org-occur-open)
+  (let ((list (split-string uri "#")))
+    (org-open-file (car list) t)
+    (occur (mapconcat 'identity (cdr list) "#"))))
+(org-link-set-parameters "occur" :follow #'org-occur-open)
 #+END_SRC
 ** Send html messages and attachments with Wanderlust
   -- David Maus
