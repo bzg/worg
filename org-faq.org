@@ -749,26 +749,8 @@ and local cycling:
 
 #+index: Visibility!Cycling
 
-   Yes, these functions are written in a way that they are independent of
-   the outline setup.  The following setup provides standard Org-mode
-   functionality in outline-mode on =TAB= and =S-TAB=.  For
-   outline-minor-mode, we use =C-TAB= instead of =TAB=,
-   because =TAB= usually has mode-specific tasks.
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'outline-minor-mode-hook
-  (lambda ()
-    (define-key outline-minor-mode-map [(control tab)] 'org-cycle)
-    (define-key outline-minor-mode-map [(shift tab)] 'org-global-cycle)))
-(add-hook 'outline-mode-hook
-  (lambda ()
-    (define-key outline-mode-map [(tab)] 'org-cycle)
-    (define-key outline-mode-map [(shift tab)] 'org-global-cycle)))
-#+END_SRC
-
-Or check out /outline-magic.el/, which does this and also provides
-promotion and demotion functionality.  /outline-magic.el/ is
-available at [[https://github.com/tj64/outline-magic/blob/master/outline-magic.el][Outline Magic]].
+Since Emacs 28, you can customize ~outline-minor-mode-cycle~ to make =TAB=
+and =S-TAB= work in =outline-mode= and =outline-minor-mode=.
 
 ** Can I save and restore the visibility state of an org-mode buffer?
    :PROPERTIES:
