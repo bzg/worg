@@ -2723,28 +2723,24 @@ variable =org-capture-templates= to "understand" (i.e. evaluate)
   check out (in the same thread) what Nick Docos had to fix to make Bernt's
   set-up work for him.
 
-** Can I automatically start the clock when opening a remember template?
+** Can I automatically start the clock when opening a capture template?
    :PROPERTIES:
    :CUSTOM_ID: start-clock-when-opening-remember-template
    :END:
 
 #+index: Clock!Start
 
-   Yes, this is possible.  Use the following code and make sure that
-   after executing it, ~my-start-clock-if-needed~ is in
-   ~remember-mode-hook~ /after/ ~org-remember-apply-template~.
-
-   : (add-hook 'remember-mode-hook 'my-start-clock-if-needed 'append)
-   : (defun my-start-clock-if-needed ()
-   :   (save-excursion
-   :     (goto-char (point-min))
-   :     (when (re-search-forward " *CLOCK-IN *" nil t)
-   :       (replace-match "")
-   :       (org-clock-in))))
-
-   Then, when a template contains the key string CLOCK-IN, the clock
-   will be started.  Starting with Org-mode version 5.20, the clock will
-   automatically be stopped when storing the remember buffer.
+   Yes, this is possible.
+   You can add =:clock-in t= parameter to the capture template where you
+   want to start the clock automatically.
+   
+   #+begin_src emacs-lisp
+     (require 'org-capture)
+     (add-to-list
+      'org-capture-templates
+      `("c" "Call" entry (file "~/Org/inbox.org")
+        "* Call with %?" :clock-in t :clock-resume t))
+   #+end_src
 
 * Searches
   :PROPERTIES:
