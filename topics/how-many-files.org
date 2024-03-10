@@ -1,0 +1,92 @@
+:PROPERTIES:
+:ID:       04739382-d384-40ad-9a02-22646553fb9a
+:END:
+#+TITLE:      How many files?
+#+SUBTITLE:   One big file, or many small ones?
+#+AUTHOR:     Adam Porter
+#+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+#+HTML_LINK_UP:    /worg/org-faq.html
+#+HTML_LINK_HOME:  https://orgmode.org/worg/
+
+# This file is released by its authors and contributors under the GNU
+# Free Documentation license v1.3 or later, code examples are released
+# under the GNU General Public License v3 or later.
+
+It's a very frequently asked question nowadays:
+
+#+begin_center
+"Should I use one big Org file or many small ones?"
+#+end_center
+
+It's become especially common since the release of [[https://www.orgroam.com/][Org-Roam]] ([[https://github.com/org-roam/org-roam][repository]]), which provides indexing and other tools that help when using the many-small-files paradigm.
+
+*Bottom line: Use whatever combination of small and large files that works for you.*
+
+It's not uncommon for Org users to have relatively large files with tens or even hundreds of thousands of lines, accumulated over many years.
+
+* Considerations
+
+** Performance
+
+*** Emacs
+
+Although Emacs has historically had some performance issues with /very/ large files, this has mainly been an issue of /line length/ rather than /file size/.  (As well, recent developments in Emacs have improved performance with long lines, such as ~so-long-mode~.)
+
+Org files generally do not suffer from such long lines, since they are intended to be read and written by humans.
+
+*** Org
+
+**** File size
+
+Org has historically performed well even with large files having many lines.  However, with the use of [[info:elisp#Overlays][overlays]] to fold outline trees, at some point, the performance of folding commands could eventually suffer.
+
+Recent developments in Org have seen the change from overlays to [[info:elisp#Text Properties][text properties]] as the default folding backend, which has improved performance.  As well, Emacs 29.1 gained an improved overlay implementation which greatly improves performance.
+
+**** Initialization
+:PROPERTIES:
+:ID:       6e8d043c-b13c-4122-93c9-3497b3bf6f49
+:END:
+
+When using many files, a constant for each file is the time it takes to initialize ~org-mode~ in each Org file's buffer.  Once that initialization is complete, the price is paid, and operations are fast; but when performing an operation on many Org files that are not yet open, the initialization cost can add up, delaying the completion of the overall operation.
+
+However, recent developments in Org have reduced per-buffer initialization time, and efforts in this regard continue.
+
+** Usability
+
+*** Agenda
+
+The Org Agenda works by searching files individually in Emacs.  This requires each file searched to be open in Emacs.  As mentioned, [[id:6e8d043c-b13c-4122-93c9-3497b3bf6f49][initialization]] time can be a factor when searching files that aren't yet open, but this can be mitigated by, e.g. using various tools like [[info:emacs#Saving Emacs Sessions][desktop-save-mode]] to automatically open relevant buffers before they are needed.
+
+*** Searching
+
+Searching Org files from within Emacs (using tools like Org's built-in agenda commands, as well as third-party tools like [[https://melpa.org/#/org-ql][Org QL]]) requires the files to be open in Emacs, and therefore [[id:6e8d043c-b13c-4122-93c9-3497b3bf6f49][initialization]] time is a factor.
+
+However, being ultimately plain text files, Org files can also be searched using external, line-based utilities, such as ~grep~, ~ripgrep~, etc.  And since these do not require the files to be open in Emacs, initialization time is not a concern.
+
+** Organization
+
+Organization is largely a personal matter.  Emacs and Org are tools designed to help users develop workflows to meet their needs, whatever they may be.  There's virtually no limit to creativity in this regard.  
+
+A user may find that, for some use cases, one file may serve as a kind of "notebook" to collect all the information and tasks related to a topic.  For others, a hierarchy of various directories and files may be more useful (e.g. Worg).
+
+* Resources
+
+** Articles
+
++ [[https://karl-voit.at/2020/05/03/current-org-files/][Karl Voit: My Current Org Mode Files and Heading Structure]] :: /This long article describes my current Org mode files, how they are named, what main headings they contain and some statistics./
++ [[https://karl-voit.at/2021/08/30/the-org-mode-way/][Karl Voit: The Right Way to Use Org Mode]] :: /Many people wonder how Emacs Org mode is used in "the right way".  Here is my short answer to that: There isn't one right way for using Org mode features.  If this is obvious to you, you can skip the rest of this article.  If not, you really should read this until the end.  It may answer many questions you probably do have in your head. Especially when you're rather new with the Org mode universe./
+
+** Discussions
+
++ [2024-03-10 Sun] [[https://old.reddit.com/r/orgmode/comments/1bb69dm/single_org_file_vs_orgroam_for_a_single_big_topic/][Single org file vs org-roam for a single big topic : orgmode]]
+
+* Colophon
+
+/This question is asked very frequently on Reddit's [[https://old.reddit.com/r/orgmode/][r/orgmode]] and other forums.  This page is intended to become a comprehensive resource that can be shared when the question is asked.  Please feel free to add relevant blog articles to the "Articles" section, and relevant discussions to the "Discussions" one.  When adding content, please follow the patterns established in each section./
+
