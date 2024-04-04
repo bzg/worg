@@ -1776,20 +1776,28 @@ YYYY-MM-DD DAYNAME
 + TIME (optional) :: An instance of the pattern =H:MM= where =H=
   represents a one to two digit number (and can start with =0=), and =M=
   represents a single digit.
-+ REPEATER-OR-DELAY (optional) :: An instance of the following pattern:
++ REPEATER-OR-DELAY (optional) :: An instance of a single =REPEATER= and/or an
+  instance of a single =DELAY= in any order.
++ REPEATER (optional) :: An instance of the following pattern:
+  #+begin_example
+MARK VALUE UNIT
+MARK VALUE UNIT/VALUE UNIT
+  #+end_example
+  Where MARK, VALUE and UNIT are not separated by whitespace characters.
+  - MARK :: Either the string =+= (cumulative type), =++= (catch-up type),
+    or =.+= (restart type).
+  - VALUE :: A number.
+  - UNIT :: Either the character =h= (hour), =d= (day), =w= (week), =m=
+    (month), or =y= (year).
++ DELAY (optional) :: An instance of the following pattern:
   #+begin_example
 MARK VALUE UNIT
   #+end_example
   Where MARK, VALUE and UNIT are not separated by whitespace characters.
-  - MARK :: Either the string =+= (cumulative type), =++= (catch-up type),
-    or =.+= (restart type) when forming a repeater, and either =-= (all
-    type) or =--= (first type) when forming a warning delay.
-  - VALUE :: A number
+  - MARK :: Either  =-= (all type) or =--= (first type).
+  - VALUE :: A number.
   - UNIT :: Either the character =h= (hour), =d= (day), =w= (week), =m=
-    (month), or =y= (year)
-
-There can be two instances of =REPEATER-OR-DELAY= in the timestamp: one
-as a repeater and one as a warning delay.
+    (month), or =y= (year).
 
 *Examples*
 
@@ -1799,6 +1807,7 @@ as a repeater and one as a warning delay.
 [2004-08-24 Tue]--[2004-08-26 Thu]
 <2012-02-08 Wed 20:00 ++1d>
 <2030-10-05 Sat +1m -3d>
+<2012-03-29 Thu ++1y/2y>
 #+end_example
 
 ** Text Markup
