@@ -3643,41 +3643,48 @@ full list.
 #+index: Export!Agenda
 #+index: Export!Faces
 
-Normally, when you export an org file or an agenda view from within
-emacs, htmlize will convert your face definitions to direct color css
-styles inlined into each =<span>= object, resulting in an HTML output
-that preserves the general look of your Org buffers and agenda views.
+Normally, when you export an agenda view from within Emacs, htmlize
+will convert your face definitions to direct color CSS styles inlined
+into each =<span>= object, resulting in an HTML output that preserves
+the general look of your Org buffers and agenda views.
 
 Let's say you generate an export from the command line, such as the
 following:
 
-: emacs -batch -l ~/.emacs -eval '(org-batch-agenda "e")'
-
-or
-
-: emacs -batch -l ~/.emacs -eval '(org-publish-all)'
+: emacs -batch -l ~/.emacs.d/init.el \
+: -eval '(progn \
+:         (org-agenda nil "a") \
+:         (org-agenda-write "~/agenda.html"))'
 
 In such an instance, the exported HTML will contain only very basic
 color styles. The reason is that when Emacs is run in batch mode, it
 does not have a display and therefore only rudimentary face
 definitions.  If you'd like to use more complex styles, you'll have to
-make sure that the export process only assigns classes instead of
-direct color values.  This can be done by binding the variable
-=org-export-htmlize-output-style= to =css= for the duration of the
-export, for example with
+supply custom CSS styles to make these classes look any way you like.
+To generate face definitions for a CSS file based on any faces you are
+currently using in Emacs, you can use the following command:
 
-: emacs -batch -l ~/.emacs
-:   -eval '(let ((org-export-htmlize-generate-css (quote css)))
-:            (org-batch-agenda "e"))'
+#+begin_src emacs-lisp
+(defun org-html-htmlize-generate-css-for-agenda ()
+  "Create the CSS for all font definitions in the current Emacs session.
+Unlike `org-html-htmlize-generate-css', do not prepend
+`org-html-htmlize-font-prefix' to face names."
+  (interactive)
+  (require 'ox-html)
+  (let ((org-html-htmlize-font-prefix ""))
+    (org-html-htmlize-generate-css)))
+#+end_src
 
-Then you can use a style file to make these classes look any way you
-like.  To generate face definitions for a CSS file based on any faces
-you are currently using in Emacs, you can use the following command:
-
-: M-x org-export-htmlize-generate-css RET
+: M-x org-html-htmlize-generate-css-for-agenda RET
 
 This will generate a =<style>...</style>= section, the content of
-which you can add to your style file.
+which you can manually copy to your style file:
+
+: emacs -batch -l ~/.emacs.d/init.el \
+: -eval '(let ((org-agenda-export-html-style \
+:               "<link rel=\"stylesheet\" type=\"text/css\" href=\"mystyles.css\">")) \
+:         (org-agenda nil "a") \
+:         (org-agenda-write "~/agenda.html"))'
 
 ** How can I avoid dark color background when exporting agenda to ps format?
    :PROPERTIES:
