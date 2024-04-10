@@ -761,15 +761,28 @@ with a vertical bar. An Org table can be followed by a number of
 of any characters but a newline.
 
 Table.el tables end at the first line not starting with either
-a vertical line or a plus sign.
+a vertical line (=|=) or a plus sign (=+=).
 
-*Example*
+*Examples*
 
 #+begin_example
-| Name  | Phone | Age |
-|-------+-------+-----|
-| Peter |  1234 |  24 |
-| Anna  |  4321 |  25 |
+Org table:
+| Name  | Phone | Age | Age - 24 |
+|-------+-------+-----+----------|
+| Peter |  1234 |  24 |       -1 |
+| Anna  |  4321 |  25 |        7 |
+| Susan |  9876 |  18 |          |
+,#+TBLFM: @<$4..@>>$4 = $3 - @+1$3
+
+Table.el table:
++------+-----+-----+
+|Name  |Phone|Age  |
++------+-----+-----+
+|Peter |1234 |24   |
++------+-----+-----+
+|Anna  |4321 |25   |
+|Turner|     |     |
++------+-----+-----+
 #+end_example
 
 ** Lesser Elements
