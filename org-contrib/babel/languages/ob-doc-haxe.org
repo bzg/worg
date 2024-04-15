@@ -85,13 +85,13 @@ headers arguments are optional.
 This is hello world:
 
 #+begin_example
-#+begin_src haxe :results output
+,#+begin_src haxe :results output
   class Main {
       public static function main() {
           Sys.print("hello, world");
       }
   }
-#+end_src
+,#+end_src
 #+end_example
 
 ** Class and Main Method Definitions
@@ -105,9 +105,9 @@ both omitted, the class will be named =Main=.
 This is exactly equivalent to the above hello world:
 
 #+begin_example
-#+begin_src haxe :results output
+,#+begin_src haxe :results output
   Sys.print("hello, world");
-#+end_src
+,#+end_src
 #+end_example
 
 ** Classname and Package Name
@@ -121,9 +121,9 @@ contain the package name, such as =com.pkg.Greeter=.  This example
 names the class =Greeter= and puts it in the =com.pkg= package.
 
 #+begin_example
-#+begin_src haxe :results output :classname com.pkg.Greeter
+,#+begin_src haxe :results output :classname com.pkg.Greeter
   Sys.print("hello, world");
-#+end_src
+,#+end_src
 #+end_example
 
 ** Source Files and Tangling
@@ -154,17 +154,17 @@ We've already seen hello world in scripting mode, but here it is
 again:
 
 #+begin_example
-#+begin_src haxe :results output
+,#+begin_src haxe :results output
   Sys.print("hello, world");
-#+end_src
+,#+end_src
 #+end_example
 
 This is what hello world looks like in functional mode:
 
 #+begin_example
-#+begin_src haxe :results value
+,#+begin_src haxe :results value
   return "hello, world";
-#+end_src
+,#+end_src
 #+end_example
 
 *** Return a List
@@ -174,16 +174,16 @@ show up as a list in the org buffer, notice that the =:results= must
 be set to =raw list=.
 
 #+begin_example
-#+begin_src haxe :results output raw list
+,#+begin_src haxe :results output raw list
   Sys.println("1");
   Sys.println("2");
-#+end_src
+,#+end_src
 #+end_example
 
 This is the output:
 
 #+begin_example
-#+RESULTS:
+,#+RESULTS:
 - 1
 - 2
 #+end_example
@@ -193,9 +193,9 @@ Returning a list in functional mode is straightforward.  Simply say
 This example results in identical output to the previous example.
 
 #+begin_example
-#+begin_src haxe :results value list
+,#+begin_src haxe :results value list
   return [1, 2];
-#+end_src
+,#+end_src
 #+end_example
 
 *** Return a Table
@@ -205,16 +205,16 @@ output includes pipe characters to build the table, and the =:results=
 header specifies the type is =raw=.
 
 #+begin_example
-#+begin_src haxe :results output raw
+,#+begin_src haxe :results output raw
   Sys.println("|1|2|3");
   Sys.println("|4|5|6");
-#+end_src
+,#+end_src
 #+end_example
 
 This is the output:
 
 #+begin_example
-#+RESULTS:
+,#+RESULTS:
 | 1 | 2 | 3 |
 | 4 | 5 | 6 |
 #+end_example
@@ -222,10 +222,10 @@ This is the output:
 The same output is achieved with the following:
 
 #+begin_example
-#+begin_src haxe :results value table
+,#+begin_src haxe :results value table
     return [[1, 2, 3],
             [4, 5, 6]];
-#+end_src
+,#+end_src
 #+end_example
 
 *** Return a Table with Headers
@@ -235,18 +235,18 @@ hline is created the same way as it is created while editing an org
 table, by inserting a =|-= at the start of a line inside the table.
 
 #+begin_example
-#+begin_src haxe :results output raw
+,#+begin_src haxe :results output raw
   Sys.println("|col1|col2|col3");
   Sys.println("|-");
   Sys.println("|1|2|3");
   Sys.println("|4|5|6");
-#+end_src
+,#+end_src
 #+end_example
 
 This is the output:
 
 #+begin_example
-#+RESULTS:
+,#+RESULTS:
 | col1 | col2 | col3 |
 |------+------+------|
 |    1 |    2 |    3 |
@@ -259,13 +259,13 @@ to using a =List<Object>= since the header row items are =String= but
 the rest of the data items are =int=.
 
 #+begin_example
-#+begin_src haxe :results value table
+,#+begin_src haxe :results value table
   var a :Array<Dynamic> = [["col1", "col2", "col3"],
                            null,
                            [1, 2, 3],
                            [4, 5, 6]];
   return a;
-#+end_src
+,#+end_src
 #+end_example
 
 ** Variables
@@ -279,26 +279,26 @@ Pass variables with the =:var= header.  Variable types are inferred.
 This example accepts two integers and adds them:
 
 #+begin_example
-#+begin_src haxe :var a=1 b=2 :results output
+,#+begin_src haxe :var a=1 b=2 :results output
   Sys.print("sum: " + (a+b));
-#+end_src
+,#+end_src
 #+end_example
 
 When passing string variables, be sure to escape the quotes, like this:
 
 #+begin_example
-#+begin_src haxe :var a="some string" :results output
+,#+begin_src haxe :var a="some string" :results output
   Sys.print(a);
-#+end_src
+,#+end_src
 #+end_example
 
 Haxe source code blocks can accept elisp =list= or =vector=.  In
 either case the variables are typed as =Array<Dynamic>=.
 
 #+begin_example
-#+begin_src haxe :var a='("one" "two") :results output
+,#+begin_src haxe :var a='("one" "two") :results output
   Sys.print(a[0] + " " + a[1]);
-#+end_src
+,#+end_src
 #+end_example
 
 This example accepts a named list taken from the org buffer.  Note
@@ -307,13 +307,13 @@ that lists appear to be a table with one item in each row.  =a= is a
 inside array contains columns.
 
 #+begin_example
-#+name: some-list
+,#+name: some-list
 - one
 - two
 
-#+begin_src haxe :var a=some-list :results output
+,#+begin_src haxe :var a=some-list :results output
   Sys.print(a[0][0] + " " + a[1][0]);
-#+end_src
+,#+end_src
 #+end_example
 
 Another way to accept an org list is to slice it when it is assigned.
@@ -321,27 +321,27 @@ The =[,0]= in this examples selects the first column of each row.  =a=
 is still an =Array<Dynamic>= but now each item is a single list item.
 
 #+begin_example
-#+name: some-list
+,#+name: some-list
 - one
 - two
 
-#+begin_src haxe :var a=some-list[,0] :results output
+,#+begin_src haxe :var a=some-list[,0] :results output
   Sys.print(a[0] + " " + a[1]);
-#+end_src
+,#+end_src
 #+end_example
 
 The following example transposes and doubles the values in a 2x2
 table.
 
 #+begin_example
-#+name: some-table
+,#+name: some-table
 | 1 | 2 |
 | 3 | 4 |
 
-#+begin_src haxe :var a=some-table :results output
+,#+begin_src haxe :var a=some-table :results output
   Sys.println((a[0][0]*2) + " " + (a[1][0]*2));
   Sys.println((a[0][1]*2) + " " + (a[1][1]*2));
-#+end_src
+,#+end_src
 #+end_example
 
 ** Imports
@@ -355,24 +355,24 @@ blocks that omit the boilerplate class and main method definitions.
 This example imports a class using the =:imports= header argument:
 
 #+begin_example
-#+begin_src haxe :results output :imports haxe.crypto.Base64 haxe.io.Bytes
+,#+begin_src haxe :results output :imports haxe.crypto.Base64 haxe.io.Bytes
   var encoded = Base64.encode(Bytes.ofString("42"));
   var decoded = Base64.decode(encoded);
   Sys.print('encoded=$encoded, decoded=$decoded');
-#+end_src
+,#+end_src
 #+end_example
 
 This is exactly equivalent, but specifies the import within the source
 code block:
 
 #+begin_example
-#+begin_src haxe :results output
+,#+begin_src haxe :results output
   import haxe.crypto.Base64;
   import haxe.io.Bytes;
   var encoded = Base64.encode(Bytes.ofString("42"));
   var decoded = Base64.decode(encoded);
   Sys.print('encoded=$encoded, decoded=$decoded');
-#+end_src
+,#+end_src
 #+end_example
 
 ** Source and Class File Locations
@@ -390,9 +390,9 @@ In order to override override the default and compile in the current
 directory, set the =:dir= parameter on the source code block.
 
 #+begin_example
-#+begin_src haxe :results output :dir "."
+,#+begin_src haxe :results output :dir "."
   Sys.print("hello, world");
-#+end_src
+,#+end_src
 #+end_example
 
 ** Tramp Support

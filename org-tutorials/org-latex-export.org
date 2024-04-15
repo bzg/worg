@@ -128,7 +128,7 @@ Here is a standard setup for export to a LaTeX book class:
 Then, in the Org file with a book-full of notes, add this line:
 
 #+begin_src org
-  #+LaTeX_CLASS: book
+  ,#+LaTeX_CLASS: book
 #+end_src
 
 <<koma-script>>
@@ -152,7 +152,7 @@ Then, this class can be used by including the following line in the
 Org-mode file.
 
 #+begin_src org :exports code
-  #+LaTeX_CLASS: koma-article
+  ,#+LaTeX_CLASS: koma-article
 #+end_src
 
 * Passing Options to Document Classes
@@ -166,7 +166,7 @@ You can pass options to the LaTeX =\documentclass= macro by putting a
 line like this in your Org-mode file:
 
 #+begin_src org :exports code
-  #+LaTeX_CLASS_OPTIONS: [a4paper,twoside,twocolumn]
+  ,#+LaTeX_CLASS_OPTIONS: [a4paper,twoside,twocolumn]
 #+end_src
 
 A useful option with the [[koma-script][KOMA script]] classes typesets table captions
@@ -175,7 +175,7 @@ exported by Org-mode above the table.  The following option to the
 [[koma-script][KOMA script]] classes accomplishes this.
 
 #+begin_src org
-  #+LaTeX_CLASS_OPTIONS: [captions=tableheading]
+  ,#+LaTeX_CLASS_OPTIONS: [captions=tableheading]
 #+end_src
 
 * Using Custom Classes
@@ -230,8 +230,8 @@ example only calls it if it would add a LaTeX class that isn't
 already on the =org-latex-classes= list:
 
 #+begin_example
-  #+name: setup
-  #+begin_src emacs-lisp :results silent :exports none
+  ,#+name: setup
+  ,#+begin_src emacs-lisp :results silent :exports none
  (unless (find "per-file-class" org-latex-classes :key 'car
            :test 'equal)
    (add-to-list 'org-latex-classes
@@ -244,13 +244,13 @@ already on the =org-latex-classes= list:
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-  #+end_src
+  ,#+end_src
 #+end_example
 
 Then, add this line to the Org-mode file:
 
 #+begin_src org :exports code
-  #+LaTeX_CLASS: per-file-class
+  ,#+LaTeX_CLASS: per-file-class
 #+end_src
 
 * Specifying LaTeX Packages
@@ -315,8 +315,8 @@ links:
 
 #+name: hyperref-header
 #+begin_src org :exports code
-  ,  #+LATEX_HEADER: \usepackage[hyperref,x11names]{xcolor}
-  ,  #+LATEX_HEADER: \usepackage[colorlinks=true,urlcolor=SteelBlue4,linkcolor=Firebrick4]{hyperref}
+  ,#+LATEX_HEADER: \usepackage[hyperref,x11names]{xcolor}
+  ,#+LATEX_HEADER: \usepackage[colorlinks=true,urlcolor=SteelBlue4,linkcolor=Firebrick4]{hyperref}
 #+end_src
 
 In addition, you can pick up the encoding used in the Org-mode buffer and pass
@@ -325,7 +325,7 @@ follows:
 
 #+name: inputenc
 #+begin_src org :exports code
-  #+LATEX_HEADER: \usepackage[AUTO]{inputenc}
+  ,#+LATEX_HEADER: \usepackage[AUTO]{inputenc}
 #+end_src
 
 * Creating PDF Output
@@ -652,12 +652,12 @@ the title, or create a custom title page, then perhaps the best way to
 do this was posted to the Org-mode list by Nick Dokos:
 
 #+begin_example
-#+LATEX_HEADER: \input{mytitle}
+,#+LATEX_HEADER: \input{mytitle}
 
- * Foo
+,* Foo
  foo
 
- * Bar
+,* Bar
  bar
 #+end_example
 
@@ -757,13 +757,13 @@ emacs-style code differs from the specially formatted emacs-lisp
 source code.
 
 #+begin_example
-, #+LATEX_CLASS: article
-, #+LaTeX_HEADER: \usepackage{minted}
-, #+LaTeX_HEADER: \usemintedstyle{emacs}
-, #+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
+,#+LATEX_CLASS: article
+,#+LaTeX_HEADER: \usepackage{minted}
+,#+LaTeX_HEADER: \usemintedstyle{emacs}
+,#+LaTeX_HEADER: \newminted{common-lisp}{fontsize=\footnotesize}
 
-, #+name: setup-minted
-, #+begin_src emacs-lisp :exports both :results silent
+,#+name: setup-minted
+,#+begin_src emacs-lisp :exports both :results silent
      (setq org-latex-listings 'minted)
      (setq org-latex-custom-lang-environments
            '(
@@ -777,12 +777,12 @@ source code.
            '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
              "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
              "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-, #+end_src
+,#+end_src
 
-, #+name: another-listing
-, #+begin_src python :exports code
+,#+name: another-listing
+,#+begin_src python :exports code
    x = str(y)
-, #+end_src
+,#+end_src
 #+end_example
 
 When this example is exported (=C-c C-e d=) the resulting pdf file
@@ -821,15 +821,15 @@ the =latex= link type is used to call the new =python= command to
 typeset an inline code snippet.
 
 #+begin_example
-, #+LATEX_CLASS: article
-, #+LaTeX_HEADER: \usepackage{listings}
-, #+LaTeX_HEADER: \lstnewenvironment{common-lispcode}
-, #+LaTeX_HEADER: {\lstset{language={Lisp},basicstyle={\ttfamily\footnotesize},frame=single,breaklines=true}}
-, #+LaTeX_HEADER: {}
-, #+LaTeX_HEADER: \newcommand{\python}[1]{\lstset{language={Python},basicstyle={\ttfamily\small}}\lstinline{#1}}
+,#+LATEX_CLASS: article
+,#+LaTeX_HEADER: \usepackage{listings}
+,#+LaTeX_HEADER: \lstnewenvironment{common-lispcode}
+,#+LaTeX_HEADER: {\lstset{language={Lisp},basicstyle={\ttfamily\footnotesize},frame=single,breaklines=true}}
+,#+LaTeX_HEADER: {}
+,#+LaTeX_HEADER: \newcommand{\python}[1]{\lstset{language={Python},basicstyle={\ttfamily\small}}\lstinline{#1}}
 
-, #+name: setup-listings
-, #+begin_src emacs-lisp :exports both :results silent
+,#+name: setup-listings
+,#+begin_src emacs-lisp :exports both :results silent
   (setq org-latex-listings 'listings)
   (setq org-latex-custom-lang-environments
         '((emacs-lisp "common-lispcode")))
@@ -850,14 +850,14 @@ typeset an inline code snippet.
        (format "<span class=\"%s\">%s</span>" path desc))
       ((eq format 'latex)
        (format "\\%s{%s}" path desc)))))
-, #+end_src
+,#+end_src
 
-, #+name: another-listing
-, #+begin_src python :exports code
+,#+name: another-listing
+,#+begin_src python :exports code
   x = str(y)
-, #+end_src
+,#+end_src
 
-, This is an inline snippet of Python: [[latex:python][x = str(y)]].
+This is an inline snippet of Python: [[latex:python][x = str(y)]].
 #+end_example
 
 When this example is exported, both source code blocks are typeset

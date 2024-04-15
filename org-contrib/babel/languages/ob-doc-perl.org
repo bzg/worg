@@ -81,11 +81,11 @@ variables. See below.
 These are two simple examples:
 
 #+BEGIN_EXAMPLE
-#+BEGIN_SRC perl :results value
+,#+BEGIN_SRC perl :results value
 "hello world";
-#+END_SRC
+,#+END_SRC
 
-#+RESULTS:
+,#+RESULTS:
 : hello world
 #+END_EXAMPLE
 
@@ -110,11 +110,11 @@ it is interpreted as a table. Some examples below:
 
 
 #+BEGIN_EXAMPLE
-#+BEGIN_SRC perl :results value
+,#+BEGIN_SRC perl :results value
 [[1,2],[2,4]]
-#+END_SRC
+,#+END_SRC
 
-#+RESULTS:
+,#+RESULTS:
 | 1 | 2 |
 | 2 | 4 |
 #+END_EXAMPLE
@@ -133,7 +133,7 @@ When returning an array, it is important to return a reference to the array. Oth
 For example, this returns the size of the array:
 
 #+BEGIN_EXAMPLE
-#+BEGIN_SRC perl :results value
+,#+BEGIN_SRC perl :results value
 my @result ;
 $i = 0;
 for $j ('a'..'e')  {
@@ -141,15 +141,15 @@ for $j ('a'..'e')  {
    $i ++;
 }
 @result;
-#+END_SRC
+,#+END_SRC
 
-#+RESULTS:
+,#+RESULTS:
 : 5
 #+END_EXAMPLE
 But this returns the values of the array and creates the corresponding table
 
 #+BEGIN_EXAMPLE
-#+BEGIN_SRC perl :results value
+,#+BEGIN_SRC perl :results value
 my @result ;
 $i = 0;
 for $j ('a'..'e')  {
@@ -157,9 +157,9 @@ for $j ('a'..'e')  {
    $i ++;
 }
 \@result;
-#+END_SRC
+,#+END_SRC
 
-#+RESULTS:
+,#+RESULTS:
 | a |
 | b |
 | c |
@@ -168,7 +168,7 @@ for $j ('a'..'e')  {
 #+END_EXAMPLE
 
 #+BEGIN_EXAMPLE
-#+BEGIN_SRC perl :results value
+,#+BEGIN_SRC perl :results value
 my @result ;
 for $i (0..3) {
    for $j (0..2) {
@@ -176,9 +176,9 @@ for $i (0..3) {
    }
 }
 \@result;
-#+END_SRC
+,#+END_SRC
 
-#+RESULTS:
+,#+RESULTS:
 | 0 | 1 | 2 |
 | 0 | 2 | 4 |
 | 0 | 3 | 6 |
@@ -193,7 +193,7 @@ tables as input to scripts.
 Let us assume we have the following table:
 
 #+BEGIN_EXAMPLE
-#+NAME:exampletable
+,#+NAME:exampletable
 | 1 | a |
 | 2 | b |
 | 3 | c |
@@ -208,12 +208,12 @@ For instance, this block simply returns the input table. Please note
 that because data is already a reference we can simply return it.
 
 #+BEGIN_EXAMPLE
-#+name: example1usingTable
-#+begin_src perl :var data=exampletable :results table :type value
+,#+name: example1usingTable
+,#+begin_src perl :var data=exampletable :results table :type value
 $data
-#+end_src
+,#+end_src
 
-#+RESULTS: example1usingTable
+,#+RESULTS: example1usingTable
 | 1 | a |
 | 2 | b |
 | 3 | c |
@@ -226,8 +226,8 @@ can have any size). In the block below we use a function (~org_table_size~) to
 return the number of columns and rows in a table.
 
 #+BEGIN_EXAMPLE
-#+name: example2usingTable
-#+begin_src perl :results value :var data=exampletable
+,#+name: example2usingTable
+,#+begin_src perl :results value :var data=exampletable
 # first we need to define two functions that will make our life easier
 sub org_table_size
 {
@@ -249,9 +249,9 @@ for my $i ($0..$cols-1) {
     }
 }
 \@result;
-#+end_src
+,#+end_src
 
-#+RESULTS: example2usingTable
+,#+RESULTS: example2usingTable
 | 1 | 2 | 3 | 4 |
 | a | b | c | d |
 #+END_EXAMPLE

@@ -81,7 +81,7 @@ like this:
 
 *Data Table* (if pulling from a table and not a formula)
 #+BEGIN_EXAMPLE
-#+tblname: data-table
+,#+tblname: data-table
 | x | y1 | y2 |
 |---+----+----|
 | 0 |  3 |  6 |
@@ -91,11 +91,11 @@ like this:
 
 *Gnuplot Source Block*
 #+BEGIN_EXAMPLE
-#+begin_src gnuplot :var data=data-table :file output.png
+,#+begin_src gnuplot :var data=data-table :file output.png
 
   gnuplot code goes here
 
-#+end_src
+,#+end_src
 #+END_EXAMPLE
 
 To run gnuplot and produce a resultant graph (or to produce any result
@@ -320,7 +320,7 @@ like when all of the above is combined.
 ** Function Plot
 A full babel block of code for a few functions might look like this:
 #+begin_example
-#+begin_src gnuplot :exports code :file file.png
+,#+begin_src gnuplot :exports code :file file.png
 reset
 
 set title "Putting it All Together"
@@ -339,7 +339,7 @@ g(x) = x**3
 h(x) = 10*sqrt(abs(x))
 
 plot f(x) w lp lw 1, g(x) w p lw 2, h(x) w l lw 3
-#+end_src
+,#+end_src
 #+end_example
 
 #+attr_html: :width 800
@@ -407,7 +407,7 @@ an example of a running distance log:[fn:6]
 |-----------+----------|
 
 #+begin_example
-#+begin_src gnuplot :var data=xtics :exports code :file file.png
+,#+begin_src gnuplot :var data=xtics :exports code :file file.png
   reset
 
   set title "Running Stats"
@@ -419,7 +419,7 @@ an example of a running distance log:[fn:6]
   set ylabel "Distance (mi)"
 
   plot data u 2:xticlabels(1) w lp lw 2 notitle
-#+end_src
+,#+end_src
 #+end_example
 
 The =2:xticlabels(1)= tells gnuplot to use the values in column 1 for
@@ -453,7 +453,7 @@ values should correspond to these x-values. Here is an example:
 |----------+---------+----------|
 
 #+begin_example
-#+begin_src gnuplot :var data=named-xtics :exports code :file file.png
+,#+begin_src gnuplot :var data=named-xtics :exports code :file file.png
   reset
 
   set yrange [0:25]
@@ -466,7 +466,7 @@ values should correspond to these x-values. Here is an example:
   set title 'War Deaths'
 
   plot data using 2:3:xticlabels(1) w p lw 3 notitle
-#+end_src
+,#+end_src
 #+end_example
 
 For multiple data sets, simply include multiple columns for y-values
@@ -478,7 +478,7 @@ same). Here is an example:
 plot data u 2:3:xticlabels(1) title 'Set1',\
 data u 2:4:xticlabels(1) title 'Set2', \
 data u 2:5:xticlabels(1) title 'Set3'
-#+end_src
+,#+end_src
 #+end_example
 
 ** Multiple X/Y Axes
@@ -508,7 +508,7 @@ be plotted in the same graph:[fn:18]
 |-----------+-------+----------|
 
 #+begin_example
-#+begin_src gnuplot :var data=multi-axes :exports code :file file.png
+,#+begin_src gnuplot :var data=multi-axes :exports code :file file.png
   reset
 
   set title "Running Stats"
@@ -529,7 +529,7 @@ be plotted in the same graph:[fn:18]
   set style data points
   plot data u 2:xticlabels(1) axis x1y1 lw 3 title 'Time', \
        data u 3:xticlabels(1) axis x1y2 lw 3 title 'Distance'
-#+end_src
+,#+end_src
 #+end_example
 
 Walking through the new items in the code:
@@ -610,7 +610,7 @@ Here is some data on the population of the world through time:[fn:12]
 |----------+--------+------|
 
 #+begin_example
-#+begin_src gnuplot :var data=diff-scales :exports code :file file.png
+,#+begin_src gnuplot :var data=diff-scales :exports code :file file.png
   reset
 
   set xrange [ -10000 : 1 ]
@@ -648,7 +648,7 @@ Here is some data on the population of the world through time:[fn:12]
   plot data using 2:3:xticlabels(1) with lines lw 3 notitle
 
   set nomultiplot
-#+end_src
+,#+end_src
 #+end_example
 
 Walking through the code:
@@ -751,7 +751,7 @@ slight modifications.
 |-----------+-------+-----+------|
 
 #+begin_example
-#+begin_src gnuplot :var data=broken-axis :exports code :file file.png
+,#+begin_src gnuplot :var data=broken-axis :exports code :file file.png
   reset
 
   A=1725
@@ -778,7 +778,7 @@ slight modifications.
   set title 'World Population'
 
   plot data u 2:3:xticlabels(1) w l lw 3 notitle, data u 2:4:xticlabels(1) w l lw 3 lc 1 notitle
-#+end_src
+,#+end_src
 #+end_example
 
 Here are some notes on the above:
@@ -836,12 +836,12 @@ acceptable. The mailing list provided an excellent solution
 for increased gnuplot image quality:[fn:16]
 
 #+BEGIN_EXAMPLE
-#+begin_src gnuplot :file file.eps
+,#+begin_src gnuplot :file file.eps
   reset
   set terminal postscript [color] [solid] eps enhanced 20
   ...
   ...
-#+end_src
+,#+end_src
 #+END_EXAMPLE
 
 Note the output to /file.eps/, which corresponds to the =set

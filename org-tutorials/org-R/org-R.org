@@ -87,7 +87,7 @@
 | A    | A    |
 | A    | B    |
 | B    | B    |
-#+R: action:tabulate columns:2
+,#+R: action:tabulate columns:2
 
 #+end_example
 
@@ -130,7 +130,7 @@ table in the org file, and refer to it by name:
 
 #+begin_example
 
-#+TBLNAME:data-set-1
+,#+TBLNAME:data-set-1
 | col1 | col2 |
 |------+------|
 | A    | A    |
@@ -139,7 +139,7 @@ table in the org file, and refer to it by name:
 
 [arbitrary other content of org buffer]
 
-#+R: intable:data-set-1 action:tabulate
+,#+R: intable:data-set-1 action:tabulate
 
 #+end_example
 
@@ -196,8 +196,8 @@ The available off-the-shelf actions are listed [[*Table of available actions][he
 
 #+begin_example
 
-#+RR: x <- c(rnorm(10, mean=-3, sd=1), rnorm(10, mean=3, sd=1))
-#+R: title:"continuous-data" output-to-buffer:t
+,#+RR: x <- c(rnorm(10, mean=-3, sd=1), rnorm(10, mean=3, sd=1))
+,#+R: title:"continuous-data" output-to-buffer:t
 
 #+end_example
 
@@ -206,7 +206,7 @@ table with "#+TBLNAME"; we'll use that to refer to these data.
 
 #+begin_example
 
-#+TBLNAME:continuous-data
+,#+TBLNAME:continuous-data
 |            values |
 |-------------------|
 | -2.48627002467785 |
@@ -239,8 +239,8 @@ name the file link to the graphical output).
 #+begin_example
 
 [[file:tmp.png][histogram example]]
-#+R: action:hist columns:1 colour:hotpink 
-#+R: intable:continuous-data outfile:"png" title:"histogram example"
+,#+R: action:hist columns:1 colour:hotpink 
+,#+R: intable:continuous-data outfile:"png" title:"histogram example"
 
 #+end_example
 [[file:../../images/org-R/histogram-example.png]]
@@ -261,8 +261,8 @@ available output image formats: "jpg", "jpeg", "pdf", "ps", "bmp",
 #+begin_example
 
 [[file:density.png][density plot example]]
-#+R: action:density columns:"values" colour:chartreuse4 args:(:lwd 4)
-#+R: intable:continuous-data outfile:"density.png" title:"density plot example"
+,#+R: action:density columns:"values" colour:chartreuse4 args:(:lwd 4)
+,#+R: intable:continuous-data outfile:"density.png" title:"density plot example"
 
 #+end_example
 [[file:../../images/org-R/density.png]]
@@ -294,9 +294,9 @@ we'll store them in a separate org file:
 #+begin_example
 
 [[file:org-variables-counts.org][org-variables-counts]]
-#+R: action:tabulate columns:2 sort:t
-#+R: infile:"variable-popcon.org" intable:"org-variables-table"
-#+R: outfile:"org-variables-counts.org" title:"org-variables-counts"
+,#+R: action:tabulate columns:2 sort:t
+,#+R: infile:"variable-popcon.org" intable:"org-variables-table"
+,#+R: outfile:"org-variables-counts.org" title:"org-variables-counts"
 
 #+end_example
 [[file:org-variables-counts.org]]
@@ -313,8 +313,8 @@ We can see the top few rows of the table by using action:head
 |           4 | org-todo-keywords           |    22 |
 |           5 | org-agenda-include-diary    |    19 |
 |           6 | org-hide-leading-stars      |    19 |
-#+R: action:head
-#+R: infile:"org-variables-counts.org" intable:"org-variables-counts" output-to-buffer:t
+,#+R: action:head
+,#+R: infile:"org-variables-counts.org" intable:"org-variables-counts" output-to-buffer:t
 
 #+end_example
 
@@ -324,10 +324,10 @@ org variables are customised by only one or two users.
 #+begin_example
 
 [[file:org-variables-barplot.png][org-variables barplot]]
-#+R: action:barplot rownames:t columns:1 width:800 col:darkblue
-#+R: args:(:names.arg "NULL")
-#+R: infile:"org-variables-counts.org" intable:"org-variables-counts"
-#+R: outfile:"org-variables-barplot.png" title:"org-variables barplot"
+,#+R: action:barplot rownames:t columns:1 width:800 col:darkblue
+,#+R: args:(:names.arg "NULL")
+,#+R: infile:"org-variables-counts.org" intable:"org-variables-counts"
+,#+R: outfile:"org-variables-barplot.png" title:"org-variables barplot"
 
 #+end_example
 [[file:../../images/org-R/org-variables-barplot.png]]
@@ -350,10 +350,10 @@ org variables are customised by only one or two users.
 #+begin_example
 
 [[file:variable-popcon-restricted.org][org-variables-table]]
-#+R: infile:"variable-popcon.org" intable:"org-variables-table"
-#+R: outfile:"variable-popcon-restricted.org" title:"org-variables-table"
-#+RR: tab <- table(x[,2])
-#+RR: x <- subset(x, Variable %in% names(tab[tab > 4]))
+,#+R: infile:"variable-popcon.org" intable:"org-variables-table"
+,#+R: outfile:"variable-popcon-restricted.org" title:"org-variables-table"
+,#+RR: tab <- table(x[,2])
+,#+RR: x <- subset(x, Variable %in% names(tab[tab > 4]))
 
 #+end_example
 [[file:variable-popcon-restricted.org][org-variables-table]]
@@ -365,9 +365,9 @@ customised variable i. We can do that without writing any R code:
 #+begin_example
 
 [[file:org-variables-incidence.org][incidence-matrix]]
-#+R: action:tabulate columns:(1 2) rownames:t
-#+R: infile:"variable-popcon-restricted.org" intable:"org-variables-table"
-#+R: outfile:"org-variables-incidence.org" title:"incidence-matrix"
+,#+R: action:tabulate columns:(1 2) rownames:t
+,#+R: infile:"variable-popcon-restricted.org" intable:"org-variables-table"
+,#+R: outfile:"org-variables-incidence.org" title:"incidence-matrix"
 
 #+end_example
 [[file:org-variables-incidence.org][incidence-matrix]]
@@ -380,10 +380,10 @@ as a dendrogram:
 #+begin_example
 
 [[file:org-users-tree.png][org-users-tree.png]]
-#+RR: par(bg="gray15", fg="turquoise2")
-#+RR: plot(hclust(dist(x, method="binary")), ann=FALSE)
-#+R: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
-#+R: outfile:"org-users-tree.png" title:"org-users-tree.png"
+,#+RR: par(bg="gray15", fg="turquoise2")
+,#+RR: plot(hclust(dist(x, method="binary")), ann=FALSE)
+,#+R: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
+,#+R: outfile:"org-users-tree.png" title:"org-users-tree.png"
 
 #+end_example
 [[file:../../images/org-R/org-users-tree.png]]
@@ -393,10 +393,10 @@ And to cluster org variables, we use the transpose of that incidence matrix:
 #+begin_example
 
 [[file:org-variables-tree.png][org-variables-tree.png]]
-#+RR: par(bg="gray15", fg="turquoise2")
-#+RR: plot(hclust(dist(t(x), method="binary")), ann=FALSE)
-#+R: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
-#+R: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:1000
+,#+RR: par(bg="gray15", fg="turquoise2")
+,#+RR: plot(hclust(dist(t(x), method="binary")), ann=FALSE)
+,#+R: infile:"org-variables-incidence.org" intable:"incidence-matrix" rownames:t
+,#+R: outfile:"org-variables-tree.png" title:"org-variables-tree.png" width:1000
 
 #+end_example
 [[file:../../images/org-R/org-variables-tree.png]]
@@ -419,10 +419,10 @@ recognise any usage affinities between the clustered org users?
 #+begin_example
 
 [[file:/usr/local/src/org-etc/Worg/org-tutorials/org-R/data/45/f39291-3abc-4d5b-96c9-3a32f77877a5/org-R-output-8119M2O.png][An example from the org-plot tutorial, plotted using org-R]]
-#+R: action:lines columns:((1)(2 3))
-#+R: infile:"../org-plot.org"
-#+R: intable:"org-plot-example-1" outfile:"png"
-#+R: title:"An example from the org-plot tutorial, plotted using org-R"
+,#+R: action:lines columns:((1)(2 3))
+,#+R: infile:"../org-plot.org"
+,#+R: intable:"org-plot-example-1" outfile:"png"
+,#+R: title:"An example from the org-plot tutorial, plotted using org-R"
 
 #+end_example
 [[file:../../images/org-R/org-plot-example-1.png]]

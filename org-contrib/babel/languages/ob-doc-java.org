@@ -105,13 +105,13 @@ headers arguments are optional.
 This is hello world:
 
 #+begin_example
-#+begin_src java :results output
+,#+begin_src java :results output
   public class Main {
       public static void main(String[] args) {
           System.out.print("hello, world");
       }
   }
-#+end_src
+,#+end_src
 #+end_example
 
 ** Class and Main Method Definitions
@@ -125,9 +125,9 @@ both omitted, the class will be named =Main=.
 This is exactly equivalent to the above hello world:
 
 #+begin_example
-#+begin_src java :results output
+,#+begin_src java :results output
   System.out.print("hello, world");
-#+end_src
+,#+end_src
 #+end_example
 
 ** Classname and Package Name
@@ -141,9 +141,9 @@ contain the package name, such as =com.package.Greeter=.  This example
 names the class =Greeter= and puts it in the =com.package= package.
 
 #+begin_example
-#+begin_src java :results output :classname com.package.Greeter
+,#+begin_src java :results output :classname com.package.Greeter
   System.out.print("hello, world");
-#+end_src
+,#+end_src
 #+end_example
 
 ** Source Files and Tangling
@@ -179,17 +179,17 @@ We've already seen hello world in scripting mode, but here it is
 again:
 
 #+begin_example
-#+begin_src java :results output
+,#+begin_src java :results output
   System.out.print("hello, world");
-#+end_src
+,#+end_src
 #+end_example
 
 This is what hello world looks like in functional mode:
 
 #+begin_example
-#+begin_src java :results value
+,#+begin_src java :results value
   return "hello, world";
-#+end_src
+,#+end_src
 #+end_example
 
 *** Return a List
@@ -199,16 +199,16 @@ show up as a list in the org buffer, notice that the =:results= must
 be set to =raw list=.
 
 #+begin_example
-#+begin_src java :results output raw list
+,#+begin_src java :results output raw list
   System.out.println("1");
   System.out.println("2");
-#+end_src
+,#+end_src
 #+end_example
 
 This is the output:
 
 #+begin_example
-#+RESULTS:
+,#+RESULTS:
 - 1
 - 2
 #+end_example
@@ -218,20 +218,20 @@ Returning a list in functional mode is straightforward.  Simply say
 example results in identical output to the previous example.
 
 #+begin_example
-#+begin_src java :results value list
+,#+begin_src java :results value list
   List<Integer> a = Arrays.asList(1, 2);
   return a;
-#+end_src
+,#+end_src
 #+end_example
 
 Another way to achieve the same result is to use an array, as in the
 following example.
 
 #+begin_example
-#+begin_src java :results value list
+,#+begin_src java :results value list
   Integer[] a = {4, 1};
   return a;
-#+end_src
+,#+end_src
 #+end_example
 
 *** Return a Table
@@ -241,16 +241,16 @@ output includes pipe characters to build the table, and the =:results=
 header specifies the type is =raw=.
 
 #+begin_example
-#+begin_src java :results output raw
+,#+begin_src java :results output raw
   System.out.println("|1|2|3");
   System.out.println("|4|5|6");
-#+end_src
+,#+end_src
 #+end_example
 
 This is the output:
 
 #+begin_example
-#+RESULTS:
+,#+RESULTS:
 | 1 | 2 | 3 |
 | 4 | 5 | 6 |
 #+end_example
@@ -258,11 +258,11 @@ This is the output:
 The same output is achieved with the following:
 
 #+begin_example
-#+begin_src java :results value table
+,#+begin_src java :results value table
     List<List<Integer>> a = Arrays.asList(Arrays.asList(1, 2, 3),
                                           Arrays.asList(4, 5, 6));
     return a;
-#+end_src
+,#+end_src
 #+end_example
 
 *** Return a Table with Headers
@@ -272,18 +272,18 @@ hline is created the same way as it is created while editing an org
 table, by inserting a =|-= at the start of a line inside the table.
 
 #+begin_example
-#+begin_src java :results output raw
+,#+begin_src java :results output raw
   System.out.println("|col1|col2|col3");
   System.out.println("|-");
   System.out.println("|1|2|3");
   System.out.println("|4|5|6");
-#+end_src
+,#+end_src
 #+end_example
 
 This is the output:
 
 #+begin_example
-#+RESULTS:
+,#+RESULTS:
 | col1 | col2 | col3 |
 |------+------+------|
 |    1 |    2 |    3 |
@@ -296,13 +296,13 @@ to using a =List<Object>= since the header row items are =String= but
 the rest of the data items are =int=.
 
 #+begin_example
-#+begin_src java :results value table
+,#+begin_src java :results value table
   List<List<Object>> a = Arrays.asList(Arrays.asList("col1", "col2", "col3"),
                                        null,
                                        Arrays.asList(1, 2, 3),
                                        Arrays.asList(4, 5, 6));
   return a;
-#+end_src
+,#+end_src
 #+end_example
 
 ** Variables and Arguments
@@ -317,17 +317,17 @@ Pass variables with the =:var= header.  Variable types are inferred.
 This example accepts two integers and adds them:
 
 #+begin_example
-#+begin_src java :var a=1 b=2 :results output
+,#+begin_src java :var a=1 b=2 :results output
   System.out.print("sum: " + (a+b));
-#+end_src
+,#+end_src
 #+end_example
 
 This example passes a string variable:
 
 #+begin_example
-#+begin_src java :var a="some string" :results output
+,#+begin_src java :var a="some string" :results output
   System.out.print(a);
-#+end_src
+,#+end_src
 #+end_example
 
 Multi-line string literals are not supported in java.  To pass a
@@ -339,9 +339,9 @@ either case the variables are typed as =java.util.List=.  In this
 example =a= is a =List<String>=.
 
 #+begin_example
-#+begin_src java :var a='("one" "two") :results output
+,#+begin_src java :var a='("one" "two") :results output
   System.out.print(a.get(0) + " " + a.get(1));
-#+end_src
+,#+end_src
 #+end_example
 
 This example accepts a named list taken from the org buffer.  Note
@@ -351,13 +351,13 @@ the inside list contains columns.  See [[*Imports][Imports]] to find out how to
 import =List=, or why we didn't do it here.
 
 #+begin_example
-#+name: some-list
+,#+name: some-list
 - one
 - two
 
-#+begin_src java :var a=some-list :results output
+,#+begin_src java :var a=some-list :results output
   System.out.print(a.get(0).get(0) + " " + a.get(1).get(0));
-#+end_src
+,#+end_src
 #+end_example
 
 Another way to accept a list is to slice it when it is assigned.  The
@@ -365,27 +365,27 @@ Another way to accept a list is to slice it when it is assigned.  The
 =a= is a =List<String>=.
 
 #+begin_example
-#+name: some-list
+,#+name: some-list
 - one
 - two
 
-#+begin_src java :var a=some-list[,0] :results output
+,#+begin_src java :var a=some-list[,0] :results output
   System.out.print(a.get(0) + " " + a.get(1));
-#+end_src
+,#+end_src
 #+end_example
 
 The following example transposes and doubles the values in a 2x2
 table.  =a= is available as a =List<List<Integer>>=.
 
 #+begin_example
-#+name: some-table
+,#+name: some-table
 | 1 | 2 |
 | 3 | 4 |
 
-#+begin_src java :var a=some-table :results output
+,#+begin_src java :var a=some-table :results output
   System.out.println((a.get(0).get(0)*2) + " " + (a.get(1).get(0)*2));
   System.out.println((a.get(0).get(1)*2) + " " + (a.get(1).get(1)*2));
-#+end_src
+,#+end_src
 #+end_example
 
 *** Arguments
@@ -395,26 +395,26 @@ All arguments are typed as strings.
 Here is an example that passes an argument:
 
 #+begin_example
-#+begin_src java :results output :cmdargs "argument"
+,#+begin_src java :results output :cmdargs "argument"
   System.out.print(args[0]);
-#+end_src
+,#+end_src
 #+end_example
 
 Pass multiple arguments by separating them by spaces.
 
 #+begin_example
-#+begin_src java :results output :cmdargs "two arguments"
+,#+begin_src java :results output :cmdargs "two arguments"
   System.out.print(args[0] + " " + args[1]);
-#+end_src
+,#+end_src
 #+end_example
 
 In order to pass a string with spaces, quote the string twice and
 escape the inner quotes.
 
 #+begin_example
-#+begin_src java :results output :cmdargs "\"this is one argument\""
+,#+begin_src java :results output :cmdargs "\"this is one argument\""
   System.out.print(args[0]);
-#+end_src
+,#+end_src
 #+end_example
 
 ** Imports
@@ -433,23 +433,23 @@ The following classes can be used without explicitly importing them:
 This example imports a class using the =:imports= header argument:
 
 #+begin_example
-#+begin_src java :results output :imports java.util.Base64
+,#+begin_src java :results output :imports java.util.Base64
   byte[] encoded = Base64.getEncoder().encode("encoded message".getBytes());
   String decoded = new String(Base64.getDecoder().decode(encoded));
   System.out.print(String.format("encoded=%s, decoded=%s", new String(encoded), decoded));
-#+end_src
+,#+end_src
 #+end_example
 
 This is exactly equivalent, but specifies the import within the source
 code block:
 
 #+begin_example
-#+begin_src java :results output
+,#+begin_src java :results output
   import java.util.Base64;
   byte[] encoded = Base64.getEncoder().encode("encoded message".getBytes());
   String decoded = new String(Base64.getDecoder().decode(encoded));
   System.out.print(String.format("encoded=%s, decoded=%s", new String(encoded), decoded));
-#+end_src
+,#+end_src
 #+end_example
 
 ** Source and Class File Locations
@@ -473,9 +473,9 @@ source block that will override the default and compile in the babel
 temporary directory:
 
 #+begin_example
-#+begin_src java :dir 'nil :classname com.package.Greeter
+,#+begin_src java :dir 'nil :classname com.package.Greeter
   System.out.print("hello, world");
-#+end_src
+,#+end_src
 #+end_example
 
 To change the default behavior see [[*Configure Defaults][Configure Defaults]].

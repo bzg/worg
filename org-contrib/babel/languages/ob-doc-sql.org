@@ -140,8 +140,8 @@ source code block.
 
 #+begin_example
 
-#+name: quote-blks
-#+BEGIN_SRC emacs-lisp :var blk="abc" :var sep="\"\n\""
+,#+name: quote-blks
+,#+BEGIN_SRC emacs-lisp :var blk="abc" :var sep="\"\n\""
     (save-excursion
       (replace-regexp-in-string "\"\"" ""
        (mapconcat
@@ -151,7 +151,7 @@ source code block.
         (split-string blk "," t)
         sep)
        t t))
-#+END_SRC
+,#+END_SRC
 
 #+end_example
 
@@ -159,11 +159,11 @@ The query is written in a named SQL source code block:
 
 #+begin_example
 
-#+name: my-query
-#+begin_src sql
+,#+name: my-query
+,#+begin_src sql
   SELECT * FROM mytable
   WHERE id > 500
-#+end_src
+,#+end_src
 
 #+end_example
 
@@ -180,7 +180,7 @@ reference to =quote-blkes= and the SQL source code block name
 
 #+begin_example
 
-#+begin_src R :colnames yes :noweb yes
+,#+begin_src R :colnames yes :noweb yes
   library(RMySQL)
   con <- dbConnect(MySQL(), user="user", password="pwd", dbname="dbname", host="host")
   q <-
@@ -188,7 +188,7 @@ reference to =quote-blkes= and the SQL source code block name
   c <- dbGetQuery(con, q)
   dbDisconnect(con)
   c
-#+end_src
+,#+end_src
 
 #+end_example
 
@@ -211,15 +211,15 @@ Alternatively, the query could be set up to run on its own:
 
 #+begin_example
 
-#+name: my-query
-#+header: :engine mysql
-#+header: :dbhost host
-#+header: :dbuser user
-#+header: :dbpassword pwd
-#+header: :database dbname
-#+begin_src sql
+,#+name: my-query
+,#+header: :engine mysql
+,#+header: :dbhost host
+,#+header: :dbuser user
+,#+header: :dbpassword pwd
+,#+header: :database dbname
+,#+begin_src sql
   SELECT * FROM mytable
   WHERE id > 500
-#+end_src
+,#+end_src
 
 #+end_example

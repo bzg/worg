@@ -94,11 +94,11 @@ default is to return a value being this the last value from a =return=
 statement. 
 
 #+begin_example
-#+begin_src tcl
+,#+begin_src tcl
   return "Hello"
-#+end_src
+,#+end_src
 
-#+RESULTS: 
+,#+RESULTS: 
 : Hello
 #+end_example
 
@@ -109,12 +109,12 @@ To change this behavior, the keyword
 =:results output= must be written in the header. For example: 
 
 #+begin_example
-#+begin_src tcl :results output
+,#+begin_src tcl :results output
 puts "Hi"
 return "Hello"
-#+end_src 
+,#+end_src 
 
-#+RESULTS:
+,#+RESULTS:
 : Hi
 #+end_example
 
@@ -130,11 +130,11 @@ example is a program that just writes the value of the variable.
 
 #+begin_example
 #+name: reflector(x=0)
-#+begin_src tcl :results output
+,#+begin_src tcl :results output
 puts $x
-#+end_src
+,#+end_src
 
-#+RESULTS: reflector
+,#+RESULTS: reflector
 : 0
 #+end_example 
 
@@ -143,8 +143,8 @@ the named block later on with a different value will result on that
 value been written in the =#RESULTS:= For example: 
 
 #+begin_example
-#+call: reflector(20)
-#+RESULTS: reflector(20)
+,#+call: reflector(20)
+,#+RESULTS: reflector(20)
 : 20
 #+end_example
 
@@ -152,12 +152,12 @@ This is not constrained only to =:results output= headers. Procedures in
 which the result is a =value= can also be used. For example: 
 
 #+begin_example
-#+name: square(x=0)
-#+begin_src tcl :results value
+,#+name: square(x=0)
+,#+begin_src tcl :results value
 return [expr $x * $x]
-#+end_src
+,#+end_src
 
-#+RESULTS: square
+,#+RESULTS: square
 : 0
 #+end_example
 
@@ -165,9 +165,9 @@ Executing it with C-c C-c with different values will result to that value being
 returned. For example:
 
 #+begin_example
-#+call: square(x=2)
+,#+call: square(x=2)
 
-#+RESULTS: square(x=2)
+,#+RESULTS: square(x=2)
 : 4
 #+end_example 
 
@@ -175,9 +175,9 @@ Sending Tcl code as part of the parameter is also supported. For
 example: 
 
 #+begin_example
-#+call: square(x=[expr 2 + 10])
+,#+call: square(x=[expr 2 + 10])
 
-#+RESULTS: square(x=[expr 2 + 10])
+,#+RESULTS: square(x=[expr 2 + 10])
 : 144
 #+end_example 
 
@@ -186,17 +186,17 @@ structure in  Tcl is a list of lists. For example:
 
 
 #+begin_example
-#+tblname: testtbl
+,#+tblname: testtbl
 | 1 | 2 |
 | 3 | 4 |
 
-#+name: processtbl(x=0)
-#+begin_src tcl :results output
+,#+name: processtbl(x=0)
+,#+begin_src tcl :results output
 puts $x
 foreach y $x {
   puts [expr [lindex $y 0] * [lindex $y 1]]
 }
-#+end_src
+,#+end_src
 #+end_example
 
 The program prints the table as a list, add the first and second values and
@@ -204,9 +204,9 @@ writing the results. Calling this block later on in the Org document
 will result in the following output.
 
 #+begin_example
-#+call: processtbl(x=testtbl)
+,#+call: processtbl(x=testtbl)
 
-#+RESULTS: processtbl(x=testtbl)
+,#+RESULTS: processtbl(x=testtbl)
 : {1  2}  {3  4}
 : 2
 : 12
