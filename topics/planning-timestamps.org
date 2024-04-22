@@ -1,0 +1,113 @@
+:PROPERTIES:
+:ID:       04739382-d384-40ad-9a02-22646553fb9a
+:END:
+#+TITLE:      Planning timestamps
+#+SUBTITLE:   How do DEADLINE, SCHEDULED, and CLOSED timestamps differ?
+#+AUTHOR:     Adam Porter
+#+OPTIONS:    H:3 num:nil toc:t \n:nil ::t |:t ^:t -:t f:t *:t tex:t d:(HIDE) tags:not-in-toc
+#+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
+#+SEQ_TODO:   TODO(t) INPROGRESS(i) WAITING(w@) | DONE(d) CANCELED(c@)
+#+TAGS:       Write(w) Update(u) Fix(f) Check(c)
+#+LANGUAGE:   en
+#+PRIORITIES: A C B
+#+CATEGORY:   worg
+#+HTML_LINK_UP:    /worg/org-faq.html
+#+HTML_LINK_HOME:  https://orgmode.org/worg/
+
+# This file is released by its authors and contributors under the GNU
+# Free Documentation license v1.3 or later, code examples are released
+# under the GNU General Public License v3 or later.
+
+It's a commonly asked question:
+
+#+begin_center
+"When should I use DEADLINE, SCHEDULED, or plain timestamps?"
+#+end_center
+
+*Bottom line:* In Org, these various timestamps are intended to have certain meanings:
+
++ A ~DEADLINE~ timestamp is intended to mark the moment at which a task becomes overdue.
++ A ~SCHEDULED~ timestamp is intended to mark the moment at which a task becomes eligible to be worked on; in terms of the Agenda, it marks the moment at which a task begins appearing in the Agenda.  It is /not/ intended to mark the moment at which an event will actually occur (but see [[id:6f818149-b6da-4eef-bee9-dbfe04c14cb8][considerations]] below).
++ A plain timestamp in an entry's heading or body, without a /planning keyword/, marks the entry as an /appointment/, i.e. an event that happens at a certain moment on a certain date.
+
+* Explanation
+
+1. Items with a ~DEADLINE~ timestamp (set with =C-c C-d=) appear on your agenda in advance of the when they are due and remain on your Agenda until they are done.  Add a ~DEADLINE~ to an item if you want to make sure to complete it by a certain date.  (The option ~org-deadline-warning-days~ determines how far in advance items with deadlines will show up in the agenda.  See [[#warning-period-for-deadlines][this FAQ]] for more information.)
+
+   For example:
+
+   #+begin_src org
+   ,* TODO Item with a deadline
+   DEADLINE: <2009-01-20 Tue>
+   #+end_src
+
+2. ~SCHEDULED~ items (set with =C-c C-s=) will appear on your Agenda on the day they are scheduled and on every day thereafter until they are done.  Schedule a task if you want to be reminded to do something beginning on a certain day and until it is done.
+
+   For example:
+
+   #+begin_src org
+   ,* TODO Scheduled item
+   SCHEDULED: <2009-03-01 Sun>
+   #+end_src
+
+3. An /active timestamp/ (set with =C-c .=) will appear on your Agenda only on the day it is scheduled; it will appear in the time-grid at the given time, if any.  Use a timestamp for appointments or any reminders you want to show up only on a particular day.
+
+   For example:
+
+   #+begin_src org
+   ,* TODO Item with an active timestamp <2009-04-18 Sat>
+   #+end_src
+
+   Or:
+
+    #+begin_src org
+    ,* TODO Item with an active timestamp
+    <2009-04-18 Sat>
+    #+end_src
+
+*Note:* Items with inactive timestamps (set with =C-c != and marked by square brackets) will not show up in the agenda at all.
+
+* Considerations
+
+** Usability
+
+*** Editing
+
+While an entry may have any number of timestamps in its heading and body, the /planning/ timestamps (i.e. ~DEADLINE~, ~SCHEDULED~, and ~CLOSED~) have associated commands that make them easy to set and unset, both from Org buffers and Org Agenda buffers.  Other timestamps require the user to locate them in the entry in order to change them.
+
+*** Agenda
+
+The Agenda and related search tools (including third-party tools like [[https://melpa.org/#/org-ql][Org QL]]) provide support specifically for /planning/ timestamps.  These timestamps are assumed to have certain meanings, as described above.
+
+As well, timestamps anywhere in an entry can be searched for: /active timestamps/ (ones surrounded by ~<~ and ~>~) appear in the Agenda by default, while /inactive timestamps/ (ones surrounded by ~[~ and ~]~) don't (unless option ~org-agenda-include-inactive-timestamps~ is enabled).
+
+*** Configuration
+
+The option ~org-agenda-include-inactive-timestamps~ controls whether inactive timestamps in an entry causes it to appear in Agenda views.  The option may be set globally, bound locally, or bound in a configured Agenda command (see [[info:org#Setting options][org#Setting options]]).
+
+** Organization
+:PROPERTIES:
+:ID:       6f818149-b6da-4eef-bee9-dbfe04c14cb8
+:END:
+
+Organization is largely a personal matter.  Emacs and Org are tools designed to help users develop workflows to meet their needs, whatever they may be.  There's virtually no limit to creativity in this regard.  
+
+While Org was originally designed with some of its creator's personal workflows in mind, and while some of those expectations persist in the code, Org is flexible and extensible enough to support nearly any workflow imaginable.  As long as the user understands how the various commands and options interact and what they expect, there's little limit to what can be achieved.
+
+* Resources
+
+** Articles
+
+/To be added./
+
+** Discussions
+
+/There are surely many more of these that would be useful to refer to; at the time of writing, these are merely the ones at hand./
+
++ [2006-04-10 Mon] [[https://lists.gnu.org/archive/html/emacs-orgmode/2006-04/msg00036.html][[Emacs-orgmode] Use case of TIMESTAMP, SCHEDULED and DEADLINE]] :: This thread includes responses from Org's original author himself, Carsten Dominik.
++ [2024-04-21 Sun] [[https://old.reddit.com/r/emacs/comments/1c9nbn9/orgmode_scheduled_and_ranges/][`org-mode`: SCHEDULED and ranges : emacs]]
+
+* Colophon
+
+/This question has been asked frequently since Org was created.  This page is intended to become a comprehensive resource that can be shared when the question is asked.  Please feel free to add relevant blog articles to the "Articles" section, and relevant discussions to the "Discussions" one.  When adding content, please follow the patterns established in each section./
+

@@ -2906,7 +2906,7 @@ following in your .emacs:
 (setq org-agenda-show-future-repeats nil)
 #+end_src
 
-** What is the difference between SCHEDULED, DEADLINE, and plain timestamps?
+** What is the difference between ~SCHEDULED~, ~DEADLINE~, and plain timestamps?
    :PROPERTIES:
    :CUSTOM_ID: scheduled-vs-deadline-vs-timestamp
    :END:
@@ -2915,34 +2915,42 @@ following in your .emacs:
 #+index: DEADLINE
 #+index: Timestamp
 
-1. SCHEDULED items (set with =C-c C-s=) will appear on your agenda on
-   the day they are scheduled and on every day thereafter until they
-   are done. Schedule a task if you want to be reminded to do
-   something beginning on a certain day and until it is done.
+/For more detailed discussion, see [[file:topics/planning-timestamps.org][Planning timestamps]]./
 
-   : ** TODO Scheduled item
-   :    SCHEDULED: <2009-03-01 Sun>
+1. Items with a ~DEADLINE~ timestamp (set with =C-c C-d=) appear on your agenda in advance of the when they are due and remain on your Agenda until they are done.  Add a ~DEADLINE~ to an item if you want to make sure to complete it by a certain date.  (The option ~org-deadline-warning-days~ determines how far in advance items with deadlines will show up in the agenda.  See [[#warning-period-for-deadlines][this FAQ]] for more information.)
 
-2. Items with a DEADLINE timestamp (set with =C-c C-d=) appear on your
-   agenda in advance of the when they are due and remain on your
-   agenda until they are done. Add a DEADLINE to an item if you want
-   to make sure to complete it by a certain date. (The variable
-   org-deadline-warning-days determines how far in advance items with
-   deadlines will show up in the agenda. See [[#warning-period-for-deadlines][this FAQ]] for more
-   information.)
+   For example:
 
-   : ** TODO Item with a deadline
-   :    DEADLINE: <2009-01-20 Tue>
+   #+begin_src org
+   ,* TODO Item with a deadline
+   DEADLINE: <2009-01-20 Tue>
+   #+end_src
 
-3. An active timestamp (set with =C-c .=) will appear on your agenda
-   only on the day it is scheduled. Use a timestamp for appointments
-   or any reminders you want to show up only on a particular day.
+2. ~SCHEDULED~ items (set with =C-c C-s=) will appear on your Agenda on the day they are scheduled and on every day thereafter until they are done.  Schedule a task if you want to be reminded to do something beginning on a certain day and until it is done.
 
-   : ** TODO Item with an active timestamp
-   : <2009-04-18 Sat>
+   For example:
 
-Note: items with inactive timestamps (set with C-c ! and marked by
-square brackets) will not show up in the agenda at all.
+   #+begin_src org
+   ,* TODO Scheduled item
+   SCHEDULED: <2009-03-01 Sun>
+   #+end_src
+
+3. An /active timestamp/ (set with =C-c .=) will appear on your Agenda only on the day it is scheduled; it will appear in the time-grid at the given time, if any.  Use a timestamp for appointments or any reminders you want to show up only on a particular day.
+
+   For example:
+
+   #+begin_src org
+   ,* TODO Item with an active timestamp <2009-04-18 Sat>
+   #+end_src
+
+   Or:
+
+    #+begin_src org
+    ,* TODO Item with an active timestamp
+    <2009-04-18 Sat>
+    #+end_src
+
+*Note:* Items with inactive timestamps (set with =C-c != and marked by square brackets) will not show up in the agenda at all.
 
 ** Can I add files recursively to my list of agenda files?
    :PROPERTIES:
