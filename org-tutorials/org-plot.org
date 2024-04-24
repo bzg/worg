@@ -43,38 +43,45 @@ following
 First we need to make sure that org-plot is on your system and
 available to emacs.  If you have a recent version of org-mode (version
 6.07 or later) then org-plot is already included.  Otherwise you can
-grab the latest org-plot.el from [[http://github.com/eschulte/org-plot/tree/master][github/eschulte/org-plot]].  Once you
-have org-plot loaded it may be useful to bind the main plotting
-command =org-plot/gnuplot= to a key chord, I use =C-M-g= for the
-mnemonic "graph" which can be done by executing the following elisp
-snippet.  This command will be the only org-plot command needed for
-the remainder of this tutorial.
+grab the latest ~org-plot.el~ from the [[https://git.savannah.gnu.org/cgit/emacs/org-mode.git/tree/lisp/org-plot.el][Org repository]].
 
-[[elisp:(local-set-key "\M-\C-g" 'org-plot/gnuplot)]]
-
-Alright, we're now ready to start generating some graphs.
+** Key binding
+The main plotting command, =org-plot/gnuplot=, is bound to =C-c " g=.
+ This is the only org-plot command used in this tutorial.
 
 * Examples
 ** 2d plots (lines and histograms)
+*** Lines
 
-First, to plot the following table use the key sequence defined above
-=C-M-g=.  This will call =org-plot/gnuplot= which finds and plots the
-nearest table.  The options specified in any =#+PLOT= lines above the
-table are read and applied to the plot.  Notice that the second
-=#+PLOT:= line specifies labels for each column, if this line is
-removed the labels will default to the column headers in the table,
-try removing this line and re-plotting.
+To plot [[org-plot-example-1][Table 1]], execute the =org-plot/gnuplot= command.  This command
+finds and plots the nearest table.  The result, saved as a =png= file,
+is displayed in [[org-plot-example-1-plot][Figure 1]].
 
+#+NAME: org-plot-example-1-plot
+#+CAPTION: Plot of Table 1.
 [[file:../images/org-plot/example-1.png]]
 
+The options specified in any =#+PLOT= lines above the table are read
+and applied to the plot.  Notice that the second =#+PLOT= line
+specifies labels for each column; if this line is removed the labels
+will default to the column headers in the table. Here are the =#+PLOT=
+lines used to create Figure 1.
+
+#+NAME: org-plot-example-1-plot-options
+#+BEGIN_EXAMPLE
+,#+PLOT: title:"example table" ind:1 type:2d with:lines
+,#+PLOT: labels:("first new label" "second column" "last column")
+#+END_EXAMPLE
+
 For a complete list of all of the options and their meanings see the
-[[options]] section at the end of this file.  For more information on
-gnuplot options see [[http://gnuplot.sourceforge.net/documentation.html][the gnuplot documentation]], nearly all gnuplot
+[[options][options]] section at the end of this file.  For more information on
+Gnuplot options see [[http://gnuplot.sourceforge.net/documentation.html][the gnuplot documentation]], nearly all Gnuplot
 options should be accessible through org-plot.
 
+#+NAME: org-plot-example-1
+#+CAPTION: Data used to plot Figure 1.
 #+PLOT: title:"example table" ind:1 type:2d with:lines
 #+PLOT: labels:("first new label" "second column" "last column")
-#+TBLNAME:org-plot-example-1
 | independent var | first dependent var | second dependent var |
 |-----------------+---------------------+----------------------|
 |             0.1 |               0.425 |                0.375 |
@@ -107,14 +114,22 @@ options should be accessible through org-plot.
 |             2.8 |           0.1598214 |           0.18928565 |
 |             2.9 |          0.15603453 |            0.1844828 |
 
+*** Historgrams
+Org-plot can also produce histograms from 2d data.  [[org-plot-example-2-plot][Figure 2]] is
+created with the following options:
+#+begin_example
+,#+PLOT: title:"Citas" ind:1 deps:(3) type:2d with:histograms set:"yrange [0:]"
+#+end_example
+Notice that the column specified as =ind= contains textual non-numeric
+data; when this is the case org-plot will use the data as labels for
+the x-axis using the gnuplot =xticlabels()= function.
 
-Org-plot can also produce histograms from 2d data, plot the following
-table.  Notice that the column specified as =ind= contains textual
-non-numeric data, when this is the case org-plot will use the data as
-labels for the x-axis using the gnuplot =xticlabels()= function.
-
+#+NAME: org-plot-example-2-plot
+#+CAPTION: H-index of selected cities.
 [[file:../images/org-plot/example-2.png]]
 
+#+NAME: org-plot-example-2
+#+CAPTION: Example 2.
 #+PLOT: title:"Citas" ind:1 deps:(3) type:2d with:histograms set:"yrange [0:]"
 | Sede      | Max cites | H-index |
 |-----------+-----------+---------|
@@ -123,14 +138,6 @@ labels for the x-axis using the gnuplot =xticlabels()= function.
 | São Paolo |     71.00 |   11.50 |
 | Stockholm |    134.19 |   14.33 |
 | Morelia   |    257.56 |   17.67 |
-
-
-For another example of plotting histograms instead of lines, change
-the following options on the first table on this page, and replot
-1) remove the =ind:1= option
-2) replace the =with:lines= option with =with:histograms=
-
-[[file:../images/org-plot/example-3.png]]
 
 ** 3d grid plots
 
@@ -220,7 +227,7 @@ has occurred on the mailing list.[fn:1] The answer is to use this:
 #<<options>>
 
 Gnuplot options (see [[http://gnuplot.sourceforge.net/documentation.html][the gnuplot documentation]]) accessible through
-`org-plot', common gnuplot options are specifically supported, while
+=org-plot=, common gnuplot options are specifically supported, while
 all other options are accessible through specification of generic set
 commands, script lines, or specification of custom script files.
 Possible options are...
