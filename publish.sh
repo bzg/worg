@@ -12,6 +12,7 @@ This variable can be set when running publish.sh script:
 (require 'ox-html)
 (require 'cl-seq)
 (require 'htmlize)
+(require 'org-inlinetask)
 
 (setq make-backup-files nil
       debug-on-error t)
