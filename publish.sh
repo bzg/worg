@@ -70,7 +70,19 @@ This variable can be set when running publish.sh script:
   (let ((html-file (concat (file-name-directory org-file)
 			   (file-name-base org-file) ".html")))
     (if (and (file-exists-p html-file)
-	     (file-newer-than-file-p html-file org-file))
+	     (file-newer-than-file-p html-file org-file)
+             ;; If there are include files or code, we need to
+             ;; re-generate the HTML just in case if the included
+             ;; files are changed.
+             (with-temp-buffer
+               (insert-file-contents org-file)
+               (and
+		(save-excursion
+		  (goto-char (point-min))
+		  (not (re-search-forward "#\\+include:" nil t)))
+                (save-excursion
+		  (goto-char (point-min))
+		  (not (re-search-forward "#\\+begin_src" nil t))))))
 	(message " [skipping] unchanged %s" org-file)
       (message "[exporting] %s" (file-relative-name org-file default-directory))
       (with-current-buffer (find-file org-file)
