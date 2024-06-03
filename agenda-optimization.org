@@ -21,9 +21,9 @@ tips that depend on a specific version of Org, we mention this version.
 * Reduce the number of Org agenda files
 
 The more agenda files, the more time it takes to check all of them before
-producing an agenda command.  The older your hardrive is, the longer it
-takes to visit a file.  Don't buy a new harddrive now!  Just reduce the
-number of agenda files.
+producing an agenda command.  When Emacs opens a new file, it may do a
+lot of work, like activating all kinds of minor modes you installed -
+it can take a considerable time when the number of agenda files is in hundreds[fn:1].
 
 Also, don't forget that you can define the set of agenda files for each
 agenda custom command like this:
@@ -33,6 +33,10 @@ agenda custom command like this:
         '((" " "Aujourd'hui" agenda "List of rendez-vous and tasks for today"
            ((org-agenda-files '("~/org/rdv.org" "~/org/bzg.org"))))))
 #+END_SRC
+
+[fn:1] Emacs 30 is somewhat better in opening large number of files,
+but will still take a long time when the number of agenda files is
+over a thousand.
 
 * Reduce the number of DONE and archived headlines
 
@@ -77,64 +81,3 @@ file for the first time, use this:
 The side-effect is that newly visited file will have all their headlines
 visible, but this speeds up agenda generation /a lot/ when those files have
 many nested headlines.
-
-* Disable tag inheritance in agendas (Org > 8.0)
-
-#+INDEX: Tag inheritance
-#+INDEX: org-use-tag-inheritance
-#+INDEX: org-agenda-use-tag-inheritance
-#+INDEX: org-agenda-show-inherited-tags
-
-Defining inherited tags for a headline in the agenda takes time, because
-Org needs will grab inherited tags from higher level headlines.
-
-Whether the agenda knows about inherited tags for each task depends on
-[[doc::org-use-tag-inheritance][org-use-tag-inheritance]] and [[doc::org-agenda-use-tag-inheritance][org-agenda-use-tag-inheritance]]:
-
-- [[doc::org-use-tag-inheritance][org-use-tag-inheritance]] controls whether tags are inherited for tags-type
-  agenda commands: =tags=, =tags-todo= and =tags-tree=.  This variable also
-  controls whether tags are inherited when running the command =M-x
-  org-sparse-tree RET= in an Org buffer (hence the name of this variable,
-  without the =org-agenda-= prefix.)
-
-- [[doc::org-agenda-use-tag-inheritance][org-agenda-use-tag-inheritance]] controls whether tags are inherited for
-  other agenda types too: =todo=, =search=, =timeline=, =agenda=.
-
-  Generally, you want this variable to be nil, because the headlines on
-  those agenda types don't depend on tags (and /a fortiori/ on inherited
-  ones.)  Still, the default is to use tags in all agenda types, because
-  [[doc::org-agenda-show-inherited-tags][org-agenda-show-inherited-tags]] needs to do the right thing by default.
-
-What to do?  If you don't need inherited tags in
-todo/search/timeline/agenda, just use this setting:
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-use-tag-inheritance nil)
-#+END_SRC
-
-If you need tags in todo agendas only:
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-use-tag-inheritance '(search timeline agenda))
-#+END_SRC
-
-You can also set this on a per-command basis:
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-custom-commands
-        '((" " "Aujourd'hui" agenda "List of rendez-vous and tasks for today"
-           ((org-agenda-files '("~/org/rdv.org" "~/org/bzg.org"))
-            (org-agenda-use-tag-inheritance nil)))))
-#+END_SRC
-
-* Disable parsing for some drawer properties
-
-Text properties are used to prepare buffers for effort estimates,
-appointments, and subtree-local categories in the agenda.  If you
-don't use some of these agenda features, you can turn them off.
-Since using such drawer properties require a special scan before each
-new agenda command, this can lead to a speedup. For example
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-ignore-drawer-properties '(effort appt category))
-#+END_SRC
