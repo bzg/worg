@@ -110,6 +110,7 @@ There are 11 SQLite-specific header arguments.
                 SQLite `list' output mode and by the SQLite dot command
                 =.import=. 
  - nullvalue :: a string to use in place of NULL values.
+ - readonly :: if yes, open the database in readonly mode.
 
 *** Variables 
 
@@ -252,3 +253,23 @@ where exists (select * from updates where updates.id = bookreview.id);
 By editing the intermediary table to replace "null" values with a
 numerical rating, and then running the second source block, the SQLite
 table will be updated correctly.
+
+** Open database in read-only mode
+
+Sometimes it is useful to open the database in readonly mode to make sure no
+modifications are made to it.
+
+#+BEGIN_EXAMPLE
+,#+begin_src sqlite :readonly yes :db /tmp/test.db
+create table atable(a int, b int);
+,#+end_src
+#+END_EXAMPLE
+
+Attempting to run this block will generate the following error:
+
+#+BEGIN_EXAMPLE
+Runtime error near line 2: attempt to write a readonly database (8)
+[ Babel evaluation exited with code 1 ]
+#+END_EXAMPLE
+
+
