@@ -553,6 +553,18 @@ of whether a =:session= is declared.
 =:cmdline <arg_1> ... [arg_n]=
 
 Use the =:cmdline= header arg to pass arguments to a shell command.
+The arguments are passed verbatim as
+: <system shell> -c <temporary file with src block contents> <arguments>
+
+#+begin_warningbox
+=:cmdline= is used verbatim and is interpreted by shell.  Org mode
+does not prevent shell expansion/interpretation.  This, for example,
+means that
+: #+begin_src sh :cmdline arg ; touch /tmp/not-an-arg
+: ...
+: #+end_src
+will evaluate =touch= command as well.
+#+end_warningbox
 
 #+begin_warningbox
 When =:cmdline= is used, the block is evaluated in a temporary shell,
