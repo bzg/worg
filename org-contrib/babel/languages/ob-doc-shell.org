@@ -159,6 +159,24 @@ Run commands in separate shells...[fn:3]
 Shell blocks can accept args, work with stdin, be tangled, use noweb,
 and more[fn:4].
 
+Some commands try to read standard input if it is available.
+In interactive sessions it may be hidden due to time interval between typed
+commands, but be careful when they are used in scripts Org source blocks.
+[[https://mywiki.wooledge.org/BashFAQ/089][BASH FAQ #89]]
+warns concerning =ssh= and =ffmpeg=.  Either explicitly specify
+=</dev/null= as input or use here-document syntax.
+
+#+begin_example
+ssh example.org 'sed -i -e s/foo/bar/ file.txt' </dev/null
+ssh example.org 'tee >>file.log' <<"EOF"
+Added by org-babel
+EOF
+#+end_example
+
+(Quotes around "EOF" delimiter suppress variable expansion in the text.)
+Tools may have dedicated options,
+for example =ssh -n= is a more concise way to avoid the pitfall.
+
 * Requirements and Setup
 # - Installation and configuration of language software
 # - Emacs configuration
