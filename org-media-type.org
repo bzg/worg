@@ -1,0 +1,37 @@
+#+title: Org Media Type
+#+author: Joseph Turner
+#+options: toc:t ':t author:nil
+#+language: en
+#+category: worg
+#+bind: sentence-end-double-space t
+#+html_link_up:    index.html
+#+html_link_home:  https://orgmode.org/worg/
+
+#+begin_comment
+This file is released by its authors and contributors under the GNU
+Free Documentation license v1.3 or later, code examples are released
+under the GNU General Public License v3 or later.
+#+end_comment
+
+* Introduction
+
+This page tracks information about the ~.org~ extension media type.
+
+Based on [[https://yhetil.org/orgmode/6d94fff4-4d30-4121-bfd1-f267cb5b637c@gmail.com/][this thread on the Org mode mailing list]], the consensus is
+that the ~.org~ file extension should map to the ~text/org~ MIME type.
+
+Until the [[file:org-syntax.org][Org syntax spec]] is complete and a proposal submitted to and
+approved by IANA, we can ask downstream MIME libraries to override
+~applicaion/vnd.lotus-organizer~ with ~text/org~.
+
+* Downstream MIME Libraries
+
+** jshttp/mime-db - NodeJS
+
+[[https://github.com/jshttp/mime-db][jshttp/mime-db]] is the de facto standard MIME database for NodeJS.
+[[https://github.com/jshttp/mime-db/commit/5797174e5434a8d2978d9fdc13ec6a47ba20a02f][This commit]] adds a mapping from ~.org~ to ~text/x-org~, but the two
+popular NodeJS utilities for getting a MIME type from a file
+extension, [[https://github.com/jshttp/mime-types][jshttp/mime-types]] and [[https://github.com/broofa/mime][broofa/mime]], return
+~applicaion/vnd.lotus-organizer~.  Both libraries return only the
+highest preference media type, and IANA-sourced media types are
+preferred over other types.
