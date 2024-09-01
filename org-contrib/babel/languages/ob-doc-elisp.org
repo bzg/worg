@@ -301,3 +301,345 @@ But passing =hetero-table= through =all-to-string= in the header argument ensure
 #+RESULTS: pass-to-all-to-string
 | t | t | t | t |
 | t | t | t | t |
+
+** Tangling with Variables
+#+property: header-args :noweb no-export :lexical yes
+#+property: header-args:sh :results verbatim :eval never
+If you are tangling an elisp source block which accepts a =:var=
+variable, there are some issues to consider.  ([[*Setup][note]])
+
+Let's say you have an e-lisp source code block something like this.
+(The =<<lex_check>>= is a noweb fragment; see [[*lex_check][below]]):
+
+#+begin_src org
+
+  ,#+begin_src elisp :tangle worgx.el
+  ;;; ...  -*- lexical-binding: t -*-
+
+  (require 'cl-lib)
+
+  (cl-defstruct struct
+    (name nil))
+
+  (let ((worg-x "Bill"))
+    <<lex_check>>
+    (let ((str (make-struct :name worg-x)))
+      (message (struct-name str))))
+  ,#+end_src
+#+end_src
+
+But now you decide to pass the value of the =worg-x= variable using a
+=:var= construct on the header line, something like this:
+
+#+begin_src org
+
+  ,#+begin_src elisp :var worg-x-value="Bill" :tangle worgx2.el
+  ;;; ...  -*- lexical-binding: t -*-
+
+  (require 'cl-lib)
+
+  (cl-defstruct struct
+    (name nil))
+
+  (let ((worg-x worg-x-value))
+    <<lex_check>>
+    (let ((str (make-struct :name worg-x)))
+      (message (struct-name str))))
+  ,#+end_src
+#+end_src
+
+Now, the tangled file will look something like this
+
+#+begin_src elisp
+  (let ((worg-x-value '"Bill"))
+  ;;; ...  -*- lexical-binding: t -*-
+
+  (require 'cl-lib)
+
+  (cl-defstruct struct
+    (name nil))
+
+  (let ((worg-x worg-x-value))
+    ;; check to make sure lexical-binding has been enabled...
+
+    (defun lex-indirect ()
+      (let ((worg-x "Jill"))
+        (ignore worg-x)
+        (if (fboundp 'lex-check)
+            (lex-check))))
+
+    (defun lex-check ()
+      worg-x)
+
+    (if (and (fboundp 'lex-check) (fboundp 'lex-indirect))
+        (cl-assert (equal (lex-check) (lex-indirect))))
+
+    (let ((str (make-struct :name worg-x)))
+      (message (struct-name str))))
+  )
+#+end_src
+
+Evaluating this code results in
+: Assertion failed: (equal (lex-check) (lex-indirect))
+
+
+The code had expected to have lexical binding enabled, but it is no
+longer enabled, as the first line of the file no longer contains the
+magical =-*- lexical-binding: t -*-= to enable lexical binding:
+org-mode has embedded all the code in a =let= construct in order to
+pass the value of the variable =worg-x-value=, and that includes the
+directive enabling lexical binding.
+
+To keep the variable, but make sure lexical binding is enabled, we
+might do something like this
+#+begin_src org
+
+  ,#+begin_src sh :eval never-export :results none
+  (echo ';;; --- -*- lexical-binding: t -*-' && cat worgx2.el) > worgx2l.el
+  ,#+end_src
+#+end_src
+
+Now all is well again.  Or, is it?
+
+#+begin_src org
+
+  ,#+begin_src sh :results org :eval never-export
+    (
+        echo run worgx2l.el
+        echo
+        emacs --batch -l worgx2l.el
+        echo && echo
+        echo now, byte compile worgx2l.el
+        echo
+        emacs --batch -f batch-byte-compile worgx2l.el
+        echo && echo
+        echo and, run worgx2l.elc
+        echo
+        emacs --batch -l worgx2l.elc
+    ) 2>&1
+  ,#+END_SRC
+#+end_src
+
+#+begin_src org
+  run worgx2l.el
+
+  Bill
+
+
+  now, byte compile worgx2l.el
+
+
+  In toplevel form:
+  worgx2l.el:7:15: Warning: reference to free variable ‘struct’
+
+  In end of data:
+  worgx2l.el:26:15: Warning: the function ‘struct-name’ is not known to be defined.
+  worgx2l.el:25:15: Warning: the function ‘make-struct’ is not known to be defined.
+  worgx2l.el:8:4: Warning: the function ‘name’ is not known to be defined.
+  worgx2l.el:7:2: Warning: the function ‘cl-defstruct’ might not be defined at runtime.
+
+
+  and, run worgx2l.elc
+
+  Symbol’s value as variable is void: struct
+
+  Error: void-variable (struct)
+    byte-code("\301\302!\210\303\10\304\305!\"\210\306\307\310\"\210\306\311\312\313\314\"\"\210\315\311!\203,\0\315\307!\203,\0\316\311 \307 \232!\210\317\320\314\"\321\322\2!!\210\207" [struct require cl-lib cl-defstruct name nil defalias lex-indirect #f(compiled-function () #<bytecode -0x30e31725c738c20>) lex-check make-closure #f(compiled-function () #<bytecode 0xaffa5f1a9bb9>) "Bill" fboundp cl-assert make-struct :name message struct-name] 5)
+    command-line-1(("-l" "worgx2l.elc"))
+    command-line()
+    normal-top-level()
+#+end_src
+
+We are using lexical binding, but there is still some problem.
+
+Here's why: As a result of passing the variable =worg-x-value= by
+embedding the code of the source block in a =let= construct, the
+=(require 'cl-lib)= (in this example) is no longer at the *top level*
+of the resulting source.  This means that when the source is byte
+compiled, the byte compiler will *not* learn about any macros defined
+in, in this case, =cl-lib=, which can cause warnings or even errors.
+In the case of the above source, loading the byte compiled file
+results in an error.
+
+We can deal with these errors when byte compiling by surrounding the
+=(require 'cl-lib)= statement with =eval-and-compile=, such as
+
+#+begin_src org
+
+  ,#+begin_src elisp :var worg-x-value="Bill" :tangle worgx3.el
+    ;;; ...  -*- lexical-binding: t -*-
+
+    (eval-and-compile
+      (require 'cl-lib))
+
+    (cl-defstruct struct
+      (name nil))
+
+    (let ((worg-x worg-x-value))
+      <<lex_check>>
+      (let ((str (make-struct :name worg-x)))
+        (message (struct-name str))))
+  ,#+end_src
+#+end_src
+
+#+begin_src org
+
+  ,#+begin_src sh :eval never-export :results none
+  (echo ';;; --- -*- lexical-binding: t -*-' && cat worgx3.el) > worgx3l.el
+  ,#+end_src
+#+end_src
+
+#+begin_src org
+
+  ,#+begin_src sh :eval never-export :results org
+    (
+        echo run worgx3l.el
+        echo
+        emacs --batch -l worgx3l.el
+        echo && echo
+        echo now, byte compile worgx3l.el
+        echo
+        emacs --batch -f batch-byte-compile worgx3l.el
+        echo && echo
+        echo and, run worgx3l.elc
+        echo
+        emacs --batch -l worgx3l.elc
+    ) 2>&1
+  ,#+END_SRC
+#+end_src
+
+#+begin_src org
+  run worgx3l.el
+
+  Bill
+
+
+  now, byte compile worgx3l.el
+
+
+
+  and, run worgx3l.elc
+
+  Bill
+#+end_src
+
+
+All good.
+
+However ...
+
+There is another way around both problems, falling back on [[https://en.wikipedia.org/wiki/Indirection][an old
+computer science saying]] (often attributed to Butler Lampson) that
+there is no problem in computer science that can't be solved by using
+an extra level of indirection.
+
+The idea is to use =<<noweb>>= syntax to pull into the source code
+block of interest the *results* of a new source code block which
+- receives the value from a header =:var= argument
+- produces that value as its result
+- is *not* itself tangled (just supplies a value to a source code
+  block that *is* tangled)
+
+#+name: intervar
+#+begin_src org
+
+  ,#+begin_src elisp :var x="Bill"
+    (format "\"%s\"" x)
+  ,#+end_src
+#+end_src
+
+Then, the results of that function are brought into the source block
+of interest using =<<noweb()>>=, i.e., the version of =<<noweb>= that
+inserts the results of the evaluation of the named source block,
+rather than the contents of the source block itself.
+
+#+begin_src org
+
+  ,#+begin_src elisp :tangle worgx4.el
+    ;;; ...  -*- lexical-binding: t -*-
+
+    (require 'cl-lib)
+
+    (cl-defstruct struct
+      (name nil))
+
+    (let ((worg-x <<intervar()>>))
+      <<lex_check>>
+      (let ((str (make-struct :name worg-x)))
+        (message (struct-name str))))
+  ,#+end_src
+#+end_src
+
+If the above two blocks have been evaluated, evaluating the following
+block will show no errors.
+
+#+begin_src org
+
+  ,#+begin_src sh :results verbatim :eval never-export
+    (
+        echo
+        echo compile worgx4.el
+        emacs --batch -f batch-byte-compile worgx4.el
+        echo
+        echo load worgx4.elc
+        emacs --batch -l worgx4.elc
+        echo
+        echo done
+    ) 2>&1
+  ,#+end_src
+#+end_src
+
+: 
+: compile worgx4.el
+: 
+: load worgx4.elc
+: Bill
+: 
+: done
+
+
+This method is maybe more cumbersome, but taste is intensely personal.
+An advantage of this method is that there is no need for an extra step
+to replace the header enabling lexical binding, as in this case, with
+no =:var= in the header, the source code block is tangled with the
+header still in the first line.
+*** Notes
+**** Setup
+
+By the way, the node for [[*Tangling with Variables][this section]] starts with the following
+
+#+begin_src org
+  ,#+property: header-args :noweb no-export :lexical yes
+  ,#+property: header-args:sh :results verbatim :eval never
+  ,#+options: ^:{}
+#+end_src
+
+Also, the elisp and shell source blocks have mostly been processed to
+wrap them inside org source blocks, to expose the =#+begin_src= lines.
+**** lex_check
+
+This is a =<<noweb>>= fragment, named =<<lex_check>>=, we use for
+expository purposes to check whether a code block is running with
+lexical binding (rather than dynamic binding).
+
+#+name: lex_check
+#+begin_src org
+
+  ,#+begin_src elisp
+  ;; check to make sure lexical-binding has been enabled...
+
+  (defun lex-indirect ()
+    (let ((worg-x "Jill"))
+      (ignore worg-x)
+      (if (fboundp 'lex-check)
+          (lex-check))))
+
+  (defun lex-check ()
+    worg-x)
+
+  (if (and (fboundp 'lex-check) (fboundp 'lex-indirect))
+      (cl-assert (equal (lex-check) (lex-indirect))))
+
+  ,#+end_src
+#+end_src
+
