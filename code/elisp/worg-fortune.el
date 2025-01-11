@@ -3,7 +3,6 @@
 ;; Copyright (C) 2011 Bastien Guerry, Inc.
 ;;
 ;; Author: Bastien Guerry <bzg AT gnu DOT org>
-;; Maintainer: Bastien Guerry <bzg AT gnu DOT org>
 ;; Keywords: org, worg, quote, fortune
 ;; Description: export Worg quotes into fortune file
 
